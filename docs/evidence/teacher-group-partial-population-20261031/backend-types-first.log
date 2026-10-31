@@ -1,0 +1,18 @@
+src/modules/huiteacher/numericGroupReport.service.ts(92,15): error TS18048: 'p.metrics' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(104,24): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(o: { [s: string]: ReportingMetricProjectionV1; } | ArrayLike<ReportingMetricProjectionV1>): [string, ReportingMetricProjectionV1][]', gave the following error.
+    Argument of type 'Record<string, ReportingMetricProjectionV1> | undefined' is not assignable to parameter of type '{ [s: string]: ReportingMetricProjectionV1; } | ArrayLike<ReportingMetricProjectionV1>'.
+      Type 'undefined' is not assignable to type '{ [s: string]: ReportingMetricProjectionV1; } | ArrayLike<ReportingMetricProjectionV1>'.
+  Overload 2 of 2, '(o: {}): [string, any][]', gave the following error.
+    Argument of type 'Record<string, ReportingMetricProjectionV1> | undefined' is not assignable to parameter of type '{}'.
+      Type 'undefined' is not assignable to type '{}'.
+src/modules/huiteacher/numericGroupReport.service.ts(106,31): error TS18048: 'm.validN' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(106,65): error TS18048: 'm.missingN' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(111,31): error TS18048: 'p.eligibleN' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(111,43): error TS18048: 'p.resultContributorN' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(111,69): error TS18048: 'p.eligibleN' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(111,81): error TS18048: 'p.resultContributorN' is possibly 'undefined'.
+src/modules/huiteacher/numericGroupReport.service.ts(191,55): error TS2339: Property 'minimumCohortN' does not exist on type 'ReportingAnalysisSpecDefinitionV1'.
+  Property 'minimumCohortN' does not exist on type 'ReportingProtectedFeedbackSpecV1'.
+src/modules/huiteacher/numericGroupReport.service.ts(191,86): error TS2339: Property 'minimumContributorN' does not exist on type 'ReportingAnalysisSpecDefinitionV1'.
+  Property 'minimumContributorN' does not exist on type 'ReportingIndividualLongitudinalSpecV1'.

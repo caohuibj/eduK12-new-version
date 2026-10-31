@@ -1,22 +1,29 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {EducationPersonalChanges} from '../modules/reporting/EducationPersonalTracking'
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { BookOpen, CalendarCheck2, ClipboardList, FileText, RefreshCw, ArrowLeft, Clock3 } from 'lucide-react'
-import { EducationScalePersonalReport, type EducationScalePersonalReportData } from '../components/education-tools/EducationScalePersonalReport'
+import { createEducationAssessmentFeedback } from '../components/education-tools/educationAssessmentFeedbackAdapter'
+import { EducationTaskFeedback, type EducationFeedbackData } from '../components/education-tools/EducationTaskFeedback'
 import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollectionControls'
 import {schoolSearchText,schoolDeadline} from './school-collection'
 import {workspaceHref} from './school-navigation'
 import type { SchoolApi } from './SchoolRecovery'
-import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
+import {deferredPage} from '../components/page-loading/deferredPage'
+import type {CampusExecutionRef} from './SchoolCompositeRunner'
+
+const SchoolCompositeRunner=deferredPage(async()=>({default:(await import('./SchoolCompositeRunner')).SchoolCompositeRunner}),{
+ label:'返回任务列表',run:props=>props.onExit(),
+})
 
 export type SchoolTask={
   id:string;activityId:string;activityTitle:string
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
-  deadline:string|null;href:string|null;resourceFamily?:string
+  deadline:string|null;href:string|null;resourceFamily?:string;feedbackNamespace?:'EDUCATION_ASSESSMENT'
+  feedbackMode?:'COMPOSITION'
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 export type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
-type StudentFinalFeedback=EducationScalePersonalReportData
 type TaskDetails={
   id:string;title:string;description?:string|null;content?:string|null
   mySubmission?:{content?:string|null;status:string}|null
@@ -30,7 +37,11 @@ const kinds:Record<SchoolTask['kind'],string>={
   ASSIGNMENT:'活动练习',READING:'阅读材料',CHECKIN:'活动记录',MEASUREMENT:'正式测评',
 }
 
-export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:string}) {
+export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;activityId?:string;onNavigate?:(page:string,activityId?:string)=>void}) {
+  const navigate=(event:MouseEvent<HTMLAnchorElement>,page:string)=>{
+    if(!onNavigate||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
+    event.preventDefault();onNavigate(page)
+  }
   const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
   const [page,setPage]=useState(1)
   const [items,setItems]=useState<TaskPage|null>(null)
@@ -42,12 +53,14 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   const [busy,setBusy]=useState(false)
   const [execution,setExecution]=useState<CampusExecutionRef|null>(null)
   const [studentReference,setStudentReference]=useState<string|null>(null)
-  const [feedback,setFeedback]=useState<{executionId:string;title:string;data:StudentFinalFeedback}|null>(null)
-  const feedbackEpoch=useRef(0)
+  const [feedback,setFeedback]=useState<{scope:object;task:SchoolTask}|null>(null)
+  const executionRef=useRef(execution);executionRef.current=execution
+  const executionScope=useRef<object|null>(null)
+  const executionTask=useRef<{scope:object;task:SchoolTask}|null>(null)
   const [loading,setLoading]=useState(false)
   const [listError,setListError]=useState('')
   const [retryPage,setRetryPage]=useState(1)
-  const scope=useMemo(()=>({pending:false,submitting:false}),[api,activityId])
+  const scope=useMemo(()=>({api,activityId,pending:false,submitting:false}),[api,activityId])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
   const detailRef=useRef<HTMLDivElement>(null)
@@ -59,7 +72,6 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   },[selected,details])
   const load=useCallback(async(targetPage:number)=>{
     if(currentScope.current!==scope||scope.pending)return
-    feedbackEpoch.current+=1;setFeedback(null)
     scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage)
     try{
       const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'+(activityId?'&activityId='+encodeURIComponent(activityId):''))
@@ -73,11 +85,11 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   },[api,scope,activityId])
   useEffect(()=>{
     currentScope.current=scope
-    feedbackEpoch.current+=1;setFeedback(null);setItems(null);setPage(1)
+    setFeedback(null);setItems(null);setPage(1)
     setSelected(null);setDetails(null);setAnswer('');setExecution(null);setError('');setNotice('');setQuery('');setSort('recommended')
     setStudentReference(null);setBusy(false)
     void load(1)
-    return ()=>{currentScope.current=null;feedbackEpoch.current+=1}
+    return ()=>{currentScope.current=null}
   },[load,scope])
   useEffect(()=>{
     let live=true
@@ -98,15 +110,28 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     }catch(err){if(currentScope.current===scope)setError(err instanceof Error?err.message:'活动材料不可访问')}
     finally{if(currentScope.current===scope)setBusy(false)}
   }
-  const showFeedback=async(task:SchoolTask)=>{
-    const token=++feedbackEpoch.current
-    setFeedback(null);setError('')
-    try{
-      const data=await api<StudentFinalFeedback>('/reports/student/executions/'+task.id)
-      if(currentScope.current===scope&&token===feedbackEpoch.current)setFeedback({executionId:task.id,title:task.title,data})
-    }catch(err){
-      if(currentScope.current===scope&&token===feedbackEpoch.current)setError(err instanceof Error?err.message:'该测评目前没有允许查看的个人反馈')
-    }
+  const visibleFeedback=feedback?.scope===scope?feedback:null
+  const visibleExecution=executionScope.current===scope?execution:null
+  const showFeedback=(task:SchoolTask)=>{
+    if(currentScope.current===scope){setFeedback({scope,task});setError('')}
+  }
+  const feedbackWasOpen=useRef(false)
+  useEffect(()=>{
+    if(!visibleFeedback&&feedbackWasOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
+    feedbackWasOpen.current=Boolean(visibleFeedback)
+  },[visibleFeedback])
+  const renderAssessmentFeedback=useMemo(()=>createEducationAssessmentFeedback({api,entry:'SCHOOL'}),[api])
+  const feedbackExecutionId=visibleFeedback?.task.id
+  const readFeedback=useCallback(()=>api<EducationFeedbackData>(
+    '/reports/student/executions/'+feedbackExecutionId),[api,feedbackExecutionId])
+  const finishExecution=()=>{
+    const active=executionRef.current
+    if(currentScope.current!==scope||!active||active!==execution)return
+    executionRef.current=null;setExecution(null)
+    const task=executionTask.current?.scope===scope&&executionTask.current.task.id===active.executionId?executionTask.current.task:undefined
+    setNotice('本次测评已完成，正式提交已确认。')
+    if(task&&task.resourceFamily!=='FORM')showFeedback(task)
+    void load(page)
   }
   const submit=async()=>{
     if(!selected||!details||selected.status==='COMPLETED'||scope.submitting||currentScope.current!==scope)return
@@ -126,12 +151,12 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   }
   const partial=Boolean(items&&(items.total>items.list.length||items.hasMore||items.truncated))
   const visibleTasks=(items?.list??[]).filter(task=>schoolSearchText(task.title+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
-  return <section className={'hs-panel hs-task-view hs-student-tasks'+(!selected&&!execution&&!feedback?' hs-student-task-index':'')}>
+  return <section className={'hs-panel hs-task-view hs-student-tasks'+(!selected&&!visibleExecution&&!visibleFeedback?' hs-student-task-index':'')}>
     <div className={selected?'hs-student-task-navigation':undefined}>
     {selected&&<button type="button" className="hs-student-detail-back" disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button>}
-    <details className="hs-task-inbox" open={!(selected||execution||feedback)}>
-    <summary hidden={!(selected||execution||feedback)}>查看任务列表</summary>
-    <div className="hs-student-task-trail"><a href={workspaceHref('overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')}>查看全部任务</a>}</div>
+    <details className="hs-task-inbox" open={!(selected||visibleExecution||visibleFeedback)}>
+    <summary hidden={!(selected||visibleExecution||visibleFeedback)}>查看任务列表</summary>
+    <div className="hs-student-task-trail"><a href={workspaceHref('overview')} onClick={event=>navigate(event,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')} onClick={event=>navigate(event,'tasks')}>查看全部任务</a>}</div>
     <header className="hs-student-task-heading"><div><h1 ref={inboxTitle} tabIndex={-1}>我的校园任务</h1><p>{activityId&&items?.list[0]?.activityTitle?items.list[0].activityTitle:'学校已开放的活动任务'}</p></div>
     {items?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索本页任务':'检索任务'} placeholder="搜索任务名称或活动名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}/>:<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}</header>
 
@@ -158,7 +183,9 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
               task.href&&['PENDING','IN_PROGRESS'].includes(task.status)?
                 <button disabled={busy} onClick={()=>{
                   const parts=task.href!.match(/^\/organizations\/([^/]+)\/activities\/([^/]+)\/runs\/([^/]+)\/executions\/([^/]+)$/)
+                  setFeedback(null);setNotice('')
                   if(!parts){setError('正式测评路径无效，请刷新后重试');return}
+                  executionScope.current=scope;executionTask.current={scope,task}
                   setExecution({organizationId:parts[1],courseId:parts[2],
                     runId:parts[3],executionId:parts[4],
                     resumeExisting:task.canResumeExisting===true,consentRequired:task.consentRequired,
@@ -184,24 +211,16 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     {items?.truncated&&<p className="hs-collection-summary">部分历史任务较多，请联系学校管理员。</p>}
     </details>
     </div>
-    {!selected&&(execution||feedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
-    {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
-      <h3>{feedback.title} · 我的反馈</h3>
-      {feedback.data.kind!==undefined?<EducationScalePersonalReport key={feedback.executionId} data={feedback.data}
-        api={api} executionId={feedback.executionId} entry="SCHOOL"/>:<>
-      {feedback.data.state==='COMPLETED'&&
-        <p>你的作答已完成。当前测评仅允许展示完成状态，不提供分数或诊断。</p>}
-      {feedback.data.state==='WITHHELD'&&
-        <p>当前反馈暂不适合公开，或尚未达到科学与隐私披露条件。如有疑问，可联系学校心理教师。</p>}
-      {feedback.data.state==='READY'&&
-        <p>结果已经生成，但针对学生的逐工具解释尚未完成科学与适龄内容审核，因此这里不会直接展示指标代码、分数或诊断推论。</p>}
-      {feedback.data.message&&<p className="hs-multiline">{feedback.data.message}</p>}
-      </>}
-      <button onClick={()=>{feedbackEpoch.current+=1;setFeedback(null)}}>关闭我的反馈</button>
-    </div>}
-    {execution&&<SchoolCompositeRunner api={api} execution={execution} title={items?.list.find(task=>task.id===execution.executionId)?.title}
+    {!selected&&(visibleExecution||visibleFeedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
+    {visibleFeedback&&(visibleFeedback.task.feedbackNamespace==='EDUCATION_ASSESSMENT'?
+      renderAssessmentFeedback({executionId:visibleFeedback.task.id,title:visibleFeedback.task.title,mode:visibleFeedback.task.feedbackMode,onClose:()=>setFeedback(null)}):
+      <EducationTaskFeedback key={visibleFeedback.task.id} entry="SCHOOL"
+      executionId={visibleFeedback.task.id} title={visibleFeedback.task.title} api={api}
+      loadFeedback={readFeedback} onClose={()=>setFeedback(null)}/>)}
+    {visibleFeedback&&['SCALE','COGNITIVE','SITUATIONAL','BUNDLE'].includes(visibleFeedback.task.resourceFamily??'')&&<EducationPersonalChanges key={'changes:'+visibleFeedback.task.id} entry="SCHOOL" api={api} executionId={visibleFeedback.task.id}/>}
+    {visibleExecution&&<SchoolCompositeRunner key={visibleExecution.executionId} api={api} execution={visibleExecution} title={executionTask.current?.scope===scope?executionTask.current.task.title:undefined}
       onExit={()=>setExecution(null)}
-      onFinished={()=>{setExecution(null);void load(page)}}/>}
+      onFinished={finishExecution} onParentCompleted={finishExecution}/>}
     {selected&&details&&<div className="hs-task-detail hs-student-task-detail" ref={detailRef} tabIndex={-1} role="region" aria-label={details.title}>
       <header className="hs-student-detail-header"><p className="hs-student-detail-kicker">{selected.activityTitle} · {kinds[selected.kind]}</p><h1>{details.title}</h1>
         {details.description&&<p className="hs-student-detail-description">{details.description}</p>}

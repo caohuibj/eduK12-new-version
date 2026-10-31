@@ -1,0 +1,1429 @@
+{
+  "schemaVersion": 1,
+  "candidate": "education-observer-native-20261029",
+  "repository": "caohuibj/eduK12-new-version",
+  "branch": "release/education-observer-native-20261029",
+  "enabled": true,
+  "base": "f39a00f12fed2e1b8e1d3cc45185969262925ed8",
+  "frozenDevelopmentHead": "25606ccd895c7059e8b391ee7570e932140e0568",
+  "productHead": "25606ccd895c7059e8b391ee7570e932140e0568",
+  "frontendTree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a",
+  "backendTree": "3a3efff9479ab3964a5b6af0963bcc643866b802",
+  "source": {
+    "docs/development/education-observer-native-ci.md": {
+      "before": "",
+      "after": "850ebfaf37f1434e4e983999160abe17ec334d7d"
+    },
+    "server-version/backend/prisma/migrations/20261028230000_education_scientific_definition_hash/migration.sql": {
+      "before": "",
+      "after": "c4390fce2d69d2c00cb937341c3dff20b1ee4f5e"
+    },
+    "server-version/backend/prisma/migrations/20261029010000_education_observer_composition/migration.sql": {
+      "before": "",
+      "after": "694ac5c77b80572c906d454957ba92dd1a8fcd3f"
+    },
+    "server-version/backend/prisma/migrations/20261029020000_huiteacher_student_composition/migration.sql": {
+      "before": "",
+      "after": "4c89a8052ec375470ff07f10f2131870d2863225"
+    },
+    "server-version/backend/prisma/migrations/20261029030000_huiteacher_expert_composition/migration.sql": {
+      "before": "",
+      "after": "077e6f1df460d9b1733270be2db8f431b69ed2e8"
+    },
+    "server-version/backend/prisma/migrations/20261029040000_education_expert_public_sources/migration.sql": {
+      "before": "",
+      "after": "426ea96fbb2aa193d95421d948fd1a61c86f56ae"
+    },
+    "server-version/backend/prisma/migrations/20261029050000_education_native_self_composition/migration.sql": {
+      "before": "",
+      "after": "74ee41c79dc600d09ad6e3fd9d27caa2a184593d"
+    },
+    "server-version/backend/prisma/migrations/20261029060000_education_student_standard_observer/migration.sql": {
+      "before": "",
+      "after": "5576214beb2ba8bd2402b96e9455e0b498d1a2fe"
+    },
+    "server-version/backend/prisma/migrations/20261029070000_education_cognitive_assignment_measurement/migration.sql": {
+      "before": "",
+      "after": "5cd0f73d781e28e022348a10f8d611e13551f893"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+      "after": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6"
+    },
+    "server-version/backend/src/__tests__/campus/school-observer-feedback.regression.test.ts": {
+      "before": "",
+      "after": "7cb87de44943edaaf6a3f3250bd3242baf0b80f1"
+    },
+    "server-version/backend/src/__tests__/campus/teacher-tasks.test.ts": {
+      "before": "c1e0b279f549c21d3c9f623f9a1b05f79fd89e13",
+      "after": "bf32583d0215542877a784e36a214a34260f1e66"
+    },
+    "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts": {
+      "before": "",
+      "after": "4830bbf39a7236a8e9407761556955b7117d8a96"
+    },
+    "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts": {
+      "before": "",
+      "after": "d226c699a14546091c075318cb8213ce8cf825fd"
+    },
+    "server-version/backend/src/__tests__/education-tools/native-composition-binding.test.ts": {
+      "before": "",
+      "after": "de3f3b5388adb57c81942fe0e54e9a1583b8cafb"
+    },
+    "server-version/backend/src/__tests__/education-tools/native-source.cognitive.test.ts": {
+      "before": "",
+      "after": "ea97052a39cd523542624ea5632ad79794425b8f"
+    },
+    "server-version/backend/src/__tests__/education-tools/native-source.sjt.test.ts": {
+      "before": "",
+      "after": "5dc714bd3bb33c93f0f88d650e6a0abcd2612592"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.composition-observer.test.ts": {
+      "before": "",
+      "after": "2006d872b57cc796160d6fa3de3a37f23044cbe0"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.composition-version-metadata.test.ts": {
+      "before": "",
+      "after": "8ffd6c86e908354dc886c3c3558aaca87ef3793a"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.composition.test.ts": {
+      "before": "fc34c2cce1211228d31d8324265c420fc3a0b555",
+      "after": "4c81d72c583733bb9e91788069d5c43754c1e707"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.run-contract.test.ts": {
+      "before": "e49ed240f7c7b05d81692d6291c374baa615ef0a",
+      "after": "d52616c5432d3425171bd376bd681d17fa01d38b"
+    },
+    "server-version/backend/src/__tests__/huiteacher/field-composition.contract.test.ts": {
+      "before": "",
+      "after": "5443d61e9fa4bab35fa9349d9e9afea0e7cba940"
+    },
+    "server-version/backend/src/__tests__/huiteacher/field-composition.evidence.test.ts": {
+      "before": "",
+      "after": "7a2b42a39f36fa7f47de10fe8091885e92c52479"
+    },
+    "server-version/backend/src/__tests__/huiteacher/field-composition.native-boundary.test.ts": {
+      "before": "",
+      "after": "5fa133de96301dc5926c10c804025e1e9147ef49"
+    },
+    "server-version/backend/src/__tests__/huiteacher/field-composition.routes.test.ts": {
+      "before": "",
+      "after": "8b59d494792a73b5ff7a65dc817227e606a9a9ce"
+    },
+    "server-version/backend/src/__tests__/huiteacher/field-expert-library-use.test.ts": {
+      "before": "",
+      "after": "a9c731e5d9a30a37cbe64240d8ff34d5f72c4f8c"
+    },
+    "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts": {
+      "before": "",
+      "after": "a24519b4b6d2f798a2e493274c01e229bdba3639"
+    },
+    "server-version/backend/src/__tests__/huiteacher/student-composition.collector.test.ts": {
+      "before": "",
+      "after": "84077175a8e79ded5f85f494747ef36a0d258020"
+    },
+    "server-version/backend/src/__tests__/huiteacher/student-composition.contract.test.ts": {
+      "before": "",
+      "after": "d8ba16051cd25ec8fcbe1cc1865186767d37d98e"
+    },
+    "server-version/backend/src/__tests__/huiteacher/student-composition.overlap.test.ts": {
+      "before": "",
+      "after": "8a277eef1f547b4d9f739d0102c3aecbf38a43f5"
+    },
+    "server-version/backend/src/__tests__/huiteacher/student-composition.runtime.test.ts": {
+      "before": "",
+      "after": "ec83b8218b3163f7ac306654cd37c82553d2a796"
+    },
+    "server-version/backend/src/__tests__/integration/educationCompositionFences.postgres.integration.test.ts": {
+      "before": "",
+      "after": "32e0cc7272a8701e98fde8111c39267d40880dac"
+    },
+    "server-version/backend/src/__tests__/integration/educationNativeSelfComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "6b59678fe631d9eb162185b4ba1e16eb30bff19e"
+    },
+    "server-version/backend/src/__tests__/integration/educationSchoolObserverComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "26aa757dc7b9a0d3e5b54db8efa0ab13385098d4"
+    },
+    "server-version/backend/src/__tests__/integration/educationScientificDefinitionHash.postgres.integration.test.ts": {
+      "before": "",
+      "after": "875a3d4251dd62456251c5984abfd62d6215f994"
+    },
+    "server-version/backend/src/__tests__/integration/huiteacherExpertComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "23bd95909a4a66568abbb390f1b1fe1c65f9b498"
+    },
+    "server-version/backend/src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts": {
+      "before": "94b748bc57021da543ecbc0c144e85c9ce3e2c60",
+      "after": "9669e74e71b78063c8bb081b05f2c8e7bc3c189d"
+    },
+    "server-version/backend/src/__tests__/integration/huiteacherStudentComposition.postgres.integration.test.ts": {
+      "before": "",
+      "after": "a284c23a861f316b760aed4421a603d842e0163b"
+    },
+    "server-version/backend/src/__tests__/integration/studentStandardSource.fixture.ts": {
+      "before": "",
+      "after": "c5d9ba27362d5fb6728a5f7aad8e1077bdf82c82"
+    },
+    "server-version/backend/src/__tests__/reporting/education-ordinary-native-feedback.test.ts": {
+      "before": "",
+      "after": "69d6b658c2a5176497736ac6f6a414177fae6ee4"
+    },
+    "server-version/backend/src/__tests__/scale-library-governance/education-distribution-public.contract.test.ts": {
+      "before": "40e05e7dac944ee111e53be84647e51998b20d3f",
+      "after": "59f69fe850487512695eb2660fa879ad0f2f4cd2"
+    },
+    "server-version/backend/src/__tests__/situational/sjt-online-final-persistence.test.ts": {
+      "before": "5e851c901121d2db4367a9d89dc40fb5a675770b",
+      "after": "3556e61844e8ab816ec9992655e1df37df7c79f8"
+    },
+    "server-version/backend/src/index.ts": {
+      "before": "c571b313ab30df2ecfbb39f1494876f553cde642",
+      "after": "76cb77d52377a590e5ce757075e5729e97099a96"
+    },
+    "server-version/backend/src/modules/assessment-run/completedSchoolFeedback.ts": {
+      "before": "",
+      "after": "3c4f41352ebfaa57343b07f529ce09f723d80e4e"
+    },
+    "server-version/backend/src/modules/assessment-run/currentPopulationAuthority.ts": {
+      "before": "b2967d0684c8ddc48ab5d5c3bf161f23aa6e43c3",
+      "after": "b587299436f475071befbfabe32e4995cdae4062"
+    },
+    "server-version/backend/src/modules/assessment-run/education-start-context.ts": {
+      "before": "961c6b0e7503438c6fdd7825a71a3de83204ee90",
+      "after": "0cb4938e96f66d5c4922125440e7be94b16b8324"
+    },
+    "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts": {
+      "before": "feea72d55ab002dacb5ff7566adf78807658e920",
+      "after": "9dc8cb06d48d50d6cb32412bfde49c44c6ff6119"
+    },
+    "server-version/backend/src/modules/assessment-run/educationCompositionIdentitySql.ts": {
+      "before": "15e63e71dbf8ce658ef1580cdad381e41bc77c0a",
+      "after": "abb5c89d7d60682d60ba6801aaa862b1b8d461e9"
+    },
+    "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts": {
+      "before": "478b0a69e7f6ca66d1f0b74102b6f6a2de3cc41d",
+      "after": "18d2b280ee6973cf7ed467ceea7055b2f5f3ba2b"
+    },
+    "server-version/backend/src/modules/assessment-run/educationPrivateFormExecution.ts": {
+      "before": "b59e11d7ed986f22667fca5dafc673ae5f5acfc4",
+      "after": "4dda57da212ea305e8a1c6af950fb6681f80aeae"
+    },
+    "server-version/backend/src/modules/assessment-run/productRead.ts": {
+      "before": "3738345e965e5f5379cc85a6429d93b612f25cf4",
+      "after": "8f50baba7c1a1f7cefab49e0a57d605fdb238bc7"
+    },
+    "server-version/backend/src/modules/assessment-run/publish.ts": {
+      "before": "015fdf333629c154e7421ae00fe7eb6f37002c5a",
+      "after": "e98bb714e632b030fe6dacd5c8da24af604eeb20"
+    },
+    "server-version/backend/src/modules/assessment-run/repository.ts": {
+      "before": "795b9a9d36364a623cdef2f850a7c7a7df3b5cc6",
+      "after": "d9359c3a3b50ea54921986227cb5d00e3b6a2e80"
+    },
+    "server-version/backend/src/modules/assessment-run/startAdmission.ts": {
+      "before": "a64af731f588848668b2bdbeb4f4fc5bba6d7991",
+      "after": "cdab1e3671be7ab42297123df224fe999a0e4da9"
+    },
+    "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts": {
+      "before": "c6636e760ae096de4aec45b33a7dda557a98befe",
+      "after": "9a4155e167de97496260d83dfca0f6395121dbe7"
+    },
+    "server-version/backend/src/modules/campus/activity.tasks.ts": {
+      "before": "da9f9c472cdb26662567e3a9d57c46484656cd43",
+      "after": "d59b5e964f480aceaec57fa079042169af45cb2b"
+    },
+    "server-version/backend/src/modules/campus/composite.routes.ts": {
+      "before": "5f666cea70ef0177b6f521b0bdc214effe6a97f9",
+      "after": "7b5b5c8bd49c28e162eb05117d3082313988d2e9"
+    },
+    "server-version/backend/src/modules/campus/teacher-tasks.ts": {
+      "before": "98e85104159d6f0218d1158bef9efb4963b60e0c",
+      "after": "5548277578c60eefab76b77289bad1a3a4625290"
+    },
+    "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": {
+      "before": "4b944e96a41b24cadf22eabb39ed1be4a00024f1",
+      "after": "9c2df4c6e68c47db6ef7c7840842adb140e2de67"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "c78446153f743f9558c2e3bc741d55794d4038f5",
+      "after": "830640c7b8539612804b964997a7bc48888bdf31"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "before": "3d105708e762c7e1bef3300f0e06dee4459824c1",
+      "after": "bcf668ae35da0a4857ff934a9f0f9d499eb5e22f"
+    },
+    "server-version/backend/src/modules/composite/training-variant-markers.ts": {
+      "before": "bce96870c6bff08c72634a6888b7c6d453bf468c",
+      "after": "e56f49817b0d4ba2fd359e4fd2483fe1ef2029d6"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.source.ts": {
+      "before": "9c26307f0e29d19ecfd7b92504d1cd56146fbec0",
+      "after": "5cf2f1c97c00f782b0e7112c493a454fb3edb10e"
+    },
+    "server-version/backend/src/modules/education-tools/expert-observation.contract.ts": {
+      "before": "",
+      "after": "c73c1bd195656a20a8c567960e209c3b4a45d051"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.catalog.ts": {
+      "before": "737042ddf0008b5322c7523684399cd96b4dede5",
+      "after": "b2ed662aa7db614652d51bf5edbd71ceb2a4adaa"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.preview.ts": {
+      "before": "8d2ccc52f47b3a3149d2eb07bc165c185fe5b47c",
+      "after": "30634a2bfcb637402f82a3278360cdb42c415e5d"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.scale.ts": {
+      "before": "5214fd2ffaf699b2976d53c2bc87729dc9c74214",
+      "after": "88554ab1bfca5e1d95ca23786a5d58b5a2f48d5a"
+    },
+    "server-version/backend/src/modules/education-tools/library-source.use.ts": {
+      "before": "b8fc349daca9c7c3b0520954788fee838f0411bb",
+      "after": "d3c51ec32524db1e41831a075170c561f5d616bb"
+    },
+    "server-version/backend/src/modules/education-tools/native-source.cognitive.ts": {
+      "before": "",
+      "after": "251de57975e9d4353e55ff74eeb8514b4a1975fe"
+    },
+    "server-version/backend/src/modules/education-tools/native-source.contracts.ts": {
+      "before": "",
+      "after": "7b6337626b5610d38d00c3b94968a530851e7b13"
+    },
+    "server-version/backend/src/modules/education-tools/native-source.locks.ts": {
+      "before": "",
+      "after": "41c51aeed0964865d6110b98d660e987b6077426"
+    },
+    "server-version/backend/src/modules/education-tools/native-source.preview.ts": {
+      "before": "",
+      "after": "a66d085b95bdc809c87b437e9b9640d3d7ef3c2b"
+    },
+    "server-version/backend/src/modules/education-tools/native-source.sjt.ts": {
+      "before": "",
+      "after": "f17de6b325a4f827da376b6f8107be1e3c63bfd3"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts": {
+      "before": "beaa628a7d8da3454d88645dba03064ce1fc69bd",
+      "after": "30dfc2b8d69884548441de058d125afc9c5e08aa"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-content.ts": {
+      "before": "9ee799e95572fb37345296b41dd022374c60c95a",
+      "after": "16435db7763b509ff1ec16f0ebe28158efe2fa54"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": {
+      "before": "fcb7ef679d8f26d2be8b56e24860620d86048c75",
+      "after": "be99ddb22302d30cfae91d6bfd0a4c3fd8869462"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-runtime.ts": {
+      "before": "67542a110f8829696ba93a9f78fb3ed22e617927",
+      "after": "20e0df3994d738979183f7494bf261ff4d63e799"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": {
+      "before": "d4aac0876f00cd9d123c9c46edf51042a0cea3df",
+      "after": "9c11cc5d703ff6e6cc8e68acd3227a610450dc8d"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.routes.ts": {
+      "before": "1f82898121aee7d71dad19be99331f6398d985d3",
+      "after": "2e5d4739a37f30d61daf67a4514087e62e2e566d"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts": {
+      "before": "afd11fd53a58a7999fb6590852db65733ca3082c",
+      "after": "78bde160a537a86307c18cd0d76ca7ab7de273c0"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.run-contract.ts": {
+      "before": "ad57ce068558874418ec69bfc83efb0efce963ba",
+      "after": "6fe658bfd1bf5ee1fe2c95767207a08dd6306912"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.service.ts": {
+      "before": "439b67f633c74e49bad36dc34ada20b03ca8086c",
+      "after": "d98861f51d2122d2661a8ef40f59ecb7f1509d45"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.catalog.ts": {
+      "before": "285a54b15d80d7af16a8620878b7bd6f2ab3eae3",
+      "after": "c3f095bc16a68df6f4db64d482d167b9fa8c4c31"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.headers.ts": {
+      "before": "07dce78d7ef2012e1fcca1f6cf767e64efeeec87",
+      "after": "c3b6f7d56d973ee833e1005a190dee37ecb82e16"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.identity.ts": {
+      "before": "92d25f11884d992c3543793bb8686935823df633",
+      "after": "784398461762c60ef5d6bbf8ef5a1cbe037e4735"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.preview.ts": {
+      "before": "3163aab02599fe295d84e3c9069709dafe176cf8",
+      "after": "52d9c0dd3ac170911f33e17094c242d4554d42cd"
+    },
+    "server-version/backend/src/modules/education-tools/public-source.standard.ts": {
+      "before": "7616b484b2c55c89674f0c985166eb35075673a5",
+      "after": "e4689d994610fec43150c7b56f10245de2a2a02b"
+    },
+    "server-version/backend/src/modules/education-tools/student-observation.contract.ts": {
+      "before": "",
+      "after": "17c4dd55ec0ac796d9b76c9de91ba58e54688ea0"
+    },
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts": {
+      "before": "8eb8fd2b92e587b83d6b393b9009cd536af2c55a",
+      "after": "ce4b142daa87c53a4774c12b70ec0ce70e9fb933"
+    },
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts": {
+      "before": "c986dc86b0727a4295c8a1d3d3f7e6e77f815ca6",
+      "after": "8ffa02478aebe3089a74750ccf3215490fd267f7"
+    },
+    "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts": {
+      "before": "8364d09d6383ce27188a2aa48e589cdb6aaa2abe",
+      "after": "056bb14ce482045550b1b8e4e9414036b856e27b"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldComposition.authority.ts": {
+      "before": "",
+      "after": "ba8f7980247d5d94b38d39bf2ff2c2269c916cad"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldComposition.contract.ts": {
+      "before": "",
+      "after": "2d9b3ae55223c39d91aca78329484b0595800af6"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldComposition.evidence.ts": {
+      "before": "",
+      "after": "46e41f25cb2e07b2b5214a5d62f52ac47600d54b"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldComposition.routes.ts": {
+      "before": "",
+      "after": "e761d780e6fb6b8605b270c081a623156d381f71"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldComposition.service.ts": {
+      "before": "",
+      "after": "7aa799c6632f338c322e91ac876e6661bf4350f5"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldForm.routes.ts": {
+      "before": "b258bd549abed149f2a444a2916dc977c78850d0",
+      "after": "c6ecaef45aee54b848dd3fad71f70536fd1e212f"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldForm.service.ts": {
+      "before": "6797e1ed1a2898d761938f47e70ba92e9d96c14f",
+      "after": "d21d96af2bc907ce592a495ec0bb08353af09a12"
+    },
+    "server-version/backend/src/modules/huiteacher/observer.routes.ts": {
+      "before": "f450fc68b3c15daf5fa5bc2af4b93ca3785b942b",
+      "after": "43f563acdac9fac0a59333e800b8f5d085b593a7"
+    },
+    "server-version/backend/src/modules/huiteacher/observer.service.ts": {
+      "before": "aba4b989b9992b66c14c96a56350f63450040354",
+      "after": "ec2d46ff3efdfe61ad8012a9b66b07a3a2bdd347"
+    },
+    "server-version/backend/src/modules/huiteacher/studentComposition.policy.ts": {
+      "before": "",
+      "after": "38dff34490b5fea038e11cb36ef0a4ff033eac2b"
+    },
+    "server-version/backend/src/modules/huiteacher/studentComposition.reducer.ts": {
+      "before": "",
+      "after": "5de809348e291c701f0b16577b9780072f52519c"
+    },
+    "server-version/backend/src/modules/huiteacher/studentComposition.report.ts": {
+      "before": "",
+      "after": "6aeed3aca84d53b9b9062a813679dfad413a78c9"
+    },
+    "server-version/backend/src/modules/huiteacher/studentComposition.service.ts": {
+      "before": "",
+      "after": "1a7aae40bb557d4c31caa2dc3276d96e6831c418"
+    },
+    "server-version/backend/src/modules/huiteacher/studentCompositionResource.ts": {
+      "before": "",
+      "after": "e43d2afe1e24e30d2e44b580b13ac3af87d3f59d"
+    },
+    "server-version/backend/src/modules/huiteacher/studentEvaluation.routes.ts": {
+      "before": "124ac38cc3868a8144a44d108b7848c413da0753",
+      "after": "9dca610e11e7e1bac329b355f621ab3c53aaf5dd"
+    },
+    "server-version/backend/src/modules/huiteacher/studentEvaluation.service.ts": {
+      "before": "07b81b8af8ff042f45d813528fc6f0d7bd0c9cd0",
+      "after": "5f455d72a9fa30ff19e506a54e0f9f818aa62306"
+    },
+    "server-version/backend/src/modules/huiteacher/studentReport.service.ts": {
+      "before": "6734aad934fa50890be2918987ead60353428c4e",
+      "after": "8cd1b8381af1a3064db44e54612f58f3593b4da3"
+    },
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+      "before": "74d7e7ce49c2fd88309904d686b6b0f330c61315",
+      "after": "ea129bb25baa5b1da4b06f0896616845cc2c32ba"
+    },
+    "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts": {
+      "before": "b3ac405aa8a0c244b8d6bd40e078126495ecba5d",
+      "after": "5cb9b456d1c72c46d864ba4867181cccc0cbe566"
+    },
+    "server-version/backend/src/modules/reporting/education-ordinary-native-feedback.ts": {
+      "before": "",
+      "after": "41118fe6d7d34de4e2a684a4ceece264d5e15006"
+    },
+    "server-version/backend/src/modules/scale-library-governance/contracts.ts": {
+      "before": "77268067d792fc29f4aae91872ef7832b9d7510d",
+      "after": "a915bc41de4464c0c7a5e56c379c676bdad1f841"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-distribution-readiness.ts": {
+      "before": "c6e6ca625ee0debcc6bd667694e9e84ae19b5b1b",
+      "after": "b94a251ad9d7fae06ceff7b5de0146d4c8b1a847"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts": {
+      "before": "d85232b4daa534a928d2f6b721988a550fd1d949",
+      "after": "85517e3bf91bf806d285433ed81cb0fad7fe7721"
+    },
+    "server-version/backend/src/modules/scale-library-governance/service.ts": {
+      "before": "b5202cc1ecea9d276a17792e90163520cf5cea78",
+      "after": "430c115e250d036d738d497cf1c576c5ce7b54a3"
+    },
+    "server-version/backend/src/modules/scale-library-governance/source.ts": {
+      "before": "a93badd3712f4378eb162de10b284fffac5e6125",
+      "after": "8965689f099f242d66c5958de0ce8c8f47935b67"
+    },
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": {
+      "before": "52e040a80bcef13394f867c66ebc4fe58fbb60d3",
+      "after": "b85c05bd0eaf8d05cae670f233bd5d16fb2c01cf"
+    },
+    "server-version/backend/src/modules/scale/onboarding/types.ts": {
+      "before": "ceed5febc6b2e67496ff4b47a87aeba5d289132b",
+      "after": "5681b8519e46ecfd3190a0c408d378fb0c3c432d"
+    },
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": {
+      "before": "273e7b369144c262edca45e6a0b880b75b19897c",
+      "after": "737fc6ae04c7c164c9b035c18f72a2b423e3d04f"
+    },
+    "server-version/backend/src/modules/situational/situational-final-submit.service.ts": {
+      "before": "732bd226532337f1dc18224fee411d87ecc258d9",
+      "after": "43816fee3c4e89c53e05748e745e8e594ead7760"
+    },
+    "server-version/frontend/src/api/scaleLibraryGovernance.ts": {
+      "before": "85359a007ea6180c4baaac676b59210e0a27f5bf",
+      "after": "2f83a8d8fd9e23b3858973f316d108376c34c1ef"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.test.tsx": {
+      "before": "3b961feb44ccdb4cb0a9d72737646701d5c3016a",
+      "after": "b27ede50e78df71afcfbf81c69233589b94da3ef"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionObservers.test.tsx": {
+      "before": "",
+      "after": "936c9a6c0354f4aa428b742ff8f83e1c606a5ed5"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx": {
+      "before": "f492657307ddd4fd2fcfdc5669f3d834cf087774",
+      "after": "0f1752b937dd3da786d4dbe6c9cc4701bb2fe26d"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx": {
+      "before": "91aee3f61d8ec16a61c993ef3cffe332e4a95844",
+      "after": "69d661dafd7caac17114c6d134e3f28b8030e346"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx": {
+      "before": "66ae34350c3eca9721005874e68621b2101d4f31",
+      "after": "fc6f73f7b3e0c5694537ec0ee960b703928c8355"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": {
+      "before": "2e5947695581ca537a95741984693a943434f06d",
+      "after": "66cdf06c5525f8007ba87b81e3f0cf2a9014717c"
+    },
+    "server-version/frontend/src/components/education-tools/EducationExpertComposition.test.tsx": {
+      "before": "",
+      "after": "6ab5a6c8d2deb62efa7a25e5f404c1a15d2f2bba"
+    },
+    "server-version/frontend/src/components/education-tools/EducationNativeComposition.test.tsx": {
+      "before": "",
+      "after": "84c31f5b6055face1f5ebe415cfee9754b40e40e"
+    },
+    "server-version/frontend/src/components/education-tools/EducationOrdinaryFeedback.tsx": {
+      "before": "9b7e42ff84177eb062031a30c830f2e226aca68f",
+      "after": "6e5edcf0ffe396f1926e199765b912f9b41f21c4"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateFeedbackAuthoring.test.tsx": {
+      "before": "656b6c421d1213b79b23e8a34365bbc75b673c9c",
+      "after": "610bc5a5e591d1dc1af4c334d0c7a89309826111"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateScaleSharing.test.tsx": {
+      "before": "cdd7423b170ced19013d4ed8106ab94773f2d6f6",
+      "after": "f40b6f687de2a6b103e4befdf4db4b7ba369832d"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateScaleSharing.tsx": {
+      "before": "c4f8dd95ab275f8b9ab4007530d2577645b4fd50",
+      "after": "c2e45f182a00c915ddaf4570630526128e1e4393"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx": {
+      "before": "93b1f85087320e0d86dbe2ec3bc8204e987b67f5",
+      "after": "65c47d9b13254bb2de6b394903ee4324e46ae509"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateVersionChooser.tsx": {
+      "before": "2261fc574ed2c3656af7e4a46eeee07f4bf1110a",
+      "after": "b4525b40012f0752ff02f6e2e7a6eb16684bbf91"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPublicFormChooser.tsx": {
+      "before": "52dae8b596ad0b4fdcab9c77a9ecefc28150a500",
+      "after": "bd602a59aa6539adb25f1386a29b028d09fdc70e"
+    },
+    "server-version/frontend/src/components/education-tools/educationCompositionAdministration.ts": {
+      "before": "",
+      "after": "54bfd0ed779e42eb4ffce3d710800a1c052ac2a3"
+    },
+    "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": {
+      "before": "4c2aa1b3afd30acbbef86366680858ff08b98bbb",
+      "after": "2d9324c0d5df8a08792d346e190e3743091caca8"
+    },
+    "server-version/frontend/src/components/education-tools/educationPrivateScaleSharingClient.ts": {
+      "before": "15f3efbd4346e65329adcb89a261c52881d6386a",
+      "after": "6ec96a4e8671b8045b60d6f9d3f6b34a66189feb"
+    },
+    "server-version/frontend/src/components/education-tools/educationPublicFormClient.ts": {
+      "before": "020a53f28935a00dcd50c3da00c99df861594352",
+      "after": "a423c9be2acd26d56b0796a36bc71028781837d6"
+    },
+    "server-version/frontend/src/components/education-tools/privateToolClient.ts": {
+      "before": "4a32eadc8afa22d66e1f32237d44256a4ce9daf1",
+      "after": "941f88c538b64e5430fe3dd8bb10790476d1ccd1"
+    },
+    "server-version/frontend/src/components/scale-governance/EducationApplicabilityFields.tsx": {
+      "before": "207d3c2870a17ad365cd9032f5d1a12b1d950915",
+      "after": "251773a29995b6986643943b9f7ea0d4f4d75f78"
+    },
+    "server-version/frontend/src/components/scale-governance/TrainingScaleLibrarySubmission.tsx": {
+      "before": "718b918d370221fd37126ddda2912e75110165f4",
+      "after": "7eb22e0bfa8a99e8776caea802e8f003b70c931c"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
+      "before": "07c6fd394a07ead96e057eb9b7c804fe5f048e0d",
+      "after": "e12051d913308554fd8de08687aba0cd8127d06b"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFieldManager.tsx": {
+      "before": "061f74928d55870caadc0b26dc7275177fae1ba1",
+      "after": "3481f5d3b78ae8416a04c8d5adc81b0c1f8bcf41"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFieldQuestionnaire.test.tsx": {
+      "before": "",
+      "after": "ea60b6017ee0df9c93ec82f695062400a7a8d46c"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFieldQuestionnaire.tsx": {
+      "before": "",
+      "after": "c06fb326753d41f4cd748912550bbcfbbb814ed7"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFieldWorkspace.tsx": {
+      "before": "9889a53ddbcfd49ae64a4fee61959e8b8caffbbb",
+      "after": "d60444c0859abd1ec1ef068bcaa9519471956239"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx": {
+      "before": "f7fa7a5551e24a007fb75b2995b1767f369507ee",
+      "after": "54c633d30e2f0bd4845c278607ad6c6e2c7b509f"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": {
+      "before": "51242c7f66fbcd5f52581f8d7869ad291086a2fd",
+      "after": "d2923a6bfb74dc33e1e0ed8707115cadcb164b5a"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyFormTasks.tsx": {
+      "before": "7e5cd6a1c774fb8197ddd1083322f4a8e674f5cd",
+      "after": "f6522642e23ea2cd9fa2e9131fca672cd475aa81"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPracticePages.test.tsx": {
+      "before": "bc4b2434b14fcbcb7c83e95ba765b64a8adc0a4a",
+      "after": "b4d2b421333142805825cfae8a7933e8c18bd22b"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentComposition.test.tsx": {
+      "before": "",
+      "after": "bc03edce33f5e32d33c1e39877757a3a15684409"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentEvaluationManager.tsx": {
+      "before": "feba211651b1d1197b70fa81c7b6442f812b3af9",
+      "after": "992ed2123942e5536a1d34238a621b5219920c91"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentFeedbackView.tsx": {
+      "before": "008dc09af456df33b0f8f231d147136ca9a2b025",
+      "after": "d5cf488f175a5ec73cbdeeaef03a7e552d59c5bf"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentTasks.tsx": {
+      "before": "",
+      "after": "739a6cafe9d3164bfbdddeeee6cf955d251c68c7"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentWorkspace.test.tsx": {
+      "before": "aa775787ad7f5f23928b7865f756dec98f44f804",
+      "after": "5fea960faae442f64517ac61f4badb9177f3c4aa"
+    },
+    "server-version/frontend/src/huiteacher/assessmentRuntime.client.ts": {
+      "before": "d3b6039a77c00f885060f5082a0070db7dfb4215",
+      "after": "68915dc632c048c0cf8cd7f072f20a44e672b4e9"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
+      "before": "aca8ffd8933ffaf0229c8b303ff4ca7050da41ff",
+      "after": "fd85e2001657e5fc31ef60568ee0d18093ee71b4"
+    },
+    "server-version/frontend/src/school/SchoolApp.tsx": {
+      "before": "2ddaf6b1420606d2484049b908eb1a1fbff8f5af",
+      "after": "5745a7c2b01b3100409086a69925bf898f9d2897"
+    },
+    "server-version/frontend/src/school/SchoolObserverCompositionFeedback.test.tsx": {
+      "before": "",
+      "after": "6f10fed7b33e5b68f51f89cbb9516cdad958ee76"
+    },
+    "server-version/frontend/src/school/SchoolParentTaskSwitch.regression.test.tsx": {
+      "before": "",
+      "after": "cfb8c26c504f13beb113d85b903a63144b53fa8d"
+    },
+    "server-version/frontend/src/school/SchoolParentTasks.tsx": {
+      "before": "569ae7819227de50a38753c5ebafcb0ea4daadcb",
+      "after": "bf9163c083094352a6a2cbac896455e011404bc2"
+    },
+    "server-version/frontend/src/school/SchoolTeacherTasks.tsx": {
+      "before": "42a0cb18fa2f782ec6057356fc2314b459a4ed49",
+      "after": "2431dae5df312a093596b5c648588e39e80f88b5"
+    },
+    "server-version/frontend/src/survey/SurveyScaleLibrarySubmission.tsx": {
+      "before": "f9d5d9b4299b66aa2e1f2d2a18e798871d4beb02",
+      "after": "dd0084d5bf28b15731a3d2e1c3b8f271b0d91966"
+    }
+  },
+  "controlBefore": {
+    ".github/scripts/school-teacher-checks.mjs": "eccd8affa6a34637fe377fdddf00f77f1e02167f",
+    ".github/scripts/school-teacher-observer-restore-input.sql.gz": "",
+    ".github/scripts/school-teacher-observer-reuse.cjs": "",
+    ".github/scripts/school-teacher-observer-reuse.test.cjs": "",
+    ".github/scripts/school-teacher-scope.mjs": "0b8d47820a1745142d4317f48bc3d62cf01c2136",
+    ".github/scripts/school-teacher-self-baseline.sql": "4052c21cfb980282bf72f581a6cd26494021d153",
+    ".github/scripts/school-teacher-self-bindings.json": "fa65ccd5b2df4f44e9771e5eb338102f1cb8271f",
+    ".github/scripts/school-teacher-self.test.mjs": "c4fd118ac85d7b77d66b6878f6b469422d9ecea6",
+    ".github/workflows/ci-school-teacher.yml": "45a4db88aa1b30e9d8c26dc17191100e37763f88",
+    ".github/workflows/ci.yml": "925606a2d9405fca545bd95f5b4fc839a944d676",
+    "server-version/e2e/education-self-questionnaire.cjs": "af54e6357a1610d8cfd96e9853b173eb966c9dc3",
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": "c2653f2aa38f48aaee1ab17291ed27cb8ea21df5",
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "a21ad90aab90e3e12e795301dc09af3505e05976",
+    "server-version/e2e/school-teacher-ui.cjs": "fce1961fbf7e1e7a04d2eb9fc4656f4919b7acbd"
+  },
+  "controlAfter": {
+    ".github/scripts/school-teacher-checks.mjs": "3ab008be96c779e282d101f8d9c8277ad4659b71",
+    ".github/scripts/school-teacher-observer-restore-input.sql.gz": "eb694d821fec247da9050c4511409673e6ee2f3c",
+    ".github/scripts/school-teacher-observer-reuse.cjs": "e67ce7300474f4562e47523539a57c4ac8e4fc53",
+    ".github/scripts/school-teacher-observer-reuse.test.cjs": "6be1b93a0eaefa9c5955dbc59c77832bad64ddf6",
+    ".github/scripts/school-teacher-scope.mjs": "41e85a871dcc046937cbaf21547415132b5d6343",
+    ".github/scripts/school-teacher-self-baseline.sql": "41aa7034b492471e930d4fa1b52f156c1184ddf3",
+    ".github/scripts/school-teacher-self.test.mjs": "8b2fd8c3a41745b7d1622501b533dcc7cbc69a2e",
+    ".github/workflows/ci-school-teacher.yml": "98705c8760e6823eefc6133f6f6cd19e7df9162f",
+    ".github/workflows/ci.yml": "521c5d49777b7481be7317a1f7112535e1bfda80",
+    "server-version/e2e/education-self-questionnaire.cjs": "e35445243a7a923f0c90624b1e2a2e0ea547da2f",
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": "dfb51e4ebe91247000e045cbaf09dc1bc495c2e5",
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": "e69cab5e5f1ba8eaa182bef67529278232380f1d",
+    "server-version/e2e/school-teacher-ui.cjs": "521dab47bdee058fe343602edc249ac00b2fdd6c"
+  },
+  "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
+  "review": {
+    "completed": true,
+    "originalExecutionSigned": false,
+    "note": "A owns development, targeted validation, CI and normal merge under the latest user delegation. Reuse only immutable official PR385 successful assertions/frontend/audits after verifying identical runtime, fixtures, schema, dependencies and the exact unconsumed merged-main CLI delta. The compiled CLI changes, so build the backend fresh once. Verify merged-main PR386 CLI SAST separately; failed parents/restore stay explicit. No local test assertions admitted. Execute only missing restore, browser and changed CI-control checks."
+  },
+  "requiredJobs": [
+    "admission",
+    "frontend",
+    "backend-self",
+    "postgres-self",
+    "browser-self",
+    "security"
+  ],
+  "qualification": "fixed-official-observer-continuation",
+  "frontendBuildDecision": "fixed-official-observer-build",
+  "backendBuildDecision": "fresh-main-tooling-integration",
+  "execution": {
+    "frontend": {
+      "types": true,
+      "lintFiles": [
+        "src/api/scaleLibraryGovernance.ts",
+        "src/components/education-tools/EducationCompositionRunPicker.tsx",
+        "src/components/education-tools/EducationCompositionStudio.tsx",
+        "src/components/education-tools/EducationOrdinaryFeedback.tsx",
+        "src/components/education-tools/EducationPrivateScaleSharing.tsx",
+        "src/components/education-tools/EducationPrivateToolStudio.tsx",
+        "src/components/education-tools/EducationPrivateVersionChooser.tsx",
+        "src/components/education-tools/EducationPublicFormChooser.tsx",
+        "src/components/education-tools/educationCompositionAdministration.ts",
+        "src/components/education-tools/educationCompositionClient.ts",
+        "src/components/education-tools/educationPrivateScaleSharingClient.ts",
+        "src/components/education-tools/educationPublicFormClient.ts",
+        "src/components/education-tools/privateToolClient.ts",
+        "src/components/scale-governance/EducationApplicabilityFields.tsx",
+        "src/components/scale-governance/TrainingScaleLibrarySubmission.tsx",
+        "src/huiteacher/HuiteacherApp.tsx",
+        "src/huiteacher/HuiteacherFieldManager.tsx",
+        "src/huiteacher/HuiteacherFieldQuestionnaire.tsx",
+        "src/huiteacher/HuiteacherFieldWorkspace.tsx",
+        "src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+        "src/huiteacher/HuiteacherMyFormTasks.tsx",
+        "src/huiteacher/HuiteacherStudentEvaluationManager.tsx",
+        "src/huiteacher/HuiteacherStudentFeedbackView.tsx",
+        "src/huiteacher/HuiteacherStudentTasks.tsx",
+        "src/huiteacher/assessmentRuntime.client.ts",
+        "src/pages/admin/ScaleLibraryGovernance.tsx",
+        "src/school/SchoolApp.tsx",
+        "src/school/SchoolParentTasks.tsx",
+        "src/school/SchoolTeacherTasks.tsx",
+        "src/survey/SurveyScaleLibrarySubmission.tsx"
+      ],
+      "batches": [
+        {
+          "files": [
+            "src/components/education-tools/EducationCompositionObservers.test.tsx",
+            "src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
+            "src/components/education-tools/EducationCompositionStudio.test.tsx",
+            "src/components/education-tools/EducationExpertComposition.test.tsx",
+            "src/components/education-tools/EducationNativeComposition.test.tsx",
+            "src/huiteacher/HuiteacherFieldQuestionnaire.test.tsx",
+            "src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx",
+            "src/huiteacher/HuiteacherStudentComposition.test.tsx",
+            "src/huiteacher/HuiteacherStudentWorkspace.test.tsx",
+            "src/school/SchoolObserverCompositionFeedback.test.tsx",
+            "src/school/SchoolParentTaskSwitch.regression.test.tsx"
+          ],
+          "expectedPassed": [
+            "Expert task host consumes the existing canonical Scale/Form runner ignores a late prior API/invitation response without blocking the next task or delivering its old parent",
+            "Expert task host consumes the existing canonical Scale/Form runner preserves the same native unit and submission on a failed or mismatched confirmation, then permits an explicit retry",
+            "Expert task host consumes the existing canonical Scale/Form runner resumes the actual parent and rejects another parent or unit before a transport write",
+            "Expert task host consumes the existing canonical Scale/Form runner starts only the invitation, forwards unchanged native submissions and records completion after exact receipts",
+            "Explicit V2 expert authoring directs expert fixed versions to event invitation binding before any relational Run write",
+            "Explicit V2 expert authoring saves a declared non-person Form source and blocks Scale without relabeling SELF or adding expert demographics",
+            "Explicit V2 expert authoring selects an authorized exact public Form by expert target, disables an undeclared source, and previews the same frozen scenario",
+            "Field manager consumes explicit fixed expert references and submitted evidence binds only the selected expert version/hash and does not fall back to published Form lists or client identity",
+            "School composition product consumers / synthetic HTTP contracts attaches a fixed PARENT_REPORT questionnaire from the actual activity consumer and displays the source revision",
+            "School composition product consumers / synthetic HTTP contracts attaches a fixed SELF questionnaire from the actual activity consumer and displays the source revision",
+            "School composition product consumers / synthetic HTTP contracts attaches a fixed TEACHER_REPORT questionnaire from the actual activity consumer and displays the source revision",
+            "School composition product consumers / synthetic HTTP contracts does not render a late Teacher draft after the entry changes on the same transport",
+            "School composition product consumers / synthetic HTTP contracts exposes the shared School editor through its parent authoring studio",
+            "School observer ordinary completion uses the authorized feedback projection clears the teacher task and feedback when the same transport switches schools",
+            "School observer ordinary completion uses the authorized feedback projection parent can reopen completion feedback and retry a denied read without starting or submitting again",
+            "School observer ordinary completion uses the authorized feedback projection parent discards late feedback and runner callbacks after the account transport changes",
+            "School observer ordinary completion uses the authorized feedback projection parent preserves the completed reference even when the refreshed inbox no longer contains the task",
+            "School observer ordinary completion uses the authorized feedback projection teacher can reopen completion feedback and retry a denied read without starting or submitting again",
+            "School observer ordinary completion uses the authorized feedback projection teacher discards late feedback and runner callbacks after the account transport changes",
+            "School observer ordinary completion uses the authorized feedback projection teacher preserves the completed reference even when the refreshed inbox no longer contains the task",
+            "School ordinary observer questionnaire UI asks before reselecting fixed leaves for a different mode and clears them only after confirmation",
+            "School ordinary observer questionnaire UI authors, saves, reopens and lazily previews exact Scale/Form versions for PARENT_REPORT",
+            "School ordinary observer questionnaire UI authors, saves, reopens and lazily previews exact Scale/Form versions for TEACHER_REPORT",
+            "School ordinary observer questionnaire UI blocks attachment when fixed administration is missing or incompatible: undefined",
+            "School ordinary observer questionnaire UI blocks attachment when fixed administration is missing or incompatible: {\"population\":\"STUDENT\",\"responseMode\":\"STUDENT_REPORT\"}",
+            "School ordinary observer questionnaire UI blocks attachment when fixed administration is missing or incompatible: {\"population\":\"TEACHER\",\"responseMode\":\"SELF\"}",
+            "School ordinary observer questionnaire UI discards the previous mode catalog even with the same account, entry and transport",
+            "School ordinary observer questionnaire UI forgets a pending attachment on actor change and ignores its late response on the stable transport",
+            "School parent task switch lifecycle regression switching directly from task A to task B must discard A attempt state and instructions",
+            "Teacher ordinary student questionnaires: source, respondent and disclosure boundaries authors and freezes a student observer version while clearing incompatible SELF background fields only after confirmation",
+            "Teacher ordinary student questionnaires: source, respondent and disclosure boundaries drops the previous student tasks immediately even when the host API object stays stable",
+            "Teacher ordinary student questionnaires: source, respondent and disclosure boundaries renders separately scoped zero-valued Scale aggregates, withheld statistics and unscored Form cells",
+            "Teacher ordinary student questionnaires: source, respondent and disclosure boundaries selects a fixed STUDENT_REPORT version and posts only its exact identity with the verified staff/class",
+            "Teacher ordinary student questionnaires: source, respondent and disclosure boundaries uses the student scope for consent, START/resume and Scale/Form FINAL and only reads completion feedback",
+            "Teacher participant host with synthetic runtime DTOs collects the actual assigned consent before first canonical START",
+            "Teacher participant host with synthetic runtime DTOs does not revive an old task on a new API identity",
+            "Teacher participant host with synthetic runtime DTOs does not treat a child completion hint or missing current item as parent completion",
+            "Teacher participant host with synthetic runtime DTOs keeps a recoverable error when child progress cannot be read; it never re-submits FINAL",
+            "Teacher participant host with synthetic runtime DTOs preserves durable completion when list refresh fails and emits each completion once",
+            "Teacher participant host with synthetic runtime DTOs rejects a late completed response after exit and after account replacement",
+            "Teacher participant host with synthetic runtime DTOs retains a durable first START across exit without repeating consent (initial read fails: false)",
+            "Teacher participant host with synthetic runtime DTOs retains a durable first START across exit without repeating consent (initial read fails: true)",
+            "Teacher participant host with synthetic runtime DTOs runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED",
+            "Teacher student task presentation avoids repeating an activity name that is identical to the form title",
+            "Teacher student task presentation keeps read errors separate from a successful empty task list and retries only the student list",
+            "Teacher student task presentation opens a student answer page after an in-place identity switch from personal-self",
+            "Teacher student task presentation shows student-only tasks, localized states and privacy help without extra reads or writes",
+            "education native SELF source authoring does not offer native proxy answers in SCHOOL PARENT_REPORT",
+            "education native SELF source authoring does not offer native proxy answers in SCHOOL TEACHER_REPORT",
+            "education native SELF source authoring does not offer native proxy answers in TEACHER EXPERT_REPORT",
+            "education native SELF source authoring does not offer native proxy answers in TEACHER STUDENT_REPORT",
+            "education native SELF source authoring saves four independent native units with an explicit research profile in SCHOOL",
+            "education native SELF source authoring saves four independent native units with an explicit research profile in TEACHER",
+            "education ordinary questionnaire authoring and fixed task attachment SCHOOL attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes",
+            "education ordinary questionnaire authoring and fixed task attachment SCHOOL chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+            "education ordinary questionnaire authoring and fixed task attachment TEACHER attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes",
+            "education ordinary questionnaire authoring and fixed task attachment TEACHER chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+            "education ordinary questionnaire authoring and fixed task attachment ignores a late questionnaire creation result after switching the Teacher account"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/package.json",
+                "blob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionObservers.test.tsx",
+                "blob": "936c9a6c0354f4aa428b742ff8f83e1c606a5ed5"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
+                "blob": "69d661dafd7caac17114c6d134e3f28b8030e346"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx",
+                "blob": "fc6f73f7b3e0c5694537ec0ee960b703928c8355"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationExpertComposition.test.tsx",
+                "blob": "6ab5a6c8d2deb62efa7a25e5f404c1a15d2f2bba"
+              },
+              {
+                "path": "server-version/frontend/src/components/education-tools/EducationNativeComposition.test.tsx",
+                "blob": "84c31f5b6055face1f5ebe415cfee9754b40e40e"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherFieldQuestionnaire.test.tsx",
+                "blob": "ea60b6017ee0df9c93ec82f695062400a7a8d46c"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx",
+                "blob": "54c633d30e2f0bd4845c278607ad6c6e2c7b509f"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherStudentComposition.test.tsx",
+                "blob": "bc03edce33f5e32d33c1e39877757a3a15684409"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/HuiteacherStudentWorkspace.test.tsx",
+                "blob": "5fea960faae442f64517ac61f4badb9177f3c4aa"
+              },
+              {
+                "path": "server-version/frontend/src/school/SchoolObserverCompositionFeedback.test.tsx",
+                "blob": "6f10fed7b33e5b68f51f89cbb9516cdad958ee76"
+              },
+              {
+                "path": "server-version/frontend/src/school/SchoolParentTaskSwitch.regression.test.tsx",
+                "blob": "cfb8c26c504f13beb113d85b903a63144b53fa8d"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "6f9c7c867f36a7f3d326d293225bafb55d5a8f7418de3c1a3587d8a1cc2ed85b"
+          }
+        }
+      ],
+      "inputClosure": {
+        "files": [
+          {
+            "path": ".github/release-tools/package-lock.json",
+            "blob": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+          },
+          {
+            "path": ".github/release-tools/package.json",
+            "blob": "1913b93fbd582fbbd28398488e8e91d6bb9865d5"
+          },
+          {
+            "path": "server-version/scripts/ci-install-canvas-deps.sh",
+            "blob": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
+          }
+        ],
+        "trees": [
+          {
+            "path": "server-version/frontend",
+            "tree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a"
+          },
+          {
+            "path": "server-version/backend",
+            "tree": "3a3efff9479ab3964a5b6af0963bcc643866b802"
+          }
+        ],
+        "sha256": "6f24ea5185f2653674c79c88f2ca61b7b4023977add655e5697ae8b1587ee7a4"
+      }
+    },
+    "backend": {
+      "batches": [
+        {
+          "files": [
+            "src/__tests__/campus/school-observer-feedback.regression.test.ts",
+            "src/__tests__/education-tools/education-observer-source-read.test.ts",
+            "src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+            "src/__tests__/education-tools/native-composition-binding.test.ts",
+            "src/__tests__/education-tools/native-source.cognitive.test.ts",
+            "src/__tests__/education-tools/native-source.sjt.test.ts",
+            "src/__tests__/education-tools/private-tool.composition-observer.test.ts",
+            "src/__tests__/education-tools/private-tool.composition-version-metadata.test.ts",
+            "src/__tests__/education-tools/private-tool.composition.test.ts",
+            "src/__tests__/education-tools/private-tool.run-contract.test.ts",
+            "src/__tests__/huiteacher/field-composition.contract.test.ts",
+            "src/__tests__/huiteacher/field-composition.evidence.test.ts",
+            "src/__tests__/huiteacher/field-composition.native-boundary.test.ts",
+            "src/__tests__/huiteacher/field-composition.routes.test.ts",
+            "src/__tests__/huiteacher/field-expert-library-use.test.ts",
+            "src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+            "src/__tests__/huiteacher/student-composition.collector.test.ts",
+            "src/__tests__/huiteacher/student-composition.contract.test.ts",
+            "src/__tests__/huiteacher/student-composition.overlap.test.ts",
+            "src/__tests__/huiteacher/student-composition.runtime.test.ts",
+            "src/__tests__/reporting/education-ordinary-native-feedback.test.ts",
+            "src/__tests__/scale-library-governance/education-distribution-public.contract.test.ts",
+            "src/__tests__/situational/sjt-online-final-persistence.test.ts"
+          ],
+          "expectedPassed": [
+            "Education public distribution exact-product contract keeps all three student modes School-only without opening Teacher variants",
+            "Education public distribution exact-product contract makes an explicitly frozen expert original distributable to Teacher without inferring a School or global relational expert role",
+            "Education public distribution exact-product contract makes teacher self-report Teacher-only, not an automatic School grant",
+            "Education public distribution exact-product contract projects mixed declarations independently and keeps an unsupported teacher/student-rating declaration intact",
+            "Education public distribution exact-product contract requires exact release/hash and explicit org vs user scope without legacy field smuggling",
+            "Education public distribution exact-product contract separates content compatibility and final public readiness, with specific temporary reasons",
+            "Expert applicability is a separately frozen V2 contract preserves an exact declaration/hash/compiler triplet and leaves old snapshots undeclared",
+            "Expert applicability is a separately frozen V2 contract rejects a shared snapshot with a substituted 'compiler'",
+            "Expert applicability is a separately frozen V2 contract rejects a shared snapshot with a substituted 'hash'",
+            "Expert applicability is a separately frozen V2 contract rejects duplicate targets, SELF declarations and an expert composition encoded as V1",
+            "Expert field routes retain their own invitation and evidence authority checks exact field parent/current grant before state, stored material and FINAL and returns explicit revocation errors",
+            "Expert field routes retain their own invitation and evidence authority requires current product administrator and recent MFA for formal evidence and preserves expert purpose text without a teacher/self-report fallback",
+            "Expert field routes retain their own invitation and evidence authority requires the actual Teacher product session/account and never substitutes student/SELF task authority",
+            "Expert field routes retain their own invitation and evidence authority uses native Scale/Form finals, forces receipt-only Scale response and mounts no personal report, cognitive or SJT execution",
+            "Expert-only library U preparation retains source authority without a V1 runtime cannot bypass original D, current organization, exact published release, emergency stop or frozen media checks",
+            "Expert-only library U preparation retains source authority without a V1 runtime does not turn School, absent or invalid declarations, SELF native content or unapproved sources into expert-only preparation",
+            "Expert-only library U preparation retains source authority without a V1 runtime prepares the exact Teacher expert/observer source after D, organization, stop and media checks, with no runtime writes",
+            "Explicit expert source and transaction-bound field identity accepts only the same transaction proof, real expert and exact parent, preserving null non-person subject",
+            "Explicit expert source and transaction-bound field identity checks a bounded sealed source and exact current parent before native access, rejecting mismatched accepted generation or subject",
+            "Explicit expert source and transaction-bound field identity compiles the original expert Scale+Form once without changing zero, formulas, fixed report or form content",
+            "Explicit expert source and transaction-bound field identity keeps accepted-generation/source keys stable on retry and different across target, invitation and a new acceptance",
+            "Explicit expert source and transaction-bound field identity permits a non-person Form, rejects a non-person Scale and requires independent U before reading external source bodies",
+            "Explicit expert source and transaction-bound field identity refuses a private SELF/other-observer Scale even when the caller supplies its correct original content hash",
+            "Explicit expert source and transaction-bound field identity reports an authorized unconfigured event as null while refusing START or a changed configured source",
+            "Explicit expert source and transaction-bound field identity requires the new exact declaration and rejects reinterpreting a V1/School source or expert background as teacher context",
+            "Formal expert evidence consumes the exact durable native final honors the fixed observer audience and invalid-quality null without substituting zero",
+            "Formal expert evidence consumes the exact durable native final preserves expert Form text/row refusal and canonical zero/null while excluding undeclared scale metrics, interpretations and raw identity",
+            "Formal expert evidence consumes the exact durable native final reads original accepted-generation history after grant changes and refuses cipher/hash/receipt or parent identity tampering",
+            "Formal expert evidence consumes the exact durable native final refuses a missing slot, changed source, forged canonical child/submission or undeclared result without saving",
+            "Formal expert evidence consumes the exact durable native final refuses incomplete, stale-epoch, wrong-person and wrong-generation native completion without creating evidence",
+            "Formal expert evidence consumes the exact durable native final withholds numeric expert evidence when the selected standard source has a stricter disclosure ceiling",
+            "Native field authority is independent from reusable admission evidence rechecks current invitation before a stored Scale admission or completed-final replay can be consumed",
+            "Native field authority is independent from reusable admission evidence rechecks current invitation before either Form stored-admission fast path",
+            "Native field authority is independent from reusable admission evidence uses the actual FINAL transaction to hold current field authority and never fabricates an assignment or consults a Run",
+            "Private fixed-version draft request accepts only an exact ordinary composition version; selectors still require the immutable administration",
+            "Private fixed-version draft request rejects arbitrary selectors, extra user role facts and empty membership lists",
+            "Private fixed-version draft request requires CAS and exact version hash without accepting a resource or authority body",
+            "Private fixed-version draft request requires canonical parent respondent and never parent subject",
+            "Private fixed-version draft request requires explicit class target only for teacher observer and rejects course",
+            "Private fixed-version draft request requires selected teacher IDs exactly for selected-class mode",
+            "Private ordinary composition definition and scoped compilation batch loads exact immutable sources once and preserves original ordered definitions and pages",
+            "Private ordinary composition definition and scoped compilation compiles the approved Teacher student observer composition without substituting a SELF administration or changing leaf scoring",
+            "Private ordinary composition definition and scoped compilation deduplicates source reads when a leaf is deliberately used twice, keeping two distinct blocks",
+            "Private ordinary composition definition and scoped compilation rejects empty or wrong-population definitions before loading sources",
+            "Private ordinary composition definition and scoped compilation rejects formal packages, nested questionnaires, arbitrary configuration and duplicate block identities",
+            "Private ordinary composition definition and scoped compilation rejects missing, foreign, wrong-kind and changed exact source references rather than selecting latest",
+            "Private ordinary composition definition and scoped compilation saves incomplete reference-only drafts without granting freeze readiness",
+            "School observer enforced receipt and feedback routing regression (mock DB, real HTTP) ADMIN with an actual assigned TEACHER task must be allowed through the feedback respondent guard",
+            "School observer enforced receipt and feedback routing regression (mock DB, real HTTP) PARENT completed replay must not expose results forbidden by the ordinary observer ceiling",
+            "School observer enforced receipt and feedback routing regression (mock DB, real HTTP) TEACHER completed replay must not expose results forbidden by the ordinary observer ceiling",
+            "School observer enforced receipt and feedback routing regression (mock DB, real HTTP) TEACHER feedback positive control reaches the same authorized feedback service",
+            "School observer enforced receipt and feedback routing regression (mock DB, real HTTP) receipt query is a working positive control without changing the submitted scientific payload",
+            "School ordinary questionnaires preserve exact observer identity admits the exact Teacher student observer proof, binds both people and rejects SELF or a cross-entry hint",
+            "School ordinary questionnaires preserve exact observer identity binds the actual student and parent to the transaction proof and refuses a swapped student or ordinary product hint",
+            "School ordinary questionnaires preserve exact observer identity keeps School parent/homeroom modes distinct and Teacher SELF unchanged",
+            "School ordinary questionnaires preserve exact observer identity matches selectors and explicit teacher targets to the frozen mode, without accepting package instructions",
+            "School ordinary questionnaires preserve exact observer identity refuses SELF relabeling, reversed actors, same-person observers and unrelated teachers",
+            "Sealed education identity is a header bound to an independent anchor does not accept a loose receipt, incomplete publication or a cross-entry key",
+            "Sealed education identity is a header bound to an independent anchor keeps legacy Training snapshots exact and permits only the strict typed education extension",
+            "Sealed education identity is a header bound to an independent anchor reads one bounded header without loading source JSON, snapshot, items, sections, or recompiling",
+            "Sealed education identity is a header bound to an independent anchor rejects a mismatched createdBy anchor",
+            "Sealed education identity is a header bound to an independent anchor rejects a mismatched creationHash anchor",
+            "Sealed education identity is a header bound to an independent anchor rejects a mismatched creationKey anchor",
+            "Sealed education identity is a header bound to an independent anchor rejects a mismatched trainingContentSnapshotHash anchor",
+            "Student Scale group projection aggregates canonical facts separately for every fixed tool preserves a real zero and null missingness; equal metric keys in other tools remain independent",
+            "Student Scale group projection aggregates canonical facts separately for every fixed tool withholds insufficient, policy-restricted or incomplete finals, keeping missing distinct from score zero",
+            "Student comparable history spans old Form and ordinary composition in both directions blocks small effective changes for composition-to-legacy",
+            "Student comparable history spans old Form and ordinary composition in both directions blocks small effective changes for legacy-to-composition",
+            "Student comparable history spans old Form and ordinary composition in both directions does not expand Standard-only history or compare an unrelated leaf; protected history cannot be bypassed",
+            "Student comparable history spans old Form and ordinary composition in both directions refuses missing/duplicate historical contributors and invalid comparability keys",
+            "Student composition report reads final canonical sources without scoring or personal projections binds each final to the actual child, submission, fixed native definition and frozen context",
+            "Student composition report reads final canonical sources without scoring or personal projections projects zero and unscored distributions from complete parents, keeps source blocks distinct and never loads a hidden Scale",
+            "Student composition report reads final canonical sources without scoring or personal projections refuses duplicate respondents, incomplete parents and an earlier epoch instead of returning partial group statistics",
+            "Student composition runtime is separately mounted with exact persisted identity binds actual Student account, exact config/hash, rated Teacher, current population and canonical parent",
+            "Student composition runtime is separately mounted with exact persisted identity checks product, current Student role and feature activation before any task/material read",
+            "Student composition runtime is separately mounted with exact persisted identity forces Scale receipt-only FINAL; subject, consent and foreign SELF versions cannot use student routes",
+            "Student questionnaires use a separate protected Teacher observer contract accepts the exact Teacher/student administration while rejecting reversed or SELF identities",
+            "Student questionnaires use a separate protected Teacher observer contract binds a single verified teacher and class to the fixed version/hash, never client SELF or a broader class",
+            "Student questionnaires use a separate protected Teacher observer contract denies an unconfigured Run before source use and requires exact author/current appointment predicates",
+            "Student questionnaires use a separate protected Teacher observer contract does not promote adult SELF reports, hidden scores or standard source numeric restrictions to Teacher group feedback",
+            "Student questionnaires use a separate protected Teacher observer contract freezes group floors independently from current flags, without granting individual results",
+            "Student questionnaires use a separate protected Teacher observer contract rejects student background collection instead of using it as the evaluated teacher context",
+            "Student questionnaires use a separate protected Teacher observer contract uses the official parsed Form digest for legacy and composition comparability",
+            "Teacher expert sources: explicit V2 declarations and independent exact U accepts the explicitly declared expert_report native standard/shared source without rewriting it",
+            "Teacher expert sources: explicit V2 declarations and independent exact U accepts the explicitly declared observer_report native standard/shared source without rewriting it",
+            "Teacher expert sources: explicit V2 declarations and independent exact U compiles a declared non-PERSON public Form without manufacturing a Scale or subject",
+            "Teacher expert sources: explicit V2 declarations and independent exact U compiles all four real adapters together and preserves exact source, C/P/R and original definitions",
+            "Teacher expert sources: explicit V2 declarations and independent exact U does not reinterpret LIBRARY_SCALE native SELF as an expert source",
+            "Teacher expert sources: explicit V2 declarations and independent exact U does not reinterpret STANDARD_SCALE native SELF as an expert source",
+            "Teacher expert sources: explicit V2 declarations and independent exact U forbids LIBRARY_SCALE for a non-PERSON target before any source reads",
+            "Teacher expert sources: explicit V2 declarations and independent exact U forbids STANDARD_SCALE for a non-PERSON target before any source reads",
+            "Teacher expert sources: explicit V2 declarations and independent exact U refuses LIBRARY_SCALE when U is absent, before reading the source body",
+            "Teacher expert sources: explicit V2 declarations and independent exact U refuses PUBLIC_FORM when U is absent, before reading the source body",
+            "Teacher expert sources: explicit V2 declarations and independent exact U refuses STANDARD_SCALE when U is absent, before reading the source body",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'LIBRARY_SCALE' with 'absent' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'LIBRARY_SCALE' with 'another target' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'LIBRARY_SCALE' with 'expert response smuggled into V1' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'LIBRARY_SCALE' with 'legacy SELF V1' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'PUBLIC_FORM' with 'absent' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'PUBLIC_FORM' with 'another target' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'PUBLIC_FORM' with 'expert response smuggled into V1' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'PUBLIC_FORM' with 'legacy SELF V1' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'STANDARD_SCALE' with 'absent' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'STANDARD_SCALE' with 'another target' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'STANDARD_SCALE' with 'expert response smuggled into V1' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects 'STANDARD_SCALE' with 'legacy SELF V1' declaration, even with valid U",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects a changed exact LIBRARY_SCALE hash without using the available latest/source row",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects a changed exact PUBLIC_FORM hash without using the available latest/source row",
+            "Teacher expert sources: explicit V2 declarations and independent exact U rejects a changed exact STANDARD_SCALE hash without using the available latest/source row",
+            "Teacher expert sources: explicit V2 declarations and independent exact U requires the standard C applicability to permit native OBSERVER in addition to the expert declaration",
+            "direct education native Cognitive config/profile freezes actual experience config and report without a Training assignment",
+            "direct education native Cognitive config/profile freezes actual research config and report without a Training assignment",
+            "direct education native Cognitive config/profile freezes actual standard config and report without a Training assignment",
+            "direct education native Cognitive config/profile keeps two explicit profiles of one config separate",
+            "direct education native Cognitive config/profile never substitutes standard for a missing or unknown profile",
+            "direct education native Cognitive config/profile rejects Cognitive and SJT proxy answering before native source reads",
+            "direct education native Cognitive config/profile rejects a 'changed content' original instead of selecting latest",
+            "direct education native Cognitive config/profile rejects a 'retired' original instead of selecting latest",
+            "direct education native Cognitive config/profile rejects a wrong exact hash and roundtrips only exact non-wildcard native U keys",
+            "direct education native Cognitive config/profile requires the original GRANT independently from the new education U, including publication and START recheck",
+            "education exact native SJT original sources bounds and validates exact selections before doing source or permission work",
+            "education exact native SJT original sources checks static deployment and installed content digests without publishing a replacement",
+            "education exact native SJT original sources discovers both real source kinds before locking without granting or mutating anything",
+            "education exact native SJT original sources fails closed for absent M, absent native UUID and an ambiguous author/static UUID",
+            "education exact native SJT original sources freezes the original online author M without borrowing course grants, Survey D or a new owner",
+            "education exact native SJT original sources honors the exact native operational hold rather than selecting an older release",
+            "education exact native SJT original sources rejects a source digest or another M hash instead of substituting a selected exact M",
+            "education exact native SJT original sources retains the existing known-rights restriction without inventing a native license or opening unknown rights",
+            "education exact native SJT original sources retains the native teacher-versus-student SELF boundary",
+            "education exact native SJT original sources reuses original publication and immutable-template checks before admitting an author source",
+            "education exact native SJT original sources uses the installed static mapping and published M verbatim, with no invented owner or rights grant",
+            "education native mapping into the existing shared attempt binding does not grant education native PRIVATE scope without an actual composition anchor",
+            "education native mapping into the existing shared attempt binding refuses different-assignment without falling back to a Scale or default profile",
+            "education native mapping into the existing shared attempt binding refuses different-config without falling back to a Scale or default profile",
+            "education native mapping into the existing shared attempt binding refuses different-profile without falling back to a Scale or default profile",
+            "education native mapping into the existing shared attempt binding refuses different-sjt-version without falling back to a Scale or default profile",
+            "education native mapping into the existing shared attempt binding refuses missing-report without falling back to a Scale or default profile",
+            "education native mapping into the existing shared attempt binding rejects native observer mappings and source aliases at the sealed contract",
+            "education native mapping into the existing shared attempt binding retains two real native families, source identities and ordered native slots",
+            "immutable composition administration summaries keeps Scale/Form summary reads unchanged and prevents author or owner failures from reading metadata",
+            "immutable composition administration summaries keeps database microsecond cursor ordering and the bounded page, and rejects a foreign cursor before reading headers",
+            "immutable composition administration summaries preserves Teacher SELF metadata on the shared version endpoint",
+            "immutable composition administration summaries returns the fixed PARENT_REPORT header without a question body or mutable draft lookup",
+            "immutable composition administration summaries returns the fixed TEACHER_REPORT header without a question body or mutable draft lookup",
+            "native education Cognitive quota belongs to the real Run parent slot allows a second legitimate Run of one frozen source while refusing a duplicate child in the entered parent",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept copied-proof as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept different-Run-assignment as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept different-actor as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept different-config as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept different-native-assignment as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept different-parent as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept different-tx as quota authority",
+            "native education Cognitive quota belongs to the real Run parent slot does not accept missing-binding as quota authority",
+            "observer source catalog and one-leaf preview filters defaults unchanged consumers to SELF and rejects observer filters for the Teacher entry before any source read",
+            "observer source catalog and one-leaf preview filters does not read source bodies when author authority is lost or turn infrastructure errors into an empty catalog",
+            "observer source catalog and one-leaf preview filters library catalog binds the requested PARENT_REPORT to the approved administration header",
+            "observer source catalog and one-leaf preview filters library catalog binds the requested TEACHER_REPORT to the approved administration header",
+            "observer source catalog and one-leaf preview filters one-leaf Scale previews use exact PARENT_REPORT eligibility, without broadening original source access",
+            "observer source catalog and one-leaf preview filters one-leaf Scale previews use exact TEACHER_REPORT eligibility, without broadening original source access",
+            "observer source catalog and one-leaf preview filters previews one PARENT_REPORT form only when the immutable declaration matches, and keeps original use mandatory",
+            "observer source catalog and one-leaf preview filters previews one TEACHER_REPORT form only when the immutable declaration matches, and keeps original use mandatory",
+            "observer source catalog and one-leaf preview filters public catalog distinguishes PARENT_REPORT from SELF and other observers while retaining current use scopes",
+            "observer source catalog and one-leaf preview filters public catalog distinguishes TEACHER_REPORT from SELF and other observers while retaining current use scopes",
+            "online FINAL persistence through the shared service accepts all-optional empty FINAL with null scores and one raw-v2 row; identical replay never writes again",
+            "online FINAL persistence through the shared service does not let a client upgrade a legacy frozen attempt or omit the frozen online protocol",
+            "online FINAL persistence through the shared service keeps a partial substantive optional submission eligible even while the incomplete metric is null",
+            "online FINAL persistence through the shared service rechecks the education Run inside FINAL before child writes, including replay=false",
+            "online FINAL persistence through the shared service rechecks the education Run inside FINAL before child writes, including replay=true",
+            "online FINAL persistence through the shared service rejects required blanks but accepts required refusal as missing evidence without satisfaction",
+            "ordinary education native stored SELF feedback does not read or decrypt any native child for NONE and reads only allowed blocks",
+            "ordinary education native stored SELF feedback honors narrower frozen per-unit metric ceilings, including prose and graphics",
+            "ordinary education native stored SELF feedback keeps saved invalid quality and withholds SJT interpretation text",
+            "ordinary education native stored SELF feedback keeps saved limited quality and withholds SJT interpretation text",
+            "ordinary education native stored SELF feedback preserves research as its exact saved participant profile without creating research export rights",
+            "ordinary education native stored SELF feedback preserves the saved native narrative without returning internal author sums or contribution metadata",
+            "ordinary education native stored SELF feedback reads the exact saved online protocol and published measurement after retirement without selecting latest or scoring",
+            "ordinary education native stored SELF feedback rejects a Cognitive child with a different compiledRuntimeHash instead of trusting childId",
+            "ordinary education native stored SELF feedback rejects a Cognitive child with a different compositeAttemptId instead of trusting childId",
+            "ordinary education native stored SELF feedback rejects a Cognitive child with a different compositeItemId instead of trusting childId",
+            "ordinary education native stored SELF feedback rejects a Cognitive child with a different submissionId instead of trusting childId",
+            "ordinary education native stored SELF feedback rejects a Cognitive child with a different userId instead of trusting childId",
+            "ordinary education native stored SELF feedback rejects a SJT child from another epoch and a changed saved SJT result",
+            "ordinary education native stored SELF feedback rejects a previous-epoch Cognitive admission and an unbound saved report",
+            "ordinary education native stored SELF feedback rejects parent FINAL receipt/core mismatch and a changed sealed source descriptor",
+            "ordinary education native stored SELF feedback requires original Cognitive profile with no standard fallback",
+            "ordinary education native stored SELF feedback requires original Cognitive profileDefinitionVersion with no standard fallback",
+            "ordinary education native stored SELF feedback requires original Cognitive resolvedConfigHash with no standard fallback",
+            "ordinary education native stored SELF feedback requires original Cognitive resolvedConfigSnapshotEncrypted with no standard fallback",
+            "ordinary education native stored SELF feedback requires original Cognitive resolvedReportSnapshotEncrypted with no standard fallback",
+            "ordinary education native stored SELF feedback retains native SJT participant pseudonym, frozen generation and Survey-origin exclusion guards",
+            "ordinary education native stored SELF feedback returns frozen scientific metadata and report limitations without consulting current catalog metadata",
+            "ordinary education native stored SELF feedback returns only the saved participant reports and safe SJT fields from exact frozen FINALs",
+            "ordinary education native stored SELF feedback withholds only Cognitive when its frozen original or profile M is revoked, without decrypting its result",
+            "ordinary education native stored SELF feedback withholds only a revoked SJT M and keeps the exact completed Cognitive participant report",
+            "shared FINAL transaction boundary awaits an asynchronous mandatory authority failure before writing any fact",
+            "shared FINAL transaction boundary keeps the mandatory host lock before child lock and admission before writes",
+            "shared FINAL transaction boundary rechecks epoch after entering the transaction and never writes stale preparation",
+            "shared FINAL transaction boundary rejects a Survey child even if a legacy runtime loader returned it",
+            "shared FINAL transaction boundary rejects preparation from another attempt despite matching scientific hashes",
+            "shared FINAL transaction boundary returns the locked winning replay without overwriting its facts"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/package.json",
+                "blob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/campus/school-observer-feedback.regression.test.ts",
+                "blob": "7cb87de44943edaaf6a3f3250bd3242baf0b80f1"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/education-observer-source-read.test.ts",
+                "blob": "4830bbf39a7236a8e9407761556955b7117d8a96"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+                "blob": "d226c699a14546091c075318cb8213ce8cf825fd"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/native-composition-binding.test.ts",
+                "blob": "de3f3b5388adb57c81942fe0e54e9a1583b8cafb"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/native-source.cognitive.test.ts",
+                "blob": "ea97052a39cd523542624ea5632ad79794425b8f"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/native-source.sjt.test.ts",
+                "blob": "5dc714bd3bb33c93f0f88d650e6a0abcd2612592"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/private-tool.composition-observer.test.ts",
+                "blob": "2006d872b57cc796160d6fa3de3a37f23044cbe0"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/private-tool.composition-version-metadata.test.ts",
+                "blob": "8ffd6c86e908354dc886c3c3558aaca87ef3793a"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/private-tool.composition.test.ts",
+                "blob": "4c81d72c583733bb9e91788069d5c43754c1e707"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/education-tools/private-tool.run-contract.test.ts",
+                "blob": "d52616c5432d3425171bd376bd681d17fa01d38b"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/field-composition.contract.test.ts",
+                "blob": "5443d61e9fa4bab35fa9349d9e9afea0e7cba940"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/field-composition.evidence.test.ts",
+                "blob": "7a2b42a39f36fa7f47de10fe8091885e92c52479"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/field-composition.native-boundary.test.ts",
+                "blob": "5fa133de96301dc5926c10c804025e1e9147ef49"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/field-composition.routes.test.ts",
+                "blob": "8b59d494792a73b5ff7a65dc817227e606a9a9ce"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/field-expert-library-use.test.ts",
+                "blob": "a9c731e5d9a30a37cbe64240d8ff34d5f72c4f8c"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/field-expert-public-sources.test.ts",
+                "blob": "a24519b4b6d2f798a2e493274c01e229bdba3639"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/student-composition.collector.test.ts",
+                "blob": "84077175a8e79ded5f85f494747ef36a0d258020"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/student-composition.contract.test.ts",
+                "blob": "d8ba16051cd25ec8fcbe1cc1865186767d37d98e"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/student-composition.overlap.test.ts",
+                "blob": "8a277eef1f547b4d9f739d0102c3aecbf38a43f5"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/huiteacher/student-composition.runtime.test.ts",
+                "blob": "ec83b8218b3163f7ac306654cd37c82553d2a796"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/reporting/education-ordinary-native-feedback.test.ts",
+                "blob": "69d6b658c2a5176497736ac6f6a414177fae6ee4"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/scale-library-governance/education-distribution-public.contract.test.ts",
+                "blob": "59f69fe850487512695eb2660fa879ad0f2f4cd2"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/situational/sjt-online-final-persistence.test.ts",
+                "blob": "3556e61844e8ab816ec9992655e1df37df7c79f8"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "8f03fd9eb649b0b5bf531b7b9c0be776207562af358823b595faacace4486d83"
+          }
+        },
+        {
+          "files": [
+            "src/__tests__/integration/educationCompositionFences.postgres.integration.test.ts",
+            "src/__tests__/integration/educationNativeSelfComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/educationSchoolObserverComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/educationScientificDefinitionHash.postgres.integration.test.ts",
+            "src/__tests__/integration/huiteacherExpertComposition.postgres.integration.test.ts",
+            "src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts",
+            "src/__tests__/integration/huiteacherStudentComposition.postgres.integration.test.ts"
+          ],
+          "expectedPassed": [
+            "Huiteacher PR4 event-scoped expert access and encrypted field records keeps invited outside expert separate from School membership and private reflection",
+            "School ordinary observer questionnaire: exact subject, relationship and consent parent compiles/fixes, receives a related-child assignment, consents, resumes and finalizes one Scale/Form questionnaire with private completion feedback",
+            "School ordinary observer questionnaire: exact subject, relationship and consent teacher observer requires a homeroom target and preserves the student through START, FINAL and restricted feedback",
+            "Scientific source JSON / exact Node-PostgreSQL seal identity freezes an actually published, approved and granted Library Scale with a legal negative fractional score and preserves its exact C/R",
+            "Scientific source JSON / exact Node-PostgreSQL seal identity matches canonicalJsonString bytes for fractions, signed values, exponent boundaries and actual JS numeric/UTF-16 key order without rounding",
+            "Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL) PRIVATE uses the actual expert/teacher, exact frozen source, current U at NEW entry and independently audited evidence",
+            "Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL) PUBLIC_LIBRARY uses the actual expert/teacher, exact frozen source, current U at NEW entry and independently audited evidence",
+            "Teacher explicit expert Scale/Form field questionnaire (real PostgreSQL) non-person expert observation uses only Form, preserves a null person subject and commits actual canonical evidence",
+            "Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL) PRIVATE_VERSION fixes the teacher/class/source, enforces publication floor, collects canonical zero+Form finals and protects feedback",
+            "Teacher student ordinary Scale/Form questionnaire (isolated PostgreSQL) STANDARD_SCALE fixes the teacher/class/source, enforces publication floor, collects canonical zero+Form finals and protects feedback",
+            "education composition real service fences actual NEW_START and NEW_USE serialize with config retirement without a measurement/config deadlock",
+            "education composition real service fences revocation holding the real org fence prevents a waiting student configuration from creating stale-author data",
+            "education ordinary Scale/Form/Cognitive/SJT native SELF on real PostgreSQL SCHOOL uses actual experience native freezes and four independent FINALs",
+            "education ordinary Scale/Form/Cognitive/SJT native SELF on real PostgreSQL TEACHER uses actual research native freezes and four independent FINALs"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/backend/package-lock.json",
+                "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+              },
+              {
+                "path": "server-version/backend/package.json",
+                "blob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationCompositionFences.postgres.integration.test.ts",
+                "blob": "32e0cc7272a8701e98fde8111c39267d40880dac"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationNativeSelfComposition.postgres.integration.test.ts",
+                "blob": "6b59678fe631d9eb162185b4ba1e16eb30bff19e"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationSchoolObserverComposition.postgres.integration.test.ts",
+                "blob": "26aa757dc7b9a0d3e5b54db8efa0ab13385098d4"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/educationScientificDefinitionHash.postgres.integration.test.ts",
+                "blob": "875a3d4251dd62456251c5984abfd62d6215f994"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/huiteacherExpertComposition.postgres.integration.test.ts",
+                "blob": "23bd95909a4a66568abbb390f1b1fe1c65f9b498"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts",
+                "blob": "9669e74e71b78063c8bb081b05f2c8e7bc3c189d"
+              },
+              {
+                "path": "server-version/backend/src/__tests__/integration/huiteacherStudentComposition.postgres.integration.test.ts",
+                "blob": "a284c23a861f316b760aed4421a603d842e0163b"
+              },
+              {
+                "path": "server-version/backend/vitest.config.ts",
+                "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+              }
+            ],
+            "sha256": "6e8d2e1ce5b97c0e7acc3823f5ec6568aa123192143be2a0c4a475b32524a01f"
+          }
+        }
+      ],
+      "inputClosure": {
+        "files": [
+          {
+            "path": ".github/release-tools/package-lock.json",
+            "blob": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+          },
+          {
+            "path": ".github/release-tools/package.json",
+            "blob": "1913b93fbd582fbbd28398488e8e91d6bb9865d5"
+          },
+          {
+            "path": "server-version/scripts/ci-install-canvas-deps.sh",
+            "blob": "75e8b7f5ce24a53e1c040d105b8b757e3686f102"
+          }
+        ],
+        "trees": [
+          {
+            "path": "server-version/backend",
+            "tree": "3a3efff9479ab3964a5b6af0963bcc643866b802"
+          },
+          {
+            "path": "server-version/frontend",
+            "tree": "8a10fe0cd4b78cf0fff76b77c5e76afbd801ef6a"
+          }
+        ],
+        "sha256": "d979908cba480cb515dfe775c2726341f6d290466067bf07aaf66865964e2f36"
+      }
+    },
+    "migration": {
+      "baselineFixturePath": ".github/scripts/school-teacher-self-baseline.sql",
+      "baselineFixtureSql": "-- Isolated synthetic row-preservation fixture, exact base 908af20ecfbd3ede55685d2052bf01b52266661c; not login or business-authorization evidence.\nBEGIN;\nINSERT INTO users (id,username,password_hash,role,account_domain,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000001','hs_migration_fixture','synthetic-not-a-login-hash','ADMIN','SCHOOL','2026-10-22T00:00:00Z');\nINSERT INTO organizations (id,name,created_by_user_id,product_domain) VALUES\n('8f761e22-0000-4000-8000-000000000002','Synthetic migration school','8f761e22-0000-4000-8000-000000000001','SCHOOL');\nINSERT INTO organization_memberships (id,organization_id,user_id,org_role) VALUES\n('8f761e22-0000-4000-8000-000000000003','8f761e22-0000-4000-8000-000000000002','8f761e22-0000-4000-8000-000000000001','ORG_ADMIN');\nINSERT INTO courses (id,title,course_code,creator_id,course_type,organization_id,status,is_library,is_recruiting,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000004','Synthetic migration preservation','school-teacher-ci-migration','8f761e22-0000-4000-8000-000000000001','CAMPUS_ACTIVITY','8f761e22-0000-4000-8000-000000000002','DRAFT',false,false,'2026-10-22T00:00:00Z');\nINSERT INTO campus_activities (course_id,organization_id,owner_membership_id,purpose) VALUES\n('8f761e22-0000-4000-8000-000000000004','8f761e22-0000-4000-8000-000000000002','8f761e22-0000-4000-8000-000000000003','STUDENT_WELLBEING');\nINSERT INTO education_private_tools(id,entry,organization_id,owner_user_id,kind,title,definition,content_hash)\nVALUES('8f761e22-0000-4000-8000-000000000005','SCHOOL','8f761e22-0000-4000-8000-000000000002','8f761e22-0000-4000-8000-000000000001','FORM','Synthetic pre-existing private Form','{\"schemaVersion\":2,\"pages\":[{\"pageKey\":\"baseline\",\"title\":\"Synthetic preserved Form\",\"questions\":[{\"itemKey\":\"note\",\"type\":\"SHORT_TEXT\",\"prompt\":\"Synthetic preserved question\",\"required\":true,\"options\":[],\"rows\":[]}]}]}'::jsonb,'8eb6dc8ff0c33f938427acde7de57da85a8796104806db7079824864b3deb47f');\nINSERT INTO education_private_tool_versions(id,tool_id,entry,organization_id,owner_user_id,kind,source_revision,title,definition,content_hash)\nSELECT '8f761e22-0000-4000-8000-000000000006',id,entry,organization_id,owner_user_id,kind,revision,title,definition,content_hash FROM education_private_tools WHERE id='8f761e22-0000-4000-8000-000000000005';\nINSERT INTO users(id,username,password_hash,role,account_domain,teacher_approved,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000007','training_migration_fixture','synthetic-not-a-login-hash','TEACHER','TRAINING',true,'2026-10-28T00:00:00Z');\nINSERT INTO composite_assessments(id,code,name,created_by,updated_at) VALUES\n('8f761e22-0000-4000-8000-000000000008','synthetic-existing-training-composite','Synthetic native Training draft','8f761e22-0000-4000-8000-000000000007','2026-10-28T00:00:00Z');\nCOMMIT;\n",
+      "baselineFixtureSha256": "26ca8df0138a868b8a6a99b161d6fa4f10041eadc4c2a46e80d7d6b1b5d7d60e",
+      "preserveTables": [
+        "users",
+        "organizations",
+        "organization_memberships",
+        "courses",
+        "campus_activities",
+        "education_private_tools",
+        "education_private_tool_versions",
+        "composite_assessments"
+      ],
+      "restoreTables": [
+        "users",
+        "organizations",
+        "organization_memberships",
+        "courses",
+        "campus_activities",
+        "education_private_tools",
+        "education_private_tool_versions",
+        "measurement_content_releases",
+        "registered_assessment_resources",
+        "composite_assessments",
+        "composite_assessment_items",
+        "assessments",
+        "composite_form_answers",
+        "composite_form_section_attempts",
+        "composite_assessment_attempts",
+        "assessment_run_executions",
+        "assessment_result_facts",
+        "scale_library_submissions",
+        "scale_library_entries",
+        "scale_library_use_grants",
+        "survey_standard_releases",
+        "survey_standard_versions",
+        "survey_standard_trials",
+        "cognitive_test_configs",
+        "cognitive_assignments",
+        "cognitive_sessions",
+        "cognitive_raw_submissions",
+        "situational_attempts",
+        "situational_raw_submissions",
+        "huiteacher_field_form_evidence",
+        "huiteacher_student_eval_configs",
+        "huiteacher_student_disclosure_ledgers"
+      ]
+    },
+    "finalized": true,
+    "auditComponents": [
+      "frontend",
+      "backend"
+    ],
+    "browserHelper": "server-version/e2e/education-self-questionnaire.cjs",
+    "officialContinuation": {
+      "run": 40849532868,
+      "head": "fe17d12aae66965b59b3bc3ed93d17dd9455cfdb",
+      "checkout": "772a8ed525fd769ebd9e11a432b8f80ffa155612"
+    }
+  },
+  "blockers": []
+}

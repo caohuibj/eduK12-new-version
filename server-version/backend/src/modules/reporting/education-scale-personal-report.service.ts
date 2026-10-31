@@ -1,19 +1,12 @@
+import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
+import {readNativeEducationScaleFeedback} from './education-native-scale-feedback'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { readEducationScaleExecutionSource } from '../assessment-run/educationScaleExecutionSource'
-import { privateToolImageReferences } from '../education-tools/private-tool.media-definition'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
-import { loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
-import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
-import { loadFrozenActiveSlotSet, compositeItemSlotKey } from '../assessment-runtime/slot-set'
-import { resolveStoredScaleResult, loadStoredCanonicalUnitResults, createStoredScaleFactsReader } from '../assessment-runtime/compact-assessment-storage'
-import { scaleProjectionPolicyFromCompiled } from '../scale/projection/policy-resolver'
-import { DISCLOSURE_PRESETS } from '../scale/policy/disclosure'
-import { buildScaleUnitReport, type ScaleUnitReport } from './scale-unit-report'
-import { educationLibraryV1ProjectionPolicy, projectEducationScaleIndividualReport } from './education-scale-report.projector'
 import { reportingFail } from './types'
 
 export type EducationPersonalReportInput = {
@@ -86,88 +79,23 @@ export async function readEducationRespondentScaleReport(input: EducationPersona
     const rule = contract.audiences.RESPONDENT
     // This stage deliberately does not infer subject/observer read rights.
     if (rule.mode !== 'INDIVIDUAL_SUMMARY') return withheld()
-    if (own.policy.analysisMode !== 'INDIVIDUAL_ONLY') return hidden()
+    if (own.policy.analysisMode !== 'INDIVIDUAL_ONLY' && !isSelfGroupV2Entry(source.resourceEntry)) return hidden()
     const parent = await tx.compositeAssessmentAttempt.findUnique({ where: { id: own.attemptId } })
     if (!parent || parent.status !== 'COMPLETED' || parent.compositeAssessmentId !== source.compositeId
       || parent.userId !== input.actorUserId || parent.respondentUserId !== input.actorUserId
       || parent.subjectUserId !== input.actorUserId || parent.assignmentRef !== own.assignmentId
       || !parent.frozenActiveSlotSetEncrypted || !parent.frozenActiveSlotSetHash) return hidden()
-    const children = await tx.assessment.findMany({ where: { compositeAttemptId: parent.id,
-      compositeItemId: source.compositeItemId, scaleId: source.scaleId, attemptEpoch: parent.attemptEpoch } })
-    if (children.length !== 1) return hidden()
-    const child = children[0]
-    if (child.status !== 'COMPLETED' || child.userId !== input.actorUserId
-      || child.respondentUserId !== input.actorUserId || child.subjectUserId !== input.actorUserId
-      || !child.submissionId || !child.runtimeSnapshotEncrypted || !child.compiledRuntimeHash
-      || !child.frozenAdmissionSnapshotHash || !child.compositeAttemptId || !child.compositeItemId) return hidden()
-    const finalRows = await tx.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: parent.id,
-      attemptEpoch: parent.attemptEpoch, slotKey: compositeItemSlotKey(child.compositeItemId, 'SCALE'),
-      unitType: 'SCALE', terminalState: 'COMPLETED', payloadKind: 'UNIT_RESULT' } })
-    if (finalRows.length !== 1) return hidden()
-    const finalUnit = finalRows[0]
-    if (!finalUnit.canonicalResultEncrypted || !finalUnit.compositeAttemptId || !finalUnit.sourceSubmissionId
-      || !finalUnit.sourceDefinitionHash || !finalUnit.compiledRuntimeHash) return hidden()
-    const runtime = await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted, tx)
-    if (runtime.sourceDefinitionHash !== source.sourceDefinitionHash) return hidden()
-    const admission = await loadStoredVersionedUnitAdmission(child, 'Report admission unavailable', tx)
-    const slotSet = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, tx)
-    // Reuse immutable facts within this authorized transaction only. Both views
-    // retain independent reconstruction and canonical consistency checks.
-    const reader = await createStoredScaleFactsReader([child], tx)
-    const [canonical] = await loadStoredCanonicalUnitResults([finalUnit.canonicalResultEncrypted], tx, [], reader)
-    if (canonical.core.unitType !== 'SCALE' || canonical.core.sourceDefinitionHash !== runtime.sourceDefinitionHash
-      || canonical.core.compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash
-      || canonical.core.contextHash !== (parent.contextSnapshotHash ?? null)
-      || canonical.persistenceProvenance.sourceType !== 'ASSESSMENT'
-      || canonical.persistenceProvenance.sourceAttemptId !== child.id
-      || canonical.persistenceProvenance.sourceSubmissionId !== child.submissionId) return hidden()
-    const storedResult = await resolveStoredScaleResult(child.result, { record: child, db: tx, reader })
-    const report = buildScaleUnitReport({ assessmentId: child.id, itemId: child.compositeItemId,
-      scaleId: child.scaleId, scaleCode: runtime.instrumentKey, scaleName: admission?.scale?.name ?? source.resourceEntry.title,
-      result: storedResult, completedAt: child.completedAt, totalTime: child.totalTime })
-    if (!report.result || report.decryptError) return hidden()
-    // Canonical FINAL is the scoring authority. The display result may not
-    // contradict it, even when legacy/full storage rather than compact facts is used.
-    if (canonical.core.metrics.length !== report.result.scores.length
-      || report.result.scores.some(score => !canonical.core.metrics.some(metric => metric.key === score.key
-        && metric.value === score.value && metric.quality === score.status))
-      || canonical.core.quality.status !== report.result.quality.status
-      || (canonical.bundleBridge && canonicalHash(canonical.bundleBridge.rawScoreFeedback ?? []) !== canonicalHash(report.result.rawScoreFeedback ?? []))) return hidden()
-    const full = DISCLOSURE_PRESETS.FULL_REPORT()
-    const projected = projectEducationScaleIndividualReport({ report, frozenSnapshot: runtime,
-      persistedFacts: { actorUserId: input.actorUserId, resultDisclosureHash: canonicalHash(contract), admission, slotSet,
-        ...(source.sourceKind === 'LIBRARY' ? { approvedLibrarySource: { approvedSnapshotHash: source.approvedSnapshotHash,
-          sourceDefinitionHash: source.sourceDefinitionHash, resultDisclosureHash: canonicalHash(source.resultDisclosure) } }
-          : { privateVersionSource: { versionId: source.origin.versionId, contentHash: source.origin.contentHash,
-            sourceDefinitionHash: source.sourceDefinitionHash, resultDisclosureHash: canonicalHash(source.resultDisclosure) } }),
-        parent: { id: parent.id, attemptEpoch: parent.attemptEpoch, frozenActiveSlotSetHash: parent.frozenActiveSlotSetHash },
-        assessment: { id: child.id, scaleId: child.scaleId, userId: child.userId, compositeAttemptId: child.compositeAttemptId,
-          compositeItemId: child.compositeItemId, attemptEpoch: child.attemptEpoch, status: child.status,
-          submissionId: child.submissionId, compiledRuntimeHash: child.compiledRuntimeHash, frozenAdmissionSnapshotHash: child.frozenAdmissionSnapshotHash },
-        finalUnit: { ...finalUnit, compositeAttemptId: finalUnit.compositeAttemptId, sourceSubmissionId: finalUnit.sourceSubmissionId,
-          sourceDefinitionHash: finalUnit.sourceDefinitionHash, compiledRuntimeHash: finalUnit.compiledRuntimeHash } },
-      resultAudience: 'RESPONDENT', resultDisclosure: contract,
-      context: { principalId: input.actorUserId, audience: 'respondent', purpose: 'report',
-        accessDecision: { source: 'RESOURCE_AUTHORIZATION', allowed: true, capabilities: full },
-        frozenPolicy: runtime.schemaVersion === 2 ? scaleProjectionPolicyFromCompiled(runtime.compiledPolicy) : educationLibraryV1ProjectionPolicy(), currentRestrictions: full,
-        relationalDisposition: 'INDIVIDUAL_ALLOWED' } })
+    const projected=(await readNativeEducationScaleFeedback(tx,{actorUserId:input.actorUserId,parent,sources:[{
+      itemId:source.compositeItemId,scaleId:source.scaleId,title:source.resourceEntry.title,sourceDefinitionHash:source.sourceDefinitionHash,
+      resultDisclosure:contract,...(source.sourceKind==='LIBRARY'?{approvedLibrary:{approvedSnapshotHash:source.approvedSnapshotHash}}
+        :{privateVersion:{versionId:source.origin.versionId,contentHash:source.origin.contentHash}}),
+    }]})).get(source.compositeItemId)
     // Recheck current task/report access after every asynchronous materialization.
     const current = await readOwn(tx, input)
     if (!current || current.attemptId !== own.attemptId || current.assignmentId !== own.assignmentId
       || current.policyHash !== own.policyHash || canonicalHash(current.policy) !== current.policyHash
       || current.resourceKey !== own.resourceKey || current.resourceVersion !== own.resourceVersion) return hidden()
-    if (projected.state !== 'PROJECTED') return withheld()
-    if (source.sourceKind === 'AUTHOR_PRIVATE') {
-      // The complete frozen definition matches the independently verified
-      // version source; its report refs, not stimulus refs or author edit URLs,
-      // are the extra ceiling on the already audience/metric-filtered images.
-      const refs = privateToolImageReferences('SCALE', runtime.definition).reports
-      for (const unit of projected.unitReports) {
-        if ('rawScoreFeedback' in unit && unit.rawScoreFeedback?.some((feedback: NonNullable<ScaleUnitReport['rawScoreFeedback']>[number]) => feedback.images?.some(image =>
-          !refs.some(ref => ref.assetId === image.asset.assetId && ref.contentHash === image.asset.contentHash
-            && ref.mimeType === image.asset.mimeType)))) return hidden()
-      }
-    }
+    if (!projected||projected.state !== 'PROJECTED') return withheld()
     return { schemaVersion: 1 as const, kind: 'EDUCATION_SCALE_PERSONAL_REPORT' as const,
       state: 'READY' as const, mode: 'INDIVIDUAL_SUMMARY' as const, message: '以下反馈来自本次作答使用的固定量表版本。', unitReports: projected.unitReports }
   })

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "gse3_asku_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "bd75e437332c6d614cd750eb34797e990c1e73735d2341816df60c2c6d3a23b3",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "general_self_efficacy"
+    ],
+    "scoreOrder": [
+      "general_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "general_self_efficacy",
+        "headline": "应对困难的信心：非商业研究描述",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份小问卷关注的是：遇到难题时，你对“自己能想出办法”有多大信心。三道题的平均分在1到5之间；分数越高，表示你这次越认同自己能应对困难，并不是说实际能力一定更强。比如，接到一项没做过的任务，有人会先想“我可以试着拆成几步”，也有人会先想“我还需要更多准备”。这些想法都可能随经验、时间和支持而变化，没有必要据此给自己贴标签。目前这份中文工作译稿还缺少充分验证，所以不把你分成高、中、低，也不拿国外人群的平均分给你排名。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想想最近一次有点棘手、但最后处理好了的事情：你做了什么？有没有人或工具帮上忙？这些支持同样算数。"
+          },
+          {
+            "category": "strategy",
+            "text": "下次遇到难题时，不妨先列出“我已经会的”“我还需要的”和“今天能做的一小步”。这不是提高问卷分数的练习，而是给自己找一个更容易开始的入口。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "仅限符合CC BY-NC-SA4.0条件的非商业研究使用，公共库收录不等于商业用途许可。",
+      "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+      "不启用英德成人在线配额样本常模；没有可用的临床阈值或高低分档，3仅是理论中点。",
+      "三题均合法有效才计算均分；个人报告不插补。原文讨论的研究级MI/FIML不在此执行。",
+      "GSE-3与ASKU属同一家族，不计为两个工具；与Schwarzer/Jerusalem GSE10、IPIP-NEO C1不是同一工具。",
+      "不用于诊断、能力鉴定、高风险选择或学生排名。"
+    ],
+    "disclaimer": "非商业研究专用。中文工作译稿未经验证，不用于心理诊断或能力鉴定。Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0. 本包中文题本及随附反馈以同一CC BY-NC-SA4.0许可分发：https://creativecommons.org/licenses/by-nc-sa/4.0/ 。收费/学校场景不自动合规，须核实实际用途；不暗示原作者认可。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:48:00Z",
+        "basis": "AI editorial check: noncommercial/ShareAlike notice, adult research description, faithful anchors and no unsupported norms; not human expert translation approval."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "general_self_efficacy"
+    ],
+    "scoreOrder": [
+      "general_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "general_self_efficacy",
+        "headline": "遇到复杂任务时，你怎样看待自己的把握",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这三题整理的是一般性的任务信心：遇到困难时能否依靠自己的能力、独立处理问题，以及面对复杂任务时是否相信能完成。三题均分范围1–5，数值越大，表示这次整体更认可这些信心描述。它没有直接观察你完成任务的表现，也不能告诉我们哪一种具体能力强或弱。\n\n例如，第一次办理复杂手续时，你可能知道怎样整理材料，却不熟悉某个新要求。需要查资料、确认规则或请人解释，不等于原有能力失效；觉得自己能处理，也仍可以核对结果。“独立解决”是一种自我描述，不是这份报告要求你全程不借助工具或别人。\n\n如果你已有处理类似任务的经验，可以看看哪些步骤能复用；若暂时没把握，也可以区分是任务不清、信息不足还是资源不够。下面的例子和行动供你核对，并不是总分已经揭示了你的困难原因。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "找一项可复用的经验：回想一件以前处理过的棘手事，写下自己具体完成的步骤，以及用到的资料、工具或支持，不把得到帮助从成功经历里扣掉。"
+          },
+          {
+            "category": "strategy",
+            "text": "把难题分成三列：“我已经会的”“还需要弄清的”“现在能开始的一步”。例如先核对一项材料要求，而不是要求自己马上解决整套流程。"
+          },
+          {
+            "category": "support",
+            "text": "把求助问得具体一点：如果卡住，可以问“这一项需要哪种证明？”或“你能帮我检查这个步骤吗？”完成一个阶段后再核对效果、调整办法，不只靠催自己更自信。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本中文工作译稿尚待专家译审、认知访谈和目标人群验证，没有可用的中文分档或人群排名。三题需完整有效才算均分，漏答不代填，也不按0分或最低分处理。"
+    ],
+    "disclaimer": "非商业研究专用。中文工作译稿未经验证，不用于心理诊断或能力鉴定。Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0. 本包中文题本及随附反馈以同一CC BY-NC-SA4.0许可分发：https://creativecommons.org/licenses/by-nc-sa/4.0/ 。收费/学校场景不自动合规，须核实实际用途；不暗示原作者认可。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:16:56Z",
+        "basis": "本次只读审阅gse3_asku_zh_cn_research C1.0.0真实source、已有证据及新1.1.0报告文字：核得分范围/方向、真实时窗、固定解释与条件式例子、可选行动、单一短限制、缺失边界；保留原受众权限和来源许可。不继承旧审核日期，不声称作者批准、中文验证或新计分/PG/CI测试通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "general_self_efficacy"
+    ],
+    "scoreOrder": [
+      "general_self_efficacy"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "general_self_efficacy",
+        "headline": "能靠自己，也不必总开“单机模式”",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：借助工具和别人，不会把你的努力清零。\n\n这不是一场“全程不用求助”的挑战。问卷只用三题回看你面对困难和复杂任务时，对自己能力的通常信心。平均分在1–5之间，数值越大，表示这次更认可“我能应对”的描述；不是给实际能力盖合格章，也不按某个分数把人分组。\n\n假设你要完成一份不熟悉的申请。你会整理材料，但其中一项规则没看懂：查说明、用清单、问窗口，都是处理任务的实际做法，不会因为“不是独自想出来的”就不算数。相反，如果很有把握，也可以让一份核对清单帮你发现漏项。\n\n若你想到的是“我怎么又需要帮忙”，不妨先把镜头拉回具体问题：哪里已会、哪里未知、哪里需要合作？若你已经有一套顺手的流程，就把有效的部分保留下来。这是通用解释与可选尝试，不是系统已从三道题判断了你的独立程度。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "打开已有技能栏：写下一项这次用得上的技能，例如整理信息、耐心核对或拆分步骤。尽量写做法，不必先给自己一句很大的肯定。"
+          },
+          {
+            "category": "support",
+            "text": "发出一条具体“协作请求”：说明卡在哪一步、已经查过什么、希望对方帮哪一处。求助可以有边界，不必把整件事交出去，也不必一切独扛。"
+          },
+          {
+            "category": "strategy",
+            "text": "保存一次通关记录：做完后留下“我做了什么、哪个工具或帮手有用、下次先查什么”。碰到新难题时，从这条记录开始，而不是从“我到底行不行”重新审判自己。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本中文工作译稿尚待专家译审、认知访谈和目标人群验证，没有可用的中文分档或人群排名。三题需完整有效才算均分，漏答不代填，也不按0分或最低分处理。"
+    ],
+    "disclaimer": "非商业研究专用。中文工作译稿未经验证，不用于心理诊断或能力鉴定。Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0. 本包中文题本及随附反馈以同一CC BY-NC-SA4.0许可分发：https://creativecommons.org/licenses/by-nc-sa/4.0/ 。收费/学校场景不自动合规，须核实实际用途；不暗示原作者认可。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:16:56Z",
+        "basis": "本次只读审阅gse3_asku_zh_cn_research C1.0.0真实source、已有证据及新1.2.0报告文字：核得分范围/方向、真实时窗、固定解释与条件式例子、可选行动、单一短限制、缺失边界；保留原受众权限和来源许可。不继承旧审核日期，不声称作者批准、中文验证或新计分/PG/CI测试通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

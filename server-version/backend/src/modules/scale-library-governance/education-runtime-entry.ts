@@ -4,11 +4,13 @@ import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
 import {compileEducationApplicability,type EducationApplicabilityVariant} from './education-applicability'
 import {educationLibraryProduct,fail} from './contracts'
+import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
+import {assertSelfGroupOwnSummaryCeiling,assertSelfGroupV2Entry,buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
 
 const hash=z.string().regex(/^[a-f0-9]{64}$/)
 /** Persisted inside the registered resource entry; never a user-supplied grant. */
 export const educationLibraryOriginSchema=z.object({
-  schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
+  schemaVersion:z.literal(1),adapterVersion:z.union([z.literal('1.0.0'),z.string().regex(/^2\.0\.\d+$/)]),
   entryId:z.string().guid(),product:educationLibraryProduct,releaseId:z.string().guid(),contentHash:hash,
   approvedSnapshotHash:hash,sourceDefinitionHash:hash,applicabilityHash:hash,variantKey:z.enum([
     'STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF','TEACHER:STUDENT_REPORT']),
@@ -17,9 +19,9 @@ export const educationLibraryOriginSchema=z.object({
 }).strict()
 export type EducationLibraryOrigin=z.infer<typeof educationLibraryOriginSchema>
 export type EducationLibraryResourceEntry=RelationalProductEntryV1&{libraryOrigin:EducationLibraryOrigin}
-export const educationLibraryResourceKey=(origin:EducationLibraryOrigin)=>`library-scale:${origin.entryId}:${origin.product}:${origin.variantKey}`
+export const educationLibraryResourceKey=(origin:EducationLibraryOrigin)=>`library-scale:${origin.entryId}:${origin.product}:${origin.variantKey}${origin.adapterVersion==='1.0.0'?'':':GROUP'}`
 export function educationLibraryResourceProduct(key:string){
-  const match=/^library-scale:([a-f0-9-]{36}):(SCHOOL|TEACHER):(STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:(?:SELF|STUDENT_REPORT))$/.exec(key)
+  const match=/^library-scale:([a-f0-9-]{36}):(SCHOOL|TEACHER):(STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:(?:SELF|STUDENT_REPORT))(?::GROUP)?$/.exec(key)
   if(!match||!z.string().guid().safeParse(match[1]).success)fail('EDUCATION_LIBRARY_RESOURCE_KEY_INVALID')
   return match[2] as EducationLibraryOrigin['product']
 }
@@ -30,8 +32,21 @@ export function educationLibraryResourceProduct(key:string){
  * person report-read permission. Disclosure below is only a content ceiling.
  */
 export function educationLibraryResourceEntry(input:{origin:EducationLibraryOrigin;variant:EducationApplicabilityVariant;
-  title:string;definition:ScaleDefinitionV2;compositeId:string}):EducationLibraryResourceEntry{
+  title:string;definition:ScaleDefinitionV2;compositeId:string;disclosure?:unknown}):EducationLibraryResourceEntry{
   const origin=educationLibraryOriginSchema.parse(input.origin),v=input.variant
+  if(origin.adapterVersion!=='1.0.0'){
+    if(v.responseMode!=='SELF')fail('EDUCATION_LIBRARY_GROUP_SELF_REQUIRED')
+    const baseline=educationLibraryResourceEntry({...input,origin:{...origin,adapterVersion:'1.0.0'}})
+    const disclosure=validateResultDisclosureContract(input.disclosure)
+    assertSelfGroupOwnSummaryCeiling({approved:baseline.resultDisclosure!,proposed:disclosure})
+    const keys=new Set(input.definition.scoring.scores.map(score=>score.key))
+    if(disclosure.audiences.SUBJECT.mode!=='NONE'||Object.values(disclosure.audiences).some(rule=>rule.metricKeys.some(key=>!keys.has(key))))fail('EDUCATION_LIBRARY_GROUP_METRIC_CEILING')
+    const entry:EducationLibraryResourceEntry={...baseline,libraryOrigin:origin,title:`${input.title}（群体汇总与原本人反馈）`,
+      applicability:{...baseline.applicability,resourceKey:educationLibraryResourceKey(origin),resourceVersion:origin.adapterVersion,
+        analysisMode:'COHORT_AGGREGATE',visibilityPolicyKey:SELF_GROUP_POLICY_KEY,minimumRespondents:disclosure.minimumRespondents},
+      resultDisclosure:disclosure,cohortAnalysisPolicy:buildSelfGroupCohortAnalysisPolicy(disclosure)}
+    assertSelfGroupV2Entry(entry);createRelationalProductRegistry([entry]);return entry
+  }
   const [population,responseMode]=origin.variantKey.split(':')
   const expected=compileEducationApplicability({schemaVersion:1,administrations:[{population,responseMode}]}).variants[0]
   if(canonicalHash(v)!==canonicalHash(expected)||canonicalHash(input.definition)!==origin.sourceDefinitionHash)
@@ -45,7 +60,7 @@ export function educationLibraryResourceEntry(input:{origin:EducationLibraryOrig
   const personal=v.responseMode==='SELF'&&((v.population==='STUDENT'&&audience==='student')
     ||(v.population==='TEACHER'&&audience==='teacher'))
   const none={mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}
-  const self={mode:'INDIVIDUAL_SUMMARY' as const,metricKeys,longitudinalMetricKeys:[]}
+  const self={mode:'INDIVIDUAL_SUMMARY' as const,metricKeys,longitudinalMetricKeys:input.definition.report.audienceContract?.longitudinalMetricKeys??[]}
   const policyKey='EDUCATION_LIBRARY_APPROVED_CONTENT_V1'
   // Observer consent is an existing collection prerequisite, not report access.
   // The independent result-disclosure ceiling below remains NONE for observers.

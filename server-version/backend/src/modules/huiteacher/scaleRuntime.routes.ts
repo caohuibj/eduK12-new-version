@@ -12,6 +12,7 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { success,notFound } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
+import {readTeacherPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
@@ -57,8 +58,9 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
       AND track."organization_id"=execution."organization_id"
       AND track."run_id"=execution."run_id"
       AND track."resource_family"='SCALE'
-      AND (track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND ((track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
         OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+        OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'
         OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
     JOIN "users" actual_respondent
       ON actual_respondent."id"=${input.actorUserId}
@@ -130,8 +132,9 @@ export async function listOwnTeacherScaleTasks(userId:string){
       ON track."organization_id"=e."organization_id"
       AND track."run_id"=e."run_id" AND track."id"=e."track_id"
       AND track."resource_family"='SCALE'
-      AND (track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND ((track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
         OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+        OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'
         OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
     JOIN "registered_assessment_resources" registered
       ON registered."resource_key"=track."resource_key"
@@ -207,6 +210,7 @@ export async function listOwnTeacherScaleTasks(userId:string){
   `
   return {list:rows.slice(0,100),truncated:rows.length>100}
 }
+router.post('/scale-tasks/:executionId/changes',authenticateHuiteacher,wrap(req=>readTeacherPersonalChanges({actorUserId:req.user!.userId,executionId:uuid.parse(req.params.executionId)})))
 router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>
   listOwnTeacherScaleTasks(req.user!.userId)))
 router.post('/run-executions/:executionId/start-scale',

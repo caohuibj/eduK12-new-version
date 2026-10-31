@@ -13,9 +13,10 @@ env:
   PLAN: ${{ inputs.plan }}
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  GH_TOKEN: ${{ github.token }}
 jobs:
   admission:
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && (github.event.pull_request.draft == false || (fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly == true)) && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -23,15 +24,32 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
-      - name: verify only new control contracts
+      - name: tighten only the user-approved PR392 temporary Chrome package write bits
+        if: fromJSON(inputs.plan).publicPackage == true
+        env:
+          SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-public-package-scope
+        run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+      - name: inspect existing Chrome before any package producer or runtime scan
+        if: fromJSON(inputs.plan).publicPackage == true
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node server-version/e2e/school-teacher-chrome.cjs preflight
+      - name: verify legacy candidate control contracts
+        if: fromJSON(inputs.plan).candidate != 'education-self' && fromJSON(inputs.plan).candidate != 'native-bundle'
         run: |
           node --test .github/scripts/school-teacher-fresh.test.mjs .github/scripts/school-teacher-restore.test.mjs server-version/e2e/school-teacher-theme-settle.test.cjs
           node --test --test-name-pattern='complete exact-source report' server-version/e2e/school-teacher-ui.test.cjs
+      - name: verify current SELF scope job artifact and browser-report contracts
+        if: fromJSON(inputs.plan).candidate == 'education-self' && fromJSON(inputs.plan).continuation != 'observer-run2'
+        run: node --test .github/scripts/school-teacher-self.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -40,6 +58,7 @@ jobs:
           if-no-files-found: error
           retention-days: 3
   frontend:
+    if: fromJSON(inputs.plan).preflightOnly != true
     needs: admission
     runs-on: ubuntu-24.04
     timeout-minutes: 12
@@ -52,19 +71,24 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - name: prepare exact frontend type dependencies without compiling backend
+        if: fromJSON(inputs.plan).continuation != 'observer-run2' && fromJSON(inputs.plan).continuation != 'package-browser-only'
         env:
           PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
         run: |
           npm ci --ignore-scripts --prefix server-version/backend
           node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
           npm ci --prefix server-version/frontend
-      - name: execute current frontend types lint affected tests and one production build
+      - name: verify the fixed official frontend checks and immutable build or execute fresh inputs
         run: node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4
+        if: fromJSON(inputs.plan).continuation != 'package-browser-only'
         with:
           name: school-teacher-frontend-${{ github.sha }}
           path: server-version/frontend/dist
@@ -77,10 +101,20 @@ jobs:
           path: school-teacher-evidence/*.json
           if-no-files-found: error
           retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).continuation != 'package-browser-only'
+        with:
+          name: school-teacher-native-frontend-context-${{ github.sha }}
+          path: |
+            school-teacher-evidence/frontend-runtime.tar.gz
+            school-teacher-evidence/frontend-runtime-context.json
+          if-no-files-found: error
+          retention-days: 3
       - name: remove private diagnostics
         if: always()
         run: node .github/scripts/school-teacher-checks.mjs cleanup
   connected:
+    if: fromJSON(inputs.plan).candidate != 'education-self' && fromJSON(inputs.plan).candidate != 'native-bundle'
     needs: [admission, frontend]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -110,15 +144,18 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - name: bind disposable endpoints after service initialization
         env:
-          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports['6379'] }}/0
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
         run: |
@@ -138,7 +175,7 @@ jobs:
         run: |
           node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
           node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-      - name: compile current backend once and bind the immutable output to this run
+      - name: verify the fixed official backend build or compile fresh inputs once
         run: node .github/scripts/school-teacher-checks.mjs backend
       - uses: actions/upload-artifact@v4
         with:
@@ -148,7 +185,7 @@ jobs:
           retention-days: 3
       - name: prove nonempty upgrade from the frozen main339 baseline
         run: node .github/scripts/school-teacher-checks.mjs migrate
-      - name: execute current affected backend and PostgreSQL assertions with real capacity guard
+      - name: verify fixed official backend and PostgreSQL assertions or execute fresh inputs
         run: node .github/scripts/school-teacher-checks.mjs postgres
       - uses: actions/download-artifact@v4
         with:
@@ -173,7 +210,7 @@ jobs:
         env:
           SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
         run: node server-version/e2e/school-teacher-browser.cjs
-      - name: require exact original and new UI assertion matrices
+      - name: require exact current SELF browser assertion matrix
         run: node .github/scripts/school-teacher-checks.mjs browser-report
       - name: prove nonempty current schema restore retains affected facts
         run: node .github/scripts/school-teacher-checks.mjs restore
@@ -189,7 +226,216 @@ jobs:
             school-teacher-evidence/screenshots/*.png
           if-no-files-found: error
           retention-days: 3
+  backend-self:
+    needs: admission
+    if: fromJSON(inputs.plan).candidate == 'education-self' || (fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly != true)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      NODE_ENV: test
+      PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/type_generation_only
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: fetch only the fixed original observer merge checkout
+      if: fromJSON(inputs.plan).continuation == 'observer-run2'
+      run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+      run: npm ci --ignore-scripts --prefix .github/release-tools
+    - if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+      run: bash server-version/scripts/ci-install-canvas-deps.sh
+    - if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+      working-directory: server-version/backend
+      run: npm ci
+    - if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+      working-directory: server-version/backend
+      run: |
+        node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
+        node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+    - name: compile the changed main tooling input and current backend exactly once
+      run: node .github/scripts/school-teacher-checks.mjs backend
+    - uses: actions/upload-artifact@v4
+      if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+      with:
+        name: school-teacher-backend-${{ github.sha }}
+        path: server-version/backend/dist
+        if-no-files-found: error
+        retention-days: 3
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: school-teacher-backend-checks-${{ github.sha }}
+        path: school-teacher-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+    - uses: actions/upload-artifact@v4
+      if: fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).continuation != 'package-browser-only'
+      with:
+        name: school-teacher-native-backend-context-${{ github.sha }}
+        path: |
+          school-teacher-evidence/backend-runtime.tar.gz
+          school-teacher-evidence/backend-runtime-context.json
+        if-no-files-found: error
+        retention-days: 3
+    - name: remove private test material on every outcome
+      if: always()
+      run: node .github/scripts/school-teacher-checks.mjs cleanup
+  postgres-self:
+    if: fromJSON(inputs.plan).candidate == 'education-self'
+    needs: [admission, backend-self]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: fetch only the fixed original observer merge checkout
+      run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: verify original PG assertions and completed official restore without executing them again
+      run: node .github/scripts/school-teacher-checks.mjs postgres
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: school-teacher-postgres-${{ github.sha }}
+        path: school-teacher-evidence/*.json
+        if-no-files-found: error
+        retention-days: 3
+    - name: remove private proof archives on every outcome
+      if: always()
+      run: node .github/scripts/school-teacher-checks.mjs cleanup
+
+  browser-self:
+    if: fromJSON(inputs.plan).candidate == 'education-self'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_DB: school_teacher_browser_ci_test
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: synthetic-actions-disposable
+        ports:
+        - 5432/tcp
+        options: --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test" --health-interval 5s --health-timeout
+          5s --health-retries 20
+      redis:
+        image: redis:7.4-bookworm
+        ports:
+        - 6379/tcp
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      NODE_ENV: test
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
+      PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
+      ASSESSMENT_COMPACT_FACTS_ENABLED: 'false'
+    needs:
+    - admission
+    - frontend
+    - backend-self
+    - postgres-self
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - name: fetch only the fixed original observer merge checkout
+      if: fromJSON(inputs.plan).continuation == 'observer-run2'
+      run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: bind disposable endpoints after service initialization
+      env:
+        DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+        SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432']
+          }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+        RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports['5432']
+          }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+        REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports['6379'] }}/0
+        CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+      run: |
+        export UPLOAD_DIR="$RUNNER_TEMP/school-teacher-checks-private/uploads"
+        mkdir -p "$UPLOAD_DIR"
+        chmod 700 "$RUNNER_TEMP/school-teacher-checks-private" "$UPLOAD_DIR"
+        for key in JWT_SECRET ASSET_SIGNING_SECRET DATA_ENCRYPTION_KEY DATA_PSEUDONYM_KEY CAMPUS_ELIGIBILITY_HMAC_KEY CAMPUS_MFA_ENCRYPTION_KEY; do
+          printf -v "$key" '%s' "$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))")"
+          export "$key"
+          printf '::add-mask::%s\n' "${!key}"
+          printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
+        done
+        for key in JWT_SECRET UPLOAD_DIR DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL RELEASE_INTEGRATION_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
+          printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
+        done
+    - run: npm ci --ignore-scripts --prefix .github/release-tools
+    - run: bash server-version/scripts/ci-install-canvas-deps.sh
+    - working-directory: server-version/backend
+      run: npm ci
+    - working-directory: server-version/backend
+      run: |
+        node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
+        node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+    - uses: actions/download-artifact@v4
+      with:
+        name: school-teacher-backend-${{ github.sha }}
+        path: server-version/backend/dist
+    - run: node .github/scripts/school-teacher-checks.mjs verify-backend-artifact
+    - name: initialize fresh browser service schema without repeating the nonempty upgrade qualification
+      working-directory: server-version/backend
+      run: node node_modules/prisma/build/index.js migrate deploy
+    - uses: actions/download-artifact@v4
+      with:
+        name: school-teacher-frontend-${{ github.sha }}
+        path: server-version/frontend/dist
+    - run: node .github/scripts/school-teacher-checks.mjs verify-frontend-artifact
+    - name: prepare only the missing authenticated CJK font without claiming visual success
+      run: node .github/scripts/school-teacher-checks.mjs fonts
+    - name: tighten only the confirmed PR382 verified Chrome package write bits
+      if: github.repository == 'caohuibj/eduK12-new-version' && github.event_name == 'pull_request' && github.event.pull_request.number == 382 && github.event.pull_request.head.ref == 'release/education-self-scale-form-20261028' && github.event.pull_request.head.repo.full_name == github.repository && fromJSON(inputs.plan).candidate == 'education-self'
+      env:
+        SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-self-package-scope
+      run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+    - name: tighten only the confirmed PR385 verified Chrome package write bits
+      if: github.repository == 'caohuibj/eduK12-new-version' && github.event_name == 'pull_request' && github.event.pull_request.number == 385 && github.event.pull_request.head.ref == 'release/education-observer-native-20261029' && github.event.pull_request.head.repo.full_name == github.repository && fromJSON(inputs.plan).continuation == 'observer-run2'
+      env:
+        SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-observer-package-scope
+      run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+    - name: inspect this runner Chrome, no automatic install or fallback
+      run: node server-version/e2e/school-teacher-chrome.cjs preflight
+    - name: seed restricted synthetic browser identities without exposing private output
+      run: node .github/scripts/school-teacher-checks.mjs seed
+    - name: execute real School Teacher journey with sandboxed official Chrome
+      env:
+        SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
+      run: node server-version/e2e/school-teacher-browser.cjs
+    - name: require exact current SELF browser assertion matrix
+      run: node .github/scripts/school-teacher-checks.mjs browser-report
+    - name: remove private test material on every outcome
+      if: always()
+      run: node .github/scripts/school-teacher-checks.mjs cleanup
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: school-teacher-browser-${{ github.sha }}
+        path: |-
+          school-teacher-evidence/*.json
+          school-teacher-evidence/screenshots/*.png
+        if-no-files-found: error
+        retention-days: 3
+
   security:
+    if: fromJSON(inputs.plan).preflightOnly != true
     needs: admission
     runs-on: ubuntu-24.04
     timeout-minutes: 8
@@ -198,10 +444,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: run current frontend and backend HIGH CRITICAL dependency audits
+      - name: verify the fixed official HIGH CRITICAL audits or execute fresh inputs
         run: node .github/scripts/school-teacher-checks.mjs audit
       - uses: actions/upload-artifact@v4
         if: always()
@@ -212,8 +461,84 @@ jobs:
           retention-days: 3
       - if: always()
         run: node .github/scripts/school-teacher-checks.mjs cleanup
+  native-evidence:
+    if: fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly != true
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: refuse unreviewed original application assertions
+        run: node .github/scripts/school-teacher-checks.mjs native-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-native-evidence-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
+  native-runtime:
+    if: fromJSON(inputs.plan).candidate == 'native-bundle' && fromJSON(inputs.plan).preflightOnly != true
+    needs: [admission, frontend, backend-self]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+        with:
+          name: school-teacher-native-frontend-context-${{ github.sha }}
+          path: native-runtime-inputs/frontend
+      - uses: actions/download-artifact@v4
+        if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+        with:
+          name: school-teacher-native-backend-context-${{ github.sha }}
+          path: native-runtime-inputs/backend
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        if: fromJSON(inputs.plan).continuation != 'package-browser-only'
+        with:
+          version: v0.70.0
+          cache: false
+      - name: install locked browser driver for the sole missing package connection
+        if: fromJSON(inputs.plan).publicPackage == true
+        run: npm ci --prefix .github/release-tools
+      - name: tighten only the user-approved PR392 temporary Chrome package write bits
+        if: fromJSON(inputs.plan).publicPackage == true
+        env:
+          SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-public-package-scope
+        run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+      - name: prepare native libraries for the original Ubuntu compiled browser service
+        if: fromJSON(inputs.plan).continuation == 'package-browser-only'
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: package the same compiled bytes and scan actual runtime images
+        env:
+          TRIVY_CACHE_DIR: ${{ runner.temp }}/native-trivy-cache
+        run: node .github/scripts/school-teacher-checks.mjs native-runtime
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-native-runtime-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
   qualified:
-    needs: [admission, frontend, connected, security]
+    needs: [admission, frontend, connected, backend-self, postgres-self, browser-self, native-evidence, native-runtime, security]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -222,6 +547,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: fetch only the fixed original observer merge checkout
+        if: fromJSON(inputs.plan).continuation == 'observer-run2'
+        run: git fetch --no-tags --depth=1 origin 772a8ed525fd769ebd9e11a432b8f80ffa155612
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'

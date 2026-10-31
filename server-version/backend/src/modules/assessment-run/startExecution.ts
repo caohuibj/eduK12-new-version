@@ -1,4 +1,7 @@
+import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
+import {admitCompositionStart,lockCompositionStartLibraryUses} from './educationCompositionExecution'
+import {assertEducationLibraryUses} from '../education-tools/library-source.use'
 import { assertEducationLibraryExecutionSource } from './educationLibraryExecution'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { Prisma } from '@prisma/client'
@@ -48,6 +51,7 @@ export class RunStartExecutionError extends Error {
 
 type LaunchEnvelope = {
   family: RunResourceFamily
+  resourceKey:string
   runtimeTargetKind: string
   runtimeTargetRef: string
 }
@@ -55,9 +59,10 @@ type LaunchEnvelope = {
 const readLaunchEnvelope = async (db: Tx | typeof prisma, executionId: string): Promise<LaunchEnvelope> => {
   const rows = await db.$queryRaw<Array<{
     family: RunResourceFamily
+    resourceKey:string
     frozenResourcePolicy: unknown
   }>>`
-    SELECT t."resource_family" AS "family", t."frozen_resource_policy" AS "frozenResourcePolicy"
+    SELECT t."resource_family" AS "family",t."resource_key" AS "resourceKey", t."frozen_resource_policy" AS "frozenResourcePolicy"
     FROM "assessment_run_executions" e
     JOIN "assessment_run_tracks" t
       ON t."organization_id" = e."organization_id" AND t."run_id" = e."run_id" AND t."id" = e."track_id"
@@ -72,7 +77,7 @@ const readLaunchEnvelope = async (db: Tx | typeof prisma, executionId: string): 
   if (!launch || typeof launch.kind !== 'string' || typeof launch.ref !== 'string' || !launch.ref.trim()) {
     throw new RunStartExecutionError('RUN_RUNTIME_TARGET_MISSING', 'frozen Run resource has no runtime target', 409)
   }
-  return { family: row.family, runtimeTargetKind: launch.kind, runtimeTargetRef: launch.ref }
+  return { family: row.family,resourceKey:row.resourceKey, runtimeTargetKind: launch.kind, runtimeTargetRef: launch.ref }
 }
 
 const attachBindingInTransaction = async (tx: Tx, input: {
@@ -129,6 +134,7 @@ const startTransactionalComposite = async (input: {
   actorUserId: string
   launch: LaunchEnvelope
 }): Promise<RunStartExecutionResult> => prisma.$transaction(async (tx) => {
+  const libraryUses=input.launch.resourceKey.startsWith('education-composition:')?await lockCompositionStartLibraryUses(tx,input):undefined
   await lockExecutionEnvelope(tx, input.executionId)
   const claims = await tx.$queryRaw<Array<{ state: string; claimGeneration: number }>>`
     SELECT "state", "claim_generation" AS "claimGeneration"
@@ -157,6 +163,7 @@ const startTransactionalComposite = async (input: {
       userId: true,
       subjectUserId: true,
       respondentUserId: true,
+      respondentType: true,
       episodeId: true,
       assignmentRef: true,
       consentId: true,
@@ -168,6 +175,7 @@ const startTransactionalComposite = async (input: {
       || existing.userId !== input.actorUserId
       || existing.subjectUserId !== admission.attemptIdentity.subjectUserId
       || existing.respondentUserId !== admission.attemptIdentity.respondentUserId
+      || existing.respondentType !== admission.attemptIdentity.respondentType
       || existing.episodeId !== admission.attemptIdentity.episodeId
       || existing.assignmentRef !== admission.attemptIdentity.assignmentRef
       || existing.consentId !== admission.attemptIdentity.consentId
@@ -204,6 +212,9 @@ const startTransactionalComposite = async (input: {
   if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
     await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
   }
+  const educationSource=admission.assignment.resourceKey.startsWith('education-assessment:')?await assertEducationAssessmentExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,purpose:'NEW_START'}):undefined
+  const compositionStart=admission.assignment.resourceKey.startsWith('education-composition:')?await admitCompositionStart(tx,{
+    executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId},libraryUses?.uses):undefined
   if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   const state=await tx.$queryRaw<Array<{runStatus:string}>>`
     SELECT r."status" AS "runStatus"
@@ -218,6 +229,14 @@ const startTransactionalComposite = async (input: {
   const repository = createSqlRelationalAssignmentRepository(tx as any)
   const relational = createRelationalAssessmentService(repository)
   const started = await relational.start({ assignmentId: admission.assignment.assignmentId, actorUserId: input.actorUserId })
+  // The claim freezes runtime identity before this transaction. The relational
+  // transition still checks current assignment/consent authority, but its legacy
+  // occupational respondent mapping must not replace that admitted identity.
+  for (const key of ['subjectUserId', 'respondentUserId', 'episodeId', 'assignmentRef', 'consentId'] as const) {
+    if (started.attemptIdentity[key] !== admission.attemptIdentity[key]) {
+      throw new RunStartExecutionError('RUN_RUNTIME_BINDING_MISMATCH', 'current assignment or consent differs from frozen Run admission', 409)
+    }
+  }
   const nowRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
   const now = nowRows[0].now
   const dispatched = await tx.$executeRaw`
@@ -230,7 +249,8 @@ const startTransactionalComposite = async (input: {
   const attempt = await startRelationalCompositeAttemptInTransaction(tx as any, {
     compositeAssessmentId: input.launch.runtimeTargetRef,
     respondentUserId: input.actorUserId,
-    attemptIdentity: started.attemptIdentity,
+    attemptIdentity: admission.attemptIdentity,
+    educationStart: compositionStart??educationSource?.startProof,
   })
   const changed = await tx.$executeRaw`
     UPDATE "assessment_run_executions"
@@ -241,6 +261,7 @@ const startTransactionalComposite = async (input: {
   if (Number(changed) !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
   await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration })
   await assertTrainingPrivateReferenceAdmissionCurrent(tx)
+  if(libraryUses)await assertEducationLibraryUses(tx,libraryUses.context,libraryUses.entryIds,{locked:libraryUses.uses,requireLocked:true})
   return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
 })
 

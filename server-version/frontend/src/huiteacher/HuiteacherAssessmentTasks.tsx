@@ -1,19 +1,24 @@
 import {SchoolTaskHelp as AssessmentHelp} from '../school/SchoolTaskHelp'
-import {useCallback,useState} from 'react'
+import {lazy,Suspense,useCallback,useState} from 'react'
 import {HuiteacherMyFormTasks} from './HuiteacherMyFormTasks'
 import {HuiteacherMyPrivateFormTasks} from './HuiteacherMyPrivateFormTasks'
 import {HuiteacherMyScaleTasks} from './HuiteacherMyScaleTasks'
+import type {TeacherAssessmentRuntimeProps} from './HuiteacherMyAssessmentTasks'
 import type {AssessmentListState} from './assessmentTaskPresentation'
 
-type Props={api:Parameters<typeof HuiteacherMyScaleTasks>[0]['api'];actorKey:string}
+type Props={api:Parameters<typeof HuiteacherMyScaleTasks>[0]['api'];actorKey:string;
+ assessmentRuntime?:Pick<TeacherAssessmentRuntimeProps,'onCompleted'|'renderFeedback'>}
 const initial:AssessmentListState={pending:true,error:false,count:0}
+const HuiteacherMyAssessmentTasks=lazy(()=>import('./HuiteacherMyAssessmentTasks').then(module=>({default:module.HuiteacherMyAssessmentTasks})))
 // Keep the existing authorized runners mounted; only their task presentation is combined.
-export function HuiteacherAssessmentTasks({api,actorKey}:Props){
+export function HuiteacherAssessmentTasks({api,actorKey,assessmentRuntime}:Props){
   const [lists,setLists]=useState({forms:initial,privateForms:initial,scales:initial})
   const forms=useCallback((value:AssessmentListState)=>setLists(old=>({...old,forms:value})),[])
   const privateForms=useCallback((value:AssessmentListState)=>setLists(old=>({...old,privateForms:value})),[])
   const scales=useCallback((value:AssessmentListState)=>setLists(old=>({...old,scales:value})),[])
-  const states=Object.values(lists)
+  const [runtimeList,setRuntimeList]=useState(initial)
+  const runtime=useCallback((value:AssessmentListState)=>setRuntimeList(value),[])
+  const states=[...Object.values(lists),...(assessmentRuntime?[runtimeList]:[])]
   const pending=states.some(state=>state.pending)
   const error=states.some(state=>state.error)
   const count=states.reduce((sum,state)=>sum+state.count,0)
@@ -28,6 +33,9 @@ export function HuiteacherAssessmentTasks({api,actorKey}:Props){
       <HuiteacherMyFormTasks api={api} unified onListStateChange={forms}/>
       <HuiteacherMyPrivateFormTasks api={api} actorKey={actorKey} unified onListStateChange={privateForms}/>
       <HuiteacherMyScaleTasks api={api} unified onListStateChange={scales}/>
+      {assessmentRuntime&&<Suspense fallback={<p role="status">正在读取测评任务…</p>}>
+        <HuiteacherMyAssessmentTasks api={api} actorKey={actorKey} unified onListStateChange={runtime} {...assessmentRuntime}/>
+      </Suspense>}
     </div>
   </div>
 }

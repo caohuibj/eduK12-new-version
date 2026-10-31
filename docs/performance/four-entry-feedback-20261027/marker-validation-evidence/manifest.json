@@ -1,0 +1,171 @@
+{
+  "kind": "cloud-marker-validation-not-CI",
+  "base": "42a36f3a12e8ebf34084b9df530069ef9a318658",
+  "rescueOnlyAncestors": [
+    "2224f2ae087df5887c2cc97694a9f75437ce94f3",
+    "d8640dcfde5478537c9f2e20e1974530dc6c8865"
+  ],
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15",
+    "database": "eduk12_pr363_publication_test",
+    "production": false
+  },
+  "receipts": [
+    {
+      "file": "pr363-marker-boundary-incremental-r1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-boundary-incremental-r1.log",
+      "sha256": "326a253879daed7b6d88f2bbbbbfbbf497be9323018150a378051ce134d65bef"
+    },
+    {
+      "file": "pr363-marker-pg-incremental-r1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-pg-incremental-r1.log",
+      "sha256": "a083ab38b71fa861ae9a379aacd3ff7e1116b4380e97cb9b39019751261c804c"
+    },
+    {
+      "file": "pr363-marker-pg-r2.log",
+      "sha256": "4e83bb47c53e66cc74e64f655bbd8420b4e6c1c7b96fb9dda3c0902544162961"
+    },
+    {
+      "file": "pr363-marker-pg-r3.log",
+      "sha256": "5e7230739b5ff881a7100d1fec673047be7b31c9bf587ec8cf6c1fe74bef81ab"
+    },
+    {
+      "file": "pr363-marker-shared-contracts-r1.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "file": "pr363-marker-shared-contracts-r1.log",
+      "sha256": "fbe8eab9461601fc4484e8c250b592b20c32bba83f99c6fba2d055f6cb8ba18e"
+    },
+    {
+      "file": "pr363-marker-standard-pg-r2.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-standard-pg-r2.log",
+      "sha256": "bb0f9f5bdecbedd5079b2e74f34ac97739d2736a056a4f78a7c9b83d6a6052c5"
+    },
+    {
+      "file": "pr363-marker-teacher-pr-pg-r1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-teacher-pr-pg-r1.log",
+      "sha256": "c0f8edb0c5160bed778752851ee3fbf1ce3f26adeac0c29489fc033f48ea7c7d"
+    },
+    {
+      "file": "pr363-marker-types-r4.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "pr363-marker-types-r5.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-types-r5.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "pr363-marker-types-r6.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-types-r6.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "pr363-marker-types-r7.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "pr363-marker-types-r7.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "shared-boundary-r1.input.ts.txt",
+      "sha256": "721ffd636a79565c463435fe072453b5c8839f8c069331ca152fa8b3a72c9faf"
+    },
+    {
+      "file": "standard-pg-r1.input.ts.txt",
+      "sha256": "9c0aa16887eb160b8f30ea6e39b8255b001b5d5eb930dc28c45c6b78053849ce"
+    },
+    {
+      "file": "standard-pg-r1.log",
+      "sha256": "bea7081600bb51ab592f8d3aba8073ddb98c8d2a0c4ba6ba4a6d3f717743ff23"
+    }
+  ],
+  "sourceInputsAtCollection": [
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts",
+      "sha256": "b5a14add6c2970878f9504505e8fe660929d172b8a8e91e78a9f0ed2fc53ea5a",
+      "gitBlob": "af894149fb01d35d3069b65a18d963ddc2013cb6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts",
+      "sha256": "4b0ddef5c0bfb10b816dc612c2c54519dcf178ff1f7f1931d1558c9f01e6b235",
+      "gitBlob": "0b8e016eac0ca64fce62fe633903a23e88c679ff"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+      "sha256": "06426b026379f0c0e25c7d37166a0c869fd5d4595b94ce6b5c7b690549fb929e",
+      "gitBlob": "1137d1872e379d0499b28cbcd393159467c5be3c"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "sha256": "aea1f755eafe6d25bf37fa4da1e29a7d9afcb4a124e44c703977156858765abf",
+      "gitBlob": "446c722d59f2f442aff9af7446065f8b20fb72b4"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-collection.ts",
+      "sha256": "ac668df080e6a1f62efe2a063a46f054c1c9b7d245302ea19e61a1a0c746c2d1",
+      "gitBlob": "03950dbcc2970b5b221f97676d580f81a461bdc8"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "sha256": "ba407c9d77e84cb4408179a2af1014a6f9f757ed3aca7127b47cd5e7d1afc87b",
+      "gitBlob": "89ac7a1ff288d3c89bf25d616a4d246b72afede7"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-content.ts",
+      "sha256": "67197abd66217b4503749cd35daf4da0cb7db4140e545749886c5b7b58e481d2",
+      "gitBlob": "ed86872d52c52195b383b0392de4dbd0c556fcc1"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+      "sha256": "fda5ac0598ede0de50cfd557fac9973036660885c060e669319382e732418793",
+      "gitBlob": "2c131002ecfff33e5dbbe853f824430bf9a6bfc4"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+      "sha256": "db3ef91e54be8b4c26a74f8136a3903e52f2bd6663bdc08c1c6ff8bceb117e48",
+      "gitBlob": "3c052a40475e777c3decee2b1a7343bded01d3e9"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "sha256": "6c7307ac3bc55adafb8545aae29f1d09178d97a4d47b87c96bb8d53486215c95",
+      "gitBlob": "776747c7b581e4a5c7c9fee641d9a9a3c2384ef9"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.source.ts",
+      "sha256": "b223b62c6cc81a0ccf3a8a20578016b537629f1b359beb3e6aa0c040e9e19416",
+      "gitBlob": "0b5065dc61fcafc0d0a7dd14efefb808d9a076d3"
+    }
+  ],
+  "limitations": [
+    "Source hashes collected after execution, not a contemporaneous signed environment attestation.",
+    "No historical full node_modules byte manifest.",
+    "types-r4 empty log has no recovered explicit exit receipt; r5/r6/r7 have actual exit 0.",
+    "PG private r3 reporter and tool exit 0 recovered in the prior turn; no fabricated .exit file.",
+    "No aggregate full-file PG rerun: five unique cases qualified across disjoint invocations.",
+    "Later test additions append cases/imports; the original positive case bodies gained only completedResourceId assignment.",
+    "Marker identity error construction was subsequently restored to the shared EducationAssessmentSourceError via lazy import; Teacher P/R PG and types-r7 use that final form.",
+    "No browser, actual respondent START/child/final/outbox replay, or new lock-contention qualification here."
+  ]
+}

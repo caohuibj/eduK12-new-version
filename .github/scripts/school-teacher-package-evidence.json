@@ -1,0 +1,472 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-native-bundle-reviewed-local-evidence",
+  "review": {
+    "recordId": "PR392-DOT-application-evidence-review",
+    "scope": "DOT has read PR392 actual source and original ZIP, accepts the existing20 contracts, two revised current-use cases, three UI cases, composed PG phases and the two additional original P/R scope cases. This does not approve the new CI control code.",
+    "originalExecutionSigned": false,
+    "originalEnvironmentFullyBound": false,
+    "limitations": [
+      "Original failed invocations remain failed. Selected passed rows are not a claim of whole failing invocation success.",
+      "WIP source hashes were recorded but not all pre-edit WIP bytes archived. Current roots bind current consumers, not reconstructed historical environments.",
+      "Current input differs only in the reviewed private P/R rejection, a UI reason/type and the CI-only probe entry. Happy paths without original P/R are unchanged; private scope is covered by the new two cases.",
+      "The sole real browser consumer is NOTRUN locally due to sandbox ownership; it must pass on the same current build in Actions. No Profile/model/FINAL matrix is reexecuted."
+    ]
+  },
+  "files": {
+    "package-contracts.report.json": {
+      "bytes": 8749,
+      "sha256": "9e2f7349939697d6231635dd086eebf2a5b51c814217186211d02979a4630d25",
+      "gzipBase64": "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"
+    },
+    "package-contracts.json": {
+      "bytes": 5041,
+      "sha256": "6e05722d329c25e61ebe4acc3f0918cd07e9b6c35c891770c28ed9c5fa54fb82",
+      "gzipBase64": "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"
+    },
+    "package-contracts.log": {
+      "bytes": 90,
+      "sha256": "26e97fd0109fbb93fb8e43a4bc525dcbcc81cf8fceddad18c2fc5f9b59bf0a48",
+      "gzipBase64": "H4sIAAAAAAACAyXMMQ6AIAwAwN1X8AFg8xEOOvgCKI1BSEtKke8b43zJbeexG8HGomZKVkUyysZPltJbAPRttW3EmsHGQamixScnpE8ClHChBSaVANrdH7m7My0vUCOQNFoAAAA="
+    },
+    "package-current-use-r2.report.json": {
+      "bytes": 2624,
+      "sha256": "76e73e1edf6a60a90d50985edf2b8e18a5dc7274d0f33f6b240b931bc3c397be",
+      "gzipBase64": "H4sIAAAAAAACA81WTU8bMRD9K1bOJCFfBdITlcoFWlUQTghFk/UkceO1LX+QphX/vc+72xBKhJBaoexh134ev/G8Gdv7q2VSObGR9IRDvEkqcmiN+0cZ/kYhsHyJX5DSz/Hj2p6NVGbxcmDLD2T0F/Ue1n2EwAYNl7RPRsGQC0sbW+NfLZKSZYXOQZU8t8Zz0oHRB3M4fxrO3Wsu7cMe4EoFsN3dN+itKSkWy13DWycpNsDuYMxRVq1kABarBt/2LnkTPm0uwFE7SM+40w6tVLL20oTwiEgj+ThRJaDeydlg0Bv2B6PTPkQJqSg4QI/oE4KF7vGaQ9JZojvIAqV9VNY8Aw2mROsnKuqcp7vWemk1C0fFihYsCmsMF3mWmNlkJHkFsyxK0vor5VW8ZYaoIg8iLllYrxbKkBaU4tJ6QUYK/kFFFE5hqhS3wmJVYq0wnKKQyWlVUEQBCIPPA4ubyfn1RJAsVQhw9FGQ8Ow0FVyyiWLhCW9p4dfYmIdIeXwebKaxplWpGBPibbmqAIHErACAQ1upTL5ujk87p8P+cPThrHpOhtv6/oKsQ/pQV1PJkbANUCqRFhX2ePR+id6JhSSiDTZ5SETzyP6Pjj7vMMiK5u1b0/JvvE8i9ju949Hx8OS4fnqDg1RxxeyC2KColuLm89WFyOVl52LChPqsK9FYX5JWP2G+LVTPmimwwBqdA/2upGGlnHum6X/0coAaenhXZmfZjjxm53pxXgGNmypCbDrr45Egre06b11r9EYEzuaR0ayrCxJIUW1jmOAMXnBspobXVX7XdRxgHlLItWNYaJsvv+YEbfZvvZur6L9jar4oyCxglVeGDyhjPihnPEc/b2rF665khz8CNsVGrK1fva7/u/h/q+73ey/wYe9kgP8hcL7Ah6N8YO07GcvaFyB0TJ2Pbl5OQD64yzJd9vptw+v2A/t8+XRx/6O57c6QNrjsBl90p9P8uxCm0+4MidPcdt7KVMRMU5+i7SbL7acsd/KcDuru8f7xNz+cPchACgAA"
+    },
+    "package-current-use-r2.json": {
+      "bytes": 5387,
+      "sha256": "9341dea39b33e6b525fa134cbe67bb77b17bbe9ab1a4d1cfe265a46c17b4d801",
+      "gzipBase64": "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"
+    },
+    "package-current-use-r2.log": {
+      "bytes": 95,
+      "sha256": "caaad5ac79ed5011b026d3ee7671e3d84ef85bd61017f1ad963b5d26fa9d32a1",
+      "gzipBase64": "H4sIAAAAAAACAyXMsQ2AIBAF0N4pWOAgsXAICy2cAPHHIOQgx6HrG2P9kjdv62IEtYiaR6Iq2Ggx7imSWvUBrk5U+55joL3zkUG44wH+xIfkT1DoImCl3kAy2n+zVys8vDYOa2pfAAAA"
+    },
+    "package-ui.report.json": {
+      "bytes": 13483,
+      "sha256": "721bfb23dc645d5eb7315839cb4c380ed63f8501cd1e7e9d4a02bf9612f63dd1",
+      "gzipBase64": "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"
+    },
+    "package-ui.json": {
+      "bytes": 5055,
+      "sha256": "5b0625a22ddacbeb389b72d4539f0870bb3eb7b734bf475ec2c0c5ed78346e7b",
+      "gzipBase64": "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"
+    },
+    "package-ui.log": {
+      "bytes": 83,
+      "sha256": "97382b88bfbf8a4a04f14df18af3569e0a5ed8a8bb0a05dbc5995d353c4cecfb",
+      "gzipBase64": "H4sIAAAAAAACA/MK9vdTKEotyC8qUSgvyiwpSc1TKMlX0C/PL8ouLkhMTtUvMNMtKE3KyUzWTSrNS8lJ1U0ty0xJzQPJJCZnJ6an6pZm6kFM0Msqzs/jAgDmW5ZWUwAAAA=="
+    },
+    "package-ui-connection-r2.report.json": {
+      "bytes": 1069,
+      "sha256": "a5ea98f956b3c64a6074582d734fcde637b4d77687eb63313c07f5dea685c674",
+      "gzipBase64": "H4sIAAAAAAACA71SwXLaMBD9FY/OAWOgBLi1M80laSeTklOGgyotoMGWPNIqhMnw732yXQKNz9VJ+1Z6u+/tvgsbq5VjWa4o8K9omIJYFjcJfpQhkP6M30lTXuOj9j1Zbez2c+LM30Pdw9pHeMGl3QcQrKzDzrFYvgupNekG3YAqehLLjSwDIQZz+PqRTuETVe61B3gwAWwv6w59tpVktbt8+FxryR1wmeSksrlFC1DtO/wc3dMxfDvegaMtEK+44wWtNrqt0kk4QSlLzytTASpuF5NJMR0Vt7N58iAqRQF+sI8QC9/5iUIsk0UvsAVOezbOXoEWX9j5leEyzanRG8vyp0wFhHLWkuKQSZvRm1ScHXaupKyWai+3lLEDDKMwnMzTFjcvUwk8gzpALI1NSefN1lhZ4qcHNZNPnBovaudZNLI4ogFRNxsBhFNL/7UHHdufYjkdfxmOZpNiNlo0Z37epR9wGFU7q8AisXIYC8ttg53W/SOaL8bTG4E9/gdfTKaLVGrcZ0HVFgOEwLYjyQ/O7wPEU0463hfjgaXD4BVi0HmOEeN6DjfeWUbRPHiVK1fVzpLlkH6qRuqAnStD/v1v/Nia+mB+e+mPw857JIZpnYYc3sRpffoDBz6JSi0EAAA="
+    },
+    "package-ui-connection-r2.json": {
+      "bytes": 5030,
+      "sha256": "e9a4062ccae1e47e0660c930f52edf3e4ed6661d7552c03d6d0bede118d5bfa1",
+      "gzipBase64": "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"
+    },
+    "package-ui-connection-r2.log": {
+      "bytes": 97,
+      "sha256": "8c8801447950230a146ec3e052d766068fbf1340d637bf11617c1e81bb5ffe9c",
+      "gzipBase64": "H4sIAAAAAAACAyXMMQqAMAwAwN1X9AOp4OAjHHTwBTUGiS1Jial+X8T54KZ1mYNRVfPwGLuTBNfQP2r5qgmpryPUthVG2JrshYBu3kk+SZjTQdAYUEUInVXAhvh/8bxUuhfWb7ENYQAAAA=="
+    },
+    "package-postgres-completion-r2.report.json": {
+      "bytes": 1121,
+      "sha256": "7f1665936cb24dbe881dd32622d7cb851bac8b7596e27949435171a63f3d7918",
+      "gzipBase64": "H4sIAAAAAAACA8WSwW4aMRCGX8Xac2BZIC2hp1RtLmmrCpZThNBgD2DhtVf2OAhFvHvHu5RAs/fuyfPZ+8/MP/OW2ViVjsCUGGgeNWHIpsVdwr8hBFQf+RNoc8sH7Xu0Stvtx4uLfod0h2qX4JWWcu8gWKjDzlE2fctAKVQN3bBU9JhNN2ACcszK4fH9OoUzrNxrB/ihA6u9LM90YSsgubt+uKgV0BlcX1LqsjlFy1Duz/wSPeMxfD0+sUabIN5oxytZpVWb5dzCiTsl8FTqilHx+WE0KsaT4r6YfOKbKCUG9oN85GbZd5phiCZZ9MK2sNOetLM30PIv5HypyaQ5Nf1GY35BSpBJV9UGWUk4a46Cdijo4AQYj6COYl4+zsrv38Rc7pwzeYnAXXghnbUoU6ogYENMFuKgaac8HMB8EcqxoHUkPNYGjqKOa6MlpB+E861q1nRKkWvK6mZJmFCq8n+XpaJvGPs/Hoz7Q/Z+PBo03/Cycj95ELD962iFBLyZPD2CbcNOy85JjkaTyeQu43X/h98PH4Yp1aTLlqpNxogD204uPzi/DzVIzFHF52LYs3jovaIPXHrOm8DHS7gGXkur8uBlvlqlxQmrVb6OVhns1d6pKCnJtGb0WHXP+XpsKGkbG9ivXaCtx9DXlnDbWtRPUn1etdPy9AfOPQuVYQQAAA=="
+    },
+    "package-postgres-completion-r2.json": {
+      "bytes": 5704,
+      "sha256": "b7036c5b19e26675331b9a65da078ba9ddd1bb69e5224071028a1beefa71888f",
+      "gzipBase64": "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"
+    },
+    "package-postgres-completion-r2.log": {
+      "bytes": 103,
+      "sha256": "e2c174ebd0fc883625f19166459c667c603bcef99f681112f76e320999156038",
+      "gzipBase64": "H4sIAAAAAAACAyXMsQ2FMAwFwP5PkQUMEsUfggIKJgjhCQWCbTkG1keI+qTrp3EIBhXzcFt2BweX0N5ie9WY0Oqf9JxLTjSfvBQQrryAX4lpjytIpfpqqJTk0ALPwmRd863NVoV/D8aJqDBnAAAA"
+    },
+    "original-scope-final.report.json": {
+      "bytes": 1331,
+      "sha256": "61e2b7e78fc6b0d95ce1c8c7289bebf615c6ab75e608e3b55e4cf8e275ed5b3a",
+      "gzipBase64": "H4sIAAAAAAACA7VTTW/iMBD9K1bODWmgQOG2e+ilu6uKpacKIRMP4MWxI88YhCr++44TPgv7cWlO9rPz3rw34/fEhnLsSJoxIP0MmgCTYX4X4ReJCOoaf5LaXOL3zX2wStvF9cGRn5H2B+ojdGK9RXjGpdwJQCsrXDpKhu+JVApUjc6ZKnhIhnNpEHjPzPjldBy3Iyjd+gbwTSOzvU326KstJRXL84uvlZK0B84PKbqsV8EyWKz2+HH3DFv8un1ijkYgXHCHM1qlVaOyt7BjpyQ9jXXJUN4fdDp5r98dtAePfBKKApDzIB/YLOdOI8BgYkRvHAsn7Uk7ewFa/oWcH2sysU+132DMDxkFEg+/oCAUzuuFttKIyus1lyNehLRKjMRG09IFYhyoaZKgJWzFDIyLayeksLARPliKNdf1U2ClpKpbzwhF7c8RU8HLaJlnq/U46Hb63fv9lz8cx+M7hyYXB/clkOQp4qRJLmpsd/fPnFYAFYrKSJo7X9blWpcejKQeKudJoAueaURAOTNQ35rVjWfP1mxFqRGjKSxcBWIuOYy/BvaZqqfk8hYH1+48HJIb/H9wkz+Ma6/H48odvML77SiW3zJdNmIM8cY2sWcb51dYyQIyUOE5b6fc/nQNHrnyjMedl8ftTPLbsypDX2TTaXwdOJ1ms2CVgbTyToWCIk1R+06ZdcV6pzjrfFrxvxYntJvsfgMi2wr6MwUAAA=="
+    },
+    "original-scope-final.json": {
+      "bytes": 5976,
+      "sha256": "01a773442bce5098a83c3a70bdc1d33f54a69c13697fb9c2cf8335ea660df2ba",
+      "gzipBase64": "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"
+    },
+    "original-scope-final.log": {
+      "bytes": 93,
+      "sha256": "384bda9d2671e3a77af3e6782710850fe6c7013d8b483d9fe1ebdca61e439ac4",
+      "gzipBase64": "H4sIAAAAAAACAyXMQQ5AQAxA0b1T9AJl5xAWLJyAmZIyaZvODNdH7H7ykj/M0whOpl7gdi6FBIpCd6uf2ZZAnfVodU0ccK0SEyFdHEleUeedZUmYgxrh9nX7v9ojqzQPh4Fzbl0AAAA="
+    },
+    "package-postgres-r3.report.json": {
+      "bytes": 3104,
+      "sha256": "948805721d725f2716a32f6f85696c90e8ac8044580c0ce1fd49d4a4215f210a",
+      "gzipBase64": "H4sIAAAAAAACA+1WPW/TQBj+K5YnkJo4tmOXeKKtWlVqoaVJp1JFV9+b1MS+i+6jpaoywYDUpQtCSCAYYORjYQJ+TtPyL3jPDk4CWahE6VArUnzP3T3v9yMf20xnLa5I2gKpmjpRIO3ImzPwJpES6CRey/EVkqTT+Og8MJqw7p8XSv4Z1DNYZxFOcFE+BiQjfbnPlR0d24RSoDnaQSotwI46JJWAa2SWC+Nts9yCjB/MANYTiWw7uyN0m2VExfuTB7f7lKgRMLmpTJT5m2YIxr0RXq7W4EguHq0gR2FAT3HrCVqa0MLKKIQBRqqIUK0kQ8idb/i+Ww+8wA9C3NFxDFKW0WLi1RZInZoc7WBeMNVCJZxNgQzvKC5aiUpNoXbsvt5Lk9g63OcpWIuaUfyLOWMQm7sW/gSQ1NrkUnUFNB+s2yZHOk3vE+PU39+3mkurGxvrFjwmsbK2LZrIGCsgjuYQwipg5a2ClBgGp9la2GrNGU7c0jlmkY4CgcQHvAcWYdSSBGtodQDoHol7dp43pTHAvCkwvZgfEzICV2KeapEfxZb2/Ho19OpB6NbyJygb9R6Wj3SLMizxrM8lTk8TxEESw7IQXETW8MXb4esnP16eDt+8P391Mvzw7vzrt7PTZ8MvJxefnl58/Hz2/flDZuFDFPo44ljhYi/BvmfWLeeQi57skxgcoHrN9SoMDisYrzTBYYfga7k0zuPsOVLETsapxhZxStLxWxWMc7KqZOR6UejfLj3ogtpmSScBWsazoBRkfdXEesA/ckcWKTP++I0gjLxwyqOr9aA+7/qRF4w9uLTBdtuMtGy3nb18rCp9gS7EytAUzVlB1h52UGU8cNV+MWiymjAF3aILq4YoL5fbiPzSMyNrkeNcykHGKbR/peTugZF95QiNbggHR0o58b5mvQqKV9LBQas+QuONGmamZvQjA0VQu1HfFOma/t8dzF0PcWotLyytLm/9N3W6GvtjeXKDebfq1YJ6w23kj3sjTzfydCNPv8vT7sxPMT+84+F3G1qcxuu10AvNWIWzZj0rBgshXLBCqa5RGezB7uAnvvwTCiAMAAA="
+    },
+    "package-postgres-r3.json": {
+      "bytes": 5338,
+      "sha256": "88d4cf4e115f73991377e56302bd91d4e0f486df58a71d67fb470282a81cb4a9",
+      "gzipBase64": "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"
+    },
+    "package-postgres-r3.log": {
+      "bytes": 92,
+      "sha256": "1d0fe730186d8e2a194c9ee52c0700e1c78d99c3537d85ee6773b6ea3f0c5a58",
+      "gzipBase64": "H4sIAAAAAAACAyXMMQ6AIAwAwN1X9AOVwcRHOOjgCxAaghLalCrfN8b5klv2bQUlYTXoms2ogjG4zno18YGczCj3UXLA466xENKTI9VPfLh8IhRulpQa6jT+1Xg2rsMLa3wWS1wAAAA="
+    },
+    "started-connections.json": {
+      "bytes": 543,
+      "sha256": "770865c61d1d20b27739114ba1f60729eb1860e6dd47f5c2224366d83d6719fe",
+      "gzipBase64": "H4sIAAAAAAACA32QTUsDQQyG7/6KZc8NzOxkPuJNSqGCUPDjJB4yk4z04LbULQjif3eqrXioHgbCJE/e8DxedN17e13Xb3cb2Zepv+z6u/lytbrpZ8cG76Z1WW95nB5edXcth5GgPkQKCmEQAiQmoIQJLA/VoThipNOCFx75+QQSVawBPRhbEDC7BEzRQyQsVT0LG/qVrON05LhK8FZgUKuAEiNkEYFCnrNDLo5/OH3Tsp/Wm/EbRc+RDGUYbE6A3ljIVRm8U0Us3E4ufSM/Zmdt3C+u5svF7f86ks3WVASKeIjwCFxaTtSUuBIXS+d1OBIjyTIIxoMO44F8IXBa2KYUna3+nA7vQh4cFkjGt8CK2ColGCS6RKV9Zv5DRzNcJZsCIjUDWrFAmiIYqiYo25jEfOm4ePoENtQZrB8CAAA="
+    },
+    "environment.json": {
+      "bytes": 985,
+      "sha256": "2ccab73f2a26c0f3a3172fc01f119617167fa18f3457bc0f5c74e8503fb45354",
+      "gzipBase64": "H4sIAAAAAAACA4WTy27cMAxF9/kKY9aNRy/q0W4KdF30GyiKzLjj2IbtJAiC/Hs1zyIJgiwMgRLJo3tpvdw0zWYYC2++N5tH41qjW7X5dtjNuBx3M5IJXhAoiCAXl9kUrTSSdblYHcRoUdmcqnpcef6N3XAoLaTE+YygfAFdnCHI2YakIBWJRnSMXuXwvvTXDoe7I/vP0D83Mj7MzdM476UfnxrhlXa3had11/TdwMuPZhgbnKamG6aHdWnoWF1OPaXreamdXmpQw4XnR55v67d047Ct0vY8lO1UV7zj236kfft3GY+XVzpDFaa0TpYEHIGolFMOUdAodJ4FPWBRUQcoNSsxxMjWSkLl4OTiR6bM47B+CmU2SaFVjo0hrTh4RQTAGapzPmqgbJ1kCCFYUighpAgVZpVP2gt/Ar0IXRcaB+nurjwKiaq4BBgVaMfJJetFi1AxglUvBOOrcNJOFROAqthQh5pcFa2d/UrkFVgHdIWmwEVxgvoLKR8xZVNN9BayNSFZU3Jkd3BdEkXD0SSNSVfjycdcvPlK5DR3yz1uF9rxPban6IANJbqMhgtzLsmAqtJzVslaqkYilYKIEEVsiHWorE21JMc6ay2uvoBNpb6en8bZzueJF5q7aT30hza1dvMm4bFbeTkeula3Wr89/Xm+KfUdD+cWxlze338P31H8hXLN+IC5ef0HpRDA8tkDAAA="
+    },
+    "continuation-input.json": {
+      "bytes": 291,
+      "sha256": "a1d73b2e59b5c3007974fb3d2ee80989a6bcf9a15910c87c5f1d6e431ac937fe",
+      "gzipBase64": "H4sIAAAAAAACAyWPQW6DMBBF9zmFxbok2IAN7apSc4E2PYDxDDAJspFtEqqqd6/drv5I/+nNzPeBsWLVcS6eWXF6OH8LqzZ4WmW5bsNCphw2CwuWeCdAm5oQtY8IpXHWoonkbDheg7PFU1aFWYtWZplSVSdbIzlwENUglKp7zptB81FWSvQ48E5WKAEaNbZGCNHUUkJXg1S8H/HfBxiMpzWvydLzTiGSnZhHvbCPy+v75fzGcEez/V3CHhRn5jxNZBPwyfSSSPhK/N3dEF7YSD7EMj0xYZr3uPmUmpac2gJLTcSER00W4Vgcfn4BjmL8tyMBAAA="
+    },
+    "final-input-comparison.json": {
+      "bytes": 1608,
+      "sha256": "0ef3e427a4eaaa657c05d14a4e35c3aa806b393211a62c4f667c34679458ebfe",
+      "gzipBase64": "H4sIAAAAAAACA+2TvW6DMBRG9zwFYg4BGwMma6dulTpGGezr64SWYGSbqlKVd68hSduhf0qqThkMkvX5nCt/8moWRS9hRVHcColtvIziXsCj2GACpvNWgHfx/JDA58bfGIUhlB23YCu6Dao7a9QAvjHdbdcP4cQyWk2BE30K98JvR4FD+4Q2CcuFE6kMPuxU6iyku8Bp0aUYcGLkJd6Y1qWnmSxqtNgBLgQAOrd4m24yWARjFar7raBFObpKxhmjlSSZQlqSihSs1EKVBVLJZaaAaFXXWmupSkWLvACBPA8ZTqjOhPxIh8EGt3+HZ6JmnOZVyVieVTWRFEkFjAlJqSKQy6KUZKRwLpEXmnFgSoUhSJXnGYr4yN5P/3X47uffFXLwJ4MLF0HPa+VHydB8AibXuv+/7qEZn2CH00WfXfi1l7/upTfObyy6xObnPZXfG8Ds+hYv6v9LWWDvTPfgEueF9UN/AX62fgWCyOTuSAYAAA=="
+    }
+  },
+  "reports": [
+    {
+      "group": "CONTRACT",
+      "file": "package-contracts.report.json",
+      "report": {
+        "sha256": "9e2f7349939697d6231635dd086eebf2a5b51c814217186211d02979a4630d25",
+        "cases": [
+          {
+            "name": "whole package connection boundaries checks the original author and exact pinned U once before one native admission; a replacement grant does not repair revocation",
+            "status": "passed"
+          },
+          {
+            "name": "whole package connection boundaries does not read a source after author removal or U revocation",
+            "status": "passed"
+          },
+          {
+            "name": "whole package connection boundaries keeps youth SELF out of Teacher and normalizes original release stoppage",
+            "status": "passed"
+          },
+          {
+            "name": "whole package connection boundaries retains original parameter priority and report, allowing only separately authorized missing target reports",
+            "status": "passed"
+          },
+          {
+            "name": "whole package connection boundaries uses one locked exact source read and rejects changed stored content before review/dependency work",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata round trips all three exact package source protocols and rejects aliases/wildcards/leaf U",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects editable or mixed items inputs before any source IO",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects editable or mixed overrides inputs before any source IO",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects editable or mixed flow inputs before any source IO",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects editable or mixed parameters inputs before any source IO",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects editable or mixed report inputs before any source IO",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects editable or mixed packages inputs before any source IO",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata accepts only exact nondelegable education root U for the whole package",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata requires the precise governed population/SELF declaration; missing metadata never widens applicability",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata lists bounded granted metadata after one current author check, without loading package bodies",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata does not materialize, publish or create an editable version during an exact native preview",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata requires current whole U before reading any source body or package review",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata refuses a different physical publication even when its content hash is identical",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata rejects changed content and unpublished status even when metadata was previously discoverable",
+            "status": "passed"
+          },
+          {
+            "name": "exact whole package source authority and metadata keeps unpublished code packages unavailable without any database or fake publication",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "branchReview": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+      "caseBranches": {
+        "2": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "3": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "4": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "5": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "6": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "7": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "8": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "9": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "10": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "11": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "12": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "13": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "14": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "15": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "16": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "17": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "18": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "19": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "recordedCommandFile": "package-contracts.json"
+    },
+    {
+      "group": "CURRENT_U",
+      "file": "package-current-use-r2.report.json",
+      "report": {
+        "sha256": "76e73e1edf6a60a90d50985edf2b8e18a5dc7274d0f33f6b240b931bc3c397be",
+        "cases": [
+          {
+            "name": "whole package connection boundaries checks the original author and exact pinned U once without duplicating native START admission; a replacement grant does not repair revocation",
+            "status": "passed"
+          },
+          {
+            "name": "whole package connection boundaries does not read a source after author removal or U revocation",
+            "status": "passed"
+          },
+          {
+            "name": "whole package connection boundaries keeps youth SELF out of Teacher and normalizes original release stoppage",
+            "status": "skipped"
+          },
+          {
+            "name": "whole package connection boundaries retains original parameter priority and report, allowing only separately authorized missing target reports",
+            "status": "skipped"
+          },
+          {
+            "name": "whole package connection boundaries uses one locked exact source read and rejects changed stored content before review/dependency work",
+            "status": "skipped"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0,
+        1
+      ],
+      "branchReview": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+      "caseBranches": {
+        "0": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "1": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "recordedCommandFile": "package-current-use-r2.json"
+    },
+    {
+      "group": "REPORT_UI",
+      "file": "package-ui.report.json",
+      "report": {
+        "sha256": "721bfb23dc645d5eb7315839cb4c380ed63f8501cd1e7e9d4a02bf9612f63dd1",
+        "cases": [
+          {
+            "name": "reads the optional server-projected native report and removes it when personal disclosure is withheld",
+            "status": "passed"
+          },
+          {
+            "name": "renders only the server-projected saved joint text and removes it outside personal disclosure",
+            "status": "passed"
+          },
+          {
+            "name": "connects an exact whole package to existing registration while retaining original parameters and report",
+            "status": "failed"
+          }
+        ],
+        "invocationSuccess": false
+      },
+      "selected": [
+        0,
+        1
+      ],
+      "branchReview": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+      "caseBranches": {
+        "0": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "1": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "recordedCommandFile": "package-ui.json"
+    },
+    {
+      "group": "CONNECT_UI",
+      "file": "package-ui-connection-r2.report.json",
+      "report": {
+        "sha256": "a5ea98f956b3c64a6074582d734fcde637b4d77687eb63313c07f5dea685c674",
+        "cases": [
+          {
+            "name": "connects an exact whole package to existing registration while retaining original parameters and report",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "branchReview": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+      "caseBranches": {
+        "0": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "recordedCommandFile": "package-ui-connection-r2.json"
+    },
+    {
+      "group": "PG_COMPLETION",
+      "file": "package-postgres-completion-r2.report.json",
+      "report": {
+        "sha256": "7f1665936cb24dbe881dd32622d7cb851bac8b7596e27949435171a63f3d7918",
+        "cases": [
+          {
+            "name": "completes only the two already STARTED School/Teacher connections after U withdrawal; does not replay publication or START",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0
+      ],
+      "branchReview": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+      "caseBranches": {
+        "0": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "recordedCommandFile": "package-postgres-completion-r2.json"
+    },
+    {
+      "group": "ORIGINAL_SCOPE",
+      "file": "original-scope-final.report.json",
+      "report": {
+        "sha256": "61e2b7e78fc6b0d95ce1c8c7289bebf615c6ab75e608e3b55e4cf8e275ed5b3a",
+        "cases": [
+          {
+            "name": "rejects original private P and R without pretending they belong to a new runtime",
+            "status": "passed"
+          },
+          {
+            "name": "keeps platform and no-original-report sources usable and batches only missing scope facts",
+            "status": "passed"
+          }
+        ],
+        "invocationSuccess": true
+      },
+      "selected": [
+        0,
+        1
+      ],
+      "branchReview": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+      "caseBranches": {
+        "0": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged.",
+        "1": "Original actual selected row consumed by the unchanged behavior branch. DOT reviewed the current extra original-private-scope guard, which is false for the historical compatible fixtures; two fresh original-scope assertions cover its added branch. Original failures/filters remain unchanged."
+      },
+      "shellExitFile": null,
+      "originalShellExit": null,
+      "recordedCommandFile": "original-scope-final.json"
+    }
+  ],
+  "observations": [
+    {
+      "id": "PG_PRELUDE",
+      "kind": "reached-package-start",
+      "file": "package-postgres-r3.report.json",
+      "checkpoints": "started-connections.json",
+      "scope": "DOT reviewed both original real PG cases reaching publish/START, U revoke, rejected second START and old START resumption before the fixture getAttemptState argument error. They remain FAILED invocations; the passed completion row checks the same two pinned revoked-U executions separately."
+    }
+  ],
+  "coverage": {
+    "whole-source-contract": [
+      "CONTRACT",
+      "CURRENT_U"
+    ],
+    "author-ui-and-restricted-report": [
+      "REPORT_UI",
+      "CONNECT_UI"
+    ],
+    "real-two-entry-connection": [
+      "PG_PRELUDE",
+      "PG_COMPLETION"
+    ],
+    "source-private-original-P-R": [
+      "ORIGINAL_SCOPE"
+    ]
+  },
+  "inputClosure": {
+    "trees": {
+      "frontend": "391d7fd729cff3f55d46b4c3bbba1b81e4a05d69",
+      "backend": "55a74ef49954d8bd21e328a34b4f611fa1a6f1b1"
+    },
+    "files": {
+      "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "server-version/backend/prisma/schema.prisma": "8beef2106fff0996ba42c9b9bfc3dd94a6e337d6"
+    }
+  },
+  "reviewSha256": "f343f5cbbe263f0958e1bf1858df3e171e441c70f951b3d64b64bd0d5479d7fe",
+  "inputClosureSha256": "7a02ca6a5252cc950dcd9a45c69f5a129f0233aa8460aa83462464126f528bf6"
+}

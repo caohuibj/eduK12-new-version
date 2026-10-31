@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "sop2_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "429b0329d8a901880e5a13ff73c2ab7e83bf4c4be644b8f5e427adcc4a6b3d65",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "optimism_composite"
+    ],
+    "scoreOrder": [
+      "optimism_composite"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism_composite",
+        "headline": "乐观与悲观：你对未来的两种声音",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两道题分别问你怎样看待自己的乐观与悲观。分数越高，表示这次回答整体更偏向积极的未来期待。期待好事发生，同时担心事情不顺，并不奇怪。这个分数只能提供一个简短观察角度，不能给性格或心理健康下结论。悲观题已反向换算，所以原始回答和合成分的方向不同。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想到同一件未来的事时，你期待什么，又担心什么？这两种声音各自在提醒你关注什么？"
+          },
+          {
+            "category": "strategy",
+            "text": "各写下一件期待和担忧，再圈出自己能影响的一小部分。为它定一个下一步，不必先让所有担忧消失。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "只有两道题，能提供的信息很有限；不划分高低，不作排名，也不能用来诊断或鉴定能力。",
+      "国外成人的研究结果只能作资料参考，不能直接用来比较中国个人或未成年人。",
+      "两题都需完整回答才计算结果；漏答不代填。精确计分方法和来源另见计分与参考资料。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:38:00Z",
+        "basis": "AI editorial check: adult self-report, full construct definitions, endpoints, reverse/raw distinction and attribution. Not human expert approval or psychometric validation."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "optimism_composite"
+    ],
+    "scoreOrder": [
+      "optimism_composite"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism_composite",
+        "headline": "关于未来，把期待和担忧放回具体事情里",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两题分别问你通常怎样描述自己的乐观与悲观。悲观题先反向换算，再与乐观题取平均，合成分范围1–7；数值越大，表示本次回答整体更偏向积极的未来期待，不是“悲观越多”。这里给的是一个合成分，而不是两项独立的心理能力。\n\n例如，想到一项工作变化，你可能既期待接触新内容，又担心适应不了。期待与担心可以同时出现，不能只因为有担心就说自己不乐观，也不能因为抱有希望就忽略需要准备的部分。这个例子供你回顾具体经历，不是问卷已判断你处在哪一种状态。\n\n同一个合成分可能来自不同的两题回答，因此仅凭这个数字，不能说你一定期待很多、担忧很多，或两者都少。比起给性格定型，更值得问：眼前期待的是什么，担心的是什么，哪些信息和准备能帮助我作下一步选择？",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "选同一件未来的事，各写一句期待和担忧。允许它们并排存在，不急着让其中一个否定另一个。"
+          },
+          {
+            "category": "strategy",
+            "text": "把预测与事实分开：列出已经知道的条件，再选一条还需要核实的信息。例如先了解一个真实要求，而不是把“可能失败”当成已经发生。"
+          },
+          {
+            "category": "strategy",
+            "text": "为能影响的一小部分安排动作：既写一个朝目标推进的步骤，也想好遇到阻碍时可以怎样调整。准备后备办法不等于放弃期待，保持期待也不等于保证成功。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "只有两题，中文研究译稿尚待译审和适用人群验证，没有可用的中文分档或排名。两题需完整作答，漏答不代填；合成分不能还原两题各自的回答。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:16:56Z",
+        "basis": "本次只读审阅sop2_zh_cn_research C1.0.0真实source、已有证据及新1.1.0报告文字：核得分范围/方向、真实时窗、固定解释与条件式例子、可选行动、单一短限制、缺失边界；保留原受众权限和来源许可。不继承旧审核日期，不声称作者批准、中文验证或新计分/PG/CI测试通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "optimism_composite"
+    ],
+    "scoreOrder": [
+      "optimism_composite"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism_composite",
+        "headline": "给未来留两张便签：期待，也做准备",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：期待好事，可以和准备B方案坐在同一张桌子上。\n\n这两道题像两张提问便签：一张问“你有多乐观”，另一张问“你有多悲观”。计算时第二题反向换算，两题再取平均，得到1–7的合成分；数值越大，表示整体更偏积极期待。它不是在给你发“乐观派”或“悲观派”的人格贴纸。\n\n假设你准备申请一个机会。便签A上可以写“我期待学到新东西”，便签B上也可以写“我担心时间不够”。接下来不必举办一场谁赢谁输的辩论：也许真正有用的是查清投入时间，再决定要不要申请、怎样准备。\n\n如果期待能让你愿意着手，可以保留它；如果担忧提醒你补一条信息，也可以听听。需要注意，同一个合成分可能来自不同的两题回答，系统不能只看这个数就知道你两张便签各写了多少。下面是可自行核对的行动，不是根据分数生成的个体画像。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "两张便签，写同一件事：一张写“我希望……”，一张写“我担心……”。先让它们并排，不要求自己只能有一种声音。"
+          },
+          {
+            "category": "strategy",
+            "text": "给便签补一条事实：挑一个最影响决定的未知条件，找一条可核实的信息。不要用反复设想代替确认，也不用为了积极而删掉现实限制。"
+          },
+          {
+            "category": "strategy",
+            "text": "带上一个B方案再走一小步：例如先问清申请期限，再安排一段准备时间；若条件不合适，就换路径。目标是多一个可选择的动作，不是把自己练成永远乐观的人。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "只有两题，中文研究译稿尚待译审和适用人群验证，没有可用的中文分档或排名。两题需完整作答，漏答不代填；合成分不能还原两题各自的回答。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T15:16:56Z",
+        "basis": "本次只读审阅sop2_zh_cn_research C1.0.0真实source、已有证据及新1.2.0报告文字：核得分范围/方向、真实时窗、固定解释与条件式例子、可选行动、单一短限制、缺失边界；保留原受众权限和来源许可。不继承旧审核日期，不声称作者批准、中文验证或新计分/PG/CI测试通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

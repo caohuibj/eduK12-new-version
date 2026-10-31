@@ -1,39 +1,42 @@
-import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
+import {deferredPage} from '../components/page-loading/deferredPage'
+
+
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { UserRoundPen } from 'lucide-react'
+import {UserRoundPen} from 'lucide-react'
 import './school.css'
 import './school-workspace.css'
-import { useProductTheme } from '../components/product-theme/useProductTheme'
-import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
-import { SchoolMark } from './SchoolMark'
-import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
+import {useProductTheme} from '../components/product-theme/useProductTheme'
+import {ProductThemeControl} from '../components/product-theme/ProductThemeControl'
+import {SchoolMark} from './SchoolMark'
+import {SchoolWorkspaceShell,SchoolWorkspaceOverview} from './SchoolWorkspaceShell'
 import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
 import {SchoolProfessionalAdmission,SchoolAdmissionProgress} from './SchoolProfessionalAdmission'
-import {SchoolPersonnelDirectory} from './SchoolPersonnelDirectory'
-import {SchoolPersonnelClaim} from './SchoolPersonnelImport'
+
+
 import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspace'
 import {SchoolReportHeader} from './SchoolReportPresentation'
-import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
-import { schoolFeatures } from './school-features'
-import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
-import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
-import { SchoolActivityManager } from './SchoolActivityManager'
-import { schoolClassApprovalReasons } from './school-activity-workflow'
-import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
-import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
+import {canManageSchoolActivities,canReadSchoolClasses,schoolNavigation,workspaceHref,workspacePage,workspacePath} from './school-navigation'
+import {schoolFeatures} from './school-features'
+import {SchoolLanding,SchoolPublicHeader,SchoolCodeRegistration,type SchoolRegistrationEntry} from './SchoolLanding'
+
+
+import {createEducationAssessmentResourceAdapter} from '../api/educationAssessmentResourceClient'
+import {schoolClassApprovalReasons} from './school-activity-workflow'
+
+
 import {SchoolLearnerHome,SchoolLearnerMenu} from './SchoolLearnerHome'
-import { SchoolStudentTasks } from './SchoolStudentTasks'
-import { SchoolTeacherTasks } from './SchoolTeacherTasks'
-import { SchoolRelationships } from './SchoolRelationships'
-import { SchoolGroupReports } from './SchoolGroupReports'
-import { SchoolProtectedReportStudio } from './SchoolProtectedReportStudio'
-import { SchoolIndividualLongitudinalStudio } from './SchoolIndividualLongitudinalStudio'
-import { SchoolGroupLongitudinal } from './SchoolGroupLongitudinal'
-import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPortal'
-import { SchoolParentTasks } from './SchoolParentTasks'
-import { SchoolPeerConsent } from './SchoolPeerConsent'
-import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer, SchoolDisclosureOfficers, SchoolProfessionalReports } from './SchoolReports'
+
+
+
+
+
+
+
+
+
+
+
 
 import './school-theme.css'
 import './school-home-refresh.css'
@@ -49,6 +52,33 @@ import './school-private-tools.css'
 import './school-compact-navigation.css'
 import './school-administrator-polish.css'
 import './school-secondary-pages.css'
+
+const EducationAssessmentRegistrationPanel=deferredPage(async()=>({default:(await import('../components/education-tools/EducationAssessmentRegistrationPanel')).EducationAssessmentRegistrationPanel}))
+const EducationPrivateToolStudio=deferredPage(async()=>({default:(await import('../components/education-tools/EducationPrivateToolStudio')).EducationPrivateToolStudio}))
+const SchoolPersonnelDirectory=deferredPage(async()=>({default:(await import('./SchoolPersonnelDirectory')).SchoolPersonnelDirectory}))
+const SchoolPersonnelClaim=deferredPage(async()=>({default:(await import('./SchoolPersonnelImport')).SchoolPersonnelClaim}))
+const SchoolStudentRecovery=deferredPage(async()=>({default:(await import('./SchoolRecovery')).SchoolStudentRecovery}))
+const SchoolRecoveryOfficer=deferredPage(async()=>({default:(await import('./SchoolRecovery')).SchoolRecoveryOfficer}))
+const SchoolActivityManager=deferredPage(async()=>({default:(await import('./SchoolActivityManager')).SchoolActivityManager}))
+const ReportPrivacyPreferences=deferredPage(async()=>({default:(await import('../components/report-privacy/ReportPrivacyPreferences')).ReportPrivacyPreferences}))
+const ProductPasswordChange=deferredPage(async()=>({default:(await import('../components/account/ProductPasswordChange')).ProductPasswordChange}))
+const SchoolStudentTasks=deferredPage(async()=>({default:(await import('./SchoolStudentTasks')).SchoolStudentTasks}))
+const SchoolTeacherTasks=deferredPage(async()=>({default:(await import('./SchoolTeacherTasks')).SchoolTeacherTasks}))
+const SchoolRelationships=deferredPage(async()=>({default:(await import('./SchoolRelationships')).SchoolRelationships}))
+const SchoolGroupReports=deferredPage(async()=>({default:(await import('./SchoolGroupReports')).SchoolGroupReports}))
+const SchoolProtectedReportStudio=deferredPage(async()=>({default:(await import('./SchoolProtectedReportStudio')).SchoolProtectedReportStudio}))
+const SchoolIndividualLongitudinalStudio=deferredPage(async()=>({default:(await import('./SchoolIndividualLongitudinalStudio')).SchoolIndividualLongitudinalStudio}))
+const SchoolGroupLongitudinal=deferredPage(async()=>({default:(await import('./SchoolGroupLongitudinal')).SchoolGroupLongitudinal}))
+const SchoolParentRegistration=deferredPage(async()=>({default:(await import('./SchoolParentPortal')).SchoolParentRegistration}))
+const SchoolParentLinks=deferredPage(async()=>({default:(await import('./SchoolParentPortal')).SchoolParentLinks}))
+const SchoolParentTasks=deferredPage(async()=>({default:(await import('./SchoolParentTasks')).SchoolParentTasks}))
+const SchoolPeerConsent=deferredPage(async()=>({default:(await import('./SchoolPeerConsent')).SchoolPeerConsent}))
+const SchoolStudentFeedback=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolStudentFeedback}))
+const SchoolStudentReportConsent=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolStudentReportConsent}))
+const SchoolParentReports=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolParentReports}))
+const SchoolReportOfficer=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolReportOfficer}))
+const SchoolDisclosureOfficers=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolDisclosureOfficers}))
+const SchoolProfessionalReports=deferredPage(async()=>({default:(await import('./SchoolReports')).SchoolProfessionalReports}))
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -85,6 +115,7 @@ async function api<T>(path:string,method='GET',payload?:unknown,options?:{respon
   if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求失败，请稍后重试'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
   return result.data
 }
+const assessmentResources=createEducationAssessmentResourceAdapter(api,'SCHOOL')
 const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
   <label className="hs-field"><span>{label}</span>
     <input value={value} onChange={event=>onChange(event.target.value)} type={type}
@@ -93,6 +124,7 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
 )
 export default function SchoolApp(){
   const [page,setPage]=useState(()=>workspacePage(window.location.pathname))
+  const [activityId,setActivityId]=useState(()=>new URLSearchParams(window.location.search).get('activityId')??undefined)
   const [user,setUser]=useState<CampusUser|null>(null)
   const appearance=useProductTheme('school',user?.id)
   const [loading,setLoading]=useState(true)
@@ -145,6 +177,12 @@ export default function SchoolApp(){
   const [campusParentReportEnabled,setCampusParentReportEnabled]=useState(false)
   const [working,setWorking]=useState(false)
 
+  const recoverSession=(cause:unknown)=>{
+    if(!user||!(cause instanceof Error)||!('status' in cause)||cause.status!==401)return
+    setUser(null);setOrgs([]);setSchoolId('');setClassId('');setAccess(null)
+    setUnits([]);setSummary(null);setIssuedCodes([]);setScreen('login')
+    setError('登录状态已失效，请重新登录')
+  }
   const refresh=async()=>{
     try{
       const me=await api<CampusUser>('/auth/me')
@@ -160,21 +198,22 @@ export default function SchoolApp(){
       const organizationId=query.get('organizationId')
       if(organizationId)setSchoolId(organizationId)
       setClassId(query.get('classUnitId')??'');setSummary(null);setIssuedCodes([])
-      setPage(workspacePage(window.location.pathname));setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
+      setPage(workspacePage(window.location.pathname));setActivityId(query.get('activityId')??undefined);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
     }
     window.addEventListener('popstate',pop)
     return()=>window.removeEventListener('popstate',pop)
   },[])
   useEffect(()=>{acceptedWorkspaceUrl.current=window.location.href},[page,schoolId,classId])
-  const navigateWorkspace=(id:string,importKind?:'GRADE'|'CLASS')=>{
-    if((id===page&&!importKind)||!canLeavePrivateTools())return
+  const navigateWorkspace=(id:string,importKind?:'GRADE'|'CLASS',nextActivityId?:string)=>{
+    if((id===page&&!importKind&&activityId===nextActivityId)||!canLeavePrivateTools())return
     const query=new URLSearchParams()
     if(schoolId)query.set('organizationId',schoolId)
     if(classId)query.set('classUnitId',classId)
     if(importKind)query.set('importKind',importKind)
+    if(id==='tasks'&&nextActivityId)query.set('activityId',nextActivityId)
     const suffix=query.size?'?'+query.toString():''
     window.history.pushState(null,'',workspacePath(id)+suffix)
-    setPage(id);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
+    setPage(id);setActivityId(id==='tasks'?nextActivityId:undefined);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
   }
 
   useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | School`:'School';return()=>{document.title=previous}},[screen,activeFeature])
@@ -183,23 +222,27 @@ export default function SchoolApp(){
     let live=true
     void api<{parentReportsEnabled:boolean}>('/reports/availability')
       .then(status=>{if(live)setCampusParentReportEnabled(status.parentReportsEnabled===true)})
-      .catch(()=>{if(live)setCampusParentReportEnabled(false)})
+      .catch(cause=>{if(live){setCampusParentReportEnabled(false);recoverSession(cause)}})
     return ()=>{live=false}
   },[user])
   useEffect(()=>{
     if(!user||user.mustChangePassword)return
+    let live=true
     void api<{list:CampusOrg[]}>('/organizations').then(data=>{
+      if(!live)return
       const list=data.list??[]
       setOrgs(list)
       if(list.length)setSchoolId(prev=>prev||list[0].id)
-    }).catch(()=>setOrgs([]))
+    }).catch(cause=>{if(live){setOrgs([]);recoverSession(cause)}})
     if(user.role==='STUDENT'){
       void api<{status:string;organizationId:string|null}>('/my-status').then(result=>{
+        if(!live)return
         setStudentStatus(result.status)
         if(result.organizationId)setSchoolId(old=>old||result.organizationId!)
       })
-        .catch(()=>setStudentStatus('暂时无法读取当前状态'))
+        .catch(cause=>{if(live){setStudentStatus('暂时无法读取当前状态');recoverSession(cause)}})
     }
+    return()=>{live=false}
   },[user])
   useEffect(()=>{
     if(!user||user.mustChangePassword||!schoolId)return
@@ -247,6 +290,8 @@ export default function SchoolApp(){
       if(result.mfaRequired){
         setMfaEnrolled(result.enrolled??true);setScreen('mfa');setMfaUri('');setMfaCode('')
         notify('账号密码已验证，请完成动态验证码验证')
+      }else if(result.user&&typeof result.user.mustChangePassword==='boolean'){
+        setUser(result.user);setScreen('workspace')
       }else{await refresh()}
     })
   }
@@ -379,7 +424,7 @@ export default function SchoolApp(){
     heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true})
     setFocusPublic(false)
   },[focusPublic,screen,loading])
-  const publicHome=!user&&screen==='home'
+  const publicHome=!user&&screen==='home'&&(!loading||window.location.pathname==='/')
   const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
 
   const professionalClassPage=professionalWorkspace&&!schoolAdmin&&page==='classes'
@@ -427,8 +472,8 @@ export default function SchoolApp(){
     <main id="hs-main" tabIndex={-1} className={`hs-main${publicHome?' hs-main-landing':publicAuth?' hs-main-auth':user?' hs-main-workspace':''}`}>
       {error&&<p className="hs-alert" role="alert">{error}</p>}
       {notice&&<p className="hs-message" role="status">{notice}</p>}
-      {loading?<p>正在核对校园会话…</p>:null}
-      {!loading&&publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
+      {loading&&!publicHome?<p>正在核对校园会话…</p>:null}
+      {publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
       {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
       {!loading&&!user&&screen==='feature'&&activeFeature&&<section className="hs-feature-blank" aria-label={`${activeFeature.title}介绍页面`}>
         <h1 className="hs-visually-hidden">{activeFeature.title}</h1>
@@ -492,7 +537,7 @@ export default function SchoolApp(){
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
       {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(groupedWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||groupedWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalScopePage?undefined:workspaceContext}>
-        {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
+        {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={(id,activity)=>navigateWorkspace(id,undefined,activity)}/>}
         {page==='overview'&&groupedWorkspace&&<SchoolProfessionalHome administrator={administratorWorkspace} items={educatorEntries} username={user.username} schoolName={orgs.find(org=>org.id===schoolId)?.name} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&!groupedWorkspace&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview compact={ordinaryTeacher||parentWorkspace} parent={parentWorkspace} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
         {page==='account'&&<section className={'hs-panel hs-account-panel'+(user.role==='STUDENT'?' hs-student-account':'')+(administratorWorkspace?' hs-admin-panel hs-admin-account':'')}><div>{administratorWorkspace?<SchoolReportHeader compact title="校园账号" label="校园账号使用说明"><p>你使用的是独立校园账号。可用功能由学校授权决定。</p></SchoolReportHeader>:<h2>校园账号</h2>}<p>用户名：{user.username}</p>
@@ -514,7 +559,7 @@ export default function SchoolApp(){
         </section>}
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
-            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api} activityId={new URLSearchParams(window.location.search).get('activityId')??undefined}/>}
+            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api} activityId={activityId} onNavigate={(id,activity)=>navigateWorkspace(id,undefined,activity)}/>}
             {page==='feedback'&&<SchoolStudentFeedback api={api}/>}
             {page==='family'&&<SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>}
             {page==='sharing'&&campusParentReportEnabled&&<SchoolStudentReportConsent api={api}/>}
@@ -561,8 +606,9 @@ export default function SchoolApp(){
           {professionalRecoveryPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope recovery>{workspaceContext}</SchoolProfessionalClassScope>{schoolId&&classId?<SchoolRecoveryOfficer compact key={classPath} api={api} classPath={classPath}/>:<section className="hs-panel hs-recovery-empty"><h2>选择要处理的班级</h2><p>选择班级后，可进入账号恢复与注册异常处理。</p></section>}</div>}
           {page==='recovery'&&!professionalRecoveryPage&&(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
+          {(page==='private-tools'||(page==='activities'&&canManageSchoolActivities(access)))&&schoolId&&<EducationAssessmentRegistrationPanel key={'registration:'+user.id+':'+schoolId} api={api} organizationId={schoolId} actorId={user.id} product="SCHOOL"/>}
           {page==='private-tools'&&schoolId&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`SCHOOL:${user.id}:${schoolId}`} api={api} organizationId={schoolId} entry="SCHOOL" actorId={user.id} onDraftStateChange={setPrivateDraftState}/>:<section className="hs-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
-          {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks compact={ordinaryTeacher} key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks compact={ordinaryTeacher} key={'SchoolTeacherTasks:'+user.id+':'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='relationships'&&schoolAdmin&&schoolId&&<><section className="hs-management-related">{managementLinks('relationships')}<a href={workspaceHref('personnel')} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('personnel')}}>按人员查看有效权限 →</a></section><SchoolRelationships compact={administratorWorkspace} key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/></>}
           {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
             &&page==='activities'&&schoolId
@@ -572,7 +618,7 @@ export default function SchoolApp(){
                 scenarios={['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']}/>
             </details>}
           {page==='activities'&&schoolId&&access&&canManageSchoolActivities(access)&&<SchoolActivityManager
-            key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} organizationId={schoolId}
+            key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} assessmentResources={assessmentResources} organizationId={schoolId}
             compact={ordinaryTeacher||groupedWorkspace} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
@@ -604,7 +650,7 @@ export default function SchoolApp(){
         </>:<div>
           {page==='family'&&<SchoolParentLinks api={api} role="PARENT"/>}
           {page==='peer'&&<SchoolPeerConsent api={api} role="PARENT"/>}
-          {page==='tasks'&&<SchoolParentTasks api={api}/>}
+          {page==='tasks'&&<SchoolParentTasks key={user.id} api={api}/>}
           {page==='parent-reports'&&campusParentReportEnabled&&<SchoolParentReports api={api}/>}
         </div>}
         {['admission','recovery'].includes(page)&&!professionalAdmissionPage&&!administratorAdmissionPage&&!professionalRecoveryPage&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}

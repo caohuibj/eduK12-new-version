@@ -9,6 +9,9 @@
 .epg-main label{display:grid;gap:.45rem;margin:1rem 0;font-weight:550}
 .epg-main input{width:min(100%,650px);height:44px;border:1px solid #a8b1c2;
  border-radius:8px;padding:.55rem;font:inherit}
+.epg-fixed-configurations select{width:min(100%,650px);min-width:0;max-width:100%;height:44px;
+ border:1px solid #a8b1c2;border-radius:8px;padding:.55rem;font:inherit}
+.epg-fixed-configurations select:focus-visible{outline:3px solid #a85d35;outline-offset:2px}
 .epg-main button{border:1px solid #8f9dae;background:#fafbfc;border-radius:8px;
  padding:.65rem .9rem;color:inherit}
 .epg-main button:disabled{opacity:.5;cursor:not-allowed}

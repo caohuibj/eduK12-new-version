@@ -6,6 +6,7 @@ import { success, error } from '../../utils/response'
 import { bundleProductService, bundleDefinitionProvider } from './service'
 import * as analysis from './analysis'
 import * as authoring from './admin-authoring'
+import {trainingTrackingSelectionSchema} from '../composite/personal-tracking'
 const router = Router()
 const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
   try { return success(res, await fn(req)) } catch (e: any) {
@@ -40,8 +41,11 @@ router.post('/attempts/:attemptId/retry', handle(async req => {
   return analysis.readReport(req.params.attemptId, req.user!.role === 'ADMIN' ? 'admin' : 'teacher', analysisId)
 }))
 router.get('/:id', handle(req => bundleProductService.detail(req.user!, req.params.id)))
-router.post('/:id/publish', refreshCatalog, handle(req => bundleProductService.publish(req.user!, req.params.id,
-  z.object({ revision: z.number().int().nonnegative() }).strict().parse(req.body).revision)))
+router.post('/:id/publish', refreshCatalog, handle(req => {
+  const input=z.object({revision:z.number().int().nonnegative(),tracking:trainingTrackingSelectionSchema.optional()}).strict().parse(req.body)
+  return bundleProductService.publish(req.user!,req.params.id,input.revision,input.tracking)
+}))
+router.post('/:id/next-wave',refreshCatalog,handle(req=>bundleProductService.nextWave(req.user!,req.params.id,req.body)))
 router.post('/:id/archive', handle(req => bundleProductService.archive(req.user!, req.params.id,
   z.object({ revision: z.number().int().nonnegative() }).strict().parse(req.body).revision)))
 export default router

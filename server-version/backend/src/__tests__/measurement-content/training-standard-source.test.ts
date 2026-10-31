@@ -28,6 +28,23 @@ describe('Training consumes one exact shared combination through one user Materi
   expect(second.reference.authority).toEqual(first.reference.authority)
   expect(second.referenceHash).toBe(first.referenceHash);expect(f.h.writes).toEqual([])
  })
+ it('pins the same exact grant in an owned anonymous GENERAL draft without borrowing a course',async()=>{
+  const f=trainingSourceHarness();f.h.composite.questionnaireType='GENERAL';f.h.composite.questionnaireCourses=[]
+  f.h.composite.publicEnabled=true
+  const source=await run(f)
+  expect(source.reference.authority.useGrantId).toBe(ids.leaf)
+  expect(source.reference.ownerId).toBe(ids.owner)
+  expect(source.reference.combination.combinationHash).toBe(f.h.row.combination_hash)
+  expect(f.h.calls.some((sql:string)=>sql.includes('FROM courses WHERE id IN'))).toBe(false)
+ })
+ it.each(['foreign-course','legacy-course','legacy-container','unknown-type'])('rejects mixed or legacy anonymous scope: %s',async kind=>{
+  const f=trainingSourceHarness();f.h.composite.questionnaireType='GENERAL';f.h.composite.questionnaireCourses=[]
+  if(kind==='foreign-course')f.h.composite.questionnaireCourses=[{courseId:tid(90)}]
+  if(kind==='legacy-course')f.h.composite.courseId=tid(91)
+  if(kind==='legacy-container')f.h.composite.productKind='LEGACY_COMPOSITE'
+  if(kind==='unknown-type')f.h.composite.questionnaireType='OTHER'
+  await expect(run(f)).rejects.toThrow('COMPOSITE_UNAVAILABLE')
+ })
  // The merged entry contract (PR355, per the 2026-10-25 daily-release rules):
  // a CURRENT formal Training entry admin distributes without per-content
  // re-approval; anyone else must present the exact delegated 21B root.
@@ -271,15 +288,16 @@ it('projects only validated frozen version labels into teacher summaries without
  expect(f.h.calls).toEqual([])
 })
 
-it('continues past 100 stale grants using the last scanned cursor, retaining current use checks',async()=>{
+it('continues past 100 stale grants through an explicit page cursor, retaining current use checks',async()=>{
  const f=trainingSourceHarness(),original=f.db.$queryRaw.getMockImplementation()!
+ f.h.use!.id=tid(1100)
  const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
  client.$transaction=async(fn:any)=>fn(f.db)
  let pages=0
  f.db.$queryRaw.mockImplementation(async(query:any,...args:any[])=>{
   if(query.sql.includes('FROM material_grants g JOIN survey_standard_releases')){
    const [valid]=await original(query,...args)
-   if(++pages===1)return Array.from({length:100},(_,i)=>({...valid,use_id:tid(1000+i)}))
+   if(++pages===1)return [...Array.from({length:100},(_,i)=>({...valid,use_id:tid(1000+i)})),valid]
    expect(query.sql).toContain('(r.tool_key,r.id,g.id)>')
    expect(query.values.slice(-3)).toEqual([valid.tool_key,valid.id,tid(1099)])
    return [valid]
@@ -287,8 +305,10 @@ it('continues past 100 stale grants using the last scanned cursor, retaining cur
   return original(query,...args)
  })
  try{
-  const {listTrainingStandardCombinationChoices}=await import('../../modules/measurement-content/standard-combination-use')
-  const choices=await listTrainingStandardCombinationChoices(ids.owner)
-  expect(pages).toBe(2);expect(choices).toHaveLength(1);expect(choices[0].useGrantId).toBe(ids.leaf)
+  const {listTrainingStandardCombinationChoicePage}=await import('../../modules/measurement-content/standard-combination-use')
+  const first=await listTrainingStandardCombinationChoicePage(ids.owner)
+  expect(first.list).toEqual([]);expect(first.nextCursor).not.toBeNull()
+  const second=await listTrainingStandardCombinationChoicePage(ids.owner,first.nextCursor!)
+  expect(pages).toBe(2);expect(second.list).toHaveLength(1);expect(second.list[0].useGrantId).toBe(tid(1100))
  }finally{client.$transaction=previous}
 })

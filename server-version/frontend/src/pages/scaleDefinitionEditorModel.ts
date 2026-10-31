@@ -36,6 +36,8 @@ export interface ScaleDefinition {
     }>
   }
   report: {
+    audienceContract?: {schemaVersion:1;respondent:'STUDENT_SELF'|'ADULT_SELF'|'PARENT_REPORT'|'TEACHER_REPORT'|'OBSERVER_REPORT';
+      audience:'student'|'parent'|'teacher';locale:string;longitudinalMetricKeys?:string[];qcReview?:{reviewer:string;reviewedAt:string;basis:string}}
     rawScoreFeedback?: RawScoreFeedback
     reportVersion: string
     primaryScoreKeys: string[]
@@ -106,6 +108,7 @@ export const updateReportContract = (definition: ScaleDefinition): ScaleDefiniti
       ...definition.report,
       primaryScoreKeys: definition.scoring.scores.filter((score) => score.canonical).map((score) => score.key),
       scoreOrder: keys,
+      ...(definition.report.audienceContract?.longitudinalMetricKeys !== undefined ? {audienceContract:{...definition.report.audienceContract,longitudinalMetricKeys:definition.report.audienceContract.longitudinalMetricKeys.filter(key=>keys.includes(key))}} : {}),
       interpretations,
       ...(definition.report.rawScoreFeedback ? { rawScoreFeedback: { ...definition.report.rawScoreFeedback, rules: definition.report.rawScoreFeedback.rules.filter(rule => keys.includes(rule.scoreKey)) } } : {}),
     } as ScaleDefinition['report'],

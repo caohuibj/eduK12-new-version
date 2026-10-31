@@ -1,0 +1,799 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP他人痛苦情绪反应10题（研究译稿）",
+      "abbreviation": "IPIP_RESPONSIVE_DISTRESS10",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "Self-reported distress resonance and emotional reactivity to others suffering and tense situations; not total empathy, compassion, helpful behavior, trauma, or objective crisis-response skill.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip_responsive_distress10",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:responsive_distress",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持当前官方题目顺序及1–5符合度锚点，不混旧题数版本。",
+        "项目采用全10题完整作答才求和，不把缺失当零。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于IPIP官方Barchard(2001)构念题库的AI辅助中文工作译稿，不是官方中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文专家译审、认知访谈和目标人群心理测量验证待完成。 项目作答说明置于首题之前，原题干顺序保留；不是原作者标准化指导语审定。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_responsive_distress10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_responsive_distress10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_responsive_distress10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "IPIP Responsive Distress",
+        "citation": "Barchard (2001), as attributed by the official IPIP key; do not claim a complete emotional-intelligence battery.",
+        "url": "https://ipip.ori.org/newEmotionalIntelligenceKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_responsive_distress10_accuracy",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+          "content": "别人的不幸会深深触动我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+          "content": "我很容易被触动而流泪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+          "content": "别人的悲伤也会让我感到痛苦。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+          "content": "陌生人的不幸也会让我难过。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+          "content": "如果看到受伤的动物，我会难过。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+          "content": "即使在紧张的情境中，我也很平静。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+          "content": "发生的事情不容易使我心烦意乱。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+          "content": "别人的痛苦不会影响我的情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+          "content": "看悲伤的电影时，我很少哭。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+          "content": "遇到紧急情况时，我保持平静。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_responsive_distress10_accuracy",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "ipip_responsive_distress10",
+            "type": "total",
+            "label": "面对他人痛苦时的情绪反应",
+            "description": "面对他人痛苦和紧张情境时自己情绪更容易受到触动的自述倾向，不是同理心、道德或实际帮助能力。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "ipip_responsive_distress10"
+        ],
+        "scoreOrder": [
+          "ipip_responsive_distress10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_responsive_distress10",
+            "headline": "关心他人的难处，也看见自己的承受范围",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "先读懂这份结果\n\n十题在统一计分方向后相加，范围10–50。数值越大，表示这次更认可自己面对他人的不幸、受伤动物或紧张情境时，情绪容易受到触动。这是对目前通常情况的符合程度回答，不是哭泣次数、悲伤时长或对方痛苦的程度；没有可用的中文高低分界。\n\n受到触动，与能提供什么帮助是两件事\n\n例如，朋友讲一件难过的事，你也跟着沉下心情；也可能你比较平静，却仍认真听、提供实际协助。两种反应都不能单独证明是否关心别人。问卷不测整体同理心、道德或危机处理能力，也不能从一个总分知道你具体怎样回应。\n\n如果你已有既能倾听、又能保留余力的方式，可以继续用。若容易被难过的内容带走，可以看看怎样保留边界；若不太受影响，也不必逼自己表现出同样强烈的情绪。适合的支持，要结合对方需要、自己的意愿与实际能力，而不是以自己多难受作为标准。\n\n下面是可选的回顾和行动，不是让你变得更敏感或更平静的任务。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回顾一次愿意想起的倾听经历，分开看看：对方在说什么需要，我自己有什么感受，我实际能提供什么？不需要猜测对方，也不把自己的反应强弱当成关心程度。"
+              },
+              {
+                "category": "strategy",
+                "text": "在合适的时候先问一句：“你希望我听一听，还是一起想办法？”再说明自己此刻能做的范围。若暂时没有余力，可以约另一个时间或帮助寻找合适支持，不必勉强承接所有事。"
+              },
+              {
+                "category": "support",
+                "text": "如果持续接触难过的内容让你很吃力，可以减少非必要接触、安排恢复时间，或与可信任的人和适当专业支持商量。需要暂停不等于放弃关心；真实的紧急情况仍应寻求对应的现实帮助，而不是靠情绪反应判断自己是否胜任。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "原英文这组题的回答一致程度有限，本中文尚未验证；仅供成人谨慎回顾，不分等级或排名。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:56:08Z",
+            "basis": "本次AI文字自审对应ipip_responsive_distress10_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_responsive_distress10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_distress10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_distress10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_distress10": 10
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_distress10"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_distress10": 50
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_distress10"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_distress10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_distress10"
+          ]
+        }
+      },
+      {
+        "name": "all-five",
+        "answers": [
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_RESPONSIVE_DISTRESS10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "ipip_responsive_distress10": 30
+          },
+          "totalScoreKeys": [
+            "ipip_responsive_distress10"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请描述你现在通常的真实情况，而不是你希望将来成为的样子。判断下面每句话与你的符合程度。没有标准答案。",
+    "language": "zh-CN",
+    "version": "1.0.1",
+    "source": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json#/executable/definition/items/0/content (既有指导语前缀原文拆分，题干原文保留) @ b92c69aefa2472775fa7ee86b9c208366886c908 (项目工作稿；非人工审批声明)"
+  }
+}

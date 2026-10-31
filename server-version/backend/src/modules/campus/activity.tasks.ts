@@ -1,4 +1,5 @@
 import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
+import {completedSchoolOrdinaryFeedbackSql} from '../assessment-run/completedSchoolFeedback'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -115,7 +116,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   const tasks:Array<{
     id:string;activityId:string;activityTitle:string;kind:CampusTaskType|'MEASUREMENT'
     title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
-    deadline:string|null;href:string|null;resourceFamily?:string
+    deadline:string|null;href:string|null;resourceFamily?:string;feedbackNamespace?:'EDUCATION_ASSESSMENT';feedbackMode?:'COMPOSITION'
     canResumeExisting?:boolean;consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
   }>=[]
   for(const t of assignments){
@@ -149,6 +150,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       e.status==='EXPIRED'?'EXPIRED':'UNAVAILABLE'
     tasks.push({id:e.executionId,activityId:courseId,activityTitle:activity.title,
       kind:'MEASUREMENT',resourceFamily:e.resourceFamily,title:e.runName,status,
+      ...(e.resourceKey?.startsWith('education-assessment:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const}:{}),
+      ...(e.resourceKey?.startsWith('education-composition:SCHOOL:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const,feedbackMode:'COMPOSITION' as const}:{}),
       canResumeExisting:e.canResumeExisting,consentRequired:e.consentRequired,consentPurpose:e.consentPurpose,
       consentVisibility:e.consentVisibility,
       deadline:e.deadline?.toISOString()??null,
@@ -179,20 +182,19 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       course."title" AS "activityTitle"
     FROM "campus_activity_runs" ar
     JOIN "campus_activities" a ON a."course_id"=ar."course_id"
-      AND a."organization_id"=ar."organization_id" AND a."status"='OPEN'
+      AND a."organization_id"=ar."organization_id"
     JOIN "courses" course ON course."id"=a."course_id"
       AND course."course_type"='CAMPUS_ACTIVITY'
     JOIN "organizations" o ON o."id"=ar."organization_id"
       AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
     JOIN "assessment_runs" r ON r."id"=ar."run_id"
       AND r."organization_id"=ar."organization_id"
-      AND (r."status"='PUBLISHED' OR (r."status"='CLOSED' AND EXISTS (
+    WHERE ((a."status"='OPEN' AND (r."status"='PUBLISHED' OR (r."status"='CLOSED' AND EXISTS (
         SELECT 1 FROM "assessment_run_executions" eligible
         WHERE eligible."organization_id"=r."organization_id" AND eligible."run_id"=r."id"
           AND ${boundCompositeContinuationSql(Prisma.sql`eligible."id"`,actor.userId)}
           AND ${currentRunPopulationAuthoritySql(Prisma.sql`eligible."id"`)}
-      )))
-    WHERE EXISTS (
+      )))) AND EXISTS (
       SELECT 1 FROM "parent_student_relationships" link
       JOIN "campus_student_enrollments" e ON e."user_id"=link."student_user_id"
         AND e."organization_id"=ar."organization_id" AND e."status"='APPROVED'
@@ -206,12 +208,14 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       WHERE link."parent_user_id"=${actor.userId}
         AND link."status"='ACTIVE' AND link."approved_at" IS NOT NULL
         AND link."revoked_at" IS NULL
-    )
+    )) OR EXISTS (SELECT 1 FROM assessment_run_executions history_execution
+      WHERE history_execution.organization_id=ar.organization_id AND history_execution.run_id=ar.run_id
+        AND ${completedSchoolOrdinaryFeedbackSql(Prisma.sql`history_execution.id`,actor.userId)})
     ORDER BY ar."created_at" DESC LIMIT 101
   `
   const indexed=links.slice(0,100)
   if(!indexed.length)return {list:[],truncated:links.length>100}
-  const tasks=await listAssignedRunTasks(actor.userId,{runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true})
+  const tasks=await listAssignedRunTasks(actor.userId,{runIds:indexed.map(l=>l.runId),preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true})
   const byRun=new Map(indexed.map(l=>[l.runId,l]))
   const list=tasks.list.filter(t=>byRun.has(t.runId)).map(t=>{
     const activity=byRun.get(t.runId)!
@@ -220,6 +224,7 @@ export async function listCampusParentRunTasks(actor:AuthenticatedPrincipal){
       organizationId:activity.organizationId,activityId:activity.courseId,
       activityTitle:activity.activityTitle,runTitle:t.runName,
       status:t.status,deadline:t.deadline?.toISOString()??null,
+      ...(t.resourceKey?.startsWith('education-composition:SCHOOL:')?{feedbackNamespace:'EDUCATION_ASSESSMENT' as const,feedbackMode:'COMPOSITION' as const}:{}),
       canResumeExisting:t.canResumeExisting,consentRequired:t.consentRequired,consentPurpose:t.consentPurpose,
       consentVisibility:t.consentVisibility,
       // No child identifiers, reports, psychometric scores or raw responses.

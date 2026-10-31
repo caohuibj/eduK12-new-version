@@ -1,0 +1,6 @@
+{
+  "exitCode": 0,
+  "source": "01d61bddb7c306bfbe3e2f4eda2d792c784aec83",
+  "probeSHA256": "b70ffe74c4986e3f920fe4885949d31b6b2f6cf61ee0df6797563fb4ecbd4ccb",
+  "writes": "Only synthetic negative branches, rolled back; no START/FINAL"
+}

@@ -1,0 +1,12 @@
+{
+  "command": "node node_modules/typescript/bin/tsc --noEmit",
+  "cwd": "server-version/backend",
+  "head": "f51d2275e065333ede10636605171404cca5e17d",
+  "backendTree": "60e3a0336b424f0ca3f665ff427251a4ca0c75d6",
+  "node": "v24.21.0",
+  "startedAt": "2026-10-30T12:00:28.997Z",
+  "finishedAt": "2026-10-30T12:01:06.352Z",
+  "exitCode": 0,
+  "signal": null,
+  "localUnsigned": true
+}

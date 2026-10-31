@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "sourceHead": "dece996eba527ed51c41e7488100c75fe55ff280",
+  "componentTree": "49e0abba067d2ce2e8efd033db9e1a8338cbce4f",
+  "startedAt": "2026-10-28T03:33:08.062991+00:00",
+  "before": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515"
+  },
+  "node": "v24.19.0",
+  "limitations": [
+    "Installed dependency versions and generated Prisma tracked separately; no claim of original DOT environment equality or signed execution."
+  ],
+  "exitCode": 0,
+  "endedAt": "2026-10-28T03:33:37.135164+00:00",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "after": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515"
+  }
+}

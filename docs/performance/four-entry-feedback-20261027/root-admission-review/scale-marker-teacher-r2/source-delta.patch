@@ -1,0 +1,93 @@
+diff --git a/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts b/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts
+index 26fc920bc..354cbb111 100644
+--- a/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts
++++ b/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts
+@@ -16,9 +16,6 @@ import {huiteacherOriginGuard} from '../../modules/huiteacher/originGuard'
+ import {generateToken} from '../../utils/jwt'
+ import {UserRole} from '../../types'
+ import {prisma} from '../../config/database'
+-import {createTrialEnvelope} from '../../modules/cognitive/v2/trial-envelope'
+-import {loadStoredCanonicalUnitResults} from '../../modules/assessment-runtime/compact-assessment-storage'
+-import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+ import {verifyRuntimePrivileges} from '../../../scripts/runtime-role-contract.mjs'
+ 
+ import campusCompositeRouter from '../../modules/campus/composite.routes'
+@@ -46,29 +43,6 @@ function requireSuccess<T=any>(response:{status:number;body:any}):T{
+  expect(response.body.code,JSON.stringify(response.body)).toBe(0)
+  return response.body.data as T
+ }
+-async function submitCognitive(parentPath:string,item:any,cookie:string){
+- const path=parentPath+'/items/'+item.id+'/cognitive/'+item.cognitiveSession.sessionId
+- const child=requireSuccess<any>(await request(path,cookie))
+- const trials=Array.from({length:child.config.totalTrials},(_,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*3000,
+-  endedAtPerfMs:trialIndex*3000+400,payload:{foreperiodMs:700+trialIndex*100,rtMs:400,prematureCount:0,interrupted:false,inputMode:'pointer'}}))
+- const payload={submissionId:randomUUID(),attemptEpoch:child.attemptEpoch??1,definitionHash:child.definitionHash,contextSnapshotHash:child.contextSnapshotHash??null,trials}
+- const result=requireSuccess<any>(await request(path+'/submit',cookie,'POST',payload))
+- expect(result).toBeTruthy()
+- return {path,payload,sessionId:child.sessionId}
+-}
+-async function submitSjt(parentPath:string,item:any,cookie:string){
+- const path=parentPath+'/items/'+item.id+'/situational/'+item.situationalAttemptId
+- const child=requireSuccess<any>(await request(path,cookie))
+- expect(child.result).toBeUndefined();expect(child.canonicalResult).toBeUndefined()
+- const payload={submissionId:randomUUID(),attemptEpoch:child.attempt.attemptEpoch,definitionHash:child.attempt.definitionHash,
+-  compiledRuntimeHash:child.attempt.compiledRuntimeHash,instrumentVersion:child.attempt.instrumentVersion,scoringVersion:child.attempt.scoringVersion,
+-  responses:[{sceneKey:'AS-01',channelKey:'behavior',responseValue:'A'},{sceneKey:'AS-02',channelKey:'behavior',responseValue:'B'}]}
+- requireSuccess(await request(path+'/submit',cookie,'POST',payload))
+- return {path,payload,childId:child.attemptId}
+-}
+-
+-
+-
+ suite('Actual education Scale marker START and FINAL',()=>{
+  beforeAll(async()=>{
+   process.env.CAMPUS_ELIGIBILITY_HMAC_KEY??='ef'.repeat(32)
+diff --git a/server-version/backend/src/modules/education-tools/assessment-resource.service.ts b/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
+index 7363182e7..1a1d5a2fd 100644
+--- a/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
++++ b/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
+@@ -1,4 +1,5 @@
+ import {CompositeServiceError} from '../composite/composite.errors'
++import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
+ import {decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
+ import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
+ import {assertStandardCombinationDerivedRelease} from '../measurement-content/standard-combination-content'
+@@ -106,6 +107,7 @@ export function pickerSourceUnavailable(error:unknown){
+  // Account contention must roll back the transaction, never masquerade as an
+  // unavailable candidate; database/unknown errors likewise propagate.
+  if(error instanceof Error&&'code'in error&&error.code==='EDUCATION_ASSESSMENT_AUTHORITY_BUSY')return false
++ if(error instanceof InstrumentFinalSubmitError)return error.code==='FORM_ANSWER_INVALID'&&error.statusCode===400
+  return error instanceof z.ZodError||error instanceof ContentReleaseError||error instanceof CompositeServiceError
+   ||error instanceof EducationAssessmentManagementError||error instanceof EducationAssessmentSourceError
+ }
+diff --git a/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts b/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts
+index b45309229..b69a6eb19 100644
+--- a/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts
++++ b/server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts
+@@ -1,25 +1,13 @@
+ import {randomUUID} from 'node:crypto'
+ import {expect} from 'vitest'
+ import type {PrismaClient} from '@prisma/client'
+-import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
+ import {getScaleInstrumentSource,getScaleInstrumentRuntimePolicy} from '../../modules/scale/onboarding/instrument-registry'
+ import {installScaleInstrument} from '../../modules/scale/onboarding/install'
+ import {planStandardScalePublication,publishStandardScale} from '../../modules/scale/onboarding/publish'
+ import {standardTripletDetail,previewStandardTriplet,approveStandardTriplet} from '../../modules/survey/standard-triplet.service'
+ import {grantTrainingStandardCombinationUse} from '../../modules/measurement-content/standard-combination-use'
+-import {prepareTrainingStandardItemSource,verifyStoredTrainingStandardItem} from '../../modules/composite/training-standard-combination'
+-import {readTrainingStandardContentIdentity} from '../../modules/composite/training-standard-content'
++import {prepareTrainingStandardItemSource} from '../../modules/composite/training-standard-combination'
+ import {publishComposite} from '../../modules/composite/composite.service'
+-import {prepareTrainingContentAttemptBinding} from '../../modules/composite/training-content-binding'
+-import {assertTrainingStandardCollectionAllowed} from '../../modules/composite/training-standard-collection'
+-import {revokeTrainingStandardCombinationUse} from '../../modules/measurement-content/standard-combination-use'
+-import {revokeContentAuthority} from '../../modules/measurement-content/content-authority.repository'
+-import {validateTrainingReferenceRelease} from '../../modules/composite/training-reference-selection'
+-import {validateTrainingReportPointer} from '../../modules/composite/training-report-selection'
+-import {issueAdminContentRoot} from '../../modules/measurement-content/admin-authority.service'
+-import * as service from '../../modules/education-tools/assessment-resource.service'
+-import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
+-import type {EducationAssessmentContext} from '../../modules/education-tools/assessment-resource.issuer'
+ import * as tools from '../../modules/education-tools/private-tool.service'
+ import {preparePrivateScaleRuntimeResource} from '../../modules/education-tools/private-tool.runtime-resources'
+ import {compileResearchScale} from '../../modules/survey/builder.compiler'

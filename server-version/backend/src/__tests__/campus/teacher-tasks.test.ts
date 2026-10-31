@@ -10,6 +10,7 @@ const actor={userId:'teacher-a',role:'TEACHER',accountDomain:'SCHOOL',platformRo
 const scoped={executionId:'exec-a',runId:'run-a',activityId:'activity-a',
   organizationId:'school-a',activityTitle:'学习适应',studentUserId:'student-a'}
 const task={executionId:'exec-a',runId:'run-a',organizationId:'school-a',runName:'教师观察',
+  resourceKey:'legacy-library-scale',
   subjectUserId:'student-a',subjectName:'PRIVATE_LOGIN_NAME',subjectRole:'STUDENT',
   respondentRole:'TEACHER',relationship:'CLASS_TEACHER_STUDENT',
   status:'ASSIGNED',deadline:null,consentRequired:true,consentPurpose:'教育支持',
@@ -60,5 +61,11 @@ describe('Huischool teacher observer task boundary',()=>{
     ],truncated:false})
     const result=await listCampusTeacherRunTasks(actor as any,'school-a')
     expect(result.list).toEqual([])
+  })
+  it('adds only the ordinary questionnaire feedback hint to an already authorized observer task',async()=>{
+    mocks.official.mockResolvedValue({list:[{...task,resourceKey:'education-composition:SCHOOL:fixed:STUDENT:TEACHER_REPORT:1.0.0',status:'COMPLETED'}],truncated:false})
+    const result=await listCampusTeacherRunTasks(actor as any,'school-a')
+    expect(result.list[0]).toMatchObject({executionId:'exec-a',status:'COMPLETED',feedbackMode:'COMPOSITION'})
+    expect(JSON.stringify(result)).not.toMatch(/subjectUserId|PRIVATE_LOGIN_NAME|reportAttemptId|contentHash|resourceKey/)
   })
 })

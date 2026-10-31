@@ -1,0 +1,32 @@
+{
+  "kind": "RETROSPECTIVE_INDEX_OF_ACTUAL_TOOL_COMMAND_RESULTS_UNSIGNED",
+  "commands": [
+    {
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern=^PR434 ",
+        ".github/scripts/onboarding-controls.test.mjs"
+      ],
+      "exitCode": 0,
+      "log": "control-test.log",
+      "node": "v24.19.0",
+      "logSHA256": "bed66a7d2a5b1985c5b5c4e8fd7d812e441ad3f6ed6a7017a26e9b61a093c793"
+    },
+    {
+      "argv": [
+        "/tmp/finalize-432/actionlint",
+        "-shellcheck=",
+        "-pyflakes=",
+        ".github/workflows/ci.yml"
+      ],
+      "exitCode": 0,
+      "log": "actionlint.log",
+      "toolArchiveSHA256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "newControlCases": 1,
+  "applicationCasesExecuted": 0,
+  "buildsExecuted": 0
+}

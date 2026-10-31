@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "ca7cef4b0dbaf943eb61d925b4883bf6de2dfbdc",
+  "main": "dc0f46ba506d51d42c5bb379059df82f18860b72",
+  "recordedAt": "2026-10-29T23:54:56.747777+00:00",
+  "changedProductionRootCount": 38,
+  "ambientAuthRootCount": 1,
+  "transitiveDependencyClosureEmitted": true,
+  "wholeBackendNpmBuildExecuted": false,
+  "compileExit": 0,
+  "compileSeconds": 30.592613,
+  "actualFreshCommonjsProcessesPassed": 4,
+  "entryCases": [
+    "Training questionnaire routes",
+    "Survey platform routes",
+    "shared School/Teacher education platform routes",
+    "system standard-triplet approval routes"
+  ],
+  "artifact": {
+    "label": "backend-task1-scale-main-dc0-dist",
+    "files": 4420,
+    "bytes": 22240466,
+    "manifest": "scale-commonjs-artifact.jsonl",
+    "manifestSha256": "64f303dc6481e33fc85b41a72af12620299715b43bd5f10260f03612e2ac27de"
+  },
+  "raw": {
+    "file": "scale-commonjs-raw.json",
+    "sha256": "a0b012478cbb4cdc69d1189c4152af85564afc336fd807894acfb238d84c6276"
+  },
+  "runnerSha256": "06384b7fac6d0658199afe4039e4e1a10e5e72205744fd27d89a05a68a344fb9",
+  "evidenceLimit": "Actual local partial production closure compilation and CommonJS initialization. Probe itself issues no HTTP/DB/seed/grant/final calls; no server boot, release role/schema check, HTTP compiled-artifact journey or formal CI admission is claimed."
+}

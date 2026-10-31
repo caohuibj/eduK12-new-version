@@ -1,0 +1,538 @@
+{
+  "scope": "Continuation only: preserve prepared source and all earlier original outcomes. Correct synthetic overbroad SUBJECT disclosure; explicitly publish existing approved report template for each selected personal audience.",
+  "startedAt": "2026-10-28T03:34:39.039Z",
+  "stages": [
+    {
+      "name": "SCHOOL-publish-target-report",
+      "start": "2026-10-28T03:34:40.064Z",
+      "end": "2026-10-28T03:34:40.076Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "family": "SCALE",
+        "key": "synthetic-system-target-report:aa2ef62b-6877-405e-9039-08138fc99274",
+        "version": "1.0.1",
+        "scope": {
+          "kind": "PRIVATE",
+          "ownerId": "be8d65bb-29a3-4b95-8b18-4bde5d222759",
+          "product": "SCHOOL",
+          "resourceId": "9923e999-463e-486d-9b97-c16453309df0"
+        },
+        "assetRefs": [],
+        "sourceReleaseId": null,
+        "provenance": {
+          "adaptation": "Identical existing approved template/metric keys; explicit target audience and exact new immutable measurement pointer, no new wording/scoring/approval",
+          "sourceReportAxis": "444693a791fa7856aaa20347369472973ee2857ba8c858fb0406a933eb9fbce9",
+          "sourceCombination": {
+            "releaseId": "bf095cfa-e6ef-4a51-9592-a5ea389365f3",
+            "combinationHash": "c89888dcf30472f3c0ff62c5c8031ec1d95ad34dc909a24bc4224011cef1b8a4"
+          },
+          "syntheticSystemProbe": true
+        },
+        "layer": "REPORT",
+        "content": {
+          "projectionVersion": 1,
+          "measurements": [
+            {
+              "releaseId": "93f76b15-1a5a-4cce-9d4d-7661c6751fe6",
+              "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2"
+            }
+          ],
+          "metricKeys": [
+            "ipip_neo_c1_self_efficacy10"
+          ],
+          "audience": "student",
+          "language": "zh-CN",
+          "generatorVersion": "DECLARATIVE_REPORT_V1",
+          "template": {
+            "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+            "blocks": [
+              {
+                "type": "METRIC",
+                "metricKey": "ipip_neo_c1_self_efficacy10",
+                "label": "一般任务自我效能感",
+                "display": "RAW"
+              },
+              {
+                "type": "TEXT",
+                "text": "任务自我效能：遇到事情时，你有多少把握\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。"
+              },
+              {
+                "type": "TEXT",
+                "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+              },
+              {
+                "type": "TEXT",
+                "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+              }
+            ],
+            "limitations": [
+              "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+              "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+              "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+              "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+            ],
+            "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+          }
+        },
+        "hashScheme": "MEASUREMENT_CONTENT_CANONICAL_V1",
+        "contentHash": "e51a24b34da525e2e8c49d71a955cb6d5a1be664c0192d3da9f8c099a47de853",
+        "releaseId": "e08ceb6c-f8b6-47e6-afa4-54103e98f324",
+        "status": "PUBLISHED",
+        "publishedBy": "be8d65bb-29a3-4b95-8b18-4bde5d222759",
+        "publishedAt": "2026-10-28T03:34:40.064Z"
+      }
+    },
+    {
+      "name": "SCHOOL-target-report-distribution",
+      "start": "2026-10-28T03:34:40.077Z",
+      "end": "2026-10-28T03:34:40.164Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "grantId": "74c49d7a-778c-4967-89a8-be561f74b291",
+        "version": 1,
+        "changed": true
+      }
+    },
+    {
+      "name": "SCHOOL-register-corrected-contract",
+      "start": "2026-10-28T03:34:40.175Z",
+      "end": "2026-10-28T03:34:40.291Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "aa2ef62b-6877-405e-9039-08138fc99274",
+        "resourceKey": "education-assessment:SCHOOL:67563cf7-ccd5-4d4b-b622-f62886ea5c11:aa2ef62b-6877-405e-9039-08138fc99274",
+        "version": "1.0.0",
+        "status": "DRAFT",
+        "entryHash": "2b8f62dfae5f6afc1d589cf3567a5569c5305cc0585e4bbb93c5310b0a240c2d",
+        "entry": {
+          "title": "合成C1系统验收 · SCHOOL",
+          "description": null,
+          "releaseStatus": "DRAFT",
+          "scienceMaturity": "PILOT",
+          "applicability": {
+            "schemaVersion": 1,
+            "resourceKind": "BUNDLE",
+            "resourceKey": "education-assessment:SCHOOL:67563cf7-ccd5-4d4b-b622-f62886ea5c11:aa2ef62b-6877-405e-9039-08138fc99274",
+            "resourceVersion": "1.0.0",
+            "subjectRoles": [
+              "STUDENT"
+            ],
+            "respondentRoles": [
+              "STUDENT"
+            ],
+            "relationshipKinds": [
+              "SELF"
+            ],
+            "perspectives": [
+              "SELF_REPORT"
+            ],
+            "analysisMode": "INDIVIDUAL_ONLY",
+            "visibilityPolicyKey": "synthetic-one-scale-respondent-only",
+            "minimumRespondents": null
+          },
+          "initiationModes": [
+            "ORG_ASSIGN",
+            "CLASS_ASSIGN"
+          ],
+          "subjectReportMode": "NONE",
+          "resultDisclosure": {
+            "schemaVersion": 1,
+            "policyKey": "synthetic-one-scale-respondent-only",
+            "minimumRespondents": null,
+            "audiences": {
+              "RESPONDENT": {
+                "mode": "INDIVIDUAL_SUMMARY",
+                "metricKeys": [
+                  "ipip_neo_c1_self_efficacy10"
+                ],
+                "longitudinalMetricKeys": []
+              },
+              "SUBJECT": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "TEACHER": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "PARENT": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "PROFESSIONAL": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "ORGANIZATION": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "RESEARCH": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              }
+            }
+          },
+          "cohortAnalysisPolicy": null,
+          "launchTarget": {
+            "runtime": "COMPOSITE",
+            "compositeAssessmentId": "9923e999-463e-486d-9b97-c16453309df0"
+          },
+          "educationOrigin": {
+            "schemaVersion": 1,
+            "adapterVersion": "1.0.0",
+            "resourceId": "aa2ef62b-6877-405e-9039-08138fc99274",
+            "product": "SCHOOL",
+            "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+            "family": "BUNDLE",
+            "sourceCompositeId": "7dfcc1f2-55a8-41d5-95c5-e9f7ff46a35e",
+            "runtimeCompositeId": "9923e999-463e-486d-9b97-c16453309df0",
+            "sourceSnapshotHash": "d6ba4c509d9ac9292063af675cb10e59568902471a33db6820f2a41e4737b7c5",
+            "runtimeSnapshotHash": "e6febb049d7086cbcdbe2db0cef749f11a27548a05d0a19ed40bdffefab4f7f5",
+            "runtimeDefinitionHash": "85a8543dc2ee5a31c70f4c00c936ed0fcdcfe39a2d941a6a8a1d03c6ccbd3aad",
+            "distribution": {
+              "actorId": "be8d65bb-29a3-4b95-8b18-4bde5d222759",
+              "grants": [
+                {
+                  "resourceId": "7dfcc1f2-55a8-41d5-95c5-e9f7ff46a35e",
+                  "grantId": "459ab72a-d6c5-444d-873f-e53ee92776f0",
+                  "version": 1
+                },
+                {
+                  "resourceId": "93f76b15-1a5a-4cce-9d4d-7661c6751fe6",
+                  "grantId": "459ab72a-d6c5-444d-873f-e53ee92776f0",
+                  "version": 1
+                },
+                {
+                  "resourceId": "e08ceb6c-f8b6-47e6-afa4-54103e98f324",
+                  "grantId": "74c49d7a-778c-4967-89a8-be561f74b291",
+                  "version": 1
+                }
+              ]
+            },
+            "feedbackPolicy": {
+              "schemaVersion": 1,
+              "mode": "IMMEDIATE"
+            },
+            "units": [
+              {
+                "itemId": "c6e0da32-8c67-46b0-9b8e-fe808079d124",
+                "family": "SCALE",
+                "measurement": {
+                  "releaseId": "93f76b15-1a5a-4cce-9d4d-7661c6751fe6",
+                  "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2",
+                  "measurementHash": "87379a92bd916b30a5f2f32f8ad716b6d0430fabd43909a602a0061e51e56f31"
+                },
+                "references": [],
+                "report": {
+                  "releaseId": "e08ceb6c-f8b6-47e6-afa4-54103e98f324",
+                  "contentHash": "e51a24b34da525e2e8c49d71a955cb6d5a1be664c0192d3da9f8c099a47de853"
+                }
+              }
+            ]
+          },
+          "educationOriginHash": "43d3ed5c18e28e974ed5a60250b161d12e29c5d01920fd0e9096ed489460824e"
+        }
+      }
+    },
+    {
+      "name": "SCHOOL-independent-business-review",
+      "start": "2026-10-28T03:34:40.291Z",
+      "end": "2026-10-28T03:34:40.359Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "aa2ef62b-6877-405e-9039-08138fc99274",
+        "resourceKey": "education-assessment:SCHOOL:67563cf7-ccd5-4d4b-b622-f62886ea5c11:aa2ef62b-6877-405e-9039-08138fc99274",
+        "version": "1.0.0",
+        "status": "REVIEWED",
+        "entryHash": "2b8f62dfae5f6afc1d589cf3567a5569c5305cc0585e4bbb93c5310b0a240c2d"
+      }
+    },
+    {
+      "name": "SCHOOL-business-publish",
+      "start": "2026-10-28T03:34:40.359Z",
+      "end": "2026-10-28T03:34:40.441Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "aa2ef62b-6877-405e-9039-08138fc99274",
+        "resourceKey": "education-assessment:SCHOOL:67563cf7-ccd5-4d4b-b622-f62886ea5c11:aa2ef62b-6877-405e-9039-08138fc99274",
+        "version": "1.0.0",
+        "status": "PUBLISHED",
+        "entryHash": "ff3f2431125227d088b0a404affaebe59973e949f37b0c4a68406c9f2f3475c6"
+      }
+    },
+    {
+      "name": "TEACHER-publish-target-report",
+      "start": "2026-10-28T03:34:40.442Z",
+      "end": "2026-10-28T03:34:40.446Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "family": "SCALE",
+        "key": "synthetic-system-target-report:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "version": "1.0.1",
+        "scope": {
+          "kind": "PRIVATE",
+          "ownerId": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+          "product": "TEACHER",
+          "resourceId": "1779ff71-5464-4c13-b5e5-4e4800c22361"
+        },
+        "assetRefs": [],
+        "sourceReleaseId": null,
+        "provenance": {
+          "adaptation": "Identical existing approved template/metric keys; explicit target audience and exact new immutable measurement pointer, no new wording/scoring/approval",
+          "sourceReportAxis": "444693a791fa7856aaa20347369472973ee2857ba8c858fb0406a933eb9fbce9",
+          "sourceCombination": {
+            "releaseId": "bf095cfa-e6ef-4a51-9592-a5ea389365f3",
+            "combinationHash": "c89888dcf30472f3c0ff62c5c8031ec1d95ad34dc909a24bc4224011cef1b8a4"
+          },
+          "syntheticSystemProbe": true
+        },
+        "layer": "REPORT",
+        "content": {
+          "projectionVersion": 1,
+          "measurements": [
+            {
+              "releaseId": "93f76b15-1a5a-4cce-9d4d-7661c6751fe6",
+              "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2"
+            }
+          ],
+          "metricKeys": [
+            "ipip_neo_c1_self_efficacy10"
+          ],
+          "audience": "teacher",
+          "language": "zh-CN",
+          "generatorVersion": "DECLARATIVE_REPORT_V1",
+          "template": {
+            "title": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+            "blocks": [
+              {
+                "type": "METRIC",
+                "metricKey": "ipip_neo_c1_self_efficacy10",
+                "label": "一般任务自我效能感",
+                "display": "RAW"
+              },
+              {
+                "type": "TEXT",
+                "text": "任务自我效能：遇到事情时，你有多少把握\n这一项关注你对完成任务、判断情况和寻找办法的信心。分数越高，表示这次更认可“我能处理好”的描述。开始一件熟悉的事和面对全新任务时，把握可能不同。信心与实际能力有关，但并不相等；这个分数也不评价个人价值。"
+              },
+              {
+                "type": "TEXT",
+                "text": "回想最近一次有把握完成的任务：信心来自经验、充分准备，还是知道可以向谁求助？"
+              },
+              {
+                "type": "TEXT",
+                "text": "把一件想做的事拆出一个能开始的小步骤，并写下可能用到的信息或支持。做完后记录具体做法，给下一次留下可参考的经验。"
+              }
+            ],
+            "limitations": [
+              "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+              "目前没有可靠依据划分高低或排名；信心不等于实际能力，也不代表个人价值。",
+              "这是IPIP的一项独立工具，并非完整人格评估；不能借用其他自我效能量表的分界。原英文研究的数据不能证明本中文版本已经验证。",
+              "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+            ],
+            "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+          }
+        },
+        "hashScheme": "MEASUREMENT_CONTENT_CANONICAL_V1",
+        "contentHash": "d07ec75e7fb1cdd9ea375d954a61beb04afbfdf0decff6e77b7b418362329849",
+        "releaseId": "1b5f5ec1-918c-4e3c-938c-3fa2e857f493",
+        "status": "PUBLISHED",
+        "publishedBy": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+        "publishedAt": "2026-10-28T03:34:40.442Z"
+      }
+    },
+    {
+      "name": "TEACHER-target-report-distribution",
+      "start": "2026-10-28T03:34:40.446Z",
+      "end": "2026-10-28T03:34:40.459Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "grantId": "90f170c6-85df-435d-993c-6ed2955db79f",
+        "version": 1,
+        "changed": true
+      }
+    },
+    {
+      "name": "TEACHER-register-corrected-contract",
+      "start": "2026-10-28T03:34:40.460Z",
+      "end": "2026-10-28T03:34:40.522Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "resourceKey": "education-assessment:TEACHER:67563cf7-ccd5-4d4b-b622-f62886ea5c11:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "version": "1.0.0",
+        "status": "DRAFT",
+        "entryHash": "953bde8d08c9082eadc5a1cc2f431f5c90ea648e1bb686b65aac5ecb2c18b757",
+        "entry": {
+          "title": "合成C1系统验收 · TEACHER",
+          "description": null,
+          "releaseStatus": "DRAFT",
+          "scienceMaturity": "PILOT",
+          "applicability": {
+            "schemaVersion": 1,
+            "resourceKind": "BUNDLE",
+            "resourceKey": "education-assessment:TEACHER:67563cf7-ccd5-4d4b-b622-f62886ea5c11:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+            "resourceVersion": "1.0.0",
+            "subjectRoles": [
+              "TEACHER"
+            ],
+            "respondentRoles": [
+              "TEACHER"
+            ],
+            "relationshipKinds": [
+              "SELF"
+            ],
+            "perspectives": [
+              "SELF_REPORT"
+            ],
+            "analysisMode": "INDIVIDUAL_ONLY",
+            "visibilityPolicyKey": "synthetic-one-scale-respondent-only",
+            "minimumRespondents": null
+          },
+          "initiationModes": [
+            "ORG_ASSIGN",
+            "CLASS_ASSIGN"
+          ],
+          "subjectReportMode": "NONE",
+          "resultDisclosure": {
+            "schemaVersion": 1,
+            "policyKey": "synthetic-one-scale-respondent-only",
+            "minimumRespondents": null,
+            "audiences": {
+              "RESPONDENT": {
+                "mode": "INDIVIDUAL_SUMMARY",
+                "metricKeys": [
+                  "ipip_neo_c1_self_efficacy10"
+                ],
+                "longitudinalMetricKeys": []
+              },
+              "SUBJECT": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "TEACHER": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "PARENT": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "PROFESSIONAL": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "ORGANIZATION": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              },
+              "RESEARCH": {
+                "mode": "NONE",
+                "metricKeys": [],
+                "longitudinalMetricKeys": []
+              }
+            }
+          },
+          "cohortAnalysisPolicy": null,
+          "launchTarget": {
+            "runtime": "COMPOSITE",
+            "compositeAssessmentId": "1779ff71-5464-4c13-b5e5-4e4800c22361"
+          },
+          "educationOrigin": {
+            "schemaVersion": 1,
+            "adapterVersion": "1.0.0",
+            "resourceId": "5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+            "product": "TEACHER",
+            "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+            "family": "BUNDLE",
+            "sourceCompositeId": "7dfcc1f2-55a8-41d5-95c5-e9f7ff46a35e",
+            "runtimeCompositeId": "1779ff71-5464-4c13-b5e5-4e4800c22361",
+            "sourceSnapshotHash": "d6ba4c509d9ac9292063af675cb10e59568902471a33db6820f2a41e4737b7c5",
+            "runtimeSnapshotHash": "16aa1404b7b3d9ce15f8cabfb1e321c3e73ad405278a0ea3880834d9055e559f",
+            "runtimeDefinitionHash": "d9918e265be364229aab4a114801746d3cdfab5aecb31fd1f4270822ef397501",
+            "distribution": {
+              "actorId": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+              "grants": [
+                {
+                  "resourceId": "1b5f5ec1-918c-4e3c-938c-3fa2e857f493",
+                  "grantId": "90f170c6-85df-435d-993c-6ed2955db79f",
+                  "version": 1
+                },
+                {
+                  "resourceId": "7dfcc1f2-55a8-41d5-95c5-e9f7ff46a35e",
+                  "grantId": "f4334f5d-5639-47ed-bc9f-84ac1eb2bab3",
+                  "version": 1
+                },
+                {
+                  "resourceId": "93f76b15-1a5a-4cce-9d4d-7661c6751fe6",
+                  "grantId": "f4334f5d-5639-47ed-bc9f-84ac1eb2bab3",
+                  "version": 1
+                }
+              ]
+            },
+            "feedbackPolicy": {
+              "schemaVersion": 1,
+              "mode": "IMMEDIATE"
+            },
+            "units": [
+              {
+                "itemId": "fa4dc98e-055d-4df6-9483-8a7d8b962263",
+                "family": "SCALE",
+                "measurement": {
+                  "releaseId": "93f76b15-1a5a-4cce-9d4d-7661c6751fe6",
+                  "contentHash": "e1fff29249e3264fc133122321d7403d6920587f4cd4cb8e3c7002243b882ab2",
+                  "measurementHash": "87379a92bd916b30a5f2f32f8ad716b6d0430fabd43909a602a0061e51e56f31"
+                },
+                "references": [],
+                "report": {
+                  "releaseId": "1b5f5ec1-918c-4e3c-938c-3fa2e857f493",
+                  "contentHash": "d07ec75e7fb1cdd9ea375d954a61beb04afbfdf0decff6e77b7b418362329849"
+                }
+              }
+            ]
+          },
+          "educationOriginHash": "cbcd4803a7af491e4acdcb4b9e0165341b52c9f1d3a8e57eba75e4b742864ed4"
+        }
+      }
+    },
+    {
+      "name": "TEACHER-independent-business-review",
+      "start": "2026-10-28T03:34:40.522Z",
+      "end": "2026-10-28T03:34:40.588Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "resourceKey": "education-assessment:TEACHER:67563cf7-ccd5-4d4b-b622-f62886ea5c11:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "version": "1.0.0",
+        "status": "REVIEWED",
+        "entryHash": "953bde8d08c9082eadc5a1cc2f431f5c90ea648e1bb686b65aac5ecb2c18b757"
+      }
+    },
+    {
+      "name": "TEACHER-business-publish",
+      "start": "2026-10-28T03:34:40.589Z",
+      "end": "2026-10-28T03:34:40.666Z",
+      "outcome": "RESOLVED",
+      "result": {
+        "resourceId": "5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "resourceKey": "education-assessment:TEACHER:67563cf7-ccd5-4d4b-b622-f62886ea5c11:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "version": "1.0.0",
+        "status": "PUBLISHED",
+        "entryHash": "5853299303b3c3da36198f9c597aec9c809af9fa42ef61fd682ec2091aed6580"
+      }
+    }
+  ],
+  "failures": [],
+  "endedAt": "2026-10-28T03:34:40.667Z"
+}

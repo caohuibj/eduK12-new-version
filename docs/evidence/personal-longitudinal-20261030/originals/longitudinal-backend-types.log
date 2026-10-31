@@ -1,0 +1,5 @@
+npm warn Unknown env config "jobs". This will stop working in the next major version of npm.
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm.
+npm warn Unknown env config "nodedir". This will stop working in the next major version of npm.
+src/modules/survey/waves.service.ts(103,78): error TS2552: Cannot find name 'ResearchFrozenPublication'. Did you mean 'ResearchFrozenUnit'?
+src/modules/survey/waves.service.ts(159,55): error TS2552: Cannot find name 'ResearchFrozenPublication'. Did you mean 'ResearchFrozenUnit'?

@@ -1,7 +1,7 @@
 import apiClient from './client'
 import type { CompositeAttemptState } from '../modules/composite/types'
 
-export type RelationalResourceKind = 'BUNDLE' | 'SCALE' | 'FORM' | 'SITUATIONAL'
+export type RelationalResourceKind = 'BUNDLE' | 'SCALE' | 'FORM' | 'SITUATIONAL' | 'COGNITIVE'
 export type RelationalProductJourney =
   | 'PARENT_SELF_SERVE'
   | 'TEACHER_ASSIGN_PARENT'

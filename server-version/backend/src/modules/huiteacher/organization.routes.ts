@@ -2,6 +2,7 @@ import {educationRosterJobRouter} from '../education-roster/jobs.routes'
 import {educationPersonnelRouter} from '../campus/personnel.routes'
 import {educationRosterFileRouter} from '../education-roster/files.routes'
 import { educationPrivateToolRouter } from '../education-tools/private-tool.routes'
+import {educationAssessmentResourceRouter} from '../education-tools/assessment-resource.routes'
 import { educationToolAuthoringCapabilitiesHandler } from '../education-tools/capabilities.handler'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
@@ -11,13 +12,14 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { organizationAdminController } from '../organization/organization.admin.controller'
 import { listEducationProductMemberships } from '../organization/educationProductAccess'
-import { requireTeacherProductAdmin, requireRecentTeacherMfa, requireTeacherProductMember } from './authority'
+import { requireTeacherAdminSession, requireTeacherProductAdmin, requireRecentTeacherMfa, requireTeacherProductMember } from './authority'
 
 const router=Router()
 router.use(educationRosterJobRouter('TEACHER'))
 router.use(educationRosterFileRouter('TEACHER'))
 router.use(educationPersonnelRouter('TEACHER'))
-router.use('/organizations/:organizationId/private-tools',authenticateHuiteacher,educationPrivateToolRouter('TEACHER'))
+router.use('/organizations/:organizationId/private-tools',authenticateHuiteacher,requireTeacherAdminSession,educationPrivateToolRouter('TEACHER'))
+router.use('/organizations/:organizationId/assessment-resource-registrations',authenticateHuiteacher,educationAssessmentResourceRouter('TEACHER',requireRecentTeacherMfa))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const id=z.string().guid()
 const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
@@ -30,7 +32,7 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
   }
 })
 router.get('/organizations/:organizationId/tool-authoring-capabilities', authenticateHuiteacher,
-  educationToolAuthoringCapabilitiesHandler('TEACHER'))
+  requireTeacherAdminSession,educationToolAuthoringCapabilitiesHandler('TEACHER'))
 router.get('/organizations',authenticateHuiteacher,wrap(async(req,res)=>{
   return success(res,{
     list:await listEducationProductMemberships(req.user!.userId,'HUITEACHER'),

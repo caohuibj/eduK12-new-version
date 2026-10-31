@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "2de32609e1888cf28b73cb26e2c0cf38b11ff875",
+  "executionKind": "new working-tree files bound by SHA256; not Actions qualification",
+  "environment": {
+    "node": "24.21.0",
+    "databaseUsed": false
+  },
+  "inputs": {
+    "server-version/backend/src/modules/assessment-authorization/selected-configuration.ts": "59611e1ebec0693b98b3bd98f876e31eb5b60dab8e182269e6dccaec75b2a017",
+    "server-version/backend/src/__tests__/assessment-authorization/selected-configuration.test.ts": "e2b03ad2a233b2a3bb1bb3f198859a627b997270326883292e3aad803bcfc629",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+  },
+  "checks": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/assessment-authorization/selected-configuration.test.ts --reporter=json",
+      "exit": 0,
+      "passed": 14,
+      "failed": 0,
+      "originalReporterSha256": "5fd3d1141300c8523c907bad6a6f134caf6f5121b0830258f3360afe4b10f009",
+      "originalReporterPath": "/workspace/materials-load-20261029/evidence/selected-configuration-current.json"
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --target ES2020 --module commonjs --moduleResolution node --esModuleInterop --strict --skipLibCheck src/modules/assessment-authorization/selected-configuration.ts src/__tests__/assessment-authorization/selected-configuration.test.ts",
+      "exit": 0,
+      "diagnostics": 0
+    }
+  ],
+  "notRun": [
+    "Business integration",
+    "UI/browser",
+    "Migration dry-run",
+    "Endpoint performance comparison",
+    "Actions/merge qualification"
+  ],
+  "scope": "new pure selected binding contract only; no existing service wired"
+}

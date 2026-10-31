@@ -1,0 +1,1 @@
+export {EducationTrackingPublish as TeacherTrackingPublish,EducationTrackingNext as TeacherTrackingNext,EducationPersonalChanges as TeacherPersonalChanges} from '../modules/reporting/EducationPersonalTracking'

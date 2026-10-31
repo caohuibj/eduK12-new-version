@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "base": "5a39fd7bf29a3c0ae8ec7c26d0631548a11ccbbb",
+  "productCommit": "073c3422f1ae0fd413771ed0dd1a913bfc7aad06",
+  "kind": "recorded-local-execution-not-ci-admission",
+  "bindingRecorded": "after execution; no contemporaneous complete node_modules or signed execution manifest",
+  "environment": {
+    "node": "24.21.0",
+    "database": "isolated loopback eduk12_group_report_test_20261030, cloned from existing test baseline and migrated",
+    "browser": "local Chromium 151"
+  },
+  "checks": {
+    "backendUnit": {
+      "passed": 81,
+      "report": "backend-tests.json"
+    },
+    "frontendUnit": {
+      "original": "1 PASS / 1 FAIL",
+      "continuation": "1 PASS / 1 filtered",
+      "distinctPassed": 2
+    },
+    "postgresHttp": {
+      "setupFailures": [
+        "consent text shorter than 20 characters",
+        "missing existing workspace flag"
+      ],
+      "first": "1 PASS / 1 FAIL (missing stranger surveyAccount fixture)",
+      "continuation": "1 PASS / 1 filtered",
+      "distinctPassed": 2,
+      "testOnlySupplement": "A separate third SQL-observation case was added after the first two case qualifications; the two old cases were filtered, not replayed."
+    },
+    "frontendTypes": {
+      "exitCode": 0,
+      "command": "tsc -p tsconfig.app.json --noEmit --pretty false"
+    },
+    "backendTypes": {
+      "exitCode": 0,
+      "command": "tsc --noEmit --pretty false"
+    },
+    "frontendLint": {
+      "exitCode": 0,
+      "warnings": 2,
+      "notes": "One existing SurveyAnalyticsWorkspace hook warning; one new epoch cleanup warning."
+    },
+    "browser": {
+      "first": "FAIL at ambiguous heading selector after successful behavior and both screenshots",
+      "continuation": "print-only PASS using retained original compiled fixture, no rebuild or replay of generation/fullscreen",
+      "pdfPages": 2,
+      "synthetic": true
+    },
+    "formalQualification": {
+      "state": "NOTRUN",
+      "items": [
+        "production builds/images/scans",
+        "current SAST",
+        "exact-main schema upgrade/native dump-restore",
+        "Ready stable aggregate"
+      ]
+    },
+    "postgresQueryCounts": {
+      "state": "PASS",
+      "report": "postgres-query-count.json",
+      "generation": {
+        "sqlEvents": 46,
+        "ms": 102.56736799999999
+      },
+      "read": {
+        "sqlEvents": 8,
+        "ms": 18.91089699999975
+      },
+      "syntheticN": 2,
+      "unit": "SQL events including transaction statements, not network round trips"
+    },
+    "actionlint": {
+      "exitCode": 0,
+      "version": "1.7.12",
+      "download": "official GitHub release; published archive checksum verified",
+      "shellcheck": false,
+      "pyflakes": false
+    },
+    "firstDraftCi": {
+      "runId": "41012289991",
+      "state": "FAILURE",
+      "reason": "precise base correctly rejected moved main; no application/new control contracts ran"
+    },
+    "wideFormP2": {
+      "first": "FAIL: 5000ms case budget including cold import",
+      "continuation": "PASS: only new wide case; 8 old cases filtered",
+      "fields": 500,
+      "statisticalFields": 126,
+      "pageSize": 198,
+      "pages": 31,
+      "finalN": 6000,
+      "caseBudgetMs": 15000,
+      "durationMs": 7550,
+      "productionLimitsUnchanged": true
+    },
+    "p2BackendTypes": {
+      "exitCode": 0,
+      "source": "P2 integrated with main1cc077; original old type logs unchanged"
+    },
+    "secondDraftCi": {
+      "runId": "41013064887",
+      "state": "FAILURE",
+      "application": "NOTRUN",
+      "newControlContracts": "NOTRUN",
+      "source": "f84424dacf7907a84a089a50f01ccd97efd9b15e",
+      "rootCause": "Actual checkout base1cc077 differs from event base dfd5063"
+    }
+  },
+  "files": {
+    "README.md": {
+      "bytes": 5655,
+      "sha256": "4b01ebdc8b054345af55aef85de58547be8822ece34defc8c48e015f2de6e82c"
+    },
+    "actionlint-current.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actionlint.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "backend-tests.json": {
+      "bytes": 32974,
+      "sha256": "8ba1e4794f888d5ce898cdfdb9f09bae3b1ce9eb5a9d2f1985f8f195bf9d1ad5"
+    },
+    "backend-types.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "browser-original.cjs": {
+      "bytes": 3966,
+      "sha256": "bc50da81242ab70d148bd776cb433aa7a787e3a1faef5bc7b59bc0d9772022b2"
+    },
+    "browser-original.log": {
+      "bytes": 648,
+      "sha256": "02dfb6b0b3aa50bb25089bb75d5971489fd8a6b52ca77c779128c536fce031ea"
+    },
+    "browser-print.log": {
+      "bytes": 68,
+      "sha256": "71e10875b774d83eb69cd20440b884343e2e9cc241fe11eee2b0d3b12beddf93"
+    },
+    "browser.json": {
+      "bytes": 463,
+      "sha256": "2a5d8919c2e03849300998e462308a92514df96c9f4fca749438dd4299daad04"
+    },
+    "ci-first-failed.log": {
+      "bytes": 9189,
+      "sha256": "bf55c87517a88dec6a70ddf441dafc97443fcab7c0d41c97f428fcc12c131c8f"
+    },
+    "ci-first.json": {
+      "bytes": 515,
+      "sha256": "bcf5599e75424fe535f0e83a1ced2ebc703ab2778f76a45bdefe5109131faada"
+    },
+    "ci-second-failed.log": {
+      "bytes": 8422,
+      "sha256": "09fcb13c3473561901772e1f9e13c477b529ad4c1d6679a063f05c5b1a37632c"
+    },
+    "ci-second-scope.log": {
+      "bytes": 32685,
+      "sha256": "d904b0ac018fc810eb523ed8475c5da5d93bccf0f67c4d32c013cc656deba381"
+    },
+    "ci-second.json": {
+      "bytes": 675,
+      "sha256": "22961bd9ff1f4b839d8252f4c415eebeaa04e2a2d4bf043d41bc15a529ed99f9"
+    },
+    "frontend-lint.log": {
+      "bytes": 695,
+      "sha256": "a69a7191f18f3f3d30d7f166e8bedd7c158d380ef79fea5ddc44d69900086bef"
+    },
+    "frontend-repair.json": {
+      "bytes": 1394,
+      "sha256": "170c94c6f661e384c21fec421ef41f9921b7aa83f9c8e1d300869646af32277e"
+    },
+    "frontend-tests.json": {
+      "bytes": 27562,
+      "sha256": "7fe4e7234993c14a86d96de5d6c81f84bec7e94ad27e344c626610e52e845beb"
+    },
+    "frontend-types.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "group-1440.png": {
+      "bytes": 166174,
+      "sha256": "afae843fa5f4b577dba5209b49404d2dd7751cee25f4d5598b8159148d98152c"
+    },
+    "group-390.png": {
+      "bytes": 152388,
+      "sha256": "64a4098f52a83c6d7efb44fa6a5d1c74402c57cfbfd6f8beddd90cf517ad167f"
+    },
+    "group-report.pdf": {
+      "bytes": 289469,
+      "sha256": "3af7ddce97ceab4756ca06435b6e48352b04d35291e0f2273b867205949c1fca"
+    },
+    "group-report.txt": {
+      "bytes": 1089,
+      "sha256": "9065d63ec89638268360a644bd31a475aeac64cfefa0ab972e2f5bc84fa7b3fc"
+    },
+    "merge-parent-diagnostic.json": {
+      "bytes": 414,
+      "sha256": "c923560f9373d1341f9d7884fdc801a8a611a8215a4ebbd466eaae3b86c6356a"
+    },
+    "p2-backend-types.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "postgres-boundary-repair.json": {
+      "bytes": 1568,
+      "sha256": "0e2aa501534b82be1a19df7ca93f8c193891ed7ebc2087357777c119f5fc42bf"
+    },
+    "postgres-boundary-repair.log": {
+      "bytes": 963,
+      "sha256": "d328e0197325ba2608f7ef7c993a6c0028171a34c7d29cbaf48ee827371e5bee"
+    },
+    "postgres-diagnostic.log": {
+      "bytes": 1642,
+      "sha256": "36cb27de7b312d64b2c5102f63c20ef5c7a5de21f20ec425d030e3a470a9acf3"
+    },
+    "postgres-first.json": {
+      "bytes": 3204,
+      "sha256": "a8a39042954796ff8593bb800345dc33a1b1b670ce5375c210a84abbb6903958"
+    },
+    "postgres-first.log": {
+      "bytes": 3574,
+      "sha256": "91f5db840dcc5a87ee7714a78f70b2e7ebf19c0a1cc5d7c92c4e5290af8b2d5f"
+    },
+    "postgres-query-count.json": {
+      "bytes": 1998,
+      "sha256": "137051a63379f10e0af7a5338cd97193c70fd27827d7393c0d4be105a8017113"
+    },
+    "postgres-query-count.log": {
+      "bytes": 783,
+      "sha256": "eefec760b3e9d70f07ccbef2619d94702253088219e4f0a15c7555a591d5978c"
+    },
+    "postgres-setup-diagnostic.json": {
+      "bytes": 1535,
+      "sha256": "9703219355374d53da3f1607210731eb85bf5d63f738cba3f516fa4b657050d0"
+    },
+    "postgres-setup-first.json": {
+      "bytes": 1535,
+      "sha256": "2bc75c639aac7bc8749bc20414f6aeb182bff741094437e3b706f45ff0fe00d1"
+    },
+    "postgres-setup-repair.json": {
+      "bytes": 1535,
+      "sha256": "251eb783d9f67c4e55f617d757ca7c0ea0796cca04c3f2913fe4c6677210b5d2"
+    },
+    "postgres-setup-repair.log": {
+      "bytes": 1680,
+      "sha256": "a82005accd5b55d1672df9dbcfacc2a9b334400bb9390f344c33dd686cd30142"
+    },
+    "wide-form-first.json": {
+      "bytes": 5098,
+      "sha256": "3d62c58f359ef0da63998a5f107adb3ef312f2cd95960177192d26804c20de5f"
+    },
+    "wide-form-first.log": {
+      "bytes": 2184,
+      "sha256": "78ed89fe46295f841e5414439bb61b9dadce51175e45d1c21ecf37502c1ca18e"
+    },
+    "wide-form-repair.json": {
+      "bytes": 3766,
+      "sha256": "47008cdef79adbb4dcd588f68fa1ee6fe3c0665c7a7c479b9edc8f2f581aa1d2"
+    },
+    "wide-form-repair.log": {
+      "bytes": 522,
+      "sha256": "5de6e881ad5a9b0fbf7c2e8f44697b4c889bf3f6a693598dbaf01dd65cbbf1aa"
+    }
+  },
+  "checkedWorkingSourceFiles": {
+    "server-version/backend/prisma/migrations/20261030160000_reporting_task_artifacts/migration.sql": "d6100a77ccd1508188ac1610a035f34902dedf7400dbdec39b429695e309c145",
+    "server-version/backend/src/__tests__/reporting/task-group-summary.test.ts": "4e798b9dc2ec4f9d23859e31549f130235e8aac8c6d7d23bcce6a6ff180c0248",
+    "server-version/backend/src/__tests__/survey/group-report.postgres.integration.test.ts": "b8280ce08098a7e98d83dd501d7c062a88d3345ef92ea82f8738c0d179b8d591",
+    "server-version/backend/src/__tests__/survey/group-report.test.ts": "91d95dbc4b90423b4bd5493501cd5ab2f1efe8d5b92180c9412dce50086dc242",
+    "server-version/backend/src/modules/reporting/group-summary.ts": "4e6efde077041f6448b39f1a23ef0a908b277c19690cf8eb140562a54eac8771",
+    "server-version/backend/src/modules/reporting/task-artifact.ts": "e5853c8675a601677a525be9516ee7005149364fdca692090d6006000dbc955e",
+    "server-version/backend/src/modules/survey/analytics.routes.ts": "2a901db9e8c52ebff05f400fc859238dff1a0d1dbe40472bb705c9273e3d25f6",
+    "server-version/backend/src/modules/survey/analytics.source.ts": "e5e4d19c7fe184e9673cc8d62eb06aca96d08d6fc26857eace2ca2424c6ab535",
+    "server-version/backend/src/modules/survey/group-report.service.ts": "1af9f852c253bb645ef8be64de8d445bf97856fc7e4a9420228ec152afe4a7b9",
+    "server-version/e2e/group-report-browser.cjs": "726d5399bd8e2d09f9c3a41b8322333d7802c5c7f2d398c8eba36b9d9787fbbd",
+    "server-version/e2e/group-report-fixture.tsx": "35514960bf020576c46a0c329ff8dec0e0267072a3949004d306b0c101bf09e3",
+    "server-version/frontend/src/modules/reporting/TaskGroupReport.tsx": "2a620e27758898130bc9cd6ee391be6af07fa472afa59632404eb2c9063a1881",
+    "server-version/frontend/src/modules/reporting/task-group-report.css": "e5538f9ad95ae113f4f9283566a2a6f39179cac7ff30861b427b3c4917d623c7",
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": "c113769b253e0ab587e07cf9d120ad973933177fd4725bcfeb2ada5dc5587d1c",
+    "server-version/frontend/src/survey/SurveyGroupReports.test.tsx": "8aaa80c22bd7894f33e9277132501011c185f880355a2adf96d01fd4a3f69b71",
+    "server-version/frontend/src/survey/SurveyGroupReports.tsx": "2fb81cb4eb0c9a5dcdc339b58e746bcdd384d0577685b437d42ddb7680d95bc4"
+  },
+  "integratedMain": "1cc077a8ee8e9475799788ab2b8bf5a4511630fe",
+  "p2ProductCommit": "be1c10330901c03741b2e9356a50b8f6bc7e5a6a"
+}

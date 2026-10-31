@@ -1,3 +1,13 @@
+import {readEducationCognitiveProfilePin,readEducationCognitiveAssignmentArtifact} from '../assessment-authorization/education-cognitive-profile-binding'
+import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
+import {readEducationStandardStartSources} from '../education-tools/public-source.standard'
+import {freezeExactStandardScaleDefinition} from './training-standard-combination'
+import {readVerifiedEducationStart,readVerifiedCompositionStart,readVerifiedLongitudinalEducationAttempt,bindVerifiedEducationAttempt,type VerifiedEducationStart,type VerifiedEducationAttempt} from '../assessment-run/education-start-context'
+import {readVerifiedFieldStart,fieldCompositionBinding,type VerifiedFieldStart} from '../huiteacher/fieldComposition.contract'
+import {resolveEducationAssessmentSituationalItems} from '../education-tools/assessment-resource.source'
+import {readEducationSjtSources} from '../education-tools/native-source.sjt'
+import {admitEducationNativeCognitive} from '../education-tools/native-source.cognitive'
 import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
@@ -11,6 +21,7 @@ import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
+import {inheritTrainingTrackingSources,freezeTrainingTracking,readTrainingTracking} from './personal-tracking'
 import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
@@ -187,6 +198,7 @@ import {
 import {
   formSectionIdentityHash,
   freezeCompositeActiveSlotSet,
+  frozenEducationBlockInstruction,
 } from '../assessment-runtime/attempt-runtime'
 import {
   loadFrozenScaleRuntimeSnapshot,
@@ -228,6 +240,9 @@ const reportPackageSummary = (row: {
 
 const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T) => {
   const {
+    personalTracking: _ignoredPersonalTracking,
+    personalTrackingInheritedUnits: _ignoredInheritedTracking,
+    personalChangesSnapshots: _ignoredPersonalChanges,
     trainingReportSelectionDraft: _ignoredTrainingReportSelection,
     trainingReferenceSelectionDraft: _ignoredTrainingReferenceSelection,
     trainingContentSnapshot: _ignoredTrainingContent,
@@ -241,7 +256,11 @@ const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T
     reportPackageProfile: _ignoredPackageProfile,
     ...safe
   } = row
-  return { ...safe, reportPackage: reportPackageSummary(row) }
+  const tracking=readTrainingTracking(row.personalTracking)
+  return { ...safe, reportPackage: reportPackageSummary(row),...(tracking?{personalTracking:{
+    baselineId:row.personalTrackingBaselineId,ordinal:row.personalTrackingOrdinal,
+    metrics:tracking.plan?.metrics.map(m=>({itemId:tracking.bindings.find(b=>b.metricId===m.id)?.itemId,scoreKey:m.scoreKey,label:m.label,unit:m.unit}))??[],
+  }}:{}) }
 }
 
 const isTeacherOrAdmin = (role: UserRole) => role === UserRole.TEACHER || role === UserRole.ADMIN
@@ -286,6 +305,8 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
                     instruction: true,
                     instrumentClass: true,
                     instrumentVersion: true,
+                    libraryEntryId: true,
+                    measurementReleaseId: true,
                     definition: true,
                   },
                 },
@@ -301,7 +322,7 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
     },
   })
   if (!composite) throw compositeNotFound()
-  return composite as any
+  return includeItems?inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite):composite as any
 }
 
 const validateCourse = async (
@@ -411,12 +432,12 @@ export const lockCompositeAssetReferences = async (db: Db, items: any[], formSec
   if (references.length) await lockStoredAssetRows(db, references.map(reference => reference.assetId))
   return references
 }
-const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease) => {
+const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease, educationProduct?:'SCHOOL'|'TEACHER') => {
   const { runtime, situationPackage } = situation
   if (!runtime.runtimeCapabilities.supported || !runtime.runtimeCapabilities.embedded || !runtime.runtimeCapabilities.aggregateEligible || runtime.runtimeCapabilities.collectionFacts) throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
   // Composite course delivery and anonymous student entry must not silently
   // administer teacher self-report instruments to students.
-  if (situationPackage.definition.respondentType === 'teacher_self_report') throw compositeBadRequest('教师自评题包不能用于学员综合测评')
+  if (situationPackage.definition.respondentType === 'teacher_self_report' && educationProduct!=='TEACHER') throw compositeBadRequest('教师自评题包不能用于学员综合测评')
   return situation
 }
 
@@ -628,6 +649,12 @@ export const assertValidItem = async (
     }
     if (assignment.listedStandalone === false) {
       throw compositeForbidden('报告包内部认知任务不能用于仅收集综合测评')
+    }
+    const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+    if(pin){
+     if(assignment.createdBy!==userId)throw compositeForbidden('不能使用其他接收者的固定认知配置')
+     const fixed=await loadPinnedTrainingCognitiveProfile(prisma as Prisma.TransactionClient,pin,{userId,configId:assignment.configId},true)
+     assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
     }
     validateCognitiveConfig(assignment.config)
     if (role !== UserRole.ADMIN && assignment.createdBy !== userId) {
@@ -1041,6 +1068,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
+    ...(composite.personalTracking?{personalTracking:{baselineId:composite.personalTrackingBaselineId,ordinal:composite.personalTrackingOrdinal}}:{}),
     trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
     trainingVariantDraft:composite.trainingVariantDraft??null,trainingVariantFrozen:composite.trainingVariantFrozen??null,trainingVariantDigest:composite.trainingVariantDigest??null,
     trainingFeedbackPolicy:composite.trainingFeedbackPolicy??null,trainingFeedbackPolicyHash:composite.trainingFeedbackPolicyHash??null,
@@ -1275,6 +1303,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           title: assignment.title || assignment.config.name,
           instruction: assignment.instruction ?? assignment.config.instruction ?? null,
           sourceFreeze: {
+            ...(readTrainingCognitiveTaskBinding(assignment.courseSnapshot)?{selectedCognitiveProfile:readTrainingCognitiveTaskBinding(assignment.courseSnapshot)!}:{}),
             profile: assignment.profile ?? null,
             profileDefinitionVersion: assignment.profileDefinitionVersion ?? null,
             resolvedConfigSnapshotEncrypted: assignment.resolvedConfigSnapshotEncrypted ?? null,
@@ -2008,6 +2037,12 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       if (!['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind) && !composite.reportPackageKey && item.cognitiveAssignment.listedStandalone === false) {
         throw compositeBadRequest('报告包内部认知任务不能用于仅收集综合测评')
       }
+      const pin=readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)
+      if(pin){
+       if(item.cognitiveAssignment.createdBy!==userId)throw compositeForbidden('不能发布其他接收者的固定认知配置')
+       const fixed=await loadPinnedTrainingCognitiveProfile(prisma as Prisma.TransactionClient,pin,{userId,configId:item.cognitiveAssignment.configId},true)
+       assertCognitiveAssignmentFreeze(item.cognitiveAssignment,fixed.artifact)
+      }
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
     }
     if (item.type === 'SITUATIONAL') {
@@ -2153,10 +2188,11 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }
 }
 
-const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
+const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
   const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational,'PUBLISH')
   const publicationSource=await loadComposite(id,true,db)
+  const tracking=await freezeTrainingTracking(db as Prisma.TransactionClient,publicationSource,prepared.trainingContentSnapshot,trackingSelection)
   await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId))
   await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
   // Shared P/R insertion or material locks may have waited past expiry. Repeat
@@ -2170,14 +2206,15 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
       status: 'PUBLISHED',
       publishedAt: new Date(),
       ...prepared,
+      ...tracking,
     },
   })
   return withoutAnalysisProtocolCipher(published)
 }
 
-export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>): Promise<any> =>
-  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational))
-    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational)
+export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>,trackingSelection?:unknown): Promise<any> =>
+  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational,trackingSelection))
+    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational,trackingSelection)
 
 const assertTokenWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw compositeForbidden('公开链接已停用')
@@ -2268,8 +2305,8 @@ export const disableAccessToken = async (userId: string, role: UserRole, composi
   await prisma.compositeAssessmentAccessToken.update({ where: { id: tokenId }, data: { isActive: false } })
 }
 
-export const listAvailableForStudent = async (userId: string, now = Date.now()) => {
-  const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] } }, select: { courseId: true } })
+export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string) => {
+  const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
@@ -2426,7 +2463,7 @@ const resolvedCompositeCognitiveConfig = (assignment: any) => {
   } catch { throw compositeBadRequest('认知任务冻结的 Profile 配置不可用') }
 }
 
-const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null, prepared?: PreparedCognitiveVariantRuntime, preparedAssignment?: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>, runtimeReference?:string) => {
+const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null, prepared?: PreparedCognitiveVariantRuntime, preparedAssignment?: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>, runtimeReference?:string,educationAttempt?:VerifiedEducationAttempt) => {
   assertCognitiveModuleEnabled()
   let assignment = item.cognitiveAssignment
   if (attempt.deliveryCourseId && assignment) {
@@ -2452,11 +2489,14 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
   const anonymous = !userId
   const sessionConfig = prepared ? prepared.snapshot.config : resolvedCompositeCognitiveConfig(assignment)
+  const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+  const fixed=!prepared?(pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},false):await readEducationCognitiveAssignmentArtifact(assignment)):null
+  if(fixed)assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
   const unifiedSnapshot = runtimeReference && prepared ? {encrypted:runtimeReference,compiledRuntime:prepared.compiledRuntime} : prepared
     ? await cognitiveSessionService.persistPreparedUnifiedCognitiveSessionConfigSnapshot(prepared, db)
     : attempt.runtimeGeneration === 'UNIFIED_V1'
       ? await cognitiveSessionService.createUnifiedCognitiveSessionConfigSnapshot({db, testType:config.testType,
-          configVersion:config.configVersion,engineVersion:config.engineVersion,scoringVersion:config.scoringVersion,config:sessionConfig})
+          configVersion:config.configVersion,engineVersion:config.engineVersion,scoringVersion:config.scoringVersion,config:sessionConfig,...(fixed?{frozenProfile:fixed.artifact}:{})})
       : null
   const configSnapshotEncrypted = unifiedSnapshot?.encrypted ?? cognitiveSessionService.createCognitiveSessionConfigSnapshot({
     testType: config.testType,
@@ -2465,7 +2505,11 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
     scoringVersion: config.scoringVersion,
     config: sessionConfig,
   })
-  if (userId) await admitCognitiveAttempt(db, userId, assignment.id)
+  if(userId){
+    const native=attempt.trainingContentBinding?.units?.some((unit:any)=>unit.itemId===item.id&&unit.source.educationNative?.provider==='COGNITIVE_CONFIG')
+    if(native||readVerifiedLongitudinalEducationAttempt(educationAttempt,db,attempt,userId))await admitEducationNativeCognitive(db as Prisma.TransactionClient,{proof:educationAttempt,parent:attempt,actorUserId:userId,itemId:item.id,assignmentId:assignment.id,configId:config.id})
+    else await admitCognitiveAttempt(db,userId,assignment.id,{compositeAttemptId:attempt.id,compositeItemId:item.id})
+  }
   return db.cognitiveSession.create({
     data: {
       userId,
@@ -2493,13 +2537,15 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
-const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization) => {
+const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization,educationProduct?:'SCHOOL'|'TEACHER',educationAttempt?:VerifiedEducationAttempt) => {
   // Prisma create/findUnique parent rows contain scalar fields only. Product
   // policy comes from the caller's already-loaded server-owned composite.
   // A composition may reference several sources in different orders. Always
   // acquire their locks in the same order to avoid cross-composition deadlocks.
   if (userId && !prepared) {
-    const sources = await Promise.all(items.filter(item => item.type === 'COGNITIVE').map(item => cognitiveQuotaSource(db, item.cognitiveAssignmentId)))
+    const longitudinal=readVerifiedLongitudinalEducationAttempt(educationAttempt,db,attempt,userId)
+    const nativeIds=new Set(attempt.trainingContentBinding?.units?.filter((unit:any)=>unit.source.educationNative?.provider==='COGNITIVE_CONFIG'||longitudinal&&unit.family==='COGNITIVE').map((unit:any)=>unit.itemId)??[])
+    const sources = await Promise.all(items.filter(item => item.type === 'COGNITIVE'&&!nativeIds.has(item.id)).map(item => cognitiveQuotaSource(db, item.cognitiveAssignmentId)))
     for (const id of [...new Set(sources.map(source => source.id))].sort()) await lockCognitiveQuota(db, userId, id)
   }
   const runtime = {
@@ -2567,7 +2613,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         })
       }
     } else if (item.type === 'COGNITIVE') {
-      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id))
+      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id),educationAttempt)
       if (attempt.runtimeGeneration === 'UNIFIED_V1') {
         const snapshot = prepared?.cognitive.get(item.id)?.snapshot ?? (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted,db as any)).snapshot
         if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
@@ -2581,7 +2627,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       }
     } else if (item.type === 'SITUATIONAL') {
       if (attempt.runtimeGeneration !== 'UNIFIED_V1') throw compositeBadRequest('情境化模块必须使用 Unified FINAL_ONLY 运行时')
-      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!)
+      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!,educationProduct)
       const embedded = await createEmbeddedSituationalAttempt(db, {
         userId,
         // Composite parent rows retain their historical participant key
@@ -2594,7 +2640,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         instrumentKey: situation.situationPackage.key,
         instrumentVersion: situation.situationPackage.instrumentVersion,
         attemptEpoch: attempt.attemptEpoch ?? 1,
-      }, situation)
+      }, situation,educationAttempt)
       runtime.situational.push({
         compositeItemId: item.id,
         instrumentKey: embedded.snapshot.instrumentKey,
@@ -2691,7 +2737,7 @@ const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?
 export interface RelationalCompositeAttemptIdentityV1 {
   subjectUserId: string
   respondentUserId: string
-  respondentType: 'SELF' | 'PARENT' | 'TEACHER' | null
+  respondentType: 'SELF' | 'PARENT' | 'TEACHER' | 'OBSERVER' | null
   episodeId: string
   assignmentRef: string
   consentId: string | null
@@ -2707,8 +2753,17 @@ const createAttempt = async (
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
   restartMaterialClaimId?: string,
+  educationStart?: VerifiedEducationStart,
+  fieldStart?: VerifiedFieldStart,
 ) => {
   assertSupportedComposite(composite)
+  const field=fieldStart?readVerifiedFieldStart(fieldStart,{tx:db,compositeId:composite.id,respondentUserId:userId??''}):undefined
+  if(field&&(relationalIdentity||educationStart||accessTokenId||credential||composite.productKind!=='ORGANIZATION_RESOURCE'))throw compositeForbidden('现场观察准入上下文不匹配')
+  const educationProduct=field?'TEACHER':educationStart?readVerifiedEducationStart(educationStart,{tx:db,compositeId:composite.id,assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''}):undefined
+  const educationComposition=field?fieldCompositionBinding(field.assessmentRef):readVerifiedCompositionStart(educationStart,{tx:db,compositeId:composite.id,
+    assignmentRef:relationalIdentity?.assignmentRef??'',subjectUserId:relationalIdentity?.subjectUserId??'',respondentUserId:userId??''})
+  if(educationProduct&&!field&&(composite.productKind!=='ORGANIZATION_RESOURCE'||!relationalIdentity
+    ||(!educationComposition&&relationalIdentity.subjectUserId!==userId)||relationalIdentity.respondentUserId!==userId))throw compositeForbidden('教育测评准入上下文不匹配')
   // Parent START and publication stop/archive serialize on the same row. Child
   // progression later consumes the already-admitted immutable runtime plan.
   await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
@@ -2721,11 +2776,14 @@ const createAttempt = async (
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
-    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!composite.creationKey?.startsWith('private-form:')||!relationalIdentity||!userId
+    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!(educationComposition||composite.creationKey?.startsWith('private-form:'))||(!relationalIdentity&&!field)||!userId
       ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
       throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
-    const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
-    await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+    if(!educationComposition){
+      if(!relationalIdentity)throw compositeForbidden('表单缺少已验证的任务身份')
+      const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
+      await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+    }
   }
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // A shared publication lock still fences archive, while independent
@@ -2733,6 +2791,7 @@ const createAttempt = async (
     // paths retain their outer exclusive publication/token locks.
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
+        personalTracking:true,personalTrackingBaselineId:true,personalTrackingOrdinal:true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
         trainingContentSnapshot:true,trainingContentSnapshotHash:true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true } })
@@ -2741,6 +2800,7 @@ const createAttempt = async (
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
     composite = { ...composite, trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash,
+      personalTracking:current.personalTracking,personalTrackingBaselineId:current.personalTrackingBaselineId,personalTrackingOrdinal:current.personalTrackingOrdinal,
       trainingPersistencePolicy: current.trainingPersistencePolicy,
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash,
       trainingFeedbackPolicy: current.trainingFeedbackPolicy, trainingFeedbackPolicyHash: current.trainingFeedbackPolicyHash }
@@ -2799,11 +2859,15 @@ const createAttempt = async (
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
   }
-  if (composite.productKind === 'ASSESSMENT_BUNDLE') {
-    const instance = await db.bundleInstance.findUniqueOrThrow({ where: { compositeId: composite.id } })
-    const { readInstance } = await import('../bundle-product/service')
-    const frozen = readInstance(instance).frozen
-    if (frozen.declarativePackage) await (await import('../bundle-product/package-release')).assertPackageAdmission(db, frozen.declarativePackage)
+  if(composite.personalTracking&&!composite.personalTrackingInheritedUnits)composite=await inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite)
+  const nativeBundleInstance = composite.productKind === 'ASSESSMENT_BUNDLE'
+    ? await db.bundleInstance.findUniqueOrThrow({where:{compositeId:composite.id}})
+    : composite.productKind === 'ORGANIZATION_RESOURCE' && composite.creationKey?.startsWith('education-assessment:')
+    ? await db.bundleInstance.findUnique({where:{compositeId:composite.id}}) : null
+  if(nativeBundleInstance){
+    const {readInstance}=await import('../bundle-product/service')
+    const frozen=readInstance(nativeBundleInstance).frozen
+    if(frozen.declarativePackage)await (await import('../bundle-product/package-release')).assertPackageAdmission(db,frozen.declarativePackage)
   }
   const finalOnly = composite.deliveryMode !== 'LEGACY'
   let formSections = finalOnly ? (composite.formSections ?? []) : []
@@ -2821,7 +2885,7 @@ const createAttempt = async (
     || packageSnapshot.packageVersion !== composite.reportPackageVersion
     || packageSnapshot.profile !== composite.reportPackageProfile
   )) throw compositeBadRequest('综合测评报告包实例与冻结快照不匹配')
-  const bundleRuntimeHash = composite.productKind === 'ASSESSMENT_BUNDLE'
+  const bundleRuntimeHash = nativeBundleInstance
     ? await (await import('../bundle-product/runtime')).compiledHashForInstance(db, composite.id)
     : null
   const flowEnabled = composite.trainingFlowFrozen!=null||composite.trainingFlowDraft!=null||composite.trainingFlowDigest!=null
@@ -2834,7 +2898,12 @@ const createAttempt = async (
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const hasPreciseCognitiveProfiles=composite.items.some((item:any)=>item.type==='COGNITIVE'&&(readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot)!==null||readEducationCognitiveProfilePin(item.cognitiveAssignment?.courseSnapshot)!==null))
+  const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
+  const educationLibraryUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationLibrary):[]
+  const educationStandards=await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
+  const educationFrozenScales=new Map<string,Awaited<ReturnType<typeof freezeExactStandardScaleDefinition>>>()
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||hasPreciseCognitiveProfiles||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2851,7 +2920,11 @@ const createAttempt = async (
     for(const assignment of cognitive){if(assignment.status!=='PUBLISHED'||assignment.config.status!=='PUBLISHED')throw compositeForbidden('候选分卷的认知配置已不可用');assertCognitiveProductEligible(assignment.config.testType);validateCognitiveConfig(assignment.config)}
 
   }
-  const situationalReleases = await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
+  const nativeSjtUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationNative?.provider==='SJT_RELEASE'):[]
+  const nativeSjt=nativeSjtUnits.length?await readEducationSjtSources(db as Prisma.TransactionClient,nativeSjtUnits.map(unit=>({provider:'SJT_RELEASE',kind:'SJT',versionId:unit.source.educationNative!.sourceId,contentHash:unit.source.educationNative!.contentHash})),educationProduct!):null
+  const situationalReleases = nativeSjt?new Map([...nativeSjt.values()].map(source=>[situationalReleaseKey(source),source.resolved])):educationProduct
+    ? await resolveEducationAssessmentSituationalItems(db as Prisma.TransactionClient,composite.items.filter((item:any)=>item.type==='SITUATIONAL').map(situationalItemIdentity),educationProduct)
+    : await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
   if ([...situationalReleases.values()].some(release => release.snapshot.authorizationReceipt)) {
     // Anonymous entry obtains the same unique persisted delivery, never a client hint.
     composite.deliveryCourseId = compositeSjtGrantScope(composite)!.courseId
@@ -2859,7 +2932,35 @@ const createAttempt = async (
   if (prepared) {
     try {
     for (const item of composite.items) {
-      if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
+      const educationUnit=educationStandardUnits.find(unit=>unit.itemId===item.id)
+      const libraryUnit=educationLibraryUnits.find(unit=>unit.itemId===item.id)
+      if(educationUnit){
+        const source=educationStandards.get(educationUnit.source.educationStandard!.releaseId)
+        if(!source)throw compositeForbidden('教育标准量表固定版本不一致')
+        const sourceId=educationUnit.source.educationStandard!.releaseId
+        let runtime=educationFrozenScales.get(sourceId)
+        if(!runtime){runtime=await freezeExactStandardScaleDefinition(db as Prisma.TransactionClient,source);educationFrozenScales.set(sourceId,runtime)}
+        if(runtime.sourceDefinitionHash!==educationUnit.source.educationStandard!.nativeDefinitionHash)throw compositeForbidden('教育标准量表冻结内容不一致')
+        prepared.scales.set(item.id,runtime)
+      }
+      else if(libraryUnit){
+        const source=libraryUnit.source.educationLibrary!,key='library:'+source.entryId
+        if(item.type!=='SCALE'||item.scaleId!==libraryUnit.source.id||item.scale.libraryEntryId!==source.entryId||item.scale.creatorId!==libraryUnit.source.ownerId
+          ||item.scale.measurementReleaseId!==libraryUnit.measurement.releaseId)
+          throw compositeForbidden('教育共用量表固定身份不一致')
+        let runtime=educationFrozenScales.get(key)
+        if(!runtime){
+          runtime=await freezeScaleRuntimeAtAttemptStart(db,{instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
+            definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',instruction:resolveFrozenScaleInstructionForScale(item.scale),
+            sealedLibraryPresentation:{entryId:source.entryId,sourceDefinitionHash:source.nativeDefinitionHash,
+              presentation:{releaseId:libraryUnit.measurement.releaseId,contentHash:libraryUnit.measurement.contentHash,
+                presentationMode:source.presentationMode==='ALL_AT_ONCE'?'ALL_AT_ONCE':'ONE_BY_ONE'}}})
+          educationFrozenScales.set(key,runtime)
+        }
+        if(runtime.sourceDefinitionHash!==source.nativeDefinitionHash)throw compositeForbidden('教育共用量表冻结内容不一致')
+        prepared.scales.set(item.id,runtime)
+      }
+      else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
         await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
       else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
         instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
@@ -2870,6 +2971,9 @@ const createAttempt = async (
         assertCognitiveModuleEnabled()
         const assignment=item.cognitiveAssignment
         const config=assignment.config
+        const pin=readTrainingCognitiveTaskBinding(assignment.courseSnapshot)
+        const fixed=pin?await loadPinnedTrainingCognitiveProfile(db as Prisma.TransactionClient,pin,{userId:assignment.createdBy,configId:config.id},true):await readEducationCognitiveAssignmentArtifact(assignment)
+        if(fixed)assertCognitiveAssignmentFreeze(assignment,fixed.artifact)
         if (composite.deliveryCourseId) prepared.assignments.set(item.id, await prepareTeacherPublishedAssignment(db, {
           userId:assignment.createdBy,courseId:composite.deliveryCourseId,configId:assignment.configId,
           title:assignment.title,instruction:assignment.instruction??null,
@@ -2880,7 +2984,7 @@ const createAttempt = async (
         }))
         prepared.cognitive.set(item.id, await cognitiveSessionService.prepareUnifiedCognitiveSessionConfigSnapshot({
           db,testType:config.testType,configVersion:config.configVersion,engineVersion:config.engineVersion,
-          scoringVersion:config.scoringVersion,config:resolvedCompositeCognitiveConfig(item.cognitiveAssignment),
+          scoringVersion:config.scoringVersion,config:resolvedCompositeCognitiveConfig(item.cognitiveAssignment),...(fixed?{frozenProfile:fixed.artifact}:{}),
         }))
       }
     }
@@ -2908,7 +3012,13 @@ const createAttempt = async (
       const sourceIds=[...new Set<string>(sources.map(source=>source.id))].sort()
       for (const id of sourceIds) await lockCognitiveQuota(db as any,userId,id)
       const quotas=new Map<string,number>()
-      for(const id of sourceIds)quotas.set(id,(await readCognitiveQuota(db as any,userId,id)).remainingAttempts)
+      for(const id of sourceIds){
+        // Read-only preflight uses the published leaf; START still verifies its
+        // actual parent binding. An untracked copy retains the global quota.
+        const items=cognitiveItems.filter((item:any)=>byItem.get(item.id)===id)
+        const remaining=await Promise.all(items.map((item:any)=>readCognitiveQuota(db as any,userId,item.cognitiveAssignmentId,{compositeAssessmentId:composite.id,compositeItemId:item.id})))
+        quotas.set(id,Math.min(...remaining.map(quota=>quota.remainingAttempts)))
+      }
       for(const group of parseCompiledWeightedVariants(composite.trainingVariantFrozen).groups){
         const needed=new Map<string,number>()
         for(const id of group.selectedItemIds){const source=byItem.get(id);if(source)needed.set(source,(needed.get(source)??0)+1)}
@@ -2923,7 +3033,7 @@ const createAttempt = async (
   const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
     compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
     snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
-    composite,resolvedSituational:situationalReleases,
+    composite,resolvedSituational:situationalReleases,educationComposition,
   })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
@@ -2983,11 +3093,15 @@ const createAttempt = async (
       ...(variantAllocation ? {trainingVariantAllocationEncrypted:encryptUnifiedRuntimePayload(variantAllocation),trainingVariantAllocationHash:variantAllocation.allocationHash} : {}),
       compositeAssessmentId: composite.id,
       ...(trainingTimingSnapshot ? {trainingTimingSnapshot} : {}),
-      ...(composite.productKind === 'QUESTIONNAIRE' ? { deliveryCourseId: composite.deliveryCourseId ?? null } : {}),
+      ...(composite.productKind === 'QUESTIONNAIRE'
+        ? { deliveryCourseId: composite.deliveryCourseId ?? null }
+        : composite.productKind === 'ASSESSMENT_BUNDLE'
+          ? { deliveryCourseId: composite.courseId ?? null }
+          : {}),
       userId,
       accessTokenId,
       recoveryTokenHash: credential?.hash ?? null,
-      participantKey: credential?.participantKey ?? `user:${userId}`,
+      participantKey: field?.participantKey ?? credential?.participantKey ?? `user:${userId}`,
       anonymousCode: credential?.anonymousCode ?? null,
       attemptNo,
       deliveryMode: finalOnly ? 'FINAL_ONLY' : 'LEGACY',
@@ -3002,6 +3116,7 @@ const createAttempt = async (
         assignmentRef: relationalIdentity.assignmentRef,
         consentId: relationalIdentity.consentId,
       } : {}),
+      ...(field?{subjectUserId:field.subjectUserId,respondentUserId:field.respondentUserId,respondentType:'OBSERVER',assignmentRef:null,episodeId:null,consentId:null}:{}),
       completedItems,
       progress,
     },
@@ -3025,10 +3140,12 @@ const createAttempt = async (
   }
   const materialAssignment = await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
-  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared)
+  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared,undefined,educationProduct,educationStart?bindVerifiedEducationAttempt(educationStart,db,attempt):undefined)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
+      unitOrder:contentCandidate&&'educationUnitOrder' in contentCandidate?contentCandidate.educationUnitOrder:undefined,
+      unitPresentation:contentCandidate&&'educationUnitPresentation' in contentCandidate?contentCandidate.educationUnitPresentation:undefined,
       scales: runtime.scales,
       cognitive: runtime.cognitive,
       situational: runtime.situational,
@@ -3061,6 +3178,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
     compositeAssessmentId: string
     respondentUserId: string
     attemptIdentity: RelationalCompositeAttemptIdentityV1
+    educationStart?: VerifiedEducationStart
   },
 ) => {
   if (input.attemptIdentity.respondentUserId !== input.respondentUserId) {
@@ -3099,7 +3217,29 @@ export const startRelationalCompositeAttemptInTransaction = async (
     (latest?.attemptNo ?? 0) + 1,
     1,
     input.attemptIdentity,
+    undefined,
+    input.educationStart,
   )
+}
+
+/** Field authority is verified by the product adapter in this same transaction.
+ * This wrapper shares the canonical builder and never creates a relational Run. */
+export async function startFieldCompositeAttemptInTransaction(db:Db,input:{compositeId:string;respondentUserId:string;proof:VerifiedFieldStart;beforeCreate:()=>Promise<void>}){
+ const scope=readVerifiedFieldStart(input.proof,{tx:db,compositeId:input.compositeId,respondentUserId:input.respondentUserId})
+ await db.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${scope.participantKey}))`)
+ const prior=await db.compositeAssessmentAttempt.findFirst({where:{compositeAssessmentId:input.compositeId,participantKey:scope.participantKey},orderBy:{attemptNo:'desc'}})
+ if(prior){
+  if(prior.userId!==scope.respondentUserId||prior.subjectUserId!==scope.subjectUserId||prior.respondentUserId!==scope.respondentUserId||prior.assignmentRef!==null)
+   throw compositeForbidden('现场观察作答身份不匹配')
+  return {attempt:prior,replayed:true}
+ }
+ await input.beforeCreate()
+ const composite=await loadComposite(input.compositeId,true,db)
+ if(composite.status!=='PUBLISHED'||composite.deliveryMode==='LEGACY'||composite.productKind!=='ORGANIZATION_RESOURCE'
+  ||composite.items.some((item:any)=>!['SCALE','FORM'].includes(item.type))||scope.subjectUserId===null&&composite.items.some((item:any)=>item.type==='SCALE'))
+  throw compositeForbidden('现场观察只允许对应目标的量表与表单')
+ const attempt=await createAttempt(db,composite,input.respondentUserId,null,undefined,1,1,undefined,undefined,undefined,input.proof)
+ return {attempt,replayed:false}
 }
 
 export const startUserAttempt = async (userId: string, compositeId: string) => {
@@ -3605,6 +3745,11 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  if(attempt.participantKey?.startsWith('field-v2:')||attempt.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!context.userId)throw compositeForbidden('现场观察需要本人教育账号')
+    await currentFieldComposition(prisma,{attemptId,actorUserId:context.userId})
+  }
   assertSupportedComposite(attempt.compositeAssessment, frozenRead && ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind), false)
   return attempt
 }
@@ -3772,6 +3917,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
       name: true,
       productKind: true,
+      creationKey: true,
       instruction: true,
       reportPackageSnapshotEncrypted: true,
       reportPackageKey: true,
@@ -3856,6 +4002,11 @@ const getUnifiedCompositeAttemptState = async (
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.userId === null && attempt.recoveryTokenHash === context.recoveryTokenHash)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  if(attempt.participantKey?.startsWith('field-v2:')||attempt.compositeAssessment.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!context.userId)throw compositeForbidden('现场观察需要本人教育账号')
+    await currentFieldComposition(prisma,{attemptId,actorUserId:context.userId})
+  }
   attempt = await applyTrainingAttemptScope(attempt)
   if (attempt.deliveryMode !== 'FINAL_ONLY' || attempt.runtimeGeneration !== 'UNIFIED_V1') {
     throw compositeConflict('综合测评运行时版本不匹配，请重启测评')
@@ -3907,7 +4058,11 @@ const getUnifiedCompositeAttemptState = async (
       .filter((item: any) => item.type !== 'FORM' && item.required)
       .map((item: any) => ({ id: item.id, type: item.type, position: item.position, required: item.required, item })),
     ...sections.map((section: any) => ({ id: section.id, type: 'FORM_SECTION', position: section.position, required: true, section })),
-  ].sort((left: any, right: any) => left.position - right.position || left.id.localeCompare(right.id))
+  ].sort((left: any, right: any) => {
+    const key=(unit:any)=>unit.type==='FORM_SECTION'?formSectionSlotKey(unit.id):compositeItemSlotKey(unit.id,unit.type)
+    const l=slotsByKey.get(key(left))?.sourceBinding.educationOrder,r=slotsByKey.get(key(right))?.sourceBinding.educationOrder
+    return typeof l==='number'&&typeof r==='number'?l-r:left.position-right.position||left.id.localeCompare(right.id)
+  })
   const unitCompleted = (unit: any) => unit.type === 'FORM_SECTION'
     ? completedSlot(formSectionSlotKey(unit.id))
     : completedItem(unit.item)
@@ -4088,6 +4243,11 @@ const getUnifiedCompositeAttemptState = async (
     }
   }
 
+  if(currentItem&&currentUnit){
+    const key=currentUnit.type==='FORM_SECTION'?formSectionSlotKey(currentUnit.id):compositeItemSlotKey(currentUnit.id,currentUnit.type)
+    const instruction=frozenEducationBlockInstruction(frozenSlotSet.slots,key)
+    if(instruction)currentItem.questionnaireInstruction=instruction
+  }
   const definitionHash = computeSubmissionPayloadHash({
     assessmentId: attempt.compositeAssessment.id,
     items: attempt.compositeAssessment.items.map((item: any) => ({ id: item.id, type: item.type, position: item.position, formSectionId: item.formSectionId ?? null })),
@@ -4540,7 +4700,7 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   } else {
     result = await finalizeCompositeAttemptFinalOnlyIfReady(attemptId)
   }
-  if (result?.status === 'COMPLETED' && route?.status !== 'COMPLETED' && route?.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE') {
+  if (result?.status === 'COMPLETED' && ((route?.status !== 'COMPLETED' && route?.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE') || (route?.compositeAssessment?.productKind === 'ORGANIZATION_RESOURCE' && route.compiledBundleRuntimeHash!==null))) {
     await (await import('../bundle-product/analysis')).processInitial(attemptId)
   }
   // The canonical runtime commits first. Reconcile outside its transaction to

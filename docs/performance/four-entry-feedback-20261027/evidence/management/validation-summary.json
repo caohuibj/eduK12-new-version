@@ -1,0 +1,87 @@
+{
+  "recordedAt": "2026-10-27T08:53:45.740322+00:00",
+  "kind": "unsigned-local-development-evidence",
+  "workingDirectory": "server-version/frontend",
+  "base": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+  "node": "24.21.0",
+  "vitest": "4.1.11",
+  "uniquePassedCases": 53,
+  "actualPassedExecutions": 61,
+  "changedReexecutedCases": 8,
+  "runs": [
+    {
+      "id": "ui-initial",
+      "command": "source /workspace/eduk12-cloud/activate.sh && npx vitest run src/components/education-tools/EducationAssessmentResourcePicker.test.tsx src/huiteacher/HuiteacherLibraryCatalog.test.tsx src/school/SchoolActivityCatalogPagination.test.tsx --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management/ui-initial.json",
+      "exitCode": 0,
+      "passed": 32,
+      "filtered": 0,
+      "inputManifest": "not captured before this execution; not eligible for automatic CI admission",
+      "toolCompletionChunk": "a58c48"
+    },
+    {
+      "id": "ui-supplement",
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/components/education-tools/EducationAssessmentResourcePicker.test.tsx src/components/education-tools/EducationAssessmentManagement.test.tsx --maxWorkers=2 -t 'does not invent|discards pending directory|requires configuration recovery|education management scoped adapter integration' --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management/ui-supplement.json",
+      "exitCode": 0,
+      "passed": 11,
+      "filtered": 16,
+      "inputManifest": "validation-inputs.json",
+      "toolCompletionChunk": "61f355"
+    },
+    {
+      "id": "management-consumers",
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/vitest/vitest.mjs run src/huiteacher/HuiteacherRunPreview.test.tsx src/school/SchoolActivityManager.test.tsx --maxWorkers=2 --reporter=default --reporter=json --outputFile=/tmp/pr363-education-management/management-consumers.json",
+      "exitCode": 0,
+      "passed": 18,
+      "filtered": 0,
+      "inputManifest": "validation-inputs.json",
+      "toolCompletionChunk": "4b1f60"
+    },
+    {
+      "id": "types",
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "inputManifest": "validation-inputs.json",
+      "toolCompletionChunk": "eb760b",
+      "output": "types.log is the actual empty stdout/stderr; exit 0 reported by exec completion"
+    },
+    {
+      "id": "lint",
+      "command": "source /workspace/eduk12-cloud/activate.sh && node node_modules/eslint/bin/eslint.js src/api/educationAssessmentResources.ts src/components/education-tools/EducationAssessmentResourcePicker.tsx src/components/education-tools/EducationAssessmentResourcePicker.test.tsx src/components/education-tools/EducationAssessmentManagement.test.tsx src/test/educationAssessmentResources.fixture.ts src/huiteacher/HuiteacherEvaluationStudio.tsx src/school/SchoolActivityManager.tsx",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 5,
+      "inputManifest": "validation-inputs.json",
+      "toolCompletionChunk": "2db31f"
+    }
+  ],
+  "nonQualification": [
+    "Synthetic adapter/UI contracts only; no real PostgreSQL authorization or browser qualification",
+    "No build, formal CI, merge, deploy or credential/protection change",
+    "No automatic historical evidence admission; node_modules complete bytes not captured"
+  ],
+  "artifacts": {
+    "management-consumers.json": "9b94ff5e192fae3d2f2f2a4646c26984a9428d342b4ad908992a70a78b2aeb48",
+    "management-consumers.log": "4546270cea5c64e6628497e7f4e466d74313aecb880a253c3f976fa8d5d69762",
+    "types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ui-initial.json": "725053a89e18ec3e654e4310d254e6b1ec9cacfee55f480e288e6ec0890c3b09",
+    "ui-initial.log": "dc8e0ea5af8a581ab0e35c6a4ea7a646589e01ab69d1c951d335b6a2f80427f9",
+    "ui-supplement.json": "1ccd19687658173cb5c485e1fd6e910c77054372f26f73013889644f6aa1dd9e",
+    "ui-supplement.log": "e3c9624c522a32acfd58170c0def8f294a0f08d6dff1922ac0375ca0fbc56ab5",
+    "validation-inputs.json": "c19056d1421f95ef4e43729926a27725c786fefe952111d36ea5df01db520b84",
+    "lint.log.gz": "ceb1221b173c001cd983be51d8e8d3940d8d217749523eda1765550e255dc315"
+  },
+  "losslessLogTransport": {
+    "file": "lint.log.gz",
+    "decodedSha256": "b225120cdae806e5db576db155c3a782140b60ab6ec04e69e4ceecdbeda27cc6",
+    "reason": "Preserve exact original stdout including final blank line; staged diff whitespace check rejected raw text packaging, no application/test failure"
+  },
+  "packagingChecks": [
+    {
+      "command": "git diff --cached --check",
+      "exitCode": 2,
+      "output": "docs/performance/four-entry-feedback-20261027/evidence/management/lint.log:14: new blank line at EOF.",
+      "commitExecuted": false,
+      "toolCompletionChunk": "50a62d"
+    }
+  ]
+}

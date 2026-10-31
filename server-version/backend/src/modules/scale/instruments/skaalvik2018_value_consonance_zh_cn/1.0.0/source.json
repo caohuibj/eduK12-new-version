@@ -1,0 +1,508 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "skaalvik2018_value_consonance_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Skaalvik2018：价值一致（项目中文工作译稿及描述性均分）",
+      "abbreviation": "SK18-VC",
+      "instrumentFamily": "Skaalvik & Skaalvik 2018 teacher work-characteristics selected independent item set; NOT original validated Chinese instrument"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "价值一致：仅本独立题组选用的3道题，基于项目认可的完整作答1–6原始均分；高分代表所感知工作资源更多，不是原作者个体标准分或诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "skaalvik2018_value_consonance_zh_cn",
+        "domain:teacher_workplace",
+        "construct:value_consonance",
+        "source:skaalvik2018",
+        "population:adult_teacher",
+        "response:self",
+        "jdr_role:resource",
+        "language_validation:project_working_translation_not_validated",
+        "scoring:project_complete_raw_mean",
+        "response:6point_endpoint_anchored_project_numeric_middle",
+        "use:individual_reflection",
+        "use:research",
+        "use:not_diagnostic",
+        "license:cc_by_4_0_article"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "项目面向理解中文的成年教师工作条件回顾，18岁以上仅项目应用范围；原2018挪威研究及本次独立工作译稿不能证明中国教师施测效度或常模。"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "当前任教学校一般工作经验；原文没有核得固定日/周/月回忆窗口",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "严格保留2018文献中此题组3个公开英文项目的相对顺序，中文译稿已标明项目工作译文（未验证）。",
+        "本项目六点作答：1=完全不同意，2/3/4/5仅展示数字，6=完全同意；原始中间类别标签和完整施测说明未知。",
+        "本项目确定的完整作答等权均分1–6；任一漏答记null、不插补、不分档。不冒充原作者计分/缺失说明。",
+        "只生成本工具中文教师报告，不给七工具JD-R合计分，也不使用外国常模。",
+        "估计时间非实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前独立选用、数字响应呈现和中文翻译/均分是项目改造，不等于原作者研究原协议或中国教师效度证据。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅回顾自己感知的工作条件，不判断教师、学生或学校优劣。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Skaalvik, E. M., & Skaalvik, S. (2018). Job demands and job resources as predictors of teacher motivation and well-being. Social Psychology of Education, 21, 1251–1275. https://doi.org/10.1007/s11218-018-9464-8；逐题原英文见本批来源说明。中文为项目编辑译稿，非原作者正式译本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "项目改造包括分离题组选用、六点数字中间选项、项目中文指导语、完整作答等权均分及原创中文反馈。原作者中间选项标签/原计分和缺失规则未核得。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "skaalvik2018_value_consonance_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "skaalvik2018_value_consonance_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "skaalvik2018_value_consonance_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Skaalvik, E. M., & Skaalvik, S. (2018). Job demands and job resources as predictors of teacher motivation and well-being. Social Psychology of Education, 21, 1251–1275. https://doi.org/10.1007/s11218-018-9464-8。文章许可：CC BY 4.0 https://creativecommons.org/licenses/by/4.0/，本包仅对文章中已发表的原作者工作特征题文制作独立中文工作译稿/编辑改造；保留署名与改动说明，不宣称原作者认可。",
+      "所有题码SK18_VC1, SK18_VC2, SK18_VC3均为项目内部定位；不复制原PDF、出版社封面/标志或MBI/UWES等第三方内容。选项中间2–5标签、原作者完整施测/评分/缺失规则仍未知。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Skaalvik & Skaalvik (2018) 价值一致 original English work-characteristics item text",
+        "citation": "Skaalvik, E. M., & Skaalvik, S. (2018). Job demands and job resources as predictors of teacher motivation and well-being. Social Psychology of Education, 21, 1251–1275. https://doi.org/10.1007/s11218-018-9464-8",
+        "url": "https://doi.org/10.1007/s11218-018-9464-8",
+        "publicationYear": 2018
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Einar M. Skaalvik and Sidsel Skaalvik, 2018, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ ; English item extracts from the cited article; Chinese translations/1–6 numeric-middle responses/missing and mean rules are project adaptations, not author-endorsed. No third-party instruments, PDF formatting or imagery reproduced."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "project_6point_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6 完全同意",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SK18_VC1",
+          "content": "我的教育价值观与本校所强调的价值观一致。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "project_6point_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SK18_VC2",
+          "content": "我与同事对教育中什么最重要有相同的看法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "project_6point_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SK18_VC3",
+          "content": "我觉得本校认同我对良好教学的理解。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "project_6point_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SK18_VC1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SK18_VC2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SK18_VC3",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "value_consonance",
+            "type": "dimension",
+            "label": "价值一致（项目描述性题均分）",
+            "description": "3题1–6完整作答均分；方向为感知资源更多；项目操作分，非原作者个体评分或常模。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SK18_VC1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SK18_VC2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SK18_VC3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "value_consonance"
+        ],
+        "scoreOrder": [
+          "value_consonance"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "value_consonance",
+            "headline": "价值一致：从工作条件看本次感受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你重视的教育价值与学校强调的价值、同事认为重要的教育重点是否相合。比如，你重视学生理解和试错，工作安排则更强调进度时，是否能够说明双方的取舍；这只是一种可能情境。分数越高表示你更认同教育理念相合；分数较低不等于你的价值观有问题，也不能据此裁定学校的某种理念正确或错误。\n\n本次采用明确标为项目改造的六级作答和完整作答题均分1–6；不是原作者正式个体计分或官方中文版，也不能与其他教师作常模排名。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一个具体教育决定：你最看重什么原则，学校有哪些要求，哪些部分可能兼顾？"
+              },
+              {
+                "category": "environment",
+                "text": "安全可行时，围绕课堂实例讨论教育取舍，而非只争论理念；制度性矛盾可以请负责人澄清调整空间。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "来源：Skaalvik与Skaalvik 2018年研究发表的英文题文；当前简体中文题项为项目工作译稿，六点响应的中间类别仅数字及完整作答均分均为项目改造，未获原作者或中国教师样本的测量验证。",
+          "仅反映一位教师的个人工作条件感受；不能从这份结果判断学校、领导、学生或教师个人的实际能力和责任。",
+          "没有已确认的中国教师常模、阈值、百分位或高/中/低等级；不用于医学诊断、绩效问责、招聘选拔或学校排名。"
+        ],
+        "disclaimer": "仅供教师工作条件自我反思；项目均分要求全部题目作答，任何漏答不补0、不形成完整解释。各工具单独反馈，不合成七工具JD-R总分。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "skaalvik2018_value_consonance_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SK18_VC1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SK18_VC2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SK18_VC3",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "value_consonance": 1
+          },
+          "totalScoreKeys": [
+            "value_consonance"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SK18_VC1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SK18_VC2",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SK18_VC3",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "value_consonance": 6
+          },
+          "totalScoreKeys": [
+            "value_consonance"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "SK18_VC1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SK18_VC2",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SK18_VC3",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "value_consonance": 2
+          },
+          "totalScoreKeys": [
+            "value_consonance"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "SK18_VC1",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SK18_VC2",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "value_consonance": null
+          },
+          "totalScoreKeys": [
+            "value_consonance"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "value_consonance": null
+          },
+          "totalScoreKeys": [
+            "value_consonance"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据您在当前任教学校的一般教学工作经验，选择每句话与实际情况的符合程度。共六个有序选项：1 完全不同意；2、3、4、5仅表示依次增加的认同程度（这些中间标签为本项目数字呈现，并非已核得的作者原版选项文字）；6 完全同意。请逐题作答。所有3题均完整作答时按项目规则计算1–6等权题均分；本工具不是原作者验证的中文版，也不构成诊断。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "基于2018年Skaalvik研究中1–6两端锚点制作的项目中文指导语；非作者原施测全文。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

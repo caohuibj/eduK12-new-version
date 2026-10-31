@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/integration/education-start-context.test.ts",
+    "-t",
+    "binds teacher permission|actual embedded SJT",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/5a77e8bdc1ae/four-entry-v2-evidence/ci40515317676-local-lab/education-context-child.json"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "cwd": "/workspace/scratch/5a77e8bdc1ae/pr357-dot-local/server-version/backend",
+  "provenance": "Post-hoc index of the root exec_command response: normal exit0. Not a signed or fabricated new process receipt."
+}

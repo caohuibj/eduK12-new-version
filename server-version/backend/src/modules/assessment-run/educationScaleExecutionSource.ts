@@ -16,8 +16,8 @@ export async function readEducationScaleExecutionSource(db:Prisma.TransactionCli
    resourceVersion:input.resourceVersion,purpose:input.purpose})
   return {...source,sourceKind:'LIBRARY' as const}
  }
- if(!input.resourceKey.startsWith('private-scale:')||input.resourceVersion!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
- const source=await readPrivateScaleRuntimeResource(db,{key:input.resourceKey,version:'1.0.0',purpose:input.purpose})
+ if(!input.resourceKey.startsWith('private-scale:')||input.resourceVersion!=='1.0.0'&&input.resourceVersion!=='2.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ const source=await readPrivateScaleRuntimeResource(db,{key:input.resourceKey,version:input.resourceVersion,purpose:input.purpose})
  if(source.origin.entry!==input.product||source.origin.organizationId!==input.organizationId)
   privateToolFail('PRIVATE_TOOL_RUNTIME_EXECUTION_SCOPE_MISMATCH',403)
  if(input.purpose==='EXISTING_EXECUTION')await assertScaleLibraryCollectionAllowed(db,[source.origin.releaseId],[source.scaleId])

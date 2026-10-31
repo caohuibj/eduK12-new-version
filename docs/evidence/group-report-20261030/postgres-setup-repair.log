@@ -1,0 +1,34 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+GROUP_REPORT_COMPARISON {}
+
+ ❯ src/__tests__/survey/group-report.postgres.integration.test.ts (2 tests | 2 skipped) 124ms
+     ↓ generates the real Form report, then reopens without FINAL decryption or regeneration
+     ↓ creates a new version while preserving the old report and enforces actual owner/withdrawal boundaries
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/survey/group-report.postgres.integration.test.ts > Survey generated group snapshot / real HTTP and PostgreSQL
+Error: Survey 匿名研究尚未启用
+ ❯ blocked src/modules/survey/admission.service.ts:16:55
+     14|
+     15| type Tx=Prisma.TransactionClient
+     16| function blocked(message='研究准入或个人凭证无效'): never {throw new SurveyWaveEr…
+       |                                                       ^
+     17| const enabled=()=>{
+     18|   if(process.env.SURVEY_WORKSPACE_ENABLED!=='true'||process.env.SURVEY…
+ ❯ enabled src/modules/survey/admission.service.ts:19:5
+ ❯ startSingleUnlinkedWave src/modules/survey/admission.service.ts:219:3
+ ❯ src/__tests__/survey/group-report.postgres.integration.test.ts:56:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  05:53:15
+   Duration  6.89s (transform 4.76s, setup 0ms, import 6.63s, tests 124ms, environment 0ms)
+
+JSON report written to /tmp/group-report-postgres-setup-repair.json

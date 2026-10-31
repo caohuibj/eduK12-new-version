@@ -1,3 +1,24 @@
+import {execFileSync} from 'node:child_process';
+import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
+import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
+import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
+import {groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
+export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
+  const actual=readCognitiveIntakeDiff(base,head,{cwd});
+  const scope=needs.scope?.outputs||{};
+  if(!actual.selected && scope.cognitive_intake_light!=='true') {
+    return actual.entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file)) ? ['unsupported-cognitive-intake'] : [];
+  }
+  const {base:baseSHA,head:checkout,entries,...selection}=actual;
+  const failed=[];
+  if(!actual.selected || scope.cognitive_intake_light!=='true' || scope.cognitive!=='true' || scope.content!=='true' || scope.scenario!=='content' || JSON.stringify(selection)!==scope.cognitive_intake_plan) failed.push('recomputed-cognitive-intake');
+  if(actual.requiresBrowser || scope.scale_intake_light==='true' || scope.scale==='true' || scope.situational==='true' || scope.bundle==='true') failed.push('unsupported-or-mixed-cognitive-intake');
+  for(const name of ['scope','content','codeql']) if(needs[name]?.result!=='success')failed.push(name);
+  return [...new Set(failed)];
+}
+import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
+import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
+import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
 import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
 import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
 import {post356Plan,post356Outputs} from './post356-scope.mjs';
@@ -65,6 +86,11 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
+  if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
+  if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
+  if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
+  if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
   if(scope.application_route==='pr356')return requiredPr356Checks();
   if(scope.application_route==='report-planning')return ['scope','report-planning','codeql'];
   if(scope.application_route==='pr357')return ['scope','pr357','codeql'];
@@ -85,7 +111,10 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='training-manual-ui')return ['scope','training-manual-ui','codeql'];
   if(scope.application_route==='survey-manual-ui')return ['scope','survey-manual-ui','codeql'];
   if(scope.application_route==='shared-authoring')return ['scope','shared-authoring','codeql'];
-  if(scope.application_route==='school-teacher')return ['scope','school-teacher','codeql'];
+  if(scope.application_route==='school-teacher'){
+    if(draft){try{const p=JSON.parse(scope.school_teacher_plan||'{}');if(p.candidate==='native-bundle'&&p.preflightOnly===true)return ['scope','school-teacher'];}catch{/* Invalid scope is rejected by failedChecks. */}}
+    return ['scope','school-teacher','codeql'];
+  }
   if(scope.application_route==='survey-workspace')return ['scope','survey-workspace','codeql'];
   if(scope.application_route==='training-appearance')return ['scope','training-appearance','codeql'];
   if(scope.application_route==='survey-cloud')return ['scope','survey-cloud','codeql'];
@@ -94,6 +123,7 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='scale-library-governance')return ['scope','scale-library-governance','codeql'];
   if(scope.application_route==='composite-csv-memory')return ['scope','composite-csv-memory','codeql'];
   if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
+  if(draft&&scope.personal_tracking_draft==='true')return ['scope','pr-light-backend','pr-light-frontend'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
@@ -117,6 +147,7 @@ export function requiredChecks(needs, draft) {
     return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
   }
   if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft?['codeql']:[])];
+  if (scope.cognitive_intake_light === 'true') return ['scope','content',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
   if (dependencies) checks.push('maintenance','backend','backend-regression','frontend-build','frontend','docker');
@@ -149,6 +180,23 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='personal-tracking'){try{const p=JSON.parse(scope.personal_tracking_plan);if(p.route!=='personal-tracking'||p.draft!==draft)failed.push('scope');}catch{failed.push('scope');}return [...new Set(failed)];}
+  if(scope.application_route==='group-report-draft'){
+    try{const p=JSON.parse(scope.group_report_plan);if(!draft||p.preflightOnly!==true||p.route!=='group-report-draft'||Object.entries(groupReportDraftOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
+  if(scope.application_route==='onboarding-structure'){
+    try{const p=JSON.parse(scope.onboarding_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='onboarding-structure'||Object.entries(onboardingOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
+  if(scope.application_route==='pr364'){
+    try{const p=JSON.parse(scope.pr364_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='pr364'||Object.entries(pr364Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
+  if(scope.application_route==='pr363'){
+    try{const p=JSON.parse(scope.pr363_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='pr363'||Object.entries(pr363Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='report-planning'){
     try{const p=JSON.parse(scope.report_planning_plan);if(draft||p.postMerge!==false||p.route!=='report-planning'||Object.entries(reportPlanningOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -222,7 +270,7 @@ export function failedChecks(needs, draft) {
     return [...new Set(failed)];
   }
   if(scope.application_route==='school-teacher'){
-    try{const p=JSON.parse(scope.school_teacher_plan);if(draft||Object.entries(schoolTeacherOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    try{const p=JSON.parse(scope.school_teacher_plan);if((draft?!(p.candidate==='native-bundle'&&p.preflightOnly===true):p.preflightOnly===true)||Object.entries(schoolTeacherOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
   }
   if(scope.application_route==='survey-workspace'){
@@ -423,6 +471,14 @@ export function failedChecks(needs, draft) {
     return [...new Set(failed)];
   }
   if (scope.application_route && scope.application_route !== 'legacy') failed.push('scope');
+  if(scope.scale_intake_light !== undefined && (!['true','false'].includes(scope.scale_intake_light)
+    || scope.scale_intake_light === 'true' && (scope.content !== 'true' || scope.frontend === 'true' || scope.scenario !== 'content')))
+    failed.push('scope');
+  if(scope.cognitive_intake_light !== undefined && (!['true','false'].includes(scope.cognitive_intake_light) || scope.cognitive_intake_light==='true' &&
+    (scope.content!=='true'||scope.cognitive!=='true'||scope.frontend!=='false'||scope.codeql!=='true'||scope.scenario!=='content'||scope.scale_intake_light==='true'||scope.scale==='true'||scope.situational==='true'||scope.bundle==='true')))
+    failed.push('scope');
+  if(scope.personal_tracking_draft!==undefined&&!['true','false'].includes(scope.personal_tracking_draft))failed.push('scope');
+  if(scope.personal_tracking_draft==='true'&&(!draft||scope.application_route!=='legacy'||scope.scenario!=='platform'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
@@ -465,6 +521,22 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='personal-tracking'){try{const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(needs.scope.outputs.personal_tracking_plan);const actual=personalTrackingReadyPlan(changedEntries(process.env.CI_BASE_SHA),process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF,draft,forceFull:process.env.CI_FORCE_FULL==='true'});if(JSON.stringify(p)!==JSON.stringify(actual))failed.push('recomputed-personal-tracking-plan');}catch{failed.push('recomputed-personal-tracking-plan');}}
+  if(needs.scope?.outputs?.personal_tracking_draft==='true'){
+    try{const {changedEntries}=await import('./content-scope.mjs');if(!personalTrackingDraftScope(changedEntries(process.env.CI_BASE_SHA),{event:process.env.CI_EVENT,draft,forceFull:process.env.CI_FORCE_FULL==='true'}))failed.push('recomputed-personal-tracking-draft');}catch{failed.push('recomputed-personal-tracking-draft');}
+  }
+  if(needs.scope?.outputs?.application_route==='group-report-draft'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),base=groupReportDiffBase(process.env.CI_BASE_SHA,head);const p=JSON.parse(needs.scope.outputs.group_report_plan);if(p.base!==base||JSON.stringify(groupReportDraftPlan(changedEntries(base,head),base,head))!==JSON.stringify(p))failed.push('recomputed-group-report-draft');}catch{failed.push('recomputed-group-report-draft');}
+  }
+  if(needs.scope?.outputs?.application_route==='onboarding-structure'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.onboarding_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(onboardingPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-onboarding-plan');}catch{failed.push('recomputed-onboarding-plan');}
+  }
+  if(needs.scope?.outputs?.application_route==='pr364'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.pr364_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(pr364Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr364-plan');}catch{failed.push('recomputed-pr364-plan');}
+  }
+  if(needs.scope?.outputs?.application_route==='pr363'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const p=JSON.parse(needs.scope.outputs.pr363_plan),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();if(p.head!==head||JSON.stringify(pr363Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr363-plan');}catch{failed.push('recomputed-pr363-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='report-planning'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.report_planning_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(reportPlanningPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-report-planning-plan');}catch{failed.push('recomputed-report-planning-plan');}
   }
@@ -673,6 +745,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(needs.scope?.outputs?.application_route==='survey-mac-ui') {
     try { recheckSurveyMac(JSON.parse(needs.scope.outputs.survey_mac_ui_plan)); }
     catch { failed.push('recomputed-survey-mac-ui-plan'); }
+  }
+  // The actual Git diff decides whether emitted Cognitive flags need checking.
+  if((!needs.scope?.outputs?.application_route || needs.scope.outputs.application_route==='legacy') && process.env.CI_FORCE_FULL!=='true') {
+    try {
+      const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+      failed.push(...recheckCognitiveIntake(needs,{base:process.env.CI_BASE_SHA,head}));
+    } catch {failed.push('recomputed-cognitive-intake');}
   }
   if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {
     const {plan,toolingOnly}=await import('../../server-version/scripts/release/policy.mjs');

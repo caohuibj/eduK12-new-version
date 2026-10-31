@@ -58,6 +58,28 @@ describe('AuthContext session expiry handling', () => {
     await waitFor(() => expect(mockMe).toHaveBeenCalledTimes(3))
   })
 
+  it.each(['broadcast-first','storage-first'])('coalesces the same cross-tab transition across both channels (%s)',async order=>{
+    let receive!: (event:{data:unknown})=>void
+    class Channel {
+      constructor(){Object.defineProperty(this,'onmessage',{set:(fn:typeof receive)=>{receive=fn}})}
+      postMessage(){}
+      close(){}
+    }
+    vi.stubGlobal('BroadcastChannel',Channel)
+    try{
+      render(<AuthProvider><Probe/></AuthProvider>)
+      await screen.findByText('signed-in:teacher-1')
+      const broadcast=()=>receive({data:{type:AUTH_SESSION_SIGNAL,nonce:'same-change'}})
+      const storage=()=>window.dispatchEvent(new StorageEvent('storage',{key:AUTH_SESSION_SIGNAL,newValue:'same-change'}))
+      act(()=>{if(order==='broadcast-first'){broadcast();storage()}else{storage();broadcast()}})
+      await waitFor(()=>expect(mockMe).toHaveBeenCalledTimes(2))
+      act(()=>receive({data:{type:AUTH_SESSION_SIGNAL,nonce:'new-change'}}))
+      await waitFor(()=>expect(mockMe).toHaveBeenCalledTimes(3))
+      act(()=>receive({data:AUTH_SESSION_SIGNAL}))
+      await waitFor(()=>expect(mockMe).toHaveBeenCalledTimes(4))
+    }finally{vi.unstubAllGlobals()}
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     sessionStorage.clear()

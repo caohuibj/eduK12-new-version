@@ -1,0 +1,13 @@
+✔ original local cases and failed continuations retain their provenance without replay (56.057549ms)
+✔ exact app pins reject unknown inputs, changed main and full fallback (251.765639ms)
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (253.822676ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (132.206797ms)
+✔ Teacher native qualification preserves original failed reporters and refuses altered fourteen-file deltas (504.054836ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1326.094589

@@ -1,0 +1,147 @@
+{
+  "scope": "Read-only diagnostic of existing completed synthetic Teacher SELF current-authority queries; not a new START or full timing replay",
+  "queries": [
+    {
+      "hash": "68348059cfa9f2cd833291245ca5f2ac5565cdfe0c902b02b878299f7dac003a",
+      "parameterCount": 21,
+      "originalCallMs": 8.472234000000014,
+      "originalRows": 1,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 1.194,
+          "executionMs": 0.214,
+          "actualRows": 1
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 1.148,
+          "executionMs": 0.275,
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "hash": "578b3ab43ff6b1b6d887ef2b5fef2a393317b624bd1df74569e01d8e444543a2",
+      "parameterCount": 1,
+      "originalCallMs": 1.900594999999953,
+      "originalRows": 1,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 0.186,
+          "executionMs": 0.057,
+          "actualRows": 1
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 0.316,
+          "executionMs": 0.046,
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "hash": "c10ddda11bd746129cd5a390f5551c0c0602c3f76f72b5b1ae7bef0a3bf6cb2e",
+      "parameterCount": 1,
+      "originalCallMs": 1.2076579999999808,
+      "originalRows": 1,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 0.155,
+          "executionMs": 0.035,
+          "actualRows": 1
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 0.098,
+          "executionMs": 0.025,
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "hash": "6ee978c49c3acfcfca7cb9e9955b0e88dd688de0597c15533820a860cfeb967f",
+      "parameterCount": 1,
+      "originalCallMs": 2.0187349999999924,
+      "originalRows": 1,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 0.428,
+          "executionMs": 0.147,
+          "actualRows": 1
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 0.3,
+          "executionMs": 0.122,
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "hash": "9c70623c3997701a26cab669e03f1b3c128a306e68a1fc2ac9895b64b8448df5",
+      "parameterCount": 1,
+      "originalCallMs": 0.7475550000000339,
+      "originalRows": 0,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 0.114,
+          "executionMs": 0.016,
+          "actualRows": 0
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 0.116,
+          "executionMs": 0.013,
+          "actualRows": 0
+        }
+      ]
+    },
+    {
+      "hash": "bd504c60e89ce1772f7b27c08d1a43f9733faa9936258a56e2f7e0431579264c",
+      "parameterCount": 1,
+      "originalCallMs": 0.9986860000000206,
+      "originalRows": 1,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 0.075,
+          "executionMs": 0.023,
+          "actualRows": 1
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 0.065,
+          "executionMs": 0.021,
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "hash": "f621e1327d2d7f9154405acaac843622462629a50e359789cffd019d6b592900",
+      "parameterCount": 21,
+      "originalCallMs": 53.955254000000025,
+      "originalRows": 1,
+      "plans": [
+        {
+          "joinCollapse": 8,
+          "planningMs": 35.629,
+          "executionMs": 2.452,
+          "actualRows": 1
+        },
+        {
+          "joinCollapse": 1,
+          "planningMs": 9.999,
+          "executionMs": 1.552,
+          "actualRows": 1
+        }
+      ]
+    }
+  ],
+  "completed": true,
+  "fullOriginalSHA256": "54e1fd45e30bc48cdfddb7d8f2ef533bd9aa91e2c900ce0a1e796238a364dc9b"
+}

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "registry": {
+    "sourceCommit": "777730eac63e08898f7a98cb7d626ee5a74ec3f8",
+    "sourceCount": 115,
+    "instrumentKeys": 115,
+    "multipleRegisteredReports": [],
+    "mechanicallyCompatibleSameCP": [],
+    "productionAccessed": false,
+    "scope": "Read-only committed registry and normal composer; no independent R registration, approval, database writes or denied tree."
+  },
+  "registryCommand": {
+    "command": [
+      "python3",
+      "/workspace/materials-load-20261029/run-task1-runtime.py",
+      "node",
+      "node_modules/tsx/dist/cli.mjs",
+      "/workspace/materials-load-20261029/inventory-nonempty-r.ts"
+    ],
+    "startedAt": "2026-10-29T23:58:34.041007+00:00",
+    "finishedAt": "2026-10-29T23:58:35.410449+00:00",
+    "exitCode": 0
+  },
+  "registryLog": "{\"sources\":115,\"keys\":115,\"multipleReportTools\":0,\"sameCPCompatiblePairs\":0}\n",
+  "databaseReadback": {
+    "scope": "Explicit retained synthetic databases; owner read-only transactions only",
+    "productionAccessed": false,
+    "sql": "BEGIN READ ONLY;\nSELECT json_build_object('registeredStoredNonemptyR', (SELECT count(*) FROM survey_standard_versions WHERE axis='REPORT' AND payload IS NOT NULL AND payload<>'null'::jsonb), 'sameCPWithTwoNonemptyR', (SELECT count(*) FROM (SELECT tool_key,snapshot#>>'{parts,CONTENT,hash}',snapshot#>>'{parts,PARAMETERS,hash}' FROM survey_standard_releases WHERE snapshot#>'{parts,REPORT,payload}' IS NOT NULL AND snapshot#>'{parts,REPORT,payload}'<>'null'::jsonb GROUP BY 1,2,3 HAVING count(DISTINCT snapshot#>>'{parts,REPORT,hash}')>1) pairs));\nROLLBACK;",
+    "databases": [
+      {
+        "database": "precise_runtime_role_test_20261029",
+        "exitCode": 0,
+        "result": {
+          "registeredStoredNonemptyR": 1,
+          "sameCPWithTwoNonemptyR": 0
+        },
+        "stderr": ""
+      },
+      {
+        "database": "precise_education_lifecycle_test_20261029",
+        "exitCode": 0,
+        "result": {
+          "registeredStoredNonemptyR": 1,
+          "sameCPWithTwoNonemptyR": 0
+        },
+        "stderr": ""
+      },
+      {
+        "database": "precise_survey_journey_test_20261029",
+        "exitCode": 0,
+        "result": {
+          "registeredStoredNonemptyR": 1,
+          "sameCPWithTwoNonemptyR": 0
+        },
+        "stderr": ""
+      },
+      {
+        "database": "materials_load_20261029",
+        "exitCode": 0,
+        "result": {
+          "registeredStoredNonemptyR": 0,
+          "sameCPWithTwoNonemptyR": 0
+        },
+        "stderr": ""
+      }
+    ]
+  }
+}

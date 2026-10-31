@@ -1,3 +1,6 @@
+import {SELF_GROUP_POLICY_KEY,buildSelfGroupCohortAnalysisPolicy,assertSelfGroupOwnSummaryCeiling} from '../assessment-policy/self-group-contract'
+import {teacherResourceMinimum} from '../huiteacher/privacyV2'
+import {validateEducationLibraryGroupCandidate} from '../scale-library-governance/education-group-resources'
 import {readEducationRunLibraryContext,assertEducationRunLibraryResources} from './educationLibraryContext'
 import {readEducationLibraryRegisteredSource} from '../scale-library-governance/education-runtime-resources'
 import {educationLibraryResourceProduct} from '../scale-library-governance/education-runtime-entry'
@@ -34,12 +37,12 @@ export function validateDescriptiveResourceScale(scale: { status: string; instru
   return definition
 }
 
-export function descriptiveResourceEntry(input: { scaleId: string; name: string; definition: ScaleDefinitionV2; definitionHash: string; compositeId: string; version: string; mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' }): RelationalProductEntryV1 {
-  const isTeacher = input.mode === 'TEACHER_INDIVIDUAL'
-  const isIndividual = input.mode !== 'GROUP'
-  const key = isTeacher ? `teacher-scale:${input.scaleId}:INDIVIDUAL` : `custom-scale:${input.scaleId}:${input.mode}`
+export function descriptiveResourceEntry(input: { scaleId: string; name: string; definition: ScaleDefinitionV2; definitionHash: string; compositeId: string; version: string; mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' | 'TEACHER_GROUP' }): RelationalProductEntryV1 {
+  const isTeacher = input.mode === 'TEACHER_INDIVIDUAL' || input.mode === 'TEACHER_GROUP'
+  const isIndividual = input.mode !== 'GROUP' && input.mode !== 'TEACHER_GROUP'
+  const key = isTeacher ? `teacher-scale:${input.scaleId}:${isIndividual?'INDIVIDUAL':'GROUP'}` : `custom-scale:${input.scaleId}:${input.mode}`
   const metricKeys = input.definition.scoring.scores.map(score => score.key)
-  const individual = { mode: 'INDIVIDUAL_SUMMARY' as const, metricKeys, longitudinalMetricKeys: metricKeys }
+  const individual = { mode: 'INDIVIDUAL_SUMMARY' as const, metricKeys, longitudinalMetricKeys: input.definition.report.audienceContract?.longitudinalMetricKeys ?? metricKeys }
   const none = { mode: 'NONE' as const, metricKeys: [], longitudinalMetricKeys: [] }
   const adultIndividual = {RESPONDENT:individual,SUBJECT:individual,TEACHER:none,PROFESSIONAL:none,PARENT:none,RESEARCH:none,ORGANIZATION:none}
   const entry: RelationalProductEntryV1 = {
@@ -54,6 +57,17 @@ export function descriptiveResourceEntry(input: { scaleId: string; name: string;
         RESPONDENT: { mode: 'AGGREGATE_ONLY', metricKeys, longitudinalMetricKeys: [] }, SUBJECT: { mode: 'AGGREGATE_ONLY', metricKeys, longitudinalMetricKeys: [] },
         TEACHER: { mode: 'CLASS_AGGREGATE', metricKeys, longitudinalMetricKeys: [] }, PROFESSIONAL: { mode: 'ORGANIZATION_AGGREGATE', metricKeys, longitudinalMetricKeys: [] },
         ORGANIZATION: { mode: 'ORGANIZATION_AGGREGATE', metricKeys, longitudinalMetricKeys: [] }, PARENT: none, RESEARCH: none } },
+  }
+  if(input.mode==='TEACHER_GROUP'){
+    const minimumRespondents=teacherResourceMinimum()
+    const approved=descriptiveResourceEntry({...input,mode:'TEACHER_INDIVIDUAL'}).resultDisclosure!
+    entry.title=`${input.name}（教师群体汇总与本人自评）`
+    entry.subjectReportMode='INDIVIDUAL_SUMMARY'
+    entry.resultDisclosure={...approved,policyKey:SELF_GROUP_POLICY_KEY,minimumRespondents,
+      audiences:{...approved.audiences,ORGANIZATION:{mode:'AGGREGATE_ONLY',metricKeys,longitudinalMetricKeys:[]}}}
+    entry.applicability={...entry.applicability,visibilityPolicyKey:SELF_GROUP_POLICY_KEY,minimumRespondents}
+    entry.cohortAnalysisPolicy=buildSelfGroupCohortAnalysisPolicy(entry.resultDisclosure)
+    assertSelfGroupOwnSummaryCeiling({approved,proposed:entry.resultDisclosure})
   }
   // Reuse the production applicability/disclosure validator; no client policy JSON.
   createRelationalProductRegistry([entry])
@@ -74,7 +88,7 @@ const checkedEntry = (row: Row): RelationalProductEntryV1 => {
   return row.entry
 }
 
-export async function registerDescriptiveResource(actor: Actor, scaleId: string, mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' = 'INDIVIDUAL') {
+export async function registerDescriptiveResource(actor: Actor, scaleId: string, mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' | 'TEACHER_GROUP' = 'INDIVIDUAL') {
   admin(actor)
   return prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM scales WHERE id=${scaleId} FOR UPDATE`
@@ -82,13 +96,13 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
     if (!scale) return reportingFail('RESOURCE_NOT_FOUND', '量表不存在', 404)
     if (scale.code?.startsWith('education-private-scale:')) return reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED', '作者私有量表不能转为旧注册资源', 409)
     if (scale.libraryEntryId) return reportingFail('RESOURCE_LIBRARY_LANE_REQUIRED', '共用库量表须使用其固定版本入口，不能转为旧注册资源', 409)
-    const isTeacher=mode==='TEACHER_INDIVIDUAL'
+    const isTeacher=mode==='TEACHER_INDIVIDUAL'||mode==='TEACHER_GROUP'
     const definition=validateDescriptiveResourceScale(scale,
       isTeacher?'teacher_self_report':'participant_self_report')
     if(isTeacher && definition.items.some(x=>Boolean(x.images)||Boolean(x.video)))
       reportingFail('RESOURCE_MEDIA_BRIDGE_NOT_RELEASED','教师版量表暂不支持没有独立跨域授权的图片或视频',409)
     const hash = hashScaleDefinition(definition)
-    const key = isTeacher?`teacher-scale:${scale.id}:INDIVIDUAL`:`custom-scale:${scale.id}:${mode}`
+    const key = isTeacher?`teacher-scale:${scale.id}:${mode==='TEACHER_GROUP'?'GROUP':'INDIVIDUAL'}`:`custom-scale:${scale.id}:${mode}`
     const existing = await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${key} AND definition_hash=${hash} ORDER BY created_at DESC,id DESC`
     if (existing[0]) {
       const prior = existing[0]; checkedEntry(prior)
@@ -134,7 +148,8 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
     const row = (await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE id=${id} FOR UPDATE`)[0]
     if (!row) return reportingFail('RESOURCE_NOT_FOUND', '资源不存在', 404)
     rejectPrivateResource(row)
-    if (row.resource_key.startsWith('library-scale:') || 'libraryOrigin' in row.entry)
+    const libraryGroup=row.resource_key.startsWith('library-scale:')&&row.resource_key.endsWith(':GROUP')
+    if (!libraryGroup&&(row.resource_key.startsWith('library-scale:') || 'libraryOrigin' in row.entry))
       return reportingFail('RESOURCE_LIBRARY_LANE_REQUIRED', '共用库资源随公库精确版本管理，不使用旧独立审核流程', 409)
     const expected = { review: 'DRAFT', publish: 'REVIEWED', retire: 'PUBLISHED' }[action]
     if (row.status !== expected) return reportingFail('RESOURCE_STATE_CONFLICT', '资源状态已变化，请刷新后再试', 409)
@@ -142,10 +157,12 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
     if (action !== 'retire') {
       await tx.$queryRaw`SELECT id FROM scales WHERE id=${row.scale_id} FOR UPDATE`
       const scale = await tx.scale.findUniqueOrThrow({ where: { id: row.scale_id } })
-      validateDescriptiveResourceScale(scale, row.resource_key.startsWith('teacher-scale:') ? 'teacher_self_report' : 'participant_self_report')
+      if(libraryGroup)await validateEducationLibraryGroupCandidate(tx,row)
+      else validateDescriptiveResourceScale(scale, row.resource_key.startsWith('teacher-scale:') ? 'teacher_self_report' : 'participant_self_report')
       if (scale.definitionHash !== row.definition_hash) reportingFail('RESOURCE_INTEGRITY', '量表已变化，请重新注册当前版本', 409)
       if (action === 'review' && [row.created_by_user_id, scale.creatorId].includes(actor.userId)) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '资源注册者和量表作者不能自审，请交由另一位平台管理员审核', 403)
       if (action === 'publish' && (!row.reviewed_by_user_id || [row.created_by_user_id, scale.creatorId].includes(row.reviewed_by_user_id))) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '发布需要独立审核记录，请重新登记新版本并独立审核', 409)
+      if(!libraryGroup){
       await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${row.composite_id} FOR UPDATE`
       const content = await prepareRegisteredResourceContentSnapshot(tx, { compositeId: row.composite_id, scale, purpose: 'PUBLISH' })
       if (action === 'publish') {
@@ -154,6 +171,7 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
           trainingContentSnapshot: content.snapshot as Prisma.InputJsonValue,
           trainingContentSnapshotHash: content.snapshotHash,
         } })
+      }
       }
     }
     const status = { review: 'REVIEWED', publish: 'PUBLISHED', retire: 'RETIRED' }[action]
@@ -194,6 +212,12 @@ export async function readPublishedRegisteredResource(actor: Actor, id: string) 
 
 /** Static content stays authoritative; registered content uses an exact, persisted identity. */
 export async function resolveReleasedRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
+  if(ref.resourceKey.startsWith('education-assessment:')){
+    const {readEducationAssessmentDeliveryIdentity}=await import('../education-tools/assessment-resource.repository')
+    const source=await readEducationAssessmentDeliveryIdentity(db as Prisma.TransactionClient,{resourceKey:ref.resourceKey,version:ref.resourceVersion,purpose:'NEW_USE'})
+    if(source.origin.family!==ref.resourceKind)return null
+    return source.entry
+  }
   if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
@@ -208,6 +232,18 @@ export async function resolveReleasedRelationalEntry(ref: { resourceKind: string
 
 /** Retirement stops new delivery; frozen reports still require all current subject/organization grants. */
 export async function resolveHistoricalRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
+  if(ref.resourceKey.startsWith('education-assessment:')){
+    const {readEducationAssessmentDeliveryIdentity}=await import('../education-tools/assessment-resource.repository')
+    const source=await readEducationAssessmentDeliveryIdentity(db as Prisma.TransactionClient,{resourceKey:ref.resourceKey,version:ref.resourceVersion,purpose:'HISTORY'})
+    if(source.origin.family!==ref.resourceKind)return null
+    return source.entry
+  }
+  if(ref.resourceKey.startsWith('private-scale:SCHOOL:')&&ref.resourceVersion==='2.0.0'
+    ||ref.resourceKey.startsWith('education-composition:SCHOOL:')||ref.resourceKey.startsWith('education-composition:TEACHER:')){
+    const {resolveSchoolPrivateGroupHistory}=await import('../education-tools/school-private-group-history')
+    const school=await resolveSchoolPrivateGroupHistory(db,ref)
+    if(school)return school
+  }
   if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
@@ -240,6 +276,14 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
 }
 
 export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false, teacherRunScope?:{ organizationId:string;runId:string }) {
+  if(ref.key.startsWith('education-assessment:')){
+    if(!teacherRunScope)reportingFail('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED','教育测评必须绑定实际组织任务',403)
+    const {assertEducationAssessmentRunUse}=await import('../education-tools/assessment-resource.authority')
+    const check=(tx:Prisma.TransactionClient)=>assertEducationAssessmentRunUse(tx,{...teacherRunScope!,actorUserId:userId,resource:ref})
+    if(db===prisma)await prisma.$transaction(check,{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+    else await check(db as Prisma.TransactionClient)
+    return
+  }
   if(ref.key.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   if(ref.family==='SCALE'&&ref.key.startsWith('library-scale:')){
     if(!teacherRunScope||lock) return reportingFail('EDUCATION_LIBRARY_BATCH_AUTHORITY_REQUIRED','公库量表必须在任务事务开始时统一校验授权',403)

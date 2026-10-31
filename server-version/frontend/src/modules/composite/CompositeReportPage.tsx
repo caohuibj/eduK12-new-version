@@ -1,4 +1,5 @@
 import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
+import {TrainingPersonalChanges} from './TrainingPersonalChanges'
 import { sessionFetch } from '../../api/client'
 import { internalReturnTo } from '../../components/app-shell/access'
 import { TrainingReinterpretationStudio } from './TrainingReinterpretationStudio'
@@ -386,6 +387,7 @@ const CompositeReportPage: React.FC = () => {
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回'}</button>}
     >
       {snapshotControls}
+      {isTrainingHost()&&!staffMode&&!publicMode&&!partial&&attemptId&&user?.id&&report.reportState!=='PARTIAL'&&<TrainingPersonalChanges attemptId={attemptId} actorId={user.id}/>}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
       {report.packageReport && <CompositePackageReport report={report.packageReport} />}
       {report.reportState === 'PARTIAL' && !unitReports.length && <ReportSection title="暂无已完成单项">完成单项并正式提交后，可在此查看其冻结结果。</ReportSection>}

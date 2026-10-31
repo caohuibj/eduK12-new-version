@@ -83,7 +83,7 @@ export function SurveyScaleLibrarySubmission({sourceId,initialReleaseId='',onBus
       {submissions.map(row=><li key={row.id} className="border rounded-lg p-3 space-y-2">
         <p>{row.metadata.title} · {submissionStatusLabel[row.status]}</p>
         <p className="text-xs break-all">精确版本：{row.releaseId}</p>
-        <EducationApplicabilitySummary value={row.educationApplicability} hash={row.educationApplicabilityHash}/>
+        <EducationApplicabilitySummary value={row.educationApplicability} hash={row.educationApplicabilityHash} expert={row.educationExpertApplicability} expertHash={row.educationExpertApplicabilityHash}/>
         {row.reason&&<p className="text-sm">处理说明：{row.reason}</p>}
         {row.status==='SUBMITTED'&&<div className="space-y-2">
           <label className="block text-sm">撤回说明<input className="input block w-full" maxLength={4000} value={withdrawReasons[row.id]||''} onChange={event=>setWithdrawReasons(value=>({...value,[row.id]:event.target.value}))}/></label>

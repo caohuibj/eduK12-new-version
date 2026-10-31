@@ -1,0 +1,18 @@
+{
+  "kind": "source observation after execution, not backdated invocation manifest",
+  "commit": "86953ce5bb3a8220f739cd740bc18ba16975979c",
+  "tree": "f0bb36aa5f4b3aea9dda35675151171a450e9355",
+  "sha256": {
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "122702239730f69700b5e947a2b1e06a66e613ddb56c5ad67a9a7a6db49b2815",
+    "server-version/backend/src/modules/reporting/respondentSummary.ts": "1cde6164c834ccf1be6a53d6b4ed36b87c49a5c839adee61d1df0c01f4bb830c",
+    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "5441a452d4142eefae23bd0d7acb52e2b891a6c5a2e051c779b2dceeb627ed89",
+    "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts": "d25932a53a1c930bcc274ab185b4cb2b909f1b2a6e855dcb25231bb040eed2ff",
+    "server-version/backend/src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts": "f507b90f1f37a3186062b345d4b8c8a7cb73b227610a2043072105b20c285ca0",
+    "server-version/backend/src/modules/reporting/education-assessment-report.service.ts": "b718719ae9ef2938085755a414a8dabf851aaeac885e6a78cc8e414c89df37fc",
+    "server-version/backend/src/modules/assessment-run/registeredResources.ts": "80ab18e0c357e16795c12003e53be76b5272c00e0c0e98d90ca5901d2fc5b740",
+    "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts": "28447e4371e888ffa9c69ac917155e7d17badb11e7381c07721ac2712a5b5e14",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+  }
+}

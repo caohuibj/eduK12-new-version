@@ -1,0 +1,31 @@
+{
+  "files": [
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx",
+      "mode": "100644",
+      "blob": "1928e89bbab253f794f021909a03004704468dfa"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "mode": "100644",
+      "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+    }
+  ],
+  "environment": {
+    "node": "24.22.1",
+    "kind": "original local development environment; not current Actions"
+  },
+  "dependencies": {
+    "lockBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "installedByteManifest": "not retained"
+  },
+  "tools": {
+    "vitest": "4.1.11",
+    "binaryHash": "not retained"
+  },
+  "generated": {
+    "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+  },
+  "sourceCapture": "Immutable post-execution checkpoint plus root input-delta review, not contemporaneous run-bound full snapshot",
+  "checkpoint": "467baeb59a72e61a5e4104b5c0163b288b0c234e"
+}

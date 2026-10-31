@@ -2,7 +2,7 @@ import {z} from 'zod'
 import type {AuthenticatedPrincipal} from '../../types'
 import type {EducationToolEntry} from './access'
 export type PrivateToolContext={principal:Pick<AuthenticatedPrincipal,'userId'|'accountDomain'>;entry:EducationToolEntry;organizationId:string}
-export const privateToolKind=z.enum(['SCALE','FORM'])
+export const privateToolKind=z.enum(['SCALE','FORM','COMPOSITION'])
 export type PrivateToolKind=z.infer<typeof privateToolKind>
 export const privateToolId=z.string().guid()
 const title=z.string().trim().min(1).max(200)

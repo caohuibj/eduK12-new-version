@@ -1,3 +1,4 @@
+import './admin-training.css'
 import TrainingResourceActions from '../../training/TrainingResourceActions'
 import TrainingResourceTools from '../../training/TrainingResourceTools'
 import {useStaffFeedback} from '../../components/staff-ui/useStaffFeedback'

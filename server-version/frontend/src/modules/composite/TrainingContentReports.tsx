@@ -8,21 +8,30 @@ function Metric({value}:{value:Record<string,unknown>}){
   const available=value.status==='INTERPRETABLE'&&value.display!=='REFERENCE_RESULT'&&typeof value.value==='number'&&Number.isFinite(value.value)
   return <><span>{available?String(value.value):'不可用'}</span>{text(value.unit)&&<span> {text(value.unit)}</span>}{value.status==='INVALID'&&<span>（质量无效）</span>}</>
 }
-function DeclaredBlock({value}:{value:unknown}){
+function DeclaredBlock({value,showMetricKeys=true}:{value:unknown;showMetricKeys?:boolean}){
   const block=object(value)
   if(!block)return null
   switch(block.type){
     case 'TEXT':return <p className="whitespace-pre-wrap">{text(block.text)}</p>
-    case 'METRIC':return <p>{text(block.label)||text(block.metricKey)}：<Metric value={block}/></p>
+    case 'METRIC':return <p>{text(block.label)||(showMetricKeys?text(block.metricKey):'测评指标')}：<Metric value={block}/></p>
     case 'REFERENCE_BAND':return <div><p>{text(block.text)}</p>{Array.isArray(block.guidance)&&<ul>{block.guidance.filter(line=>typeof line==='string').map((line,index)=><li key={index}>{line}</li>)}</ul>}</div>
     // No asset URL is authorized by this DTO. Never render a URL, image or media element.
     case 'ASSET':return <p>图片替代文本：{text(block.alt)||'未提供说明'}（未提供授权资源链接）</p>
     case 'CHART':{
       const metrics=Array.isArray(block.metrics)?block.metrics.map(object).filter((metric):metric is Record<string,unknown>=>!!metric):[]
-      return <div>{text(block.caption)&&<p>{text(block.caption)}</p>}<table className="w-full text-left"><caption>冻结指标数据</caption><thead><tr><th scope="col">指标</th><th scope="col">结果与单位</th></tr></thead><tbody>{metrics.map((metric,index)=><tr key={index}><th scope="row">{text(metric.metricKey)}</th><td><Metric value={metric}/></td></tr>)}</tbody></table></div>
+      return <div>{text(block.caption)&&<p>{text(block.caption)}</p>}<table className="w-full text-left"><caption>{showMetricKeys?'冻结指标数据':'获准的测评结果'}</caption><thead><tr><th scope="col">指标</th><th scope="col">结果与单位</th></tr></thead><tbody>{metrics.map((metric,index)=><tr key={index}><th scope="row">{text(metric.label)||(showMetricKeys?text(metric.metricKey):'测评指标')}</th><td><Metric value={metric}/></td></tr>)}</tbody></table></div>
     }
     default:return null
   }
+}
+/** Data-only rendering shared by entry-specific authorized projections. This
+ * accepts no transport and grants no participant access to Training reports. */
+export function DeclaredReportContent({report,showMetricKeys=true}:{report:NonNullable<TrainingContentReport['rendered']>;showMetricKeys?:boolean}){
+  return <>
+    {Array.isArray(report.blocks)&&report.blocks.map((block,i)=><DeclaredBlock key={i} value={block} showMetricKeys={showMetricKeys}/>)}
+    {Array.isArray(report.limitations)&&report.limitations.length>0&&<div><h4>局限说明</h4><ul>{report.limitations.filter(line=>typeof line==='string').map((line,i)=><li key={i}>{line}</li>)}</ul></div>}
+    {typeof report.disclaimer==='string'&&report.disclaimer&&<p>{report.disclaimer}</p>}
+  </>
 }
 /** Presentation only: consume the server's exact saved-fact projection, never infer metrics or interpret references. */
 export function TrainingContentReports({reports,audience,partial=false}:{reports?:TrainingContentReport[];audience:CompositeReportAudience;partial?:boolean}){
@@ -35,9 +44,7 @@ export function TrainingContentReports({reports,audience,partial=false}:{reports
       {report.lifecycleNotices?.map((notice,i)=><p key={i} role="status">版本状态变更：{notice.layer} · {notice.releaseId} · {statuses[notice.status]||notice.status}</p>)}
       {report.status==='REVOKED'&&<p>测量或报告版本已撤销，停止展示报告内容；原始已保存计分事实未被改写。</p>}
       {report.status==='READY'&&report.rendered?.generatorVersion==='DECLARATIVE_REPORT_V1'&&<>
-        {report.rendered.blocks.map((block,i)=><DeclaredBlock key={i} value={block}/>)}
-        {report.rendered.limitations.length>0&&<div><h4>局限说明</h4><ul>{report.rendered.limitations.map((line,i)=><li key={i}>{line}</li>)}</ul></div>}
-        {report.rendered.disclaimer&&<p>{report.rendered.disclaimer}</p>}
+        <DeclaredReportContent report={report.rendered}/>
       </>}
       {report.status==='READY'&&report.rendered?.generatorVersion!=='DECLARATIVE_REPORT_V1'&&<p>报告格式暂不支持，未展示内容。</p>}
     </article>)}</div>

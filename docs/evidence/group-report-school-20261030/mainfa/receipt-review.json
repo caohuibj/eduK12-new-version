@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "product": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+  "selectedCases": 41,
+  "reportGroups": 12,
+  "types": [
+    {
+      "originalExitCode": 0,
+      "originalNode": "v24.21.0",
+      "originalSigned": false,
+      "component": "backend",
+      "currentComponentTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "currentBackend": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "coverage": "exact-backend-tree"
+    },
+    {
+      "originalExitCode": 0,
+      "originalNode": "v24.21.0",
+      "originalSigned": false,
+      "component": "frontend",
+      "currentComponentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
+      "coverage": "exact-frontend-tree"
+    }
+  ],
+  "applicationTestsExecuted": false,
+  "ciExecuted": false,
+  "originalExecutionSigned": false
+}

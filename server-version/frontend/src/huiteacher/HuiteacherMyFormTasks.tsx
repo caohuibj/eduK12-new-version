@@ -3,7 +3,8 @@ import {SchoolTaskHelp as StudentTaskHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
-import { TaskForm } from '../survey/SurveyPublicApp'
+import {deferredPage} from '../components/page-loading/deferredPage'
+const TaskForm=deferredPage(async()=>({default:(await import('../survey/TaskForm')).TaskForm}))
 import { sanitizeFormAnswers } from '../survey/form-visibility'
 import {lastVisibleHuiteacherFormPageIndex} from './formTaskPagination'
 import type { FormDraft } from '../survey/builder.types'
@@ -165,7 +166,7 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
         {student?<><span className="ht-student-task-icon" aria-hidden="true"><ClipboardList size={20}/></span><div className="ht-student-task-copy"><h3>{item.formTitle}</h3>{(item.eventTitle!==item.formTitle||item.teacherName)&&<p>{[item.eventTitle===item.formTitle?'':item.eventTitle,item.teacherName].filter(Boolean).join(' · ')}</p>}<div className="ht-student-task-meta"><span className="ht-tag" data-status={item.status}>{assessmentStatus(item.status)}</span>{item.deadline&&<span>截止：{new Date(item.deadline).toLocaleString('zh-CN')}</span>}</div></div></>:<><strong>{item.formTitle}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span><p>{item.eventTitle}</p></>}
         {(!student||item.status!=='COMPLETED')&&<button disabled={busy||item.status==='COMPLETED'}
           onClick={()=>void open(item)}>
-          {unified?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(item.status==='ASSIGNED'?'开始评价':'继续评价')}
+          {unified&&!student?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(item.status==='ASSIGNED'?'开始评价':'继续评价')}
         </button>}
       </article>)}</div>}
     {active&&<TeacherAssessmentPage kind="answer" title={active.title} onBack={()=>{if(active.status==='STARTED')storeDraft(active,answers);setActive(null)}}><div className="ht-task ht-form-surface ht-task-answer-form">

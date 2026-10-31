@@ -5,6 +5,7 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import {FieldCompositionError} from './fieldComposition.authority'
 import {
   HuiteacherObserverError,inviteHuiteacherObserver,
   acceptHuiteacherObserver,revokeHuiteacherObserver,listHuiteacherObserverGrants,
@@ -30,6 +31,7 @@ const submit=z.object({
   expectedRevision:z.number().int().min(1),
   fieldFormId:uuid.optional(),
   answers:z.record(z.string(), z.unknown()).optional(),
+  assessmentAttemptId:uuid.optional(),
 }).strict()
 const limiter=createRedisRateLimiter({
   name:'huiteacher-observation-writes',limit:90,windowSeconds:900,
@@ -41,7 +43,7 @@ const wrap=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     if(e instanceof ZodError)return res.status(400).json({
       code:'HUITEACHER_OBSERVER_ARGUMENT_INVALID',message:'现场评价参数无效',data:null,
     })
-    if(e instanceof HuiteacherObserverError)return res.status(e.statusCode).json({
+    if(e instanceof HuiteacherObserverError||e instanceof FieldCompositionError)return res.status(e.statusCode).json({
       code:e.code,message:'观察任务授权、状态或记录版本不符合要求',data:null,
     })
     throw e

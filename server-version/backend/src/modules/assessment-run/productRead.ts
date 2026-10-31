@@ -1,6 +1,7 @@
 import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
+import {completedSchoolOrdinaryFeedbackSql} from './completedSchoolFeedback'
 import { prisma } from '../../config/database'
 import { AssessmentRunRepositoryError, type AssessmentRunStatus } from './repository'
 
@@ -31,6 +32,8 @@ export interface AssessmentRunProductTrack {
   requestedPolicy: unknown
   frozenResourcePolicy: unknown | null
   resourcePolicyHash: string | null
+  title?:string
+  sourceRevision?:number
 }
 
 export interface AssessmentRunFrozenActorSummary {
@@ -114,13 +117,16 @@ export async function readAssessmentRunProduct(
 
   const [tracks, actors, relationships, executions] = await Promise.all([
     prisma.$queryRaw<AssessmentRunProductTrack[]>`
-      SELECT "id", "resource_family" AS "resourceFamily", "resource_key" AS "resourceKey",
-             "resource_version" AS "resourceVersion", "subject_selector" AS "subjectSelector",
-             "respondent_selector" AS "respondentSelector", "requested_policy" AS "requestedPolicy",
-             "frozen_resource_policy" AS "frozenResourcePolicy", "resource_policy_hash" AS "resourcePolicyHash"
-      FROM "assessment_run_tracks"
-      WHERE "organization_id" = ${organizationId} AND "run_id" = ${runId}
-      ORDER BY "created_at", "id"
+      SELECT t."id",t."resource_family" AS "resourceFamily",t."resource_key" AS "resourceKey",
+        t."resource_version" AS "resourceVersion",t."subject_selector" AS "subjectSelector",
+        t."respondent_selector" AS "respondentSelector",t."requested_policy" AS "requestedPolicy",
+        t."frozen_resource_policy" AS "frozenResourcePolicy",t."resource_policy_hash" AS "resourcePolicyHash",
+        v.title,v.source_revision AS "sourceRevision"
+      FROM "assessment_run_tracks" t LEFT JOIN education_private_tool_versions v ON v.id=split_part(t.resource_key,':',3)
+       AND v.organization_id=t.organization_id AND v.kind='COMPOSITION' AND t.resource_family='BUNDLE'
+       AND t.resource_key='education-composition:'||v.entry||':'||v.id||':'||(v.definition#>>'{administration,population}')||':'||(v.definition#>>'{administration,responseMode}')||':1.0.0'
+      WHERE t."organization_id" = ${organizationId} AND t."run_id" = ${runId}
+      ORDER BY t."created_at",t."id"
     `,
     prisma.$queryRaw<AssessmentRunFrozenActorSummary[]>`
       SELECT "provenance_kind" AS "provenanceKind", "actor_role" AS "actorRole", COUNT(*)::int AS "count"
@@ -147,7 +153,7 @@ export async function readAssessmentRunProduct(
 
   return {
     run,
-    tracks,
+    tracks:tracks.map(({title,sourceRevision,...track})=>title==null?track:{...track,title,sourceRevision}),
     frozenPopulation: { actors, relationships },
     executions,
   }
@@ -158,6 +164,8 @@ export async function listAssignedRunTasks(userId: string, options?: {
   runIds?: string[]
   /** Campus inbox only: restore an already bound attempt, never new admission. */
   preserveBoundSchoolContinuation?: boolean
+  /** Own completed ordinary observer feedback; does not authorize collection. */
+  includeCompletedSchoolFeedback?: boolean
 }) {
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false }
   const runScope=options?.runIds
@@ -176,8 +184,11 @@ export async function listAssignedRunTasks(userId: string, options?: {
       AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`, userId)})`
     : Prisma.sql`FALSE`
   const closedScope = options?.preserveBoundSchoolContinuation
-    ? Prisma.sql`AND (r."status" <> 'CLOSED' OR NOT ${schoolScope} OR ${schoolContinuation})`
-    : Prisma.empty
+    ? Prisma.sql`(r."status" <> 'CLOSED' OR NOT ${schoolScope} OR ${schoolContinuation})`
+    : Prisma.sql`TRUE`
+  const completedSchoolFeedback=options?.includeCompletedSchoolFeedback
+    ? completedSchoolOrdinaryFeedbackSql(Prisma.sql`e."id"`,userId)
+    : Prisma.sql`FALSE`
   const list = await prisma.$queryRaw<Array<{
     __boundSchoolContinuation: boolean;
     executionId: string; organizationId: string; runId: string; runName: string;
@@ -219,11 +230,12 @@ export async function listAssignedRunTasks(userId: string, options?: {
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
       ${runScope}
-      ${closedScope}
+      AND ((${closedScope}
       AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
-          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START'))
+          AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START')))
+        OR ${completedSchoolFeedback})
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT 101
   `
   return {

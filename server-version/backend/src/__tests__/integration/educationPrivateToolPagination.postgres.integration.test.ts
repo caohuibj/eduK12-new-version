@@ -20,6 +20,7 @@ async function actor(organizationId?:string):Promise<PrivateToolContext>{
  const membership=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:org,userId:user.id,validFrom:new Date(Date.now()-60000)}})
  await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:membership.id,persona:'COUNSELOR',grantedByUserId:user.id}})
  await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:membership.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:user.id}})
+ await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:membership.id,product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:user.id}})
  return {principal:{userId:user.id,accountDomain:'SCHOOL'},entry:'SCHOOL',organizationId:org}
 }
 const where=(c:PrivateToolContext)=>({entry:c.entry,organizationId:c.organizationId,ownerUserId:c.principal.userId})

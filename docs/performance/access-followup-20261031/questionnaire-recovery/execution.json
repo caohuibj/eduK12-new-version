@@ -1,0 +1,56 @@
+{
+  "kind": "LOCAL_UNSIGNED_TASK_OBSERVATIONS",
+  "base": "0a9c565ce9a46793363fd1b40a3e7a0b1d124019",
+  "node": "v24.21.0",
+  "dependencies": {
+    "vitest": "4.1.11",
+    "react": "18.3.1",
+    "typescript": "5.6.3"
+  },
+  "workingDirectory": "server-version/frontend",
+  "commandBase": "node node_modules/vitest/vitest.mjs run src/components/__tests__/FinalQuestionnaireAssessment.test.tsx --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "invocations": [
+    {
+      "report": "questionnaire-baseline.json.gz",
+      "selection": "recovery:",
+      "exitCode": 1,
+      "note": "2 accepted-state regressions and 1 ambiguous locator fixture failure."
+    },
+    {
+      "report": "questionnaire-baseline-form.json.gz",
+      "selection": "recovery: keeps sealed Form",
+      "exitCode": 1,
+      "note": "Only fixture selector corrected; confirms disabled navigation on original product."
+    },
+    {
+      "report": "questionnaire-candidate.json.gz",
+      "selection": "recovery:",
+      "exitCode": 1,
+      "note": "Product edit script used wrong cwd and failed before editing; shell then ran unchanged product. Misnamed output retained, not candidate evidence."
+    },
+    {
+      "report": "questionnaire-fixed.json.gz",
+      "selection": "recovery:",
+      "exitCode": 0,
+      "note": "3 unique targeted cases PASS after actual product edit. Existing cases filtered; no full journey/build replay."
+    }
+  ],
+  "currentSourceSHA256": {
+    "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": "e1abdaef49915f8fdb02d5ac13772cad25f061b80fa4397fa9f01397c6a74442",
+    "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx": "d5d083948130850df169dc160733e422595d908c069256890f7dba1802afc712",
+    "server-version/frontend/src/components/questionnaire/FormPlayer.tsx": "5737183d11f6de76f79e8ef757a61363609a57f7629e69d0105d00c356ff1466",
+    "server-version/frontend/src/components/questionnaire/ScalePlayer.tsx": "e50d526d94300ae39667ddbdf9a374cee71cbb7660abbfa2924f87cb8bebf5a1",
+    "server-version/frontend/src/services/persistence/finalSubmissionFailure.ts": "fd021ccbd62334d4c588fd526567c645426d5b07bc3dedd4a35ff620fc390ad6",
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": "f359ed8d0c87be804e7b379bf88659313da5d0c43050c9f00489c7a9fc007de4",
+    "server-version/frontend/src/services/persistence/finalDraftCapacityRetry.ts": "cadc57a7a2d1d713480b902a835c1f1bffb7d7ca3a058bf8fdbed5b3a7f311eb",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  },
+  "limitations": [
+    "React/jsdom and actual local draft store; synthetic POST/reload, not fresh PostgreSQL/auth/FINAL durability evidence.",
+    "No full installed node_modules byte attestation; relevant installed versions recorded.",
+    "Initial failure logs, corrected selector and mistaken repeated red invocation retained."
+  ]
+}

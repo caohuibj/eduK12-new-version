@@ -1,0 +1,46 @@
+[
+  {
+    "evidenceKey": "e",
+    "slotKey": "ase",
+    "selector": "academic_self_efficacy",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "math.academic_self_efficacy",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "v",
+    "slotKey": "vc",
+    "selector": "value",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "math.importance_utility_value",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "c",
+    "slotKey": "vc",
+    "selector": "cost",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "math.time_opportunity_cost",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "grade",
+    "slotKey": "context",
+    "selector": "grade_level",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "context.grade",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

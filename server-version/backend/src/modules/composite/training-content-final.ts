@@ -9,12 +9,12 @@ import type {CanonicalUnitResultEnvelopeV1} from '../assessment-runtime/unit-res
 import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
-import {trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
+import {trainingContentAttemptBindingSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
+import {assertSealedCompositionAnchor} from '../assessment-run/educationCompositionExecution'
 import {validateTrainingReportPointer} from './training-report-selection'
 
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
-const bindingSchema=z.object({schemaVersion:z.literal(1),compositeId:text,attemptId:text,epoch:z.number().int().positive(),
-  publicationHash:hash,units:trainingContentSnapshotSchema.shape.units}).strict()
+const bindingSchema=trainingContentAttemptBindingSchema
 const numeric=z.number().finite().nullable()
 const referenceSchema=z.object({metricKey:text,referenceKind:z.enum(['normative_distribution','criterion_threshold','descriptive_sample','theoretical_range']),
   status:z.enum(['AVAILABLE','UNAVAILABLE','REVOKED']),reason:text.optional(),values:z.object({z:numeric,t:numeric,meanDifference:numeric,
@@ -52,6 +52,8 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
   if(!binding)return null
   const referenceBinding=decodeTrainingReferenceBinding(parent),populationContext=referenceBinding?readTrainingReferenceContext(parent):{}
   if(parent.compositeAssessment.id!==binding.compositeId)fail()
+  const educationComposition=binding.educationComposition?await assertSealedCompositionAnchor(tx,binding.educationComposition,
+    binding.compositeId,parent.compositeAssessment.createdBy):undefined
   const bySlot=new Map(input.verifiedPayloads.map(p=>[p.header.slotKey,p]))
   if(bySlot.size!==input.verifiedPayloads.length)fail()
   // Index frozen bindings only. Authority validation still runs on every read,
@@ -83,14 +85,14 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     if(release.layer==='REPORT'){
       const matching=binding.units.filter(unit=>unit.report?.releaseId===id)
       if(!matching.length)fail()
-      for(const unit of matching)if(unit.source.standardCombination)await validateTrainingReportPointer(tx,{unit,compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,
+      for(const unit of matching)if(unit.source.standardCombination||scope.kind==='PLATFORM'||scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(scope.product))await validateTrainingReportPointer(tx,{unit,compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,
         reportReleaseId:id,contentHash:expectedHash,publication:false,releases:cache})
       else if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==parent.compositeAssessment.createdBy||scope.resourceId!==binding.compositeId)fail()
     }else if(release.layer==='MEASUREMENT'){
       const matching=measurementUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()
       for(const unit of matching)if(release.family!==unit.family||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source,
-        {compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,itemId:unit.itemId}))fail()
+        {compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,itemId:unit.itemId,educationComposition}))fail()
     }else if(release.layer==='REFERENCE'){
       const matching=selectedReferenceUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()

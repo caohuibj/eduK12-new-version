@@ -1,0 +1,31 @@
+{
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts",
+      "mode": "100644",
+      "blob": "8b77d6ab7889d27247ae9e4c9f5649d75647f0d9"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "mode": "100644",
+      "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    }
+  ],
+  "environment": {
+    "node": "24.22.1",
+    "kind": "original local development environment; not current Actions"
+  },
+  "dependencies": {
+    "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "installedByteManifest": "not retained"
+  },
+  "tools": {
+    "vitest": "4.1.11",
+    "binaryHash": "not retained"
+  },
+  "generated": {
+    "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+  },
+  "sourceCapture": "Immutable post-execution checkpoint plus root input-delta review, not contemporaneous run-bound full snapshot",
+  "checkpoint": "79de674ee7788feeeab10d5b37c1d74b0aadf1fc"
+}

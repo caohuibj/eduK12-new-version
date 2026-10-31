@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "actualSchoolAppNavigationAndGroupLongitudinalComponents": true,
+  "syntheticAuthAndBackend": true,
+  "realPostgres": false,
+  "finalsReplayed": 0,
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/campus/auth/me"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations/org/tool-authoring-capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/availability"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations/org/context"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations/org/units"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/catalog"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/sources"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/plans/org/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/plans/org/run/long-latest"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/plans/org/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/plans/org/run/long-old"
+    }
+  ],
+  "checks": [
+    "School navigation",
+    "page-two frozen source",
+    "stored longitudinal report",
+    "append older pointers retains selection",
+    "old snapshot read",
+    "existing SVG",
+    "390 layout",
+    "no POST"
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "kseg6_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "c411659f3ecf355ee3c11204e9bd4c7ad5c571f44a4e03c24c3a5d32ee332dd8",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "scoreOrder": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "positive_endorsement",
+        "headline": "你会怎样描述自己做得好的地方？",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这几道题问到争论时保持客观、压力下友好待人，以及认真听别人说话。你越同意这些说法，表示这次越认同自己始终有这些正面表现的描述，并不能据此断定你在夸大或说谎。比如，工作汇报时我们可能先想到顺利完成的部分，而和熟悉的人复盘时更容易讲到困难。描述自己会受到场合、心情和题目理解的影响；试着回到具体经历，比给自己一个笼统评价更有帮助。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次争论或忙碌的场景：当时哪些表现做得不错，哪些地方和理想中的自己不一样？"
+          },
+          {
+            "category": "strategy",
+            "text": "下次复盘时，可以各写一件做得好的事和一件想改进的事，用具体经历代替“我总是”或“我从不”。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "negative_admission_raw",
+        "headline": "也给不完美的经历留一点位置",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这几道题涉及占便宜、乱扔垃圾，以及期待回报才帮助别人等不太理想的经历。回答越同意，只表示你越承认题目提到的行为，并不表示你越会隐瞒，也不能反过来把不同意当成不诚实。人们对这些情境的理解和回忆可能不同，愿不愿意谈及它们也受安全感影响。这不是一份好人或坏人的成绩单，更不能凭几道题决定别人的回答是否应该被丢弃。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "如果某句话让你想到具体经历，可以想想当时发生了什么，而不急着给自己贴标签。"
+          },
+          {
+            "category": "strategy",
+            "text": "选择一件自己愿意改进的小事，例如更清楚地表达期待、处理好垃圾或尊重别人的边界；不必为了证明诚实而勉强承认没有发生的事。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这是独立中文工作译稿，仍待人工审校和本地验证，仅供成人研究与自我了解。",
+      "英国和德国成人研究中的平均值仅作出处记录，不能当作中国人的标准答案；本报告不作高低分级、排名或风险判断。",
+      "六题都需完整回答才提供完整报告；两个方面分开看，不合成总体诚信分。漏答不补零、不猜测。",
+      "不能用于诊断、重要选拔、对个人诚信作结论或自动剔除研究参与者。"
+    ],
+    "disclaimer": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "scoreOrder": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "positive_endorsement",
+        "headline": "给做得好的地方配一个真实场景",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组三题关注争论时客观、压力下友好，以及交谈时认真听人说话的自我描述。均分范围1–5，数值越大，表示这次更认可自己始终有这些正面表现；不能据此断定夸大、说谎或确实每次都如此。\n\n例如，一次争论中，你也许认真听了对方的理由，却有一句话说得急。回顾具体片段，可以同时看见做得到的部分和受到压力影响的部分。若某种做法确实有用，可以保留；不必为了显得完美否认例外，也不需要为了显得真实刻意多写缺点。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回到一段具体对话：你是怎样听、怎样回应的？哪些细节让你觉得自己做到了客观或礼貌？先记行为，不替整个人下一个“总是如此”的结论。"
+          },
+          {
+            "category": "strategy",
+            "text": "保留一个实际有用的回应方式：例如先复述对方的意思再表达意见，或在声音变急时说明需要缓一下。它是可尝试的沟通方式，不是让问卷分数变好的答题方法。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "negative_admission_raw",
+        "headline": "承认一件行为，不等于给整个人下定义",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组三题涉及占过别人便宜、乱扔垃圾，以及期待回报才帮助别人。这里保留原始方向，均分范围1–5；数值越大，表示这次越承认题目所说的行为，不是越会隐瞒，也不能据此判定更诚实。不同意同样不能自动判为撒谎。\n\n如果一句话让你想起真实经历，可以把发生了什么、当时期待什么、是否影响别人分开看。愿意反思不需要把一次行为扩写成“我就是坏人”，也不要求为证明诚实承认没发生的事。这个结果不用于替任何人的答卷作废，也不能给人品排队。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只看自己愿意回顾的真实一件事：区分发生的行为、当时的想法与造成的影响，不用强迫自己公开细节，也不补写没有发生的经历。"
+          },
+          {
+            "category": "strategy",
+            "text": "若希望改进，选与真实影响相符的补救：例如清楚说明互惠期待、尊重他人边界或妥善处理垃圾。做法针对那件事，不把“承认更多”当成目标。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本仍在研究完善，不提供人群分档或诚信排名。两组分别描述、不合成总分；六题答完整才提供整份解释，漏答不补0。"
+    ],
+    "disclaimer": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "scoreOrder": [
+      "positive_endorsement",
+      "negative_admission_raw"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "positive_endorsement",
+        "headline": "好的一页可以留下，不必变成完美封面",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：给优点配一段经历，比给自己做全天候保证更具体。\n\n把自我描述想成一本生活相册：这组三题看你怎样描述客观、礼貌和倾听。均分1–5，数值越大表示整体更认可这些“总是如此”的正面说法，但它不是摄像机，也不是测谎仪。\n\n相册里可以有一张认真听人说话的好照片，也可以记得同一场谈话里曾着急打断。两者不必互相删掉。若有一个好做法帮上忙，就把它留住；不是因为分数证明你完美，更不是说你一定在给自己加滤镜。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给照片写说明：选一次对话，写一件具体做得好的事及其情境；若有例外，也只按真实经历记，不刻意凑一个优缺点比例。"
+          },
+          {
+            "category": "strategy",
+            "text": "把有用做法带到下一次：例如先听完、确认理解再回应。只试一个合适的沟通动作，不把自己变成必须每次表现满分的人。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "negative_admission_raw",
+        "headline": "不完美的一页，可以回看，也不必编造",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：行为可以回看，人不必被一句话定型。\n\n相册里也可能有不太理想的片段。这组三题问对特定行为的承认，原始均分1–5，数值越大表示越承认这些行为；不是“隐瞒更多”，也不是一枚诚实奖章。\n\n如果你想起一次帮助别人时也期待回报，可以看看期待有没有说清楚、双方是否理解一致。若没有这段经历，就不必为了证明坦诚编出一段没发生的经历。回答需要放回真实理解与情境，不能由几道题给人贴好坏标签。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只翻自己愿意翻的一页：回看真实行为和影响，不强迫披露，也不把“有这件事”写成“我永远这样”。"
+          },
+          {
+            "category": "strategy",
+            "text": "想修哪一处，就修那一处：若确实需要补救，可以说明期待、补做一项负责的行动或调整边界。不是为了显得诚实多承认，而是照顾真实影响。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文版本仍在研究完善，不提供人群分档或诚信排名。两组分别描述、不合成总分；六题答完整才提供整份解释，漏答不补0。"
+    ],
+    "disclaimer": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

@@ -1,0 +1,60 @@
+{
+  "pr": 408,
+  "status": "FORMAL_SUCCESS_NOT_MERGED",
+  "source": "55ceb9c3d0c306e3632e0d9b20e604893b0dddf2",
+  "base": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+  "product": "e0c993ef672e889c9373d68d1c90541f61b53e5e",
+  "controlCheckpoint": "131fad32c002e3b1a0915d7661daed78bc32856a",
+  "sourceTree": "37f55543abfb7629cde66d6f057f01cff8247961",
+  "currentGitHubMergePreview": "8070cfc71280046301a3201b81eeac25e121ed1d",
+  "mergePreviewTreeMatchesSource": true,
+  "mergePreviewParents": [
+    "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+    "55ceb9c3d0c306e3632e0d9b20e604893b0dddf2"
+  ],
+  "run": 41047385826,
+  "attempt": 1,
+  "observedJobs": 125,
+  "selectedJobs": [
+    {
+      "id": 124034696563,
+      "name": "classify changed content",
+      "conclusion": "success"
+    },
+    {
+      "id": 124034843280,
+      "name": "codeql (javascript/typescript SAST)",
+      "conclusion": "success"
+    },
+    {
+      "id": 124034844495,
+      "name": "reviewed onboarding evidence admission",
+      "conclusion": "success"
+    },
+    {
+      "id": 124035323657,
+      "name": "merge gate / ready PR",
+      "conclusion": "success"
+    }
+  ],
+  "requiredCheck": "merge gate / ready PR pass",
+  "currentPR": "Ready; mergeable=true / clean at observation; not merged",
+  "original175CasesReplayed": false,
+  "originalBrowserOrPostgresOrControlFixtureReplayed": false,
+  "freshCompilers": "one backend plus one frontend for changed exact whole-component inputs",
+  "draftRun": {
+    "id": 41046979347,
+    "scopeJob": 124033351910,
+    "scope": "success",
+    "gateJob": 124033487841,
+    "gate": "failure",
+    "reason": "Existing onboarding gate rejects Draft and missing actual admission/SAST; those were skipped. Source guarded behavior, not business test failure. Original failure retained."
+  },
+  "logBoundary": "CLI log-failed and explicit gate-log returned empty bodies, exit0. Metadata and gate source verified; no claim of a directly observed run checkout log. Current GitHub merge-preview commit/tree/parents read through API; successful gate checks actual checkout equality.",
+  "zipDownloaded": false,
+  "sarifBodyRead": false,
+  "original403NotRetried": true,
+  "originalUnsignedLocalProvenanceRetained": true,
+  "merged": false,
+  "deployed": false
+}

@@ -1,0 +1,540 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "talis2018_teacher_exchange_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "选用TALIS2018题集：教师交流与协调（项目描述性均分）",
+      "abbreviation": "T3EXCH-RAW",
+      "instrumentFamily": "TALIS2018 selected complete item set; project descriptive raw mean, not OECD factor score"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "交换资料、讨论学生学习发展计划、协调评价标准及团队会议的频率；不测另一T3COLES课堂专业合作量尺。 使用完整作答的项目等权原始均分，不是OECD CFA因子分，也未验证为独立施测量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "talis2018_teacher_exchange_zh_cn",
+        "domain:teacher_workplace",
+        "construct:teacher_exchange",
+        "population:adult_teacher",
+        "population:shanghai_lower_secondary_source",
+        "response:self",
+        "scoring:project_complete_raw_mean_not_oecd_cfa",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "license:oecd_pre_2024_terms",
+        "language_validation:existing_shanghai_chinese",
+        "language_validation:standalone_validation_pending"
+      ]
+    },
+    "population": {
+      "populationNotes": "复用上海ISCED2教师问卷现成简体中文原题，面向当前初中教师的工作条件回顾候选；18+是项目成人范围，不冒称原作者年龄界线。本独立选用形式与项目描述性均分未建立效度或本地常模。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目标班级/本校的一般教学与工作语境；未额外指定回顾期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留所选原题相对顺序、原响应类别和正式题码。",
+        "本工具只使用T3EXCH完整题集；报告为项目原始均分，不是OECD因子分或独立量表效度证明。",
+        "完整作答后等权均分为项目明示规则，不冒称OECD官方缺失算法。",
+        "2分钟为阅读估计，尚未做电子施测时长实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官方题集依据不证明当前独立选用形式、描述性均分或个体解释有效。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "OECD TALIS2018上海ISCED2教师问卷现成简体中文原题；原文未重译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "只选取完整T3EXCH题集，原题文和响应类别逐项核到现成上海DOCX；项目改造为独立选用、原始均分和原创教师反馈，不称OECD官方计分包或验证独立短表。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_teacher_exchange_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_teacher_exchange_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "talis2018_teacher_exchange_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire, https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip",
+      "本项目改编自OECD原作；本改编的观点与论证不代表OECD或其成员国的官方观点。",
+      "署名与改造说明依OECD现行条款§1.2；只选现成2018自有中文文本，不实施商业新译；排除TSES第三方题项、整份题本、封面、版式、标识和图片。 https://www.oecd.org/en/about/terms-conditions.html"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "TALIS2018 T3EXCH complete selected item set; project descriptive raw mean",
+        "citation": "OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire; OECD TALIS2018 Technical Report, table/page 252. Complete item-set selection and project scoring/report adaptation.",
+        "url": "https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "仅针对本包所选2018 OECD自有现成中文题文，依据OECD条款§1.2署名改编；无另见第三方声明。OECD (2018), TALIS2018 Shanghai-China ISCED2 Teacher Questionnaire, https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip。本项目改编自OECD原作；本改编的观点与论证不代表OECD或其成员国的官方观点。排除TSES题项、整份题本、标识/封面/图片；非新商业翻译。 https://www.oecd.org/en/about/terms-conditions.html"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "original_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "从未有过",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "每年1次或更少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "每年 2-4 次",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "每年 5-10 次",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "每月1-3次",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "每周1次或更多",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "TT3G33D",
+          "content": "与同事交换教学资料",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G33E",
+          "content": "参与特定学生的学习发展计划的讨论",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G33F",
+          "content": "和本校其他教师合作以确保采用共同标准评估学生的进步程度",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TT3G33G",
+          "content": "参加团队会议",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "original_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "TT3G33D",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G33E",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G33F",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TT3G33G",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "teacher_exchange",
+            "type": "dimension",
+            "label": "教师交流与协调（描述性均分）",
+            "description": "交换资料、讨论学生学习发展计划、协调评价标准及团队会议的频率；不测另一T3COLES课堂专业合作量尺。 仅完整作答后等权均分；不代表OECD因子分。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TT3G33D",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G33E",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G33F",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TT3G33G",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "teacher_exchange"
+        ],
+        "scoreOrder": [
+          "teacher_exchange"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "teacher_exchange",
+            "headline": "同事协作：日常交流与协调怎样发生",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注交换教学资料、讨论学生发展、协调评价标准和参加团队会议的频率。1–6描述性均分越大，表示这些交流与协调更频繁；编码是有序类别，均分不是每周或每年的实际次数，也不表示协作质量一定更高。比如，经常开会但没有解决教学难题，与少而有用的交流可能给人很不一样的体验，不能只凭频率判断好坏。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次真正帮到教学的同事交流：它解决了什么问题，哪些安排让它有用？再想一项耗时却帮助不大的交流。"
+              },
+              {
+                "category": "environment",
+                "text": "与一位可信同事围绕具体教学问题尝试一次短交流，明确希望带走的一份资料、一种评估标准或一个学生支持安排；利用已有协作时间，避免为了提高频率额外增加会议负担。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "此处是交流与协调，不是T3COLES课堂专业合作量尺，也不测同事关系好坏。不能用均分比较教师积极性或证明越多会议越好。",
+          "本独立选用工具只给项目等权原始均分，不是OECD因子分；未建立独立施测效度、中国教师常模、百分位或分级线。"
+        ],
+        "disclaimer": "仅用于本次工作条件回顾；不诊断、考核或排名。所有题目均有有效回答才生成项目均分，缺失不补0、不插补；四工具分别解释，不计算JD-R合计。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "talis2018_teacher_exchange_zh_cn",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "TT3G33D",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G33E",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G33F",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G33G",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_exchange": 1
+          },
+          "totalScoreKeys": [
+            "teacher_exchange"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "TT3G33D",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "TT3G33E",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "TT3G33F",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "TT3G33G",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_exchange": 6
+          },
+          "totalScoreKeys": [
+            "teacher_exchange"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "TT3G33D",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G33E",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "TT3G33F",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TT3G33G",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "teacher_exchange": 3.5
+          },
+          "totalScoreKeys": [
+            "teacher_exchange"
+          ]
+        }
+      },
+      {
+        "name": "missing",
+        "answers": [
+          {
+            "itemCode": "TT3G33D",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G33E",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TT3G33F",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "teacher_exchange": null
+          },
+          "totalScoreKeys": [
+            "teacher_exchange"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "teacher_exchange": null
+          },
+          "totalScoreKeys": [
+            "teacher_exchange"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "平均而言，您在本校是否经常从事以下活动？ 请每行只勾选一项。本选用形式采用完整作答的项目描述性均分，不是OECD官方因子分。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "上海ISCED2原指导语/题组语境；独立选用、缺失策略说明及原创教师反馈为项目改造。 https://webfs.oecd.org/talis/CSH_Shanghai_China_TALIS_2018_questionnaires.zip"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

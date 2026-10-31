@@ -1,8 +1,12 @@
+import {EducationTrackingPublish,EducationTrackingNext} from '../modules/reporting/EducationPersonalTracking'
 import {SchoolActivityCollection} from './SchoolActivityCollection'
 import './school-activity-collection.css'
 import './school-activity-configuration.css'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
+import {EducationCompositionRunPicker} from '../components/education-tools/EducationCompositionRunPicker'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
+import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
+import type {EducationAssessmentResourceAdapter} from '../api/educationAssessmentResources'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
@@ -21,7 +25,7 @@ type Activity={
   version:number;participantCount:number;runCount:number
 }
 type ActivityPage={list:Activity[];hasMore?:boolean;page?:number}
-type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
+type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title?:string;sourceRevision?:number}
 type Run={id:string;name:string;status:string;version:number;tracks?:RunTrackSummary[]}
 type RunDetail={run:Run;tracks?:RunTrackSummary[]}
 type ActivityCapabilities={canSubmit:boolean;canOpen:boolean;canPause:boolean;canResume:boolean;canClose:boolean;canPublishRun:boolean;ownPsychologyPublisher:boolean}
@@ -62,8 +66,8 @@ const stateText:Record<ActivityState,string>={
   DRAFT:'准备中',SUBMITTED:'学校审核中',OPEN:'已开放',PAUSED:'已暂停',CLOSED:'已结束',
 }
 
-export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey='',compact=false}: {
-  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean
+export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey='',compact=false,assessmentResources}: {
+  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean;assessmentResources?:EducationAssessmentResourceAdapter
 }){
   const [list,setList]=useState<Activity[]>([])
   const [listLoading,setListLoading]=useState(true),[listError,setListError]=useState('')
@@ -114,7 +118,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const path=selected?`${base}/${selected.courseId}`:base
   const activityPath=useRef(path)
   activityPath.current=path
-  const resourceScope=path+'/'+(activeRun?.id??'')
+  const resourceScope=JSON.stringify([actorKey,path,activeRun?.id??'',activeRun?.version??null])
   const resourceContext=useRef({scope:resourceScope,api})
   resourceContext.current={scope:resourceScope,api}
   const nextStep=selected?schoolActivityNextStep(selected.status,selected.runs.map(run=>run.status),selected.capabilities?.ownPsychologyPublisher===true):null
@@ -123,7 +127,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const libraryTeacherReport=Boolean(resource?.key.startsWith('library-scale:')
     &&resource.subjectRoles.length===1&&resource.subjectRoles[0]==='STUDENT'
     &&resource.respondentRoles.length===1&&resource.respondentRoles[0]==='TEACHER'
-    &&resource.perspectives.length===1&&resource.perspectives[0]==='TEACHER_REPORT')
+    &&resource.perspectives.length===1&&resource.perspectives[0]==='OBSERVER_REPORT')
   const homeroomOnly=libraryTeacherReport&&!isAdmin&&selected?.capabilities?.ownPsychologyPublisher===true
   const targetModes=(resource?.allowedTargetModes??[]).filter(mode=>mode!=='COURSE_TEACHER'
     &&(!libraryTeacherReport||['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS'].includes(mode))
@@ -241,7 +245,9 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       const result=await api<{list:CatalogResource[];nextCursor?:string|null}>(
         path+'/run-resources'+(cursor?'?cursor='+encodeURIComponent(cursor):'?page=1'))
       if(!current())return
-      const visibleResources=result.list.filter(resource=>resource.family!=='COGNITIVE')
+      // Registered education deliveries use the scoped, authorized adapter below.
+      // Do not accept an identity-only resource via the legacy catalog projection.
+      const visibleResources=result.list.filter(resource=>!resource.key.startsWith('education-assessment:'))
       setResources(previous=>mergeResources(cursor?previous:[],visibleResources))
       setResourceCursor(result.nextCursor??null);setResourcesRead(true)
       if(!cursor)setResourceId(previous=>visibleResources.some(resource=>resourceIdentity(resource)===previous)?previous:'')
@@ -294,10 +300,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setPreview(r)
     setNotice('仅展示人数预览，不展示任何个体心理报告或原始作答。')
   })
-  const publishRun=()=>void execute(async()=>{
+  const publishRun=(tracking?:unknown)=>void execute(async()=>{
     if(!selected||!activeRun)return
     if(!window.confirm('确认测评资源、参与名单、许可与科学成熟度已经审核，正式向获批人员发布？'))return
-    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version})
+    await api(path+'/runs/'+activeRun.id+'/publish','POST',{expectedVersion:activeRun.version,tracking})
     await fetchDetail(selected.courseId)
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
@@ -418,6 +424,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             if(request!==runRequest.current||activityPath.current!==path)return
             setActiveRun({...d.run,tracks:d.tracks})
           })}>{r.name} · {schoolRunStatusText(r.status)}</button>
+          {['PUBLISHED','CLOSED'].includes(r.status)&&<EducationTrackingNext entry="SCHOOL" api={api} path={path+'/runs/'+r.runId} disabled={busy} create={()=>void execute(async()=>{
+            const next=await api<{courseId:string;runId:string}>(path+'/runs/'+r.runId+'/next-wave','POST',{requestId:crypto.randomUUID()})
+            await fetchList();await fetchDetail(next.courseId);setActiveRun(null);setPreview(null);setNotice('下一轮活动草稿已创建；请按原流程确认名单、审批并发布。')
+          })}/>}
           {(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
         {r.capabilities.canClose&&<button aria-label={compact?`收尾 ${r.name}`:undefined} disabled={busy} onClick={()=>void execute(async()=>{
           if(!window.confirm('停止该批次的新作答；已开始的作答按原有规则继续。确认收尾？'))return
@@ -434,12 +444,25 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       {activeRun&&<div className={compact?"hs-task-detail hs-activity-run-editor":"hs-task-detail"}>
         <h3 className={compact?'hs-visually-hidden':undefined}>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
         <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p>{compact&&<ul className="hs-activity-track-identifiers">{activeRun.tracks?.map(track=><li key={track.id}>{track.resourceFamily} · {track.resourceKey} · 固定版本：{track.resourceVersion}</li>)}</ul>}</details>
-        <SelectedToolOutline className="hs-selected-tool-outline" heading={compact?'已配置测评项目':'已选工具大纲'} items={activeRun.tracks?.map((track,index)=>({
-          id:track.id,kind:compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,version:track.resourceVersion,
-          title:resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
-            &&resource.version===track.resourceVersion)?.title??(compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
+        <SelectedToolOutline disabled={busy} onRemove={selected.status==='DRAFT'&&activeRun.status==='DRAFT'?trackId=>void execute(async()=>{
+          if(!window.confirm('从本轮草稿移除此投放？追踪工具缺失或定义变化将阻止发布；请加入保留冻结指标的新问卷版本。'))return
+          await api(path+'/runs/'+activeRun.id+'/tracks/'+encodeURIComponent(trackId),'DELETE',{expectedVersion:activeRun.version})
+          const detail=await api<RunDetail>(path+'/runs/'+activeRun.id);setActiveRun({...detail.run,tracks:detail.tracks});setPreview(null)
+        }):undefined} className="hs-selected-tool-outline" heading={compact?'已配置测评项目':'已选工具大纲'} items={activeRun.tracks?.map((track,index)=>({
+          id:track.id,kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,
+          version:track.sourceRevision?'修订 '+track.sourceRevision:track.resourceKey.startsWith('education-composition:')?'固定问卷':track.resourceVersion,
+          title:track.title??resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
+            &&resource.version===track.resourceVersion)?.title??(track.resourceKey.startsWith('education-composition:')?`普通问卷 ${index+1}`:compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
         }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
+          <EducationAssessmentResourcePicker
+            scope={{product:'SCHOOL',organizationId,actorKey,workflowId:selected.courseId,runId:activeRun.id,expectedVersion:activeRun.version}}
+            adapter={!compact||panel==='assessments'?assessmentResources:undefined} disabled={busy} onBusy={setBusy}
+            onRefresh={async()=>{
+              const context=resourceContext.current
+              const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
+            }}/>
           <ActivityLayout compact={compact} className="hs-activity-private-pickers">
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
@@ -461,7 +484,12 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
               const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
               if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}
-          </ActivityLayout>
+          {canAuthorPrivateTools&&actorKey&&<EducationCompositionRunPicker key={`composition:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
+            api={api} entry="SCHOOL" organizationId={organizationId} actorKey={actorKey} endpoint={path+'/runs/'+activeRun.id+'/tracks'} expectedVersion={activeRun.version}
+            disabled={busy} onBusy={setBusy} onRefresh={async()=>{
+              const context=resourceContext.current,data=await api<RunDetail>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
+            }}/>}</ActivityLayout>
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}
           {resourceError&&<div><p role="alert">{resourceError} 已配置的测评项目不受影响。</p>
@@ -509,8 +537,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
           {preview.tracks.map((t,i)=><span key={i}> 项目 {i+1}（作答 {t.executionCount}，
             受评对象 {t.subjectCount}）</span>)}</p>}
         {selected.runs.find(r=>r.runId===activeRun.id)?.capabilities?.canPublish===true&&
-          <button className="hs-primary" disabled={busy||!preview} onClick={publishRun}>
-            {selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}</button>}
+          <EducationTrackingPublish key={actorKey+':'+activeRun.id+':'+activeRun.version} entry="SCHOOL" api={api} path={path+'/runs/'+activeRun.id} disabled={busy||!preview} publish={publishRun} publishLabel={selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}/>}
       </div>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-results" aria-label="活动进度与结果" hidden={compact&&panel!=='results'}>

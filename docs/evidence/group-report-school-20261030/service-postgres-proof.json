@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "syntheticContentRegistry": true,
+  "realSchoolServiceAuthorityCanonicalStatsAndArtifact": true,
+  "selectedPeople": 10,
+  "assignedPeople": 20,
+  "generationCanonical": 10,
+  "readCanonical": 0,
+  "operations": {
+    "generate": 38,
+    "read": 17
+  },
+  "generationMs": 188,
+  "readMs": 26,
+  "measurement": "explicit updated version generation versus its immediate persisted read",
+  "resumedFirstArtifact": true,
+  "immutableOldVersion": true,
+  "frozenRangeAfterRename": true,
+  "currentAuthorityRevocation": true,
+  "specIndependentReviewReal": true,
+  "productionAccessed": false
+}

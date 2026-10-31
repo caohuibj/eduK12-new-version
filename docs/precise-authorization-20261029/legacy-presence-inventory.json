@@ -1,0 +1,64 @@
+{
+  "at": "2026-10-29T18:44:49.922650+00:00",
+  "scope": "Presence inventory only; not trusted identity validation, migration execution, production counts or full dry-run qualification",
+  "rows": [
+    {
+      "database": "precise_general_test_20261029",
+      "counts": {
+        "users": 4,
+        "privateTools": 0,
+        "surveyGrants": 0,
+        "compositeTasks": 3,
+        "privateVersions": 0,
+        "surveyPublications": 0,
+        "surveyWithBindingMarker": 0,
+        "trainingCombinationGrants": 2,
+        "educationStandardUseGrants": 0,
+        "surveyWithoutBindingMarker": 0,
+        "trainingHistoricalTypedAudits": 1,
+        "educationHistoricalTypedAudits": 0
+      },
+      "readOnly": true
+    },
+    {
+      "database": "precise_education_lifecycle_test_20261029",
+      "counts": {
+        "users": 19,
+        "privateTools": 4,
+        "surveyGrants": 0,
+        "compositeTasks": 6,
+        "privateVersions": 4,
+        "surveyPublications": 0,
+        "surveyWithBindingMarker": 0,
+        "trainingCombinationGrants": 0,
+        "educationStandardUseGrants": 5,
+        "surveyWithoutBindingMarker": 0,
+        "trainingHistoricalTypedAudits": 0,
+        "educationHistoricalTypedAudits": 5
+      },
+      "readOnly": true
+    },
+    {
+      "database": "precise_survey_standard_use_test_20261029",
+      "counts": {
+        "users": 11,
+        "privateTools": 0,
+        "surveyGrants": 5,
+        "compositeTasks": 0,
+        "privateVersions": 0,
+        "surveyPublications": 3,
+        "surveyWithBindingMarker": 4,
+        "trainingCombinationGrants": 0,
+        "educationStandardUseGrants": 3,
+        "surveyWithoutBindingMarker": 1,
+        "trainingHistoricalTypedAudits": 0,
+        "educationHistoricalTypedAudits": 3
+      },
+      "readOnly": true
+    }
+  ],
+  "sourceCommit": "564209f580089346f66d4d8e9d6bf668d39db22c plus recorded Survey UI/HTTP WIP",
+  "execution": "psql -X -U materials_owner -At -v ON_ERROR_STOP=1 via localhost task-owned PG container; BEGIN REPEATABLE READ READ ONLY, SELECT aggregate counts, COMMIT; exit0 for each of3 explicit retained synthetic databases",
+  "noBackfill": true,
+  "classificationNotYetValidated": "Marker presence is not trusted binding, valid current authority or proposed migration acceptance. No production inventory or write."
+}

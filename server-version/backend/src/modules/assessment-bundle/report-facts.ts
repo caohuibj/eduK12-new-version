@@ -271,6 +271,8 @@ export const projectBundleReportFacts = (input: {
 }
 
 export interface BundleAudienceProjectionV1 {
+  /** Additive server-projected Profile capability; absent from historical reports. */
+  profileView?: import('./profile/report').ProfileView
   audience: BundleReportAudienceV1
   identity: BundleReportFactsV1['identity']
   quality: BundleReportFactsV1['quality']

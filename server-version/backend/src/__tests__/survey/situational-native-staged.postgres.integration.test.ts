@@ -109,6 +109,10 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     expect(final.status).toBe('COMPLETED')
     const report=await readGeneralForOwnAttempt(f.proof)
     expect(report.kind).toBe('DESCRIPTIVE')
+    // Fresh FINAL consumes the same authorized projector without rereading the
+    // saved cipher. The independent reader still reauthorizes history.
+    expect((final as any).participantFeedbackReceipt).toEqual(report)
+    expect(JSON.stringify((final as any).participantFeedbackReceipt)).not.toMatch(/rawAnswers|privateScoring|researchCapture|expertKey/)
     const source=await loadSurveySource({actorUserId:owner,projectId,waveIds:[f.waveId],includeAttendance:false})
     expect(source.scores[0].value).toBe(trainingResult.result!.metrics.find(metric=>metric.key==='coordination')!.value)
     expect(source.scores[0].value).toBe(5)

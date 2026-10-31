@@ -1,0 +1,15 @@
+{
+  "status": "prepared only; not applied; shared-owner coordination via DOT",
+  "changes": [
+    {
+      "path": "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+      "before": "ff6bb5f3cb8f72f8da6d9ad7229d1625515010ec",
+      "proposedAfter": "8d290123929e9f6dca82492572e08118f6dd2546"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+      "before": "caca09d42ced85f2590e2b31e377455c8c46472f",
+      "proposedAfter": "2237597e5f3b2da6b6e5f1698aac578226bd5435"
+    }
+  ]
+}

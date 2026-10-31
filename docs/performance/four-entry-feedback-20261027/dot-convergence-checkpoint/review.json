@@ -1,0 +1,47 @@
+{
+  "base": "79de674ee7788feeeab10d5b37c1d74b0aadf1fc",
+  "integratedRuntime": "5e86cb0377b2337f33ba3220cce1044b6e4cee2c",
+  "integratedDisabledCI": "c8812586cee9844b49a9b19735c2be5885e35e1b",
+  "scope": "System optimization development/review consolidated to dot local. Cognitive domain tasks continue separately.",
+  "rootReview": [
+    "Read actual browser source, fixture and canonical output contract; real browser/seed/startup remain NOTRUN.",
+    "Read actual Scale marker two PG journeys and verify gzip/raw hashes; grade-adjustment School-only follow-up retained.",
+    "Require both managementReads in the formal browser receipt, not just participant cases.",
+    "Add fixed verbose-log reader: parse original pass/fail/filtered rows and require original totals agree; it is an in-memory view, not a newly executed test report.",
+    "Add one Actions-only additive schema/nonempty restore consumer; only syntax reviewed so far, no local migration/restore run or pass claimed."
+  ],
+  "newChecks": [
+    {
+      "command": "node --test --test-name-pattern='browser|report' .github/scripts/pr363-controls.test.mjs",
+      "exit": 0,
+      "passed": 6,
+      "artifact": "pr363-browser-reader-control.log"
+    },
+    {
+      "command": "node --test --test-name-pattern='fixed verbose originals' .github/scripts/pr363-controls.test.mjs",
+      "exit": 0,
+      "passed": 1,
+      "artifact": "pr363-verbose-reader-control.log"
+    },
+    {
+      "command": "node --check server-version/e2e/pr363-database.cjs",
+      "exit": 0,
+      "kind": "syntax only"
+    }
+  ],
+  "node": "24.22.1",
+  "readOnlyOriginalParsing": {
+    "phase4/r4": "8 pass",
+    "phase4/r5": "2 pass,8 filtered",
+    "phase6/r2": "2 pass",
+    "phase6/r3": "1 pass,1 filtered",
+    "newApplicationExecution": false
+  },
+  "notReady": [
+    "Historical original execution/source/runtime proof mappings and root decisions still need finalization.",
+    "Execution commands/outcomes and full source/control bindings not frozen.",
+    "Actual browser, upgrade/restore, build,scan,CodeQL and CI not executed."
+  ],
+  "originalsPreserved": true,
+  "notDeployed": true
+}

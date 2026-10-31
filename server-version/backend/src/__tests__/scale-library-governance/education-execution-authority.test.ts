@@ -5,11 +5,12 @@ import {assertCurrentRunStartAuthority} from '../../modules/assessment-run/start
 
 function accountProbe(rows:unknown[][]){
  const sql:string[]=[]
- const tx={$queryRaw:vi.fn(async(first:any,...values:any[])=>{
+ const controls:string[]=[]
+ const tx={$executeRaw:vi.fn(async(first:any,...values:any[])=>{controls.push(Prisma.sql(first,...values).sql);return 0}),$queryRaw:vi.fn(async(first:any,...values:any[])=>{
   const query=Array.isArray(first)?Prisma.sql(first as any,...values):first
   sql.push(query.sql);return rows.shift()??[]
  })} as unknown as Prisma.TransactionClient
- return {tx,sql}
+ return {tx,sql,controls}
 }
 describe('education execution purpose and account-lock boundary',()=>{
  it('keeps default collection denies and rejects School Training fallback',()=>{
@@ -74,6 +75,15 @@ describe('education execution purpose and account-lock boundary',()=>{
   if(final)await expect(call).resolves.toBeUndefined()
   else await expect(call).rejects.toMatchObject({code:'RUN_INTAKE_CLOSED'})
   expect(p.sql[1]).not.toContain('FOR SHARE OF u')
+ })
+
+ it.each(['accountsCurrent','populationCurrent'] as const)('planner bound preserves current %s refusal',async(field)=>{
+  const p=accountProbe([[{id:'execution'}],[{valid:true}],[{organizationId:'org',active:true}],
+   [{valid:true,denied:false}],[],[{kind:'SELF',ref:null,facts:{}}],[{accountsCurrent:true,populationCurrent:true,intakeOpen:true,[field]:false}]])
+  await expect(assertCurrentRunStartAuthority(p.tx,'execution',{accountMode:'DETECT_EDUCATION_LIBRARY'})).rejects.toMatchObject({code:field==='accountsCurrent'?'RUN_ACCOUNT_INACTIVE':'RUN_ACTOR_AUTHORITY_REVOKED'})
+  expect(p.controls).toEqual(['SET LOCAL join_collapse_limit = 1'])
+  expect(p.sql.at(-1)).toContain('statement_timestamp()')
+  expect(p.sql.at(-1)).toContain('populationCurrent')
  })
 
 })

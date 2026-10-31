@@ -1,9 +1,15 @@
 import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
+import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
+import {lockCompositionLibraryUses,assertLockedLibraryUseTime,type LockedEducationLibraryUses} from '../education-tools/library-source.use'
+import {privateCompositionRunTrackInput} from '../education-tools/private-tool.run-contract'
+import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
+import {isStudentCompositionKey} from '../huiteacher/studentComposition.policy'
+import {assertStudentCompositionRunUse,assertStudentCompositionSelection} from '../huiteacher/studentCompositionResource'
 import {assertPrivateScaleRunResource,assertPrivateFormRunResource} from './educationPrivateScaleContext'
-import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection} from '../education-tools/private-tool.run-contract'
+import {privateRunTrackInput,privateFormRunTrackInput,assertPrivateRunSelection,assertPrivateAdministrationSelection} from '../education-tools/private-tool.run-contract'
 import {assertRunTrackNarrowing,relationalEntryToRunPolicy} from './resourceAuthority'
 import {assertEducationLibraryPopulationSupport} from './educationLibraryPopulation'
-import {assertEducationRunLibraryResources} from './educationLibraryContext'
+import {assertEducationRunLibraryResources,readEducationRunLibraryContext,lockAndAssertEducationRunWorkflow} from './educationLibraryContext'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -18,6 +24,8 @@ export type RunActorRole = 'TEACHER' | 'STUDENT' | 'COUNSELOR' | 'CLIENT' | 'PAR
 type Tx = Prisma.TransactionClient
 
 export interface AssessmentRunRecord {
+  personalTrackingBaselineId?:string|null
+  personalTrackingOrdinal?:number|null
   id: string
   organizationId: string
   name: string
@@ -67,7 +75,8 @@ export class AssessmentRunRepositoryError extends Error {
 const runProjection = `
   "id", "organization_id" AS "organizationId", "name", "status", "version",
   "created_by_user_id" AS "createdByUserId", "intake_deadline" AS "intakeDeadline",
-  "published_at" AS "publishedAt", "closed_at" AS "closedAt", "cancelled_at" AS "cancelledAt"
+  "published_at" AS "publishedAt", "closed_at" AS "closedAt", "cancelled_at" AS "cancelledAt",
+  personal_tracking_baseline_id AS "personalTrackingBaselineId",personal_tracking_ordinal AS "personalTrackingOrdinal"
 `
 
 export async function createAssessmentRunDraft(input: {
@@ -102,10 +111,56 @@ export async function addAssessmentRunTrackDraft(input: {
   requestedPolicy: RunTrackNarrowingRequest
   actorUserId?: string
   expectedVersion?: number
+  expectedRunId?:string
+  educationWorkflow?:{product:'SCHOOL'|'TEACHER';id:string}
+  privateComposition?:{versionId:string;contentHash:string}
+  privateCompositionLibraryLocks?:{proof:LockedEducationLibraryUses|undefined}
   // Trusted product adapter can bind draft + track in the same transaction.
   tx?: Tx
 }): Promise<AssessmentRunTrackRecord> {
   const work=async (tx:Tx) => {
+    const composition=input.resource.key.startsWith('education-composition:')
+    let compositionLibraryUses:LockedEducationLibraryUses|undefined
+    if(input.resource.key.startsWith('education-assessment:')||composition){
+      if(!input.actorUserId||input.expectedVersion===undefined||!Number.isSafeInteger(input.expectedVersion)||input.expectedVersion<1)
+        throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_EXPECTED_VERSION_REQUIRED','Current editor and exact draft version required',400)
+      if(input.expectedRunId!==input.runId||!input.educationWorkflow)
+        throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_EXPECTED_RUN_REQUIRED','Exact workflow and run binding required',409)
+      const workflow=await readEducationRunLibraryContext(tx,input)
+      if(!workflow||workflow.product!==input.educationWorkflow.product
+        ||(workflow.product==='TEACHER'?workflow.teacherEventId:workflow.schoolCourseId)!==input.educationWorkflow.id)
+        throw new AssessmentRunRepositoryError('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED','Exact education workflow required',403)
+      const libraryUses=composition?(input.privateCompositionLibraryLocks?input.privateCompositionLibraryLocks.proof:await lockCompositionLibraryUses(tx,{entry:workflow.product,organizationId:input.organizationId,
+        principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},[input.resource.key])):undefined
+      compositionLibraryUses=libraryUses
+      const current=await lockAndAssertEducationRunWorkflow(tx,{...input,actorUserId:input.actorUserId,purpose:'EDIT'},workflow)
+      if(!composition&&workflow.product==='TEACHER'&&await tx.huiteacherStudentEvaluationConfig.findUnique({where:{
+        organizationId_eventId:{organizationId:input.organizationId,eventId:input.educationWorkflow.id}},select:{id:true}}))
+        throw new AssessmentRunRepositoryError('HUITEACHER_STUDENT_EVAL_TRACK_READONLY','Student evaluation tracks require their protected workflow',403)
+      if(composition){
+        const selected=privateCompositionRunTrackInput.parse({expectedVersion:input.expectedVersion,privateComposition:input.privateComposition,
+          subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector,targetPolicy:input.requestedPolicy.targetPolicy})
+        let editor:{context:import('../education-tools/private-tool.contracts').PrivateToolContext;schoolAdmin:boolean}
+        if(isStudentCompositionKey(input.resource.key)){
+          const protectedScope=await assertStudentCompositionRunUse(tx,{...input,actorUserId:input.actorUserId,ref:input.resource})
+          assertStudentCompositionSelection({...selected,requestedPolicy:input.requestedPolicy},protectedScope)
+          editor={context:{entry:'TEACHER',organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},schoolAdmin:false}
+        }else editor=await assertPrivateScaleRunWorkflow(tx,{...input,actorUserId:input.actorUserId},current)
+        const sources=await readPrivateCompositionRunSources(tx,editor.context,[input.resource],{lockForUse:true,libraryUses}),source=sources.get(input.resource.key)!
+        if(source.origin.versionId!==selected.privateComposition.versionId||source.origin.contentHash!==selected.privateComposition.contentHash)
+          throw new AssessmentRunRepositoryError('PRIVATE_COMPOSITION_VERSION_MISMATCH','Exact fixed version required',409)
+        const mode=source.origin.variantKey.split(':')[1]
+        assertPrivateAdministrationSelection(mode,selected)
+        if(editor.context.entry==='SCHOOL'&&!editor.schoolAdmin&&mode==='TEACHER_REPORT'&&selected.targetPolicy?.mode!=='HOMEROOM_TEACHER')
+          throw new AssessmentRunRepositoryError('PRIVATE_TOOL_HOMEROOM_TARGET_REQUIRED','Psychology drafts require explicit homeroom target',403)
+        assertEducationLibraryPopulationSupport([input])
+        assertRunTrackNarrowing(source.policy,input.requestedPolicy)
+      }else{
+        const {assertEducationAssessmentRunUse}=await import('../education-tools/assessment-resource.authority')
+        const source=await assertEducationAssessmentRunUse(tx,{...input,actorUserId:input.actorUserId})
+        assertRunTrackNarrowing(relationalEntryToRunPolicy(source.entry),input.requestedPolicy)
+      }
+    }
     if(input.resource.key.startsWith('library-scale:'))assertEducationLibraryPopulationSupport([input])
     if(input.resource.key.startsWith('private-scale:')||input.resource.key.startsWith('private-form:')){
       const form=input.resource.key.startsWith('private-form:')
@@ -121,7 +176,7 @@ export async function addAssessmentRunTrackDraft(input: {
         throw new AssessmentRunRepositoryError('PRIVATE_TOOL_HOMEROOM_TARGET_REQUIRED','Psychology drafts require explicit homeroom target',403)
       assertEducationLibraryPopulationSupport([input])
       assertRunTrackNarrowing(form?privateFormDraftResourcePolicy(checked.source):relationalEntryToRunPolicy(checked.source.resourceEntry),input.requestedPolicy)
-    }else if(input.actorUserId)await assertEducationRunLibraryResources(tx,{...input,actorUserId:input.actorUserId,resources:[input.resource],purpose:'EDIT'})
+    }else if(input.actorUserId&&!composition)await assertEducationRunLibraryResources(tx,{...input,actorUserId:input.actorUserId,resources:[input.resource],purpose:'EDIT'})
     else if(input.resource.key.startsWith('library-scale:'))throw new AssessmentRunRepositoryError('EDUCATION_LIBRARY_ACTOR_REQUIRED','Current editor required',403)
     const runs = await tx.$queryRaw<Array<{ status: AssessmentRunStatus; version:number }>>`
       SELECT "status", "version" FROM "assessment_runs"
@@ -134,6 +189,7 @@ export async function addAssessmentRunTrackDraft(input: {
     }
     if(input.expectedVersion!==undefined&&runs[0].version!==input.expectedVersion)
       throw new AssessmentRunRepositoryError('RUN_VERSION_CONFLICT','Draft version changed',409)
+    await assertLockedLibraryUseTime(tx,compositionLibraryUses)
     const id = randomUUID()
     const subjectJson = JSON.stringify(input.subjectSelector ?? {})
     const respondentJson = JSON.stringify(input.respondentSelector ?? {})
@@ -270,4 +326,20 @@ export async function insertRunExecution(tx: Tx, input: {
     RETURNING "id"
   `
   return rows[0]
+}
+
+/** Draft-only native authoring; published/frozen reports are never removed. */
+export async function removeAssessmentRunTrackDraft(input:{organizationId:string;runId:string;trackId:string;expectedVersion:number;tx?:Tx}){
+ const work=async(tx:Tx)=>{
+  const [run]=await tx.$queryRaw<Array<{status:string;version:number}>>`SELECT status,version FROM assessment_runs WHERE organization_id=${input.organizationId} AND id=${input.runId} FOR UPDATE`
+  if(!run||run.status!=='DRAFT')throw new AssessmentRunRepositoryError('RUN_NOT_DRAFT','Only an unpublished draft may change sources',409)
+  if(run.version!==input.expectedVersion)throw new AssessmentRunRepositoryError('RUN_VERSION_CONFLICT','Re-read the current draft version',409)
+  const executions=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM assessment_run_executions WHERE organization_id=${input.organizationId} AND run_id=${input.runId} LIMIT 1`
+  if(executions.length)throw new AssessmentRunRepositoryError('RUN_HAS_EXECUTIONS','An admitted runtime source cannot be removed',409)
+  const removed=await tx.$executeRaw`DELETE FROM assessment_run_tracks WHERE organization_id=${input.organizationId} AND run_id=${input.runId} AND id=${input.trackId}`
+  if(!removed)throw new AssessmentRunRepositoryError('TRACK_NOT_FOUND','Draft source not found',404)
+  const [next]=await tx.$queryRaw<Array<{version:number}>>`UPDATE assessment_runs SET version=version+1 WHERE organization_id=${input.organizationId} AND id=${input.runId} RETURNING version`
+  return {removedTrackId:input.trackId,version:next.version}
+ }
+ return input.tx?work(input.tx):prisma.$transaction(work)
 }

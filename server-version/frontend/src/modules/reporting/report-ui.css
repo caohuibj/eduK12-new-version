@@ -731,3 +731,19 @@
   }
 }
 .report-primary-score .report-range__heading strong { font-size:1.5rem; }
+
+
+/* Keep Scale report surfaces paired with Training's dark text tokens. Other
+ * report families, light mode and printed reports retain their own styling. */
+@media screen {
+  .hui-training[data-training-theme="dark"] .scale-unit-report :is(.report-core,.report-metric,.report-range,.report-feedback) {
+    background: var(--training-raised, #253029);
+    border-color: var(--training-border, #354339);
+  }
+  .hui-training[data-training-theme="dark"] .scale-unit-report :is(.report-feedback p,.report-feedback ul,.report-details__body) {
+    color: var(--training-ink, #e5e9df);
+  }
+  .hui-training[data-training-theme="dark"] .scale-unit-report :is(p, ul).text-amber-700 {
+    color: var(--hui-ds-status-warning-text, #e7cc92);
+  }
+}

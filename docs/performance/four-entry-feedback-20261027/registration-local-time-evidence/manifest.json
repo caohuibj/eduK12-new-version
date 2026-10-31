@@ -1,0 +1,47 @@
+{
+  "kind": "unsigned local consumer evidence; post-execution source observation",
+  "base": "4fad823fc4fe97b45b49e360085f51e0fa3e6a9e",
+  "inputs": {
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": "a04895401da3ced4320d9f13e42b557928c46d5743fae3ccbd006df0022eea5d",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": "9cf2c3d8c13069a628b249fe354970dd9edafc7c34bc2c4f4ae396911b916824",
+    "server-version/frontend/src/components/LocalDateTimeInput.tsx": "634c6bd0ac7500eec5a0fa8ca08ea3e36308cdaa7d14ddd14d277bb0c3ce58cd",
+    "server-version/frontend/src/utils/dateTime.ts": "101adc7c2898b177458e18162388d9cdf25ff2d7097244c3ace1d1b93973f928"
+  },
+  "artifacts": {
+    "local-time.json": {
+      "sha256": "c552bb24030b1b44d9a5c019705678ddbfe4f0012ffe37e22aaddbfd8ad4c367",
+      "decodedSha256": "c552bb24030b1b44d9a5c019705678ddbfe4f0012ffe37e22aaddbfd8ad4c367"
+    },
+    "local-time.log.gz": {
+      "sha256": "305aaf6c310deae4b7123aed62bb65fc7b6c1729d91eb1719b94bb219c30a205",
+      "decodedSha256": "8e206b8d405b37ad3fe753e3766b8ef34e2073669bcc59be50bcca5d5b9c9f16"
+    },
+    "local-time-types.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "decodedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "local-time-lint.log.gz": {
+      "sha256": "0108007425af5b29b8d02746c3dbc2c072d09f8fb81b21f19e97e1e793013fe5",
+      "decodedSha256": "fddb4ea03693e54ef15a7de5f9465950afba80a3e730ec32f87b3fe958a1fd4a"
+    }
+  },
+  "commands": [
+    {
+      "command": "TZ=Asia/Shanghai node node_modules/vitest/vitest.mjs run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'freezes exact' --reporter=json",
+      "exit": 0,
+      "passed": 1,
+      "filtered": 8
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exit": 0
+    },
+    {
+      "command": "node node_modules/eslint/bin/eslint.js src/components/education-tools/EducationAssessmentRegistrationPanel.tsx src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 1
+    }
+  ],
+  "pending": "Exact licenses DTO integration; no real source PG/browser/CI results"
+}

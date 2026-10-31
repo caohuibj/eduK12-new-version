@@ -1,0 +1,60 @@
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 2
+INSERT 0 1
+INSERT 0 2
+CREATE TABLE
+CREATE INDEX
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+                                      result                                       
+-----------------------------------------------------------------------------------
+ 8 rejection assertions and DRAFT->REVIEWED->PUBLISHED->RETIRED transitions passed
+(1 row)
+

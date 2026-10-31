@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "base": "61cfb2a3f5a8c5a714d70878654feb1417d00534",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "recordedAt": "2026-10-29T22:24:25.901675+00:00",
+  "scope": "Training COURSE exact full-R grant through protected creation/publication, normal course enrollment, authenticated START, ordinary revoke, native SCALE FINAL/retry and frozen teacher report. Test-only delta.",
+  "results": {
+    "distinctPassedCases": 2,
+    "notOneFullCleanInvocation": true,
+    "firstInvocationPassed": 1,
+    "firstInvocationFailed": 1,
+    "finalInvocationPassed": 1,
+    "finalInvocationFiltered": 1,
+    "recordedHttpRequests": 21,
+    "finalOfficialNodeClosureTypesExit": 0,
+    "taskAttempts": 1,
+    "originalOtherTasksUnchanged": 12,
+    "originalUsersUnchanged": 4,
+    "normalNewStudentEnrollments": 2,
+    "sourceUseFrozenRevision": 7,
+    "ordinaryRevokedPhysicalRevision": 8
+  },
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost55439 owner role",
+    "database": "precise_training_course_journey_test_20261029",
+    "template": "precise_training_replacement_test_20261029 unchanged",
+    "redis": "localhost:56389/5 normal limits",
+    "productionAccessed": false,
+    "realMfaCeremony": false
+  },
+  "raw": {
+    "file": "training-course-journey-raw.json",
+    "sha256": "cf368f1e99e13a38425d6ac7fc00d2ecb38853f03f0c6b4c74991ffc003c553b"
+  },
+  "finalFilesSha256": {
+    "server-version/backend/src/__tests__/assessment-authorization/training-course-exact-journey.http.postgres.integration.test.ts": "3beb2485b78b7c700fd549bb93b761de9eb762f2d96477a7dc11a0b310ed397a"
+  },
+  "evidenceLimit": "Post-execution final source inventory, not signed historical dependencies/formal CI. Prior successful create/enrollment/START/revoke/form work read back and not replayed; final used original untimed snapshot.",
+  "notExecuted": [
+    "browser/human experience",
+    "runtime DB role",
+    "same-environment latency/load comparison",
+    "three-scale synthetic report replay",
+    "formal CI/PR/merge/deployment"
+  ]
+}

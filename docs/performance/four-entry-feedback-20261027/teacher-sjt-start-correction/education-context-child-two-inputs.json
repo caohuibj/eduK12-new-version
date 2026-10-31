@@ -1,0 +1,41 @@
+{
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/integration/education-start-context.test.ts",
+      "mode": "100644",
+      "blob": "9c68a23244ba35ffd12e3afa8929a26693ed3978"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+      "mode": "100644",
+      "blob": "eaaf9def6fba07c36979908548737b27116da99c"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+      "mode": "100644",
+      "blob": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "mode": "100644",
+      "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    }
+  ],
+  "environment": {
+    "node": "v24.22.1",
+    "kind": "root local diagnostic pure/mock contract, not Actions"
+  },
+  "dependencies": {
+    "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "installedByteManifest": "not retained"
+  },
+  "tools": {
+    "vitest": "4.1.11",
+    "binaryHash": "not retained"
+  },
+  "generated": {
+    "kind": "No contemporaneous generated binary manifest; no database exercised by these unit cases"
+  },
+  "sourceCapture": "Post-execution committed checkpoint. First report predates appending the two child cases/functions; selected first-two function bodies are unchanged. Original uncommitted file byte snapshots were not retained. Tool output log is the retained command-result stdout excerpt, not a claimed complete raw stream.",
+  "checkpoint": "243c866789f67d2d85c61c70daa1e3f7e491de30"
+}

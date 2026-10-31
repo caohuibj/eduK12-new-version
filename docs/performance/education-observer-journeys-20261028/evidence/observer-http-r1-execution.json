@@ -1,0 +1,9 @@
+{
+  "exitCode": 1,
+  "seconds": 9.343075620010495,
+  "head": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "node": "v24.22.1",
+  "scope": "School observer real password login, CSRF and HTTP route chain; synthetic setup, no browser claim"
+}

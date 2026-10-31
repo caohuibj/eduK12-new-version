@@ -1,0 +1,122 @@
+prisma:error 
+Invalid `db.assessment.findMany()` invocation in
+/tmp/pr374-cloud/http.ts:39:40
+
+  36 const replay=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra);assert.equal(replay.replayed,true);row.sameSubmissionReplay=true
+  37 const changed=await client.raw('POST',path+'/items/'+item.id+'/scale/submit',{...submission,answers:submission.answers.map((a:any,i:number)=>i? a:{...a,responseValue:'4'})},extra);assert.equal(changed.status,409);row.changedReplayDenied=true
+  38 const reopened=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(reopened.status,'COMPLETED');row.reopenedCompleted=true
+→ 39 const assessments=await db.assessment.findMany({
+       where: {
+         compositeAttemptId: "d0300f43-5a09-4630-ad8a-d125dafd92a1"
+       },
+       select: {
+         id: true,
+         status: true,
+         results: true,
+         ~~~~~~~
+         submissionId: true,
+     ?   timingEncrypted?: true,
+     ?   scaleId?: true,
+     ?   userId?: true,
+     ?   deliveryMode?: true,
+     ?   runtimeGeneration?: true,
+     ?   attemptEpoch?: true,
+     ?   submissionPayloadHash?: true,
+     ?   submissionCompletedAt?: true,
+     ?   answers?: true,
+     ?   answersRevision?: true,
+     ?   result?: true,
+     ?   runtimeSnapshotEncrypted?: true,
+     ?   compiledRuntimeHash?: true,
+     ?   frozenAdmissionSnapshotEncrypted?: true,
+     ?   frozenAdmissionSnapshotHash?: true,
+     ?   progress?: true,
+     ?   startedAt?: true,
+     ?   completedAt?: true,
+     ?   totalTime?: true,
+     ?   questionnaireAssessmentId?: true,
+     ?   compositeAttemptId?: true,
+     ?   compositeItemId?: true,
+     ?   subjectUserId?: true,
+     ?   respondentUserId?: true,
+     ?   respondentType?: true,
+     ?   episodeId?: true,
+     ?   assignmentRef?: true,
+     ?   consentId?: true,
+     ?   contextSnapshotRef?: true,
+     ?   resultFacts?: true,
+     ?   scale?: true,
+     ?   user?: true,
+     ?   episode?: true,
+     ?   consent?: true,
+     ?   questionnaireAssessment?: true,
+     ?   compositeAttempt?: true,
+     ?   compositeItem?: true,
+     ?   _count?: true
+       }
+     })
+
+Unknown field `results` for select statement on model `Assessment`. Available options are marked with ?.
+School authenticated approved student: exact target R -> START/resume/FINAL/replay/report 
+Invalid `db.assessment.findMany()` invocation in
+/tmp/pr374-cloud/http.ts:39:40
+
+  36 const replay=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra);assert.equal(replay.replayed,true);row.sameSubmissionReplay=true
+  37 const changed=await client.raw('POST',path+'/items/'+item.id+'/scale/submit',{...submission,answers:submission.answers.map((a:any,i:number)=>i? a:{...a,responseValue:'4'})},extra);assert.equal(changed.status,409);row.changedReplayDenied=true
+  38 const reopened=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(reopened.status,'COMPLETED');row.reopenedCompleted=true
+→ 39 const assessments=await db.assessment.findMany({
+       where: {
+         compositeAttemptId: "d0300f43-5a09-4630-ad8a-d125dafd92a1"
+       },
+       select: {
+         id: true,
+         status: true,
+         results: true,
+         ~~~~~~~
+         submissionId: true,
+     ?   timingEncrypted?: true,
+     ?   scaleId?: true,
+     ?   userId?: true,
+     ?   deliveryMode?: true,
+     ?   runtimeGeneration?: true,
+     ?   attemptEpoch?: true,
+     ?   submissionPayloadHash?: true,
+     ?   submissionCompletedAt?: true,
+     ?   answers?: true,
+     ?   answersRevision?: true,
+     ?   result?: true,
+     ?   runtimeSnapshotEncrypted?: true,
+     ?   compiledRuntimeHash?: true,
+     ?   frozenAdmissionSnapshotEncrypted?: true,
+     ?   frozenAdmissionSnapshotHash?: true,
+     ?   progress?: true,
+     ?   startedAt?: true,
+     ?   completedAt?: true,
+     ?   totalTime?: true,
+     ?   questionnaireAssessmentId?: true,
+     ?   compositeAttemptId?: true,
+     ?   compositeItemId?: true,
+     ?   subjectUserId?: true,
+     ?   respondentUserId?: true,
+     ?   respondentType?: true,
+     ?   episodeId?: true,
+     ?   assignmentRef?: true,
+     ?   consentId?: true,
+     ?   contextSnapshotRef?: true,
+     ?   resultFacts?: true,
+     ?   scale?: true,
+     ?   user?: true,
+     ?   episode?: true,
+     ?   consent?: true,
+     ?   questionnaireAssessment?: true,
+     ?   compositeAttempt?: true,
+     ?   compositeItem?: true,
+     ?   _count?: true
+       }
+     })
+
+Unknown field `results` for select statement on model `Assessment`. Available options are marked with ?.
+Teacher authenticated same-person SELF: exact target R -> START/resume/FINAL/replay/report GET /api/huiteacher/assessment-composite-attempts/9591e94d-e4d0-41cf-9ece-f73a355c6c5d?view=current-unit {"code":"STALE_ATTEMPT","message":"ELIGIBILITY_INELIGIBLE:RESPONDENT_TYPE_NOT_ALLOWED","data":null}
+
+409 !== 200
+

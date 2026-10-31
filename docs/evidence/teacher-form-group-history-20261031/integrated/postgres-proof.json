@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "syntheticPointers": 105,
+  "pages": 2,
+  "equalTimestampMicroseconds": "123456",
+  "uniquePointers": 105,
+  "otherEventExcluded": true,
+  "existingVersionReadable": true,
+  "finalQueries": 0,
+  "regeneratedReports": 0,
+  "productionAccessed": false
+}

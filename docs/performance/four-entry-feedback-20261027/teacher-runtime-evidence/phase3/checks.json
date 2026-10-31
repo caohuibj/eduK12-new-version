@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "unsigned local targeted diagnostic results, not CI admission",
+  "branch": "feat/pr363-teacher-runtime",
+  "rootDependency": "0e3d210d63ae1b6c74835265e12943cf6e84ec4e",
+  "productCommit": "06f8400f77b7d550c72e299a307dba707f2e4067",
+  "productTree": "a7fdb443e7ad1c0f6248aca05de6e12936d82d5a",
+  "producer": "actual issueAdminContentRoot + prepare/register/independent REVIEW/PUBLISH with synthetic content and accounts",
+  "pgDatabase": "pr363_runtime_test",
+  "restrictedRuntimeRole": true,
+  "originalEvidenceModified": false,
+  "formalCI": false,
+  "browser": false,
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+      "sha256": "eb7b34960b7f9776cb194d39596b8beabc394aa318035f0f4095e6304556e322"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+      "sha256": "46528ab72d2b915c63ec0577af2a3ff0cc14a4de78555be36a290b7521fa3f2f"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.routes.test.ts",
+      "sha256": "70b9dc9460ed689a04dd324ea3424feb5eb271c11134a2f0c6904ab685843297"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+      "sha256": "79e84c66bf92062e48d116ec8c3ef96c81998881264f6b7fcb1803a49af43a83"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+      "sha256": "f426d35d60781f8137bbdcda72fcd418ab608a10256e6420651afb938a97bde2"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.source.ts",
+      "sha256": "0fe6729e252fc52b5fbddcb3ac70b951698143cbaa2e2e296d6cd1f578e0187e"
+    }
+  ],
+  "checks": [
+    {
+      "log": "pg-distribution-r1.log",
+      "rawSha256": "f589dbe66363fe144d496dbe0817a1f23ab1a5a617f1d5e1800397d349d9d601",
+      "note": "exit1: fixture incorrectly expected transition DTO to contain entry; actual producer completed, use real identity reader",
+      "exit": 1,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|exact distribution",
+        "--reporter=verbose"
+      ],
+      "archive": "pg-distribution-r1.log.gz",
+      "archiveSha256": "65461bb1f65f9fd890342ad823e1d99c83d8f00e9a07c13d097bde5eb090e706"
+    },
+    {
+      "log": "pg-distribution-r2.log",
+      "rawSha256": "304f70d253d2dd8f26b1db914848690b8c10f58a0edf58cf99c8bd7aaf06b44c",
+      "note": "exit1: fixture missing current management expectedRunId/expectedVersion",
+      "exit": 1,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|exact distribution",
+        "--reporter=verbose"
+      ],
+      "archive": "pg-distribution-r2.log.gz",
+      "archiveSha256": "f4675291388761b90eb0fdc660b57acd7374529775d0f83e1d0a984e0684c9c0"
+    },
+    {
+      "log": "pg-distribution-r3.log",
+      "rawSha256": "02a319cb38799fbeec823beaa8c594749967632387530c60e3f8e4a6d28bf931",
+      "note": "exit1: original mixed journey passed; withdrawn grant exposed missing HTTP mapping for ContentAuthorityError (500)",
+      "exit": 1,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|exact distribution",
+        "--reporter=verbose"
+      ],
+      "archive": "pg-distribution-r3.log.gz",
+      "archiveSha256": "251d54ed64438c2f5689774b5c453fd429f71909af3c02ede86db6ab3d1dfba8"
+    },
+    {
+      "log": "pg-distribution-r4.log",
+      "rawSha256": "e95221dc39728de0d926afd32188c4df597db59d1d7020dcd6fac711a6d98a7e",
+      "note": "exit1: dedicated SJT and Cognitive passed; new START correctly 403; list still included revoked task because identityOnly reader does not authorize distribution",
+      "exit": 1,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "dedicated SJT|dedicated Cognitive|exact distribution",
+        "--reporter=verbose"
+      ],
+      "archive": "pg-distribution-r4.log.gz",
+      "archiveSha256": "3d1683a72855411b0d8637d4d57b381192b8729cae7a40a8d72795e0e2b0ad05"
+    },
+    {
+      "log": "pg-distribution-r5.log",
+      "rawSha256": "1dadf4d9c6362767ef7f514b653f9aa87d3db9c520509d77d8e04fb76c0b181b",
+      "note": "exit0: shared distribution helper on unstarted Teacher source; new START403/list empty, exact bound mixed restore/FINAL COMPLETED and three durable snapshots",
+      "exit": 0,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "exact distribution",
+        "--reporter=verbose"
+      ],
+      "archive": "pg-distribution-r5.log.gz",
+      "archiveSha256": "2348e3a8d0cb58728b567eb40e877d43d34c6b54d5555cd0006703e9a82aebd0"
+    },
+    {
+      "log": "page-whitelist.log",
+      "rawSha256": "bc3a2874c0fb6375059c2c25d1111582c244411cb6820fd6cc49d070940f9d3a",
+      "note": "exit0: two selected synthetic assertions; bounded unavailable page retains cursor, corrupt identity/unknown409/DB error propagate",
+      "exit": 0,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.routes.test.ts",
+        "-t",
+        "bounded page|propagates identity",
+        "--reporter=verbose"
+      ],
+      "archive": "page-whitelist.log.gz",
+      "archiveSha256": "216f856125a07b061f0d91e35a947f961228d09b0b7a797d01959e0ba8a86d34"
+    },
+    {
+      "log": "types-distribution.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "exit0: diagnostic intermediate types, not final snapshot",
+      "exit": 0,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ]
+    },
+    {
+      "log": "types-distribution-final.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "exit0: intermediate types before final source helper change",
+      "exit": 0,
+      "inputBinding": "diagnostic input changed between targeted runs; no full contemporaneous immutable manifest",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ]
+    },
+    {
+      "log": "types-distribution-admission.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "exit0: frozen final production inputs at 06f8400f77b7d550c72e299a307dba707f2e4067",
+      "exit": 0,
+      "inputBinding": "06f8400f77b7d550c72e299a307dba707f2e4067",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ]
+    }
+  ]
+}

@@ -37,6 +37,7 @@ beforeEach(()=>{
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 async function openTool(){
   await screen.findByRole('heading',{name:'研究工作台'})
+  await screen.findAllByRole('button',{name:'查看/编辑'})
   selectStudy(0)
   fireEvent.click(await screen.findByRole('tab',{name:'发布与采集'}))
   fireEvent.change(await screen.findByLabelText('合成草稿'),{target:{value:'不能丢失'}})

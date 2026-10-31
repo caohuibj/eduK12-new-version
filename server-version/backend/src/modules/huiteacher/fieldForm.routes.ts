@@ -38,7 +38,7 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/field-for
       actorUserId:req.user!.userId,
       organizationId:uuid.parse(req.params.organizationId),
       eventId:uuid.parse(req.params.eventId),
-      formId:z.object({formId:uuid}).strict().parse(req.body).formId,
+      privateComposition:z.object({privateComposition:z.object({versionId:uuid,contentHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()}).strict().parse(req.body).privateComposition,
     })))
 router.get('/field-invitations/:invitationId/form',authenticateHuiteacher,wrap(req=>
   readInvitedHuiteacherFieldForm({

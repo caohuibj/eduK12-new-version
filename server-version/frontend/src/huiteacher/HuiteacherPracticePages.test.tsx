@@ -1,14 +1,19 @@
-import {useState} from 'react'
-import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
+import {useEffect,useRef,useState} from 'react'
+import {act,cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import HuiteacherApp from './HuiteacherApp'
 import {HuiteacherFieldWorkspace} from './HuiteacherFieldWorkspace'
 import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
-import type {FormDraft} from '../survey/builder.types'
+// This suite owns activity/note/account boundaries. Native transport and finals
+// are covered by HuiteacherFieldQuestionnaire.test.tsx; no second Form engine.
+vi.mock('./HuiteacherFieldQuestionnaire',()=>({HuiteacherFieldQuestionnaire:({task,onProgress}:{task:{title:string;attemptId:string|null;status:string};onProgress:(value:{attemptId:string|null;completed:boolean;writing:boolean})=>void})=>{
+ const [started,setStarted]=useState(!!task.attemptId),[completed,setCompleted]=useState(task.status==='COMPLETED'),notify=useRef(onProgress);notify.current=onProgress
+ useEffect(()=>notify.current({attemptId:started?'canonical-attempt':null,completed,writing:false}),[started,completed])
+ return <section><h4>{task.title}</h4><button onClick={()=>setStarted(true)}>开始固定问卷</button><button onClick={()=>{setStarted(true);setCompleted(true)}}>完成固定问卷</button></section>
+}}))
 type Api=Parameters<typeof HuiteacherFieldWorkspace>[0]['api']
 const invite={invitationId:'invite',organizationId:'school',eventId:'event',title:'课堂实践活动',kind:'CLASSROOM',role:'PEER',expiresAt:'2026-12-01T00:00:00Z',status:'ACCEPTED'}
-const pages:FormDraft['pages']=[{pageKey:'one',title:'课堂观察',questions:[{itemKey:'q1',prompt:'教学目标是否清晰',type:'SINGLE',required:true,options:[{optionKey:'a',label:'目标清晰'}],rows:[]},{itemKey:'q2',prompt:'学生参与情况',type:'SINGLE',required:true,options:[{optionKey:'b',label:'积极参与'}],rows:[]}]},{pageKey:'two',title:'改进建议',questions:[{itemKey:'q3',prompt:'后续跟进',type:'SINGLE',required:true,options:[{optionKey:'c',label:'安排教研跟进'}],rows:[]}]}]
-const form={formId:'form',title:'课堂观察预制表单',definitionDigest:'fixed',pages}
+const form={title:'课堂观察预制表单',targetName:'本次教师',assessmentRef:{origin:{versionId:'fixed-version',contentHash:'a'.repeat(64),targetKind:'PERSON'}},attemptId:null,status:'ASSIGNED',attemptEpoch:null}
 const note={id:'note',eventId:'event',kind:'FORMAL_FEEDBACK',status:'DRAFT',revision:1,content:'原有意见',createdAt:'2026-10-26',submittedAt:null as string|null}
 function Workspace({api,onDraftStateChange}:{api:Api;onDraftStateChange?:(value:{dirty:boolean;writing:boolean})=>void}){
  const [active,setActive]=useState(false)
@@ -42,6 +47,7 @@ describe('Teacher professional practice form pages',()=>{
   expect(within(page).queryByRole('textbox')).not.toBeInTheDocument()
   expect(within(page).queryByRole('button',{name:'正式提交'})).not.toBeInTheDocument()
   expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+  expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
  })
  it('prevents an older draft from submitting when the activity already has formal feedback',async()=>{
   const completed={...note,id:'completed',status:'SUBMITTED',content:'已提交专业意见',submittedAt:'2026-10-26T10:00:00Z'}
@@ -52,44 +58,36 @@ describe('Teacher professional practice form pages',()=>{
   expect(screen.getByRole('button',{name:'正式提交'})).toBeDisabled()
   expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
  })
- it('opens the preset form on a dedicated page, keeps the manual block boundary and preserves answers on return',async()=>{
+ it('opens the canonical host on a dedicated page and preserves the professional draft on return',async()=>{
   const api=fixture(),draft=vi.fn();render(<Workspace api={api as Api} onDraftStateChange={draft}/>)
   expect(screen.queryByRole('textbox',{name:'专业意见与补充说明'})).not.toBeInTheDocument()
-  expect(screen.queryByRole('textbox',{name:'记录正文'})).not.toBeInTheDocument()
   fireEvent.click(await screen.findByRole('button',{name:'填写实践表单'}))
   const page=await screen.findByRole('region',{name:'专业实践独立页面'})
   expect(screen.queryByRole('heading',{name:'专业实践首页'})).not.toBeInTheDocument()
   expect(screen.getByText('其他协作卡片')).not.toBeVisible()
   await within(page).findByRole('heading',{name:'课堂观察预制表单'})
-  const choice=within(page).getByRole('radio',{name:'目标清晰'})
-  choice.focus();fireEvent.click(choice)
-  await waitFor(()=>expect(choice).toBeChecked())
-  expect(choice).toHaveFocus()
-  expect(document.getElementById('survey-answer-form-q2')).not.toHaveFocus()
-  fireEvent.click(within(page).getByRole('radio',{name:'积极参与'}))
-  expect(screen.queryByRole('radio',{name:'安排教研跟进'})).not.toBeInTheDocument()
-  expect(within(page).getByRole('button',{name:'正式提交'})).toBeDisabled()
-  fireEvent.click(within(page).getByRole('button',{name:'下一页'}))
-  fireEvent.click(within(page).getByRole('radio',{name:'安排教研跟进'}))
+  fireEvent.click(screen.getByRole('button',{name:'开始固定问卷'}))
+  expect(screen.getByRole('button',{name:'正式提交'})).toBeDisabled()
   fireEvent.change(within(page).getByRole('textbox',{name:'专业意见与补充说明'}),{target:{value:'未提交的专业意见'}})
   fireEvent.click(within(page).getByRole('button',{name:'返回专业实践'}))
   expect(screen.getByRole('heading',{name:'专业实践首页'})).toBeVisible()
   fireEvent.click(screen.getByRole('button',{name:'填写实践表单'}))
-  expect(await screen.findByRole('radio',{name:'安排教研跟进'})).toBeChecked()
-  expect(screen.getByRole('textbox',{name:'专业意见与补充说明'})).toHaveValue('未提交的专业意见')
+  expect(await screen.findByRole('textbox',{name:'专业意见与补充说明'})).toHaveValue('未提交的专业意见')
   expect(draft).toHaveBeenLastCalledWith({dirty:true,writing:false})
   const unload=new Event('beforeunload',{cancelable:true});window.dispatchEvent(unload);expect(unload.defaultPrevented).toBe(true)
   expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+  expect(api.mock.calls.filter(([path])=>path.endsWith('/form'))).toHaveLength(1)
  })
- it('keeps structured answers through creation and submits only via explicit confirmation using the existing API',async()=>{
+ it('links only canonical completion on explicit formal confirmation and preserves the separately saved opinion',async()=>{
   const api=fixture(),confirm=vi.spyOn(window,'confirm').mockReturnValue(false);render(<Workspace api={api as Api}/>)
   fireEvent.click(await screen.findByRole('button',{name:'填写实践表单'}))
-  fireEvent.click(await screen.findByRole('radio',{name:'目标清晰'}));fireEvent.click(screen.getByRole('radio',{name:'积极参与'}))
-  fireEvent.click(screen.getByRole('button',{name:'下一页'}));fireEvent.click(screen.getByRole('radio',{name:'安排教研跟进'}))
+  await screen.findByRole('heading',{name:'课堂观察预制表单'})
   fireEvent.change(screen.getByRole('textbox',{name:'专业意见与补充说明'}),{target:{value:'独立专业意见'}})
   fireEvent.click(screen.getByRole('button',{name:'保存专业意见草稿'}))
   await screen.findByText(/专业意见草稿已加密保存/)
-  await waitFor(()=>expect(screen.getByRole('radio',{name:'安排教研跟进'})).toBeChecked())
+  expect(screen.getByRole('button',{name:'正式提交'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'完成固定问卷'}))
+  await waitFor(()=>expect(screen.getByRole('button',{name:'正式提交'})).toBeEnabled())
   fireEvent.click(screen.getByRole('button',{name:'正式提交'}))
   await waitFor(()=>expect(confirm).toHaveBeenCalledOnce())
   expect(api.mock.calls.some(([path])=>path.endsWith('/submit'))).toBe(false)
@@ -97,9 +95,9 @@ describe('Teacher professional practice form pages',()=>{
   confirm.mockReturnValue(true);fireEvent.click(screen.getByRole('button',{name:'正式提交'}))
   await screen.findByText('正式观察记录已提交，原稿将保持不可改写。')
   expect(api).toHaveBeenCalledWith('/organizations/school/evaluation-events/event/field-notes','POST',{kind:'FORMAL_FEEDBACK',content:'独立专业意见'})
-  expect(api).toHaveBeenCalledWith('/field-notes/note/submit','POST',{expectedRevision:1,fieldFormId:'form',answers:{q1:'a',q2:'b',q3:'c'}})
+  expect(api).toHaveBeenCalledWith('/field-notes/note/submit','POST',{expectedRevision:1,assessmentAttemptId:'canonical-attempt'})
   expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-  expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+  expect(api.mock.calls.filter(([path])=>path.endsWith('/form'))).toHaveLength(1)
  })
  it('warns before leaving the practice module with unsubmitted form answers and respects cancellation',async()=>{
   const api=fixture(),confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
@@ -114,7 +112,7 @@ describe('Teacher professional practice form pages',()=>{
   render(<HuiteacherApp/>)
   fireEvent.click(await screen.findByRole('button',{name:'专业实践'}))
   fireEvent.click(await screen.findByRole('button',{name:'填写实践表单'}))
-  fireEvent.click(await screen.findByRole('radio',{name:'目标清晰'}))
+  fireEvent.click(await screen.findByRole('button',{name:'开始固定问卷'}))
   fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}))
   fireEvent.click(screen.getByRole('button',{name:'教师成长'}))
   expect(confirm).toHaveBeenCalledWith('实践表单或记录尚未正式保存，确定放弃当前输入并离开吗？')
@@ -148,6 +146,7 @@ describe('Teacher professional practice form pages',()=>{
   expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
   expect(screen.queryByRole('radio')).not.toBeInTheDocument()
   expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+  expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
  })
  it('isolates a failed form load per activity and allows an explicit retry without a write',async()=>{
   const other={...invite,invitationId:'other',eventId:'other-event',title:'另一活动'};let fail=true
@@ -163,4 +162,85 @@ describe('Teacher professional practice form pages',()=>{
   await screen.findByRole('heading',{name:'课堂观察预制表单'})
   expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
  })
+ it('does not prefetch accepted activities or auxiliary records, and reads only the opened formal activity',async()=>{
+  const other={...invite,invitationId:'other',eventId:'other-event',title:'另一活动'}
+  const auxiliary={...note,id:'fact',kind:'FACT',content:'事实记录'}
+  const api=fixture({invites:[invite,other],existing:[auxiliary]})
+  render(<Workspace api={api as Api}/>)
+  const buttons=await screen.findAllByRole('button',{name:'填写实践表单'})
+  expect(api.mock.calls.map(([path])=>path)).toEqual(['/my-field-invitations','/my-field-notes'])
+  fireEvent.click(screen.getByRole('button',{name:'继续填写'}))
+  expect(await screen.findByRole('textbox',{name:'记录正文'})).toHaveValue('事实记录')
+  expect(api.mock.calls.some(([path])=>path.endsWith('/form'))).toBe(false)
+  fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}))
+  fireEvent.click(buttons[1])
+  await screen.findByRole('heading',{name:'课堂观察预制表单'})
+  expect(api.mock.calls.filter(([path])=>path.endsWith('/form')).map(([path])=>path)).toEqual(['/field-invitations/other/form'])
+ })
+ it('ignores a late abandoned activity read and reloads it without replacing the currently selected frozen form',async()=>{
+  const other={...invite,invitationId:'other',eventId:'other-event',title:'另一活动'}
+  let resolve!:(value:typeof form)=>void,reads=0
+  const late=new Promise<typeof form>(done=>{resolve=done})
+  const base=fixture({invites:[invite,other]})
+  const api=vi.fn((path:string,method?:string,data?:unknown)=>{
+   if(path==='/field-invitations/invite/form')return ++reads===1?late:Promise.resolve({...form,title:'重新读取的冻结版本'})
+   if(path==='/field-invitations/other/form')return Promise.resolve({...form,title:'另一活动冻结表单'})
+   return base(path,method,data)
+  })
+  render(<Workspace api={api as Api}/>)
+  const buttons=await screen.findAllByRole('button',{name:'填写实践表单'})
+  fireEvent.click(buttons[0]);await screen.findByText('正在读取本活动的预制表单…')
+  fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}));fireEvent.click(buttons[1])
+  await screen.findByRole('heading',{name:'另一活动冻结表单'})
+  fireEvent.change(screen.getByRole('textbox',{name:'专业意见与补充说明'}),{target:{value:'保留活动意见'}})
+  await act(async()=>resolve({...form,title:'迟到的旧版本'}))
+  expect(screen.queryByRole('heading',{name:'迟到的旧版本'})).not.toBeInTheDocument()
+  expect(screen.getByRole('heading',{name:'另一活动冻结表单'})).toBeInTheDocument()
+  expect(screen.getByRole('textbox',{name:'专业意见与补充说明'})).toHaveValue('保留活动意见')
+  fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}));fireEvent.click(buttons[0])
+  await screen.findByRole('heading',{name:'重新读取的冻结版本'})
+  expect(reads).toBe(2)
+  fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}));fireEvent.click(buttons[1])
+  expect(await screen.findByRole('textbox',{name:'专业意见与补充说明'})).toHaveValue('保留活动意见')
+  expect(api.mock.calls.filter(([path])=>path==='/field-invitations/other/form')).toHaveLength(1)
+  expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+ })
+ it('keeps the previously loaded activity draft and frozen definition when retrying another activity',async()=>{
+  const other={...invite,invitationId:'other',eventId:'other-event',title:'另一活动'}
+  let fail=true
+  const base=fixture({invites:[invite,other]})
+  const api=vi.fn(async(path:string,method?:string,data?:unknown)=>{
+   if(path==='/field-invitations/other/form'&&fail)throw Error('另一活动读取失败')
+   return base(path,method,data)
+  })
+  render(<Workspace api={api as Api}/>)
+  const buttons=await screen.findAllByRole('button',{name:'填写实践表单'})
+  fireEvent.click(buttons[0]);fireEvent.click(await screen.findByRole('button',{name:'开始固定问卷'}))
+  fireEvent.change(screen.getByRole('textbox',{name:'专业意见与补充说明'}),{target:{value:'保留的活动意见'}})
+  fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}));fireEvent.click(buttons[1])
+  await screen.findByText(/实践表单暂时无法读取/)
+  fail=false;fireEvent.click(screen.getByRole('button',{name:'重试实践表单'}))
+  await screen.findByRole('heading',{name:'课堂观察预制表单'})
+  fireEvent.click(screen.getByRole('button',{name:'返回专业实践'}));fireEvent.click(buttons[0])
+  expect(await screen.findByRole('textbox',{name:'专业意见与补充说明'})).toHaveValue('保留的活动意见')
+  expect(api.mock.calls.filter(([path])=>path==='/field-invitations/invite/form')).toHaveLength(1)
+  expect(api.mock.calls.filter(([path])=>path==='/field-invitations/other/form')).toHaveLength(2)
+ })
+ it('does not reuse a prior API scope form or accept its late response',async()=>{
+  let resolve!:(value:typeof form)=>void
+  const late=new Promise<typeof form>(done=>{resolve=done}),base=fixture()
+  const api=vi.fn((path:string,method?:string,data?:unknown)=>path.endsWith('/form')?late:base(path,method,data))
+  const nextBase=fixture(),next=vi.fn(async(path:string,method?:string,data?:unknown)=>path.endsWith('/form')?{...form,title:'当前账号冻结表单'}:nextBase(path,method,data))
+  const {rerender}=render(<Workspace api={api as Api}/>)
+  fireEvent.click(await screen.findByRole('button',{name:'填写实践表单'}))
+  await screen.findByText('正在读取本活动的预制表单…')
+  rerender(<Workspace api={next as Api}/>)
+  fireEvent.click(await screen.findByRole('button',{name:'填写实践表单'}))
+  await screen.findByRole('heading',{name:'当前账号冻结表单'})
+  await act(async()=>resolve({...form,title:'旧账号迟到表单'}))
+  expect(screen.queryByRole('heading',{name:'旧账号迟到表单'})).not.toBeInTheDocument()
+  expect(screen.getByRole('heading',{name:'当前账号冻结表单'})).toBeInTheDocument()
+  expect(next.mock.calls.filter(([path])=>path.endsWith('/form'))).toHaveLength(1)
+ })
+
 })

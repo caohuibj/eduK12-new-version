@@ -1,0 +1,56 @@
+{
+  "synthetic": true,
+  "productionAccessed": false,
+  "calls": [
+    {
+      "method": "GET",
+      "path": "",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/sources/1563ed01-52eb-4925-b063-3bcd2de51508",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/1563ed01-52eb-4925-b063-3bcd2de51508/c3229d9e-8116-4aae-98bd-b518955fe2f5",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/1563ed01-52eb-4925-b063-3bcd2de51508/c3229d9e-8116-4aae-98bd-b518955fe2f5",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/1563ed01-52eb-4925-b063-3bcd2de51508/c3229d9e-8116-4aae-98bd-b518955fe2f5",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/1563ed01-52eb-4925-b063-3bcd2de51508/c3229d9e-8116-4aae-98bd-b518955fe2f5",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "path": "",
+      "status": 403
+    }
+  ]
+}

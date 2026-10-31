@@ -131,7 +131,7 @@ describe('whole questionnaire page guards', () => {
     await screen.findByText('保存成功')
     const publish = screen.getByText('发布问卷')
     act(() => { fireEvent.click(publish); fireEvent.click(publish) })
-    expect(mocks.post).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledTimes(1))
     expect(name).toBeDisabled()
     expect(screen.getByRole('button', { name: '保存中...' })).toBeDisabled()
     await act(async () => finish({ code: 7, message: 'publish offline' }))

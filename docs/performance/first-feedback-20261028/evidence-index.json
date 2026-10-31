@@ -1,0 +1,159 @@
+{
+  "base": "aa774983db8edd85b3c1617aef7218f71664746d",
+  "sourceAssociation": "Root direct local execution, then reviewed against final source. Original runs were uncommitted and unsigned; do not claim signed contemporaneous commits.",
+  "selectedDistinctPassedCases": 11,
+  "summaries": [
+    {
+      "id": "ack-before-red",
+      "success": false,
+      "passed": 0,
+      "failed": 2,
+      "filtered": 32
+    },
+    {
+      "id": "ack-after",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 32
+    },
+    {
+      "id": "survey-inline-backend-r1",
+      "success": false,
+      "passed": 2,
+      "failed": 2,
+      "filtered": 48
+    },
+    {
+      "id": "survey-inline-backend-r2",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 50
+    },
+    {
+      "id": "survey-commit-failure",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 52
+    },
+    {
+      "id": "survey-inline-frontend-r1",
+      "success": true,
+      "passed": 3,
+      "failed": 0,
+      "filtered": 53
+    },
+    {
+      "id": "inline-pg-r1",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 11
+    }
+  ],
+  "files": [
+    {
+      "path": "evidence/ack-before-red.json",
+      "sha256": "413dadcdbb201aa7e4acf90ab4065c2c560a4f222582c99bba8c6cad937f9a11"
+    },
+    {
+      "path": "evidence/ack-before-red.log",
+      "sha256": "f41d71cd2eb9b7f6fa5ce7d83e3fd9cc4f0d6bd8a39dcc013a853ff3ca512718"
+    },
+    {
+      "path": "evidence/ack-after.json",
+      "sha256": "3073c405342e90d029c58be9031700a07b20e16b967924b3743a31469332875f"
+    },
+    {
+      "path": "evidence/ack-after.log",
+      "sha256": "cd9e1ff06db4669b09863714ca643d052e174e57ca2e4c6f680865aa5bb5fd91"
+    },
+    {
+      "path": "evidence/survey-inline-backend-r1.json",
+      "sha256": "207f1ecacece86e98e5ce00c76817c66f1ddb3eb5ef1b6fbea7491a9097c7f4e"
+    },
+    {
+      "path": "evidence/survey-inline-backend-r1.log",
+      "sha256": "99ec6db47d818c5f6036f07b11818e829957d56715cdee16e1ec7f17b10c0ebf"
+    },
+    {
+      "path": "evidence/survey-inline-backend-r2.json",
+      "sha256": "a464e8df050f6085ceec7e40ddd58677970e5d09c2b8fc509cd7d44c49003876"
+    },
+    {
+      "path": "evidence/survey-inline-backend-r2.log",
+      "sha256": "c6012857b4c4eb10c824d586f5751be7a2d3770085611328cb94a989d70e7279"
+    },
+    {
+      "path": "evidence/survey-commit-failure.json",
+      "sha256": "7836bcd003d619cd6d8695c3381fe5be1ee1a2aad60d4ad17033fc957ea33a7b"
+    },
+    {
+      "path": "evidence/survey-commit-failure.log",
+      "sha256": "7c2ae6b7b8d7b41ce071364901b7bb8bf17b83974d80301bb528912e6173e72f"
+    },
+    {
+      "path": "evidence/survey-inline-frontend-r1.json",
+      "sha256": "0ccf00ff8520ed8a06a11c444b627de93493e34f2456bf54a246b6a82b93b1ea"
+    },
+    {
+      "path": "evidence/survey-inline-frontend-r1.log",
+      "sha256": "9539ab02f3fe857271a78bcffc634662b1ee7a573187e9da87da3b58190dfa8c"
+    },
+    {
+      "path": "evidence/inline-pg-r1.json",
+      "sha256": "e9a9009859d599a001c787cdb617809aec53a9bc8e80633a15c3b651ea49540a"
+    },
+    {
+      "path": "evidence/inline-pg-r1.log",
+      "sha256": "d26ada5a953bc512b2b35ac1b2601b6711283133496a63e871f7e440bfbb7340"
+    },
+    {
+      "path": "evidence/inline-pg-r1-execution.json",
+      "sha256": "1d495610c89df57ab77dfdca7e75933befd0d9f543a498c50b48d7a38ac7c6d4"
+    },
+    {
+      "path": "evidence/backend-types.log",
+      "sha256": "d416fbbf3895c3521f63942a1d6b1e37915075231db35aaa99291b9bf63dc6e4"
+    },
+    {
+      "path": "evidence/backend-types-receipt.json",
+      "sha256": "5ee687674c83a90aa8a7b3b28958cb74742dbb880cb7a9d80840625c9d9e9638"
+    },
+    {
+      "path": "evidence/backend-types-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/backend-types-r2-receipt.json",
+      "sha256": "782fcda3c05b60c4aadd73b44cc12dccac385484f1efc6d3f4ca242fee5cf094"
+    },
+    {
+      "path": "evidence/backend-types-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/backend-types-r3-receipt.json",
+      "sha256": "483de9f17dba495d55391a7383ef942e4546925d1b7ca4d7d742b9b61bdd95bf"
+    },
+    {
+      "path": "evidence/frontend-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/frontend-types-r1-receipt.json",
+      "sha256": "52926cb6ed7cc5205cf1ceb9637de5c45d7ed4ce5cceeb604867d6d330ab9eb3"
+    }
+  ],
+  "limits": [
+    "ACK baseline two real React failures retained, then only those two checked after the status fix.",
+    "Backend r1 retains two passed cases and two governed-fixture failures. The unit fixture explicitly stubs only the independent interpretation pipeline; only the two failed projection cases ran in r2. PG separately uses real frozen content.",
+    "Explicit discriminated return typing fixed two direct TS consumers; runtime code unchanged by that type annotation. Final normalization reuses the existing JSON pass and replaces the original result reference, so no second full result object is retained. Selected valid JSON fixture values and encrypted representation are unchanged.",
+    "Interpretation fixture null was corrected to its actual undefined return contract; both take the same no-interpretation branch. Original reports were not edited.",
+    "Final backend r3 and frontend r1 types bind exact staged component trees. Older backend type failure and intermediate success remain historical.",
+    "PG is owned local PostgreSQL17, one selected real native SJT/Survey lifecycle case with 11 filtered; not HTTP/browser/production qualification.",
+    "No full suite, scoring-library replay, image build, production deployment or new security/permission setting."
+  ]
+}

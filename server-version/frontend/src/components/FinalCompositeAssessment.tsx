@@ -502,14 +502,16 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const units = state.units || state.items
   const currentUnit = units[state.currentIndex]
   const contextText = state.context?.status === 'frozen' ? '已确认的背景信息将沿用于后续部分。' : '未提交的答案保存在当前浏览器，完成本部分后再提交。'
-  const submissionStatus = submitting
-    ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
-    : meta?.status === 'SUBMITTING'
-      ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
-      : meta?.status === 'RETRY_PENDING'
-        ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
-        : meta?.status === 'COMPLETED'
-          ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+  // The server receipt is already durable while onReload still waits. A later
+  // progress/report request must not hide that accepted state or imply resubmit.
+  const submissionStatus = meta?.status === 'COMPLETED'
+    ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
+    : submitting
+      ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
+      : meta?.status === 'SUBMITTING'
+        ? { state: 'reconciling' as const, message: '当前单元已有封存提交，正在等待服务器终态确认。' }
+        : meta?.status === 'RETRY_PENDING'
+          ? { state: 'pending' as const, message: meta.errorMessage || '提交状态尚未确认；答案保持锁定，后续只重放同一份封存内容。' }
           : { state: 'ready' as const }
   const recoveryState = expiredCognitive
     ? { state: 'blocked' as const, message: '当前认知任务的本机试次草稿已过期，不能继续原试次。' }
@@ -594,6 +596,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           if (sectionId) { formValuesRef.current = nextForm; setFormValues(nextForm); setSectionIndex(0) }
           else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0); setActiveWholePageItem('') }
         }}/>:null}
+      {item?.questionnaireInstruction&&<section aria-label="本段作答说明" className="mb-4 whitespace-pre-wrap rounded-lg border border-slate-200 p-4 text-sm">
+        <p>{item.questionnaireInstruction}</p>
+      </section>}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -697,6 +702,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             </div>
             <span className="text-sm text-slate-500">{allScaleItems ? `整页呈现 · 共 ${scaleItems.length} 题，最后手动提交` : `题目 ${scaleIndex + 1} / ${scaleItems.length}`}</span>
           </div>
+          {item.scale.instruction ? <section aria-label="本量表作答说明" className="mb-5 whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-sm text-slate-700">{item.scale.instruction}</section> : null}
           {(() => {
             const renderQuestion = (question: typeof scaleItems[number], questionIndex: number) => {
             const imageItems = assessmentImageItems(question.images)

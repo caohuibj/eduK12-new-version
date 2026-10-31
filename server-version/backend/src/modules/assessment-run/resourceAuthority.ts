@@ -1,4 +1,5 @@
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
+import type {EducationCompositionPolicyBinding} from '../education-tools/private-tool.composition-contracts'
 import { teacherFormResourceId,resolveTeacherFormResourcePolicy } from '../huiteacher/formRunResource'
 import {studentFormResourceId,resolveStudentFormResourcePolicy} from '../huiteacher/studentFormResource'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
@@ -12,7 +13,7 @@ import {
 } from '../assessment-relational/product-registry'
 import type { RelationalResourceKindV1 } from '../assessment-relational/types'
 
-export type RunResourceFamily = RelationalResourceKindV1 | 'COGNITIVE'
+export type RunResourceFamily = RelationalResourceKindV1
 export type RunAdapterTransactionMode = 'TRANSACTIONAL_DB' | 'EXTERNAL'
 export type RunAdapterStartMode = 'TRANSACTIONAL' | 'OPERATION_KEY' | 'UNSUPPORTED'
 
@@ -23,6 +24,8 @@ export interface RunResourceRef {
 }
 
 export interface RunResourcePolicy {
+  /** Server-frozen ordinary questionnaire identity and per-unit report ceilings. */
+  educationComposition?: EducationCompositionPolicyBinding
   resultDisclosure?: ResultDisclosureContractV1
   initiationModes?: readonly AssessmentInitiationModeV1[]
   allowedTargetModes?: readonly EvaluationTargetMode[]
@@ -277,4 +280,7 @@ export const productionRunResourceAuthorityRegistry = new RunResourceAuthorityRe
           :original.resolveExact(ref)}
   })(),
   createRelationalRunResourceAdapter({ family: 'SITUATIONAL', capabilities: transactionalCompositeCapabilities }),
+  // One cognitive tool uses the same transactional Composite parent and canonical
+  // child FINAL. This advertises capability, not approval of any source/version.
+  createRelationalRunResourceAdapter({ family: 'COGNITIVE', capabilities: transactionalCompositeCapabilities }),
 ])

@@ -1,3 +1,4 @@
+import {deferredPage} from '../page-loading/deferredPage'
 import {RefreshCw,Info} from 'lucide-react'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
 import {EducationFormBulkImport} from './EducationFormBulkImport'
@@ -8,13 +9,15 @@ import {EducationPrivateScaleSharing} from './EducationPrivateScaleSharing'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationQuestionImageField} from './EducationQuestionImageField'
 import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react'
-import {ScaleDefinitionEditor} from '../../pages/ScaleDefinitionEditor'
+const ScaleDefinitionEditor=deferredPage(async()=>({default:(await import('../../pages/ScaleDefinitionEditor')).ScaleDefinitionEditor}))
 import {type ScaleDefinition,updateReportContract} from '../../pages/scaleDefinitionEditorModel'
-import {EducationPrivateFormEditor} from './EducationPrivateFormEditor'
+const EducationPrivateFormEditor=deferredPage(async()=>({default:(await import('./EducationPrivateFormEditor')).EducationPrivateFormEditor}))
 import type {FormDraft} from '../../survey/builder.types'
 import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 import {sanitizeFormAnswers} from '../../modules/assessment-core/form/form-visibility'
 import {PrivateToolPreview} from './PrivateToolPreview'
+const EducationCompositionStudio=deferredPage(async()=>({default:(await import('./EducationCompositionStudio')).EducationCompositionStudio}))
+const EducationPackageLibrary=deferredPage(async()=>({default:(await import('./EducationPackageLibrary')).EducationPackageLibrary}))
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateTool,type PrivateToolSummary,type PrivateToolKind,type PrivateToolValidation,type PrivateToolVersion,type PrivateDraftState,type PrivateToolIssue} from './privateToolClient'
 import './education-private-tools.css'
 
@@ -23,7 +26,21 @@ function SchoolLayout({entry,className,children}:{entry:Props['entry'];className
 const mergeById=<T extends {id:string}>(current:T[],next:T[]):T[]=>Array.from(new Map([...current,...next].map(item=>[item.id,item])).values())
 const fingerprint=(tool:PrivateTool)=>JSON.stringify({title:tool.title,definition:tool.definition})
 /** A keyed session prevents responses from one school from entering another editor. */
-export function EducationPrivateToolStudio(props:Props){return <PrivateToolSession key={`${props.entry}:${props.actorId??'session'}:${props.organizationId}`} {...props}/>}
+export function EducationPrivateToolStudio(props:Props){
+ const [mode,setMode]=useState<'TOOLS'|'COMPOSITIONS'|'PACKAGES'>('TOOLS'),draft=useRef<PrivateDraftState>({dirty:false,writing:false})
+ const onDraftStateChange=useCallback((value:PrivateDraftState)=>{draft.current=value;props.onDraftStateChange?.(value)},[props.onDraftStateChange])
+ const switchMode=(next:typeof mode)=>{
+  if(next===mode||draft.current.writing||draft.current.dirty&&!window.confirm('当前草稿尚未保存，确定放弃修改并切换吗？'))return
+  setMode(next)
+ }
+ return <><nav className={'education-private-studio-modes education-private-studio-modes--'+props.entry.toLowerCase()} aria-label="工具编制类型">
+  <button type="button" aria-pressed={mode==='TOOLS'} onClick={()=>switchMode('TOOLS')}>量表与表单</button>
+  <button type="button" aria-pressed={mode==='COMPOSITIONS'} onClick={()=>switchMode('COMPOSITIONS')}>普通问卷</button>
+  <button type="button" aria-pressed={mode==='PACKAGES'} onClick={()=>switchMode('PACKAGES')}>正式整包 · 整体引用</button>
+ </nav>{mode==='TOOLS'?<PrivateToolSession key={`${props.entry}:${props.actorId??'session'}:${props.organizationId}`} {...props} onDraftStateChange={onDraftStateChange}/>
+  :mode==='COMPOSITIONS'?<EducationCompositionStudio api={props.api} entry={props.entry} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>
+  :<EducationPackageLibrary api={props.api} entry={props.entry} organizationId={props.organizationId} actorId={props.actorId??'session'} onDraftStateChange={onDraftStateChange}/>}</>
+}
 function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftStateChange}:Props){
  const {hasPending:bulkPending,onPendingChange,clear:clearPending}=useFormPendingBuffers()
  const pendingRef=useRef(bulkPending);pendingRef.current=bulkPending
@@ -88,6 +105,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
   void operate(async current=>{
    const value=await api<PrivateTool>(`${base}/${id}`)
    if(!current())return
+   if(value.kind!=='SCALE'&&value.kind!=='FORM')throw new Error('请从普通问卷编制入口打开这份问卷。')
    apply(value);setVersions([]);setVersionsCursor(null)
    const history=await api<{list:PrivateToolVersion[];nextCursor?:string|null}>(`${base}/${id}/versions`)
    if(current()){setVersions(mergeById([],history.list));setVersionsCursor(history.nextCursor??null)}
@@ -168,9 +186,22 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
    <SchoolLayout entry={entry} className="education-private-editor-controls"><label className="education-private-title-field">工具名称<input value={tool.title} maxLength={200} disabled={busy||importBusy||mediaCount>0||sharingState.writing} onChange={event=>{if(!locked.current)setTool({...tool,title:event.target.value})}}/></label>
    <div className="education-private-toolbar education-private-actions" role="group" aria-label="草稿与版本操作"><button type="button" className={checked?undefined:'education-private-primary'} disabled={busy||importBusy||mediaCount>0||sharingState.writing||bulkPending||csvPending||!tool.title.trim()} onClick={()=>void save()}>保存草稿</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||bulkPending||csvPending||dirty} onClick={check}>检查定义</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||!checked} onClick={()=>{setPreviewing(value=>!value);setPreviewResult(null)}}>{previewing?'返回编辑':'试填预览'}</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||!checked} className={checked?'education-private-primary':undefined} onClick={freeze}>固定私有版本</button></div></SchoolLayout>
    <p className="education-private-step-help">{dirty?'请先保存修改，再检查定义。':checked?'定义检查已通过。建议试填核对后固定版本；活动发布仍在活动工作区单独完成。':'保存后检查定义，检查通过后可试填和固定版本。'}</p></SchoolLayout>
+   {entry==='TEACHER'&&tool.kind==='SCALE'&&!previewing&&<label>量表原版施测声明<select disabled={busy||importBusy||csvPending||mediaCount>0||sharingState.writing} value={(tool.definition as ScaleDefinition).respondentType} onChange={event=>{
+    const definition=tool.definition as ScaleDefinition;if(event.target.value===definition.respondentType)return
+    if(!window.confirm('改变施测声明会清除本草稿的旧受众声明，请核对题目适用性后保存并固定新版本。原固定版本保持不变。'))return
+    const {audienceContract:_oldAudience,...report}=definition.report
+    editDefinition({...definition,respondentType:event.target.value,report})
+   }}><option value={(tool.definition as ScaleDefinition).respondentType}>{(tool.definition as ScaleDefinition).respondentType==='expert_report'?'专家观察':'当前原版声明 · '+(tool.definition as ScaleDefinition).respondentType}</option>
+    {(tool.definition as ScaleDefinition).respondentType!=='expert_report'?<option value="expert_report">声明为专家观察（新版本）</option>:<option value="teacher_self_report">声明为教师自评（新版本）</option>}
+   </select></label>}
    {entry==='SCHOOL'&&tool.kind==='FORM'&&!previewing&&<EducationFormBulkImport key={`${tool.id}:${editorSessionRevision}`} api={api} organizationId={organizationId} actorId={actorId} tool={tool} disabled={dirty||bulkPending||busy||importBusy||mediaCount>0||sharingState.writing} onBusy={onImportBusy} onPendingChange={setCsvPending} onImported={value=>{apply(value);setNotice('表单题目已追加并保存，请重新检查定义。')}}/>}
    {previewing&&checked?<><p>使用已保存定义进行试填，不创建被试任务、不保存正式作答。</p><fieldset disabled={busy||importBusy||mediaCount>0||sharingState.writing}><PrivateToolPreview renderMaterials={items=>items?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={tool.id} item={item}/>)} imageAdapter={imageAdapter} tool={tool} answers={answers} onAnswer={(key,value)=>{setAnswers(old=>({...old,[key]:value}));setPreviewResult(null)}}/></fieldset><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing} onClick={preview}>检查试填结果</button>{previewResult!==null&&<details open><summary>服务端预览结果</summary><pre>{JSON.stringify(previewResult,null,2)}</pre></details>}</>
-    :tool.kind==='SCALE'?<><nav className="education-private-tabs" aria-label="量表编辑分区">{([['responses','响应选项'],['items','题目'],['scores','计分'],['report','报告文案']] as const).map(([key,label])=><button type="button" key={key} disabled={csvPending||busy||importBusy||mediaCount>0||sharingState.writing} aria-pressed={tab===key} onClick={()=>setTab(key)}>{label}</button>)}</nav><fieldset disabled={mediaCount>0||sharingState.writing}><ScaleDefinitionEditor importControl={<EducationScaleCsvImport api={api} organizationId={organizationId} tool={tool} disabled={dirty||bulkPending||busy||importBusy||mediaCount>0||sharingState.writing} onPendingChange={setCsvPending} onBusy={onImportBusy} onImported={value=>{apply(value);setNotice('CSV题目已导入并保存，请重新检查定义。')}}/>} key={`${tool.id}:${editorSessionRevision}`} renderItemMaterials={(item,change)=><EducationMaterialPicker api={api} entry={entry} actorId={actorId} organizationId={organizationId} toolId={tool.id} value={item.materials} onChange={materials=>change({materials})} disabled={busy||importBusy||csvPending} label="题目展示素材" onBusy={onUploadBusy}/>} renderFeedbackContent={(content,change)=><EducationMaterialPicker api={api} entry={entry} actorId={actorId} organizationId={organizationId} toolId={tool.id} value={content.materials} onChange={materials=>change({...content,materials})} disabled={busy||importBusy||csvPending} label="反馈展示素材" onBusy={onUploadBusy}/>} renderFeedbackPreview={content=>content.materials?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={tool.id} item={item}/>)} onPendingChange={onPendingChange} definition={tool.definition as ScaleDefinition} setDefinition={value=>editDefinition(typeof value==='function'?value(tool.definition as ScaleDefinition):value)} activeTab={tab} readOnly={false} controlsDisabled={busy||importBusy||csvPending||sharingState.writing} saveDefinition={save} mediaEnabled={Boolean(imageAdapter)} imageAdapter={imageAdapter} mediaUploadCount={mediaCount} onUploadBusy={onUploadBusy}/></fieldset></>
+    :tool.kind==='SCALE'?<><nav className="education-private-tabs" aria-label="量表编辑分区">{([['responses','响应选项'],['items','题目'],['scores','计分'],['report','报告文案']] as const).map(([key,label])=><button type="button" key={key} disabled={csvPending||busy||importBusy||mediaCount>0||sharingState.writing} aria-pressed={tab===key} onClick={()=>setTab(key)}>{label}</button>)}</nav>{tab==='report'&&<label className="education-private-step-help"><input type="checkbox"
+      disabled={busy||importBusy||csvPending||mediaCount>0||sharingState.writing}
+      checked={(tool.definition as ScaleDefinition).report.audienceContract?.audience===(entry==='TEACHER'?'teacher':'student')}
+      onChange={event=>{const definition=tool.definition as ScaleDefinition;const {audienceContract:_audience,...report}=definition.report
+        editDefinition({...definition,report:event.target.checked?{...report,audienceContract:{schemaVersion:1,respondent:entry==='TEACHER'?(definition.respondentType==='expert_report'?'OBSERVER_REPORT':'ADULT_SELF'):'STUDENT_SELF',audience:entry==='TEACHER'?'teacher':'student',locale:'zh-CN'}}:report})}}/>
+      {entry==='TEACHER'?((tool.definition as ScaleDefinition).respondentType==='expert_report'?'允许本量表的描述性计分进入正式专业证据':'允许教师自评者查看本量表的本人反馈'):'允许学生自评者查看本量表的本人反馈'}<span>{(tool.definition as ScaleDefinition).respondentType==='expert_report'?'仅影响新固定版本；正式提交后由获权管理员经 MFA 和审计读取，不自动向受评教师公开个人答案或量表解释。':'仅影响以后固定的版本；本人反馈仍受具体任务及当前报告权限约束。'}</span></label>}<fieldset disabled={mediaCount>0||sharingState.writing}><ScaleDefinitionEditor longitudinalDisclosureEnabled importControl={<EducationScaleCsvImport api={api} organizationId={organizationId} tool={tool} disabled={dirty||bulkPending||busy||importBusy||mediaCount>0||sharingState.writing} onPendingChange={setCsvPending} onBusy={onImportBusy} onImported={value=>{apply(value);setNotice('CSV题目已导入并保存，请重新检查定义。')}}/>} key={`${tool.id}:${editorSessionRevision}`} renderItemMaterials={(item,change)=><EducationMaterialPicker api={api} entry={entry} actorId={actorId} organizationId={organizationId} toolId={tool.id} value={item.materials} onChange={materials=>change({materials})} disabled={busy||importBusy||csvPending} label="题目展示素材" onBusy={onUploadBusy}/>} renderFeedbackContent={(content,change)=><EducationMaterialPicker api={api} entry={entry} actorId={actorId} organizationId={organizationId} toolId={tool.id} value={content.materials} onChange={materials=>change({...content,materials})} disabled={busy||importBusy||csvPending} label="反馈展示素材" onBusy={onUploadBusy}/>} renderFeedbackPreview={content=>content.materials?.map(item=><EducationMaterialPreview key={item.asset.assetId} api={api} organizationId={organizationId} toolId={tool.id} item={item}/>)} onPendingChange={onPendingChange} definition={tool.definition as ScaleDefinition} setDefinition={value=>editDefinition(typeof value==='function'?value(tool.definition as ScaleDefinition):value)} activeTab={tab} readOnly={false} controlsDisabled={busy||importBusy||csvPending||sharingState.writing} saveDefinition={save} mediaEnabled={Boolean(imageAdapter)} imageAdapter={imageAdapter} mediaUploadCount={mediaCount} onUploadBusy={onUploadBusy}/></fieldset></>
     :<fieldset disabled={busy||importBusy||csvPending||mediaCount>0||sharingState.writing}><EducationPrivateFormEditor compactSettings={entry==='SCHOOL'} renderMaterials={(question,change)=><EducationMaterialPicker api={api} entry={entry} actorId={actorId} organizationId={organizationId} toolId={tool.id} value={question.materials} onChange={materials=>change({...question,materials})} disabled={busy||importBusy||csvPending} label="题目展示素材" onBusy={onUploadBusy}/>} bulkPending={bulkPending} onPendingChange={onPendingChange} key={`${tool.id}:${editorSessionRevision}`} value={tool.definition as FormDraft} onChange={editDefinition} renderImageField={imageAdapter?props=><EducationQuestionImageField {...props} adapter={imageAdapter} onBusy={onUploadBusy} disabled={busy}/>:undefined}/></fieldset>}
    <details className="education-private-versions"><summary>当前显示的固定版本（{versions.length}）</summary><p className="education-private-step-help">每个版本保留固定时的内容。后续编辑只改变草稿，不会覆盖已固定版本。</p>{versionsCursor&&<p>当前仅显示部分固定版本，不代表完整历史。每次最多读取 50 条，可继续加载历史；下方也会显示本次新固定的版本。</p>}{versions.length?versions.map(version=><div className="education-private-version" key={version.id}><div><strong>{version.title}</strong><p>源修订 {version.sourceRevision} · 固定私有版本</p></div>{tool.kind==='SCALE'&&<button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing} onClick={()=>{
     if(sharingVersion?.id===version.id)return

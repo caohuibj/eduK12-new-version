@@ -1,4 +1,5 @@
 import {educationApplicabilitySchema} from './education-applicability'
+import {expertSourceApplicabilitySchema} from '../education-tools/expert-observation.contract'
 import {z} from 'zod'
 export const libraryProduct=z.enum(['TRAINING','SURVEY','SCHOOL','TEACHER'])
 // Authoring origin is distinct from legacy, organization-free use authority.
@@ -16,6 +17,7 @@ export const libraryMetadata=z.object({
 }).strict()
 export const submissionInput=z.object({requestId:z.string().guid(),releaseId:z.string().guid(),metadata:libraryMetadata,
   educationApplicability:educationApplicabilitySchema.optional(),
+  educationExpertApplicability:expertSourceApplicabilitySchema.optional(),
   mediaConsent:z.object({manifestHash:z.string().regex(/^[a-f0-9]{64}$/),shareWithAuthorizedUsers:z.literal(true)}).strict().optional(),
   dependencyReleaseIds:z.array(z.string().guid()).max(20).refine(v=>new Set(v).size===v.length).default([])}).strict()
 const reason=z.string().trim().min(1).max(1000)

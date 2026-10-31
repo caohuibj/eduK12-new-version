@@ -1,0 +1,11 @@
+{
+  "observedAt": "2026-10-28T03:54:10.375517+00:00",
+  "api": "SIGTERM_SENT",
+  "retainedOwnContainers": [
+    "pr374-df46abf6-pg",
+    "pr374-df46abf6-redis"
+  ],
+  "database": "pr374_df46abf6",
+  "productionAccess": false,
+  "reason": "Independent review and remaining UI qualification; private fixture credentials stay in /tmp, no shared Redis touched."
+}

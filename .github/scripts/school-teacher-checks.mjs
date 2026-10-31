@@ -6,6 +6,8 @@ import {pathToFileURL} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {binding,actualPlan,requireSuccess,sha256,git} from './school-teacher-scope.mjs';
+import observerReuse from './school-teacher-observer-reuse.cjs';
+import {requireNativeEvidence,requireNativeProducerAttempt,JDR_AUDIT,verifyJdrAuditReuse} from './school-teacher-native.mjs';
 const out=resolve('school-teacher-evidence');
 function receipt(name,value){mkdirSync(out,{recursive:true});writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2)+'\n')}
 const RESUME={run:39867718449,head:'dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c',checkout:'81ee1f6d6a097e0c9e0aca3da05582f614325878',frontendJob:120134202466,auditJob:120134202442,sastJob:120134095190,frontendArtifact:12465090917,frontendDigest:'7663300255799eff7bd3e8f4ac7f79fef42e3ad62af40da66d5f947876241451',auditArtifact:12464502959,auditDigest:'dac8363a31ff8e8a05809ec80d9b31929624e0be9a9f06bc549d2fb0e66fda1b',workflowSha256:'3711b141411280f2775ba9475d72b4011ecbfd664789b5228114eefee58331d7'};
@@ -314,7 +316,13 @@ export function verifyTestReport(report,batch){
  assert.deepEqual(filtered.sort(),[...batch.expectedFiltered].sort(),'Unexpected filtering');assert.equal(cases.length,passed.length+filtered.length);
  return {passed:passed.length,filtered:filtered.length,caseNames:passed,wholeInvocationSucceeded:true};
 }
-function verifyClosure(closure){assert(closure&&Array.isArray(closure.files)&&closure.files.length>0);assert.equal(sha256(JSON.stringify(closure.files)),closure.sha256);for(const f of closure.files){assert.match(f.path,/^(server-version\/|\.github\/)/);assert(!f.path.split('/').includes('..'));assert.equal(git('rev-parse','HEAD:'+f.path),f.blob)}}
+function verifyClosure(closure){
+ assert(closure&&Array.isArray(closure.files)&&closure.files.length>0);
+ const trees=closure.trees;
+ assert.equal(sha256(JSON.stringify(trees?{files:closure.files,trees}:closure.files)),closure.sha256);
+ for(const f of closure.files){assert.match(f.path,/^(server-version\/|\.github\/)/);assert(!f.path.split('/').includes('..'));assert.equal(git('rev-parse','HEAD:'+f.path),f.blob)}
+ if(trees){assert(Array.isArray(trees)&&trees.length>0);for(const t of trees){assert(['server-version/backend','server-version/frontend','server-version/shared'].includes(t.path));assert.match(t.tree,/^[a-f0-9]{40}$/);assert.equal(git('rev-parse','HEAD:'+t.path),t.tree)}}
+}
 export function reviewedCases(group){
  assert.equal(group.originalExecutionSigned,false);assert.equal(group.ciExecuted,false);
  assert(Array.isArray(group.admittedCaseKeys)&&group.admittedCaseKeys.length>0);assert.equal(new Set(group.admittedCaseKeys).size,group.admittedCaseKeys.length);
@@ -341,6 +349,7 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
   'server-version/e2e/school-teacher-fixture.cjs','server-version/e2e/school-teacher-browser.cjs','server-version/e2e/school-teacher-chrome.cjs','server-version/e2e/school-teacher-chrome-permissions.cjs','server-version/e2e/school-teacher-ui.cjs',b.execution.browserHelper]);
  for(const component of ['frontend','backend']){
   const prefix='server-version/'+component+'/';paths.add(prefix+'package.json');paths.add(prefix+'package-lock.json');
+  if(b.branch==='release/education-observer-native-20261029')for(const f of b.execution[component].inputClosure.files)paths.add(f.path);
   for(const batch of b.execution[component].batches){for(const f of batch.files)paths.add(prefix+f);for(const f of batch.inputClosure.files)paths.add(f.path)}
  }
  for(const f of b.execution.frontend.lintFiles)paths.add('server-version/frontend/'+f);
@@ -348,10 +357,16 @@ export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'u
  const frontend=JSON.parse(read('server-version/frontend/package.json')),backend=JSON.parse(read('server-version/backend/package.json'));
  assert.equal(frontend.scripts?.build,'vite build','Frontend build script changed');assert.equal(backend.scripts?.['db:generate'],'prisma generate','Backend client generation script changed');
  assert.equal(sha256(b.execution.migration.baselineFixtureSql),b.execution.migration.baselineFixtureSha256);
+ if(b.branch==='release/education-observer-native-20261029'){
+  assert.equal(b.execution.migration.baselineFixturePath,'.github/scripts/school-teacher-self-baseline.sql');
+  assert.equal(read(b.execution.migration.baselineFixturePath),b.execution.migration.baselineFixtureSql,'Reviewed nonempty baseline fixture changed');
+ }
  return {sourcePathsChecked:paths.size,npmScriptsChecked:2,inlineBaselineFixtureHashVerified:true};
 }
 function admission(b,plan){
  const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));requireNoHistoricalAcceptance(evidence);
+ if(b.branch==='release/education-observer-native-20261029')for(const component of ['frontend','backend'])verifyClosure(b.execution[component].inputClosure);
+ if(b.qualification===observerReuse.mode)observerReuse.verifyInputs(b,git);
  const inputs=verifyExecutionInputs(b);receipt('admission',{status:'PASSED',plan,inputs,historicalAcceptedCases:0,acceptedCases:[]});
 }
 function batches(component,selected,offset=0){const cwd=resolve('server-version',component),allowedSourcePaths=new Set(git('ls-files','server-version/'+component+'/src').split('\n').map(p=>p.slice(('server-version/'+component+'/').length)));assert(Array.isArray(selected));for(const [index,b] of selected.entries()){const i=index+offset;
@@ -372,6 +387,11 @@ function freshArtifact(kind){
  const dir=resolve('server-version',kind,'dist'),manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json')));
  return verifyFreshManifest(manifest,{kind,head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,lockDigest:sha256(readFileSync(resolve('server-version',kind,'package-lock.json'))),contentDigest:treeDigest(dir)});
 }
+function currentBackendArtifact(){
+ const dir=resolve('server-version/backend/dist');assert.equal(existsSync(join(out,'official-backend-build-reuse.json')),false);
+ const manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json')));
+ return verifyFreshManifest(manifest,{kind:'backend',head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,lockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),contentDigest:treeDigest(dir)});
+}
 function freshBuild(kind){
  const cwd=resolve('server-version',kind);rmSync(join(cwd,'dist'),{recursive:true,force:true});
  if(kind==='frontend')command('frontend-build','npm',['run','build'],cwd);
@@ -379,10 +399,13 @@ function freshBuild(kind){
  command(kind+'-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write',kind]);
  receipt(kind+'-fresh-build',{status:'PASSED',qualification:'fresh-current-source',manifest:freshArtifact(kind)});
 }
+export const frontendTypeCommand=b=>b.branch==='release/education-observer-native-20261029'
+ ?{exe:'npm',args:['run','typecheck']}:{exe:process.execPath,args:['node_modules/typescript/bin/tsc','-b']};
 async function frontend(b){
  if(b.qualification!=='fresh-integrated-authoring'){await reuseCompletedFrontend(b);return}
  const cwd=resolve('server-version/frontend');
- command('frontend-types',process.execPath,['node_modules/typescript/bin/tsc','-b'],cwd);
+ if(b.branch==='release/education-observer-native-20261029')verifyClosure(b.execution.frontend.inputClosure);
+ const types=frontendTypeCommand(b);command('frontend-types',types.exe,types.args,cwd);
  if(b.execution.frontend.lintFiles.length)command('frontend-lint',process.execPath,['node_modules/eslint/bin/eslint.js',...b.execution.frontend.lintFiles],cwd);
  batches('frontend',b.execution.frontend.batches);freshBuild('frontend');
 }
@@ -395,7 +418,7 @@ function databaseGuard(){
 const identifier=x=>{assert(/^[A-Za-z][A-Za-z0-9_]*$/.test(x));return '"'+x+'"'};
 export async function snapshots(client,tables){assert(tables.length>0);const rows=[];for(const entry of tables){const table=typeof entry==='string'?entry:entry.table;identifier(table);const columns=typeof entry==='string'||!entry.columns?(await client.query("SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name=$1 ORDER BY ordinal_position",[table])).rows.map(r=>r.column_name):entry.columns;assert(columns.length>0);const projection=columns.map(identifier).join(',');const q=await client.query('SELECT to_jsonb(t)::text AS row FROM (SELECT '+projection+' FROM '+identifier(table)+') t ORDER BY to_jsonb(t)::text');const expectEmpty=typeof entry==='object'&&entry.expectEmpty===true;if(expectEmpty){assert.equal(table,'assessment_result_facts','Only explicitly disabled compact storage may be empty');assert.equal(q.rows.length,0,'Disabled compact storage must remain empty')}else assert(q.rows.length>0,'Nonempty preservation table required: '+table);rows.push({table,columns,count:q.rows.length,sha256:sha256(JSON.stringify(q.rows)),...(expectEmpty?{expectEmpty:true}:{})})}return rows}
 
-async function migrate(b){databaseGuard();const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg');const client=new Client({connectionString:process.env.DATABASE_URL});await client.connect();
+export async function migrate(b,{guard=databaseGuard}={}){guard();const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg');const client=new Client({connectionString:process.env.DATABASE_URL});await client.connect();
  try{const m=b.execution.migration;assert(m.baselineFixtureSql&&m.preserveTables.length);assert.equal(sha256(m.baselineFixtureSql),m.baselineFixtureSha256);
   const dir=mkdtempSync(join(privateRoot(),'baseline-'));const archive=join(privateRoot(),'baseline.tar');
   // Binary git archive uses a direct binary spawn rather than the text diagnostic helper.
@@ -412,40 +435,118 @@ export function restoreStorageTables(tables,report,identity){
  for(const table of ['assessments','composite_form_answers','composite_form_section_attempts','composite_assessment_attempts','assessment_run_executions','relational_assessment_assignments','assessment_result_facts'])assert(tables.includes(table),'Required real result storage must be restored: '+table);
  return tables.map(table=>table==='assessment_result_facts'?{table,expectEmpty:true}:table);
 }
-async function restore(b){databaseGuard();const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg'),u=new URL(process.env.DATABASE_URL),owner=new Client({connectionString:u.href});await owner.connect();const db='school_teacher_restore_ci_test',svc=process.env.CI_POSTGRES_SERVICE_ID;let bodyFailed=false,preserved;
- try{const browserReport=JSON.parse(readFileSync(join(out,'browser.json')));const tables=restoreStorageTables(b.execution.migration.restoreTables,browserReport,{head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID});const before=await snapshots(owner,tables);preserved=before;await owner.query('CREATE DATABASE '+identifier(db));
-  command('dump-current','docker',['exec',svc,'pg_dump','-U','ptool','-d','school_teacher_browser_ci_test','--format=custom','--file=/tmp/school-teacher.dump']);
-  command('restore-current','docker',['exec',svc,'pg_restore','-U','ptool','-d',db,'--exit-on-error','/tmp/school-teacher.dump']);u.pathname='/'+db;const restored=new Client({connectionString:u.href});await restored.connect();try{assert.deepEqual(await snapshots(restored,before),before)}finally{await restored.end()}
-  const fixtureModule=await import(pathToFileURL(resolve('server-version/e2e/school-teacher-fixture.cjs'))),fixture=(fixtureModule.default||fixtureModule).readFixture().value;const runtimeUrl=new URL(fixture.runtimeUrl);assert.equal(runtimeUrl.hostname,u.hostname);runtimeUrl.pathname='/'+db;const {PrismaClient}=createRequire(resolve('server-version/backend/package.json'))('@prisma/client');const runtime=new PrismaClient({datasources:{db:{url:runtimeUrl.href}}});try{const {verifyRuntimePrivileges}=await import(pathToFileURL(resolve('server-version/backend/scripts/runtime-role-contract.mjs'))),{verifyReleaseSchema}=await import(pathToFileURL(resolve('server-version/backend/scripts/release-schema-contract.mjs')));assert.equal((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole,true);await verifyReleaseSchema(runtime);}finally{await runtime.$disconnect()}
+export async function restoreRows({owner,url,serviceId,tables,database='school_teacher_restore_ci_test',checkRestored=async()=>{}}){
+ const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg');const source=new URL(url),svc=serviceId;
+ const before=await snapshots(owner,tables),ddl=await owner.query("SELECT p.oid::regprocedure::text AS identity,pg_get_functiondef(p.oid) AS definition FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND (p.proname LIKE 'education_composition_%' OR p.proname LIKE 'protect_education_composition%') ORDER BY identity");let bodyFailed=false,created=false;
+ try{
+  await owner.query('CREATE DATABASE '+identifier(database));created=true;
+  command('dump-current','docker',['exec',svc,'pg_dump','-U','ptool','-d',source.pathname.slice(1),'--format=custom','--file=/tmp/school-teacher.dump']);
+  command('restore-current','docker',['exec',svc,'pg_restore','-U','ptool','-d',database,'--exit-on-error','/tmp/school-teacher.dump']);
+  const target=new URL(source.href);target.pathname='/'+database;const restored=new Client({connectionString:target.href});await restored.connect();
+  let restoredFailed=false;
+  try{assert.deepEqual(await snapshots(restored,before),before);
+   assert.deepEqual((await restored.query("SELECT p.oid::regprocedure::text AS identity,pg_get_functiondef(p.oid) AS definition FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND (p.proname LIKE 'education_composition_%' OR p.proname LIKE 'protect_education_composition%') ORDER BY identity")).rows,ddl.rows);
+   await checkRestored(target,restored)
+  }catch(error){restoredFailed=true;throw error}finally{try{await restored.end()}catch(error){if(!restoredFailed)throw error}}
  }catch(error){bodyFailed=true;throw error}finally{
   const failures=[];
   for(const [stage,cleanup] of [
-   ['drop-restore-database',()=>owner.query('DROP DATABASE IF EXISTS '+identifier(db)+' WITH (FORCE)')],
-   ['close-restore-owner',()=>owner.end()],
+   ['drop-restore-database',()=>created?owner.query('DROP DATABASE '+identifier(database)+' WITH (FORCE)'):undefined],
    ['remove-private-dump',()=>command('remove-private-dump','docker',['exec',svc,'rm','-f','/tmp/school-teacher.dump'])]
   ]){try{await cleanup()}catch(error){failures.push({stage,messageHash:sha256(String(error))})}}
-  if(failures.length){
-   try{receipt('restore-cleanup',{status:'FAILED',errors:failures})}catch{/* Preserve primary error, or fail below. */}
-   if(!bodyFailed)throw Error('Restore cleanup failed; no passing restore receipt was written');
-  }
+  if(failures.length){try{receipt('restore-cleanup',{status:'FAILED',errors:failures})}catch{/* Keep the primary failure. */}if(!bodyFailed)throw Error('Restore cleanup failed')}
  }
+ return before;
+}
+async function checkRestoredRuntime(runtimeSource,target){
+ const runtimeUrl=new URL(runtimeSource);assert.equal(runtimeUrl.hostname,target.hostname);runtimeUrl.pathname=target.pathname;
+ const {PrismaClient}=createRequire(resolve('server-version/backend/package.json'))('@prisma/client');const runtime=new PrismaClient({datasources:{db:{url:runtimeUrl.href}}});
+ try{const {verifyRuntimePrivileges}=await import(pathToFileURL(resolve('server-version/backend/scripts/runtime-role-contract.mjs'))),{verifyReleaseSchema}=await import(pathToFileURL(resolve('server-version/backend/scripts/release-schema-contract.mjs')));
+  assert.equal((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole,true);await verifyReleaseSchema(runtime);
+ }finally{await runtime.$disconnect()}
+}
+async function restore(b){
+ databaseGuard();const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg'),owner=new Client({connectionString:process.env.DATABASE_URL});await owner.connect();
+ let bodyFailed=false,preserved;
+ try{const browserReport=JSON.parse(readFileSync(join(out,'browser.json'))),tables=restoreStorageTables(b.execution.migration.restoreTables,browserReport,{head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID});
+  const fixtureModule=await import(pathToFileURL(resolve('server-version/e2e/school-teacher-fixture.cjs'))),fixture=(fixtureModule.default||fixtureModule).readFixture().value;
+  preserved=await restoreRows({owner,url:process.env.DATABASE_URL,serviceId:process.env.CI_POSTGRES_SERVICE_ID,tables,
+   checkRestored:target=>checkRestoredRuntime(fixture.runtimeUrl,target)});
+ }catch(error){bodyFailed=true;throw error}finally{try{await owner.end()}catch(error){if(!bodyFailed)throw error}}
  receipt('restore',{status:'PASSED',preserved,restrictedRuntimeRole:true,releaseSchemaVerified:true});
 }
+async function restoreQualifiedPostgres(b){
+ databaseGuard();assert.equal(b.branch,'release/education-observer-native-20261029');assert.equal(process.env.ASSESSMENT_COMPACT_FACTS_ENABLED,'false');
+ for(const [index,batch]of b.execution.backend.batches.entries()){
+  const result=JSON.parse(readFileSync(join(out,'backend-tests-'+index+'.json')));
+  assert.equal(result.sourceHead,git('rev-parse','HEAD'));assert.equal(result.wholeInvocationSucceeded,true);
+  assert.deepEqual([...result.caseNames].sort(),[...batch.expectedPassed].sort());verifyClosure(batch.inputClosure);
+ }
+ const names=b.execution.migration.restoreTables;
+ for(const required of ['assessments','composite_form_answers','composite_form_section_attempts','composite_assessment_attempts','assessment_run_executions','assessment_result_facts','measurement_content_releases','education_private_tool_versions','scale_library_submissions','survey_standard_releases'])assert(names.includes(required));
+ const fixtureModule=await import(pathToFileURL(resolve('server-version/e2e/school-teacher-fixture.cjs'))),fixture=fixtureModule.default||fixtureModule;
+ const runtimeUrl=await fixture.restrictedRole(process.env.DATABASE_URL,'self_restore_'+process.env.GITHUB_RUN_ID+'_'+process.env.GITHUB_RUN_ATTEMPT);
+ const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg'),owner=new Client({connectionString:process.env.DATABASE_URL});await owner.connect();
+ let bodyFailed=false,preserved;
+ try{const tables=names.map(table=>table==='assessment_result_facts'?{table,expectEmpty:true}:table);
+  preserved=await restoreRows({owner,url:process.env.DATABASE_URL,serviceId:process.env.CI_POSTGRES_SERVICE_ID,tables,checkRestored:target=>checkRestoredRuntime(runtimeUrl,target)});
+ }catch(error){bodyFailed=true;throw error}finally{try{await owner.end()}catch(error){if(!bodyFailed)throw error}}
+ receipt('restore',{status:'PASSED',source:'qualified-current-PostgreSQL-native-and-declared-results',sourceHead:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,preserved,restrictedRuntimeRole:true,releaseSchemaVerified:true});
+}
 function cleanup(){const root=realpathSync(process.env.RUNNER_TEMP);for(const name of ['school-teacher-private','school-teacher-checks-private','school-teacher-seed.log']){const p=join(root,name);if(existsSync(p)){assert.equal(realpathSync(p),p);rmSync(p,{recursive:true})}}receipt('cleanup',{privateMaterialRemoved:true})}
+function nativeContext(kind){
+ const manifest=freshArtifact(kind),cwd=resolve('server-version',kind);
+ const files=kind==='frontend'?['dist','Dockerfile','nginx.conf']:['dist','node_modules','assets','prisma','scripts/runtime-role-contract.mjs','scripts/release-schema-contract.mjs','scripts/runtime-table-policy.json','package.json','package-lock.json','Dockerfile'];
+ const archive=join(out,kind+'-runtime.tar.gz');
+ command(kind+'-runtime-context','tar',['-czf',archive,'-C',cwd,...files]);
+ receipt(kind+'-runtime-context',{schemaVersion:1,kind,head:git('rev-parse','HEAD'),tree:git('rev-parse','HEAD:server-version/'+kind),runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,archiveSha256:sha256(readFileSync(archive)),manifest});
+}
+async function nativePhase(phase,b,plan){
+ if(plan.continuation==='package-browser-only'&&['frontend','backend','audit','native-evidence','native-runtime'].includes(phase)){
+  const {resumePackagePhase}=await import('./school-teacher-package-resume.mjs');await resumePackagePhase(phase,b,plan,{git,officialApi,officialZip,jsonZip,receipt,command});return;
+ }
+ if(phase==='admission')receipt('admission',{status:'PASSED',plan,applicationEvidenceStatus:b.evidence.status,historicalAcceptedCases:0});
+ else if(phase==='frontend'||phase==='backend'){
+  requireNativeProducerAttempt(process.env.GITHUB_RUN_ATTEMPT);
+  const kind=phase==='frontend'?'frontend':'backend';
+  // Build each component once. Original application cases and Draft lint/types
+  // keep their own identities; they are not silently reexecuted here.
+  if(kind==='frontend'&&plan.publicPackage)process.env.P6_PACKAGE_PROBE_BUILD='true';
+  if(kind==='frontend'&&plan.jdrDemo)command('frontend-types',process.execPath,['node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],resolve('server-version/frontend'));
+  freshBuild(kind);nativeContext(kind);
+ }
+ else if(phase==='verify-frontend-artifact')freshArtifact('frontend');
+ else if(phase==='verify-backend-artifact')freshArtifact('backend');
+ else if(phase==='native-evidence')receipt('native-reviewed-local-evidence',requireNativeEvidence(b,{inspectHistoricalCase,requireReviewedCase}));
+ else if(phase==='native-runtime')command('native-runtime','python3',['.github/scripts/school-teacher-native-runtime.py']);
+ else if(phase==='audit'){
+  if(b.execution.officialAuditReuse!==undefined){
+   const proof=verifyJdrAuditReuse(b,await officialApi('/actions/runs/'+JDR_AUDIT.run),await officialApi('/actions/jobs/'+JDR_AUDIT.job),git);
+   const zip=await officialZip(JDR_AUDIT.artifact,JDR_AUDIT.digest,'school-teacher-audit-'+JDR_AUDIT.checkout,JDR_AUDIT.run,JDR_AUDIT.head,JDR_AUDIT.bytes);
+   receipt('audit-official-reuse',{status:'VERIFIED_OFFICIAL_AUDIT',currentHead:plan.head,currentRun:process.env.GITHUB_RUN_ID,...proof,original:verifyCompletedAudit(jsonZip(zip))});
+  }else auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));
+ }
+ else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
+ else throw Error('Native Bundle refuses historical/unselected phase: '+phase);
+}
 async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup();return}assert.equal(process.version,'v24.21.0');const b=binding(),plan=actualPlan();assert.deepEqual(plan,JSON.parse(process.env.PLAN));const fresh=b.qualification==='fresh-integrated-authoring';
+ if(b.candidate==='native-bundle'){await nativePhase(phase,b,plan);return;}
+ const continuation=b.qualification===observerReuse.mode;
+ const reuseDeps={git,officialApi,officialZip,jsonZip,verifyTestReport,receipt,treeDigest,command,databaseGuard,restoreRows,checkRestoredRuntime};
  if(phase==='admission')admission(b,plan);
- else if(phase==='frontend')await frontend(b);
- else if(phase==='verify-frontend-artifact')fresh?freshArtifact('frontend'):verifyConnectedFrontend();
- else if(phase==='backend'){if(fresh)freshBuild('backend');else await reuseCompletedBackend(b);}
- else if(phase==='verify-backend-artifact')fresh?freshArtifact('backend'):verifyConnectedBackend();
+ else if(phase==='frontend'){if(continuation)await observerReuse.reuse('frontend',b,reuseDeps);else await frontend(b);}
+ else if(phase==='verify-frontend-artifact')continuation?observerReuse.verifyArtifact('frontend',reuseDeps):fresh?freshArtifact('frontend'):verifyConnectedFrontend();
+ else if(phase==='backend'){if(continuation||fresh)freshBuild('backend');else await reuseCompletedBackend(b);}
+ else if(phase==='verify-backend-artifact')continuation?currentBackendArtifact():fresh?freshArtifact('backend'):verifyConnectedBackend();
  else if(phase==='migrate'){if(fresh){freshArtifact('backend');await migrate(b)}else await prepareCurrentDatabase(b);}
- else if(phase==='postgres'){if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
+ else if(phase==='postgres'){if(continuation)await observerReuse.reuse('postgres',b,reuseDeps);else if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');if(b.branch==='release/education-observer-native-20261029')verifyClosure(b.execution.backend.inputClosure);batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
  else if(phase==='fonts')prepareFonts();
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
- else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend,...(fresh?{frontend:freshArtifact('frontend'),backend:freshArtifact('backend')}:{officialFrontendReuse:verifyConnectedFrontend(),officialBackendReuse:verifyConnectedBackend(),backendCompileDigest:verifyBackendCompileInputs()}),backendLockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),backendContentDigest:treeDigest(resolve('server-version/backend/dist')),frontendTree:git('rev-parse','HEAD:server-version/frontend'),frontendLockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),frontendContentDigest:treeDigest(resolve('server-version/frontend/dist'))},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
- else if(phase==='audit'){if(fresh)auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));else await reuseOfficial('audit',b);}
- else if(phase==='sast-reuse'){assert.equal(fresh,false,'Fresh qualification requires actual SAST, never historical reuse');await reuseOfficial('sast',b);}
+ else if(phase==='postgres-restore'){if(continuation)await observerReuse.restore(b,reuseDeps);else await restoreQualifiedPostgres(b);}
+ else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend,...(continuation?{officialFrontendReuse:observerReuse.verifyArtifact('frontend',reuseDeps),backend:currentBackendArtifact()}:fresh?{frontend:freshArtifact('frontend'),backend:freshArtifact('backend')}:{officialFrontendReuse:verifyConnectedFrontend(),officialBackendReuse:verifyConnectedBackend(),backendCompileDigest:verifyBackendCompileInputs()}),backendLockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),backendContentDigest:treeDigest(resolve('server-version/backend/dist')),frontendTree:git('rev-parse','HEAD:server-version/frontend'),frontendLockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),frontendContentDigest:treeDigest(resolve('server-version/frontend/dist'))},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
+ else if(phase==='audit'){if(continuation)await observerReuse.reuse('audit',b,reuseDeps);else if(fresh)auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));else await reuseOfficial('audit',b);}
+ else if(phase==='sast-reuse'){if(continuation)await observerReuse.reuse('sast',b,reuseDeps);else{assert.equal(fresh,false,'Fresh qualification requires actual SAST, never historical reuse');await reuseOfficial('sast',b);}}
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Unknown phase');
 }

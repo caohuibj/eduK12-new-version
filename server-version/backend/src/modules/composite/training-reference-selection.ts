@@ -1,3 +1,5 @@
+import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
+import {assertEducationRuntimeContentScope} from './education-content-scope'
 import {validateTrainingReportPointer} from './training-report-selection'
 import {assertTrainingPrivateReferenceCourseUse} from './training-private-reference-use'
 import {Prisma} from '@prisma/client'
@@ -39,12 +41,20 @@ export async function validateTrainingReferenceRelease(tx:Prisma.TransactionClie
   if(entry.metricKey!==definition.scoreKey||entry.referenceKind!==definition.referenceKind)trainingReferenceFail('ENTRY_INVALID');return definition})
  if(new Set(entries.map(referenceEntryKey)).size!==entries.length)trainingReferenceFail('ENTRY_INVALID')
  const scope=release.scope
+ if(input.unit.source.educationStandard){
+  await assertCompositionPublicContent(tx,{compositeId:input.compositeId,ownerId:input.ownerId,unit:input.unit,release})
+  return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}
+ }
  if(input.unit.source.standardCombination){
   await validateTrainingStandardDerivedContent(tx,input.unit,release,{compositeId:input.compositeId,ownerId:input.ownerId})
   return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}
  }
  if(scope.kind==='PLATFORM')return resolveFormalReferenceRelease(tx,{releaseId:release.releaseId,contentHash:release.contentHash,
   measurementReleaseId:input.unit.measurement.releaseId,purpose:input.purpose},release)
+ if(scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(scope.product)){
+  await assertEducationRuntimeContentScope(tx,{...input,release})
+  return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}
+ }
  if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==input.ownerId)trainingReferenceFail('SCOPE_DENIED')
  if(scope.resourceId!==input.compositeId)await assertTrainingPrivateReferenceCourseUse(tx,{release,ownerId:input.ownerId,
   compositeId:input.compositeId,currentAdmission:input.purpose!=='HISTORY'||input.admission===true,draftSelection:input.purpose==='NEW_BINDING',recordAdmissionExpiry:input.admission===true})
@@ -94,8 +104,13 @@ export async function listTrainingReferenceChoices(tx:Prisma.TransactionClient,i
    AND scope->>'ownerId'=${input.ownerId} AND scope->>'resourceId'=${input.snapshot.compositeId}
   ORDER BY published_at DESC,id LIMIT 1001 FOR SHARE`)
  if(reportRows.length>1000)trainingReferenceFail('LIST_BOUND_EXCEEDED')
- const units:Array<{itemId:string;family:Unit['family'];measurementReleaseId:string;reports:Array<{releaseId:string;version:string;title:string|null;audience:string}>;choices:Array<{releaseId:string;entryKey:string;version:string;metricKey:string;referenceKind:string;scope:'PRIVATE'|'PLATFORM';population:AssessmentReferenceEntry['population'];limitations:string[]}>}>=[]
+ const units:Array<{itemId:string;family:Unit['family'];measurementReleaseId:string;fixedConfiguration?:{name:string|null};reports:Array<{releaseId:string;version:string;title:string|null;audience:string}>;choices:Array<{releaseId:string;entryKey:string;version:string;metricKey:string;referenceKind:string;scope:'PRIVATE'|'PLATFORM';population:AssessmentReferenceEntry['population'];limitations:string[]}>}>=[]
  for(const unit of input.snapshot.units){
+  if(unit.source.standardCombination){
+   units.push({itemId:unit.itemId,family:unit.family,measurementReleaseId:unit.measurement.releaseId,
+    fixedConfiguration:{name:unit.source.standardCombination.reference.configurationName??null},choices:[],reports:[]})
+   continue
+  }
   const choices:typeof units[number]['choices']=[]
   for(const row of rows){
    let release=input.releases.get(row.id)

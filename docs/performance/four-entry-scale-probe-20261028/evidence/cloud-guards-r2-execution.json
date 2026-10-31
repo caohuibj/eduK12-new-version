@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "node_modules/tsx/dist/cli.mjs",
+    "/tmp/pr374-cloud/guards-r2.ts"
+  ],
+  "startedAt": "2026-10-28T03:47:07.889987+00:00",
+  "head": "3ad550800119b87ad355b52b5268a6fc38a542b0",
+  "scriptSHA256": "605168a73caea6a9b35092c3e1bc41b6ece70242fa24a51569ed4ea82acc0d66",
+  "fixtureSHA256": "c1f67bc13ced80481a727d3321cdd3b94e4a8b363c5cf3c41e5689bf2b3b7294",
+  "exitCode": 0,
+  "endedAt": "2026-10-28T03:47:09.778351+00:00",
+  "logSHA256": "877b4d34ac1fe6b8d1e4a67830844ef7072a28bd12869cb6942d50a3358582e9"
+}

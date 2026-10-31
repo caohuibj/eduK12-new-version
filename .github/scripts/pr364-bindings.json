@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "enabled": true,
+  "base": "5c427f2bfe646def2200162bab449a0711a6e133",
+  "product": "83da994e8e3312601fd0258657287dda798edf25",
+  "controlCheckpoint": "03bb9cd9e5e2ef883b7059a6c190191c87233546",
+  "source": {
+    "docs/performance/four-entry-postmerge-20261028/README.md": {
+      "before": null,
+      "after": "d9ca2b6657905c1414abac54960f29c71ec6f011"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/backend-types.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/frontend-types.log": {
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/initial-empty-selection.json": {
+      "before": null,
+      "after": "becee0b69c52cf219fe75620553e32f5a1a1ca80"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/postgres-pagination.json": {
+      "before": null,
+      "after": "47fa503edb022f71ff84571620f716ac7ea973af"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/postgres-pagination.log": {
+      "before": null,
+      "after": "5fcb9a4d4754f14c71e4457bb891ec32e4ee9526"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/review.json": {
+      "before": null,
+      "after": "8cfb4769904c690c549a2624ec7ae41de2e4fc6d"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/ui-pagination-passed.json": {
+      "before": null,
+      "after": "b67b3d49ff7d0bf2a92f51db02e0d21fe43d74ad"
+    },
+    "docs/performance/four-entry-postmerge-20261028/evidence/ui-transform-failed.json": {
+      "before": null,
+      "after": "b25e4415b50148e8ad82cd025cd9180b5b6cbfb2"
+    },
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.license-selection.postgres.integration.test.ts": {
+      "before": "c16cd9d2d7896c656c906e5ad70fb0d3874b7c49",
+      "after": "4309d359826daaf981e907abcc298b9b6b69d8a2"
+    },
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts": {
+      "before": "e928739b1a8bef1f81f3d96925f4b526cfb63e55",
+      "after": "b82a9ced59e471cd6005b934f2838d2989927cd1"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts": {
+      "before": "4e294af6e3a2f6c217e6033d4d460c2a110ec891",
+      "after": "f34a0f532a571fc85899435fdbf4c1d833d0c974"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": {
+      "before": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c",
+      "after": "77dc141bbd7817eaf18c8228a19fd0e8b5746f95"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": {
+      "before": "c671002f9d1e263ed3a1c21a567763bdc93ec654",
+      "after": "6d310822184db5c4361155361df1fe1b5e74554f"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": {
+      "before": "c335f97642f989d4f55aac2fc733c36d32c17ac9",
+      "after": "a829e614dab2d491f29186a1dbf547a44050903f"
+    },
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": {
+      "before": "1eafa2c5cc56bd76e2ae95c827a2666385fdfbde",
+      "after": "c413eeda62715fa8a054ddaf53ab6ce29e9fddb8"
+    }
+  },
+  "controlBefore": {
+    ".github/scripts/pr364-bindings.json": null,
+    ".github/scripts/pr364-scope.mjs": null,
+    ".github/scripts/pr364-checks.mjs": null,
+    ".github/scripts/pr364-controls.test.mjs": null,
+    ".github/scripts/content-scope.mjs": "54acbe62c167c069fe84a72af77a326aab93a3ec",
+    ".github/scripts/merge-gate.mjs": "fc84b2398cda80f8a52528d2d063c626582beb30",
+    ".github/workflows/ci.yml": "a1ae228174f75d3a5d6d90b7f26c4dfa8e5f1eca"
+  },
+  "components": {
+    "backend": "329d74f7d03d571f2306ff72c60c3fb93d223246",
+    "frontend": "08e007747668fcf67cfd44d323a70daf8dc1ab9e"
+  }
+}

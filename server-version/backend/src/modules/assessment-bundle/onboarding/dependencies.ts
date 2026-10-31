@@ -1,3 +1,6 @@
+import { canonicalHash } from '../../assessment-runtime/canonical'
+import { calculateScoreRanges } from '../../scale/scale-scoring'
+import { hashScaleDefinition } from '../../scale/scale-definition'
 import { cognitiveSeeds } from '../../cognitive/generated/seeds'
 import { getExecutableScalePackage } from '../../scale/onboarding/executable-registry'
 import { getSituationPackage } from '../../situational/situation-package.registry'
@@ -27,6 +30,15 @@ export function dependencyBlockers(raw: unknown): string[] {
       if(!context||slot.instrumentKey!==context.contextDefinitionKey||slot.instrumentVersion!==context.contextDefinitionVersion)errors.push(`${slot.slotKey}: FORM context mismatch`)
       for(const e of mappings){const field=context?.fields.find(f=>f.contextKey===e.selector);if(!field||(field.valueType==='enum'?'string':field.valueType)!==e.valueType||e.unit!=='context')errors.push(`${e.evidenceKey}: context type/unit mismatch`)}
     }
+  }
+  if(p.schemaVersion===2)for(const b of p.profile.bindings){
+    const e=p.evidence.find(e=>e.evidenceKey===b.evidenceKey)!,pkg=getExecutableScalePackage(b.source.instrumentKey,b.source.instrumentVersion)
+    const d=pkg?.definition,score=d?.scoring.scores.find(s=>s.key===e.selector)
+    const range=d?calculateScoreRanges(d).get(e.selector):undefined
+    if(!d || canonicalHash(d)!==b.source.runtimeDefinitionHash || range?.min!==b.transformation.min || range?.max!==b.transformation.max || hashScaleDefinition(d)!==b.source.measurementHash || d.scoring.scoringVersion!==b.source.scoringVersion ||
+      d.versionAxes?.localizationVersion!==b.source.localizationVersion || d.versionAxes?.subjectKey!==(b.source.subjectKey??p.profile.applicability.domain) ||
+      d.scoring.scorerKey || score?.source.type!=='items' || score.source.items.length!==b.source.expectedItems || score.source.aggregation!=='mean')
+      errors.push(b.evidenceKey+': PROFILE frozen measurement/scoring/locale/item identity mismatch')
   }
   return errors.sort()
 }

@@ -1,0 +1,17 @@
+✔ original local cases and failed continuations retain their provenance without replay (55.1127ms)
+✔ exact app pins reject unknown inputs, changed main and full fallback (206.949572ms)
+✔ Ready requires actual native/image/SAST success; Draft never qualifies (208.881638ms)
+✔ actual entrypoint child resolves original admission without a top-level-await cycle (134.839851ms)
+✔ image reuse refuses failed, skipped or expired original producer steps (221.146639ms)
+✔ actual main schema archive exceeds 1 MiB without stdout buffer truncation (40.519884ms)
+✔ backend audit receipt cannot admit a failed or expired original audit step (205.973953ms)
+✔ retained application SAST requires exact official successful extraction and current tree (222.28419ms)
+✔ actual original source-SHA job metadata admits unchanged complete native and application SAST only (332.000145ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1766.906746

@@ -59,7 +59,7 @@ const invalidCatalogRecord = (asset: StoredAssetRecord | undefined): boolean => 
   || !['local', 'cos'].includes(asset.provider)
 )
 
-const validateAssessmentAssetCatalog = (
+export const validateAssessmentAssetCatalog = (
   references: readonly AssessmentAssetIdentityV1[], assets: readonly StoredAssetRecord[],
 ): AssessmentAssetValidation => {
   const byId = new Map<string, StoredAssetRecord>(assets.map((asset) => [asset.id, asset]))

@@ -1,0 +1,485 @@
+{
+  "status": "PREPARED_NOT_MERGE_READY",
+  "base": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+  "productHead": "f736217fc2426cbcee35b602eafbed43a5a16164",
+  "componentTrees": {
+    "backend": "dc9a331f08901238236ec3664e3173aba3f15030",
+    "frontend": "cba77e36ec1ba531a20f7775ea00a34c91699fe5"
+  },
+  "localTypes": [
+    {
+      "component": "backend",
+      "report": "frozen-privacy-types-repair.json",
+      "componentTree": "303a4a4ca919da1ec9d0e7e8c858f5a8fe89aa60",
+      "exitCode": 0
+    },
+    {
+      "component": "frontend app",
+      "report": "frontend-final-types.log",
+      "componentTree": "83917ae150cafbbe825a269d4c56a0e08a98e0a8",
+      "exitCode": 0,
+      "reusedUnchangedFrontend": true
+    },
+    {
+      "component": "backend",
+      "report": "backend-leaf-floor-types.json",
+      "componentTree": "315616d1b8fead0cbbd340822ef8828498007cb9",
+      "exitCode": 0,
+      "replaysPriorCases": false
+    },
+    {
+      "component": "backend",
+      "report": "current-backend-types.json",
+      "componentTree": "b0ab5f0b0fad5b14d203499deea50640264c2901",
+      "exitCode": 0,
+      "sourceCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "current-frontend-types.json",
+      "componentTree": "7db01e8ff09cd4f5865e99fbb0438f2f4ff6caea",
+      "exitCode": 0,
+      "sourceCheckpoint": "199d2807fd634e6fa54fd09163233d4722fd9778",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "group-discovery-backend-types.json",
+      "componentTree": "95198c4740897cb76e4fddb8db8dbd78a232f1e7",
+      "exitCode": 0,
+      "sourceCheckpoint": "a2b20a6e66ac68fd38ca8c37b9128613c2a725f4",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "mainfa/backend-types.json",
+      "componentTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+      "exitCode": 0,
+      "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "mainfa/frontend-types.json",
+      "componentTree": "3346bc7d97cb4fb66560e25719f8d7d56f7e61c8",
+      "exitCode": 0,
+      "sourceCheckpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "backend",
+      "report": "mainfb/backend-types.json",
+      "componentTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+      "exitCode": 0,
+      "sourceCheckpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
+      "originalExecutionSigned": false
+    },
+    {
+      "component": "frontend",
+      "report": "mainfb/frontend-types.json",
+      "componentTree": "cba77e36ec1ba531a20f7775ea00a34c91699fe5",
+      "exitCode": 0,
+      "sourceCheckpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
+      "originalExecutionSigned": false
+    }
+  ],
+  "distinctUnitAndMockHttpCases": 37,
+  "postgres": {
+    "initial": "failed after historical class/tag/source assertions, invalid staff-role fixture enum",
+    "continuation": "one retained staff-class step passed; no fixture reset or replay",
+    "isFullSchoolServiceJourney": false,
+    "schoolService": {
+      "original": "service-postgres-first.json",
+      "usersContinuation": "service-postgres-users-continuation.json",
+      "domainContinuation": "service-postgres-domain-continuation.json",
+      "readContinuation": "service-postgres-read-continuation.json",
+      "proof": "service-postgres-proof.json",
+      "status": "PASSED_BY_RETAINED_STAGE_CONTINUATION",
+      "failures": [
+        "Fixture missing explicit required IDs; reused created users",
+        "Fixture lacked ORGANIZATION_RUN DB-only assignment provenance; repaired only synthetic retained assignments",
+        "Actual first artifact saved then read failed: SQL GREATEST returned bigint; cast to int and resumed existing artifact read"
+      ],
+      "noResetOrFirstGenerationReplay": true,
+      "registryStubOnly": true,
+      "generationCanonical": 10,
+      "readCanonical": 0,
+      "operationsAre": "Prisma/Raw calls, not SQL events or production CPU",
+      "generationMs": 188,
+      "readMs": 26
+    }
+  },
+  "browser": {
+    "report": "browser.json",
+    "realSchoolAppNavigation": true,
+    "syntheticAuthAndApi": true,
+    "pdfPages": 2
+  },
+  "notQualification": [
+    "frontend-types.log runs empty root tsconfig and is not application type evidence",
+    "preparation shell paths failed before some checks; initial PostgreSQL test continued after that preparation error",
+    "backend types before later source edits retained as earlier checkpoints only"
+  ],
+  "remaining": [
+    "Exact PR414 qualification configuration/control review and official selected admission/CodeQL/gate results remain NOTRUN.",
+    "School Form and additional runtime sources remain future batches; no claim of all sources complete.",
+    "Legacy no-leaf V1 lacks frozen leaf identity: recorded compatibility limit, no unrelated migration.",
+    "Group longitudinal waits stable personal contract."
+  ],
+  "reports": {
+    "backend-delta.json": {
+      "sha256": "2684a545392afb6a18c07d0dd204711b29ccdacff0d1cf9ca4712f020abecfed",
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 17,
+      "bytes": 8699
+    },
+    "backend-final-delta.json": {
+      "sha256": "25acc300726464e0c0f40781288da36a3708a340ad4898260f56306dd82dd11c",
+      "numPassedTests": 9,
+      "numFailedTests": 0,
+      "numPendingTests": 13,
+      "bytes": 9233
+    },
+    "backend-unit.json": {
+      "sha256": "dc9929e6495d8c761eef42dd37c61560fa74852ed06672b6b2f8a0965d329e9d",
+      "numPassedTests": 21,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "bytes": 9187
+    },
+    "browser.json": {
+      "sha256": "7791ffd1feecb7227a8ef682bfe013eef5d0b28e15ee3b73054837cc8e1b6daa",
+      "bytes": 1350
+    },
+    "frontend-renderer-delta.json": {
+      "sha256": "437a3d269d34e12fb83b1c04312c3e85a091baf94c9a1e0de070bb529b406603",
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 2,
+      "bytes": 1860
+    },
+    "frontend-unit.json": {
+      "sha256": "3e6dcaefa9273816f5885a871b65696d2b6ab04f0a700571563e57f62daebcee",
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "bytes": 1926
+    },
+    "leaf-current-epoch.json": {
+      "sha256": "eeae411c7413e1a7d8a5d0c0efbd91008402c7bcf20096911a669b66a5cd85e5",
+      "numPassedTests": 6,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "bytes": 3034
+    },
+    "postgres-continuation.json": {
+      "sha256": "b9f0441d384e03089ff70df3f3f7f91376714c66f51bd70ff7653475471a1653",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 1,
+      "bytes": 1613
+    },
+    "postgres.json": {
+      "sha256": "a40a837700683f7bb55dfea98d2bcf3d874948d62935da9a5ebafcbd549df77f",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "bytes": 2652
+    },
+    "presentation-delta.json": {
+      "sha256": "4dd4fb5464ff20de9258ba45805194e6a657948f3a565eca17c539b7c0a1b57e",
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 19,
+      "bytes": 9061
+    },
+    "routes.json": {
+      "sha256": "e2cada086cd988e05da342cd15dece86c150b6e7b398d020058bbb924748a04e",
+      "numPassedTests": 6,
+      "numFailedTests": 0,
+      "numPendingTests": 28,
+      "bytes": 12133
+    },
+    "frozen-privacy.json": {
+      "sha256": "c1e77020cf51e3f5913a55f3c6e7d96692606cc54cf230f954708609a15dece9",
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "bytes": 2447
+    },
+    "frozen-privacy-types.json": {
+      "sha256": "c80bccc8d5789f488b6e982dc6cd96a7faeb607d4518cd838305b530daee6752",
+      "exitCode": 2,
+      "bytes": 481
+    },
+    "frozen-privacy-types-repair.json": {
+      "sha256": "1fa8b543cbbe0172901d7d8e4d6fad98ac101835a6f5cca40f0f30b7f39bac89",
+      "exitCode": 0,
+      "bytes": 481
+    },
+    "backend-leaf-floor-types.json": {
+      "sha256": "f11e7e993985150cd5a58d7f9e2eae066420b14af27af38f69430c5d619ef46e",
+      "exitCode": 0,
+      "bytes": 434
+    },
+    "leaf-floor-before.json": {
+      "sha256": "68a47f61885fc7d5199a5cbdba7f7235fe7d71a8b9b939aaea8f4477763c3a1d",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 6,
+      "bytes": 4217
+    },
+    "leaf-floor-fix.json": {
+      "sha256": "2705ad058580ade96d0309b29bad6e96becbf5315b5b2c79dc102aeee59a0957",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 6,
+      "bytes": 3218
+    },
+    "leaf-floor-reproduction.json": {
+      "sha256": "4e12922c904a6dcad49c8f19ee0d9cfcadabe54cd0755d27eb24c4323e75ba69",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 6,
+      "bytes": 3647
+    },
+    "leaf-floor-review-fix.json": {
+      "sha256": "c53655e4267b1e05f503806e5b781eea5035584aeea9d3507cb7182c5e21907b",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 6,
+      "bytes": 3219
+    },
+    "service-postgres-domain-continuation.json": {
+      "sha256": "87eef3b6401608869e1317dc2e5285d8524b784432ac550694855ef6fe43d1c9",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "bytes": 2114
+    },
+    "service-postgres-first.json": {
+      "sha256": "23d5ec6cfba880b57f710732986c19a7df74a0c4ce55c826300024dbb3030ec6",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "bytes": 3306
+    },
+    "service-postgres-proof.json": {
+      "sha256": "b1c07e34d3eecd7de7b33b208b523f128c0b260506e4781536fcce84837d0db5",
+      "bytes": 610
+    },
+    "service-postgres-read-continuation.json": {
+      "sha256": "2869d7a74016c34ea3364b8ebb360ed33bab5ef906b5a8fa995eb6c2527732db",
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "bytes": 1233
+    },
+    "service-postgres-users-continuation.json": {
+      "sha256": "c6de98132500c2159f4c732e786893481d7d5f644d2d2c874f8b8f48fc8b9d39",
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "bytes": 2303
+    },
+    "current-backend-types.json": {
+      "sha256": "62a9bfa1fa2a3da32534572464b3ced2730d97e3bb9e95ff24a5476478782cff",
+      "bytes": 492
+    },
+    "current-backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "current-frontend-types.json": {
+      "sha256": "843346e130fa53092e33320006675537e733e79a3df497029213ae99f3bf3017",
+      "bytes": 528
+    },
+    "current-frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "qualification-case-inventory.json": {
+      "sha256": "7e36e348c7026099f53e87961ad302bfb88181e2574acf03cefd56a0e80de000",
+      "bytes": 15167
+    },
+    "main55-qualification-plan.json": {
+      "sha256": "850000dbcbceabec183bba2accbb7a12b84dc7ded19ba4e61ca0a50f10992946",
+      "bytes": 2862
+    },
+    "main55-source-diff.raw": {
+      "sha256": "b3e929c7915f0c07aabc14d3b0850b4b458edcd897232b7ce2e3870a716c7f58",
+      "bytes": 16466
+    },
+    "group-discovery-contract.json": {
+      "sha256": "9e64c85b2921b6454c87fbd724bcb09c4afc6566d31cfb407eb18a9d9bd61799",
+      "bytes": 5178
+    },
+    "group-discovery-contract.log": {
+      "sha256": "debbbdb8efbc40769f4832cd377cfa0e43711014906e445de34473641a0818db",
+      "bytes": 126
+    },
+    "group-discovery-backend-types.json": {
+      "sha256": "a236956f792966856b42697532692ca5b3467d5f01324e4869959aaa07e91ea8",
+      "bytes": 492
+    },
+    "group-discovery-backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/backend-types.json": {
+      "sha256": "dd458fa11d29e5c4e63bd36987d6abff9d76b996d1ee3508083c6330b9b962bc",
+      "bytes": 492
+    },
+    "mainfa/backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/frontend-types.json": {
+      "sha256": "676d4b28428ce44964d660035e9046b5b58ef07e629302ccfac1ab105c9288e4",
+      "bytes": 528
+    },
+    "mainfa/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfa/qualification-plan.json": {
+      "sha256": "aa3dae1e77a31a8dd541f35bb83ce62d46548105e00f86e19ec5ed0262e8df31",
+      "bytes": 2681
+    },
+    "mainfa/source-diff.raw": {
+      "sha256": "f91bfc34aa4ca246555f804bc2c9a41ddd5ccedda5d071809274cca151469d44",
+      "bytes": 17809
+    },
+    "mainfa/prisma-generate.log.gz": {
+      "sha256": "1ba4d378849898d61ba6b45e4d139c833d4fe51730199a33446e56a66f57f688",
+      "bytes": 242,
+      "transport": "lossless gzip; original trailing blank lines preserved",
+      "originalSHA256": "83e77ef372e807271b890e2150324d024ecf2bbac53f7f231b47a8510e79ad25"
+    },
+    "mainfa/receipt-review.json": {
+      "sha256": "0bc318b2af1cc16f7d95f32235f4e88767638c3d0e457ad8d207739ce2fc0632",
+      "bytes": 806
+    },
+    "mainfb/backend-types.json": {
+      "sha256": "5c58f97910b464ebf6899f5b4fc99d43ab03822082c5f557ff5a47ec8991d4e9",
+      "bytes": 492
+    },
+    "mainfb/backend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfb/frontend-types.json": {
+      "sha256": "6311a7169e2a703e1b27b614364f99fb6bead0e931a9f9902f58a9d94c8e3773",
+      "bytes": 528
+    },
+    "mainfb/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfb/prisma-generate.log.gz": {
+      "sha256": "8f400f00c074d76cebe0c850ac644a0472470ad43474b5d51584046a1d3ae2d5",
+      "bytes": 239,
+      "originalSHA256": "5b93bcfd901faeec05c6cdd43445ea5d66ae4aada45df94218caa3e83ab795a0"
+    },
+    "mainfb/qualification-plan.json": {
+      "sha256": "0ffb3b4f2bef8fab78e8f862092abe758e742319b5bd7d63ef4cebd9a5e2664f",
+      "bytes": 1329
+    }
+  },
+  "ciExecuted": false,
+  "productionTouched": false,
+  "typeFailure": {
+    "original": "frozen-privacy-types.json",
+    "exitCode": 2,
+    "reason": "TS2345 scenario union was not narrowed after arrow-function never call",
+    "repair": "explicit return hidden(); same throwing path, no runtime behavior change",
+    "continuation": "frozen-privacy-types-repair.json",
+    "exitCodeAfter": 0,
+    "policyCasesReplayed": false
+  },
+  "integrationCheckpoint": {
+    "head": "42e2a40d908cef7e3e0c4a52eeb1975c7079301a",
+    "trainingDependency": "20de08b63b8b77efe1941c935ec154ca74177051",
+    "mainIntegrated": "31845e3a14dd5edf6e03c90e7f71c014bcf0aa06",
+    "backendTree": "d11a452cf25da1465fbb745a6a7c5f86aab8fe29",
+    "frontendTree": "83917ae150cafbbe825a269d4c56a0e08a98e0a8",
+    "currentBackendTypes": "PENDING_NEXT_PRODUCT_FREEZE",
+    "frontendEvidenceReused": true
+  },
+  "leafFloor": {
+    "status": "V2_FIXED_V1_SCOPE_OPEN",
+    "test": "parent10 leaf20 spec10 cohort12",
+    "before": "leaf-floor-reproduction.json",
+    "after": "leaf-floor-review-fix.json",
+    "cases": 1,
+    "invariant": "max leaf/parent/request/spec; same floor for V2 generation, old snapshot metric/cell reads, and School differencing",
+    "v1Risk": "Old unselected whole-Run V1 lacks leaf identity. Existing parent-only path can flatten a child metric without its stronger contract. Do not claim all GROUP paths fixed; migration/legacy read compatibility scope pending. School subgroup without leaf is still rejected.",
+    "currentScopeDecision": "V2 fix accepted by parent after a7969866 review; retain old V1 limitation accurately without expanding into unrelated migration."
+  },
+  "historicalManifestCheckpoint": {
+    "status": "IN_PROGRESS_NOT_MERGE_READY",
+    "base": "296c941419d76b360405c2c487d10514cd5c530e",
+    "productHead": "95baa41c600b1f6e8ac930a83da04578c3614894",
+    "componentTrees": {
+      "backend": "315616d1b8fead0cbbd340822ef8828498007cb9",
+      "frontend": "83917ae150cafbbe825a269d4c56a0e08a98e0a8"
+    },
+    "remaining": [
+      "V2 School PG service completed; old no-leaf V1 whole-Run floor scope remains unresolved before full disclosure finding closure",
+      "Teacher actual product entry and product-admin adaptation",
+      "School Form choices and unsupported standalone/Bundle runtime adapters",
+      "group longitudinal awaits stable personal contract",
+      "Notion 409 review-page append denied by automatic review: explicit target authorization pending; no write performed, no reroute"
+    ]
+  },
+  "qualificationPreparation": {
+    "plan": "mainfb/qualification-plan.json",
+    "deduplicatedCases": "qualification-case-inventory.json",
+    "distinctNamedPassed": 41,
+    "unitAndMockHttp": 39,
+    "retainedPg": 2,
+    "businessChecksReexecuted": false,
+    "formalActivation": false,
+    "remainingControlWork": "Final binding verification and existing Ready PR synchronize on exact mainfb; no new workflow."
+  },
+  "groupDiscoveryContractFix": {
+    "scope": "School GROUP source catalog uses actual audience and frozen parent GROUP contract; leaf tools require the same parent ceiling and a resolvable leaf GROUP contract/metric keys",
+    "privateComposition": "Current private parent contract is INDIVIDUAL_ONLY with manager/professional NONE; private canonical instrument lacks generic registry adapter. Do not infer GROUP permission from personal or longitudinal fields; do not advertise until a valid GROUP source adapter and ceiling exist.",
+    "newCases": 2,
+    "report": "group-discovery-contract.json",
+    "old37AndPgReexecuted": false,
+    "backendTypes": "group-discovery-backend-types.json: one actual current backend compile exit0; no frontend replay.",
+    "frontendChanged": false
+  },
+  "mainfaIntegration": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "checkpoint": "7cc7edb045f04981c6d64df65c5fa0290f7a109b",
+    "conflicts": false,
+    "sharedPersonalFilesModifiedByThisNode": false,
+    "prismaClientGenerated": true,
+    "databaseMigrationApplied": false,
+    "oldBusinessTestsReexecuted": false,
+    "groupLongitudinalStarted": false
+  },
+  "mainfbIntegration": {
+    "main": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+    "checkpoint": "f736217fc2426cbcee35b602eafbed43a5a16164",
+    "mergeConflicts": false,
+    "schoolTeacherReportingSourceChangesFromMainfa": [],
+    "prismaClientGenerated": true,
+    "databaseMigrationApplied": false,
+    "old41BusinessOrPgObservationsReexecuted": false,
+    "previousFormal": {
+      "run": 41057783824,
+      "candidate": "77e2767248d171f8914fe94b9f3debada424a4d4",
+      "base": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+      "requiredJobsAllSuccess": true,
+      "admissionZipVerified": true,
+      "sarifZipVerified": true,
+      "sarifFindings": 1,
+      "baselineTestAdvisoryRetained": true
+    }
+  }
+}

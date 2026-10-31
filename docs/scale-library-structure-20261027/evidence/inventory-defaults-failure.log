@@ -1,0 +1,17 @@
+<anonymous_script>:5
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+                                                                 ^
+
+TypeError: Cannot read properties of undefined (reading 'length')
+    at __spreadArray (eval at <anonymous> (/workspace/eduK12-new-version/server-version/backend/scripts/audit-scale-candidate-structure.ts:2:2576), <anonymous>:5:66)
+    at _loop_1 (eval at <anonymous> (/workspace/eduK12-new-version/server-version/backend/scripts/audit-scale-candidate-structure.ts:2:2576), <anonymous>:33:24)
+    at Object.validateAudienceReport (eval at <anonymous> (/workspace/eduK12-new-version/server-version/backend/scripts/audit-scale-candidate-structure.ts:2:2576), <anonymous>:47:9)
+    at <anonymous> (/workspace/eduK12-new-version/server-version/backend/scripts/audit-scale-candidate-structure.ts:72:512)
+    at Array.map (<anonymous>)
+    at exports (/workspace/eduK12-new-version/server-version/backend/scripts/audit-scale-candidate-structure.ts:54:122)
+    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/scripts/audit-scale-candidate-structure.ts:76:42)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object.transformer (/workspace/eduK12-new-version/server-version/backend/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)
+    at Module.load (node:internal/modules/cjs/loader:1651:32)
+
+Node.js v24.21.0

@@ -12,3 +12,7 @@ export async function compiledHashForInstance(db: Prisma.TransactionClient, comp
   if (!row) throw new Error('BUNDLE_INSTANCE_MISSING')
   return compiledHashFromInstance(row)
 }
+
+export function isNativeBundleComposite(value:{productKind:string;bundleInstance?:unknown}){
+  return value.productKind==='ASSESSMENT_BUNDLE'||value.productKind==='ORGANIZATION_RESOURCE'&&value.bundleInstance!=null
+}

@@ -1,0 +1,1512 @@
+{
+  "schemaVersion": 1,
+  "repository": "caohuibj/eduK12-new-version",
+  "slice": "school",
+  "branch": "feat/personal-longitudinal-school-20261030",
+  "base": "8bc677156a3548333450363a31e33812ad2a9f0c",
+  "reviewedCandidate": "2d72ed1e4092250bbf2411f3210ae1a6a5f17727",
+  "originalSource": "aecb26636ebec3d7e8fe27201bc01ad7840ca7e2",
+  "originalCaseCount": 37,
+  "originalReportPrefix": "docs/evidence/personal-longitudinal-school-20261030/",
+  "reviewBasis": "School55 exact source-line deltas match immutable aecb against Teacher f0. Original37 successful local observations across18 raw JSON reporters retain unsigned provenance, all failed/filtered rows and12 original failed reporters/continuations remain intact. No application, browser or PostgreSQL replay. Main8bc includes independently qualified414 and409; merge is conflict-free. No School migration exists: complete current base/candidate Prisma equals the original physically qualified Teacher candidate, so only official native schema/restore state is reused. Current School source/consumer/image/security/SAST and changed admission controls execute through the existing bounded workflow.",
+  "files": {
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts": {
+      "before": "8f81f4544d6a01e0bffee469f107c8235007823b",
+      "after": "dc4aaa442b165414ebad26f629d210b6f01a79fe",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "6e54ff4fcdf3cae5e66fdb67d0584e1632fc001d0569a3a1761d4468dc2f5b00"
+    },
+    "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts": {
+      "before": "d226c699a14546091c075318cb8213ce8cf825fd",
+      "after": "c67f7af4eed24c9077dbeeb95607b7b46446e461",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "cad5e677da06be6d83892aa97a1b8623b3ec2f255aad6f32fc5d58179c1ad43c"
+    },
+    "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts": {
+      "before": "0ceba3ce66382fd11bf31a77a83121d82f03e15d",
+      "after": "25a8d8895ea835d28d2a0db8bf2b1544b1db3372",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "0197d2a63485e6de04aa0c4f93c8df0412ed1d8cd4838a38b7037423694511f9"
+    },
+    "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts": {
+      "before": null,
+      "after": "94c658456b19c81e5ddd0f02cd20682cc697e2fa",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "5f99aeda1e705f981c83e8163e71ef341cc6a55bb557c95ab80f2db4071bafc5"
+    },
+    "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts": {
+      "before": null,
+      "after": "563987c89a05086e03a88eae3a09eae3c38a6f7b",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "b03284b7f942b5c201dbc8f0612317326818bb123c691ca291d1c70bd2cd2a6b"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts": {
+      "before": "3785647b219465580198a0bc6db5c332676862db",
+      "after": "521570184613e4123e73ad4ead7a21398592832b",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "b6022ba9ae98cca4852ed7ebaa742ce34cdee06f9af5474b0ad2403598811a8b"
+    },
+    "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts": {
+      "before": null,
+      "after": "6e88c0d55a606729e336e64395ac5484fcb12284",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "cf16ab12ab425db1d55af549a49b8c502f31aa63263b9e30cab46e7d1d091948"
+    },
+    "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts": {
+      "before": null,
+      "after": "479790ac16dc063201617b57780f5ab7cc612e22",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "1e86629a9b69dd1591edf1919ad0dcc2a9afabb7215a09d3e6c042713fe4a5ba"
+    },
+    "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts": {
+      "before": null,
+      "after": "8c359528150357559ec2eb5d7554ab8cd9b8485d",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "36d66ff17ea2df60a6d1b4e5e86b56e6db58061a7a6c2b6030bfec2b0e10aba2"
+    },
+    "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts": {
+      "before": null,
+      "after": "1cacab48f0c11b897379364a62c4350fbb549956",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "b81af6ac0eca8d907d6721fb71e6db15c3c779d866750debf8afd389da99087d"
+    },
+    "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts": {
+      "before": null,
+      "after": "0717e8a994a90529d904dc9ab1a31969181ec05d",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "6d443d86cf64dff988593a6f3a5e0c15b47247ad27f75eb0486146f7a1c41a32"
+    },
+    "server-version/backend/src/modules/assessment-run/education-start-context.ts": {
+      "before": "0cb4938e96f66d5c4922125440e7be94b16b8324",
+      "after": "2a2a0672e9a2855db27dc572de7b93c3c17f76ee",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "faa37dbe7fb1080f8f7ec392cf4246bd3a8f75a40e29baa80cd1b2c368b3b35a"
+    },
+    "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": {
+      "before": "6f496c3f92905bbe1ca44817a7b65821036acae0",
+      "after": "b88589e5ecfb7107b5f387af2b78d9271b74a700",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "f416e2052317994e1ed310eccd9141339c9af23472f2d24e155caa2c6deff89b"
+    },
+    "server-version/backend/src/modules/assessment-run/registeredResources.ts": {
+      "before": "7fce451eece648fa97a6ce6bebbce1ce3a8706e0",
+      "after": "ff6bb5f3cb8f72f8da6d9ad7229d1625515010ec",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "9f8bb3f438fafdcc08e24a1cbcceea11a5b33713ca962b105b74958a514de3f9"
+    },
+    "server-version/backend/src/modules/assessment-run/repository.ts": {
+      "before": "26208ea23966b8cfadfe1cdda85fb93ab6eeb4e3",
+      "after": "21539c14c664e6183a2630c6beb8c3c1bb123e72",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "e7579ea0f82732b4e8e3dc9e2a3386351365b2df7bb8492a1622833d715698a6"
+    },
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": {
+      "before": "e65641b19c944eee873dcaabe6a7a7fc74b2130f",
+      "after": "5410e58fffec10a1162d746b966b0975bc214af4",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "229880490e2ec72173e98ff024278b815b4c642907379e9d7a3df9159be3bdd0"
+    },
+    "server-version/backend/src/modules/campus/activity.allocation.ts": {
+      "before": "b38e2231633a43812525c744b4e9053dee4bd167",
+      "after": "0c3c6f50ed9833420883a75c7dfc6581f5507a80",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "61dbee64f967bc43998e1d6a177dc66fd389099586ad9e48859976ad0db4cd1b"
+    },
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": {
+      "before": "0731e2258a84269ae5f7e3858980994f368c652e",
+      "after": "ed8b7777abee5467b6d706d6d7055ae11b9e724a",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "9038eaf1015963370a4cd835d80d344c4a522b962731a9378796bfe6ed826b0b"
+    },
+    "server-version/backend/src/modules/campus/activity.runs.ts": {
+      "before": "e004fedd3e519ea22506152c49e4c18b56bcbd15",
+      "after": "898e864499cf85a5f1d4db095e6d7a230ee2d318",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "61dbee64f967bc43998e1d6a177dc66fd389099586ad9e48859976ad0db4cd1b"
+    },
+    "server-version/backend/src/modules/campus/activity.service.ts": {
+      "before": "a56a843a6ff81b85209418b6477bc8ab7d87c1f3",
+      "after": "0f41e01425ef605fc426c934ca00a09cb525a1d3",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "61dbee64f967bc43998e1d6a177dc66fd389099586ad9e48859976ad0db4cd1b"
+    },
+    "server-version/backend/src/modules/campus/personal-tracking.ts": {
+      "before": null,
+      "after": "fa98528a08b5e2f8d17a4de099a4b6dd0c24db97",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "36839b30b55dedf2ede25cd203c3750034146a8f6da7a34d244dc345bf550577"
+    },
+    "server-version/backend/src/modules/campus/report.routes.ts": {
+      "before": "4c9042098c9c4db63322dfb5b1e99b380b0de0cd",
+      "after": "f6c1ab4062b4eea8436f14138c30d460e2b7b02c",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "e919c7dcdac570b4cd936803c430570a9a325620644d3b93f82f0807aace8d45"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "3878a537a413f7349930c285b89b830033eab37e",
+      "after": "4476074c3e87983510288151e8293c473c654a53",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "781240bbddb6f8546f71f5317e6448a80f6f118d364be5ce654bc3667dedbbe3"
+    },
+    "server-version/backend/src/modules/composite/personal-tracking-results.ts": {
+      "before": "e93c69f08e23ac18c36c42d57f36b655174059c0",
+      "after": "d375ca02e81d8d8808049a348e6f34a36183c644",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "551894a6533100afc2661841f0b7c9d0b6080d0e3163f5969316bb274c9bc1b2"
+    },
+    "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": {
+      "before": "9dcedb9d38ecdfb00ba707b9b5352cb1ff16ea16",
+      "after": "eb61e88f84ea455eebc29fb66dd9e721d19a0763",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "b3accc0b9081f3a7421ca2ba167bd1d1c16c2be0b673b4e53bdde4001c087d9f"
+    },
+    "server-version/backend/src/modules/education-tools/native-source.cognitive.ts": {
+      "before": "77f5276cb56a36e6890317340a761f74774e9b28",
+      "after": "2f8c6b88c8f9babca5f2ba7eae38c3fece5ec57f",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "962852b66feac730e62910dcc2e4834330229d3aaad5d1b6e942ba5c8ca43f07"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": {
+      "before": "851de59a38be769318e12d362bf16a20034126e5",
+      "after": "dc194dfd9b29cf2260f27e57deb805f0ede356ef",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "d9a30cbe14ef6bf47419ca9e44434b33d9841198f5f882cb23f79ee8b7f92bcf"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": {
+      "before": "e995eedb2dfa6e3f141acb625cd83a4059dab339",
+      "after": "b404055e4545412cfbf13975aafd6cd0ae205557",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "6448c8a326b917c2edecaa5451bc03702c1c890e7a52f24482ca1a3ddfb164e2"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts": {
+      "before": "25dcae89584c597143176e809bd2fce8de4ce036",
+      "after": "2612c469f0f9089041ecbae4032a3a839e249a53",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "fc5cd2e228e00e94489ce0eae13453845d8a20f79a6cbd4b98d606358a008a55"
+    },
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts": {
+      "before": "8ffa02478aebe3089a74750ccf3215490fd267f7",
+      "after": "8d0eb96a98dea86ec6c6b027795d3c7dc5f8cb02",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "8cb52fe75f25036fcdc213524a4db517afeca55aa83c3c3df28a9456f14e504e"
+    },
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": {
+      "before": "e5f50445c5ef7876e3a4c86da806438cdc850746",
+      "after": "ff4b0422c92301d11b9100acc5c6fdaf19660225",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "1e649deecd3b705e3dc128b3df5cd38f9e069b9297c472ef394c96b56db94897"
+    },
+    "server-version/backend/src/modules/huiteacher/run.service.ts": {
+      "before": "70eac6c38c43683490f53069792290dd697fa039",
+      "after": "d2ceb2f0d4de6e6720164d36c9271f1d620daf0f",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "28853daa1bb15f0eb6cba13910d80acf74df01aa8999cd0c0205b52405477208"
+    },
+    "server-version/backend/src/modules/reporting/education-personal-tracking.ts": {
+      "before": "6353b866b5ef2b8ecac22698abbf2b957e83d61d",
+      "after": "6639a339b89b210fbd95d0dfaff2e8bd022770e1",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "ef876a087345934a75f09f4326dc522fed1d072d557bd36559a8249f14c80505"
+    },
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": {
+      "before": "737821d28e4556096806911118e820668c36b68b",
+      "after": "864c2149e8a6cdb5df9992ce90bbe1adaa6596fc",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "573a670b4020513521b6ffeb4d03f1a1d5ef341afb8c62afd84ebd0f008ccf2b"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts": {
+      "before": "a17803757b832fa2324f3527a04180a7678313c6",
+      "after": "714c875fd4fdcc841ed1e1df443743906a5a3c76",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "e684e60e275731ce09907fd4679b7d71ddd88f726eb53c0d9147ced57a316d53"
+    },
+    "server-version/backend/src/modules/scale/scale-definition.ts": {
+      "before": "23a1edce1ddcc3a14c1b938f5319e1f5f1a2d7c0",
+      "after": "b7e67baa27ebe89c488e62de010de1e13781f508",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "a9235ec7b251740a65393df78dc1738d0da4479778ab35266dc3921da1697882"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": {
+      "before": "6d310822184db5c4361155361df1fe1b5e74554f",
+      "after": "3a5a87f4c2ba63a96ce68492e098a990f6a95d53",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "132a143461adbd99cf45717b0a314fc45e3ffe4f8ae14d09e3827f4423912868"
+    },
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": {
+      "before": "f4cc6644607931519b1946bc4814699a00daf5c0",
+      "after": "d7a0ffb27930725e0ff251949b5763ee3a2ff788",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "59a64f11d820d72869152d5f7c3635485c2861df5f51ffe88009c15169c401a2"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx": {
+      "before": "fc6f73f7b3e0c5694537ec0ee960b703928c8355",
+      "after": "10c82b3f8ac651edc3337d64b29452092785e80d",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "0b2e2689ccb27fd21fb0a62bffbb8c609f1615a6f976e7cacf31f508233b10c3"
+    },
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": {
+      "before": "b51ba49a8c173cbb78fc3ecb6f2d7c7091d7c646",
+      "after": "f4be5589bb68f753bcb33f1da99a30d47a9969fc",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "f0cef7a8774c4685978e7be419e847c72c79c7681d2305c3104deb3b2d0bc3e3"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx": {
+      "before": "556bcaff07a1f2ea0ed78ee59e12e57ca01a46e3",
+      "after": "adf71e9a0b5a87416551e1e04f7eb52e83b95200",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "cdbc636089d32acdadbf48f14dddeae37ac702d77ccd1246a535755f47e3c8a0"
+    },
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": {
+      "before": "36d8c052146d51b91736fd548a372b4e2d182e2e",
+      "after": "517ba17a464e69c0ad072b251b9ec92eac151639",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "4c34892f3c7e786f67e1964cc14f97bbf1aaf71a9dc7e8848d28cc018451a787"
+    },
+    "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": {
+      "before": "9ebc6ee2bd9823042c7a0687d459cf0038eb8f09",
+      "after": "3b916b7113b9ded279a923ebe850c0cf1da0072f",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "f17236e7f4f26ef5d02dd38b7756690412270e19f45d4cac4d126fe1a4f83ee8"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+      "before": "b6bab50a6a827937877e8534469ca5fabd363ec5",
+      "after": "c95c07f6bd7d038e4fc330fb58c2e396f387d7b2",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "047866cb5727f0540336057184720d69dafeee771d5d099bfddc60990a2100a6"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": {
+      "before": "d2923a6bfb74dc33e1e0ed8707115cadcb164b5a",
+      "after": "302c143ae37be6302e35a77aca696c1838d0f750",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "e29faa949d743e291fda3699921ed5425ceb83f202942b12d17ec51c267b4c92"
+    },
+    "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx": {
+      "before": "9d7e6c65e255a419ec4bd49d083511c38447305d",
+      "after": "e75156197bf28dd7a0103ba15c2c9a0359b8931b",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "e648c75837fa6d879cb407a480f763b965f8c58b428522e36beced846c2aa101"
+    },
+    "server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx": {
+      "before": "9c93fa1c85efdffd07b94abf7225cef44061d76a",
+      "after": "cd7a52997156905aad62542c97cc0fcd9da8b259",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "01a15e45882884ec98e6b114c4dfd30930111cabad970e132ac3a64650310747"
+    },
+    "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx": {
+      "before": null,
+      "after": "97052e8266935f50b4f6d8c0713bc0da373eb2fb",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "ced4813f2a7654896338587e01d0ce326d53c2e6a321cc1a7b672b1722c00497"
+    },
+    "server-version/frontend/src/modules/reporting/__tests__/EducationPersonalTracking.test.tsx": {
+      "before": null,
+      "after": "fc7615e811d56a8082cd700589207bc9a8cede63",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "17639618fc2147e7c38eb4ddffd017f0d01b5ca1a2f07b1172f2e37cfe3eb5f8"
+    },
+    "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx": {
+      "before": "faea32296f05e2dd9b4d11dd135984f13b5f4f91",
+      "after": "4ad5d2bcb0caa514e3c2b2d8d1c0c41fed785e1e",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "57d971597682fc83a1c4badd5f7aa14d5c10a3da72bad1f6835566678cea953f"
+    },
+    "server-version/frontend/src/pages/ScaleLongitudinalMetricChoice.tsx": {
+      "before": null,
+      "after": "3bcd55e9fbbf296661dcc4ce2b5b8f19cb5178e2",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "c1b1265019d1e05635c1c11f5d65a7268672d1ad402f3fa83f4df583c2782bab"
+    },
+    "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts": {
+      "before": "54a502f284aae434819be5c730faadcf38b5583c",
+      "after": "382967dac2b54eae961c88774ecda66d9ff66b70",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "56ccd2fcef485714530b1d77f6de4f0d39d32140c7b4cd413d2ba54db6e1bad7"
+    },
+    "server-version/frontend/src/school/SchoolActivityManager.tsx": {
+      "before": "1963db2da9c513ceed2e1fd28f9f8bdf217cdbe6",
+      "after": "8ba8c4d3fd92907b427b838269b0bfecccba560a",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "6659d92233bad1607afaf208f832bacfb9003d07cc64b8f55c2b2259400b17a2"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx": {
+      "before": "6efd554c5461fcfb9a2f1a53ad78ddc3621e4640",
+      "after": "83e86f8f48b80f5015b61f1fda6b34a807749635",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "9a8a4bedf56070d62861fbf0d603ee8d826c225fa2ed90ab851048239b5aa0ac"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": {
+      "before": "1dbf0802689bcee03d25cc5e6d4b410475dc5cac",
+      "after": "df19639816e9ce76756648c878da49575c554a71",
+      "originalBase": "f0bf64596359ef29f8a0207ebfd4fcf793ba6138",
+      "originalDeltaSHA256": "b4b682070ca5cc05811dc287ccd0d352b3feab341c1c364f8dea88b4502db793"
+    }
+  },
+  "protectedInputs": {
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df"
+  },
+  "reports": [
+    {
+      "id": "school-original-1",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-source-declaration-unit-repair.json",
+      "sha256": "5fdbe8f9747de3b27c648fd1251ccc020dd747c3a5a9e9832ef6c174e4e0e279",
+      "review": {
+        "cases": [
+          {
+            "fullName": "new fixed education SELF longitudinal disclosure keeps absent old declarations absent and accepts an explicit numeric subset or empty set",
+            "status": "passed"
+          },
+          {
+            "fullName": "new fixed education SELF longitudinal disclosure rejects unknown, duplicate, observer and mismatched SELF numeric declarations",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 2,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "new fixed education SELF longitudinal disclosure keeps absent old declarations absent and accepts an explicit numeric subset or empty set",
+          "new fixed education SELF longitudinal disclosure rejects unknown, duplicate, observer and mismatched SELF numeric declarations"
+        ]
+      }
+    },
+    {
+      "id": "school-original-2",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-source-runtime-rights.json",
+      "sha256": "a8128e878e927b3d18108454454cd3d75f4906a9031789d03de9801f3fa94f45",
+      "review": {
+        "cases": [
+          {
+            "fullName": "new fixed education SELF longitudinal disclosure keeps absent old declarations absent and accepts an explicit numeric subset or empty set",
+            "status": "skipped"
+          },
+          {
+            "fullName": "new fixed education SELF longitudinal disclosure rejects unknown, duplicate, observer and mismatched SELF numeric declarations",
+            "status": "skipped"
+          },
+          {
+            "fullName": "preserves old private numeric rights without adding longitudinal disclosure and freezes only explicit SELF keys",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 2
+        },
+        "selectedCases": [
+          "preserves old private numeric rights without adding longitudinal disclosure and freezes only explicit SELF keys"
+        ]
+      }
+    },
+    {
+      "id": "school-original-3",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-teacher-adult-source.json",
+      "sha256": "185b16d1f20ecf7263199e611558f21b25583fca312ac74277dc3424d4342155",
+      "review": {
+        "cases": [
+          {
+            "fullName": "new fixed education SELF longitudinal disclosure keeps absent old declarations absent and accepts an explicit numeric subset or empty set",
+            "status": "skipped"
+          },
+          {
+            "fullName": "new fixed education SELF longitudinal disclosure rejects unknown, duplicate, observer and mismatched SELF numeric declarations",
+            "status": "skipped"
+          },
+          {
+            "fullName": "preserves old private numeric rights without adding longitudinal disclosure and freezes only explicit SELF keys",
+            "status": "skipped"
+          },
+          {
+            "fullName": "accepts the existing generic participant SELF declaration for an explicitly adult Teacher audience",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 3
+        },
+        "selectedCases": [
+          "accepts the existing generic participant SELF declaration for an explicitly adult Teacher audience"
+        ]
+      }
+    },
+    {
+      "id": "school-original-4",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-native-private-lane-repair.json",
+      "sha256": "8497ea4ce151ea4fe9c9e182196821ea3832ca73610bd4553476751c5274c917",
+      "review": {
+        "cases": [
+          {
+            "fullName": "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity"
+        ]
+      }
+    },
+    {
+      "id": "school-original-5",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-retained-source-read.json",
+      "sha256": "625783e68e8d32682dd7bd1476c19f988aa260f73b87edf2148cdaec66691bd4",
+      "review": {
+        "cases": [
+          {
+            "fullName": "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity",
+            "status": "skipped"
+          },
+          {
+            "fullName": "School explicitly configured new SELF longitudinal source reads retained current SELF waves after source batching and rejects the Teacher entry for a student",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 1
+        },
+        "selectedCases": [
+          "School explicitly configured new SELF longitudinal source reads retained current SELF waves after source batching and rejects the Teacher entry for a student"
+        ]
+      }
+    },
+    {
+      "id": "school-original-6",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-teacher-shared-reader.json",
+      "sha256": "4f84b85519d641bdc9992a935bd24159fc4c2b1f54a0cccff3106483c9f06794",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Teacher personal longitudinal native Run publishes frozen T1, creates native T2, saves actual answers, reads both reports and rejects wrong/currently revoked identity",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Teacher personal longitudinal native Run retains completed T1/T2 and verifies current report denial after the original native journey",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Teacher personal longitudinal native Run keeps published Teacher tracking and encrypted snapshots immutable",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Teacher personal longitudinal native Run reads retained native T3 with tracked-task bounds and stable cached ordering",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 3
+        },
+        "selectedCases": [
+          "Teacher personal longitudinal native Run reads retained native T3 with tracked-task bounds and stable cached ordering"
+        ]
+      }
+    },
+    {
+      "id": "school-original-7",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-completion-single-feedback.json",
+      "sha256": "aea61398a51ee8dc2380fb86cd83b73039e66ca269b840e1edee9e56bb046cdf",
+      "review": {
+        "cases": [
+          {
+            "fullName": "School authoritative completion feedback consumer (synthetic transport) routes an assigned ordinary questionnaire completion to its scoped feedback without relying on a refreshed list",
+            "status": "skipped"
+          },
+          {
+            "fullName": "School authoritative completion feedback consumer (synthetic transport) opens feedback once independently of a slow or failed list refresh",
+            "status": "passed"
+          },
+          {
+            "fullName": "School authoritative completion feedback consumer (synthetic transport) preserves FORM completion without requesting personal psychological feedback",
+            "status": "skipped"
+          },
+          {
+            "fullName": "remounts a newly selected task and prevents the previous completion callback from opening feedback",
+            "status": "skipped"
+          },
+          {
+            "fullName": "keeps the active task feedback identity when a background list changes its page contents",
+            "status": "skipped"
+          },
+          {
+            "fullName": "uses the server-declared education feedback namespace for approved new families",
+            "status": "skipped"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 5
+        },
+        "selectedCases": [
+          "School authoritative completion feedback consumer (synthetic transport) opens feedback once independently of a slow or failed list refresh"
+        ]
+      }
+    },
+    {
+      "id": "school-original-8",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-longitudinal-browser-report-resume.json",
+      "sha256": "6ea52940eb9e084fe548d2eb8323a8448a9f376b8a258f624816b3cfeb5172dc",
+      "review": {
+        "cases": [
+          {
+            "fullName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes"
+        ]
+      }
+    },
+    {
+      "id": "school-original-9",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-authoring-ui.json",
+      "sha256": "1d80d92a9ae7bc4d5c90a2669c319166ef4abd68139198db83e19c1ca0653dae",
+      "review": {
+        "cases": [
+          {
+            "fullName": "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts does not expose operations before actual issuer read succeeds and keeps denial closed",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts freezes only an explicitly selected own longitudinal subset in the new registration",
+            "status": "passed"
+          },
+          {
+            "fullName": "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts recovers a lost registration response by original id without repeating the mutation",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts discards a pending read after organization switches",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts disables unavailable sources and P/R without guessing missing authority",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts clears an old source selection when the current source list refreshes",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts cancels a pending permission read without late resurrection",
+            "status": "skipped"
+          },
+          {
+            "fullName": "shared education registration management real client contracts reviews an independent frozen registration with its hash and reads the result back",
+            "status": "skipped"
+          },
+          {
+            "fullName": "bounded resource pagination continues an empty eligible source page and preserves the selected source grant",
+            "status": "skipped"
+          },
+          {
+            "fullName": "bounded resource pagination appends P/R choices without clearing selections or replacing the original grant",
+            "status": "skipped"
+          },
+          {
+            "fullName": "bounded resource pagination refuses a changed measurement on later pages and preserves the prior selection",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education ordinary questionnaire authoring and fixed task attachment TEACHER chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+            "status": "passed"
+          },
+          {
+            "fullName": "education ordinary questionnaire authoring and fixed task attachment SCHOOL chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+            "status": "passed"
+          },
+          {
+            "fullName": "education ordinary questionnaire authoring and fixed task attachment TEACHER attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education ordinary questionnaire authoring and fixed task attachment SCHOOL attaches one fixed ordinary version with draft CAS and SELF selectors, blocking duplicate writes",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education ordinary questionnaire authoring and fixed task attachment ignores a late questionnaire creation result after switching the Teacher account",
+            "status": "skipped"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 3,
+          "numFailedTests": 0,
+          "numPendingTests": 19
+        },
+        "selectedCases": [
+          "shared education registration management real client contracts freezes only an explicitly selected own longitudinal subset in the new registration",
+          "education ordinary questionnaire authoring and fixed task attachment TEACHER chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source",
+          "education ordinary questionnaire authoring and fixed task attachment SCHOOL chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source"
+        ]
+      }
+    },
+    {
+      "id": "school-original-10",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-bundle-contract-repair.json",
+      "sha256": "93e52c427c8aa99c721949cdf46fe8ab3e79f89b15a59a3de6740a4b026851f2",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure keeps identical total keys in separate leaves and freezes the actual cognitive profile",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure rebinds unchanged frozen blocks into new slots, rejects ambiguity and actual protocol changes",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure applies explicit empty visibility and refuses a grant above each source ceiling during real freezer projection",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure leaves historical composition declarations absent and forbids observer or Form longitudinal grants",
+            "status": "skipped"
+          },
+          {
+            "fullName": "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 4
+        },
+        "selectedCases": [
+          "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE"
+        ]
+      }
+    },
+    {
+      "id": "school-original-11",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-bundle-contract.json",
+      "sha256": "dc05be7593f240fef64a91b795474f41a78dade4fc75af63977e41ee45210641",
+      "review": {
+        "cases": [
+          {
+            "fullName": "education delivery identity is independent of tool publication builds only a draft for exact SCHOOL product and organization",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education delivery identity is independent of tool publication builds only a draft for exact TEACHER product and organization",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education delivery identity is independent of tool publication does not reuse Training runtime identity or accept a mismatched task family",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education delivery identity is independent of tool publication preserves explicit no-reference/no-report selection without inventing parameters",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education delivery identity is independent of tool publication refuses duplicates, hash ambiguity and unknown publication attributes",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education delivery identity is independent of tool publication does not silently grant manager, parent or subject disclosure",
+            "status": "skipped"
+          },
+          {
+            "fullName": "education delivery identity is independent of tool publication accepts a configured respondent summary only as a draft, not permission to expose metrics",
+            "status": "skipped"
+          },
+          {
+            "fullName": "allows a Form-only BUNDLE draft but not invented measurement feedback or empty native tools",
+            "status": "skipped"
+          },
+          {
+            "fullName": "preserves exact historical origin bytes without defaulting feedback policy",
+            "status": "skipped"
+          },
+          {
+            "fullName": "freezes an explicit shared feedback policy and refuses null or malformed timing",
+            "status": "skipped"
+          },
+          {
+            "fullName": "allows an explicit own longitudinal numeric subset without changing other audiences or old origins",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure keeps identical total keys in separate leaves and freezes the actual cognitive profile",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure rebinds unchanged frozen blocks into new slots, rejects ambiguity and actual protocol changes",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure applies explicit empty visibility and refuses a grant above each source ceiling during real freezer projection",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure leaves historical composition declarations absent and forbids observer or Form longitudinal grants",
+            "status": "skipped"
+          },
+          {
+            "fullName": "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE",
+            "status": "failed"
+          }
+        ],
+        "summary": {
+          "success": false,
+          "numPassedTests": 1,
+          "numFailedTests": 1,
+          "numPendingTests": 14
+        },
+        "selectedCases": [
+          "allows an explicit own longitudinal numeric subset without changing other audiences or old origins"
+        ],
+        "allowPartialFailure": true,
+        "failureContinuations": [
+          {
+            "caseName": "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE",
+            "reportId": "school-original-10"
+          }
+        ]
+      }
+    },
+    {
+      "id": "school-original-12",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-draft-removal-boundary.json",
+      "sha256": "0a53f6b371c819a1e191ff014660cecdc898bfc493cb00d5898e06dfae221014",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Education longitudinal native/composition actual slots refuses removing a published inherited source and keeps the accepted execution intact",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+            "status": "skipped"
+          },
+          {
+            "fullName": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+            "status": "skipped"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 2
+        },
+        "selectedCases": [
+          "Education longitudinal native/composition actual slots refuses removing a published inherited source and keeps the accepted execution intact"
+        ]
+      }
+    },
+    {
+      "id": "school-original-13",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-native-number-repair.json",
+      "sha256": "2b8e57a2c1a89378b6dddeb356d286126034663c41d6d99e5d7ca76804d3a037",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 2,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped"
+        ]
+      }
+    },
+    {
+      "id": "school-original-14",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-publisher-ui-path-repair.json",
+      "sha256": "09b91e1e933da1335be9508773d87d4744773d608cf44265892cff6cc656e0bb",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Education tracking plan versus own numeric disclosure keeps both leaf totals in the plan while explicit empty own visibility hides all",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education tracking plan versus own numeric disclosure keeps inherited metrics locked and does not restore a previously hidden metric implicitly",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education tracking plan versus own numeric disclosure drops the prior source choices while another authenticated source is loading",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 3,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "Education tracking plan versus own numeric disclosure keeps both leaf totals in the plan while explicit empty own visibility hides all",
+          "Education tracking plan versus own numeric disclosure keeps inherited metrics locked and does not restore a previously hidden metric implicitly",
+          "Education tracking plan versus own numeric disclosure drops the prior source choices while another authenticated source is loading"
+        ]
+      }
+    },
+    {
+      "id": "school-original-15",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-timing.json",
+      "sha256": "9ce5f4220ae410877cea2031d19aa0469dbb9dce8b6e5c7d80258a050ebac38e",
+      "review": {
+        "cases": [
+          {
+            "fullName": "gates native education feedback by its frozen opening time before snapshot reuse",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "gates native education feedback by its frozen opening time before snapshot reuse"
+        ]
+      }
+    },
+    {
+      "id": "school-original-16",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-unit-first.json",
+      "sha256": "a39ffd472ca82230e11d4d8b654a240ef1a1d7c227e63c4eac29ef07461794e0",
+      "review": {
+        "cases": [
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure keeps identical total keys in separate leaves and freezes the actual cognitive profile",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure rebinds unchanged frozen blocks into new slots, rejects ambiguity and actual protocol changes",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure applies explicit empty visibility and refuses a grant above each source ceiling during real freezer projection",
+            "status": "passed"
+          },
+          {
+            "fullName": "Education exact leaf tracking and independent disclosure leaves historical composition declarations absent and forbids observer or Form longitudinal grants",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 4,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "Education exact leaf tracking and independent disclosure keeps identical total keys in separate leaves and freezes the actual cognitive profile",
+          "Education exact leaf tracking and independent disclosure rebinds unchanged frozen blocks into new slots, rejects ambiguity and actual protocol changes",
+          "Education exact leaf tracking and independent disclosure applies explicit empty visibility and refuses a grant above each source ceiling during real freezer projection",
+          "Education exact leaf tracking and independent disclosure leaves historical composition declarations absent and forbids observer or Form longitudinal grants"
+        ]
+      }
+    },
+    {
+      "id": "school-original-17",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/native-extension/education-native-longitudinal-tracked-run.json",
+      "sha256": "089a55bd4c3f8758bd7ce21c5991a9bd33f62eac6bfff0eb39be0d75a62b1a51",
+      "review": {
+        "cases": [
+          {
+            "fullName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+            "status": "passed"
+          },
+          {
+            "fullName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 2,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports"
+        ]
+      }
+    },
+    {
+      "id": "school-original-18",
+      "file": "docs/evidence/personal-longitudinal-school-20261030/native-extension/education-native-longitudinal-quota-guards.json",
+      "sha256": "0ff826795514f4152b57d8a01333b763891ec979a4ffeaf96bc2791430a17ba3",
+      "review": {
+        "cases": [
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot allows a second legitimate Run of one frozen source while refusing a duplicate child in the entered parent",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept copied-proof as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept different-tx as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept different-parent as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept different-actor as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept different-Run-assignment as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept different-config as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept different-native-assignment as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "native education Cognitive quota belongs to the real Run parent slot does not accept missing-binding as quota authority",
+            "status": "passed"
+          },
+          {
+            "fullName": "requires a nonce from an actually tracked registered Run, preserves single-use scope and refuses replay or copied authority",
+            "status": "passed"
+          }
+        ],
+        "summary": {
+          "success": true,
+          "numPassedTests": 10,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "selectedCases": [
+          "native education Cognitive quota belongs to the real Run parent slot allows a second legitimate Run of one frozen source while refusing a duplicate child in the entered parent",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept copied-proof as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept different-tx as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept different-parent as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept different-actor as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept different-Run-assignment as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept different-config as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept different-native-assignment as quota authority",
+          "native education Cognitive quota belongs to the real Run parent slot does not accept missing-binding as quota authority",
+          "requires a nonce from an actually tracked registered Run, preserves single-use scope and refuses replay or copied authority"
+        ]
+      }
+    }
+  ],
+  "historicalImageSuccess": {
+    "runId": 41028537466,
+    "jobId": 123972544793,
+    "sourceHead": "171f3c483d70b0d309b1ad2fe9fe4f0563512a4f",
+    "executionHead": "de5fa671d56fe824c480a5f2f715d338034fa045",
+    "serverVersionTree": "e1c1076b76b9aa92aef43e748bdeb9094630caa4",
+    "inputs": {
+      ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
+      ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917"
+    },
+    "maximumAgeHours": 24,
+    "scope": "Official successful image build/scan checks only. No deployment or retained image archive is claimed."
+  },
+  "backendAuditReuse": {
+    "runId": 41031885906,
+    "jobId": 123983441600,
+    "sourceHead": "571a14b73ef81148913f5ff1666e7e461f2f4b92",
+    "executionHead": "f482328ef680238b3916930adbb2d761cfd3c747",
+    "step": "install locked native migration tools and audit backend",
+    "maximumAgeHours": 24
+  },
+  "historicalMain318ApplicationSastReuse": {
+    "runId": 41037266506,
+    "jobId": 124001202537,
+    "sourceHead": "af8fad552f776615afaa1e91e57a012768021bca",
+    "executionHead": "bb54da2172b7a517e7775b3f0efa72f1901e3984",
+    "serverVersionTree": "04c7d744e4835dabd055a5595ad8578a792d8b72",
+    "maximumAgeHours": 24,
+    "paths": [
+      "server-version/backend/src/modules/survey",
+      "server-version/backend/src/modules/reporting/personal-tracking.ts",
+      "server-version/frontend/src/survey",
+      "server-version/frontend/src/modules/reporting"
+    ]
+  },
+  "previousSliceQualification": {
+    "sourceHead": "a787a777d444b649a3d13870b737fc5113652cad",
+    "runId": 41057646991,
+    "jobId": 124069249478,
+    "serverVersionTree": "bfd2e2e2e24051095ae306624c980460044a526c",
+    "maximumAgeHours": 24
+  },
+  "frontendAuditReuse": {
+    "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
+    "executionHead": "7ca965681cc92ff669d36d2495660ef263b6977a",
+    "runId": 41053670118,
+    "jobId": 124055865989,
+    "step": "install frontend tools and audit locked inputs",
+    "maximumAgeHours": 24
+  },
+  "historicalFailures": [
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-bundle-contract.json",
+      "sha256": "dc05be7593f240fef64a91b795474f41a78dade4fc75af63977e41ee45210641",
+      "summary": {
+        "success": false,
+        "numPassedTests": 1,
+        "numFailedTests": 1,
+        "numPendingTests": 14
+      },
+      "cases": [
+        {
+          "fullName": "education delivery identity is independent of tool publication builds only a draft for exact SCHOOL product and organization",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education delivery identity is independent of tool publication builds only a draft for exact TEACHER product and organization",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education delivery identity is independent of tool publication does not reuse Training runtime identity or accept a mismatched task family",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education delivery identity is independent of tool publication preserves explicit no-reference/no-report selection without inventing parameters",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education delivery identity is independent of tool publication refuses duplicates, hash ambiguity and unknown publication attributes",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education delivery identity is independent of tool publication does not silently grant manager, parent or subject disclosure",
+          "status": "skipped"
+        },
+        {
+          "fullName": "education delivery identity is independent of tool publication accepts a configured respondent summary only as a draft, not permission to expose metrics",
+          "status": "skipped"
+        },
+        {
+          "fullName": "allows a Form-only BUNDLE draft but not invented measurement feedback or empty native tools",
+          "status": "skipped"
+        },
+        {
+          "fullName": "preserves exact historical origin bytes without defaulting feedback policy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "freezes an explicit shared feedback policy and refuses null or malformed timing",
+          "status": "skipped"
+        },
+        {
+          "fullName": "allows an explicit own longitudinal numeric subset without changing other audiences or old origins",
+          "status": "passed"
+        },
+        {
+          "fullName": "Education exact leaf tracking and independent disclosure keeps identical total keys in separate leaves and freezes the actual cognitive profile",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Education exact leaf tracking and independent disclosure rebinds unchanged frozen blocks into new slots, rejects ambiguity and actual protocol changes",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Education exact leaf tracking and independent disclosure applies explicit empty visibility and refuses a grant above each source ceiling during real freezer projection",
+          "status": "skipped"
+        },
+        {
+          "fullName": "Education exact leaf tracking and independent disclosure leaves historical composition declarations absent and forbids observer or Form longitudinal grants",
+          "status": "skipped"
+        },
+        {
+          "fullName": "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE",
+          "successfulReportId": "school-original-10"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-native-first.json",
+      "sha256": "6c6e496d59cdc80c7480201a46948cb4e37bcc8ea0ba36a905f5b117f46e850d",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "status": "failed"
+        },
+        {
+          "fullName": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "successfulReportId": "school-original-13"
+        },
+        {
+          "failedCaseName": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "successfulReportId": "school-original-13"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/leaf-extension/education-leafs-native-setup-repair.json",
+      "sha256": "4d3600abbe6171edf7c969332d438b739744687e585bb3f3d119028638e79ffa",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "status": "failed"
+        },
+        {
+          "fullName": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "successfulReportId": "school-original-13"
+        },
+        {
+          "failedCaseName": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+          "successfulReportId": "school-original-13"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/native-extension/education-native-longitudinal-first.json",
+      "sha256": "0a5d2fec888eb177a7a095efc0d65f83a0e242c15dda2a955d364adb03ad8594",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        },
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        },
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/native-extension/education-native-longitudinal-setup-repair.json",
+      "sha256": "3c4316be0db98f85cbdf6b02888921d5f729700e5033e160648518eebb4b6fcf",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        },
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        },
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/native-extension/education-native-longitudinal-source-course.json",
+      "sha256": "f719adfa8437ecb96084bfa759c41bf3502fb2bbdb946b64e4422af98a1d7a25",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        },
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        },
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/native-extension/education-native-longitudinal-standalone-source.json",
+      "sha256": "e4270239f0a41e2f09a9500d19fbb17b61db7d0a0a30237d2181b1f3dd90b1e2",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 1
+      },
+      "cases": [
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "status": "failed"
+        },
+        {
+          "fullName": "registered native longitudinal actual two-wave lifecycle TEACHER preserves the registered exact source through two native publications and both reports",
+          "status": "skipped"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "registered native longitudinal actual two-wave lifecycle SCHOOL preserves the registered exact source through two native publications and both reports",
+          "successfulReportId": "school-original-17"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-longitudinal-browser-first.json",
+      "sha256": "a4cb5bb6e508bb38cce31c92d50c73f597a8bd44d8c1cffab3b318df72d4242f",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+          "successfulReportId": "school-original-8"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-longitudinal-browser-media-resume.json",
+      "sha256": "a863be300d40de3d1ea4e4ee7ad82abe7bd1ea6882cc33419af7b9f5acb15dd5",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+          "successfulReportId": "school-original-8"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-longitudinal-browser-resume.json",
+      "sha256": "66fc1edd6a8f109ddd1f2e84c8e3b1eb846c6ce2de0fe42ae7e51ad5250b0cec",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "School native next activity, SELF answers and both reports in Chromium creates native T3, opens and publishes it, saves an actual SELF answer and shows single plus independent changes",
+          "successfulReportId": "school-original-8"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-native-first-execution.json",
+      "sha256": "38a26201ea211a29b0d919df2ad4fd3472d5f17a68711df94a5e4e99de39310c",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity",
+          "successfulReportId": "school-original-4"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "file": "docs/evidence/personal-longitudinal-school-20261030/school-native-key-repair.json",
+      "sha256": "b4aeb620fd58336c77fde8b21f7f5a48c73d4d1fe78a5ab070955f82eea688da",
+      "summary": {
+        "success": false,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "cases": [
+        {
+          "fullName": "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity",
+          "status": "failed"
+        }
+      ],
+      "continuations": [
+        {
+          "failedCaseName": "School explicitly configured new SELF longitudinal source publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity",
+          "successfulReportId": "school-original-4"
+        }
+      ],
+      "status": "ORIGINAL_FAILURE_RETAINED"
+    }
+  ],
+  "qualificationReuse": {
+    "sourceHead": "1170ac40728191631be07330bc8d58712339de34",
+    "executionHead": "236c76ed82d654536c3112ff543e2316e8cc1b54",
+    "runId": 41061117266,
+    "jobId": 124080976872,
+    "serverVersionTree": "c218d9913a1294fbdaf5066eee04264cbdab9fa6",
+    "nativeOnly": true,
+    "maximumAgeHours": 24,
+    "candidateAsBaseline": true
+  }
+}

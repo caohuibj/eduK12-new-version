@@ -234,6 +234,25 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     situational: [],
     courses: [],
   })
+  const choicePageEpoch=useRef(0)
+  const [choicePageLoading,setChoicePageLoading]=useState(false)
+  const [choicePageError,setChoicePageError]=useState('')
+  const loadMoreStandardChoices=async()=>{
+    const cursor=catalog.standardCombinationsNextCursor
+    if(!cursor||choicePageLoading)return
+    const epoch=choicePageEpoch.current
+    setChoicePageLoading(true);setChoicePageError('')
+    try{
+      const page=await request('/standard-combination-choices?'+new URLSearchParams(cursor).toString())
+      if(choicePageEpoch.current!==epoch)return
+      setCatalog((current:any)=>{
+        if(JSON.stringify(current.standardCombinationsNextCursor)!==JSON.stringify(cursor))return current
+        const seen=new Set((current.standardCombinations??[]).map((c:any)=>c.useGrantId??c.combination.releaseId))
+        return {...current,standardCombinations:[...(current.standardCombinations??[]),...page.list.filter((c:any)=>!seen.has(c.useGrantId??c.combination.releaseId))],standardCombinationsNextCursor:page.nextCursor}
+      })
+    }catch(e){if(choicePageEpoch.current===epoch)setChoicePageError(message(e))}
+    finally{if(choicePageEpoch.current===epoch)setChoicePageLoading(false)}
+  }
   const [name, setName] = useState('')
   const [instruction, setInstruction] = useState('')
   const [description, setDescription] = useState('')
@@ -372,7 +391,9 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   }
   const actionInFlight = useRef(false)
   useEffect(()=>{actionInFlight.current=false;setBusy(false)},[measurementRecoveryKey])
-  const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
+  const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; trackingCandidates?:Array<{itemId:string;scoreKey:string;label:string;unit:string}>; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
+  const [trackingMode,setTrackingMode]=useState<'SINGLE'|'LONGITUDINAL'>('SINGLE'),[trackingKeys,setTrackingKeys]=useState<string[]>([])
+  useEffect(()=>{setTrackingMode('SINGLE');setTrackingKeys([])},[id,user?.id])
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
   const [requestId] = useState(() => crypto.randomUUID())
@@ -409,6 +430,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   }
   useEffect(() => {
     let active = true
+    choicePageEpoch.current++;setChoicePageLoading(false);setChoicePageError('')
+    setCatalog((current:any)=>({...current,standardCombinations:[],standardCombinationsNextCursor:null}))
     setDetail(null)
     setError('')
     const resourcesRequest = formTemplate ? Promise.resolve({scales:[],cognitive:[],situational:[],courses:[]}) : request('/resources')
@@ -441,7 +464,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
       if (!formTemplate && row.productKind === 'FORM_TEMPLATE') { navigate('/toolkit/forms/' + id, { replace: true }); return }
       hydrate(row)
     }).catch(e => { if (active) setError(message(e)) })
-    return () => { active = false }
+    return () => { active = false;choicePageEpoch.current++ }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id, formTemplate, navigate])
   const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
     if(externalToolPending){setError('请先在工具中核对未确认的参数／报告请求，再修改组合测评。');return}
@@ -619,7 +642,10 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
       const item: any = { type, required: type === 'FORM' ? required : true }
       if (type === 'SCALE') {
         const approved=standardCombinationChoices.find(choice=>choice.id===selected)
-        if(approved){item.scaleId=approved.scaleId;item.standardCombination={...approved.combination}}
+        if(approved){
+          if(approved.disabled)throw new Error(approved.unavailableReason??'此固定配置暂不可用，请管理员确认业务配置。')
+          item.scaleId=approved.scaleId;item.standardCombination={...approved.combination,...(approved.selectedBinding?{selectedBinding:approved.selectedBinding}:{})}
+        }
         else {
           if(selected.startsWith('standard:'))throw new Error('所选批准组合已变化，请重新读取工具。')
           item.scaleId=selected
@@ -661,7 +687,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
           .map((v: any) => ({
             ...v,
             label:
-              (v.standardCombinationSummary ? (v.scale?.name??'标准量表')+' · 已批准组合 · '+standardVersionLabel(v.standardCombinationSummary.axisVersions) : null) ||
+              (v.standardCombinationSummary ? (v.scale?.name??'标准量表')+' · '+(v.standardCombinationSummary.authorizationMode==='PRECISE'?(v.standardCombinationSummary.configurationName??'管理员固定配置'):'已批准组合 · '+standardVersionLabel(v.standardCombinationSummary.axisVersions)) : null) ||
               v.scale?.name ||
               v.cognitiveAssignment?.title ||
               v.situational?.key ||
@@ -698,7 +724,9 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     if (trainingDesign && !await confirmManagement({ title: '确认发布组合测评', body: '发布后内容、投放范围和相关策略将冻结。确认后系统会再次检查当前草稿与权限。', confirmLabel: '确认发布' })) return
     return action(async () => {
       hydrate(
-        await request('/' + id + '/publish', { revision: detail.revision }),
+        await request('/' + id + '/publish', { revision: detail.revision,
+          ...(trainingDesign&&!detail.personalTracking&&trackingMode==='LONGITUDINAL'?{tracking:{mode:trackingMode,
+            metrics:(preflight?.trackingCandidates??[]).filter(m=>trackingKeys.includes(JSON.stringify([m.itemId,m.scoreKey]))).map(({itemId,scoreKey})=>({itemId,scoreKey}))}}:{}) }),
       )
     })
   }
@@ -769,10 +797,13 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
     !detail?.deliveryPolicy && !detail?.selectionPolicy && !detail?.routingPolicy && !detail?.randomizationPolicy
   const draft = id === 'new' || detail?.status === 'DRAFT'
-  const standardCombinationChoices: Array<{id:string;name:string;scaleId:string;instrumentVersion:string;version:string;code:string;profile:string;combination:{releaseId:string;combinationHash:string}}> = trainingDesign&&kind==='COURSE'&&!formTemplate
+  const standardCombinationChoices: Array<{id:string;name:string;scaleId:string;instrumentVersion:string;version:string;code:string;profile:string;disabled?:boolean;unavailableReason?:string|null;
+    selectedBinding?:{authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string};combination:{releaseId:string;combinationHash:string}}> = trainingDesign&&!formTemplate
     ? (catalog.standardCombinations??[]).map((choice:any)=>{
       const axes=choice.axisVersions
       const version=axes?standardVersionLabel(axes):choice.instrumentVersion
+      if(choice.authorizationMode==='PRECISE')return {...choice,id:'standard:'+choice.combination.releaseId+':'+choice.combination.combinationHash,
+        name:choice.title+' · '+(choice.configurationName??'管理员固定配置'),version:'',instrumentVersion:'',code:'',profile:'管理员固定配置',disabled:choice.available===false}
       return {...choice,id:'standard:'+choice.combination.releaseId+':'+choice.combination.combinationHash,name:choice.title,version,code:choice.toolKey,profile:'已批准组合'}
     }) : []
   const choices =
@@ -1048,9 +1079,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       )}
                     </select>
                   </label>
-                  {type==='SCALE'&&trainingDesign&&kind!=='COURSE'&&(catalog.standardCombinations??[]).length>0&&<p className="qt-content-availability">精确批准组合目前适用于课程问卷。</p>}
                   {type !== 'FORM' ? (
-                    trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
+                    trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} more={type==='SCALE'&&catalog.standardCombinationsNextCursor?<div><ProductButton disabled={choicePageLoading} onClick={()=>void loadMoreStandardChoices()}>{choicePageLoading?'正在读取更多配置…':'载入更多已授权配置'}</ProductButton>{choicePageError&&<p role="alert">{choicePageError}</p>}</div>:undefined}/></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
                       选择测评
                       <select
                         aria-label="选择测评"
@@ -1158,7 +1188,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       )}
                     </>
                   )}
-                  <ProductButton variant={trainingDesign ? 'primary' : 'secondary'} disabled={trainingDesign && (busy || dirty || hasPendingChoices || (type === 'FORM' ? !formLabel.trim() : !selected))} onClick={() => void add()}>
+                  <ProductButton variant={trainingDesign ? 'primary' : 'secondary'} disabled={trainingDesign && (busy || dirty || hasPendingChoices || (type === 'FORM' ? !formLabel.trim() : !selected||Boolean(standardCombinationChoices.find(choice=>choice.id===selected)?.disabled)))} onClick={() => void add()}>
                     {editingFormItem ? '保存题目修改' : formTemplate ? '添加题目' : '添加到测评'}
                   </ProductButton>{hasPendingChoices&&<p className="qt-form-hint" role="status">请先应用或取消所有批量输入，再保存题目。</p>}{editingFormItem && <ProductButton disabled={busy} onClick={cancelFormEdit}>取消编辑</ProductButton>}
                 </fieldset>
@@ -1402,15 +1432,28 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   </>
 
   const publishPanel = <>
+      {trainingDesign&&detail?.personalTracking&&!draft&&<ProductButton disabled={busy} onClick={()=>void action(async()=>{
+        const row=await request('/'+id+'/next-wave',{requestId:crypto.randomUUID()})
+        navigate(assessmentContextHref(base+'/'+row.id,location.pathname,location.search))
+      })}>创建下一轮</ProductButton>}
       {detail && !draft && <section className="questionnaire-publish-panel" aria-label="发布状态"><div className="questionnaire-publish-summary"><div><h2>{labels[detail.status] || detail.status} · {detail.name}</h2><p>当前版本的内容与投放设置已锁定。如需调整，请复制为新草稿后重新编制。</p></div><Link className="hui-button hui-button--primary" to={'/composite-assessments/' + id + '/results'}>查看作答与结果</Link></div></section>}
       {detail && draft && <section id="questionnaire-publish" aria-label="正式发布" className="questionnaire-publish-panel">
+        {trainingDesign&&detail.questionnaireType==='COURSE'&&<fieldset className="space-y-2 border-b pb-4"><legend>测评方式</legend>
+          {detail.personalTracking?<p>纵向追踪 · T{detail.personalTracking.ordinal}。已继承基线计分定义，未追踪内容可调整。本人可见范围仍受各工具原披露上限和反馈开放时间限制。</p>:<>
+            <label><input type="radio" name="tracking-mode" checked={trackingMode==='SINGLE'} disabled={busy} onChange={()=>setTrackingMode('SINGLE')}/> 单次测评</label>
+            <label><input type="radio" name="tracking-mode" checked={trackingMode==='LONGITUDINAL'} disabled={busy} onChange={()=>setTrackingMode('LONGITUDINAL')}/> Longitudinal 纵向追踪</label>
+            {trackingMode==='LONGITUDINAL'&&<div><p>先运行发布前自检，再选择需要追踪的子工具指标。选择输出不会删评分所需题目。本人只可查看原工具允许披露且已开放的指标；一次性匿名身份不能跨轮配对。</p>
+              {preflight&&preflight.revision===detail.revision&&!dirty&&preflight.trackingCandidates?.map(metric=>{const key=JSON.stringify([metric.itemId,metric.scoreKey]);return <label key={key} className="block"><input type="checkbox" checked={trackingKeys.includes(key)} disabled={busy} onChange={event=>setTrackingKeys(old=>event.target.checked?[...old,key]:old.filter(k=>k!==key))}/> {metric.label}（{metric.unit}）</label>})}
+            </div>}
+          </>}
+        </fieldset>}
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">
                 {dirty && !trainingDesign && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}
                 {draft && <ProductButton variant="secondary" disabled={busy || dirty || authoringLocked} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
                   <ProductButton
-                    disabled={busy || dirty || authoringLocked}
+                    disabled={busy || dirty || authoringLocked || (trainingDesign&&!detail.personalTracking&&trackingMode==='LONGITUDINAL'&&(!trackingKeys.length||preflight?.revision!==detail.revision))}
                     variant="primary"
                     onClick={() => void publish()}
                   >

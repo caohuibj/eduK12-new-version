@@ -1,0 +1,25 @@
+{
+  "values": {
+    "e": {
+      "state": "present",
+      "value": 2.2
+    },
+    "v": {
+      "state": "present",
+      "value": 5
+    },
+    "c": {
+      "state": "invalid"
+    },
+    "grade": {
+      "state": "present",
+      "value": 9
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED",
+  "expectedProfile": {
+    "state": "INVALID",
+    "profileId": null
+  }
+}

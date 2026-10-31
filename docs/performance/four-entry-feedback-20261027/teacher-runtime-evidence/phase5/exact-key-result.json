@@ -1,0 +1,19 @@
+{
+  "recordKind": "unsigned targeted PG regression after root review",
+  "commandAfterNode": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+    "-t",
+    "TEACHER.*IMMEDIATE.*Form=false completionOnly=false actual",
+    "--reporter=verbose"
+  ],
+  "exit": 0,
+  "passed": 2,
+  "filtered": 8,
+  "selectionNote": "regex selected ordinary and ADMIN immediate Teacher variants; original other8 scenarios not repeated",
+  "assertion": "find core.metrics by exact metric.metricKey, then compare value; prior10 evidence retains former value-only assertion",
+  "rawSha256": "312e9489b56e40467a4b51000f12ea7f8b927894099d42935192390c6763c8b4",
+  "archiveSha256": "fd0d5680b99c0d885f0b87db8c8d5f46f770f8dc71ea57061492c54bf7398e19",
+  "browserExecuted": false
+}

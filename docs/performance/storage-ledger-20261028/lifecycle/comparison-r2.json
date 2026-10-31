@@ -1,0 +1,96 @@
+{
+  "rows": [
+    {
+      "mode": "legacy",
+      "completed": true,
+      "count": 30,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1559,
+      "baselineRelationBytes": 1581056,
+      "completedRelationBytes": 2965504,
+      "relationGrowthBytes": 1384448,
+      "selectedEncryptedTextBytes": 682500,
+      "walInsertDelta": 1435544,
+      "phases": {
+        "START": {
+          "firstMs": 219.99677999999994,
+          "subsequentMedianMs": 99.29974100000072,
+          "subsequentMedianSqlCount": 115,
+          "subsequentMedianSqlMs": 8,
+          "totalProcessCpuMs": 2179.02
+        },
+        "FINAL": {
+          "firstMs": 102.99631399999998,
+          "subsequentMedianMs": 44.71145299999989,
+          "subsequentMedianSqlCount": 51,
+          "subsequentMedianSqlMs": 1,
+          "totalProcessCpuMs": 1144.032
+        },
+        "parent-completion": {
+          "firstMs": 215.60286199999973,
+          "subsequentMedianMs": 25.175484999999753,
+          "subsequentMedianSqlCount": 29,
+          "subsequentMedianSqlMs": 1,
+          "totalProcessCpuMs": 911.075
+        },
+        "authorized-report": {
+          "firstMs": 55.025251000000026,
+          "subsequentMedianMs": 41.232020000000375,
+          "subsequentMedianSqlCount": 21,
+          "subsequentMedianSqlMs": 17,
+          "totalProcessCpuMs": 664.91
+        }
+      }
+    },
+    {
+      "mode": "shared-compact",
+      "completed": true,
+      "count": 30,
+      "semanticHash": "413de7a0fa2cabc7ca5ab549a544e78b82066e36a669cfbfc023af9a7f71a5e8",
+      "reportBytes": 1559,
+      "baselineRelationBytes": 1581056,
+      "completedRelationBytes": 2473984,
+      "relationGrowthBytes": 892928,
+      "selectedEncryptedTextBytes": 100302,
+      "walInsertDelta": 863976,
+      "phases": {
+        "START": {
+          "firstMs": 208.37390000000005,
+          "subsequentMedianMs": 149.8713289999996,
+          "subsequentMedianSqlCount": 117,
+          "subsequentMedianSqlMs": 64,
+          "totalProcessCpuMs": 1993.009
+        },
+        "FINAL": {
+          "firstMs": 94.70572599999969,
+          "subsequentMedianMs": 43.15464400000019,
+          "subsequentMedianSqlCount": 56,
+          "subsequentMedianSqlMs": 0,
+          "totalProcessCpuMs": 1104.127
+        },
+        "parent-completion": {
+          "firstMs": 69.85380299999997,
+          "subsequentMedianMs": 22.521883000000344,
+          "subsequentMedianSqlCount": 30,
+          "subsequentMedianSqlMs": 0,
+          "totalProcessCpuMs": 569.231
+        },
+        "authorized-report": {
+          "firstMs": 61.03043200000002,
+          "subsequentMedianMs": 39.69032200000038,
+          "subsequentMedianSqlCount": 26,
+          "subsequentMedianSqlMs": 14,
+          "totalProcessCpuMs": 666.351
+        }
+      }
+    }
+  ],
+  "scope": "One-item synthetic Teacher SELF, 30 distinct participant executions per mode, one fixed-order sequence. Not browser, p95, concurrency or production flags.",
+  "semanticComparison": "Same selected public scores/raw feedback/interpretations normalized hash and 1559-byte report size; not byte-identical full report across participant identities.",
+  "deltaPercent": {
+    "completedRelationBytes": -16.574585635359117,
+    "relationGrowthBytes": -35.502958579881664,
+    "selectedEncryptedTextBytes": -85.30373626373627,
+    "walInsertDelta": -39.81542885484527
+  }
+}

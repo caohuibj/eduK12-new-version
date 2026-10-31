@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 1,
+  "invocations": [
+    {
+      "name": "cognitive-profile-artifact-unit",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-artifact-unit.json"
+        ],
+        "startedAt": "2026-10-30T00:05:32.972087+00:00",
+        "finishedAt": "2026-10-30T00:05:35.619089+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-artifact-unit.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 7,
+        "numPassedTests": 7,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793318733321,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+                "status": "passed",
+                "title": "keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+                "duration": 40.819898000000194,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+                "status": "passed",
+                "title": "rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+                "duration": 9.156191999999919,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization reads an original saved artifact after the same-named registry profile changes without resolving it again",
+                "status": "passed",
+                "title": "reads an original saved artifact after the same-named registry profile changes without resolving it again",
+                "duration": 8.513691999999992,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+                "status": "passed",
+                "title": "shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+                "duration": 37.8867180000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization validates each expected identity after cache hits and refuses a different storage kind or missing source",
+                "status": "passed",
+                "title": "validates each expected identity after cache hits and refuses a different storage kind or missing source",
+                "duration": 20.98082599999998,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+                "status": "passed",
+                "title": "rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+                "duration": 11.989164000000073,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization does not substitute a registry implementation, a requested profile or an expected historical version",
+                "status": "passed",
+                "title": "does not substitute a registry implementation, a requested profile or an expected historical version",
+                "duration": 3.4644130000001496,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793318735437,
+            "endTime": 1793318735570.4644,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cognitive-profile-artifact-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/cognitive-profile-artifact-types.json"
+        ],
+        "startedAt": "2026-10-30T00:06:18.866605+00:00",
+        "finishedAt": "2026-10-30T00:06:46.551999+00:00",
+        "exitCode": 2
+      },
+      "log": "src/modules/assessment-authorization/cognitive-profile-artifact.ts(49,14): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.\nsrc/modules/assessment-authorization/cognitive-profile-artifact.ts(74,91): error TS18047: 'resolvedReport' is possibly 'null'.\nsrc/modules/assessment-authorization/cognitive-profile-artifact.ts(75,28): error TS18047: 'resolvedReport' is possibly 'null'.\nsrc/modules/assessment-authorization/cognitive-profile-artifact.ts(75,92): error TS18047: 'resolvedReport' is possibly 'null'.\nsrc/modules/assessment-authorization/cognitive-profile-artifact.ts(76,64): error TS18047: 'resolvedReport' is possibly 'null'.\n"
+    },
+    {
+      "name": "cognitive-profile-artifact-types-v2",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/cognitive-profile-artifact-types.json"
+        ],
+        "startedAt": "2026-10-30T00:07:19.536129+00:00",
+        "finishedAt": "2026-10-30T00:07:54.054298+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    },
+    {
+      "name": "cognitive-profile-artifact-metric-continuation",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-task1-runtime.py",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts",
+          "-t",
+          "mechanically",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-artifact-metric-continuation.json"
+        ],
+        "startedAt": "2026-10-30T00:07:19.535990+00:00",
+        "finishedAt": "2026-10-30T00:07:23.279650+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-artifact-metric-continuation.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 7,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 6,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793318839925,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+                "status": "skipped",
+                "title": "keeps one reaction config identity while freezing distinct existing experience/research profiles without an attempt seed",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+                "status": "skipped",
+                "title": "rejects config/report/protocol mutation and unknown envelope fields rather than accepting supplied identity hashes",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization reads an original saved artifact after the same-named registry profile changes without resolving it again",
+                "status": "skipped",
+                "title": "reads an original saved artifact after the same-named registry profile changes without resolving it again",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+                "status": "skipped",
+                "title": "shares one encrypted content record between independently scoped recipients without sharing their authorization binding",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization validates each expected identity after cache hits and refuses a different storage kind or missing source",
+                "status": "skipped",
+                "title": "validates each expected identity after cache hits and refuses a different storage kind or missing source",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+                "status": "passed",
+                "title": "rejects mechanically missing report metrics and inconsistent protocol/presentation even if inner hashes are recomputed",
+                "duration": 47.79042500000014,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "exact cognitive profile content before recipient authorization"
+                ],
+                "fullName": "exact cognitive profile content before recipient authorization does not substitute a registry implementation, a requested profile or an expected historical version",
+                "status": "skipped",
+                "title": "does not substitute a registry implementation, a requested profile or an expected historical version",
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793318843133,
+            "endTime": 1793318843180.7905,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cognitive-profile-artifact-migrate",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_PROFILE_MIGRATION_OWNER=1",
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "npm",
+          "run",
+          "db:migrate:guarded"
+        ],
+        "startedAt": "2026-10-30T00:08:12.818045+00:00",
+        "finishedAt": "2026-10-30T00:08:14.411776+00:00",
+        "exitCode": 1
+      },
+      "log": "\n> ptool-backend@1.0.0 db:migrate:guarded\n> node scripts/pr24-migration-preflight.mjs && prisma migrate deploy && node scripts/runtime-role-contract.mjs post-migrate\n\n{\"ok\":true,\"skipped\":true,\"reason\":\"destructive_migration_already_applied\",\"migration\":\"20260827100000_scale_assessment_v2_foundation\"}\nPrisma schema loaded from prisma/schema.prisma\nDatasource \"db\": PostgreSQL database \"precise_cognitive_profile_artifact_test_20261030\", schema \"public\" at \"127.0.0.1:55439\"\n\n256 migrations found in prisma/migrations\n\nApplying migration `20261030001000_cognitive_profile_public_template`\n\nThe following migration(s) have been applied:\n\nmigrations/\n  └─ 20261030001000_cognitive_profile_public_template/\n    └─ migration.sql\n      \nAll migrations have been successfully applied.\nruntime role/schema preflight failed\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+    },
+    {
+      "name": "cognitive-profile-artifact-runtime-check",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "node",
+          "scripts/runtime-role-contract.mjs",
+          "verify-current"
+        ],
+        "startedAt": "2026-10-30T00:09:46.491854+00:00",
+        "finishedAt": "2026-10-30T00:09:46.718494+00:00",
+        "exitCode": 0
+      },
+      "log": "{\"ok\":true,\"runtimeTables\":267,\"runtimeSequences\":1,\"restrictedRuntimeRole\":true,\"migrationCount\":256,\"migrationFingerprint\":\"fd10ea3573aa2fe4442ae4d9f71fd2f238ea29ccfae0d5b287dc55ae36ef2731\"}\n"
+    },
+    {
+      "name": "cognitive-profile-artifact-postgres",
+      "status": {
+        "command": [
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "env",
+          "PRECISE_COGNITIVE_PROFILE_ARTIFACT=1",
+          "PRECISE_COGNITIVE_PROFILE_EVIDENCE=/workspace/materials-load-20261029/evidence/cognitive-profile-artifact-postgres-readback.json",
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts",
+          "--maxWorkers=1",
+          "--reporter=json",
+          "--outputFile=/workspace/materials-load-20261029/evidence/cognitive-profile-artifact-postgres.json"
+        ],
+        "startedAt": "2026-10-30T00:10:18.852843+00:00",
+        "finishedAt": "2026-10-30T00:10:22.058157+00:00",
+        "exitCode": 0
+      },
+      "log": "JSON report written to /workspace/materials-load-20261029/evidence/cognitive-profile-artifact-postgres.json\n",
+      "reporter": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1793319019185,
+        "success": true,
+        "testResults": [
+          {
+            "assertionResults": [
+              {
+                "ancestorTitles": [
+                  "Cognitive profile content on a migrated local clone under actual runtime identity"
+                ],
+                "fullName": "Cognitive profile content on a migrated local clone under actual runtime identity uses normal source installation/publication and appends two exact nonpersonal profile artifacts",
+                "status": "passed",
+                "title": "uses normal source installation/publication and appends two exact nonpersonal profile artifacts",
+                "duration": 1971.7760990000002,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              },
+              {
+                "ancestorTitles": [
+                  "Cognitive profile content on a migrated local clone under actual runtime identity"
+                ],
+                "fullName": "Cognitive profile content on a migrated local clone under actual runtime identity reads exact encrypted definitions with a fresh store and preserves existing rows and append-only runtime boundaries",
+                "status": "passed",
+                "title": "reads exact encrypted definitions with a fresh store and preserves existing rows and append-only runtime boundaries",
+                "duration": 50.64034800000036,
+                "failureMessages": [],
+                "meta": {},
+                "tags": []
+              }
+            ],
+            "startTime": 1793319019829,
+            "endTime": 1793319021851.6404,
+            "status": "passed",
+            "message": "",
+            "name": "/workspace/eduK12-new-version/server-version/backend/src/__tests__/assessment-authorization/cognitive-profile-artifact.postgres.integration.test.ts"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cognitive-profile-artifact-migrate-idempotent",
+      "status": {
+        "command": [
+          "env",
+          "PRECISE_PROFILE_MIGRATION_OWNER=1",
+          "python3",
+          "/workspace/materials-load-20261029/run-cognitive-profile-artifact.py",
+          "node",
+          "node_modules/prisma/build/index.js",
+          "migrate",
+          "deploy"
+        ],
+        "startedAt": "2026-10-30T00:11:06.911707+00:00",
+        "finishedAt": "2026-10-30T00:11:07.649824+00:00",
+        "exitCode": 0
+      },
+      "log": "Prisma schema loaded from prisma/schema.prisma\nDatasource \"db\": PostgreSQL database \"precise_cognitive_profile_artifact_test_20261030\", schema \"public\" at \"127.0.0.1:55439\"\n\n256 migrations found in prisma/migrations\n\n\nNo pending migrations to apply.\n"
+    },
+    {
+      "name": "cognitive-profile-artifact-pg-types",
+      "status": {
+        "command": [
+          "/workspace/materials-load-20261029/runtime/node-v24.21.0-linux-x64/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "/workspace/materials-load-20261029/cognitive-profile-artifact-pg-types.json"
+        ],
+        "startedAt": "2026-10-30T00:11:08.229997+00:00",
+        "finishedAt": "2026-10-30T00:12:10.319908+00:00",
+        "exitCode": 0
+      },
+      "log": ""
+    }
+  ],
+  "clone": {
+    "target": "precise_cognitive_profile_artifact_test_20261030",
+    "template": "precise_runtime_role_test_20261029",
+    "action": "Create new local synthetic clone; no source reset or ACL change",
+    "recordedAt": "2026-10-30T00:07:53.907978+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": "",
+    "sql": "CREATE DATABASE precise_cognitive_profile_artifact_test_20261030 TEMPLATE precise_runtime_role_test_20261029 OWNER materials_owner;"
+  },
+  "migrationReadback": {
+    "sql": "BEGIN READ ONLY; SELECT json_build_object('migrations',(SELECT count(*) FROM _prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL),'newMigrationRows',(SELECT count(*) FROM _prisma_migrations WHERE migration_name='20261030001000_cognitive_profile_public_template' AND finished_at IS NOT NULL),'newKindAllowed',(SELECT position('COGNITIVE_PROFILE_CONFIGURATION' IN pg_get_constraintdef(oid))>0 FROM pg_constraint WHERE conname='assessment_public_templates_template_kind_check')); ROLLBACK;",
+    "databases": [
+      {
+        "database": "precise_cognitive_profile_artifact_test_20261030",
+        "exitCode": 0,
+        "result": {
+          "migrations": 256,
+          "newMigrationRows": 1,
+          "newKindAllowed": true
+        },
+        "stderr": ""
+      },
+      {
+        "database": "precise_runtime_role_test_20261029",
+        "exitCode": 0,
+        "result": {
+          "migrations": 255,
+          "newMigrationRows": 0,
+          "newKindAllowed": false
+        },
+        "stderr": ""
+      }
+    ]
+  },
+  "actualReadback": {
+    "productionAccessed": false,
+    "scope": "One registered main reaction source installed DRAFT and explicitly published on a new synthetic clone; content artifacts only, no profile grant or assignment/START.",
+    "observations": [
+      {
+        "normalInstallCreatedDraft": true,
+        "source": {
+          "testType": "reaction",
+          "configVersion": "1.1.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0"
+        }
+      },
+      {
+        "normalExplicitLocalPublication": true,
+        "sharedConfigId": "76162502-e649-4e30-ba23-34856594fb9b",
+        "distinctExactProfiles": 2,
+        "artifactRetryAddsNoRow": true,
+        "profileTrials": {
+          "experience": 8,
+          "research": 60
+        },
+        "noUserRightsGranted": true
+      },
+      {
+        "freshEncryptedProfileReads": 2,
+        "actualRuntimeRole": true,
+        "immutableUpdateDeleteDenied55000": true,
+        "originalSixUsersFourGrantsThirteenTasksAndAttemptsUnchanged": true,
+        "originalPublicTemplatesUnchanged": true,
+        "noAssignmentOrSeedCreated": true
+      }
+    ],
+    "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+    "measurement": {
+      "releaseId": "51441fa0-21d9-4b4b-93fa-7a7a99aaff12",
+      "contentHash": "1e16631aa4dac844b8bdb9c2f182eac33bd041e9245a910117443bf0ff4e9266"
+    },
+    "artifacts": [
+      {
+        "artifactHash": "b4dfe2436a01d785f1fd216aa1fd8bbb09e67b92af9a2e38f221df34aa7730cd",
+        "identity": {
+          "kind": "COGNITIVE_PROFILE",
+          "testType": "reaction",
+          "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+          "configVersion": "1.1.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0",
+          "measurement": {
+            "releaseId": "51441fa0-21d9-4b4b-93fa-7a7a99aaff12",
+            "contentHash": "1e16631aa4dac844b8bdb9c2f182eac33bd041e9245a910117443bf0ff4e9266"
+          },
+          "profile": "experience",
+          "profileDefinitionVersion": "1.1.0",
+          "resolvedConfigHash": "1e794593810e051521095e9bb8760a295452db90cdb986219c78b3fb62e96c2d",
+          "protocolSignature": "f31e756f3f91b46da4c22b51d419af99c0abb231d2048d4f28d1b08b27f1aaed",
+          "metricDefinitionVersion": "1.1.0",
+          "qualityDefinitionVersion": "1.1.0",
+          "reportDefinitionVersion": "1.1.0",
+          "reportHash": "f70b35960c0670de58df2f1e10ca19202912ffa507ec1c9259282e06225024a0",
+          "presentationVersion": "1.2.0"
+        }
+      },
+      {
+        "artifactHash": "3e5bf939452b61a9a1dfd3d8a01d59c29ef944b4273d1a12438873b03694de20",
+        "identity": {
+          "kind": "COGNITIVE_PROFILE",
+          "testType": "reaction",
+          "configId": "76162502-e649-4e30-ba23-34856594fb9b",
+          "configVersion": "1.1.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0",
+          "measurement": {
+            "releaseId": "51441fa0-21d9-4b4b-93fa-7a7a99aaff12",
+            "contentHash": "1e16631aa4dac844b8bdb9c2f182eac33bd041e9245a910117443bf0ff4e9266"
+          },
+          "profile": "research",
+          "profileDefinitionVersion": "1.1.0",
+          "resolvedConfigHash": "9402f8907753c52d1b7286669f9fb7f09ab8b1a687765c2574c95cc23bfa9456",
+          "protocolSignature": "f31e756f3f91b46da4c22b51d419af99c0abb231d2048d4f28d1b08b27f1aaed",
+          "metricDefinitionVersion": "1.1.0",
+          "qualityDefinitionVersion": "1.1.0",
+          "reportDefinitionVersion": "1.1.0",
+          "reportHash": "789123e7a4c53b35f39075a1971a555dc42324ea54ed60260c8c0990ba83e35e",
+          "presentationVersion": "1.2.0"
+        }
+      }
+    ]
+  }
+}

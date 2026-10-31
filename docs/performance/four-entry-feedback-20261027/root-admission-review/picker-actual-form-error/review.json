@@ -1,0 +1,85 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "picker-actual-form-error",
+  "outcomes": [
+    "source picker typed unavailable failures recognizes the actual typed Form definition failure without swallowing other final-submit errors"
+  ],
+  "originalSHA256": {
+    "report": "4ab91d29c39f2586420f484cabb3cf31737723b358f94a5dd5db199032258cbe",
+    "execution": "7299b322a6c6c97b1bad759e2017788bf0657f4e2f093565ff9b4d1f1f4a282a",
+    "log": "678c99035e995888dbec63494b3671be0cace04c01cd545c081103579d08de08",
+    "inputs": "1bec7aa4dee2a2bfb39d65bbd04e6c315ace30a2f77086b7e3ccf71e0560ecd7"
+  },
+  "currentInputsSHA256": "e5f323918c6be6fbc83e140c231ad103d42901c811f463485bf8ab922ac6cda3",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/backend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 2,
+    "numPassedTests": 1,
+    "numFailedTests": 0,
+    "numPendingTests": 1
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "source picker typed unavailable failures projects known invalid source definitions but not unknown HTTP-shaped or SQL errors",
+      "status": "skipped"
+    },
+    {
+      "fullName": "source picker typed unavailable failures recognizes the actual typed Form definition failure without swallowing other final-submit errors",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend",
+      "currentObject": "3f56dbc63c9be94321c5f3d81dc10fffee5a9240",
+      "rationale": "Root read both revisions of the exact classifier: earlier unknown HTTP/SQL and NOWAIT assertions are unaffected by adding the precise InstrumentFinalSubmitError FORM_ANSWER_INVALID400 branch; the new actual-validator case is independently selected from its own report."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node 24.22.1 is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance."
+  ],
+  "rootReadRationale": "Root read both revisions of the exact classifier: earlier unknown HTTP/SQL and NOWAIT assertions are unaffected by adding the precise InstrumentFinalSubmitError FORM_ANSWER_INVALID400 branch; the new actual-validator case is independently selected from its own report."
+}

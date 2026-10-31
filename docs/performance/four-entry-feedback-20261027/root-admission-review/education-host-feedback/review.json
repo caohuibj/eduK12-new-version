@@ -1,0 +1,136 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "education-host-feedback",
+  "outcomes": [
+    "unified Teacher assessment inbox adds the approved runtime source only when explicitly assembled and forwards authoritative completion",
+    "unified Teacher assessment inbox combines formats and retains the authorized start route",
+    "unified Teacher assessment inbox waits for all sources before showing one empty state",
+    "unified Teacher assessment inbox keeps successful tasks during partial failure and recovers via existing retry",
+    "unified Teacher assessment inbox retains private task pagination in the unified list",
+    "Teacher participant host with synthetic runtime DTOs runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED",
+    "Teacher participant host with synthetic runtime DTOs does not treat a child completion hint or missing current item as parent completion",
+    "Teacher participant host with synthetic runtime DTOs preserves durable completion when list refresh fails and emits each completion once",
+    "Teacher participant host with synthetic runtime DTOs collects the actual assigned consent before first canonical START",
+    "Teacher participant host with synthetic runtime DTOs rejects a late completed response after exit and after account replacement",
+    "Teacher participant host with synthetic runtime DTOs does not revive an old task on a new API identity",
+    "Teacher participant host with synthetic runtime DTOs keeps a recoverable error when child progress cannot be read; it never re-submits FINAL"
+  ],
+  "originalSHA256": {
+    "report": "1198eab52c52fcd8432d8b08eb4b56810c19fdb22af4104e72d90d66f7e35c39",
+    "execution": "396130cba85413cc06d6b198c562c485789da95eb5d9a1f73fbc78a03b4935dd",
+    "log": "e3a5ff16d42485ff8fb951a11839309179aeb617c3de7ec29fbd368e8a9c0044",
+    "inputs": "6483f51bb1ebaeaac527c113066fca0382d3f4cd78a9f91ea7934529c394a7de"
+  },
+  "currentInputsSHA256": "4c90e64f059fdeb4fee5c237f97f81e611d62e43d569ad0948bf057a5e4c5cd8",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx, server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/frontend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 12,
+    "numPassedTests": 12,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "unified Teacher assessment inbox adds the approved runtime source only when explicitly assembled and forwards authoritative completion",
+      "status": "passed"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox combines formats and retains the authorized start route",
+      "status": "passed"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox waits for all sources before showing one empty state",
+      "status": "passed"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox keeps successful tasks during partial failure and recovers via existing retry",
+      "status": "passed"
+    },
+    {
+      "fullName": "unified Teacher assessment inbox retains private task pagination in the unified list",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs runs Cognitive, SJT, Scale and Form transports and completes only after a fresh parent COMPLETED",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs does not treat a child completion hint or missing current item as parent completion",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs preserves durable completion when list refresh fails and emits each completion once",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs collects the actual assigned consent before first canonical START",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs rejects a late completed response after exit and after account replacement",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs does not revive an old task on a new API identity",
+      "status": "passed"
+    },
+    {
+      "fullName": "Teacher participant host with synthetic runtime DTOs keeps a recoverable error when child progress cannot be read; it never re-submits FINAL",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/frontend",
+      "currentObject": "361fcbf63584d4e07cef72192a47d27e9392e050",
+      "rationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node 24.22.1 is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance."
+  ],
+  "rootReadRationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+}

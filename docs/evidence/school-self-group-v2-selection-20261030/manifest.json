@@ -1,0 +1,73 @@
+{
+  "parentSchoolCandidate": "424667b022853f01887bed91841cba7c89257c73",
+  "branch": "feat/school-self-group-source-v2-20261030",
+  "distinctCases": 3,
+  "layers": {
+    "pureBackend": 2,
+    "jsdom": 1,
+    "realHTTP": 0,
+    "realPG": 0,
+    "browser": 0,
+    "nativePublication": 0
+  },
+  "reports": {
+    "private-selection-contract.json": {
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "caseNames": [
+        "School explicit private group publisher selection (not publication) retains separate audience and block ceilings, canonicalizes order and never selects a fallback audience",
+        "School explicit private group publisher selection (not publication) rejects stale fixed sources, same-named score borrowing, insufficient N and non-School SELF"
+      ]
+    },
+    "private-selection-contract-continuation.json": {
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "caseNames": [
+        "School explicit private group publisher selection (not publication) retains separate audience and block ceilings, canonicalizes order and never selects a fallback audience",
+        "School explicit private group publisher selection (not publication) rejects stale fixed sources, same-named score borrowing, insufficient N and non-School SELF"
+      ]
+    },
+    "private-selection-ui.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "caseNames": [
+        "requires an explicit audience choice and discards it on opt-out; stale source pins cannot carry forward"
+      ]
+    }
+  },
+  "typeChecks": {
+    "backendFirst": 2,
+    "backendAfterExplicitMissingSourceReturn": 0,
+    "frontendApp": 0,
+    "lintObservedToolExit": 0
+  },
+  "sharedModuleBytesAvailable": false,
+  "sharedInterfaceCommit": "00f2b788b764ca5c92e6fcf0ebda442928259f11",
+  "livePublisherOrPickerChanged": false,
+  "formalCI": false,
+  "uploads": false,
+  "old15_22_37Replayed": false,
+  "typeFix": "Explicit return for absent exact source narrows TypeScript lookup; original TS18048 and both original/continuation reporter retained.",
+  "savedCandidateSHA256": {
+    "server-version/backend/src/modules/education-tools/school-private-group-selection.ts": "58a6eacd48c2b8f427508bd51b5ea93350de864692481504017b0ff24cafb37c",
+    "server-version/backend/src/__tests__/campus/school-private-group-selection.test.ts": "1965be8b7c502f216248643e74fc595527a5e62739e85f3f13823b1c2144eaa6",
+    "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx": "2029126c7d1315ecf96f2b667973cd2647d519aeff340d2d44c7be4cb28c658e",
+    "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.test.tsx": "919aef4dcb1b99f1099016fa6d97c1ca35db7e9771a229acdfd381dab288f004"
+  },
+  "sourceHashMeaning": "Recorded at this saved local candidate; not a retroactive signed execution/input attestation.",
+  "rawEvidenceSHA256": {
+    "private-selection-contract.json": "f79bfea06664bff20932709c96f73a03c6d77b34a2da32dd67a3022138030253",
+    "private-selection-contract-continuation.json": "2a74e52890e2e3ca7043264b90c08582bce75744c778133cfe231765a1d46f56",
+    "private-selection-ui.json": "3dbfb1c85136e997e9cca4e03364d3787a789b7dffdbb6cf099b52fd5f664bd5",
+    "private-selection-backend-types.log": "7060fb05d965da7e3157764bd23d3a24cf6dcee8a12f0d44c1eef77b25b19bd1",
+    "private-selection-backend-types.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "private-selection-backend-types-continuation.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "private-selection-backend-types-continuation.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "private-selection-frontend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "private-selection-frontend-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "private-selection-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

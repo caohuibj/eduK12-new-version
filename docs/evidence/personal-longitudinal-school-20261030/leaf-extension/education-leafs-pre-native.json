@@ -1,0 +1,36 @@
+{
+  "capturedBeforeExecutionAt": "2026-10-30T11:21:18.242547+00:00",
+  "indexTree": "9b2ebbae78753138e84c1ededb6ef9244b1f77d1",
+  "blobs": {
+    "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts": "36a19f59c97a43b3204cd497ef5936705f90b4c3",
+    "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts": "cba2c5bb1ece9b96e17edd283f0928693be5bae0",
+    "server-version/backend/src/modules/assessment-run/repository.ts": "21539c14c664e6183a2630c6beb8c3c1bb123e72",
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": "ed8b7777abee5467b6d706d6d7055ae11b9e724a",
+    "server-version/backend/src/modules/campus/personal-tracking.ts": "fa98528a08b5e2f8d17a4de099a4b6dd0c24db97",
+    "server-version/backend/src/modules/composite/personal-tracking-results.ts": "d375ca02e81d8d8808049a348e6f34a36183c644",
+    "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts": "dc194dfd9b29cf2260f27e57deb805f0ede356ef",
+    "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts": "b404055e4545412cfbf13975aafd6cd0ae205557",
+    "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts": "8d0eb96a98dea86ec6c6b027795d3c7dc5f8cb02",
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": "ff4b0422c92301d11b9100acc5c6fdaf19660225",
+    "server-version/backend/src/modules/huiteacher/run.service.ts": "d2ceb2f0d4de6e6720164d36c9271f1d620daf0f",
+    "server-version/backend/src/modules/reporting/education-personal-tracking.ts": "6639a339b89b210fbd95d0dfaff2e8bd022770e1",
+    "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts": "864c2149e8a6cdb5df9992ce90bbe1adaa6596fc",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": "d7a0ffb27930725e0ff251949b5763ee3a2ff788",
+    "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx": "f4be5589bb68f753bcb33f1da99a30d47a9969fc",
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": "517ba17a464e69c0ad072b251b9ec92eac151639",
+    "server-version/frontend/src/components/education-tools/educationCompositionClient.ts": "3b916b7113b9ded279a923ebe850c0cf1da0072f",
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": "c95c07f6bd7d038e4fc330fb58c2e396f387d7b2",
+    "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx": "302c143ae37be6302e35a77aca696c1838d0f750",
+    "server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx": "cd7a52997156905aad62542c97cc0fcd9da8b259",
+    "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx": "699f27df129ad608fc968ebf5e5f23b94122e72c",
+    "server-version/frontend/src/school/SchoolActivityManager.tsx": "27ca9694a1e5fca131c4a27b98edd808c79e7678",
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": "df19639816e9ce76756648c878da49575c554a71"
+  },
+  "case": "new School and Teacher native mixed leaf longitudinal trajectories; no prior full journeys replayed",
+  "envKeys": [
+    "RELEASE_INTEGRATION_DATABASE_URL",
+    "DATABASE_URL",
+    "COGNITIVE_MODULE_ENABLED"
+  ],
+  "database": "existing isolated loopback eduk12_test"
+}

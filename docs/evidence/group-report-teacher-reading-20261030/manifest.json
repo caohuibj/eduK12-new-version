@@ -1,0 +1,197 @@
+{
+  "status": "DRAFT_NOT_MERGE_READY",
+  "base": "43d119c9bfbc7949baab2edea29d96044b04607c",
+  "scope": "Existing Teacher adult Form report reading only; existing permission/release/statistics/store reused",
+  "frontendTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+  "backendTreeUnchanged": "dc9a331f08901238236ec3664e3173aba3f15030",
+  "freshDistinctNavigationCases": 1,
+  "unitFinal": "navigation-projection-continuation.json",
+  "unitFailuresRetained": [
+    "navigation.json: public landing same-label button selected before authenticated workspace",
+    "navigation-diagnosis.json: diagnostic confirmed selected button has no aria-pressed",
+    "navigation-workspace-continuation.json: repeated legitimate explanation matched twice; test expected unique text"
+  ],
+  "browser": "browser.json",
+  "browserInitialFailure": "browser.log: esbuild lacked public absolute asset resolution; no browser journey executed",
+  "browserContinuation": "browser-public-assets-continuation.log: actual journey first executed successfully",
+  "pdfPages": 2,
+  "syntheticAuthAndApi": true,
+  "productionAuthorityClaim": false,
+  "checksReplayed": [],
+  "localInputAttribution": "Original local executions unsigned. Reports preceded index freeze; unchanged exact input contents then staged and bound to component trees. No backfilled execution signature.",
+  "lint": "exit0, one existing scopeGeneration cleanup-ref warning remains; no threshold/rule changes",
+  "remaining": [
+    "PR415 exact existing-route binding stays disabled while PR409 aligns; no Ready/qualification/merge queue activation.",
+    "PR418 contains Teacher native Form subgroup/version work and POST-success/directory-failure correction; not part of this reading-only tranche.",
+    "Other sources retain their actual GROUP ceilings; personal INDIVIDUAL_ONLY is not group authorization.",
+    "Group longitudinal follows existing configured plans after stable longitudinal interface; no Bundle Profile aggregate."
+  ],
+  "ciExecuted": false,
+  "merged": false,
+  "deployed": false,
+  "reports": {
+    "browser-bundle.json": {
+      "sha256": "18f09d3fafb5a92604d883a0dae981887b2df25654871201c92ba1a6eedfcaa7",
+      "bytes": 586
+    },
+    "browser-public-assets-continuation.log": {
+      "sha256": "952a6ac4248ceb08d3b8febbf9841bc140358a11026e0f60c3209be55ef220ad",
+      "bytes": 53
+    },
+    "browser.json": {
+      "sha256": "7484e30d26f2c7781d485159ccdd04b64a3035e794db000f27f600dd82880f87",
+      "bytes": 1989,
+      "passed": true
+    },
+    "browser.log": {
+      "sha256": "437c80886d7f783a6d48432545027886cdc0b7a6083cf4e4f1edd219d76e8635",
+      "bytes": 1984
+    },
+    "frontend-lint.json": {
+      "sha256": "abd11bf92a872f253e5f2ef76c1c564be1c99d8dae441daa9e3a8b1f7e9f94bd",
+      "bytes": 679
+    },
+    "frontend-types.json": {
+      "sha256": "76327d0a2efa4e600ee677c639befdf63a43619ac6d2a8bdc8311e4f3ac18655",
+      "bytes": 455,
+      "exitCode": 0
+    },
+    "frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "navigation-diagnosis.json": {
+      "sha256": "57cde9de5bffa2f57035a2cafb92b81f63d6bc5ae97234134f218f09b7176d2d",
+      "bytes": 12105,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "navigation-diagnosis.log": {
+      "sha256": "312d393cb7833a006a14904c40da58770664afa904356077963815acb6a76b7b",
+      "bytes": 131
+    },
+    "navigation-projection-continuation.json": {
+      "sha256": "1afb5de7b87704f64780535b89ed092349b693878b9078508806b232dff2de34",
+      "bytes": 1090,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "navigation-projection-continuation.log": {
+      "sha256": "a7b21c1db91481239becf10416eac879b62383fa9adb1eac61b8d9175c71d366",
+      "bytes": 145
+    },
+    "navigation-workspace-continuation.json": {
+      "sha256": "e9ab4df04359e28dcf60bb16c3ed181bd1cf11212d3cdafd221b0f50ecdf6781",
+      "bytes": 18779,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "navigation-workspace-continuation.log": {
+      "sha256": "6ec7357686e0cab7daed22028ce4f46192b31185494eb0f334df0ddfbb807812",
+      "bytes": 144
+    },
+    "navigation.json": {
+      "sha256": "9a8f283ab7d42bed77cc15499cd3ba9a78f037aae58d81398fb47c7c492895e6",
+      "bytes": 11452,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "navigation.log": {
+      "sha256": "cff1f12ac1e85ab849f6df994568ad52e89edfbf0d2479264545abe99b2f2bc0",
+      "bytes": 121
+    },
+    "teacher-group-1440.png": {
+      "sha256": "d8b95deb1402cfc7f6e0bd7158b602dcbd0beba18f55d0a62a4f9f0437039230",
+      "bytes": 247059
+    },
+    "teacher-group-390.png": {
+      "sha256": "8b61ec042f0c92ec441b4acc73f10cb4d0fc6f83ed951069ab2a92606817724a",
+      "bytes": 228517
+    },
+    "teacher-group-report.pdf": {
+      "sha256": "c6d80e8688601d2ec28bf0f2c10801db285d51afe38c518d0f5c057096a9345b",
+      "bytes": 400421
+    },
+    "frontend-lint.log.gz": {
+      "sha256": "0def6a4ca42738764b513ccc8e794f60b99e280edd6533693ba0d108fa9c3043",
+      "bytes": 302
+    },
+    "mainfa/frontend-types.json": {
+      "sha256": "6e3ed12d1457bfe76d23beb01e02a8ae287b341495d3ce2da69062057568c1da",
+      "bytes": 528
+    },
+    "mainfa/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "mainfb/frontend-types.json": {
+      "sha256": "fc4cd9fc51b83b2d96f1081b7a471726606ce2ee69741f9be7be067664f97de0",
+      "bytes": 528
+    },
+    "mainfb/frontend-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "qualification-controls.log": {
+      "sha256": "f26b0f8a821c72d2e91bec19aa36c0c933077c5dffaec8096a215ab382269780",
+      "bytes": 238
+    }
+  },
+  "rawLogTransport": "frontend-lint.log.gz losslessly preserves original lint output, including trailing blank line; no output trimming",
+  "mainfaQualificationPreparation": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "schoolDependency": "77e2767248d171f8914fe94b9f3debada424a4d4",
+    "sourceCheckpoint": "68f047824a940595a9a9346298235c3f4cddaa56",
+    "frontendTree": "b6e7cfb9d6bd52c9f67fcb3b744f3d9b8936f31f",
+    "frontendTypes": "mainfa/frontend-types.json: actual once exit0",
+    "backendTree": "2342ff04dd851b9c82383fd5835f35935ecb67fa",
+    "backendTypes": "Exact unchanged backend tree equals PR414 current mainfa/backend-types.json receipt; no backend replay.",
+    "oldNavigationBrowserReexecuted": false,
+    "formalCiActivated": false,
+    "schoolCandidateModified": false
+  },
+  "mainfbPreparation": {
+    "main": "fb3a0cab6f3f28e737a38550167ff6b2affcae56",
+    "schoolDependency": "f5fabe490334f06c7f97436e82545d3b55b921f6",
+    "sourceCheckpoint": "704a0ab779929592f201a54d367a9d9e295f29c9",
+    "frontendTree": "b672a3fcf90f535079675048a7a013fbbbf660fb",
+    "frontendTypes": "mainfb/frontend-types.json: once exit0",
+    "backendTree": "dc9a331f08901238236ec3664e3173aba3f15030",
+    "backendTypesReused": "Exact same tree as School mainfb/backend-types.json; no backend replay.",
+    "businessOrBrowserReexecuted": false,
+    "formalCiActivated": false,
+    "schoolFinalCandidateModified": false
+  },
+  "historicalReaderTrees": {
+    "frontend": "00a843d3164e16ae7b7b4045ee0597db2812d790",
+    "backend": "315616d1b8fead0cbbd340822ef8828498007cb9"
+  },
+  "main414Preparation": {
+    "sourceCheckpoint": "91487d27e12e60cd30895d5e5327016552f9a45a",
+    "componentTreesChangedByMainMerge": false,
+    "frontendReceiptReused": "mainfb/frontend-types.json",
+    "backendReceiptReused": "../group-report-school-20261030/mainfb/backend-types.json",
+    "ownFiveReaderSourceBlobsUnchangedFrom": "380b90cd700d2180015f60b44aad4fbd2131029c",
+    "oldNavigationBrowserPgOrTypesReexecuted": false,
+    "newControlCheck": "qualification-controls.log:1 passed",
+    "qualificationBinding": "Prepared existing exact candidate415; disabled until PR409 baseline settles",
+    "formalCiActivated": false,
+    "draft": true,
+    "mergeQueueEntered": false
+  },
+  "main8bcFinalPreparation": {
+    "main": "8bc677156a3548333450363a31e33812ad2a9f0c",
+    "sourceCheckpoint": "486fa3286f264d6321b8140373aaf4dce0593154",
+    "sharedConflict": "preserved both reporting and personal-tracking imports",
+    "affectedNavigation": "main8bc/navigation.json:1 PASS, explicit nonconfigured tracking reply",
+    "frontendTypes": "main8bc/frontend-types.json:current frontend tree once",
+    "backend": "exact main8bc tree; no backend diff, compile or PG replay",
+    "oldBrowser": "retained original380b90 observation; no identical complete bundle claim",
+    "notion": "415/418 preparation append confirmed success after corrected content argument; earlier INVALID_ARGUMENT did not write",
+    "remaining": "existing formal scope/admission/CodeQL/gate; no merge/deploy"
+  }
+}

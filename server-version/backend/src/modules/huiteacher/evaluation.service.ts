@@ -103,13 +103,14 @@ export async function archiveHuiteacherTarget(input:{
 export async function createHuiteacherEvent(input:{
   organizationId:string;actorUserId:string;targetId:string
   kind:TeacherEventKind;title:string;notes?:string;scheduledAt?:Date
+  tx?:Tx
 }){
   const title=input.title.trim()
   if(!title||title.length>200||(input.notes?.length??0)>12000)
     fail('HUITEACHER_EVENT_INPUT_INVALID',400)
   if(input.scheduledAt&&!Number.isFinite(input.scheduledAt.getTime()))
     fail('HUITEACHER_EVENT_DATE_INVALID',400)
-  return prisma.$transaction(async tx=>{
+  const write=async(tx:Tx)=>{
     await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
     const target=await tx.huiteacherEvaluationTarget.findFirst({where:{
       id:input.targetId,organizationId:input.organizationId,status:'ACTIVE',
@@ -126,7 +127,8 @@ export async function createHuiteacherEvent(input:{
       targetId:id,domainEventId:randomUUID(),
       payload:{kind:input.kind,targetId:input.targetId}})
     return event
-  })
+  }
+  return input.tx?write(input.tx):prisma.$transaction(write)
 }
 export async function listHuiteacherEvents(input:{
   organizationId:string;actorUserId:string;targetId?:string;cursor?:string
@@ -239,12 +241,13 @@ export async function transitionHuiteacherEvent(input:{
 export async function createHuiteacherEventRunDraft(input:{
   organizationId:string;actorUserId:string;eventId:string;name:string;
   intakeDeadline?:Date|null
+  tx?:Tx
 }){
   const name=input.name.trim()
   if(!name||name.length>200)fail('HUITEACHER_RUN_NAME_INVALID',400)
   if(input.intakeDeadline&&!Number.isFinite(input.intakeDeadline.getTime()))
     fail('HUITEACHER_RUN_DATE_INVALID',400)
-  return prisma.$transaction(async tx=>{
+  const write=async(tx:Tx)=>{
     await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
     const events=await tx.$queryRaw<Array<{id:string;status:string;targetId:string}>>`
       SELECT event."id",event."status",event."target_id" AS "targetId"
@@ -288,7 +291,8 @@ export async function createHuiteacherEventRunDraft(input:{
       payload:{eventId:input.eventId,runVersion:run.version,runStatus:run.status},
     })
     return {eventId:input.eventId,runId:run.id,status:run.status,version:run.version}
-  })
+  }
+  return input.tx?write(input.tx):prisma.$transaction(write)
 }
 
 export async function readHuiteacherEventRun(input:{
@@ -311,14 +315,15 @@ export async function readHuiteacherEventRun(input:{
     // check above remains mandatory; never return selectors, definitions,
     // respondent identities, frozen policies or execution details here.
     const tracks=await tx.$queryRaw<Array<{
-      id:string;resourceFamily:string;resourceKey:string;resourceVersion:string
+      id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title:string|null;sourceRevision:number|null
     }>>`
-      SELECT "id", "resource_family" AS "resourceFamily",
-        "resource_key" AS "resourceKey", "resource_version" AS "resourceVersion"
-      FROM "assessment_run_tracks"
-      WHERE "organization_id"=${input.organizationId}
-        AND "run_id"=${link.runId}
-      ORDER BY "created_at", "id"
+      SELECT t.id,t.resource_family AS "resourceFamily",t.resource_key AS "resourceKey",t.resource_version AS "resourceVersion",
+        v.title,v.source_revision AS "sourceRevision"
+      FROM assessment_run_tracks t LEFT JOIN education_private_tool_versions v ON v.kind='COMPOSITION'
+        AND v.entry='TEACHER' AND v.organization_id=t.organization_id AND t.resource_family='BUNDLE'
+        AND t.resource_key='education-composition:TEACHER:'||v.id||':TEACHER:SELF:1.0.0'
+      WHERE t.organization_id=${input.organizationId} AND t.run_id=${link.runId}
+      ORDER BY t.created_at,t.id
     `
     return {...link,...run[0],trackCount:tracks.length,tracks}
   })

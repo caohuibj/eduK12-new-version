@@ -1,0 +1,15 @@
+{
+  "command": [
+    "./node_modules/.bin/prisma",
+    "migrate",
+    "deploy"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "startedAtUnix": 1793095730.9220088,
+  "endedAtUnix": 1793095732.8968742,
+  "exitCode": 0,
+  "explicitNewLoopbackDatabase": true,
+  "CI": null,
+  "GITHUB_ACTIONS": null,
+  "RELEASE_VERIFY_LOCAL": null
+}

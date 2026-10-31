@@ -1,0 +1,4 @@
+const fs=require('node:fs'),crypto=require('node:crypto');
+const root='/workspace/eduK12-new-version',dir=root+'/docs/performance/four-entry-scale-probe-20261028/fixtures',m=JSON.parse(fs.readFileSync(dir+'/manifest.json')),bytes=fs.readFileSync(dir+'/c1-source.json');
+if(crypto.createHash('sha256').update(bytes).digest('hex')!==m.sha256)throw Error('Exact fixture bytes drift');
+require(root+'/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts').GENERATED_SCALE_INSTRUMENT_SOURCES.push(JSON.parse(bytes));

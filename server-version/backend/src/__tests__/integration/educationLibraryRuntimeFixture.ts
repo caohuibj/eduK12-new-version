@@ -17,7 +17,7 @@ import { listEducationLibraryResourcePage } from '../../modules/scale-library-go
 import { grantSyntheticHuischoolProduct } from './educationProductFixture'
 import { publishRegisteredScaleFixture } from './registered-resource-fixture'
 
-const name = (prefix: string) => prefix + randomUUID().replaceAll('-', '').slice(0, 32 - prefix.length)
+const name = (prefix: string) => prefix + randomUUID().replace(/-/g, '').slice(0, 32 - prefix.length)
 const principal = (u: Pick<User, 'id' | 'username' | 'role'>): AuthenticatedPrincipal => ({ userId: u.id,
   username: u.username, role: u.role, platformRole: 'STANDARD', tokenVersion: 0, mustChangePassword: false, accountDomain: 'SCHOOL' })
 async function seedSchool(db: PrismaClient) {
@@ -60,6 +60,11 @@ async function seedTeacher(db: PrismaClient) {
     participantMembershipId: member.id, studentNumber: null, classUnitId: null, studentMembershipId: null, studentClassAssignmentId: null }
 }
 
+/** Reusable identities/workflow population only, without installing another
+ * library tool or running any existing tool's acceptance journey. */
+export async function setupEducationRuntimeActors(db:PrismaClient,product:'SCHOOL'|'TEACHER'){
+ return product==='SCHOOL'?seedSchool(db):seedTeacher(db)
+}
 /** Synthetic identities only; real source approval, grants, catalog, draft and
  * publication services. No registry override, fake execution or fake FINAL. */
 export async function setupEducationLibraryRuntimeFixture(input: {
@@ -118,7 +123,7 @@ export async function setupEducationLibraryRuntimeFixture(input: {
   const imageReference = asset ? { assetId: asset.id, contentHash: asset.sha256, mimeType: asset.mimeType as 'image/png' } : null
   definition.report.rawScoreFeedback = { schemaVersion: 1, rules: [{ scoreKey: 'support', ranges: [{ key: 'descriptive', min: 0, max: 5,
     includeMax: true, text: '本次支持体验仅用于自我反思，不是诊断。', ...(imageReference ? { images: [{ asset: imageReference, altText: '合成反馈配图', order: 0 }] } : {}) }] }] }
-  const scale = await db.scale.create({ data: { code: 'edlib_' + randomUUID().replaceAll('-', ''), name: '合成教育公库量表', status: 'PUBLISHED',
+  const scale = await db.scale.create({ data: { code: 'edlib_' + randomUUID().replace(/-/g, ''), name: '合成教育公库量表', status: 'PUBLISHED',
     creatorId: author.id, instrumentClass: 'CUSTOM_DESCRIPTIVE', definition, definitionHash: hashScaleDefinition(definition) } })
   const release = await publishRegisteredScaleFixture(db, scale.id)
   const manifest = await prepareMediaManifest(author.id, 'TRAINING', { releaseId: release.releaseId, dependencyReleaseIds: [] })
@@ -154,16 +159,16 @@ export async function setupEducationLibraryRuntimeFixture(input: {
   const catalog = await db.$transaction(tx => listEducationLibraryResourcePage(tx, { product, organizationId, actorId: managerUserId, workflow }))
   if (!catalog.entries.some(entry => entry.applicability.resourceKey === resource.key)) throw new Error('Granted exact source is absent from real catalog')
   const a = registered.resourceEntry.applicability
-  const requestedPolicy = { subjectRoles: a.subjectRoles, respondentRoles: a.respondentRoles, relationshipKinds: responseMode === 'TEACHER_REPORT' ? a.relationshipKinds.filter(kind => kind === 'CLASS_TEACHER_STUDENT') : a.relationshipKinds,
+  const requestedPolicy: Parameters<typeof addAssessmentRunTrackDraft>[0]['requestedPolicy'] = { subjectRoles: a.subjectRoles, respondentRoles: a.respondentRoles, relationshipKinds: responseMode === 'TEACHER_REPORT' ? a.relationshipKinds.filter(kind => kind === 'CLASS_TEACHER_STUDENT') : a.relationshipKinds,
     perspectives: a.perspectives, analysisMode: a.analysisMode, visibilityPolicyKey: a.visibilityPolicyKey, minimumRespondents: a.minimumRespondents,
-    ...(responseMode === 'TEACHER_REPORT' ? { targetPolicy: { mode: input.publisher === 'PSYCHOLOGY' ? 'HOMEROOM_TEACHER' : 'ALL_CLASS_TEACHERS' } } : {}) }
+    ...(responseMode === 'TEACHER_REPORT' ? { targetPolicy: { mode: input.publisher === 'PSYCHOLOGY' ? 'HOMEROOM_TEACHER' as const : 'ALL_CLASS_TEACHERS' as const } } : {}) }
   for (let index = 0; index < (input.trackCount ?? 1); index++) await addAssessmentRunTrackDraft({ organizationId, runId,
     actorUserId: managerUserId, resource, subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [subjectMembershipId] },
     respondentSelector: responseMode === 'PARENT_REPORT' ? { kind: 'RELATED_PARENT' } : { kind: 'MEMBERSHIP_IDS', membershipIds: [participantMembershipId!] }, requestedPolicy })
   const readVersion = async () => (await db.$queryRaw<Array<{ version: number }>>`SELECT version FROM assessment_runs WHERE id=${runId}`)[0].version
   const expectedVersion = await readVersion()
   const preview = async () => previewAssessmentRun({ organizationId, runId, actorUserId: managerUserId, expectedVersion: await readVersion() })
-  const publish = async () => publishAssessmentRun({ organizationId, runId, actorUserId: managerUserId, expectedVersion: await readVersion() })
+  const publish = async (tracking?:unknown) => publishAssessmentRun({ organizationId, runId, actorUserId: managerUserId, expectedVersion: await readVersion(),tracking })
   const executions = () => db.$queryRaw<Array<{ id: string }>>`SELECT e.id FROM assessment_run_executions e
     JOIN assessment_run_actor_snapshots r ON r.id=e.respondent_actor_snapshot_id AND r.run_id=e.run_id AND r.organization_id=e.organization_id
     WHERE e.run_id=${runId} AND e.organization_id=${organizationId} AND r.user_id=${participantUserId} ORDER BY e.id`
@@ -173,3 +178,6 @@ export async function setupEducationLibraryRuntimeFixture(input: {
     imageReference, workflow, catalog, requestedPolicy, open, preview, publish, executions,
     executionId: (await executions())[0]?.id ?? null, answers: [{ itemCode: 'Q1', responseValue: 'option_3' }] }
 }
+
+// Identity metadata only, for native-profile fixtures that reuse an already installed source.
+export {seedSchool as seedEducationSchoolRuntimeIdentity,seedTeacher as seedEducationTeacherRuntimeIdentity}

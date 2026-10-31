@@ -1,0 +1,281 @@
+{
+  "recordedAt": "2026-10-30T11:33:00.007454+00:00",
+  "originalCheckpoint": "10c12ff680059850c31f11165c1f7611e8385946",
+  "stackedBase": "2160f195f67b211cc62ab8eda1ecf3f698927900",
+  "latestMainObserved": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+  "scope": "Education exact leaves and independent own disclosure; no migration, build, CI, merge or deployment",
+  "files": [
+    {
+      "path": "education-leafs-authoring-ui.json",
+      "sha256": "1d80d92a9ae7bc4d5c90a2669c319166ef4abd68139198db83e19c1ca0653dae",
+      "bytes": 9989
+    },
+    {
+      "path": "education-leafs-authoring-ui.log",
+      "sha256": "0fbd1e72e97b99980b6e994a05cfbbd0c894cf009fcec80db416fda01976bc32",
+      "bytes": 62
+    },
+    {
+      "path": "education-leafs-backend-first-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "education-leafs-bundle-contract-repair.json",
+      "sha256": "93e52c427c8aa99c721949cdf46fe8ab3e79f89b15a59a3de6740a4b026851f2",
+      "bytes": 2700
+    },
+    {
+      "path": "education-leafs-bundle-contract-repair.log",
+      "sha256": "592aef53c43da21e6910ebda4826dc72a1a0e15a4785ca2b5a813e80de755696",
+      "bytes": 72
+    },
+    {
+      "path": "education-leafs-bundle-contract.json",
+      "sha256": "dc05be7593f240fef64a91b795474f41a78dade4fc75af63977e41ee45210641",
+      "bytes": 7615
+    },
+    {
+      "path": "education-leafs-bundle-contract.log",
+      "sha256": "06b757aa3ad4b8c144451bd34bd487348867628c36210560d6731f53c68b3e26",
+      "bytes": 65
+    },
+    {
+      "path": "education-leafs-draft-removal-boundary.json",
+      "sha256": "0a53f6b371c819a1e191ff014660cecdc898bfc493cb00d5898e06dfae221014",
+      "bytes": 1952
+    },
+    {
+      "path": "education-leafs-draft-removal-boundary.log",
+      "sha256": "0493a4b6c6c89870f331dc94c4e27f8b04a5480d6c3494ca18228ff5252031ac",
+      "bytes": 72
+    },
+    {
+      "path": "education-leafs-final-inputs.json",
+      "sha256": "9aa915e4e27a0b19f0a7c2c5124e1e6bb09d75eff595f89d954be3c368888a29",
+      "bytes": 689865
+    },
+    {
+      "path": "education-leafs-frontend-first-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "education-leafs-native-first.json",
+      "sha256": "6c6e496d59cdc80c7480201a46948cb4e37bcc8ea0ba36a905f5b117f46e850d",
+      "bytes": 2579
+    },
+    {
+      "path": "education-leafs-native-first.log",
+      "sha256": "c4182a7e7056c27d8ea123e5e2e1ba37e0552c1daebca9d7dc03ee285a637c3f",
+      "bytes": 62
+    },
+    {
+      "path": "education-leafs-native-number-repair.json",
+      "sha256": "2b8e57a2c1a89378b6dddeb356d286126034663c41d6d99e5d7ca76804d3a037",
+      "bytes": 1586
+    },
+    {
+      "path": "education-leafs-native-number-repair.log",
+      "sha256": "4efc4aa7e56349dfceb97a67844872fd266613102949cd8bd9288cd8cb0e9fe1",
+      "bytes": 70
+    },
+    {
+      "path": "education-leafs-native-setup-repair.json",
+      "sha256": "4d3600abbe6171edf7c969332d438b739744687e585bb3f3d119028638e79ffa",
+      "bytes": 2638
+    },
+    {
+      "path": "education-leafs-native-setup-repair.log",
+      "sha256": "233f224bd6589af060e4366164280c1793c1bf035bbe2d30940ce32dc7d70576",
+      "bytes": 69
+    },
+    {
+      "path": "education-leafs-pre-native-setup-repair.json",
+      "sha256": "b5ba7146e289416c0729bdb648c5f09c4ed3b834e2e9b74a699f0a32976dad28",
+      "bytes": 284
+    },
+    {
+      "path": "education-leafs-pre-native.json",
+      "sha256": "a50007a90add7e6efb16dc938569cb3cb02e36ba2cba226e9b323aba10c2456a",
+      "bytes": 3351
+    },
+    {
+      "path": "education-leafs-pre-types.json",
+      "sha256": "4d16fee8b6b3b34e574e00464fe225b1171f12cf6b73be2b6b67466ce4b8f4c5",
+      "bytes": 2377
+    },
+    {
+      "path": "education-leafs-publisher-ui-first.json",
+      "sha256": "5fd08feb09b5e03ba64a85bf923c10babc5427839c05702fe5cf2e90ee9f655a",
+      "bytes": 483
+    },
+    {
+      "path": "education-leafs-publisher-ui-first.log",
+      "sha256": "2ae8cf00cda19f039b3bf152ed53206ed0eadf299c70d7d85261883344fbcb71",
+      "bytes": 68
+    },
+    {
+      "path": "education-leafs-publisher-ui-path-repair.json",
+      "sha256": "09b91e1e933da1335be9508773d87d4744773d608cf44265892cff6cc656e0bb",
+      "bytes": 1945
+    },
+    {
+      "path": "education-leafs-publisher-ui-path-repair.log",
+      "sha256": "246c45e7435a2691248a402ef9769d7ad71ac1179d41a85c6b7ae1b38cc296b6",
+      "bytes": 74
+    },
+    {
+      "path": "education-leafs-rebinding-backend-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "education-leafs-rebinding-frontend-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "education-leafs-rebinding-pre-types.json",
+      "sha256": "f5dcd3128819c56d9cbbd41a39fc84a341528173c32bfffc5a187ed178aa3d29",
+      "bytes": 2959
+    },
+    {
+      "path": "education-leafs-timing.json",
+      "sha256": "9ce5f4220ae410877cea2031d19aa0469dbb9dce8b6e5c7d80258a050ebac38e",
+      "bytes": 1014
+    },
+    {
+      "path": "education-leafs-timing.log",
+      "sha256": "df8ef526f2e2816ceb63cba3e412409c417820f7541f40fb6cf349bfc2f2a9a2",
+      "bytes": 56
+    },
+    {
+      "path": "education-leafs-unit-first.json",
+      "sha256": "a39ffd472ca82230e11d4d8b654a240ef1a1d7c227e63c4eac29ef07461794e0",
+      "bytes": 2483
+    },
+    {
+      "path": "education-leafs-unit-first.log",
+      "sha256": "4eb9e6c9f444d91e02b3f0bc67f71586f649bbc92446aeb13921e18d9d45a1dd",
+      "bytes": 60
+    },
+    {
+      "path": "education-leafs-final-backend-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "education-leafs-final-frontend-types.log",
+      "sha256": "2f67e52cfe4231d6e3fdcd9f4f3e609f210cd8cae027d9ad2fc145c6c014d9b0",
+      "bytes": 1249
+    },
+    {
+      "path": "education-leafs-final-frontend-lint.log",
+      "sha256": "c5375a329513ae866b1485388516a7885b074afa984b0e3dfc42622b4224e0c6",
+      "bytes": 2642
+    }
+  ],
+  "uniquePassedCases": {
+    "shared education registration management real client contracts freezes only an explicitly selected own longitudinal subset in the new registration": [
+      "education-leafs-authoring-ui.json"
+    ],
+    "education ordinary questionnaire authoring and fixed task attachment TEACHER chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source": [
+      "education-leafs-authoring-ui.json"
+    ],
+    "education ordinary questionnaire authoring and fixed task attachment SCHOOL chooses explicit immutable versions, saves/reopens real order and lazily previews only the current source": [
+      "education-leafs-authoring-ui.json"
+    ],
+    "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE": [
+      "education-leafs-bundle-contract-repair.json"
+    ],
+    "allows an explicit own longitudinal numeric subset without changing other audiences or old origins": [
+      "education-leafs-bundle-contract.json"
+    ],
+    "Education longitudinal native/composition actual slots refuses removing a published inherited source and keeps the accepted execution intact": [
+      "education-leafs-draft-removal-boundary.json"
+    ],
+    "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped": [
+      "education-leafs-native-number-repair.json"
+    ],
+    "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped": [
+      "education-leafs-native-number-repair.json"
+    ],
+    "Education tracking plan versus own numeric disclosure keeps both leaf totals in the plan while explicit empty own visibility hides all": [
+      "education-leafs-publisher-ui-path-repair.json"
+    ],
+    "Education tracking plan versus own numeric disclosure keeps inherited metrics locked and does not restore a previously hidden metric implicitly": [
+      "education-leafs-publisher-ui-path-repair.json"
+    ],
+    "Education tracking plan versus own numeric disclosure drops the prior source choices while another authenticated source is loading": [
+      "education-leafs-publisher-ui-path-repair.json"
+    ],
+    "gates native education feedback by its frozen opening time before snapshot reuse": [
+      "education-leafs-timing.json"
+    ],
+    "Education exact leaf tracking and independent disclosure keeps identical total keys in separate leaves and freezes the actual cognitive profile": [
+      "education-leafs-unit-first.json"
+    ],
+    "Education exact leaf tracking and independent disclosure rebinds unchanged frozen blocks into new slots, rejects ambiguity and actual protocol changes": [
+      "education-leafs-unit-first.json"
+    ],
+    "Education exact leaf tracking and independent disclosure applies explicit empty visibility and refuses a grant above each source ceiling during real freezer projection": [
+      "education-leafs-unit-first.json"
+    ],
+    "Education exact leaf tracking and independent disclosure leaves historical composition declarations absent and forbids observer or Form longitudinal grants": [
+      "education-leafs-unit-first.json"
+    ]
+  },
+  "originalFailedCases": [
+    {
+      "name": "keeps the original fixed Bundle Scale ceiling when the education runtime is ORGANIZATION_RESOURCE",
+      "report": "education-leafs-bundle-contract.json"
+    },
+    {
+      "name": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+      "report": "education-leafs-native-first.json"
+    },
+    {
+      "name": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+      "report": "education-leafs-native-first.json"
+    },
+    {
+      "name": "Education longitudinal native/composition actual slots SCHOOL freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+      "report": "education-leafs-native-setup-repair.json"
+    },
+    {
+      "name": "Education longitudinal native/composition actual slots TEACHER freezes exact independent leaves, changes untracked Form and keeps disclosure scoped",
+      "report": "education-leafs-native-setup-repair.json"
+    }
+  ],
+  "limitations": [
+    "Local results are not formal Actions qualification.",
+    "Native School/Teacher mixed-composition cases use real source/version/publication/START/FINAL/feedback/changes; fixed Bundle ceiling sample is a codec/policy boundary case, not a fresh registered native Bundle lifecycle.",
+    "Initial source tables cover staged changed inputs; final-inputs records full tracked backend/frontend/config input blobs immediately before final types/lint. Missing earlier complete-transitive execution tables are not backfilled or signed.",
+    "NUMBER fixture first sent a string and correctly failed validation; continuation reused the same accepted Scale answer and existing parent, sending a number for the unfinished Form.",
+    "Original catalog ReferenceError occurred before native publication; source checkpoint preserves prepared sources.",
+    "Publisher first UI startup used wrong path and executed zero tests; corrected path ran three cases.",
+    "Bundle ceiling fixture originally omitted required policyVersion/unknownAudience; only that failed boundary case was resumed.",
+    "Existing prior9/Survey31/Training32/Teacher5 journeys and full cognition timing/formula baseline were not replayed.",
+    "No new browser journey for mixed composition; original native composition renderer is reused. Registered standalone/fixed native Bundle full journeys and conservative departed-member allocation behavior remain separate follow-up."
+  ],
+  "finalChecks": {
+    "education-leafs-final-backend-types.log": {
+      "exitCode": 0,
+      "inputRecord": "education-leafs-final-inputs.json",
+      "observedCompletedAt": "2026-10-30T11:33:36.490147+00:00"
+    },
+    "education-leafs-final-frontend-types.log": {
+      "exitCode": 0,
+      "inputRecord": "education-leafs-final-inputs.json",
+      "observedCompletedAt": "2026-10-30T11:33:36.490785+00:00",
+      "incidentalNpmPretypecheck": "Existing product inventory 158 routes, FE-11 gates and its3 fixed checks invoked by npm pretypecheck; not counted among16 feature cases."
+    },
+    "education-leafs-final-frontend-lint.log": {
+      "exitCode": 0,
+      "inputRecord": "education-leafs-final-inputs.json",
+      "observedCompletedAt": "2026-10-30T11:33:36.490985+00:00",
+      "warnings": 7
+    }
+  }
+}

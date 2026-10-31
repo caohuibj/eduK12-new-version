@@ -121,6 +121,8 @@ export const canInstantiateConfig = async (
   role: UserRole | string,
   testConfig: { id: string; status: string; accessPolicy?: 'OPEN' | 'GRANT' | string | null },
 ): Promise<boolean> => {
+  const {hasTrainingCognitiveProfileHistory}=await import('../modules/assessment-authorization/training-cognitive-profile-use')
+  if(await hasTrainingCognitiveProfileHistory(prisma,userId,testConfig.id))return false
   if (role === UserRole.ADMIN) return true
   if (testConfig.status !== 'PUBLISHED') return false
   if (!config.materialGrantsEnabled) return true
@@ -205,7 +207,14 @@ const assertGrantableResource = async (resourceType: MaterialResourceType, resou
   if (resourceType === MaterialResourceType.ASSESSMENT_BUNDLE) {
     const { bundleDefinitionProvider } = await import('../modules/bundle-product/service')
     const entry = bundleDefinitionProvider.list().find(v => v.definition.bundleKey + '@' + v.definition.bundleVersion === resourceId)
-    if (!entry || bundleDefinitionProvider.publicationBlockers(entry.definition.bundleKey, entry.definition.bundleVersion).length) throw grantBadRequest('只能授权已具备发布条件的 Bundle 精确版本')
+    const blockers=entry?bundleDefinitionProvider.publicationBlockers(entry.definition.bundleKey,entry.definition.bundleVersion).filter(b=>!(entry.declarativePackage&&b==='BUNDLE_NOT_PUBLISHED')):[]
+    if (!entry || blockers.length) throw grantBadRequest('只能授权已具备发布条件的 Bundle 精确版本')
+    // Declarative source bytes deliberately stay DRAFT. Its existing signed
+    // DB release, not the source literal or leaf rights, authorizes whole use.
+    if(entry.declarativePackage){
+      const {assertPackageAdmission}=await import('../modules/bundle-product/package-release')
+      await assertPackageAdmission(prisma,entry.declarativePackage)
+    }
     return
   }
   throw grantBadRequest('不支持的材料类型')

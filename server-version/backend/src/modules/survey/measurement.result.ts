@@ -10,6 +10,7 @@ import type { FrozenUnitResult } from './final.compute'
 export function cognitiveParentUnit(unit:ResearchFrozenUnit,loaded:LoadedSurveyCognitiveResult):FrozenUnitResult{
   const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
   const stored=loaded.result
+  if(frozen.schemaVersion===2&&(stored.profileArtifactHash!==frozen.artifactHash||stored.profile!==frozen.artifact.identity.profile||stored.configHash!==frozen.sessionSnapshot.configHash||stored.protocolSignature!==frozen.sessionSnapshot.protocolSignature))throw new Error('原认知结果与冻结 profile 不一致')
   const definitions=parseCompiledInstrumentRuntime(frozen.sessionSnapshot.compiledRuntime).metricDefinitions
   const measurement=projectStoredMeasurement({identity:{schemaVersion:1,kind:'COGNITIVE',
     sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,
@@ -23,15 +24,21 @@ export function cognitiveParentUnit(unit:ResearchFrozenUnit,loaded:LoadedSurveyC
 const feedbackLabels={hitRate:'Go 命中率',goMedianRtMs:'Go 正确反应中位时长'} as const
 /** Independent fixed product allowlist, intersected with the frozen author
  * choice. Never disclose raw/seed/config/scoring/audit to a participant. */
-export function cognitiveParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,
-  collectionClosed:boolean){
+export function surveyCognitiveMetricDisclosure(unit:ResearchFrozenUnit,collectionClosed:boolean){
   const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
   if(unit.sourceProvenance?.reportConfigured===false)return null
-  if(frozen.feedback.mode!=='DESCRIPTIVE'||result.notExecuted)return null
-  if(frozen.feedback.release==='AFTER_COLLECTION'&&!collectionClosed)return {pending:true as const}
+  if(frozen.feedback.mode!=='DESCRIPTIVE')return null
+  return {frozen,keys:frozen.feedback.metricKeys.filter(key=>Object.prototype.hasOwnProperty.call(feedbackLabels,key)),pending:frozen.feedback.release==='AFTER_COLLECTION'&&!collectionClosed}
+}
+export function cognitiveParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,
+  collectionClosed:boolean){
+  if(result.notExecuted)return null
+  const access=surveyCognitiveMetricDisclosure(unit,collectionClosed)
+  if(!access)return null
+  if(access.pending)return {pending:true as const}
+  const {frozen,keys}=access
   if(!result.measurement||result.measurement.measurementDigest!==frozen.measurementDigest)
     throw new Error('Stored participant measurement projection mismatch')
-  const keys=frozen.feedback.metricKeys.filter(key=>Object.prototype.hasOwnProperty.call(feedbackLabels,key))
   const report=projectMeasurementReport(result.measurement,'PARTICIPANT',keys)
   return {pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
     measurementDigest:report.measurementDigest,maturity:'PILOT' as const,

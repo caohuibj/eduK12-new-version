@@ -1,0 +1,29 @@
+{
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "shellLogin": false,
+  "startedAt": "2026-10-27T23:35:35.201442+00:00",
+  "before": {
+    "server-version/backend/prisma/seeds/scales.ts": "f6e7714173469a71d9eaee52c809a0e9416b27937654cf0b9fcb19b4b64f2570",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "bfc6cf19f4ee7de7b33ef3ec4304c0f3ae9e473866d017c75832501b2f9275d7",
+    "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts": "ab717382e2d2b6616c3c58de27f35d18dfba52722ced1d22eb2b910c132aa0b7",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "eb8af6bf0a9ca8134f35220a733d5c6cede1f7411232c465aa543ebe5478d2c2",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "3a0e0d0edd7416e71255946c1398597be675574e8dedfb57d9bc2177ac4aed9d",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "32f5ec30db867a8265153874558c4091a502b76e642f0b19a685ae4b483ee2fd"
+  },
+  "ciExecuted": false,
+  "scopeNote": "Backend tsconfig; Prisma seed and tests are exercised by the selected Vitest cases, not claimed as included in this tsc.",
+  "checkProcessExit": 0,
+  "endedAt": "2026-10-27T23:36:02.480136+00:00",
+  "after": {
+    "server-version/backend/prisma/seeds/scales.ts": "f6e7714173469a71d9eaee52c809a0e9416b27937654cf0b9fcb19b4b64f2570",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "bfc6cf19f4ee7de7b33ef3ec4304c0f3ae9e473866d017c75832501b2f9275d7",
+    "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts": "ab717382e2d2b6616c3c58de27f35d18dfba52722ced1d22eb2b910c132aa0b7",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "eb8af6bf0a9ca8134f35220a733d5c6cede1f7411232c465aa543ebe5478d2c2",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "3a0e0d0edd7416e71255946c1398597be675574e8dedfb57d9bc2177ac4aed9d",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "32f5ec30db867a8265153874558c4091a502b76e642f0b19a685ae4b483ee2fd"
+  }
+}

@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {requireFreshQualification,requireSuccess,JOBS} from './school-teacher-scope.mjs';
 import {verifyFreshManifest,verifyTestReport,requireNoHistoricalAcceptance,safeTestFailure} from './school-teacher-checks.mjs';
-const fresh=()=>({qualification:'fresh-integrated-authoring',base:'ea887330b6eba11013a00e294d5aff84ecfbaf36',frontendBuildDecision:'fresh-current-source',backendBuildDecision:'fresh-current-source',execution:{finalized:true,frontend:{types:true,batches:[{}]},backend:{batches:[{}]},auditComponents:['frontend','backend']}});
+const fresh=()=>({branch:'work/school-teacher-review-20261022',qualification:'fresh-integrated-authoring',base:'ea887330b6eba11013a00e294d5aff84ecfbaf36',frontendBuildDecision:'fresh-current-source',backendBuildDecision:'fresh-current-source',execution:{finalized:true,frontend:{types:true,batches:[{}]},backend:{batches:[{}]},auditComponents:['frontend','backend']}});
 test('fresh qualification requires exact new base two fresh builds and finalized affected work',()=>{
  assert.equal(requireFreshQualification(fresh()),true);
  for(const mutate of [b=>b.base='69497181d569d4a5f7d61cdab108b977894cf9b3',b=>b.base='4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66',b=>b.frontendBuildDecision='fixed-run15-frontend-build',b=>b.backendBuildDecision='fixed-official-backend-build',b=>b.execution.finalized=false,b=>b.execution.frontend.types=false,b=>b.execution.backend.batches=[],b=>b.execution.auditComponents=['frontend']]){const b=fresh();mutate(b);assert.throws(()=>requireFreshQualification(b));}
@@ -65,9 +65,12 @@ test('theme failure diagnostics retain fixed phase classification without publis
  test('post-merge main classification does not execute PR-only School qualification',()=>{
  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
  const school=ci.split('  school-teacher:\n')[1].split('\n  survey-workspace:')[0];
- assert(school.includes("if: github.event_name == 'pull_request' && github.event.pull_request.draft == false"));
+ const condition=/^    if: (.+)$/m.exec(school)?.[1];assert(condition);
+ assert(condition.includes("github.event_name == 'pull_request' && github.event.pull_request.draft == false"));
+ assert(condition.includes("needs.scope.outputs.application_route == 'school-teacher'"));
+ assert(school.includes('uses: ./.github/workflows/ci-school-teacher.yml'));
  assert(ci.includes("github.event.before == 'ea887330b6eba11013a00e294d5aff84ecfbaf36'"));
- const gate=ci.split('  merge-gate:\n')[1].split('    runs-on:')[0];
+ const gate=ci.split('  merge-gate:\n')[1].split('    runs-on:')[0].replace(/\s+/g,' ');
  assert(gate.includes("vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'"));
  const scope=readFileSync(new URL('./school-teacher-scope.mjs',import.meta.url),'utf8');
  assert(scope.includes("assert(pr,'PR event required')"));

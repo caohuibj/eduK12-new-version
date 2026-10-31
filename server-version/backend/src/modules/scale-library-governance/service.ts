@@ -25,7 +25,7 @@ export function sourceMetadataDefaults(snapshot:LibrarySnapshot){
   reportDescription:[d.report.disclaimer,...d.report.limitations].filter(Boolean).join('\n').slice(0,4000)}
 }
 export const submissionView=(row:SubmissionRow)=>({id:row.id,releaseId:row.release_id,sourceProduct:row.product,product:row.product,sourceId:row.source_id,
-  ...libraryCompatibility(row.snapshot,{approved:row.status==='APPROVED',dependencyReleaseIds:row.dependency_release_ids}),educationApplicability:row.snapshot.educationApplicability??null,educationApplicabilityHash:readFrozenEducationApplicability(row.snapshot)?.contractHash??null,mediaManifest:row.snapshot.mediaManifest,metadata:row.metadata,snapshotOrigin:row.snapshot.snapshotOrigin,definitionHash:row.snapshot.definitionHash,dependencyReleaseIds:row.dependency_release_ids,status:row.status,version:row.version,reason:row.reason,createdAt:row.created_at})
+  ...libraryCompatibility(row.snapshot,{approved:row.status==='APPROVED',dependencyReleaseIds:row.dependency_release_ids}),educationApplicability:row.snapshot.educationApplicability??null,educationApplicabilityHash:readFrozenEducationApplicability(row.snapshot)?.contractHash??null,educationExpertApplicability:row.snapshot.educationExpertApplicability??null,educationExpertApplicabilityHash:readFrozenExpertApplicability(row.snapshot)?.contractHash??null,mediaManifest:row.snapshot.mediaManifest,metadata:row.metadata,snapshotOrigin:row.snapshot.snapshotOrigin,definitionHash:row.snapshot.definitionHash,dependencyReleaseIds:row.dependency_release_ids,status:row.status,version:row.version,reason:row.reason,createdAt:row.created_at})
 // Catalog discovery is not media authorization. Exact manifests remain on
 // owner/reviewer submission detail and the separately authorized media endpoints.
 export const entryView=(row:EntryRow,submission:SubmissionRow)=>({...submissionView(submission),mediaManifest:undefined,id:row.id,submissionId:row.submission_id,
@@ -82,9 +82,16 @@ export async function submitInTransaction(tx:Tx,actorId:string,product:LibrarySo
     source.snapshot.educationApplicabilityHash=declared.contractHash
     source.snapshot.educationApplicabilityCompilerVersion=declared.compilerVersion
   }
+  if(input.educationExpertApplicability){
+    if(!isNativeExpertObserver(source.snapshot.compiledDefinition.respondentType)||input.educationExpertApplicability.administrations.some(a=>a.targetKind!=='PERSON'))fail('专家量表须有原版观察者声明且仅适用于教师个人')
+    const declared=compileExpertSourceApplicability(input.educationExpertApplicability)
+    source.snapshot.educationExpertApplicability=declared.declaration
+    source.snapshot.educationExpertApplicabilityHash=declared.contractHash
+    source.snapshot.educationExpertApplicabilityCompilerVersion=declared.compilerVersion
+  }
   await assertScaleLibraryCollectionAllowed(tx,[input.releaseId],product==='TRAINING'?[source.sourceId]:[])
   const [prior]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`SELECT * FROM scale_library_submissions WHERE id=${input.requestId} FOR SHARE`)
-  if(prior){if(prior.author_id!==actorId||prior.product!==product||prior.source_id!==source.sourceId||prior.release_id!==input.releaseId||canonicalHash(prior.metadata)!==canonicalHash(input.metadata)||canonicalHash(prior.dependency_release_ids)!==canonicalHash(input.dependencyReleaseIds)||canonicalHash(prior.snapshot.educationApplicability??null)!==canonicalHash(input.educationApplicability??null))fail('请求编号已用于其他申请')
+  if(prior){if(prior.author_id!==actorId||prior.product!==product||prior.source_id!==source.sourceId||prior.release_id!==input.releaseId||canonicalHash(prior.metadata)!==canonicalHash(input.metadata)||canonicalHash(prior.dependency_release_ids)!==canonicalHash(input.dependencyReleaseIds)||canonicalHash(prior.snapshot.educationApplicability??null)!==canonicalHash(input.educationApplicability??null)||canonicalHash(prior.snapshot.educationExpertApplicability??null)!==canonicalHash(input.educationExpertApplicability??null))fail('请求编号已用于其他申请')
     return submissionView(prior)}
   const [row]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`INSERT INTO scale_library_submissions
     (id,release_id,product,source_id,author_id,metadata,dependency_release_ids,snapshot,snapshot_hash)
@@ -128,6 +135,7 @@ export async function review(actorId:string,id:string,raw:unknown){
     if(!release||release.status!=='PUBLISHED'||canonicalHash(row.snapshot)!==row.snapshot_hash)fail('申请版本不再可审批')
     if(input.decision==='APPROVE'){
       readFrozenEducationApplicability(row.snapshot)
+      readFrozenExpertApplicability(row.snapshot)
       await validateLibraryDependencies(tx,row.author_id,release,row.dependency_release_ids)
     }
     const status=input.decision==='APPROVE'?'APPROVED':'RETURNED'
@@ -249,3 +257,4 @@ export async function prepareMediaManifest(actorId:string,product:LegacyLibraryP
   return {mediaManifest:await buildLibraryMediaManifest(tx,actorId,source.snapshot,source.release,dependencies)}
  })
 }
+import {compileExpertSourceApplicability,isNativeExpertObserver,readFrozenExpertApplicability} from '../education-tools/expert-observation.contract'

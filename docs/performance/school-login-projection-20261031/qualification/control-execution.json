@@ -1,0 +1,22 @@
+{
+  "kind": "ACTUAL_DOT_LOCAL_CONTROL_EXECUTION_UNSIGNED",
+  "command": [
+    "node",
+    "--test",
+    "--test-name-pattern=PR439",
+    ".github/scripts/onboarding-controls.test.mjs"
+  ],
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "selectedTests": 3,
+  "applicationTestsExecuted": false,
+  "sha256": {
+    ".github/scripts/onboarding-scope.mjs": "6d3426196f3b70b0124c0ada212a4d74b12dcc2f0c25cd3483e8146d67b5aaf6",
+    ".github/scripts/onboarding-checks.mjs": "870cd2fa646b3d6d70c4b0dd13c204ca006a4559d06bcec425603697e5cb7ab9",
+    ".github/scripts/onboarding-controls.test.mjs": "e85d6e35dd5155bf9240c5c8095728f7840ee61b3fc935a620499d3a333f0e9f",
+    ".github/scripts/onboarding-evidence.json": "87712731f291167df056d1f80981fa0771538eb1305d5d4e2bb040d8529cfc2b",
+    ".github/workflows/ci.yml": "eaf7d2fbe4a9e7b6fc5817faf30b50c0e819b0b6454f8947f0833e85a351920e"
+  },
+  "logSHA256": "e20024f93c216cd7ccc55dfb4b3c867ad63af1659a9b243a664f55ed9d79dea5",
+  "note": "Final control input check after removal of unreachable generic-dispatch entries. Three reader/scope contracts only; no application rerun. First receipt retained controls-first.tap."
+}

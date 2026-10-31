@@ -1,0 +1,219 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "runtime-report-r5",
+  "outcomes": [
+    "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+    "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening"
+  ],
+  "originalSHA256": {
+    "report": "9844afe16c37e4d9a689189f9aaeb501e06d98422e97132a17be23db2826542f",
+    "execution": "b35d72af79759cca6accebf747243a8119ffe0564829a9cf9aaf44a33169ad1f",
+    "log": "9844afe16c37e4d9a689189f9aaeb501e06d98422e97132a17be23db2826542f",
+    "inputs": "5313e108d59bbb64f21a2d936c9d1a4a3d6a9e95796e90666c120e1eabbe8956"
+  },
+  "currentInputsSHA256": "4bcfdc2e320eb954f33a3a524ba19a32ef0a6c457d9fd066a06f9208e9d38263",
+  "originalExecution": {
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+      "-t",
+      "SCHOOL.*FUTURE|SCHOOL.*DUE",
+      "--reporter=verbose"
+    ],
+    "cwd": "/workspace/eduK12-new-version/server-version/backend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 10,
+    "numPassedTests": 2,
+    "numFailedTests": 0,
+    "numPendingTests": 8
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=false actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=true actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=true completionOnly=true actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'ADMIN_IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "skipped"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "passed"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend/src/modules",
+      "currentObject": "ed03949a2505228d082d70f8b027686edac098b0",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/config",
+      "currentObject": "dff457d37da95188509bda32d0a8c50f29519ee5",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/middleware",
+      "currentObject": "078e550f9334347ded4e042576469c293d8aaae6",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/services",
+      "currentObject": "b220b8fef97669b19c6f0eea0f3bd39a613f089e",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/utils",
+      "currentObject": "6124610cffa9d450f8f5bce7b6f6a01128c46b10",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/prisma",
+      "currentObject": "2da0306e1568c090ea0bd4b462d07ffb9eca353b",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "currentObject": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "currentObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "currentObject": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/scripts/runtime-role-contract.mjs",
+      "currentObject": "3669f1dabc2b26c42ea0158d93a1977d3f38898d",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/scripts/runtime-table-policy.json",
+      "currentObject": "bb703b167ab21ed990031021d6e8d0bca1124d58",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.21.0",
+        "postgres": "16.15",
+        "database": "pr363_runtime_test",
+        "restrictedRuntime": true,
+        "source": "original phase4/6 manifests and real beforeAll verifier"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "prisma": "5.22.0",
+        "basis": "original verbose output and manifest; binary hashes not retained"
+      },
+      "generated": {
+        "prismaVersion": "5.22.0",
+        "exactGeneratedByteManifest": "not retained"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Original Node24.21/PG16.15/Prisma5.22 match target versions. Original installed/generated byte hashes were not captured and are not backfilled. This admits independently read historical semantic assertions only; fresh official production build, image/dependency audits and actual browser remain required. No historical execution signature or whole-environment cryptographic identity is claimed."
+  },
+  "deltas": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "ad64c440c610448b3439c45dbd6f0988ab610936"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "547246fee2a6fa6e00129379689e647c2e6623bd"
+      },
+      "outcomes": [
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening"
+      ],
+      "rationale": "Only later School FUTURE/DUE case additions and exact metricKey strengthening: old cases retain original value-based semantics; two Teacher exact-key cases are selected from new r6 instead."
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "422bf5559676321cf9523b79d73c3cfa1d1b311c"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
+      },
+      "outcomes": [
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening"
+      ],
+      "rationale": "Root read full producer delta: prepare projection adds pinned licenses; private-owner loop extracted without semantic change; discovery-only multi-grant helpers and typed error filter do not run in these explicit-license producer/FINAL/report journeys. No source registration/transition or frozen report logic weakened."
+    }
+  ],
+  "limitations": [
+    "Verbose source remains verbatim and hash-verified; parsed view is not a new reporter JSON.",
+    "Accepted case set is not a new all-file run; failed and filtered history remains original.",
+    "No current browser, deployment, COS, or formal CI claim."
+  ],
+  "rootRead": [
+    "actual fixture/producer/start/final/report source",
+    "raw verbose and original exits",
+    "recorded and immutable Git source observations",
+    "post-execution changes and relevant caller paths"
+  ]
+}

@@ -1,3 +1,6 @@
+import { calculateScoreRanges } from '../scale/scale-scoring'
+import { groupFormMetricType } from '../reporting/group-summary'
+import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import {DEIDENTIFIED_SURVEY_RESPONSE_TYPES} from './deidentified-export'
 import {missingSurveyFlowUnit} from './flow.runtime'
 import { situationalResponseHistoryIdentities } from '../situational/situation-research-capture'
@@ -81,6 +84,8 @@ export type SurveySourceVersion=Pick<ResearchRawCodebook,'waveId'|'instrumentKey
 export interface SurveySourceProjection {
   /** Frozen sourced instruments, including cognitive units with no raw item codebook. */
   sourceVersions?:SurveySourceVersion[]
+  groupParents?:Array<{finalId:string;attemptId:string;sourceFinalHash:string}>
+  groupTools?:Array<{instrumentKey:string;kind:ResearchFrozenUnit['kind'];title:string;definitionDigest:string;scoringDigest:string|null;metrics?:Array<{key:string;label:string;range:{min:number;max:number}|null}>}>
   variantConfigurations?:SurveyVariantConfiguration[]
   projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
   completeAttempts:number
@@ -245,6 +250,8 @@ export const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResu
   }
   return output
 }
+export const projectGroupRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,onlyItemKey?:string)=>
+  projectRawItems(items.filter(item=>groupFormMetricType(item.responseType)!==null),unit,onlyItemKey)
 const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;researchCode:string|null;completedAt:string;sourceFinalHash:string
 }):FrozenScoreObservation[]=>{
@@ -363,9 +370,23 @@ const frozenRawSchema=(snapshot:ResearchFrozenPublication,waveOrdinal:number,inc
   return {itemsByUnit,keys}
 }
 
-type SurveyDictionaryInput={actorUserId:string;projectId:string;waveId:string}
+function groupTool(frozen:ResearchFrozenUnit):NonNullable<SurveySourceProjection['groupTools']>[number]{
+  let metrics:NonNullable<NonNullable<SurveySourceProjection['groupTools']>[number]['metrics']>=[]
+  if(frozen.kind==='SCALE'){
+    const definition=frozen.compiledDefinition as ScaleDefinitionV2,ranges=calculateScoreRanges(definition)
+    metrics=definition.scoring.scores.map(score=>({key:score.key,label:score.label,range:ranges.get(score.key)??null}))
+  }else if(frozen.kind==='SJT')metrics=(frozen.compiledDefinition as SituationRuntimeDefinition).scoring.publishedMetrics.map(metric=>({key:metric.key,label:metric.label,range:null}))
+  else if(frozen.kind==='COGNITIVE')metrics=Object.values(parseFrozenSurveyCognitive(frozen.compiledDefinition).sessionSnapshot.compiledRuntime!.metricDefinitions)
+    .filter(metric=>metric.valueType==='number'||metric.valueType==='integer').map(metric=>({key:metric.key,label:metric.label,range:null}))
+  return {instrumentKey:frozen.instrumentKey,kind:frozen.kind,title:frozen.title,definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,metrics}
+}
+
+type SurveyDictionaryInput={actorUserId:string;projectId:string;waveId:string;includeGroupTools?:boolean}
 export interface SurveyItemDictionary {
   waveId:string
+  tools?:NonNullable<SurveySourceProjection['groupTools']>
+  /** Internal group consumers only; never a participant disclosure grant. */
+  longitudinal?:ResearchFrozenPublication['longitudinal']
   source:'FROZEN_CODEBOOK'
   variables:Pick<ResearchRawCodebook,'instrumentKey'|'itemKey'|'prompt'|'responseType'|
     'kind'|'columnKey'|'definitionDigest'>[]
@@ -380,6 +401,8 @@ export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Prom
   const signature=(material:typeof first)=>canonicalHash(JSON.parse(JSON.stringify(material)))
   const originalSignature=signature(first)
   const variables:SurveyItemDictionary['variables']=[]
+  const tools:NonNullable<SurveyItemDictionary['tools']>=[]
+  let longitudinal:SurveyItemDictionary['longitudinal']
   if(first.publication){
     const publication=first.publication
     const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
@@ -390,6 +413,11 @@ export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Prom
       ||canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
       invalid('冻结研究发布定义摘要不匹配')
     if(snapshot.waveId!==first.wave.id)invalid('冻结波次定义摘要缺失')
+    if(input.includeGroupTools){
+      if(frozenVariantConfiguration(snapshot.flow,snapshot.waveId))invalid('A/B问卷子版本不可合并统计；请按冻结子版本分层分析')
+      tools.push(...snapshot.units.map(groupTool))
+      longitudinal=snapshot.longitudinal
+    }
     // Resolve collisions against the complete schema, including text fields
     // excluded from this endpoint. These IDs must match every export page.
     const schema=frozenRawSchema(snapshot,first.wave.ordinal,false)
@@ -407,7 +435,7 @@ export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Prom
   const current=await readSurveyDictionaryMaterial(input)
   if(originalSignature!==signature(current))
     invalid('研究来源在计算期间变化，请重新开始')
-  return {waveId:input.waveId,source:'FROZEN_CODEBOOK',variables}
+  return {waveId:input.waveId,source:'FROZEN_CODEBOOK',variables,...(input.includeGroupTools?{tools,longitudinal}:{})}
 }
 
 async function readSurveyDictionaryMaterial(input:SurveyDictionaryInput){
@@ -476,11 +504,13 @@ type SurveySourceInput = {
   /** Only internal paged analyses: project exactly the selected variable from
    * each verified FINAL, instead of rejecting an otherwise valid high-item
    * study against the 25k intermediate-row cap. No public raw API shortcut. */
-  selectRaw?:false|{instrumentKey:string;itemKey:string}
+  selectRaw?:false|{instrumentKey:string;itemKey?:string}
   /** Internal positive projection for the separately authorized system export. */
   deidentifiedChoicesOnly?:true
-  selectScore?:false|{instrumentKey:string;scoreKey:string}
+  selectScore?:false|{instrumentKey:string;scoreKey?:string}
   includeInterpretation?:boolean
+  /** Internal aggregate artifact generation; never bound from raw export requests. */
+  includeGroupParents?:boolean
   /** Paired score aggregation does not need longitudinal attendance matrices. */
   includeAttendance?:boolean
   afterFinal?:{id:string;completedAt:Date}
@@ -826,6 +856,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
     let cognitiveTrials:CognitiveTrialObservation[]|undefined
     let cognitivePage:SurveySourceProjection['cognitivePage']
+    const groupParents:NonNullable<SurveySourceProjection['groupParents']>=[]
     let completedFinals=0,fullCompletionAttempts=0,earlyCompletionAttempts=0
     const cognitiveProjections=new Map<ResearchFrozenUnit,ReturnType<typeof prepareCognitiveProjection>>()
     const cognitiveProjectionFor=(unit:ResearchFrozenUnit)=>{
@@ -1022,6 +1053,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         const trialInputs:Array<Iterable<CognitiveTrialObservation>>=[]
         const flowTrace=result.executionTrace
         const completionStatus=flowTrace?.termination??'COMPLETE'
+        if(input.includeGroupParents)groupParents.push({finalId:final.id,attemptId:final.attempt.id,sourceFinalHash:final.resultsHash})
         completedFinals++
         if(completionStatus==='COMPLETE')fullCompletionAttempts++
         else if(completionStatus==='COMPLETE_EARLY')earlyCompletionAttempts++
@@ -1080,7 +1112,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           if(frozen.kind==='COGNITIVE'&&unit.notExecuted){
             if(input.selectScore!==false&&(!input.selectScore||frozen.instrumentKey===input.selectScore.instrumentKey))
               scores.push(...scoreColumnsFor(frozen,wave.id,wave.ordinal)
-                .filter(column=>!input.selectScore||column.measurement.scoreKey===input.selectScore.scoreKey)
+                .filter(column=>!input.selectScore||!input.selectScore.scoreKey||column.measurement.scoreKey===input.selectScore.scoreKey)
                 .map(column=>({...meta,sourceVerified:true as const,measurement:column.measurement,
                   value:null,missingReason:'NOT_SHOWN' as MissingReason,completionStatus})))
             continue
@@ -1092,20 +1124,24 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             const childScores=projection.scoresFromChild(unit,child,cognitiveMeta).map(score=>({...score,measurement:{...score.measurement,...frozenSourceMetadata(frozen),
               ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}}))
             if(input.selectScore!==false&&(!input.selectScore||frozen.instrumentKey===input.selectScore.instrumentKey))
-              scores.push(...childScores.filter(score=>!input.selectScore||score.measurement.scoreKey===input.selectScore.scoreKey))
+              scores.push(...childScores.filter(score=>!input.selectScore||!input.selectScore.scoreKey||score.measurement.scoreKey===input.selectScore.scoreKey))
             if(input.cognitiveTrials)trialInputs.push(projection.trialRows(child,cognitiveMeta))
             continue
           }
           if(input.selectScore!==false&&(!input.selectScore||
             frozen.instrumentKey===input.selectScore.instrumentKey))
-            scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||
+            scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||!input.selectScore.scoreKey||
               score.measurement.scoreKey===input.selectScore.scoreKey).map(score=>
                 ({...score,...(score.measurement.provenance||meta.variant?{completionStatus}:{}),measurement:{...score.measurement,...frozenSourceMetadata(frozen),
                   ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}})))
           if(input.selectRaw!==false&&(!input.selectRaw||
             frozen.instrumentKey===input.selectRaw.instrumentKey)){
-            const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
-            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined,input.deidentifiedChoicesOnly)){
+            const allItems=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
+            // Group reports do not need text, ranking or structured allocation
+            // fields. Filter before projecting/counting the 25k raw-row budget.
+            const projected=input.includeGroupParents?projectGroupRawItems(allItems,unit,input.selectRaw?input.selectRaw.itemKey:undefined)
+              :projectRawItems(allItems,unit,input.selectRaw?input.selectRaw.itemKey:undefined,input.deidentifiedChoicesOnly)
+            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projected){
             const missingReason=nativeMissing.get(r.itemKey)??baseMissingReason
             const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
             if(raw.length>=25000)
@@ -1164,6 +1200,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       invalid('认知试次分页引用的整轮 FINAL 不再可用')
     return {projectId:input.projectId,collectionMode:project.collectionMode,variantConfigurations,
       ...(sourceVersions.length?{sourceVersions}:{}),
+      ...(input.includeGroupParents?{groupParents,groupTools:[...verifiedSnapshots.values()].flatMap(snapshot=>snapshot.units.map(groupTool))}:{}),
       sourceRevision:project.sourceRevision,
       completeAttempts:completedFinals,
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,

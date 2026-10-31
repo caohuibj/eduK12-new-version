@@ -130,6 +130,9 @@ export function BundleProducts() {
 export function BundleProductDetail() {
   const { id } = useParams(), [row, setRow] = useState<any>(null), [error, setError] = useState('')
   const [loading, setLoading] = useState(true), [busy, setBusy] = useState(false)
+  const navigate=useNavigate()
+  const [trackingMode,setTrackingMode]=useState<'SINGLE'|'LONGITUDINAL'>('SINGLE'),[trackingKeys,setTrackingKeys]=useState<string[]>([])
+  useEffect(()=>{setTrackingMode('SINGLE');setTrackingKeys([])},[id])
   const feedback = useStaffFeedback()
   const load = useCallback(async()=>{
     setLoading(true); setError('')
@@ -142,7 +145,8 @@ export function BundleProductDetail() {
     if(busy || !row)return
     if(action==='archive' && !await feedback.confirm({title:'归档固定包投放？',body:'归档后停止新作答，已提交的冻结结果和报告会保留。',confirmLabel:'归档投放',danger:true}))return
     setBusy(true);setError('')
-    try {setRow(await request('/bundle-products/'+id+'/'+action,{revision:row.revision}));feedback.success(action==='archive'?'已归档，停止新作答':'投放已发布')}
+    try {setRow(await request('/bundle-products/'+id+'/'+action,{revision:row.revision,
+      ...(action==='publish'&&!row.personalTracking&&trackingMode==='LONGITUDINAL'?{tracking:{mode:trackingMode,metrics:(row.trackingCandidates??[]).filter((m:any)=>trackingKeys.includes(JSON.stringify([m.itemId,m.scoreKey]))).map(({itemId,scoreKey}:any)=>({itemId,scoreKey}))}}:{})}));feedback.success(action==='archive'?'已归档，停止新作答':'投放已发布')}
     catch(e){setError(apiErrorMessage(e, '操作失败，请重新加载最新状态后重试'))}
     finally {setBusy(false)}
   }
@@ -151,9 +155,22 @@ export function BundleProductDetail() {
     {error && <ProductStatus kind="error" title="操作未完成" announce="assertive" actions={<button className="btn-secondary" disabled={busy || loading} onClick={()=>void load()}>重新加载</button>}>{error}</ProductStatus>}
     {loading && <ProductStatus kind="pending" title="正在读取投放与作答记录" announce="polite" />}
     {row && <><p>{row.bundle.name} · {row.bundle.bundleVersion} · {statusLabel(row.status)}</p>
+      {row.status==='DRAFT'&&row.courseId&&<fieldset className="my-4 space-y-2"><legend>测评方式</legend>
+        {row.personalTracking?<p>纵向追踪 · T{row.personalTracking.ordinal}。本轮继续投放同一固定版本的完整测评包。</p>:<>
+          <label><input type="radio" name="bundle-tracking" checked={trackingMode==='SINGLE'} onChange={()=>setTrackingMode('SINGLE')} disabled={busy}/> 单次测评</label>
+          <label><input type="radio" name="bundle-tracking" checked={trackingMode==='LONGITUDINAL'} onChange={()=>setTrackingMode('LONGITUDINAL')} disabled={busy}/> Longitudinal 纵向追踪</label>
+          {trackingMode==='LONGITUDINAL'&&<div><p>仅追踪已选叶工具的原始分数，固定包仍完整投放。本人可见指标遵守原工具披露上限；不提供画像趋势或转移分析。</p>
+            {(row.trackingCandidates??[]).map((metric:any)=>{const key=JSON.stringify([metric.itemId,metric.scoreKey]);return <label key={key} className="block"><input type="checkbox" checked={trackingKeys.includes(key)} disabled={busy} onChange={event=>setTrackingKeys(old=>event.target.checked?[...old,key]:old.filter(k=>k!==key))}/> {metric.label}</label>})}
+          </div>}
+        </>}
+      </fieldset>}
       <ul>{row.bundle.slots.map((v:any)=><li key={v.slotKey}>{v.slotKey} · {v.unitType} · {v.instrumentKey} {v.instrumentVersion}</li>)}</ul>
       <div className="flex flex-wrap gap-3 my-4">
-      {row.status==='DRAFT' && <button className="btn-primary" disabled={busy || loading} onClick={()=>void mutate('publish')}>{busy?'正在提交…':'发布投放'}</button>}
+      {row.status==='DRAFT' && <button className="btn-primary" disabled={busy || loading || (!row.personalTracking&&trackingMode==='LONGITUDINAL'&&!trackingKeys.length)} onClick={()=>void mutate('publish')}>{busy?'正在提交…':'发布投放'}</button>}
+      {row.status==='PUBLISHED'&&row.personalTracking&&<button className="btn-secondary" disabled={busy} onClick={async()=>{
+        setBusy(true);setError('');try{const next=await request('/bundle-products/'+id+'/next-wave',{requestId:crypto.randomUUID()});navigate('/bundle-products/'+next.id)}
+        catch(cause){setError(apiErrorMessage(cause,'创建下一轮失败'))}finally{setBusy(false)}
+      }}>创建下一轮</button>}
       {row.status!=='ARCHIVED' && <button className="btn-secondary" disabled={busy || loading} onClick={()=>void mutate('archive')}>归档，停止新作答</button>}
       </div>
       {row.status==='PUBLISHED' && row.publicEnabled && id && <PublicDeliveryManager key={id} family="COMPOSITE" resourceId={id} maximumExpiry={row.expiresAt} />}

@@ -1,3 +1,5 @@
+import {listEducationLibrarySources} from './library-source.catalog'
+import {readEducationLibraryScalePreview} from './library-source.preview'
 import {importPrivateForm} from './private-tool.form-import.service'
 import {importPrivateToolCsv} from './private-tool.csv.service'
 import {privateToolSharingRouter} from './private-tool.sharing.routes'
@@ -9,8 +11,18 @@ import {success} from '../../utils/response'
 import {FormAnswerValidationError} from '../assessment-core/form/answers'
 import {ScaleAnswerValidationError} from '../scale/scale-scoring'
 import type {EducationToolEntry} from './access'
-import {EducationPrivateToolError,privateToolId,type PrivateToolContext} from './private-tool.contracts'
+import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateToolContext} from './private-tool.contracts'
 import * as service from './private-tool.service'
+import {listEducationPublicSources,educationPublicCatalogQuery} from './public-source.catalog'
+import {readEducationPublicFormPreview,readEducationPublicStandardPreview} from './public-source.preview'
+import {educationCompositionResponseModeSchema} from './private-tool.composition-contracts'
+import {expertTargetKindSchema} from './expert-observation.contract'
+import {readEducationNativePreview} from './native-source.preview'
+import {educationCognitiveProfileSchema} from './native-source.contracts'
+import {listEducationPackageSources} from './package-reference.catalog'
+import {previewEducationWholePackage} from './package-reference.source'
+
+const sourcePreviewQuery=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
 
 /** Mounted under the matching product authentication middleware only. */
 export function educationPrivateToolRouter(entry:EducationToolEntry){
@@ -34,8 +46,31 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  })
  router.use(educationPrivateToolMediaRouter(context))
  router.use(privateToolSharingRouter(context))
- router.get('/',handle(req=>service.listPrivateTools(context(req),cursor(req))))
+ router.get('/',handle(req=>{
+  const query=z.object({cursor:privateToolId.optional(),kind:privateToolKind.optional()}).strict().parse(req.query)
+  return service.listPrivateTools(context(req),query.cursor,query.kind)
+ }))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
+ router.get('/package-sources',handle(req=>listEducationPackageSources(context(req),req.query)))
+ router.post('/package-sources/preview',handle(req=>previewEducationWholePackage(context(req),req.body)))
+ router.get('/library-sources',handle(req=>listEducationLibrarySources(context(req),req.query)))
+ router.get('/library-sources/:versionId',handle(req=>{
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationLibraryScalePreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
+ }))
+ router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
+ router.get('/public-sources/native/:provider/:versionId',handle(req=>{
+  const input=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),profile:educationCognitiveProfileSchema.optional(),artifactHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict().parse(req.query)
+  return readEducationNativePreview(context(req),{...input,provider:z.enum(['COGNITIVE_CONFIG','SJT_RELEASE']).parse(req.params.provider),versionId:privateToolId.parse(req.params.versionId)})
+ }))
+ router.get('/public-sources/form/:versionId',handle(req=>{
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationPublicFormPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
+ }))
+ router.get('/public-sources/standard/:versionId',handle(req=>{
+  const query=sourcePreviewQuery.parse(req.query)
+  return readEducationPublicStandardPreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
+ }))
  router.get('/runtime-candidates',handle(req=>{
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)
   return (query.kind==='FORM'?service.listPrivateFormRuntimeCandidates:service.listPrivateScaleRuntimeCandidates)(context(req),query.cursor)

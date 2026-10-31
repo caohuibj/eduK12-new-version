@@ -1,0 +1,71 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/dot-questionnaire-open-retry-20261031/server-version/frontend
+
+stderr | src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx > shows the opening error and retries without treating a temporary failure as a missing questionnaire
+开始问卷测评失败 Error: 网络暂不可用
+    at /workspace/scratch/5a77e8bdc1ae/dot-questionnaire-open-retry-20261031/server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx:35:35
+    at file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64
+
+ ❯ src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx (4 tests | 1 failed) 1064ms
+   × shows the opening error and retries without treating a temporary failure as a missing questionnaire 1004ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx > shows the opening error and retries without treating a temporary failure as a missing questionnaire
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"text-center py-12"[39m
+    [36m>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-gray-500"[39m
+      [36m>[39m
+        [0m问卷不存在或未发布[0m
+      [36m</p>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"text-center py-12"[39m
+    [36m>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-gray-500"[39m
+      [36m>[39m
+        [0m问卷不存在或未发布[0m
+      [36m</p>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../../dot-main-review-perf-20261030/server-version/frontend/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../../dot-main-review-perf-20261030/server-version/frontend/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx:43:23
+     41|     <Route path="/student/questionnaires/:questionnaireId/assessment" …
+     42|   </Routes></MemoryRouter>)
+     43|   expect(await screen.findByRole('alert')).toHaveTextContent('网络暂不可用')
+       |                       ^
+     44|   expect(screen.queryByText('问卷不存在或未发布')).not.toBeInTheDocument()
+     45|   expect(mocks.post).not.toHaveBeenCalled()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  15:37:49
+   Duration  2.08s (transform 176ms, setup 121ms, import 283ms, tests 1.06s, environment 370ms)
+

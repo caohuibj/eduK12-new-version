@@ -1,0 +1,95 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "education-context-first-two",
+  "outcomes": [
+    "transaction-bound education START context retains exact server-verified product and refuses copied or cross-transaction/assignment/actor/runtime hints",
+    "transaction-bound education START context keeps SCHOOL distinct and snapshots issuer facts against later mutation"
+  ],
+  "originalSHA256": {
+    "report": "ee166eb193dddbaa26f2caff3d4b4e79b9aef694963404df1f907ec45e01fba9",
+    "execution": "79eb555cdf06993e20cf301b21ece38391eebeac7d52fcc1ee49652b67fa28c0",
+    "log": "a0732c500ca0f5fc4045a39a482c7d4a328008a69760dcccba7bb72cd6ee2261",
+    "inputs": "bda205f9a684ed6d72f67755748b45c299e9b4d286c5e44982d3a1ca3c6f47c8"
+  },
+  "currentInputsSHA256": "1d79ffcb1926bcca82e791b08df7d6662476ef3b3b12167b6a9eb72ba7a3ba2c",
+  "originalExecution": {
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/integration/education-start-context.test.ts",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/workspace/scratch/5a77e8bdc1ae/four-entry-v2-evidence/ci40515317676-local-lab/education-context-r2.json"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "cwd": "/workspace/scratch/5a77e8bdc1ae/pr357-dot-local/server-version/backend"
+  },
+  "signalBasis": "inferred only from recorded normal exit 0; no original signal field was retained",
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 2,
+    "numPassedTests": 2,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "transaction-bound education START context retains exact server-verified product and refuses copied or cross-transaction/assignment/actor/runtime hints",
+      "status": "passed"
+    },
+    {
+      "fullName": "transaction-bound education START context keeps SCHOOL distinct and snapshots issuer facts against later mutation",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend",
+      "currentObject": "857b09f27913b2d630a306d339a87ecec974e68e",
+      "rationale": "Root read actual selected case bodies and proof functions and actual embedded SJT reject branch. Appending child proof functions/cases did not change first two exercised functions. New exact education resolver locking is not exercised by these pure/mock cases; real runtime and backend types remain separate."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "v24.22.1",
+        "kind": "root local diagnostic pure/mock contract, not Actions"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No contemporaneous generated binary manifest; no database exercised by these unit cases"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Pure WeakMap identity and mocked early rejection semantics are reviewed compatible across local24.22 and Actions24.21; no native/database/browser/timing qualification is inferred. Installed binary bytes and original source snapshot were not contemporaneously retained."
+  },
+  "deltas": [],
+  "limitations": [
+    "Post-execution committed checkpoint. First report predates appending the two child cases/functions; selected first-two function bodies are unchanged. Original uncommitted file byte snapshots were not retained. Tool output log is the retained command-result stdout excerpt, not a claimed complete raw stream.",
+    "First wrong-working-directory launch returned exit1 before intended test creation and is not counted.",
+    "First report2pass; child report2pass plus2filtered, not a whole current-file execution.",
+    "No current full backend compile/type qualification yet."
+  ]
+}

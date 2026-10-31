@@ -1,0 +1,122 @@
+import {createRequire} from 'node:module'
+import {readFileSync,writeFileSync,chmodSync} from 'node:fs'
+import {randomUUID} from 'node:crypto'
+import assert from 'node:assert/strict'
+require('/tmp/pr374-cloud/load-c1.cjs')
+const root='/workspace/eduK12-new-version',b=root+'/server-version/backend',out=root+'/docs/performance/four-entry-scale-probe-20261028/evidence',req=createRequire(b+'/package.json'),{prisma:db}=req(b+'/src/config/database.ts')
+const pvt=JSON.parse(readFileSync('/tmp/pr374-cloud/accounts.json','utf8')),source=JSON.parse(readFileSync(out+'/../fixtures/c1-source.json','utf8'))
+const report:any={scope:'Real current-candidate HTTP routes with actual authentication, authorization, canonical FINAL and database; fixture content is fixed PR371 C1 only. No browser claim.',startedAt:new Date().toISOString(),cases:[],requests:[],failures:[]}
+const safe=(v:any):any=>Array.isArray(v)?v.map(safe):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,/token|password|secret|credential|csrf|recovery|otpauth/i.test(k)?'[PRIVATE SYNTHETIC CAPABILITY]':safe(x)])):v
+const save=()=>{writeFileSync(out+'/cloud-more-r1.json',JSON.stringify(report,null,2)+'\n');writeFileSync('/tmp/pr374-cloud/accounts.json',JSON.stringify(pvt,null,2));chmodSync('/tmp/pr374-cloud/accounts.json',0o600)}
+class Client{
+ cookies=new Map<string,string>();csrf='';origin:string
+ constructor(public product:string,public base:string){this.origin='http://'+product+'.localhost:5187'}
+ async raw(method:string,path:string,body?:any,headers:Record<string,string>={}){
+  const start=Date.now(),r=await fetch('http://127.0.0.1:3187'+path,{method,headers:{Origin:this.origin,'Content-Type':'application/json',Cookie:[...this.cookies].map(([k,v])=>k+'='+v).join('; '),...(this.csrf?{'x-csrf-token':this.csrf}:{}),...headers},...(body===undefined?{}:{body:JSON.stringify(body)})})
+  for(const c of r.headers.getSetCookie()){const [pair]=c.split(';'),i=pair.indexOf('=');this.cookies.set(pair.slice(0,i),pair.slice(i+1))}
+  const text=await r.text();let json:any;try{json=JSON.parse(text)}catch{json={text:text.slice(0,1000)}}
+  report.requests.push({product:this.product,method,path:path.replace(/\/[A-Za-z0-9_-]{43}(?=\/|$)/g,'/[PRIVATE CAPABILITY]'),status:r.status,durationMs:Date.now()-start,body:safe(json)});save();return {status:r.status,json}
+ }
+ async ok(method:string,path:string,body?:any,headers:Record<string,string>={}){const r=await this.raw(method,path,body,headers);assert.equal(r.status,200,method+' '+path+' '+JSON.stringify(safe(r.json)));assert.equal(r.json.code,0);return r.json.data}
+ async login(account:any){const csrf=await this.ok('GET',this.base+'/auth/csrf');this.csrf=csrf.csrfToken;const data=await this.ok('POST',this.base+'/auth/login',{username:account.username,password:account.password});assert.ok(data.user?.id,'Actual authenticated user, not an MFA pending state');return data}
+}
+async function test(name:string,work:(row:any)=>Promise<void>){const row:any={name,status:'RUNNING'};report.cases.push(row);save();try{await work(row);row.status='PASS';console.log(name,'PASS')}catch(e:any){row.status='FAIL';row.error={name:e.name,message:e.message};report.failures.push({name,error:row.error});console.error(name,e.message)}finally{save()}}
+async function final(row:any,client:Client,parentPath:string,start:any,extra:Record<string,string>={}){
+ const attemptId=start.id??start.runtimeBindingRef??start.attemptId;assert.ok(attemptId);row.attemptId=attemptId
+ const path=parentPath.replace(':attemptId',attemptId),state=await client.ok('GET',path+'?view=current-unit',undefined,extra)
+ assert.equal(state.currentItem.type,'SCALE');assert.equal(state.currentItem.scale.instruction,source.instruction.text)
+ row.identity={respondentType:state.attemptIdentity?.respondentType??null};row.frozenInstructionExact=true
+ const resumed=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(resumed.id,state.id);assert.equal(resumed.currentItem.definitionHash,state.currentItem.definitionHash);row.resume=true
+ const item=state.currentItem,submission={submissionId:randomUUID(),attemptEpoch:state.attemptEpoch??1,definitionHash:item.definitionHash,contextSnapshotHash:state.contextSnapshotHash??state.context?.snapshotHash??null,answers:source.executable.definition.items.map((i:any)=>({itemCode:i.itemCode??i.code,responseValue:'3'}))}
+ // The released source's actual executable item identity is frozen by the runtime.
+ submission.answers=item.scale.definition.items.map((i:any)=>({itemCode:i.itemCode,responseValue:'3'}))
+ assert.equal(submission.answers.length,10)
+ const sent=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra)
+ row.final=safe(sent)
+ const replay=await client.ok('POST',path+'/items/'+item.id+'/scale/submit',submission,extra);assert.equal(replay.replayed,true);row.sameSubmissionReplay=true
+ const changed=await client.raw('POST',path+'/items/'+item.id+'/scale/submit',{...submission,answers:submission.answers.map((a:any,i:number)=>i? a:{...a,responseValue:'4'})},extra);assert.equal(changed.status,409);row.changedReplayDenied=true
+ const reopened=await client.ok('GET',path+'?view=current-unit',undefined,extra);assert.equal(reopened.status,'COMPLETED');row.reopenedCompleted=true
+ const assessments=await db.assessment.findMany({where:{compositeAttemptId:attemptId},include:{scale:true}})
+ assert.equal(assessments.length,1);assert.equal(assessments[0].status,'COMPLETED');assert.equal(assessments[0].submissionId,submission.submissionId)
+ const {result,decryptError}=await req(b+'/src/modules/scale/scale-workflow.service.ts').loadScaleResult(assessments[0].result,assessments[0],{full:true},db);assert.equal(decryptError,false)
+ row.saved={assessmentId:assessments[0].id,status:assessments[0].status,result:safe(result)}
+ const score=result.scores.find((s:any)=>s.key==='ipip_neo_c1_self_efficacy10');assert.equal(score.value,30);assert.equal(result.method.reportVersion,'1.0.1');row.score=score.value
+ const parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attemptId}});assert.equal(parent.status,'COMPLETED')
+ return {attemptId,path}
+}
+async function main(){
+ await test('Training authenticated student current FINAL/resume/replay',async row=>{
+  const c=new Client('training','/api'),csrf=await c.ok('GET','/api/auth/csrf');c.csrf=csrf.csrfToken
+  await c.ok('POST','/api/auth/training-login',{username:pvt.accounts.learner.username,password:pvt.accounts.learner.password,expectedRole:'STUDENT'})
+  const started=await c.ok('POST','/api/composite-assessments/'+pvt.training.compositeId+'/attempts',{})
+  const result=await final(row,c,'/api/composite-assessments/attempts/:attemptId',started)
+  row.report=await c.ok('GET',result.path+'/report')
+ })
+ await test('Training anonymous token and recovery credential are an independent FINAL path',async row=>{
+  const service=req(b+'/src/modules/composite/composite.service.ts'),expiresAt=new Date(Date.now()+3600000).toISOString()
+  await service.updateComposite(pvt.accounts.author.id,'TEACHER',pvt.training.compositeId,{publicEnabled:true,expiresAt})
+  const token=await service.createAccessTokenForComposite(pvt.accounts.author.id,'TEACHER',pvt.training.compositeId,expiresAt,2)
+  pvt.trainingAnonymous={token:token.token};save()
+  const c=new Client('training','/api/public/composite-assessments'),startPath=c.base+'/'+token.token+'/start'
+  const started=await c.ok('POST',startPath,{});assert.ok(started.recoveryToken);pvt.trainingAnonymous.recoveryToken=started.recoveryToken;pvt.trainingAnonymous.attemptId=started.id??started.attemptId;save()
+  const again=await c.ok('POST',startPath,{recoveryToken:started.recoveryToken});assert.equal(again.id??again.attemptId,started.id??started.attemptId)
+  const result=await final(row,c,c.base+'/attempts/:attemptId',started,{'x-recovery-token':started.recoveryToken})
+  row.report=await c.ok('GET',result.path+'/report',undefined,{'x-recovery-token':started.recoveryToken})
+  const denied=await c.raw('GET',result.path,undefined,{'x-recovery-token':'A'.repeat(43)});assert.ok([403,404].includes(denied.status));row.wrongCredentialDenied=true
+ })
+ await test('Survey genuine researcher password/TOTP enrollment and project preparation',async row=>{
+  const c=new Client('survey','/api/survey'),csrf=await c.ok('GET',c.base+'/auth/csrf');c.csrf=csrf.csrfToken
+  await c.ok('POST',c.base+'/auth/login',{username:pvt.accounts.researcher.username,password:pvt.accounts.researcher.password})
+  const setup=await c.ok('POST',c.base+'/auth/mfa/setup',{}),secret=new URL(setup.otpauthUri).searchParams.get('secret')!;pvt.surveyMfaSecret=secret
+  let bits=0,value=0,bytes:number[]=[];for(const char of secret){value=(value<<5)|'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'.indexOf(char);bits+=5;if(bits>=8){bits-=8;bytes.push((value>>>bits)&255)}}
+  const crypto=req('node:crypto'),counter=Buffer.alloc(8);counter.writeBigUInt64BE(BigInt(Math.floor(Date.now()/30000)))
+  const h=crypto.createHmac('sha1',Buffer.from(bytes)).update(counter).digest(),offset=h[h.length-1]&15,code=String((h.readUInt32BE(offset)&0x7fffffff)%1000000).padStart(6,'0')
+  await c.ok('POST',c.base+'/auth/mfa/confirm',{code});await c.ok('GET',c.base+'/auth/me');row.realMfa=true
+  pvt.surveyProjects=[]
+  for(const mode of ['SINGLE_UNLINKED','LINKED_WAVES']){
+   const pid=randomUUID(),project=await c.ok('POST',c.base+'/projects',{requestId:pid,title:'C1 synthetic '+mode,description:'Only adult synthetic technical validation, no scientific approval',collectionMode:mode})
+   const grant=await req(b+'/src/modules/survey/catalog.service.ts').grantCatalogSource(pvt.accounts.survey_admin.id,pvt.accounts.researcher.id,{kind:'SCALE',sourceId:'survey-standard:'+pvt.combination.releaseId,sourceVersion:pvt.combination.combinationHash})
+   const draft=await req(b+'/src/modules/survey/builder.service.ts').importCatalogDraft(pvt.accounts.researcher.id,pid,grant.id,{requestId:randomUUID(),instrumentKey:'c1systemprobe',title:'C1 synthetic exact source'})
+   await req(b+'/src/modules/survey/measurement-publication.service.ts').publishSurveyMeasurementDraft(pvt.accounts.researcher.id,pid,draft.id,draft.revision)
+   const waves=req(b+'/src/modules/survey/waves.service.ts'),publish=req(b+'/src/modules/survey/waves.publish.ts'),entry:any={mode,projectId:pid,waves:[]};pvt.surveyProjects.push(entry);save()
+   for(let i=0;i<(mode==='LINKED_WAVES'?2:1);i++){
+    const wave=await waves.createWave(pvt.accounts.researcher.id,pid,{requestId:randomUUID(),title:'C1 synthetic '+(i+1),consentText:'This is an isolated synthetic adult technical test. No real participant or diagnostic decision.',generalText:'Synthetic result saved.',instrumentIds:[draft.id],allowNewParticipants:true})
+    const release=i===1?'AFTER_COLLECTION':'AFTER_FINAL'
+    await publish.prepareWave(pvt.accounts.researcher.id,pid,wave.id,wave.revision,undefined,[{instrumentId:draft.id,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['ipip_neo_c1_self_efficacy10'],release}}])
+    const frozen=await waves.getWave(pvt.accounts.researcher.id,pid,wave.id),opened=await publish.openWave(pvt.accounts.researcher.id,pid,wave.id,frozen.revision)
+    entry.publicId=opened.publicId;entry.waves.push({id:wave.id,entryToken:opened.entrySecret,consentVersion:wave.consentVersion,release});save()
+   }
+  }
+  row.projects=pvt.surveyProjects.map((p:any)=>({projectId:p.projectId,mode:p.mode,waves:p.waves.map((w:any)=>({id:w.id,release:w.release}))}))
+ })
+ for(const mode of ['SINGLE_UNLINKED','LINKED_WAVES'])await test('Survey '+mode+' real FINAL, saved metric, recovery and current feedback',async row=>{
+  const f=pvt.surveyProjects.find((p:any)=>p.mode===mode);assert.ok(f,'Actual prepared project required')
+  const c=new Client('survey','/api/public/survey'),base=c.base+'/r/'+f.publicId;let identity:any
+  if(mode==='LINKED_WAVES')identity=await c.ok('POST',base+'/waves/'+f.waves[0].id+'/join',{entryToken:f.waves[0].entryToken,consent:true,consentVersion:f.waves[0].consentVersion})
+  row.waves=[]
+  for(const wave of f.waves){
+   const started=await c.ok('POST',base+'/waves/'+wave.id+(mode==='LINKED_WAVES'?'/start':'/start-unlinked'),{...(mode==='LINKED_WAVES'?{researchCode:identity.researchCode,accessCredential:identity.accessCredential}:{entryToken:wave.entryToken}),consent:true,consentVersion:wave.consentVersion})
+   const proof=mode==='LINKED_WAVES'?{researchCode:identity.researchCode,accessCredential:identity.accessCredential}:{accessCredential:started.accessCredential},path=base+'/attempts/'+started.attemptId
+   f.proof=proof;wave.attemptId=started.attemptId;save()
+   const task=await c.ok('POST',path+'/task',proof),resumed=await c.ok('POST',path+'/task',proof);assert.equal(resumed.definitionDigest,task.definitionDigest)
+   const unit=task.units.find((u:any)=>u.kind==='SCALE');assert.equal(unit.instruction.text??unit.instruction,source.instruction.text)
+   const answers={c1systemprobe:Object.fromEntries(unit.items.map((i:any)=>[i.itemKey,'3']))},body={...proof,submissionId:randomUUID(),answers}
+   assert.equal(Object.keys(answers.c1systemprobe).length,10)
+   const final=await c.ok('POST',path+'/final',body),replay=await c.ok('POST',path+'/final',body);assert.equal(final.status,'COMPLETED');assert.equal(replay.idempotent,true)
+   const changed=await c.raw('POST',path+'/final',{...body,answers:{c1systemprobe:{...answers.c1systemprobe,[unit.items[0].itemKey]:'4'}}});assert.equal(changed.status,409)
+   const feedback=await c.ok('POST',path+'/general',proof)
+   if(wave.release==='AFTER_COLLECTION'){assert.equal(feedback.pending,true);assert.ok(!JSON.stringify(feedback).includes('一般任务自我效能感'))}
+   else {const metric=feedback.measurements[0].metrics[0];assert.equal(metric.value,30);assert.equal(metric.label,'一般任务自我效能感')}
+   const stored=await req(b+'/src/modules/survey/report-results.service.ts').readSurveyStoredReport(pvt.accounts.researcher.id,{projectId:f.projectId,waveId:wave.id,finalId:final.receiptId,instrumentKey:'c1systemprobe'})
+   row.waves.push({attemptId:started.attemptId,finalId:final.receiptId,release:wave.release,feedback:safe(feedback),stored:safe(stored),replay:true,changedReplayDenied:true})
+   const reopened=await c.ok('POST',path+'/task',proof);assert.equal(reopened.status,'COMPLETED')
+  }
+  if(mode==='LINKED_WAVES'){
+   const invalid=await c.raw('POST',base+'/attempts/'+f.waves[0].attemptId+'/general',{...f.proof,accessCredential:'A'.repeat(43)});assert.equal(invalid.status,403)
+   await c.ok('POST',base+'/revoke-access',f.proof)
+   const revoked=await c.raw('POST',base+'/attempts/'+f.waves[0].attemptId+'/general',f.proof);assert.equal(revoked.status,403);row.revocationDenied=true
+  }
+ })
+ report.endedAt=new Date().toISOString();save();if(report.failures.length)process.exitCode=1
+}
+main().catch(e=>{report.fatal={name:e.name,message:e.message};save();console.error(e.message);process.exitCode=1}).finally(()=>db.$disconnect())

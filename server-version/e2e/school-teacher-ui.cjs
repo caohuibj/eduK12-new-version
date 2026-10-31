@@ -5,6 +5,7 @@
 'use strict'
 const assert = require('node:assert/strict')
 const path = require('node:path')
+const observerReuse = require('../../.github/scripts/school-teacher-observer-reuse.cjs')
 const { CJK_SAMPLES, validateCjkInventory, validateRenderedCjk } = require('./school-teacher-chrome.cjs')
 const products = ['SCHOOL', 'TEACHER']
 const names = { SCHOOL: 'School', TEACHER: 'Teacher' }
@@ -392,6 +393,10 @@ const OFFICIAL_FRONTEND = Object.freeze({
   frontendTree: '4c089c44c21c156f416879896c41ade98c40309a',
 })
 function validateOfficialFrontendReceipt(receipt, { head, runId, frontend, frontendTree, frontendLockDigest, frontendContentDigest }) {
+  if (receipt?.originalRun === observerReuse.fixed.run) return observerReuse.verifyBuildReceipt(receipt, {
+    head, runId, kind: 'frontend', manifest: frontend, componentTree: frontendTree,
+    lockDigest: frontendLockDigest, contentDigest: frontendContentDigest,
+  })
   assert.deepEqual(Object.keys(receipt).sort(), ['schemaVersion', 'status', 'currentHead', 'currentRun',
     ...Object.keys(OFFICIAL_FRONTEND), 'manifest'].sort())
   assert.equal(receipt.schemaVersion, 1); assert.equal(receipt.status, 'VERIFIED_OFFICIAL_FRONTEND_BUILD')
@@ -474,7 +479,7 @@ function validateReportBuildInputs(report, options) {
   for (const [kind, expected] of Object.entries({ frontend, backend })) {
     const m = report.inputs[kind]
     assert.deepEqual(m, expected); assert.equal(m.schemaVersion, 1); assert.equal(m.kind, kind)
-    const original = kind === 'frontend' && officialFrontendReuse ? OFFICIAL_FRONTEND : kind === 'backend' && officialBackendReuse ? OFFICIAL_BACKEND : null
+    const original = kind === 'frontend' ? officialFrontendReuse : officialBackendReuse
     assert.equal(m.sha, original ? original.originalCheckout : head)
     assert.equal(m.runId, original ? String(original.originalRun) : runId)
     assert.match(m.contentDigest, /^[a-f0-9]{64}$/); assert.match(m.lockDigest, /^[a-f0-9]{64}$/)

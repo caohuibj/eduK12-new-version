@@ -155,6 +155,17 @@ const sharedProps = {
   onEnterSituational: vi.fn(),
 }
 
+describe('ordinary questionnaire block instructions',()=>{
+ it('shows the current frozen transition alongside native tool text without inserting a unit',async()=>{
+  const state=makeState({...scaleItem,questionnaireInstruction:'本段固定衔接说明',scale:{...scaleItem.scale!,instruction:'原量表作答说明'}})
+  const view=render(<FinalCompositeAssessment state={state} campusMode submitFormSection={vi.fn()} submitScale={vi.fn()} {...sharedProps}/>)
+  expect(await screen.findByRole('region',{name:'本段作答说明'})).toHaveTextContent('本段固定衔接说明')
+  expect(screen.getByRole('region',{name:'本量表作答说明'})).toHaveTextContent('原量表作答说明')
+  view.rerender(<FinalCompositeAssessment state={makeState({...formItem,questionnaireInstruction:'表单的衔接说明'})} campusMode submitFormSection={vi.fn()} submitScale={vi.fn()} {...sharedProps}/>)
+  expect(await screen.findByRole('region',{name:'本段作答说明'})).toHaveTextContent('表单的衔接说明')
+  expect(screen.queryByText('本段固定衔接说明')).not.toBeInTheDocument()
+ })
+})
 describe('historical empty sections', () => {
   it('submits an explicit empty FINAL for an ordinary frozen section', async () => {
     const submitFormSection = vi.fn().mockResolvedValue({ code: 0 })
@@ -544,4 +555,41 @@ it('uses plain School page wording for submission, progress and required answers
  expect(screen.getByRole('region',{name:'测评内容'})).toBeInTheDocument()
  expect(view.container.textContent).not.toMatch(/区段|字段/)
  expect(submit).not.toHaveBeenCalled()
+})
+
+describe('durable acknowledgement before slow progress or feedback reload',()=>{
+ it.each(['FORM_SECTION','SCALE'] as const)('shows accepted %s immediately without submitting again while reload waits',async type=>{
+  const user=userEvent.setup()
+  let release!:()=>void
+  const gate=new Promise<void>(resolve=>{release=resolve})
+  const onReload=vi.fn(()=>gate),submit=vi.fn().mockResolvedValue({code:0,data:{completed:true,replayed:false}})
+  const item=type==='SCALE'?scaleItem:{...formItem,formAnswers:[],contextSection:false}
+  render(<FinalCompositeAssessment {...sharedProps} state={makeState(item)} onReload={onReload} submitScale={submit} submitFormSection={submit}/> )
+  try{
+   if(type==='SCALE')await user.click(await screen.findByRole('button',{name:'经常'}))
+   await user.click(await screen.findByRole('button',{name:type==='SCALE'?'提交整份量表':'确认并继续'}))
+   await waitFor(()=>expect(onReload).toHaveBeenCalledTimes(1))
+   expect(screen.getByText('服务器已确认当前单元的权威结果。')).toBeVisible()
+   expect(screen.queryByText('答案已锁定，正在提交当前单元的同一份 FINAL。')).not.toBeInTheDocument()
+   expect(submit).toHaveBeenCalledTimes(1)
+  }finally{await act(async()=>release())}
+ })
+})
+
+
+describe('frozen scale instruction in the shared unit player',()=>{
+ it.each(['training','education','public'] as const)('shows the frozen scale instruction before questions for %s without inventing text',async host=>{
+  trainingPresentation.enabled=host==='training'
+  const instruction='请根据最近一周的实际感受作答。\n没有对错，请选择最符合自己的选项。'
+  const item={...scaleItem,scale:{...scaleItem.scale!,instruction}}
+  const props={...sharedProps,submitScale:vi.fn(),submitFormSection:vi.fn(),campusMode:host==='education',publicMode:host==='public'}
+  const view=render(<FinalCompositeAssessment {...props} state={makeState(item)}/>)
+  const panel=await screen.findByRole('region',{name:'本量表作答说明'})
+  expect(panel.textContent).toBe(instruction)
+  const question=await screen.findByRole('heading',{name:/综合量表第一题/})
+  expect(panel.compareDocumentPosition(question)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  view.rerender(<FinalCompositeAssessment {...props} state={makeState(scaleItem)}/>)
+  expect(screen.queryByRole('region',{name:'本量表作答说明'})).not.toBeInTheDocument()
+  expect(props.submitScale).not.toHaveBeenCalled()
+ })
 })

@@ -4,17 +4,31 @@ import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollec
 import {schoolSearchText,schoolDeadline} from './school-collection'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
-import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
+import {deferredPage} from '../components/page-loading/deferredPage'
+import type {CampusExecutionRef} from './SchoolCompositeRunner'
+import {createEducationAssessmentFeedback} from '../components/education-tools/educationAssessmentFeedbackAdapter'
+
+const SchoolCompositeRunner=deferredPage(async()=>({default:(await import('./SchoolCompositeRunner')).SchoolCompositeRunner}),{
+ label:'返回任务列表',run:props=>props.onExit(),
+})
 
 type ParentRunTask={
   executionId:string;runId:string;organizationId:string;activityId:string
   activityTitle:string;runTitle:string;status:string;deadline:string|null
   canResumeExisting?:boolean
+  feedbackMode?:'COMPOSITION'
   consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
 }
-export function SchoolParentTasks({api}:{api:SchoolApi}){
+export function SchoolParentTasks(props:{api:SchoolApi}){
+  const scope=useRef({...props,epoch:0})
+  if(scope.current.api!==props.api)scope.current={...props,epoch:scope.current.epoch+1}
+  return <ParentTasksSession key={scope.current.epoch} {...props}/>
+}
+function ParentTasksSession({api}:{api:SchoolApi}){
   const [tasks,setTasks]=useState<ParentRunTask[]|null>(null)
-  const [active,setActive]=useState<CampusExecutionRef|null>(null)
+  const [active,setActive]=useState<{execution:CampusExecutionRef;task:ParentRunTask}|null>(null)
+  const [feedback,setFeedback]=useState<ParentRunTask|null>(null)
+  const renderFeedback=useMemo(()=>createEducationAssessmentFeedback({api,entry:'SCHOOL'}),[api])
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
   const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
@@ -43,8 +57,8 @@ export function SchoolParentTasks({api}:{api:SchoolApi}){
   const visible=(tasks??[]).filter(task=>schoolSearchText(task.runTitle+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.runTitle.localeCompare(b.runTitle,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
   const refreshButton=<button type="button" disabled={busy} onClick={()=>void refresh()} aria-label={busy?'正在读取…':error?'重试读取任务':'刷新任务'} title="刷新任务"><RefreshCw size={18} aria-hidden="true"/></button>
   return <section className="hs-panel hs-task-view hs-parent-tasks">
-    <details className="hs-task-inbox" open={!active}>
-    <summary hidden={!active}>查看任务列表</summary>
+    <details className="hs-task-inbox" open={!active&&!feedback}>
+    <summary hidden={!active&&!feedback}>查看任务列表</summary>
     <header className="hs-parent-task-heading"><div className="hs-parent-task-summary"><h2>我的家校观察任务</h2>{tasks&&<p className="hs-collection-summary">{query?`检索到 ${visible.length} 项`:`${tasks.length} 项观察任务`}</p>}
       <SchoolTaskHelp label="家长观察任务与隐私说明" buttonText="任务说明"><p>只显示你作为答题者被正式分配、且关系当前仍有效的测评。答题不代表获得孩子的个人心理报告。</p></SchoolTaskHelp>
     </div>
@@ -57,18 +71,20 @@ export function SchoolParentTasks({api}:{api:SchoolApi}){
         <div className="hs-parent-task-copy"><small>{task.activityTitle}</small><h3>{task.runTitle}</h3>
         <p>当前状态：{({ASSIGNED:'待完成',STARTED:'进行中',COMPLETED:'已完成',EXPIRED:'已截止',CANCELLED:'已取消'} as Record<string,string>)[task.status]??task.status}{task.deadline?' · 截止 '+new Date(task.deadline).toLocaleDateString('zh-CN'):''}</p></div>
         <div className="hs-parent-task-action">{['ASSIGNED','STARTED'].includes(task.status)&&
-          <button disabled={busy} aria-label={(task.status==='STARTED'?'继续作答':'查看任务')+'（开始／继续校园正式测评）'} onClick={()=>setActive({
+          <button disabled={busy} aria-label={(task.status==='STARTED'?'继续作答':'查看任务')+'（开始／继续校园正式测评）'} onClick={()=>{setFeedback(null);setActive({task,execution:{
             organizationId:task.organizationId,courseId:task.activityId,
             runId:task.runId,executionId:task.executionId,
             resumeExisting:task.canResumeExisting===true,consentRequired:task.consentRequired,
             consentPurpose:task.consentPurpose,
             consentVisibility:task.consentVisibility,
-          })}>{task.status==='STARTED'?'继续作答':'查看任务'}</button>}</div>
+          }})}}>{task.status==='STARTED'?'继续作答':'查看任务'}</button>}
+          {task.status==='COMPLETED'&&task.feedbackMode==='COMPOSITION'&&<button disabled={busy} onClick={()=>{setActive(null);setFeedback(task)}}>查看完成反馈</button>}</div>
       </article>)}</div>}
       {tasks&&tasks.length>0&&visible.length===0&&<p className="hs-collection-empty">没有匹配的观察任务，请尝试其他关键词。</p>}
     </details>
-    {active&&<SchoolCompositeRunner api={api} execution={active} observer observerRole="parent" observerTaskTitle={tasks?.find(task=>task.executionId===active.executionId)?.runTitle}
-      onExit={()=>setActive(null)}
-      onFinished={()=>{setActive(null);void refresh()}}/>}
+    {feedback&&renderFeedback({executionId:feedback.executionId,title:feedback.runTitle,mode:'COMPOSITION',onClose:()=>setFeedback(null)})}
+    {active&&<SchoolCompositeRunner key={active.execution.executionId} api={api} execution={active.execution} observer observerRole="parent" observerTaskTitle={active.task.runTitle}
+      onExit={()=>{if(currentScope.current===scope)setActive(null)}}
+      onFinished={()=>{if(currentScope.current!==scope)return;setActive(null);if(active.task.feedbackMode==='COMPOSITION')setFeedback(active.task);void refresh()}}/>}
   </section>
 }

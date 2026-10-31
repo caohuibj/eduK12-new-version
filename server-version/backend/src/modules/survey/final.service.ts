@@ -1,10 +1,10 @@
+import {computeSurveyNativeReports} from '../bundle-product/survey-native'
 import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {persistGovernedPackageReports} from './governed-package.reports'
-import {rawParticipantFeedback} from './participant-feedback'
+import {projectSurveyParticipantFeedback} from './participant-feedback-response'
 import {interpretSurveyFinal} from './final-interpretation.service'
 import type { SurveyCognitiveReference } from './cognitive.definition'
-import { cognitiveParticipantFeedback } from './measurement.result'
 import type { SurveyComputedFinal } from './final.compute'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
@@ -173,7 +173,11 @@ export async function submitResearchFinal(input:FinalInput){
     const interpretation=await interpretSurveyFinal(tx,{projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
       publicationId:publication.id,definitionDigest:publication.definitionDigest,selectedSnapshot,calculated})
     if(interpretation)calculated.interpretation=interpretation
-    const resultsHash=canonicalHash(JSON.parse(JSON.stringify(calculated)))
+    if(selectedSnapshot.governedPackages?.some(p=>p.nativeBundle))calculated.nativeBundleReports=computeSurveyNativeReports(selectedSnapshot,calculated)
+    // Reuse the existing JSON normalization for hashing and first feedback so
+    // the in-memory view matches what an independent saved-result read sees.
+    calculated=JSON.parse(JSON.stringify(calculated)) as SurveyComputedFinal
+    const resultsHash=canonicalHash(calculated)
     const resultsCipher=encryptUnifiedRuntimePayload(calculated)
     const receipt=await tx.surveyWaveFinal.create({data:{
       id:randomUUID(),attemptId:attempt.id,projectId:known.projectId,waveId:wave.id,
@@ -192,9 +196,23 @@ export async function submitResearchFinal(input:FinalInput){
     // enclosing transaction commits. Replays and independent reads must still
     // use current authorization; no receipt or participant authority is cached.
     const general=generalReceipt(wave.generalText,receipt.completedAt)
+    // First non-flow FINAL already holds the same project/wave/attempt/person
+    // locks and current consent/credential checks required for disclosure.
+    // Project only the existing authorized allowlist, never the private result.
+    // Optional projection failure must not turn a durable answer into a retry;
+    // the independent reader remains the recovery path. Flow/replay keep it too.
+    let participantFeedbackReceipt
+    if(!snapshot.flow&&selectedSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
+      try{
+        const end=wave.finishUntil??wave.closesAt
+        const projected=projectSurveyParticipantFeedback(selectedSnapshot.units,calculated,
+          wave.hardStopAt!==null||(end!==null&&end<=new Date()),selectedSnapshot.governedPackages)
+        if(projected)participantFeedbackReceipt={...general,...projected}
+      }catch{ /* Accepted FINAL remains authoritative; the GET path reports unavailable feedback. */ }
+    }
     return {attemptId:attempt.id,receiptId:receipt.id,completedAt:receipt.completedAt,
       status:'COMPLETED' as const,idempotent:false,
-      generalText:general.text,generalReceipt:general}
+      generalText:general.text,generalReceipt:general,...(participantFeedbackReceipt?{participantFeedbackReceipt}:{})}
   })
 }
 export async function readGeneralForOwnAttempt(input:{
@@ -234,18 +252,9 @@ export async function readGeneralForOwnAttempt(input:{
     const collectionEnd=attempt.wave.finishUntil??attempt.wave.closesAt
     const collectionClosed=attempt.wave.hardStopAt!==null||
       (collectionEnd!==null&&collectionEnd<=new Date())
-    const measurements=[];let pending=false
-    for(const unit of valid.compiledSnapshot.units.filter(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
-      const stored=result.units.find(candidate=>candidate.instrumentKey===unit.instrumentKey)
-      if(!stored)blocked('研究反馈工具来源缺失')
-      const feedback=unit.kind==='COGNITIVE'?cognitiveParticipantFeedback(unit,stored,collectionClosed):
-        rawParticipantFeedback(unit,stored,collectionClosed)
-      if(feedback?.pending)pending=true
-      else if(feedback)measurements.push(feedback)
-    }
-    const general=generalReceipt(attempt.wave.generalText,final.completedAt)
-    return measurements.length||pending?{kind:'DESCRIPTIVE' as const,...general,measurements,pending}:
-      {kind:'GENERAL_ONLY' as const,...general}
+    const projected=projectSurveyParticipantFeedback(valid.compiledSnapshot.units,result,collectionClosed,valid.compiledSnapshot.governedPackages)
+    if(!projected)blocked('研究反馈工具来源缺失')
+    return {...generalReceipt(attempt.wave.generalText,final.completedAt),...projected}
   })
   const final=await prisma.surveyWaveFinal.findFirst({where:{
     attemptId:valid.attemptId,projectId:valid.projectId,waveId:valid.waveId,

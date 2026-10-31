@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "curiosity_5dcr24_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "b5263e4f99fcc3cd67761f9596b0525f26b1b1dc9150edba4c2d5f20214eb8d3",
+  "oldReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "scoreOrder": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "joyous_exploration",
+        "headline": "愉悦探索",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "你对新问题、新知识和挑战的兴趣，可能在学习、工作或日常生活的不同阶段有所变化。这个分数只反映你在本次回答中多大程度认可“愿意探索”这类描述，不是智力、学习成绩或潜力的评定。可以回想最近一件曾吸引你主动了解的事情：是什么让你想继续了解？不必要求自己对每件事都保持强烈好奇。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近什么问题让你想主动多了解一点？"
+          },
+          {
+            "category": "strategy",
+            "text": "为一件自己真正感兴趣的事留出十分钟，随意探索一个新线索。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "deprivation_sensitivity",
+        "headline": "匮乏敏感性",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "遇到一个暂时没有答案的问题时，有些人会一直惦记着，直到找到解释才感到踏实。这一维度描述的是你在这类时刻的倾向；较高的分数不等于更擅长解决难题，也不意味着越坚持越好。有时多想一会儿能带来发现，有时暂停和休息同样重要。可以想想哪些疑问值得继续投入，哪些可以允许自己先放下。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么问题会让你一直想弄清答案？"
+          },
+          {
+            "category": "strategy",
+            "text": "给一个难题设定适合自己的探索时段，结束时也允许自己休息。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "stress_tolerance",
+        "headline": "面对不确定性的耐受",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "新的环境、未知的结果或突然发生的变化，可能让人既好奇又有点紧张。这里的分数已经把四道反向题转换，高一些仅表示你在本次作答中更认同自己能够带着不确定感继续探索。它不是抗压能力的客观测试，也不能判断有没有焦虑问题。如果你想到某次犹豫的经历，可以试着分清实际风险和对未知的担心，再选择对自己安全的小尝试。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "遇到未知的情境时，哪种不确定感最容易影响你？"
+          },
+          {
+            "category": "strategy",
+            "text": "选择一个风险可控的小变化，先了解情况，再决定是否尝试。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social_curiosity_general",
+        "headline": "一般社会好奇心",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "与人交往时，你可能喜欢问问题、了解对方的经历，也可能更愿意安静地观察。这部分关注你是否有主动理解他人的兴趣，并不评判社交能力或人际关系质量。真正的了解往往需要对方愿意分享，也需要倾听和尊重边界。下一次与人谈话，可以关注一个让你真心想理解的观点，而不是必须得到更多私人细节。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "你最喜欢了解别人经历中的哪一部分？"
+          },
+          {
+            "category": "strategy",
+            "text": "在一次轻松的交谈中，提一个尊重对方意愿的开放问题，并认真倾听。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social_curiosity_covert",
+        "headline": "间接了解他人的好奇心",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一维度描述你对他人谈话、事情来龙去脉或私人信息的好奇程度。分数较高并不自动意味着你不尊重别人，较低也不代表缺乏关心；情境、关系和习惯都会影响这些回答。好奇心与隐私边界可以同时存在：即使想知道发生了什么，也可以尊重别人不愿公开的内容。可以想想，哪些问题适合直接询问，哪些应该交给对方自主决定是否分享。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么时候你会特别想弄清别人正在谈论的事情？"
+          },
+          {
+            "category": "strategy",
+            "text": "留意一次好奇心出现的时刻，先考虑对方是否愿意分享，再决定是否询问。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "thrill_seeking",
+        "headline": "寻求新鲜与刺激",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "有的人喜欢可预期的安排，有的人对一点惊喜和刺激更感兴趣。这部分只描述你对冒险、新鲜体验和不按计划发生的事情有多大兴趣，不代表你应该从事危险活动，也不能据此判断是不是勇敢的人。想寻求新鲜感时，安全和个人边界仍然重要。你可以找到一种风险可控的新体验，例如换一种散步路线或尝试从未做过的小型创作。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么样的新鲜体验会让你觉得有趣，却不会带来不必要的风险？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一种安全、可退出的小尝试，为日常生活增添一点变化。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本版中文为AI协助的研究工作译稿，未经作者批准、人工专家译审、认知访谈或中国样本验证；现有中文研究不能直接移用于本精确题本。",
+      "无总分、无中国常模、无诊断或选拔阈值；各维分数仅为本人自报倾向，不是客观能力。",
+      "GESIS缺答分母未明确，本平台草稿规定仅完整四题计该维；不等同作者验证的缺失算法。",
+      "寻求刺激不构成风险行为建议，隐蔽社会好奇心不意味着有权侵犯他人隐私。",
+      "某一方面漏答时，该方面不计算；其他已答完整的方面可保留数值，但本次整体结果不作解释。漏答不代表没有好奇心。"
+    ],
+    "disclaimer": "5DCR原作者Kashdan等（2020），GESIS 2022 英文原题CC BY 4.0；该中文版本和报告为独立工作稿，未完成人工审校和中国效度验证。本报告用于非诊断研究准备，不提供总分、百分位或群体优劣评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN"
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "scoreOrder": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "joyous_exploration",
+        "headline": "探索的愉悦：给真正想了解的事一点空间",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：好奇可以有自己的方向，不必每个方面都更高。\n\n六个侧面各四题均分1–7，分别看，没有总分。题目是一般自我描述的符合程度，不是最近一周的次数或客观能力；下面的场景只是回顾提示。\n\n愉悦探索这一项越大，表示更认同喜欢新知识、陌生主题和思考挑战。例如，读到一个不熟悉的概念后想再查一点，不等于学得更快或成绩更好。已有自然兴趣可以保留；忙碌或暂时不想探索，也不需要给自己安排一份好奇作业。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "若愿意，从一个真实感兴趣的问题找一条可靠线索，到够用时就停。可以只了解一点，也可以不继续，不把投入时间或知道多少变成新的成绩。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "deprivation_sensitivity",
+        "headline": "未解的问题：想弄清楚，也允许先放下",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示更认同不知道答案时难安心、受挫后继续钻研等描述，不是解决问题能力更强，也不是物质匮乏或孤独程度。\n\n例如，一个疑问让人迟迟不愿停手，是一种可能情境，不是报告已认定你的习惯。持续探索有时有帮助，付出的时间和休息也需要看。\n\n已有合适节奏可保留；并不是坚持越久越好，也不必先得到完整答案才能休息。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只挑一个还惦记的问题，区分“现在必须知道”和“可以稍后再看”。愿意时留一个下一步线索，随后允许暂停；没有解开不等于个人失败。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "stress_tolerance",
+        "headline": "面对不确定：较少被疑虑挡住，不是更应冒险",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "四题都反向整理，数值越大表示较少认同疑虑、紧张或难专注会阻止自己探索未知，不是压力更多，也不是客观抗压成绩。\n\n例如，初到一个地方先了解安排再决定参与，是可能的做法，不是分数已证明你敢尝试。真实风险、精力和可得支持同样重要。\n\n可以保留适合的准备方式；不确定时多了解、暂缓或退出都可以，不需要用承受不适证明好奇。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "在低风险、愿意的情境里先核实一个重要信息，再选一个可退出的小步。安全不足或不合适时就不尝试，不把犹豫一律当成需要克服的缺点。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social_curiosity_general",
+        "headline": "主动了解他人：兴趣和边界一起保留",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示更认同喜欢询问、理解他人的兴趣与行为原因，不是社交能力、受欢迎程度或实际洞察力分。\n\n例如，听见对方谈一件兴奋的事，想了解为什么，只是帮助回想的场景，不代表系统已判断你的交往方式。真正的了解仍需要对方愿意分享。\n\n已有舒服的倾听可以保留；安静相处也可以，不必靠多问私人细节表现关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "在双方都愿意的交谈中，只问一个尊重边界的问题，留意对方是否想继续。对方不愿说时就停，不追问、不把自己的解释当成对方真实想法。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social_curiosity_covert",
+        "headline": "间接了解他人：想知道，不等于有权知道",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示更认同想了解他人谈话、争执来龙去脉或私人信息的描述，不自动说明你侵犯过隐私，也不是人品评价。\n\n例如，听到别人交谈时好奇在说什么，是一个可能场景，不是报告查明的行为。好奇的念头与是否采取行动是两回事。\n\n可以选择不继续了解。关系和分享意愿需要被尊重，分数不能授权偷听、查看私人消息或追问对方不想公开的事。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "出现好奇时先问：这是对方愿意公开的内容吗，与我需要处理的事情有关吗？不确定就不获取；确有必要时用合适方式询问，并接受对方拒绝。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "thrill_seeking",
+        "headline": "新鲜与刺激：偏好不是危险行动的要求",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示更认同对冒险、兴奋或不可预测体验感兴趣，不等于现实风险承受能力更强，也不说明更勇敢或更有趣。\n\n例如，有人喜欢行程里留一点变化，有人偏爱熟悉安排；这只是不同选择的例子，问卷没决定你该怎样生活。\n\n已有适合的节奏可保留。偏好新鲜也不需要转成危险活动，不喜欢刺激也不是应该补齐的短板。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "若想有一点变化，可选安全、低成本、随时可停的体验，如换一个创作材料或了解一个新主题。先看风险和自身条件，不靠挑战危险、身体极限或人际边界证明分数。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每侧面仅4题，本独立中文稿尚未验证；不分能力强弱，刺激与好奇不授权冒险或侵犯隐私。"
+    ],
+    "disclaimer": "5DCR原作者Kashdan等（2020），GESIS 2022 英文原题CC BY 4.0；该中文版本和报告为独立工作稿，未完成人工审校和中国效度验证。本报告用于非诊断研究准备，不提供总分、百分位或群体优劣评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:52:24Z",
+        "basis": "本次AI文字自审对应curiosity_5dcr24_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "scoreOrder": [
+      "joyous_exploration",
+      "deprivation_sensitivity",
+      "stress_tolerance",
+      "social_curiosity_general",
+      "social_curiosity_covert",
+      "thrill_seeking"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "joyous_exploration",
+        "headline": "好奇有自己的入口，不必全图点亮",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：跟着一个真想了解的问题走，不为六项数字集章。\n\n六个四题侧面各1–7均分，没有总分；问一般自我描述的符合程度，不是智力或最近几天的次数。例子没有替你认定日常习惯。\n\n愉悦探索越大，是更认同新知识、陌生主题和思考挑战有吸引力。比如看到一个新概念想多查一句，是可能的入口，不是学得快的证明。已有兴趣就留着；暂时只想把眼前事做好，也不用补交“保持好奇”作业。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只开一个问题的小窗口：找一条可靠线索，够用就先关上。不必开满十个标签页，也不用知道得更多才算认真。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "deprivation_sensitivity",
+        "headline": "答案可以待续，休息不必等大结局",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "未解问题这一项越大，是更认同不知道答案就不安心、想继续钻研，不是更会解题，也不是缺钱或缺陪伴。\n\n一个疑问让人停不下来，是可能场景，报告没有把你判成某种人。探索可以有收获，也可能占掉休息，需要看看实际代价。\n\n有合适节奏就继续用；不是每个问题都必须今晚结案，也不靠坚持时间证明努力。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "给一个问题留句“下次从这里接着看”，再判断眼下是否真的必须解开。能待续就先停，不把没有答案当成不能休息的理由。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "stress_tolerance",
+        "headline": "未知不是考试，退出也算选择",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这四题反向后越大，是较少被疑虑、紧张或难专注挡住探索，不是压力更大，也不是抗压徽章。\n\n先问清陌生场所怎样安排，再决定是否参与，是一个可能做法；数字没证明你平时有多敢。实际风险、精力和支持仍要一起看。\n\n可以多准备，也可以暂缓，不需要用硬撑未知来证明好奇心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只先问清一项重要信息，再看要不要迈一个低风险、可退出的小步。条件不安全或不合适时跳过，报告不是冒险邀请函。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social_curiosity_general",
+        "headline": "聊天不是收集人物资料卡",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "主动了解这一项越大，是更认同对他人兴趣与行为原因好奇，不是越会交朋友或越懂人心。\n\n对方兴奋地讲一件事，你想知道原因，是场景，不是系统替你写的社交画像。了解靠对方愿意说，不靠问题数量取胜。\n\n舒服的倾听可以继续，安静陪伴也可以；不必问得更私人来证明关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "双方愿意时问一个真想理解的问题，然后认真听。对方不想继续就停，不追问细节，也不给对方的内心擅自填答案。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "social_curiosity_covert",
+        "headline": "想点开，不等于拿到了查看权限",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "间接好奇这一项越大，是更认同想知道他人谈话或私人事情，不是系统发现你做过什么，也不是道德标签。\n\n听见别人在交谈而想知道内容，是可能的念头，是否行动仍可选择。报告没发隐私通行证。\n\n不继续了解也完全可以；他人的消息、边界和不愿分享的内容，不因为自己好奇就应该开放。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "先看是否公开、是否确有需要。不确定就别获取；真有必要时用合适方式问，并接受拒绝。不偷听、查看私人消息或追着不愿公开的事情问。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "thrill_seeking",
+        "headline": "新鲜感不用拿安全来换",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "刺激偏好越大，是更认同兴奋、冒险与变化有吸引力，不是更勇敢、更会处理危险。\n\n有人想让行程多一点变化，有人愿意照熟悉路线走，都只是选择，数字没有替你定生活方式。\n\n现有节奏合适就保留。想试新东西也不必增加危险，不想刺激同样不欠一场胆量挑战。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只给日常加一个安全小变化：新材料、小创作或新主题，随时可停。先看条件和风险，不靠极限活动或越过关系边界来证明有趣。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "每侧面仅4题，本独立中文稿尚未验证；不分能力强弱，刺激与好奇不授权冒险或侵犯隐私。"
+    ],
+    "disclaimer": "5DCR原作者Kashdan等（2020），GESIS 2022 英文原题CC BY 4.0；该中文版本和报告为独立工作稿，未完成人工审校和中国效度验证。本报告用于非诊断研究准备，不提供总分、百分位或群体优劣评价。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:52:24Z",
+        "basis": "本次AI文字自审对应curiosity_5dcr24_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

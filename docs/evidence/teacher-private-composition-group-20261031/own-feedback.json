@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "kind": "EDUCATION_FEEDBACK",
+  "mode": "COMPOSITION",
+  "state": "READY",
+  "title": "Synthetic private GROUP source",
+  "units": [
+    {
+      "blockId": "cea21a9b-b342-49aa-9fc4-a75a979254b0",
+      "kind": "SCALE",
+      "title": "Synthetic private GROUP source",
+      "state": "READY",
+      "nativeScaleUnits": [
+        {
+          "itemId": "880854c1-4a1c-4b48-80bf-0f41db015a31",
+          "type": "SCALE",
+          "kind": "scale",
+          "scaleId": "aee12f22-993d-44d9-8e4e-fbdcbaf6e31c",
+          "scaleCode": "education-private-scale:81e92390-66c9-4465-b047-741f193488f9",
+          "label": "Synthetic private GROUP source",
+          "scaleName": "Synthetic private GROUP source",
+          "completedAt": "2026-10-31T08:37:41.192Z",
+          "totalTime": 77,
+          "scores": [
+            {
+              "key": "total",
+              "label": "Support",
+              "value": 1,
+              "type": "dimension",
+              "direction": "descriptive",
+              "canonical": true,
+              "displayPrecision": 2,
+              "range": {
+                "min": 1,
+                "max": 2
+              },
+              "expectedItems": [
+                "q"
+              ],
+              "answeredItems": [
+                "q"
+              ],
+              "status": "calculated",
+              "prorated": false
+            }
+          ],
+          "references": [],
+          "interpretations": [
+            {
+              "scoreKey": "total",
+              "headline": "Support",
+              "label": null,
+              "interpretation": "研究探索性得分，不对被试作诊断或常模解释。",
+              "guidance": [],
+              "limitations": [
+                "未经研究样本验证的描述性分数；不提供常模和诊断解释。"
+              ],
+              "referenceVersion": null
+            }
+          ],
+          "rawScoreFeedback": [
+            {
+              "text": "Own authorized reflection",
+              "scoreKey": "total",
+              "rangeKey": "reflection"
+            }
+          ],
+          "assessmentId": "06cb5167-2735-4ac9-8abf-207d34fd8804",
+          "disclaimer": "研究者自编探索性工具。结果用于本项目科研记录，无常模或诊断效力；被试只接收获准的通用反馈。"
+        }
+      ]
+    }
+  ]
+}

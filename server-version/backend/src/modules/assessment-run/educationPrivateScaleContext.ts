@@ -4,6 +4,7 @@ import {assertEducationLibraryReadCommitted} from '../scale-library-governance/e
 import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.form-runtime-resources'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
 import {privateToolFail,type PrivateToolContext} from '../education-tools/private-tool.contracts'
+import {readPrivateCompositionRunSources} from '../education-tools/private-tool.composition-source'
 
 /** Current draft editor facts only; neither private ownership nor this check
  * confers event publication authority or participant/report access. */
@@ -31,8 +32,8 @@ export async function assertPrivateScaleRunWorkflow(tx:Prisma.TransactionClient,
 }
 export async function assertPrivateScaleRunResource(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;resource:{key:string;version:string}}){
  const editor=await assertPrivateScaleRunEditor(tx,input)
- if(input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
- const source=await readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
+ if(input.resource.version!=='1.0.0'&&input.resource.version!=='2.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ const source=await readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:input.resource.version,purpose:'NEW_USE',context:editor.context})
  return {...editor,source}
 }
 
@@ -46,10 +47,10 @@ export async function assertPrivateFormRunResource(tx:Prisma.TransactionClient,i
 /** Advisory source preparation only. Publication repeats current author and
  * workflow checks in its locked transaction; this does not confer use rights. */
 export async function readPrivateScaleRunSourceForPreparation(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;resource:{family:string;key:string;version:string}}){
- if(input.resource.family!=='SCALE'||input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ if(input.resource.family!=='SCALE'||input.resource.version!=='1.0.0'&&input.resource.version!=='2.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
  const workflow=await readEducationRunLibraryContext(tx,input)
  if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
- return readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:{
+ return readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:input.resource.version,purpose:'NEW_USE',context:{
   entry:workflow.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}}})
 }
 
@@ -61,4 +62,15 @@ export async function readPrivateFormRunSourceForPreparation(tx:Prisma.Transacti
  if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
  return readPrivateFormRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:{
   entry:workflow.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}}})
+}
+
+/** One advisory workflow/author/metadata batch, regardless of selected track
+ * count. The locked consumer rechecks current rights and mutable source state. */
+export async function readPrivateCompositionRunSourcesForPreparation(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;
+ resources:Array<{family:string;key:string;version:string}>}){
+ if(!input.resources.length)return new Map()
+ const workflow=await readEducationRunLibraryContext(tx,input)
+ if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
+ return readPrivateCompositionRunSources(tx,{entry:workflow.product,organizationId:input.organizationId,
+  principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}},input.resources)
 }

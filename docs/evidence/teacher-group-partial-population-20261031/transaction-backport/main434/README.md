@@ -1,0 +1,3 @@
+# Current partial Teacher consumer on main434
+
+Prepared source1161b6bdddf0110230f089d671734c99c860eee5 includes the unchanged transaction correction, actual-contributor and pointer semantics plus actual main432/434 application inputs. Each combined component compiled once; earlier receipts retain their own component identities. Questionnaire-target/progress/units changes are outside Teacher numeric cases, and the spec-discovery optimization retains its existing published validator. No original PG, FINAL, pointer UI or alias case is replayed. Frontend tree5b108c22d6006abddcfcabd71ce2de67ed886828 is identical for the native slice and is reusable there.

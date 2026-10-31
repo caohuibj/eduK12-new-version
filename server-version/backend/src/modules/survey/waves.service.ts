@@ -1,3 +1,5 @@
+import {loadSurveyTrackingSource,inheritedSurveyTrackingUnit} from './tracking-source'
+import {surveyFormTrackingIdentity} from './personal-tracking'
 import {surveyFrozenMeasurementPointerSchema,surveyFrozenContentSelectionSchema} from './content-selection'
 import {z} from 'zod'
 import {surveyRawFeedbackSchema} from './participant-feedback'
@@ -7,12 +9,13 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
-import { compileFrozenResearchUnit,resolveSurveyMeasurementUnit,surveyMeasurementPublicationMode,type ResearchFrozenUnit } from './publication.service'
+import { compileFrozenResearchUnit,resolveSurveyMeasurementUnit,surveyMeasurementReleaseInput,surveyMeasurementPublicationMode,type ResearchFrozenUnit,type ResearchFrozenPublication } from './publication.service'
 import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
 import { compileGroupQuotaPolicy,compileCheckpointPolicy,
   groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
+import {surveyWaveReferenceChanges} from './selected-reference-audit'
 
 import { groupIpDraftPolicySchema,freezeGroupIpPolicy,resolveGroupIpOpenWindow } from './group-ip-policy'
 
@@ -83,7 +86,17 @@ export async function getWave(uid:string,pid:string,wid:string){
   return prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,false)
     const wave=await ownWave(tx,pid,wid)
-    if(!wave.publicationId)return wave
+    if(!wave.publicationId){
+      const source=await loadSurveyTrackingSource(tx,pid,wave.longitudinalSourceWaveId)
+      const ids=new Set(wave.instrumentIds as string[])
+      const inheritedTrackingUnits=(source?.units??[]).filter(u=>ids.has(u.draftId)).flatMap(unit=>{
+        const frozen=inheritedSurveyTrackingUnit(source,{id:unit.draftId,instrumentKey:unit.instrumentKey,
+          catalogGrantId:typeof unit.sourceProvenance?.sourceGrantId==='string'?unit.sourceProvenance.sourceGrantId:null})
+        return frozen?[{id:frozen.draftId,instrumentKey:frozen.instrumentKey,kind:frozen.kind,title:frozen.title,
+          definition:frozen.displayDefinition,revision:frozen.draftRevision,readOnly:true,status:'PUBLISHED',measurementRelease:frozen.measurementRelease??null}]:[]
+      })
+      return {...wave,inheritedTrackingUnits}
+    }
     const publication=await tx.surveyPublication.findFirst({where:{id:wave.publicationId,projectId:pid},
       select:{id:true,projectId:true,definitionDigest:true,compiledSnapshot:true}})
     if(!publication||publication.id!==wave.publicationId||publication.projectId!==pid||
@@ -100,7 +113,7 @@ export async function getWave(uid:string,pid:string,wid:string){
     if(parsed.data.units.some(unit=>unit.contentSelection&&(!unit.measurementRelease||unit.kind==='FORM'||
       unit.contentSelection.referencePolicy.measurementReleaseId!==unit.measurementRelease.releaseId)))
       return fail(409,'冻结内容版本来源校验失败')
-    return {...wave,frozenContentSelections:parsed.data.units.filter(unit=>unit.kind!=='FORM').map(unit=>({
+    return {...wave,longitudinal:(publication.compiledSnapshot as unknown as ResearchFrozenPublication).longitudinal??null,frozenContentSelections:parsed.data.units.filter(unit=>unit.kind!=='FORM').map(unit=>({
       draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,
       measurementRelease:unit.measurementRelease??null,contentSelection:unit.contentSelection??null})),frozenParticipantFeedback:parsed.data.units.filter(unit=>unit.kind==='SCALE'||unit.kind==='SJT')
       .map(unit=>({draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,participantFeedback:unit.participantFeedback??null}))}
@@ -108,6 +121,7 @@ export async function getWave(uid:string,pid:string,wid:string){
 }
 type WaveInput={
   requestId:string;title:string;consentText:string;generalText?:string;instrumentIds:string[];
+  longitudinalSourceWaveId?:string;
   opensAt?:string|null;closesAt?:string|null;finishUntil?:string|null;
   quotaStarts?:number|null;allowNewParticipants?:boolean;
   linkageNoticeConfirmed?:boolean
@@ -136,6 +150,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         ||existing.revision!==0||existing.title!==input.title
         ||existing.consentText!==input.consentText
         ||existing.generalText!==(input.generalText??'')
+        ||existing.longitudinalSourceWaveId!==(input.longitudinalSourceWaveId??null)
         ||existing.linkageNoticeConfirmed!==(input.linkageNoticeConfirmed===true)
         ||JSON.stringify(existing.instrumentIds)!==JSON.stringify(input.instrumentIds)
         ||canonicalHash(existing.flowDefinition)!==canonicalHash(flowDefinition)
@@ -150,12 +165,20 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         fail(409,'同一波次创建请求 ID 已用于不同内容')
       return existing
     }
+    if(input.longitudinalSourceWaveId){
+      const source=await ownWave(tx,pid,input.longitudinalSourceWaveId)
+      if(!source.publicationId||source.status==='DRAFT')fail(409,'续轮须来自已经正式开放的纵向波次')
+      const publication=await tx.surveyPublication.findUniqueOrThrow({where:{id:source.publicationId!}})
+      if(!(publication.compiledSnapshot as unknown as ResearchFrozenPublication).longitudinal)fail(409,'来源波次未配置纵向计划')
+    }
     await validateDraftRefs(tx,pid,input.instrumentIds)
+    const selectedSourceChanges=await surveyWaveReferenceChanges(tx,uid,pid,[],input.instrumentIds)
     const ordinal=await tx.surveyWave.aggregate({where:{projectId:pid},_max:{ordinal:true}})
     const next=(ordinal._max.ordinal||0)+1
     if(next>100)fail(400,'首版单项目最多 100 个波次')
     const row=await tx.surveyWave.create({data:{
       id:input.requestId,projectId:pid,ordinal:next,title:input.title,
+      longitudinalSourceWaveId:input.longitudinalSourceWaveId??null,
       consentText:input.consentText,generalText:input.generalText??'',consentVersion:1,
       linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
       instrumentIds:input.instrumentIds,
@@ -171,11 +194,27 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,
       projectId:pid,action:'WAVE_DRAFT_CREATED',
-      metadata:{waveId:row.id,ordinal:row.ordinal,collectionMode:project.collectionMode}}})
+      metadata:{waveId:row.id,ordinal:row.ordinal,collectionMode:project.collectionMode,...(selectedSourceChanges?{selectedSourceChanges}:{})}}})
     return row
   })
 }
-type WaveUpdate=Omit<WaveInput,'requestId'>&{revision:number}
+/** Reuse Survey's existing project drafts, package membership and Flow. No
+ * universal clone or Bundle unpacking: immutable publications stay intact. */
+export async function createNextWave(uid:string,pid:string,wid:string,requestId:string){
+  const source=await prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,true)
+    const wave=await ownWave(tx,pid,wid)
+    if(!wave.publicationId||wave.status==='DRAFT')return fail(409,'请先正式开放来源波次')
+    return wave
+  })
+  const next=await createWave(uid,pid,{requestId,title:source.title+' · 下一轮',consentText:source.consentText,
+    generalText:source.generalText,instrumentIds:source.instrumentIds as string[],
+    linkageNoticeConfirmed:source.linkageNoticeConfirmed,allowNewParticipants:false,
+    flowDefinition:source.flowDefinition,quotaPolicy:source.quotaPolicy,checkpointPolicy:source.checkpointPolicy,
+    longitudinalSourceWaveId:source.id})
+  return getWave(uid,pid,next.id)
+}
+type WaveUpdate=Omit<WaveInput,'requestId'|'longitudinalSourceWaveId'>&{revision:number}
 export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpdate){
   ensureWindow(input)
   const requestedFlow=input.flowDefinition===undefined?undefined:
@@ -192,6 +231,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     if(old.status!=='DRAFT'||old.publicationId!==null||old.revision!==input.revision)
       fail(409,'仅能修改当前版本的未发布波次')
     await validateDraftRefs(tx,pid,input.instrumentIds)
+    const selectedSourceChanges=await surveyWaveReferenceChanges(tx,uid,pid,Array.isArray(old.instrumentIds)?old.instrumentIds as string[]:[],input.instrumentIds)
     const changed=await tx.surveyWave.updateMany({
       where:{id:wid,projectId:pid,status:'DRAFT',publicationId:null,revision:input.revision},
       data:{title:input.title,consentText:input.consentText,generalText:input.generalText??'',instrumentIds:input.instrumentIds,
@@ -209,7 +249,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     })
     if(changed.count!==1)fail(409,'另一个研究者会话已修改波次')
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,projectId:pid,
-      action:'WAVE_DRAFT_UPDATED',metadata:{waveId:wid,revision:input.revision+1}}})
+      action:'WAVE_DRAFT_UPDATED',metadata:{waveId:wid,revision:input.revision+1,...(selectedSourceChanges?{fromRevision:input.revision,selectedSourceChanges}:{})}}})
     return ownWave(tx,pid,wid)
   })
 }
@@ -223,7 +263,8 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     await validateDraftRefs(tx,pid,ids)
     const drafts=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}}})
     const catalogSources=await catalogSnapshotsForDrafts(tx,uid,drafts.flatMap(d=>d.catalogGrantId?[d.catalogGrantId]:[]))
-    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids,catalogSources}
+    const inheritedSnapshot=await loadSurveyTrackingSource(tx,pid,wave.longitudinalSourceWaveId)
+    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids,catalogSources,inheritedSnapshot}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
   let compiledFlow:import('./flow.definition').FrozenSurveyFlow|undefined
@@ -231,7 +272,7 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     try{
       const compiled=compileSurveyFlow(input.wave.flowDefinition,input.drafts.map(d=>({
         instrumentKey:d.instrumentKey,kind:d.kind,
-        displayDefinition:d.definition,
+        displayDefinition:inheritedSurveyTrackingUnit(input.inheritedSnapshot,d)?.displayDefinition??d.definition,
       })) as import('./publication.service').ResearchFrozenUnit[],
       input.project.collectionMode as 'SINGLE_UNLINKED'|'LINKED_WAVES')
       compiledFlow=compiled
@@ -267,8 +308,8 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     await prisma.$transaction(async tx=>{
       await ownProject(tx,uid,pid,false)
       await assertSurveyMediaOwned(tx,uid,pid,input.drafts.map(d=>{
-        const unit=d.catalogGrantId?compileCatalogUnit(d,input.catalogSources.get(d.catalogGrantId)!):null
-        return {kind:surveyKindSchema.parse(d.kind),definition:d.definition,
+        const unit=inheritedSurveyTrackingUnit(input.inheritedSnapshot,d)??(d.catalogGrantId?compileCatalogUnit(d,input.catalogSources.get(d.catalogGrantId)!):null)
+        return {kind:surveyKindSchema.parse(d.kind),definition:unit?.displayDefinition??d.definition,
           ...(unit?{compiledDefinition:unit.compiledDefinition,sourceProvenance:unit.sourceProvenance}:{})}
       }))
     })
@@ -287,10 +328,21 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     checks.push({key:'linkage_disclosure',ok:linkedConfirmed,
       issues:linkedConfirmed?[]:['跨波次研究必须由研究者确认已明确告知：随机研究编号将关联不同时间点的答案']})
   }
+  const trackingTools:ResearchFrozenUnit[]=[]
   const measured:ResearchFrozenUnit[]=[]
   for(const draft of input.drafts){
+    const inherited=inheritedSurveyTrackingUnit(input.inheritedSnapshot,draft)
+    if(inherited){
+      if(draft.catalogGrantId&&compileCatalogUnit(draft,input.catalogSources.get(draft.catalogGrantId)!).sourceDigest!==inherited.sourceDigest)
+        fail(409,'冻结追踪工具的授权来源版本已变化')
+      checks.push({key:draft.id,ok:true,issues:[],digest:inherited.sourceDigest})
+      trackingTools.push(inherited)
+      if(surveyMeasurementPublicationMode(inherited)==='EXPLICIT')measured.push(inherited)
+      continue
+    }
     if(draft.catalogGrantId){
       const compiled=compileCatalogUnit(draft,input.catalogSources.get(draft.catalogGrantId)!)
+      trackingTools.push(compiled)
       checks.push({key:draft.id,ok:true,issues:[],digest:compiled.sourceDigest})
       if(surveyMeasurementPublicationMode(compiled)==='EXPLICIT')measured.push(compiled)
       continue
@@ -302,7 +354,7 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     checks.push({key:draft.id,ok:compilation.ok,
       issues:compilation.issues.map(issue=>issue.path+': '+issue.message),
       digest:compilation.definitionDigest})
-    if(compilation.ok&&draft.kind!=='FORM')measured.push(compileFrozenResearchUnit(draft))
+    if(compilation.ok){const compiled=compileFrozenResearchUnit(draft);trackingTools.push(compiled);if(draft.kind!=='FORM')measured.push(compiled)}
   }
   if(measured.length)await prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,false)
@@ -323,6 +375,14 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
+    trackingOptions:trackingTools.flatMap(unit=>{
+      try{
+        const release=unit.kind==='FORM'?null:surveyMeasurementReleaseInput(unit,uid,pid)
+        if(release&&release.layer!=='MEASUREMENT')return []
+        const metrics=release&&release.layer==='MEASUREMENT'?release.content.metrics.map(m=>({key:m.metricKey,unit:m.unit,label:m.metricKey})):surveyFormTrackingIdentity(unit).metrics
+        return metrics.map(m=>({instrumentId:unit.draftId,instrumentKey:unit.instrumentKey,scoreKey:m.key,label:unit.title+' · '+m.label,unit:m.unit}))
+      }catch{return []}
+    }),
     ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)+
       (input.wave.flowDefinition?1:0)+(input.wave.quotaPolicy?1:0)+
       (input.wave.checkpointPolicy?1:0)+(input.wave.groupIpPolicy?1:0)+measured.length&&checks.every(c=>c.ok),

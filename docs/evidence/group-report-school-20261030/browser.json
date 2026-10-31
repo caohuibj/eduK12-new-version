@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "actualSchoolAppNavigationAndGroupComponent": true,
+  "syntheticAuthAndBackend": true,
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/campus/auth/me"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations/org/tool-authoring-capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/availability"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations/org/context"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/organizations/org/units"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/catalog"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/org/old"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/tools"
+    },
+    {
+      "method": "POST",
+      "path": "/api/campus/reports/groups"
+    },
+    {
+      "method": "GET",
+      "path": "/api/campus/reports/groups/org/old"
+    }
+  ],
+  "checks": [
+    "real School navigation to group reports",
+    "latest snapshot without discovery or generation",
+    "single leaf class selection",
+    "retained version read",
+    "metric switch",
+    "fullscreen",
+    "1440/390 layout",
+    "all metrics print/PDF"
+  ]
+}

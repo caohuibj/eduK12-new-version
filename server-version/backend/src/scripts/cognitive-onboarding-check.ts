@@ -5,20 +5,23 @@ import {
   composeCognitiveOnboardingDecision,
   serializeCognitiveOnboardingDecision,
   formatCognitiveOnboardingDecision,
+  cognitiveOnboardingExitCode,
   type CognitiveBlockerV1,
 } from '../modules/cognitive/onboarding/decision'
 import { cognitiveBankMetaSchema } from '../modules/cognitive/banks/bank-meta'
 const manifests = require('../../../scripts/cognitive/manifests.cjs')
 const dependencies = require('../../../scripts/cognitive/dependencies.cjs')
+const { selectOnboarding } = require('../../../scripts/cognitive/onboarding-selection.cjs')
 const { runAcceptance } = require('../../../scripts/cognitive/acceptance.cjs')
 const {
   classifyChangedPath,
 } = require('../../../scripts/cognitive/content-policy.cjs')
 
 async function main() {
-  const args = process.argv.slice(2),
-    task = args[0],
-    json = args.includes('--json')
+  const args = process.argv.slice(2)
+  const checks: any[] = [], identityResults: any[] = []
+  let selection: any
+  const record = (name: string, status: string, details?: unknown) => checks.push({name,status,...(details === undefined ? {} : {details})})
   const technical: CognitiveBlockerV1[] = []
   const add = (
     code: string,
@@ -41,74 +44,34 @@ async function main() {
     },
   })
   let packages: any[] = []
+  packages = manifests.discover()
+  selection = selectOnboarding(args, packages)
+  const { json, selected: selectedPackages, frontendSuites } = selection
   try {
-    packages = manifests.discover()
-    // An unknown task is already fail-closed; do not load or scan every runtime
-    // just to report a misspelled directory. Valid targets retain all gates.
-    if (task === '--all' || packages.some((p) => p.task === task)) {
-      manifests.generate({ check: true })
-      dependencies.guard(manifests.ROOT, packages)
-    }
-  } catch (e) {
-    technical.push(
-      add(
-        'COG_REGISTRATION_CHECK_FAILED',
-        String(e).includes('COG_ASSET') ? 'ASSET' : 'REGISTRATION',
-        (e as Error).message,
-      ),
-    )
+    manifests.generate({ check: true })
+    record('manifest', 'PASS')
+  } catch(e) {
+    record('manifest', 'FAIL', (e as Error).message)
+    technical.push(add('COG_REGISTRATION_CHECK_FAILED','REGISTRATION',(e as Error).message))
   }
-  const selectedPackages =
-    task === '--all' ? packages : packages.filter((p) => p.task === task)
-  const selected = selectedPackages.length
-    ? {
-        ...selectedPackages[0],
-        acceptance: {
-          frontendSuites: [
-            ...new Set(
-              selectedPackages.flatMap(
-                (p) => p.acceptance?.frontendSuites ?? [],
-              ),
-            ),
-          ],
-        },
-      }
-    : undefined
-  for (const p of selectedPackages)
-    if (!p.acceptance?.frontendSuites?.length)
-      technical.push(
-        add(
-          'COG_RUNNER_EVIDENCE_MISSING',
-          'EXECUTION',
-          'Task must declare executable frontend acceptance suites.',
-          p.file,
-          'acceptance.frontendSuites',
-        ),
-      )
-  if (selected)
-    try {
-      runAcceptance(manifests.ROOT, selected)
-    } catch (e) {
-      technical.push(
-        add(
-          'COG_RUNNER_ACCEPTANCE_FAILED',
-          'EXECUTION',
-          (e as Error).message,
-          selected.file,
-          'acceptance.frontendSuites',
-        ),
-      )
-    }
-  if (!selected)
-    technical.push(
-      add(
-        'COG_TASK_NOT_FOUND',
-        'IDENTITY',
-        'Supply one discovered task directory name.',
-      ),
-    )
-  if (args.includes('--content-only')) {
-    const base = args[args.indexOf('--base') + 1]
+  try {
+    const modules = dependencies.guard(manifests.ROOT, packages)
+    record('dependencies', 'PASS', {modules})
+  } catch(e) {
+    record('dependencies', 'FAIL', (e as Error).message)
+    technical.push(add('COG_DEPENDENCY_CHECK_FAILED','EXECUTION',(e as Error).message))
+  }
+  for(const p of selectedPackages) if(!p.acceptance?.frontendSuites?.length)
+    technical.push(add('COG_RUNNER_EVIDENCE_MISSING','EXECUTION','Task must declare executable frontend acceptance suites.',p.file))
+  try {
+    const count = runAcceptance(manifests.ROOT, {acceptance:{frontendSuites}})
+    record('frontend-acceptance','PASS',{suites:frontendSuites,count})
+  } catch(e) {
+    record('frontend-acceptance','FAIL',{suites:frontendSuites,error:(e as Error).message})
+    technical.push(add('COG_RUNNER_ACCEPTANCE_FAILED','EXECUTION',(e as Error).message))
+  }
+  if (selection.contentOnly) {
+    const base = selection.base
     if (!args.includes('--base') || !base || !/^[0-9a-f]{40}$/.test(base))
       technical.push(
         add(
@@ -156,7 +119,7 @@ async function main() {
       }
   }
   const decisions = []
-  if (selectedPackages.length) try {
+  try {
     const { getCognitiveRegistryEntry } = await import(
       '../modules/cognitive/cognitive.registry'
     )
@@ -186,6 +149,9 @@ async function main() {
     )
     for (const selected of selectedPackages)
       for (const id of selected.identities) {
+        const stages: any[] = []
+        const stage = (name: string, blockers: any[] = []) => stages.push({name,status:blockers.some(b=>b.severity==='ERROR')?'FAIL':'PASS'})
+        try {
         const local = [...technical],
           pilot: CognitiveBlockerV1[] = []
         const entry = getCognitiveRegistryEntry(
@@ -222,6 +188,7 @@ async function main() {
             gate: 'PILOT_PUBLISH',
           })
         }
+        stage('contract',pilot)
         const seeds = cognitiveSeeds.filter(
           (s) =>
             s.testType === id.testType &&
@@ -283,6 +250,7 @@ async function main() {
             })
           }
         }
+        stage('readiness',pilot)
         const presentation = resolveParticipantPresentation(id)
         if (
           !presentation?.title ||
@@ -297,6 +265,7 @@ async function main() {
               selected.presentationFile,
             ),
           )
+        stage('presentation',local)
         const file = `${selected.directory}/fixtures/${id.engineVersion}-${id.scoringVersion}.json`
         try {
           pilot.push(
@@ -319,6 +288,7 @@ async function main() {
             gate: 'PILOT_PUBLISH',
           })
         }
+        stage('fixtures-scorer-report',pilot)
         const governance = cognitiveGovernance.filter(
           (g) =>
             g.testType === id.testType &&
@@ -327,12 +297,12 @@ async function main() {
         )
         if (governance.length !== 1)
           local.push(
-            add(
+            {...add(
               'COG_GOVERNANCE_IDENTITY_INVALID',
               'GOVERNANCE',
-              'Exactly one governance record is required.',
+              'Scientific metadata needs human review: expected one exact identity record; technical admission is evaluated separately.',
               selected.scientificFile,
-            ),
+            ),severity:'WARNING'},
           )
         const scientific = evaluateCognitiveScientificQualification(definition)
         decisions.push(
@@ -354,6 +324,12 @@ async function main() {
             },
           }),
         )
+        identityResults.push({identity:id,checks:stages})
+        } catch(e) {
+          const blocker=add('COG_IDENTITY_VALIDATION_ABORTED','EXECUTION',(e as Error).message)
+          identityResults.push({identity:id,checks:[...stages,{name:'identity-completion',status:'FAIL',error:(e as Error).message}]})
+          decisions.push(composeCognitiveOnboardingDecision({identity:id,technicalBlockers:[...technical,blocker],pilotPublishBlockers:[],scientific:{declaredMaturity:'PILOT',maxEligibleMaturity:'PILOT',blockersToNextTier:[]}}))
+        }
       }
   } catch (e) {
     technical.push(
@@ -368,7 +344,7 @@ async function main() {
     decisions.push(
       composeCognitiveOnboardingDecision({
         identity: {
-          testType: task || 'UNKNOWN',
+          testType: selection.tasks.join(',') || 'UNKNOWN',
           engineVersion: 'UNKNOWN',
           scoringVersion: 'UNKNOWN',
         },
@@ -382,20 +358,17 @@ async function main() {
       }),
     )
   }
-  for (const d of decisions)
-    process.stdout.write(
-      json
-        ? serializeCognitiveOnboardingDecision(d)
-        : formatCognitiveOnboardingDecision(d),
-    )
-  if (
-    decisions.some(
-      (d) => !d.pilotPublish.ready || !d.scientific.declarationValid,
-    )
-  )
-    process.exitCode = 1
+  const exitCode = cognitiveOnboardingExitCode(decisions)
+  if(selection.batch) {
+    process.stdout.write(JSON.stringify({schemaVersion:1,kind:'cognitive-onboarding-batch',selectedTasks:selection.tasks,
+      selectedIdentities:selectedPackages.flatMap((p: any)=>p.identities.map(({testType,engineVersion,scoringVersion}: any)=>({testType,engineVersion,scoringVersion}))),
+      checks,identityResults,decisions,selectionIsScopeEvidence:false,exitCode})+'\n')
+  } else for (const d of decisions)
+    process.stdout.write(json ? serializeCognitiveOnboardingDecision(d) : formatCognitiveOnboardingDecision(d))
+  process.exitCode = exitCode
 }
 void main().catch((error) => {
+  if(process.argv.some(arg=>arg==='--tasks'||arg==='--tasks-json')) process.stdout.write(JSON.stringify({schemaVersion:1,kind:'cognitive-onboarding-batch',selectedTasks:[],selectedIdentities:[],checks:[{name:'batch-completion',status:'FAIL',error:String(error)}],identityResults:[],decisions:[],selectionIsScopeEvidence:false,exitCode:1})+'\n')
   process.stderr.write(String(error) + '\n')
   process.exitCode = 1
 })

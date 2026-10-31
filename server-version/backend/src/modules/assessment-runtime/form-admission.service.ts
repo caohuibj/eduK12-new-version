@@ -59,6 +59,7 @@ export type CompositeFormAdmissionParent = {
   frozenActiveSlotSetEncrypted: string | null
   frozenActiveSlotSetHash: string | null
   compositeAssessment: {
+    creationKey?: string | null
     productKind?: string
     reportPackageKey?: string | null
     analysisProtocolKey?: string | null
@@ -307,11 +308,16 @@ export const activateCompositeFormAdmission = async (input: {
   }
 }): Promise<FrozenUnitAdmissionV1> => {
   const selectedParent = await assertTrainingSectionSelected(input.parent.id, input.sectionId, { parent: input.parent })
+  if(selectedParent.compositeAssessment?.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!selectedParent.userId)throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','现场观察需要本人教育账号',403)
+    await currentFieldComposition(prisma,{attemptId:input.parent.id,actorUserId:selectedParent.userId})
+  }
   const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent = await loadTrainingChildAdmissionParent(input.parent.id, selectedParent)
   if(input.definition.items.some(item=>item.formPolicy!=null) && (parent.compositeAssessment.productKind!=="QUESTIONNAIRE" || parent.assignmentRef || parent.compositeAssessment.reportPackageKey || parent.compositeAssessment.analysisProtocolKey)) {
-    if(parent.compositeAssessment.productKind!=="ORGANIZATION_RESOURCE"||!parent.assignmentRef||parent.compositeAssessment.reportPackageKey||parent.compositeAssessment.analysisProtocolKey)
+    if(parent.compositeAssessment.productKind!=="ORGANIZATION_RESOURCE"||parent.compositeAssessment.reportPackageKey||parent.compositeAssessment.analysisProtocolKey)
       throw new InstrumentFinalSubmitError("INSTRUMENT_NOT_AVAILABLE","Form V3 不支持此任务组合",422)
     const {assertPrivateFormParentSource}=await import('../assessment-run/educationPrivateFormExecution')
     await assertPrivateFormParentSource(parent.id)
@@ -471,6 +477,11 @@ export const activateStoredOrCatalogCompositeFormAdmission = async (input: {
   }
 }): Promise<FrozenUnitAdmissionV1> => {
   const selectedParent = await assertTrainingSectionSelected(input.parentId, input.sectionId, { parent: input.parent })
+  if(selectedParent.compositeAssessment?.creationKey?.endsWith(':TEACHER:EXPERT_REPORT:2.0.0')){
+    const {currentFieldComposition}=await import('../huiteacher/fieldComposition.authority')
+    if(!selectedParent.userId)throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE','现场观察需要本人教育账号',403)
+    await currentFieldComposition(prisma,{attemptId:input.parentId,actorUserId:selectedParent.userId})
+  }
   const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent = await loadTrainingChildAdmissionParent(input.parentId, selectedParent)

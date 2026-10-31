@@ -16,6 +16,8 @@ import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from '../cognitive/product-eligibility'
 import { assertCognitiveCatalogConfiguration } from '../cognitive/assignment.service'
 import { Prisma, UserRole } from '@prisma/client'
+import {trainingTrackingSelectionSchema,copiedTrainingTracking,readTrainingTracking,trainingTrackingPreviewChoices} from '../composite/personal-tracking'
+import {getContentRelease} from '../measurement-content/repository'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { config } from '../../config'
@@ -31,9 +33,13 @@ import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { addCompositeItemSchema } from '../composite/composite.schema'
 import { listQuestionnaireScaleResources } from './scale-resources'
 import {prepareTrainingStandardItemSource,verifyStoredTrainingStandardItem,decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
-import {listTrainingStandardCombinationChoices} from '../measurement-content/standard-combination-use'
+import {trainingReferenceAudit} from '../composite/training-reference-audit'
+import {selectedReferenceChanges,type SelectedReferenceAudit} from '../assessment-authorization/selected-reference-audit'
+import {listTrainingStandardCombinationChoicePage} from '../measurement-content/standard-combination-use'
 import { situationalReleaseKey, listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
+import {readTrainingCognitiveTaskBinding,loadPinnedTrainingCognitiveProfile} from '../assessment-authorization/training-cognitive-profile-use'
+import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { z } from 'zod'
 
@@ -343,6 +349,8 @@ export async function addItem(actor: Actor, id: string, raw: unknown) {
       contextKey: item.type === 'FORM' ? item.contextKey : null,
     } })
     await ensureCompositeFormSections(id, tx)
+    await auditSelectedReferences(tx,actor,row,[],trainingReferenceAudit(row,{id:itemId,type:item.type,scaleId:item.scaleId??null,
+      standardCombinationSource:standard?{reference:standard.reference,referenceHash:standard.referenceHash}:null}))
   }, true, undefined, true)
 }
 export async function updateFormItem(actor: Actor, id: string, itemId: string, raw: unknown) {
@@ -366,9 +374,16 @@ export async function removeItem(actor: Actor, id: string, itemId: string, raw: 
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
     const item = row.items.find((v: any) => v.id === itemId)
     if (!item) throw compositeNotFound('问卷内容项不存在')
+    const removed=trainingReferenceAudit(row,item)
     await tx.compositeAssessmentItem.delete({ where: { id: itemId } })
     if (item.formSectionId && !await tx.compositeAssessmentItem.count({ where: { formSectionId: item.formSectionId } })) await tx.compositeFormSection.delete({ where: { id: item.formSectionId } })
+    await auditSelectedReferences(tx,actor,row,removed,[])
   }, true, undefined, true)
+}
+async function auditSelectedReferences(tx:Tx,actor:Actor,row:{id:string;createdBy:string;revision:number},previous:SelectedReferenceAudit[],next:SelectedReferenceAudit[]){
+ const changes=selectedReferenceChanges(previous,next)
+ if(changes)await tx.assessmentManagementEvent.create({data:{actorId:actor.userId,resourceId:row.id,action:'TRAINING_DRAFT_SOURCE_BINDINGS_CHANGED',
+  metadata:{schemaVersion:1,ownerId:row.createdBy,fromRevision:row.revision,toRevision:row.revision+1,...changes}}})
 }
 export async function reorder(actor: Actor, id: string, raw: unknown) {
   const { revision, units } = orderSchema.parse(raw)
@@ -440,6 +455,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     if (row.revision !== revision) throw compositeConflict('草稿已变化，请刷新后重新自检')
     const inspectedSituational = await inspectCompositeSituationalItems(row.items, tx, compositeSjtGrantScope(row))
     const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string; targetId?: string }> = []
+    const trackingCandidates:Array<{itemId:string;scoreKey:string;label:string;unit:string}>=[]
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
       ['training-persistence', 'Training 草稿策略与课程来源', () => validateTrainingPersistenceAuthoring(tx, row, row.trainingPersistencePolicy)],
@@ -447,9 +463,18 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
       ['training-variants', 'Training 加权分组、完整覆盖与次数限制', () => validateTrainingVariants(tx, row)],
       ['training-flow', 'Training 条件路径、材料与结束规则', () => validateTrainingFlow(tx, row)],
       ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row, inspectedSituational)],
-      ['content', '区段、背景顺序、字段与冻结定义', () => {
+      ['content', '区段、背景顺序、字段与冻结定义', async () => {
         if (inspectedSituational.errors.size) throw inspectedSituational.errors.values().next().value
-        return prepareCompositePublication(actor.userId, actor.role, id, tx, inspectedSituational.releases)
+        const prepared=await prepareCompositePublication(actor.userId, actor.role, id, tx, inspectedSituational.releases)
+        const snapshot=prepared.trainingContentSnapshot as import('../composite/training-content-binding').TrainingContentSnapshot|undefined
+        for(const unit of snapshot?.units??[]){
+          const release=await getContentRelease(tx,unit.measurement.releaseId)
+          const item=row.items.find(i=>i.id===unit.itemId)
+          if(release?.layer==='MEASUREMENT')for(const metric of release.content.metrics)trackingCandidates.push({
+            itemId:unit.itemId,scoreKey:metric.metricKey,label:(item?.scale?.name??item?.cognitiveAssignment?.title??item?.situationalInstrumentKey??'工具')+' · '+metric.metricKey,unit:metric.unit})
+        }
+        trackingCandidates.push(...trainingTrackingPreviewChoices(row.items.filter(item=>item.type==='FORM')).map(choice=>({...choice,unit:'raw'})))
+        return prepared
       }],
     ] as const) {
       try { await validate(); checks.push({ key, label, status: 'passed', message: '通过' }) }
@@ -471,7 +496,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
       for (const section of row.formSections.filter(section => !section.items.length)) checks.push({ key: 'section:' + section.id, label: section.title, status: 'failed', message: '移除空区段或在当前草稿补齐字段，再重新自检。', targetId: section.id })
     }
     if(row.trainingTimingPolicy){try{await timingPolicy(tx,row,true);checks.push({key:'timing',label:'可选计时来源',status:'passed',message:'通过'})}catch(cause:any){if(!(cause.statusCode>=400&&cause.statusCode<500))throw cause;checks.push({key:'timing',label:'可选计时来源',status:'failed',message:cause.message})}}
-    return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY' }
+    return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY',trackingCandidates }
   }, { timeout: 30000 })
 }
 
@@ -480,6 +505,9 @@ async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
   const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
     for (const item of row.items) {
       const copiedBinding = copiedCognitiveBinding(item, row)
+      const fixedPin=item.type==='COGNITIVE'?readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot):null
+      const precise=fixedPin?await loadPinnedTrainingCognitiveProfile(tx,fixedPin,{userId:actor.userId,configId:item.cognitiveAssignment.configId},true):null
+      if(precise)assertCognitiveAssignmentFreeze(item.cognitiveAssignment,precise.artifact)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
         const source = item.cognitiveAssignment
         const entry = requireCognitiveRegistryEntry(source.config.testType, source.config.engineVersion, source.config.scoringVersion)
@@ -492,11 +520,14 @@ async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
           configId: source.configId, createdBy: actor.userId, title: source.title, instruction: source.instruction,
           status: 'PUBLISHED', publishedAt: new Date(), listedStandalone: false, required: false, ...freeze,
           quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null, maxAttempts: source.maxAttempts,
+          ...(precise?{courseSnapshot:{selectedCognitiveProfile:fixedPin,selectedCognitiveConfigurationName:precise.configurationName}}:{}),
         } })
         await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { cognitiveAssignmentId: binding.id } })
-        await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id)
+        if(precise)await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id,precise.artifact)
+        else await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id)
       } else if (item.type==='COGNITIVE') {
-        await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
+        if(precise)await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id,precise.artifact)
+        else await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
       }
     }
   return expiry
@@ -557,7 +588,8 @@ export async function publishMeasurementInstances(actor:Actor,id:string,raw:unkn
 }
 
 export async function publish(actor: Actor, id: string, raw: unknown) {
-  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+  const input=revisionSchema.extend({tracking:trainingTrackingSelectionSchema.optional()}).parse(raw)
+  return mutate(actor, id, input.revision, async (tx, row) => {
     if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
     if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
     await validateDelivery(tx, actor, row)
@@ -571,7 +603,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
       await retainFormSectionVideos({ owner: mediaOwner, presentations: compositeFormSectionVideoPresentations(definition), db: tx })
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
-    await publishComposite(actor.userId, actor.role, id, tx, situational)
+    await publishComposite(actor.userId, actor.role, id, tx, situational,input.tracking)
     await recheckMeasurementPublisherExpiry(tx,measurementPublisherExpiry)
   })
 }
@@ -621,29 +653,35 @@ export async function available(userId: string) {
 }
 export async function resources(actor: Actor) {
   author(actor)
-  const [scales, cognitive, courseRows, situational,standardCombinations] = await Promise.all([
+  const [scales, cognitive, courseRows, situational,standardPage] = await Promise.all([
     listQuestionnaireScaleResources(actor),
     isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true, courseType: true } }),
     listSituationalResourceSummaries(actor.userId),
-    actor.role==='TEACHER'?listTrainingStandardCombinationChoices(actor.userId):Promise.resolve([]),
+    actor.role==='TEACHER'?listTrainingStandardCombinationChoicePage(actor.userId):Promise.resolve({list:[],nextCursor:null}),
   ])
   for (const row of cognitive.filter(v => isCognitiveProductEligible(v.config.testType))) assertCognitiveCatalogConfiguration(row.config)
   return {
     scales, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational,
-    standardCombinations,
+    standardCombinations:standardPage.list,
+    standardCombinationsNextCursor:standardPage.nextCursor,
     courses: courseRows,
   }
 }
 
+export async function standardCombinationChoices(actor:Actor,raw:unknown){
+  author(actor)
+  return actor.role==='TEACHER'?listTrainingStandardCombinationChoicePage(actor.userId,raw):{list:[],nextCursor:null}
+}
+
 /** Copy definitions only; no attempts, responses, tokens or report ciphertext. */
-export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean; allowTrainingFlow?: boolean } = {}) {
+export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean; allowTrainingFlow?: boolean;trackingNext?:boolean } = {}) {
   author(actor)
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放新版问卷创建')
   const { requestId } = z.object({ requestId: z.string().guid() }).strict().parse(raw)
   const creationKey = actor.userId + ':' + requestId
-  const creationHash = canonicalHash({ copySource: id })
+  const creationHash = canonicalHash({ copySource: id,...(options.trackingNext?{trackingNext:true}:{}) })
   const run = () => prisma.$transaction(async tx => {
     const existing = await tx.compositeAssessment.findUnique({ where: { creationKey } })
     if (existing) {
@@ -679,6 +717,14 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       }
     }
     const source = legacy ?? composite!
+    let trackingOrdinal:number|undefined
+    if(options.trackingNext){
+      if(!composite||composite.status!=='PUBLISHED'||!composite.personalTrackingBaselineId||!readTrainingTracking(composite.personalTracking))throw compositeBadRequest('请从已发布的纵向测评创建下一轮')
+      await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.personalTrackingBaselineId} FOR UPDATE`
+      const last=await tx.compositeAssessment.findFirst({where:{personalTrackingBaselineId:composite.personalTrackingBaselineId},orderBy:{personalTrackingOrdinal:'desc'}})
+      trackingOrdinal=(last?.personalTrackingOrdinal??0)+1
+      if(trackingOrdinal>100)throw compositeBadRequest('纵向计划最多100轮')
+    }
     if (composite && (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
     const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.productKind === 'LEGACY_COMPOSITE' ? (composite!.courseId ? [composite!.courseId] : []) : composite!.questionnaireCourses.map(v => v.courseId)
@@ -705,6 +751,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
     const copiedIds = new Map<string, string>((composite?.items ?? []).map(item => [item.id, randomUUID()]))
     const copiedKeys = new Map<string, string>((composite?.items ?? []).filter(item => item.formDefinition != null).map(item => [(item.formDefinition as any).itemKey, 'q_' + copiedIds.get(item.id)]))
     const sectionIds = new Map<string, string>()
+    const copiedSelectedReferences:SelectedReferenceAudit[]=[]
     for (const section of source.formSections) {
       const created = await tx.compositeFormSection.create({ data: {
         compositeAssessmentId: target.id, title: section.title, description: section.description,
@@ -726,6 +773,9 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       for (const item of composite!.items) {
         if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, placeholder: item.formPlaceholder ?? null } as any)
         const { id: _id, compositeAssessmentId: _parent, cognitiveAssignment, ...data } = item
+        const fixedCognitivePin=cognitiveAssignment?readTrainingCognitiveTaskBinding(cognitiveAssignment.courseSnapshot):null
+        const preciseCognitive=fixedCognitivePin?await loadPinnedTrainingCognitiveProfile(tx,fixedCognitivePin,{userId:actor.userId,configId:cognitiveAssignment!.configId},true):null
+        if(preciseCognitive)assertCognitiveAssignmentFreeze(cognitiveAssignment!,preciseCognitive.artifact)
         if (cognitiveAssignment?.listedStandalone === false) {
           const binding = await tx.cognitiveAssignment.create({ data: {
             configId: cognitiveAssignment.configId, createdBy: actor.userId, title: cognitiveAssignment.title,
@@ -737,11 +787,15 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
             resolvedReportSnapshotEncrypted: cognitiveAssignment.resolvedReportSnapshotEncrypted,
             maxAttempts: cognitiveAssignment.maxAttempts,
             quotaSourceAssignmentId: cognitiveAssignment.createdBy === actor.userId ? cognitiveAssignment.quotaSourceAssignmentId ?? cognitiveAssignment.id : null,
+            ...(preciseCognitive?{courseSnapshot:{selectedCognitiveProfile:fixedCognitivePin,selectedCognitiveConfigurationName:preciseCognitive.configurationName}}:{}),
           } })
           data.cognitiveAssignmentId = binding.id
         }
-        const standard=item.standardCombinationSource!=null?await prepareTrainingStandardItemSource(tx,actor.userId,
-          {...target,questionnaireCourses:sourceCourses.map(courseId=>({courseId}))},{id:copiedIds.get(item.id)!,scaleId:item.scaleId!},decodeTrainingStandardItemSource(item.standardCombinationSource).reference.combination):null
+        const originalStandard=item.standardCombinationSource!=null?decodeTrainingStandardItemSource(item.standardCombinationSource,
+          {compositeId:composite!.id,itemId:item.id,scaleId:item.scaleId!,ownerId:composite!.createdBy!}).reference:null
+        const standard=originalStandard?await prepareTrainingStandardItemSource(tx,actor.userId,
+          {...target,questionnaireCourses:sourceCourses.map(courseId=>({courseId}))},{id:copiedIds.get(item.id)!,scaleId:item.scaleId!},
+          {...originalStandard.combination,...(originalStandard.selectedBinding?{selectedBinding:originalStandard.selectedBinding}:{})}):null
         await tx.compositeAssessmentItem.create({ data: { ...data, id:copiedIds.get(item.id), compositeAssessmentId: target.id,
           standardCombinationSource:standard?{reference:standard.reference,referenceHash:standard.referenceHash} as Prisma.InputJsonValue:Prisma.DbNull,
           formOptions: item.formOptions ?? Prisma.JsonNull,
@@ -749,9 +803,15 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
           formPolicy: item.formPolicy ?? Prisma.DbNull,
           formSectionId: item.formSectionId ? sectionIds.get(item.formSectionId) : null,
         } })
+        if(standard)copiedSelectedReferences.push(...trainingReferenceAudit({id:target.id,createdBy:actor.userId},{id:copiedIds.get(item.id)!,type:item.type,scaleId:item.scaleId,
+          standardCombinationSource:{reference:standard.reference,referenceHash:standard.referenceHash}}))
       }
     }
     await ensureCompositeFormSections(target.id, tx)
+    if(options.trackingNext)await tx.compositeAssessment.update({where:{id:target.id},data:{
+      name:source.name+' · T'+trackingOrdinal,personalTrackingBaselineId:composite!.personalTrackingBaselineId,
+      personalTrackingOrdinal:trackingOrdinal,personalTracking:copiedTrainingTracking(composite,copiedIds,copiedKeys),
+    }})
     if (composite?.trainingVariantDraft != null) {
       const original = weightedVariantConfigSchema.parse(composite.trainingVariantDraft)
       const remapped = { ...original, groups: original.groups.map(group => ({ ...group,
@@ -784,6 +844,10 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
         trainingFlowDraft: remapped as Prisma.InputJsonValue, trainingFlowFrozen: Prisma.DbNull, trainingFlowDigest: null,
       } })
     }
+    const selectedSourceChanges=selectedReferenceChanges([],copiedSelectedReferences)
+    if(selectedSourceChanges)await tx.assessmentManagementEvent.create({data:{actorId:actor.userId,resourceId:target.id,
+      action:'TRAINING_DRAFT_SOURCE_BINDINGS_COPIED',metadata:{schemaVersion:1,ownerId:actor.userId,sourceCompositeId:id,
+       sourceRevision:composite!.revision,revision:target.revision,...selectedSourceChanges}}})
     return target.id
   }, { timeout: 30000 })
   let target: string

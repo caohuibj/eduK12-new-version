@@ -21,6 +21,11 @@ import { compositeVideoController } from '../composite/composite-video.controlle
 import { situationalVideoController } from '../situational/situational-video.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
+import {z} from 'zod'
+import {readSchoolOrdinaryFeedback} from '../reporting/education-ordinary-feedback.service'
+import {serveProjectedReportImage} from '../reporting/report-image-delivery'
+import {assessmentAssetIdSchema} from '../assessment-media/assessment-asset-identity'
+import {ReportingError} from '../reporting/types'
 
 /** School-only canonical Composite runtime. A browser never switches to the
  * legacy ptool_session to answer a campus Run. Every read and write is bound
@@ -29,6 +34,24 @@ import { RelationalAssessmentError } from '../assessment-relational/errors'
  */
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+// The same ordinary-questionnaire feedback projection as Teacher, with the
+// Actual School respondent/relationship/report authority; no author role needed.
+async function ordinaryFeedback(req:Request,res:Response,next:NextFunction){
+ try{
+  const id=z.string().guid().safeParse(req.params.executionId)
+  const asset=req.params.assetId===undefined?undefined:assessmentAssetIdSchema.safeParse(req.params.assetId)
+  if(req.user?.accountDomain!=='SCHOOL'||!['STUDENT','PARENT','TEACHER','ADMIN'].includes(req.user.role)||Object.keys(req.query).length||!id.success||asset&&!asset.success)
+   return notFound(res,'当前校园反馈不可访问')
+  const feedback=await readSchoolOrdinaryFeedback({executionId:id.data,actorUserId:req.user.userId})
+  if(asset?.success)return serveProjectedReportImage({unitReports:feedback.units.flatMap(unit=>'nativeScaleUnits' in unit?unit.nativeScaleUnits:[])},asset.data,res)
+  return success(res,feedback)
+ }catch(error){
+  if(error instanceof ReportingError)return res.status(error.statusCode).json({code:error.code,message:'当前校园反馈不可访问',data:null})
+  return next(error)
+ }
+}
+router.get('/run-executions/:executionId/feedback',authenticateSchool,ordinaryFeedback)
+router.get('/run-executions/:executionId/feedback/images/:assetId',authenticateSchool,ordinaryFeedback)
 async function campusCompositeAccess(req:Request,res:Response,next:NextFunction){
   try {
     const attemptId=req.params.attemptId
@@ -214,7 +237,12 @@ router.post('/composite-attempts/:attemptId/form-sections/:sectionId/submit',
   compositeController.submitFinalFormSection)
 router.post('/composite-attempts/:attemptId/items/:itemId/scale/submit',
   authenticateSchool,campusCompositeAccess,campusFinalConsent,
-  compositeController.submitFinalScale)
+  async(req,res)=>{
+    // FINAL returns only its receipt, including completed replay. Every unit's
+    // frozen disclosure ceiling is consumed by the dedicated feedback reader.
+    req.query.response='receipt'
+    await compositeController.submitFinalScale(req,res)
+  })
 router.get('/composite-attempts/:attemptId/items/:itemId/situational/:situationalAttemptId',
   authenticateSchool,campusCompositeAccess,compositeController.getEmbeddedSituational)
 router.get('/composite-attempts/:attemptId/items/:itemId/situational/:situationalAttemptId/assets/:assetId/content',

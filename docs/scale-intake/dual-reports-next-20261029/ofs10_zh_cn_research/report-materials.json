@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ofs10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "originalSourceSha256": "6a75be405ca859488b08056bf44437c634bc58108778d670152fdacd47c108e6",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "openness_to_future"
+    ],
+    "scoreOrder": [
+      "openness_to_future"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "openness_to_future",
+        "headline": "此刻怎样面向未来",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+          },
+          {
+            "category": "support",
+            "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+      "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+      "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+      "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+      "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+    ],
+    "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted source and plain-language editorial check; human expert review PENDING",
+        "reviewedAt": "2026-10-26T08:59:49.043158Z",
+        "basis": "2018正式英文附件工作翻译、西语消歧；唯一总和、仅R6，无分档/中国常模或疗效主张。原始引用、2017信用行及许可已核；不冒称人工译审已批准。"
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "openness_to_future"
+    ],
+    "scoreOrder": [
+      "openness_to_future"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "openness_to_future",
+        "headline": "为未来保留一个可能，也容纳尚未确定",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "可以带走的一点：不必先消除所有不确定，才允许自己有一点期待。\n\n这十题把对未来的期待、计划与应对信心，以及能否接受好事坏事都可能发生的态度汇在一起。总分10–50，数值越大，表示这次整体更认可积极面向未来的描述。它只有一个总分，不是五项能力，也不能预言未来一定顺利。\n\n例如，你想重新参加一次喜欢的活动，却不确定时间和精力是否允许。可以保留这个愿望，同时了解条件、给计划留调整余地；若眼前更需要休息或处理压力，也不必用有没有大计划衡量自己。\n\n如果某个期待愿意继续保留，可以看看它与现实有哪些连接；若暂时没有方向，也值得先照顾最迫切的需要。下面的例子和选项是通用反思提示，不是系统已从分数判断你的未来或困难原因。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "挑一个仍愿意保留的可能：可以是一段关系、一个兴趣或一种生活安排。问自己期待的究竟是什么，不要求立刻写出完整人生计划。"
+          },
+          {
+            "category": "strategy",
+            "text": "把愿望与不确定一起放进计划：哪些条件可以了解，哪些只能暂时等待？允许设一个备选安排，不把调整计划看成希望落空的证明。"
+          },
+          {
+            "category": "support",
+            "text": "先照顾挡在眼前的实际压力：若负担让你难以想未来，可以先休息、处理迫切需要或找人商量。获得支持不需要先表现得很乐观。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "中文工作版本仍在研究完善，没有可用的中文等级或排名；本次回答不能预言未来。十题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T16:04:01Z",
+        "basis": "本次只读审阅ofs10_zh_cn_research C1.0.0精确source、既有固定方法证据及新R1.1.0文字，核情境/构念/组别方向/时窗/人群、0与null、固定例子及可选行动；不继承旧日期，不声称作者批准、平台科学验证或新schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "openness_to_future"
+    ],
+    "scoreOrder": [
+      "openness_to_future"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "openness_to_future",
+        "headline": "给明天留一扇窗，不用先买一颗水晶球",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：可以有期待，也可以承认“我现在还不知道”。\n\n这十题像是在看你怎样向未来开窗：有无期待与计划、怎样看待应对障碍，以及是否容得下不确定。总分10–50，数值越大表示整体更认可积极面向未来的描述，不是水晶球，也不表示窗开得大就一定风景好。\n\n假设你想恢复一个喜欢的活动，还不知道时间是否合适。窗边可以同时放着愿望与现实条件：先看有哪些机会，必要时换时间或换方式。没有把一切安排妥当，并不会取消期待的资格；暂时只想缓一缓，也不等于把未来关死了。\n\n这扇窗只是比喻，不是人格开放性的分型，更没有量出你的五种未来能力。你可以用下面的提示照顾自己的节奏，不需要为了分数表现成永远充满希望的人。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "看看窗外哪一点让你在意：挑一个还愿意探索的可能，说清它对自己意味着什么，不追求“足够宏大”。"
+          },
+          {
+            "category": "strategy",
+            "text": "给计划留一条能调整的窗缝：确认一项可查的条件，也承认尚未知道的部分；需要时准备另一种安排，不拿确定性作开工许可。"
+          },
+          {
+            "category": "support",
+            "text": "先把窗边的重物挪开一点：若眼前实际压力太大，先处理需要照顾的事或寻找支持。休息和求助，不是对未来投反对票。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "中文工作版本仍在研究完善，没有可用的中文等级或排名；本次回答不能预言未来。十题需答完整才计算，漏答不是0分。"
+    ],
+    "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+        "reviewedAt": "2026-10-29T16:04:01Z",
+        "basis": "本次只读审阅ofs10_zh_cn_research C1.0.0精确source、既有固定方法证据及新R1.2.0文字，核情境/构念/组别方向/时窗/人群、0与null、固定例子及可选行动；不继承旧日期，不声称作者批准、平台科学验证或新schema/scorer/PG/CI通过。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

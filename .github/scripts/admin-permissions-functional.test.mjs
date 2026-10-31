@@ -86,7 +86,7 @@ test('gate refuses Training impersonation, performance execution, changed plans 
 test('workflows preserve ordinary jobs, refuse manual fallback and pass the distinct administrator plan',()=>{
   const ci=workflow('ci'),backend=workflow('ci-backend'),browser=workflow('ci-browser');
   for(const name of ['scope','probe-backend','probe-perf','probe-browser','merge-gate'])
-    assert.match(job(ci,name),/!\(github\.event_name == 'workflow_dispatch' && github\.ref == 'refs\/heads\/admin-permissions\/a01-a07-20261020'\)/,name);
+    assert.match(job(ci,name),/!\(github\.event_name == 'workflow_dispatch'\s*&& github\.ref == 'refs\/heads\/admin-permissions\/a01-a07-20261020'\)/,name);
   assert.match(job(ci,'known-admin-functional-manual-refusal'),/throw new Error/);
   assert.match(job(ci,'scope'),/CI_ADMIN_FUNCTIONAL_REQUIRED:/);
   assert.match(job(ci,'scope'),/admin_permissions_functional_plan: \$\{\{ steps\.scope\.outputs\.admin_permissions_functional_plan \}\}/);
@@ -147,6 +147,8 @@ test('real administrator verification and merge CLIs re-read Git and reject tamp
 const fs=require('node:fs'),fixture=JSON.parse(fs.readFileSync(process.env.ADMIN_CLI_GIT_FIXTURE,'utf8')),args=process.argv.slice(2);
 if(JSON.stringify(args)===JSON.stringify(['rev-parse','HEAD']))process.stdout.write(fixture.head+'\\n');
 else if(JSON.stringify(args)===JSON.stringify(['diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40','-z',fixture.base,fixture.head,'--']))process.stdout.write(fixture.raw);
+else if(JSON.stringify(args)===JSON.stringify(['diff','--no-ext-diff','--no-textconv','--ignore-submodules=none','--name-only','HEAD','--']))process.stdout.write('');
+else if(JSON.stringify(args)===JSON.stringify(['diff','--no-ext-diff','--no-textconv','--ignore-submodules=none','--raw','--abbrev=40','--no-renames','-z',fixture.base,fixture.head]))process.stdout.write(fixture.raw);
 else if(JSON.stringify(args)===JSON.stringify(['show',fixture.head+':'+fixture.configPath]))process.stdout.write(JSON.stringify(fixture.config));
 else process.exit(1);
 `,{mode:0o700});

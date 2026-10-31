@@ -82,8 +82,9 @@ export default function BundleAuthoring() {
       {preview.blockers.length ? <ul role="alert">{preview.blockers.map((value: string) => <li key={value}>{value}</li>)}</ul> : <p>结构、依赖与合成样本校验通过。科学声明和使用权限仍需独立审核。</p>}
       <ul className="space-y-3">{preview.scenarios.map((scenario: any) => <li className="rounded bg-slate-50 p-3" key={scenario.name}>
         <strong>合成预览：{scenario.name}</strong>
-        {scenario.conclusions?.length ? scenario.conclusions.map((conclusion: any) => <p key={conclusion.ruleId}>{conclusion.text}</p>) : <p>{scenario.message || '当前证据不支持整体结论；仍可按授权查看单项依据。'}</p>}
+        {scenario.profile ? <p>理论试验画像：{scenario.profile.state} · {scenario.profile.profileId || '不作单一分型'}</p> : scenario.conclusions?.length ? scenario.conclusions.map((conclusion: any) => <p key={conclusion.ruleId}>{conclusion.text}</p>) : <p>{scenario.message || '当前证据不支持整体结论；仍可按授权查看单项依据。'}</p>}
       </li>)}</ul>
+      {preview.profile && <details><summary>理论模型与冻结参数（研究试验）</summary><pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words text-sm">{JSON.stringify(preview.profile, null, 2)}</pre></details>}
       <details><summary>报告块和适用范围</summary><pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words text-sm">{JSON.stringify({ report: preview.report, scientific: preview.scientific }, null, 2)}</pre></details>
       {selected?.review?.expiresAt && <p>{Date.parse(selected.review.expiresAt) <= Date.now() ? '审批已到期' : '审批仍有效'}；审核有效期至：{new Date(selected.review.expiresAt).toLocaleString()}。到期后停止新投放，已有冻结报告保留；请由另一位管理员独立续审。</p>}
       {selected?.status === 'HOLD' && <p>此版本暂停新投放。另一位管理员需重新核对四项声明并确认恢复；历史冻结报告保留。</p>}

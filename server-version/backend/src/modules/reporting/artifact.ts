@@ -8,7 +8,7 @@ import {
   type ReportingIndividualArtifactRecord,
   type ReportingArtifactPayloadV1,
   type ReportingArtifactRecord,
-  type ReportingGroupArtifactPayloadV1,
+  type ReportingGroupArtifactPayload,
   type ReportingGroupArtifactRecord,
   type ReportingLongitudinalArtifactPayloadV1,
   type ReportingLongitudinalArtifactRecord,
@@ -109,7 +109,7 @@ const verifyStored = async (tx: Tx, row: ArtifactRow): Promise<ReportingArtifact
       || 'analysisKind' in payload
       || payload.cohortSnapshotId !== row.cohortSnapshotId
     ) reportingFail('REPORT_ARTIFACT_INTEGRITY', 'GROUP artifact row shape is invalid', 500)
-    return { ...row, analysisKind: 'GROUP', policyDomain: 'ORG_GROUP_REPORT_V1', artifactPayload: payload as ReportingGroupArtifactPayloadV1 } as ReportingGroupArtifactRecord
+    return { ...row, analysisKind: 'GROUP', policyDomain: 'ORG_GROUP_REPORT_V1', artifactPayload: payload as ReportingGroupArtifactPayload } as ReportingGroupArtifactRecord
   }
 
   if (row.analysisKind === 'REPEATED_COHORT' || row.analysisKind === 'MATCHED_LONGITUDINAL') {
@@ -202,11 +202,12 @@ export const createOrReuseReportingArtifact = async (input: {
   cohortSnapshotId: string
   specId: string
   analysisIdentityHash: string
-  artifactPayload: ReportingGroupArtifactPayloadV1
+  artifactPayload: ReportingGroupArtifactPayload
   snapshotHash: string
   generatedByUserId: string
   generatedAt: Date
-}): Promise<ReportingGroupArtifactRecord> => prisma.$transaction(async (tx) => {
+}, tx?: Tx): Promise<ReportingGroupArtifactRecord> => {
+ const persist = async (tx: Tx): Promise<ReportingGroupArtifactRecord> => {
   const rows = await tx.$queryRaw<ArtifactRow[]>`
     INSERT INTO "reporting_analysis_artifacts"
       ("id","organization_id","analysis_kind","policy_domain","cohort_snapshot_id","spec_id","analysis_identity_hash","artifact_payload","snapshot_hash","generated_by_user_id","generated_at")
@@ -231,7 +232,9 @@ export const createOrReuseReportingArtifact = async (input: {
   const existing = await verifyStored(tx, await readByIdentity(tx, input.analysisIdentityHash))
   if (existing.analysisKind !== 'GROUP') reportingFail('REPORT_ANALYSIS_REUSE', 'analysis identity collides with a different artifact kind', 500)
   return existing as ReportingGroupArtifactRecord
-}, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+ }
+ return tx ? persist(tx) : prisma.$transaction(persist, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+}
 
 export const createOrReuseLongitudinalReportingArtifact = async (input: {
   organizationId: string

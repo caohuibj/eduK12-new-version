@@ -1,0 +1,12 @@
+✔ observer follow-up admits only its HTTP test, scoped CSS and evidence; browser qualification stays required (5.43087ms)
+✔ PR393 selects only its appended exact backend candidate and preserves old route boundaries (3.246051ms)
+✔ PR393 admits the original 7 plus 7, retains skipped rows and cannot select superseded or withheld cases (14.559023ms)
+✔ PR393 keeps only missing backend types, changed SAST and the existing mandatory gate (2.184219ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 147.714217

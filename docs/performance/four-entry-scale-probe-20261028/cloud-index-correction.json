@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-10-28T03:55:30.740504+00:00",
+  "initialEvidenceCommit": "45e76c379a26a0fe140821200e388a460d4243c4",
+  "originalVerification": "FAIL: two service logs changed during graceful shutdown. Shell lacked fail-fast and committed/pushed the Draft despite failed verification.",
+  "changes": [
+    {
+      "path": "evidence/cloud-api-r2.stderr.log",
+      "indexedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stoppedServiceSHA256": "59b568d5accbf7cb3caedfe0808ff8d13ee6281cece820e77aba6c3762619113"
+    },
+    {
+      "path": "evidence/cloud-api-r2.stdout.log",
+      "indexedSHA256": "4dfacf0e072843fee86125c3bd67afacfc65205425f726f721a23be61d68dd66",
+      "stoppedServiceSHA256": "c17a7d566b02112509ab9c827b2990d168d7800350866f2e44bc112510e2b6c9"
+    }
+  ],
+  "correction": "Retain original logs and failed snapshot in Git history. Recompute index after process is defunct. No application/type checks repeated.",
+  "rawWhitespace": "git diff --check warnings are restricted to original .log whitespace; do not normalize original logs."
+}

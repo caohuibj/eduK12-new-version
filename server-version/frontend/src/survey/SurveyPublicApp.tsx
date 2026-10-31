@@ -1,29 +1,32 @@
+import {SurveyPersonalChanges} from './SurveyPersonalChanges'
+import BundleProfileSummary,{type BundleProfileView} from '../pages/bundle/BundleProfileSummary'
 import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
-import { SurveySituationalUnit } from './SurveySituationalUnit'
+import {deferredPage} from '../components/page-loading/deferredPage'
+const SurveySituationalUnit=deferredPage(async()=>({default:(await import('./SurveySituationalUnit')).SurveySituationalUnit}))
 import type { SurveySituationalReference } from './survey-situational-api'
 import {SurveyRandomCodeEntry} from './SurveyRandomCodeEntry'
 import {SurveyMemorableCodeSetup,SurveyMemorableCodeSaved,SurveyMemorableCodeRecovery,type MemorableEnrollment} from './SurveyMemorableCode'
 import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
-import type {PublicMaterial} from '../modules/assessment-media/material'
-import {SurveyCatalogScaleMedia,type SurveyScaleMedia} from './SurveyCatalogScaleMedia'
-import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
+import {SurveyCatalogScaleMedia} from './SurveyCatalogScaleMedia'
 import {loadSurveyCognitiveUnit,loadSurveyPersonalLink,prepareSurveyCognitive,scheduleParticipantIdle} from './participant-loading'
 import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { SurveyCognitiveReference,SurveyCognitiveSessionInfo } from './survey-cognitive-api'
-import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
-import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
-import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
+import type { ProfessionalAnswer } from './ProfessionalFormAnswer'
+import {hasSelectedOther} from './FormChoiceExtras'
 import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,clearLocalSurveyDraft,type SurveyFinalSubmission} from './local-answer-draft'
 import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
   type SurveyWaveScaleTimings} from './survey-scale-timing'
-import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
+import {SurveyParticipantImage} from './SurveyParticipantImage'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
 import {readPersonalParticipationProof,personalParticipationLink} from './personal-participation-link'
+import {TaskForm,isTaskFormRefusal as isRefusal,type TaskFormUnit as Unit,type TaskFormQuestion as Question} from './TaskForm'
+// Preserve the original public import for existing consumers.
+export {TaskForm} from './TaskForm'
 import './survey-participant.css'
 import './survey-participant-polish.css'
 
@@ -39,31 +42,15 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
   opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null;
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';participantCodeLabel?:string;participantCodeInstructions?:string};waves:Wave[];scopeWaveId?:string|null}
-type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
-type Question=SurveyScaleMedia&{materials?:PublicMaterial[];responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
-  options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
-  min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
-  maxLength?:number;minSelections?:number;maxSelections?:number;
-  total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
-  otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
-type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';required?:boolean;allowRefusal?:boolean;exclusiveOptionKeys?:string[];minSelections?:number;maxSelections?:number;options:Choice[]}
-type Unit={executionProtocol?:'SITUATIONAL_NATIVE_V1';materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;instruction?:string;
-  presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
-  stimulus?:string;scenarioTitle?:string;
-  pages?:{pageKey:string;title:string;description?:string;questions:Question[]}[];
-  responseOptions?:Choice[];
-  items?:Question[];
-  feedback?:{mode:'GENERAL'|'DESCRIPTIVE';release:'AFTER_FINAL'|'AFTER_COLLECTION'};
-  scenes?:{sceneKey:string;title:string;stimulus:string;image?:SurveyPublicImage;questions:SjtPublicQuestion[]}[];
-  questions?:SjtPublicQuestion[]}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'|'DESCRIPTIVE';cognitiveSessions?:SurveyCognitiveSessionInfo[];lockedPriorAnswers?:Record<string,Record<string,Answer>>;flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
 type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').MatchedRawScoreFeedback[]}
 type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
-type General={kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
+type NativeFeedback={importId:string;title:string;status:string;factsHash:string|null;profileView:BundleProfileView|null}
+type General={nativeBundles?:NativeFeedback[];kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
-  idempotent?:boolean;generalReceipt?:unknown}
+  idempotent?:boolean;generalReceipt?:unknown;participantFeedbackReceipt?:unknown}
 // Only the first, unambiguous committed FINAL may supply this submission-time
 // receipt. Older servers or malformed payloads fall back to the GENERAL route.
 function firstFinalGeneral(result:FinalResponse,attemptId:string):General|null {
@@ -78,6 +65,44 @@ function firstFinalGeneral(result:FinalResponse,attemptId:string):General|null {
     ||!Number.isFinite(Date.parse(receipt.completedAt)))return null
   return {kind:'GENERAL_ONLY',text:receipt.text,disclaimer:receipt.disclaimer,completedAt:receipt.completedAt}
 }
+// Accept only a fresh, bound server projection. Old/malformed replies and
+// replay/refresh still use the independently authorized reader.
+function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):General|null {
+  const general=firstFinalGeneral(result,attemptId),value=result.participantFeedbackReceipt
+  if(!general||!value||typeof value!=='object'||Array.isArray(value))return null
+  const receipt=value as Record<string,unknown>
+  if(receipt.text!==general.text||receipt.disclaimer!==general.disclaimer||receipt.completedAt!==general.completedAt)return null
+  if(receipt.kind==='GENERAL_ONLY')return Object.keys(receipt).sort().join(',')==='completedAt,disclaimer,kind,text'?general:null
+  if(receipt.kind!=='DESCRIPTIVE'||Object.keys(receipt).filter(k=>k!=='nativeBundles').sort().join(',')!=='completedAt,disclaimer,kind,measurements,pending,text'
+    ||typeof receipt.pending!=='boolean'||!Array.isArray(receipt.measurements))return null
+  const valid=receipt.measurements.every(value=>{
+    if(!value||typeof value!=='object'||Array.isArray(value))return false
+    const item=value as Record<string,unknown>,raw=item.feedbackKind==='RAW_METRICS'
+    if(typeof item.instrumentKey!=='string'||typeof item.title!=='string'||typeof item.quality!=='string'
+      ||(raw?typeof item.measurementReleaseId!=='string':item.feedbackKind!==undefined||item.maturity!=='PILOT'||typeof item.measurementDigest!=='string')
+      ||!Array.isArray(item.metrics))return false
+    if(!item.metrics.every(value=>{
+      if(!value||typeof value!=='object'||Array.isArray(value))return false
+      const metric=value as Record<string,unknown>
+      return typeof metric.key==='string'&&typeof metric.label==='string'&&typeof metric.status==='string'
+        &&(metric.value===null||typeof metric.value==='number'&&Number.isFinite(metric.value))
+        &&(raw?metric.unit===null:metric.unit==='ratio'||metric.unit==='ms')
+    }))return false
+    if(item.rawScoreFeedback!==undefined&&(!Array.isArray(item.rawScoreFeedback)||!item.rawScoreFeedback.every(value=>{
+      if(!value||typeof value!=='object'||Array.isArray(value))return false
+      const feedback=value as Record<string,unknown>
+      return typeof feedback.scoreKey==='string'&&typeof feedback.text==='string'
+        &&(feedback.rangeKey===null||typeof feedback.rangeKey==='string')
+        &&(feedback.images===undefined||Array.isArray(feedback.images))&&(feedback.materials===undefined||Array.isArray(feedback.materials))
+    })))return false
+    return true
+  })
+  const native=receipt.nativeBundles
+  if(native!==undefined&&(!Array.isArray(native)||native.some(v=>!v||typeof v!=='object'||typeof v.importId!=='string'||typeof v.title!=='string'||typeof v.status!=='string'||(v.factsHash!==null&&typeof v.factsHash!=='string')||(v.profileView!==null&&(!v.profileView||typeof v.profileView!=='object'||v.profileView.schemaVersion!=='bundle-profile-view-v1'||!Array.isArray(v.profileView.constructs)||!Array.isArray(v.profileView.actions))))))return null
+  return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[],...(native?{nativeBundles:native as NativeFeedback[]}:{})}:null
+}
+const feedbackQualityText=(value:string)=>({interpretable:'本次结果可作参考',limited:'本次结果仅供有限参考',invalid:'本次作答不足以形成有效解释'} as Record<string,string>)[value]??'本次结果暂无法解释'
+const feedbackMetricStatusText=(value:string)=>({OK:'已计算',calculated:'已计算',INSUFFICIENT_DATA:'有效作答不足',insufficient_data:'有效作答不足',INVALID:'本次数据无效',invalid:'本次数据无效',not_calculable:'暂无法计算',limited:'仅供有限参考'} as Record<string,string>)[value]??'暂无法说明'
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
 const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
 const readSingleResume=(id:string):SingleResume|null=>{
@@ -97,10 +122,6 @@ const readSingleResume=(id:string):SingleResume|null=>{
   }catch{return null}
 }
 type Answer=ProfessionalAnswer
-const isRefusal=(answer:Answer|undefined):answer is {_surveyRefusal:true}=>
-  !!answer&&typeof answer==='object'&&!Array.isArray(answer)&&'_surveyRefusal' in answer
-  &&answer._surveyRefusal===true
-const refusal=():{_surveyRefusal:true}=>({_surveyRefusal:true})
 const safePattern=/^[a-f0-9-]{36}$/i
 // A valid research key can equal a property inherited from Object.prototype.
 const own=<T,>(values:Record<string,T>,key:string):T|undefined=>
@@ -118,160 +139,6 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   const envelope=await result.json() as ApiResult<T>
   if(!result.ok||envelope.code!==0||!envelope.data)throw new SurveyPublicApiError(envelope.message||'操作未完成',result.status)
   return envelope.data
-}
-export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false,advanceSingleChoiceFocus=false,videoComplete,onVideoComplete,imageReady,onImageReadyChange}:{unit:Unit;answer:Record<string,Answer>;
-  onChange:(name:string,value:Answer)=>void;proof?:SurveyImageProof;
-  pageIndex:number;onPageChange:(next:number)=>void;
-  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;advanceSingleChoiceFocus?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
-  const [pageError,setPageError]=useState('')
-  const surveyForm=purpose==='SURVEY'&&unit.kind==='FORM'
-
-  const formQuestions=useMemo(()=>unit.pages?.flatMap(p=>p.questions)??[],[unit])
-  const shownFormKeys=useMemo(()=>unit.kind==='FORM'
-    ?visibleFormKeys(formQuestions,answer):null,[unit,formQuestions,answer])
-  const visiblePages=useMemo(()=>unit.kind==='FORM'?(unit.pages??[])
-    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[],[unit,shownFormKeys])
-  const currentIndex=Math.min(pageIndex,Math.max(0,visiblePages.length-1))
-  const activePage=visiblePages[currentIndex]
-  const pendingChoiceFocus=useRef<{key:string;value:string;unit:string;page:string}|null>(null)
-  useEffect(()=>{
-    const pending=pendingChoiceFocus.current
-    if(!advanceSingleChoiceFocus||readOnly||!pending||answer[pending.key]!==pending.value)return
-    pendingChoiceFocus.current=null
-    if(!activePage||pending.unit!==unit.instrumentKey||pending.page!==activePage.pageKey)return
-    const questions=activePage.questions.filter(q=>shownFormKeys?.has(q.itemKey))
-    const index=questions.findIndex(q=>q.itemKey===pending.key),question=questions[index]
-    if(!question||hasSelectedOther(question,answer[pending.key]))return
-    const next=questions[index+1]
-    if(!next)return // A page/block boundary always requires the existing manual action.
-    const target=document.getElementById('survey-answer-'+unit.instrumentKey+'-'+next.itemKey)
-    target?.focus({preventScroll:true});target?.scrollIntoView?.({block:'start'})
-  },[advanceSingleChoiceFocus,readOnly,answer,unit.instrumentKey,activePage,shownFormKeys])
-
-  // A one-page form often repeats the tool name with only a generic suffix.
-  const headingKey=(title:string)=>title.trim().replace(/\s+/g,'').replace(/(?:表单|问卷|表)$/u,'')
-  const repeatedPageHeading=surveyForm&&visiblePages.length===1&&!!activePage
-    &&!!headingKey(unit.title)&&headingKey(activePage.title)===headingKey(unit.title)
-  const nextPage=()=>{
-    if(!activePage||currentIndex>=visiblePages.length-1)return
-    for(const q of activePage.questions){
-      if(!shownFormKeys?.has(q.itemKey)||!q.required)continue
-      if(q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&
-        isRefusal(answer[q.itemKey]))continue
-      const keys=['MATRIX','MATRIX_MULTIPLE'].includes(q.type)
-        ?(q.rows||[]).map(row=>q.itemKey+':'+row.rowKey):[q.itemKey]
-      const empty=keys.some(key=>{
-        const value=answer[key]
-        return !isRefusal(value)&&(value===null||value===undefined||value===''||
-          (Array.isArray(value)&&value.length===0))
-      })
-      const rankInvalid=q.type==='RANK_ORDER'&&
-        (!Array.isArray(answer[q.itemKey])||(answer[q.itemKey] as string[]).length!==q.options.length)
-      const totalInvalid=q.type==='CONSTANT_SUM'&&(()=>{
-        const v=answer[q.itemKey]
-        if(!v||typeof v!=='object'||Array.isArray(v)||isRefusal(v))return true
-        const numbers=v as Record<string,number>
-        return q.options.some(opt=>!Number.isFinite(numbers[opt.optionKey]))||
-          Math.abs(q.options.reduce((n,opt)=>n+numbers[opt.optionKey],0)-(q.total??0))>1e-7
-      })()
-      const otherInvalid=hasSelectedOther(q,answer[q.itemKey])&&
-        (typeof answer[q.itemKey+':other']!=='string'||
-          !(answer[q.itemKey+':other'] as string).trim())
-      if(empty||rankInvalid||totalInvalid||otherInvalid){
-        setPageError('请先完成当前页的必答题：'+q.prompt)
-        document.getElementById('survey-answer-'+unit.instrumentKey+'-'+q.itemKey)?.focus()
-        return
-      }
-    }
-    setPageError('')
-    onPageChange(currentIndex+1)
-    window.requestAnimationFrame(()=>document.getElementById(
-      'survey-page-'+unit.instrumentKey)?.focus())
-  }
-  const choice=(q:Question,options:Choice[],kind:'SINGLE'|'MULTIPLE'|'MATRIX'|'LIKERT')=>
-    kind==='MULTIPLE'?options.map(o=>{
-      const selected=Array.isArray(answer[q.itemKey])?answer[q.itemKey] as string[]:[]
-      return <label className={surveyForm?'survey-form-choice':'block my-2 text-sm'} key={o.optionKey}>
-        <input type="checkbox" checked={selected.includes(o.optionKey)}
-          disabled={!selected.includes(o.optionKey)&&q.maxSelections!==undefined
-            &&selected.length>=q.maxSelections&&!q.exclusiveOptionKeys?.includes(o.optionKey)}
-          onChange={e=>onChange(q.itemKey,toggleFormMultiple(
-            selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/><span>{o.label}</span></label>
-    }):options.map(o=><label className={surveyForm?'survey-form-choice':'block my-2 text-sm'} key={o.optionKey}>
-      <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
-        checked={answer[q.itemKey]===o.optionKey} disabled={unit.kind==='SCALE'&&!!q.images?.length&&imageReady?.[q.itemKey]!==true}
-        onChange={()=>{if(advanceSingleChoiceFocus&&activePage)pendingChoiceFocus.current={key:q.itemKey,value:o.optionKey,unit:unit.instrumentKey,page:activePage.pageKey};onChange(q.itemKey,o.optionKey)}}/><span>{o.label}</span></label>)
-  const item=(q:Question,index?:number)=>{
-    if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
-    return <fieldset disabled={readOnly} className={'border rounded-lg p-4 my-4 bg-white scroll-mt-4'+(surveyForm?' survey-form-item survey-form-item--'+q.type.toLowerCase():'')}
-      id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
-      <legend className="font-medium text-sm">{surveyForm?<><span className="survey-form-number" aria-hidden="true">{String((index??0)+1).padStart(2,'0')}</span><span className="survey-form-prompt">{q.prompt}</span><span className="survey-form-requirement">{q.required?'必答':'选填'}</span></>:<>{q.prompt}{q.required?' *':''}</>}</legend>
-      {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} onImagesReadyChange={ready=>onImageReadyChange?.(q.itemKey,ready)} readOnly={readOnly}/>}
-      {q.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} proof={proof}/>)}
-      {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
-      {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
-        请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
-      {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
-      {unit.kind==='FORM'&&['SINGLE','MULTIPLE'].includes(q.type)&&q.otherOptionKey&&
-        <FormChoiceExtras question={q} answers={answer} onChange={onChange}/>}
-      {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full text-sm">
-        <thead><tr><th scope="col">项目</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}
-          {q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
-        <tbody>{(q.rows||[]).map(row=><tr key={row.rowKey}><th scope="row">{row.label}</th>{q.options.map(o=><td className="text-center" key={o.optionKey}>
-          <input type="radio" name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
-            aria-label={q.prompt+' · '+row.label+' · '+o.label}
-            checked={answer[q.itemKey+':'+row.rowKey]===o.optionKey}
-            onChange={()=>onChange(q.itemKey+':'+row.rowKey,o.optionKey)}/>
-        </td>)}
-        {q.allowRefusal&&<td className="text-center"><input type="radio"
-          aria-label={q.prompt+' · '+row.label+' · 不愿回答'}
-          name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
-          checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
-          onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
-      {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
-        <ProfessionalFormAnswer question={q} answers={answer} prefix={unit.instrumentKey} onAnswer={onChange}/>}
-      {q.type==='NUMBER'&&<BasicFormAnswer question={{...q,prompt:q.prompt||'数值回答'}} className="input block w-full" value={typeof answer[q.itemKey]==='number'?answer[q.itemKey] as number:null} disabled={isRefusal(answer[q.itemKey])} onChange={value=>onChange(q.itemKey,value)}/>}
-      {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="block my-3 text-sm">
-        <input type="checkbox" checked={isRefusal(answer[q.itemKey])}
-          onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
-        我选择不回答这一题（REFUSED）
-      </label>}
-      {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} value={typeof answer[q.itemKey]==='string'?answer[q.itemKey] as string:null} disabled={isRefusal(answer[q.itemKey])} onChange={value=>onChange(q.itemKey,value)}/>}
-    </fieldset>
-  }
-  return <section className={'border rounded-xl bg-slate-50 p-4 my-5'+(purpose==='SURVEY'?' survey-answer-panel'+(surveyForm?' survey-form-experience':''):'')}>
-    <h3 className="text-lg font-semibold">{unit.title}</h3>
-    {unit.instruction&&<p className="survey-answer-guide" role="note">{unit.instruction}</p>}
-    {purpose==='SURVEY'&&unit.kind==='SJT'&&<p className="survey-answer-guide">请先阅读情境，再选择你的回答。* 为必答。</p>}
-    {unit.kind==='FORM'&&<div>
-      {(!surveyForm||visiblePages.length>1)&&<div className="survey-form-page-progress"><p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
-        {purpose==='HUITEACHER'&&'（所有页面完成后一次性提交正式评价）'}</p>
-      <progress className="w-full" max={Math.max(1,visiblePages.length)}
-        value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/></div>}
-      {activePage&&<div key={activePage.pageKey} className={surveyForm?'survey-form-page':undefined}>
-        <h4 className={'mt-4 font-medium scroll-mt-5'+(repeatedPageHeading?' sr-only':'')} id={'survey-page-'+unit.instrumentKey}
-          tabIndex={-1}>{activePage.title}</h4>{activePage.description&&<p className="whitespace-pre-wrap text-sm">{activePage.description}</p>}
-        {activePage.questions.filter(q=>shownFormKeys?.has(q.itemKey)).map((q,index)=>item(q,index))}
-      </div>}
-      {pageError&&<p role="alert" className="text-sm text-red-700 my-2">{pageError}</p>}
-      {(purpose!=='SURVEY'||visiblePages.length>1)&&<nav aria-label="问卷分页" className={purpose==='SURVEY'?'survey-question-navigation':'flex justify-between gap-3 mt-4'}>
-        <button type="button" className="btn-secondary" disabled={currentIndex===0}
-          onClick={()=>{setPageError('');onPageChange(Math.max(0,currentIndex-1));window.requestAnimationFrame(()=>document.getElementById('survey-page-'+unit.instrumentKey)?.focus())}}>上一页</button>
-        <button type="button" className="btn-secondary"
-          disabled={!activePage||currentIndex>=visiblePages.length-1} onClick={nextPage}>下一页</button>
-      </nav>}
-    </div>}
-    {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:q.responseOptions??unit.responseOptions??[]}))}
-    {purpose==='SURVEY'&&unit.kind!=='SJT'&&!surveyForm&&<p className="survey-answer-guide">* 为必答。</p>}
-    {unit.kind==='SJT'&&(unit.scenes??[{sceneKey:'legacy',title:unit.scenarioTitle,stimulus:unit.stimulus,image:unit.image,questions:unit.questions??[]}]).map(scene=><section key={scene.sceneKey} aria-label={'情境 '+scene.title} className="mt-4 space-y-3">
-      <h4 className="font-medium">{scene.title}</h4><p className="whitespace-pre-wrap text-sm">{scene.stimulus}</p>
-      {scene.image&&proof&&<SurveyParticipantImage image={scene.image} proof={proof}/>}
-      {scene.questions.map(q=>item({itemKey:q.questionKey,type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
-        prompt:q.prompt,options:q.options,required:q.required??true,allowRefusal:q.allowRefusal,
-        minSelections:q.minSelections,maxSelections:q.maxSelections,
-        exclusiveOptionKeys:[...(q.exclusiveOptionKeys??[]),...q.options.filter(o=>o.nonanswerReason).map(o=>o.optionKey)]}))}
-    </section>)}
-  </section>
 }
 /** Research participants have NO platform account or Student/Teacher session.
  * This UI contains no researcher or management cookie-based fallbacks.
@@ -975,8 +842,10 @@ export default function SurveyPublicApp(){
       accessCredential:accessCredential.trim(),
     }
     markCompleted(attemptId,proof)
-    const receipt=firstRequest?firstFinalGeneral(final,attemptId):null
-    if(receipt&&task.reportMode!=='DESCRIPTIVE'&&!task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')){
+    const inline=firstRequest?firstFinalParticipantFeedback(final,attemptId):null
+    const requiresDescription=task.reportMode==='DESCRIPTIVE'||task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')
+    const receipt=inline??(firstRequest&&!requiresDescription?firstFinalGeneral(final,attemptId):null)
+    if(receipt){
       // In-memory display only. Refresh/reopen and explicit reads reauthorize.
       setCompletionOptionsOpen(false);setGeneral(receipt)
       setNotice('')
@@ -1317,8 +1186,8 @@ export default function SurveyPublicApp(){
           {general.pending&&<p role="status">部分反馈将在问卷收集结束后开放。</p>}
           {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
             <h4 className="font-medium">{measurement.title}</h4>
-            <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?'受控原始指标':'试点测量'} · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
-            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{metric.status}）</p>)}
+            <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?feedbackQualityText(measurement.quality):'试点测量 · 质量状态：'+measurement.quality}。仅反映本次条件下的表现。</p>
+            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{measurement.feedbackKind==='RAW_METRICS'?feedbackMetricStatusText(metric.status):metric.status}）</p>)}
             {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
               <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
               {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
@@ -1326,7 +1195,9 @@ export default function SurveyPublicApp(){
             </section>)}
           </article>)}
         </section>}
+        {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
         <p className="survey-completion-time">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
+        {info.project.collectionMode==='LINKED_WAVES'&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
         {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
           <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
         </div>}

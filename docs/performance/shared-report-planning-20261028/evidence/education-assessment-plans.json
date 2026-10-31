@@ -1,0 +1,518 @@
+{
+  "scope": "Current real education assessment report service using synthetic accepted FINAL facts; no START/FINAL/browser or capacity claim",
+  "rows": [
+    {
+      "product": "SCHOOL",
+      "phase": "PLAN_AND_REVOCATION",
+      "metricVerified": true,
+      "revocationVerified": true,
+      "queryPlan": [
+        {
+          "limit": 8,
+          "planningMs": 105.697,
+          "executionMs": 1.311,
+          "actualRows": 1
+        },
+        {
+          "limit": 1,
+          "planningMs": 6.592,
+          "executionMs": 0.659,
+          "actualRows": 1
+        }
+      ],
+      "plannerBefore": {
+        "pid": 50,
+        "setting": "8"
+      },
+      "plannerAfter": {
+        "pid": 50,
+        "setting": "8"
+      },
+      "elapsedMs": 97.64566999999988,
+      "cpuMs": 71.478,
+      "rssBytes": 281718784,
+      "responseLogicalBytes": 783,
+      "sqlEvents": 38,
+      "queries": [
+        {
+          "sha256": "a8402858d4f1e1d27afee976520485ebb4b96a5387355b823f0d0b8079729032",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "BEGIN"
+        },
+        {
+          "sha256": "1c252fc3073b55e861640c548142ef7fdb24c46ca6a3c4689117b401006a2dae",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SET"
+        },
+        {
+          "sha256": "39a7e1e917de3340e626c141410c30e56fa24bafb1686e999e81e7cbb9b4bf25",
+          "durationMs": 13,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "e932b489e96be1b7a8f34dffc0b58441e2bb98c2d5ac17a116a20391db7f7231",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "bdae48ce543bd9977b83d3e86e46c758b00362c1a27c06009f076dbf8f5be125",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "9865c1678fe18c345801e3dafdc83dacfe9cf0b5f1f276b9200ad1a23b9d4aaa",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "b53e8fe21fd519a752d3c7f7bc6bb2f980312256e22f58c57167d58aea2da436",
+          "durationMs": 1,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "ff318b7e975c97cc25cb9d998cedcffb784e72a049bb4edce2a7f7e0f621cf7f",
+          "durationMs": 10,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "ff318b7e975c97cc25cb9d998cedcffb784e72a049bb4edce2a7f7e0f621cf7f",
+          "durationMs": 7,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "b73db3fed1e13660529d2a76ade394be8fad0be02abfe0f1590d47ee563df953",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "39a7e1e917de3340e626c141410c30e56fa24bafb1686e999e81e7cbb9b4bf25",
+          "durationMs": 6,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "e932b489e96be1b7a8f34dffc0b58441e2bb98c2d5ac17a116a20391db7f7231",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "b53e8fe21fd519a752d3c7f7bc6bb2f980312256e22f58c57167d58aea2da436",
+          "durationMs": 0,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "COMMIT"
+        }
+      ]
+    },
+    {
+      "product": "TEACHER",
+      "phase": "PLAN_AND_REVOCATION",
+      "metricVerified": true,
+      "revocationVerified": true,
+      "queryPlan": null,
+      "plannerBefore": {
+        "pid": 50,
+        "setting": "8"
+      },
+      "plannerAfter": {
+        "pid": 50,
+        "setting": "8"
+      },
+      "elapsedMs": 69.1024010000001,
+      "cpuMs": 41.24,
+      "rssBytes": 294432768,
+      "responseLogicalBytes": 783,
+      "sqlEvents": 38,
+      "queries": [
+        {
+          "sha256": "a8402858d4f1e1d27afee976520485ebb4b96a5387355b823f0d0b8079729032",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "BEGIN"
+        },
+        {
+          "sha256": "1c252fc3073b55e861640c548142ef7fdb24c46ca6a3c4689117b401006a2dae",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SET"
+        },
+        {
+          "sha256": "39a7e1e917de3340e626c141410c30e56fa24bafb1686e999e81e7cbb9b4bf25",
+          "durationMs": 7,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "e932b489e96be1b7a8f34dffc0b58441e2bb98c2d5ac17a116a20391db7f7231",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "bdae48ce543bd9977b83d3e86e46c758b00362c1a27c06009f076dbf8f5be125",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "9865c1678fe18c345801e3dafdc83dacfe9cf0b5f1f276b9200ad1a23b9d4aaa",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "b53e8fe21fd519a752d3c7f7bc6bb2f980312256e22f58c57167d58aea2da436",
+          "durationMs": 0,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "ff318b7e975c97cc25cb9d998cedcffb784e72a049bb4edce2a7f7e0f621cf7f",
+          "durationMs": 8,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "ff318b7e975c97cc25cb9d998cedcffb784e72a049bb4edce2a7f7e0f621cf7f",
+          "durationMs": 6,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "b73db3fed1e13660529d2a76ade394be8fad0be02abfe0f1590d47ee563df953",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "39a7e1e917de3340e626c141410c30e56fa24bafb1686e999e81e7cbb9b4bf25",
+          "durationMs": 6,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "e932b489e96be1b7a8f34dffc0b58441e2bb98c2d5ac17a116a20391db7f7231",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "b53e8fe21fd519a752d3c7f7bc6bb2f980312256e22f58c57167d58aea2da436",
+          "durationMs": 0,
+          "authority": true,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "d2a9a3613fbcaf9d9b712f0f6f93b59a9d619f2099000cd1ffb405ebba7a6294",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "edb2db98bf9c2a55fced2118a663461e508233c607fde5bfa1222a1c3e2786b2",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "80a613eea9adfd82f3e4ca95918a3fa2b05cca4e362a666f51d32ebaf812f2db",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "4dab50885ea414a2d0dd4190b1c63289812f9fa8619d81e7c8bb7ef0dfd26ed0",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "770fb268d295a1aefecda054049bfa5a014b0942b18fc294c6b05194374f932e",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "3fb985de1f1930796307669d038fabd23ad67c1783dc5783969ccceef4949979",
+          "durationMs": 0,
+          "authority": false,
+          "kind": "SELECT"
+        },
+        {
+          "sha256": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+          "durationMs": 1,
+          "authority": false,
+          "kind": "COMMIT"
+        }
+      ]
+    }
+  ]
+}

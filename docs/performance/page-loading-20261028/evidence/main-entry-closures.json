@@ -1,0 +1,3067 @@
+{
+  "scope": "Built Vite static import plus CSS closure; excludes dynamic children not activated, public media/fonts, HTTP headers, runtime API traffic and cache reuse. Gzip level1 bytes estimate configured code compression, not network timing.",
+  "base": "b7909cbf05d5ba0092c59853f20c86491ab38137",
+  "rows": [
+    {
+      "name": "Training app shell",
+      "rootEntries": [
+        "_App-DmcHk_fo.js"
+      ],
+      "files": [
+        {
+          "file": "assets/App-DmcHk_fo.js",
+          "bytes": 130873,
+          "gzip1Bytes": 44302,
+          "sha256": "e2489eccf0f471c6c8e17f346564485906aa0b422b393b0b89a1d3cefa212233"
+        },
+        {
+          "file": "assets/App-fRTZbItP.css",
+          "bytes": 420032,
+          "gzip1Bytes": 85149,
+          "sha256": "aa1ec482d28cc308eb78b5d5bfbc6553cb943d01ece59842f148e5e967cbf931"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Defg3fcW.js",
+          "bytes": 483,
+          "gzip1Bytes": 340,
+          "sha256": "acbf17bfc3bb2d892b05e3e5cba20069d9acc1d51402116a8386e68eac3320ed"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        }
+      ],
+      "count": 21,
+      "rawBytes": 955306,
+      "gzip1Bytes": 278174,
+      "incrementalAfterHomepage": {
+        "files": 0,
+        "gzip1Bytes": 0
+      }
+    },
+    {
+      "name": "Training homepage",
+      "rootEntries": [
+        "_App-DmcHk_fo.js",
+        "src/training/TrainingPortal.tsx"
+      ],
+      "files": [
+        {
+          "file": "assets/App-DmcHk_fo.js",
+          "bytes": 130873,
+          "gzip1Bytes": 44302,
+          "sha256": "e2489eccf0f471c6c8e17f346564485906aa0b422b393b0b89a1d3cefa212233"
+        },
+        {
+          "file": "assets/App-fRTZbItP.css",
+          "bytes": 420032,
+          "gzip1Bytes": 85149,
+          "sha256": "aa1ec482d28cc308eb78b5d5bfbc6553cb943d01ece59842f148e5e967cbf931"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/TrainingPortal-B5lerlhs.js",
+          "bytes": 5611,
+          "gzip1Bytes": 2245,
+          "sha256": "02d493064366e991d7fe0b78cec7d5a64072143974ce7bd1d27b792a47990515"
+        },
+        {
+          "file": "assets/arrow-down-fol4R5P5.js",
+          "bytes": 349,
+          "gzip1Bytes": 272,
+          "sha256": "13f9817b5713c557cbac76e60df223917d9b9e92f821fe7065655dfa6a4ec0d2"
+        },
+        {
+          "file": "assets/arrow-right-DF1j1Xdq.js",
+          "bytes": 349,
+          "gzip1Bytes": 273,
+          "sha256": "c0bc9f048b7601f64a02459414b016c80c10075a0092d24511ddb27e56a2ded1"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/chart-no-axes-combined-DzkwLJHs.js",
+          "bytes": 564,
+          "gzip1Bytes": 366,
+          "sha256": "616cc46a375f8a2d046c2ad74bfac62579473cfe66e7aa92130bc186035ff9be"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Defg3fcW.js",
+          "bytes": 483,
+          "gzip1Bytes": 340,
+          "sha256": "acbf17bfc3bb2d892b05e3e5cba20069d9acc1d51402116a8386e68eac3320ed"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/featureContent-T4PYbl7s.js",
+          "bytes": 6926,
+          "gzip1Bytes": 3053,
+          "sha256": "8e20a8a0662eaaa5fe6648f9139275de0f8eb88665150635d7659b9152360e1b"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/images-MWAMo_C5.js",
+          "bytes": 554,
+          "gzip1Bytes": 383,
+          "sha256": "4ab761d3e72f4418f8fe0d94688c8cb032a108b7c75e72d1558df10033dab50e"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/list-checks-CCx41ybC.js",
+          "bytes": 458,
+          "gzip1Bytes": 299,
+          "sha256": "fc7a717e4c6232e8b55a3ddc323fd41163165bd14de0198961a6e387ecb1cd76"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/training-portal-refresh-DbTaAAZU.css",
+          "bytes": 20637,
+          "gzip1Bytes": 4559,
+          "sha256": "1e17706447820a35d5f5080f84da415914def3bce830d7ce1569bc691b0a06ca"
+        },
+        {
+          "file": "assets/training-portal-refresh-ql8AezRR.js",
+          "bytes": 871,
+          "gzip1Bytes": 498,
+          "sha256": "b15f29457e27d496b67200809a23801e9159f85f2ba95661db732d842653f886"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        }
+      ],
+      "count": 30,
+      "rawBytes": 991625,
+      "gzip1Bytes": 290122,
+      "incrementalAfterHomepage": {
+        "files": 0,
+        "gzip1Bytes": 0
+      }
+    },
+    {
+      "name": "Training learner home",
+      "rootEntries": [
+        "_App-DmcHk_fo.js",
+        "src/training/TrainingLearnerHome.tsx"
+      ],
+      "files": [
+        {
+          "file": "assets/App-DmcHk_fo.js",
+          "bytes": 130873,
+          "gzip1Bytes": 44302,
+          "sha256": "e2489eccf0f471c6c8e17f346564485906aa0b422b393b0b89a1d3cefa212233"
+        },
+        {
+          "file": "assets/App-fRTZbItP.css",
+          "bytes": 420032,
+          "gzip1Bytes": 85149,
+          "sha256": "aa1ec482d28cc308eb78b5d5bfbc6553cb943d01ece59842f148e5e967cbf931"
+        },
+        {
+          "file": "assets/ModalSurface-B-CSFw3F.js",
+          "bytes": 2541,
+          "gzip1Bytes": 1249,
+          "sha256": "80231bc663c15c648c6a057d627d4603abc15761db9e1f8d3c7b894718e4f821"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/TrainingLearnerHome-CaLqX6Tx.js",
+          "bytes": 15765,
+          "gzip1Bytes": 5838,
+          "sha256": "c4e9b824c773b01b51b70c5d03064f803d3500e95941c713c674fde73e4411db"
+        },
+        {
+          "file": "assets/TrainingLearnerHome-DTq0mELR.css",
+          "bytes": 34370,
+          "gzip1Bytes": 5471,
+          "sha256": "268d600c5017a8c05c78550a93b0c58e6a155127a0df1c18c6826d87ffa031d3"
+        },
+        {
+          "file": "assets/arrow-right-DF1j1Xdq.js",
+          "bytes": 349,
+          "gzip1Bytes": 273,
+          "sha256": "c0bc9f048b7601f64a02459414b016c80c10075a0092d24511ddb27e56a2ded1"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/check-BhdW9H3s.js",
+          "bytes": 303,
+          "gzip1Bytes": 251,
+          "sha256": "2cf5e84bd6127331eb7606067eebc3b89599f311378658aecca59ce168be3915"
+        },
+        {
+          "file": "assets/check-check-COsykNdu.js",
+          "bytes": 358,
+          "gzip1Bytes": 280,
+          "sha256": "73f663292feef8576512a7d5648a65dd3f33927857a3b8afef7f7563e1505159"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Defg3fcW.js",
+          "bytes": 483,
+          "gzip1Bytes": 340,
+          "sha256": "acbf17bfc3bb2d892b05e3e5cba20069d9acc1d51402116a8386e68eac3320ed"
+        },
+        {
+          "file": "assets/clipboard-list-D92Uiadj.js",
+          "bytes": 595,
+          "gzip1Bytes": 374,
+          "sha256": "461b4e7c7e9872baa4b1ef6af19a2f0e758a922e08cf4438a17dab1346209f85"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/list-checks-CCx41ybC.js",
+          "bytes": 458,
+          "gzip1Bytes": 299,
+          "sha256": "fc7a717e4c6232e8b55a3ddc323fd41163165bd14de0198961a6e387ecb1cd76"
+        },
+        {
+          "file": "assets/loader-circle-ismh_Nml.js",
+          "bytes": 323,
+          "gzip1Bytes": 265,
+          "sha256": "0c2573020acdbb180b23b408f1f76b714c450d1974dffdb92fbe17156c94eb89"
+        },
+        {
+          "file": "assets/message-square-text-Cp1D6jDa.js",
+          "bytes": 530,
+          "gzip1Bytes": 356,
+          "sha256": "652e82aeca32d6f2789609cca1f2007f35a19ab5d898b1cbb81bd2e485756f8c"
+        },
+        {
+          "file": "assets/plus-Bu5Ob2oO.js",
+          "bytes": 337,
+          "gzip1Bytes": 261,
+          "sha256": "ec6d251235b76654e5e1d645fe060d36620eafb5238caba95c6669e283eb3eb4"
+        },
+        {
+          "file": "assets/refresh-cw-DCyrw0kk.js",
+          "bytes": 505,
+          "gzip1Bytes": 333,
+          "sha256": "965446f93fffe0365b3d9a1717e12c8e581dee610900139ba38ba56cf31c975a"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/useCursorList-BtEYX0JK.js",
+          "bytes": 1119,
+          "gzip1Bytes": 667,
+          "sha256": "7d972f5421db3b99c567f183c6d219ea83ee46cba57628871de0e95dbae32f91"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        },
+        {
+          "file": "assets/x-BmSjsqVm.js",
+          "bytes": 338,
+          "gzip1Bytes": 265,
+          "sha256": "e52776e596e83d9b64f878d929b127ec8520cef813053741f5eb00befcd9ef82"
+        }
+      ],
+      "count": 35,
+      "rawBytes": 1013197,
+      "gzip1Bytes": 294356,
+      "incrementalAfterHomepage": {
+        "files": 12,
+        "gzip1Bytes": 15610
+      }
+    },
+    {
+      "name": "Training composite answer",
+      "rootEntries": [
+        "_App-DmcHk_fo.js",
+        "src/modules/composite/CompositeAssessmentPage.tsx"
+      ],
+      "files": [
+        {
+          "file": "assets/App-DmcHk_fo.js",
+          "bytes": 130873,
+          "gzip1Bytes": 44302,
+          "sha256": "e2489eccf0f471c6c8e17f346564485906aa0b422b393b0b89a1d3cefa212233"
+        },
+        {
+          "file": "assets/App-fRTZbItP.css",
+          "bytes": 420032,
+          "gzip1Bytes": 85149,
+          "sha256": "aa1ec482d28cc308eb78b5d5bfbc6553cb943d01ece59842f148e5e967cbf931"
+        },
+        {
+          "file": "assets/AssessmentImageGate-CvIN20zQ.js",
+          "bytes": 682,
+          "gzip1Bytes": 412,
+          "sha256": "51c4418d365ec147bc90e9e3fd52edfe294e2ebfd843cd66bff8c61c9be2adda"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1046,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-Cb9rtb42.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1092,
+          "sha256": "0380c4f20264f7249435fc6e27e78d66e5cdbe4e96f0f6aad03624c969ba6f72"
+        },
+        {
+          "file": "assets/CompositeAssessmentPage-Dvrm6DDq.js",
+          "bytes": 36029,
+          "gzip1Bytes": 14398,
+          "sha256": "c1d6129291d2e40fa4e2b6187e879b61170f8a13d7b78e23377175f71ee4acf9"
+        },
+        {
+          "file": "assets/FinalCompositeAssessment-BSi8rszi.js",
+          "bytes": 33178,
+          "gzip1Bytes": 12539,
+          "sha256": "6888cf31556af4adc99dc229de75cbf73782f8e4b03f1b0d73275aa769cdf694"
+        },
+        {
+          "file": "assets/FormChoiceExtras-BZA_k_g7.js",
+          "bytes": 7309,
+          "gzip1Bytes": 2839,
+          "sha256": "505fe936542cdf6827da838ce177b9a098945ee1cb2ac4a4c9aa06dc05a0a1d5"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/SurveyPersonalLink-CrUxUCda.js",
+          "bytes": 3722,
+          "gzip1Bytes": 1696,
+          "sha256": "0283ddd2ea8ef1339cc3286f26f3bbe85b236f86a59c74b382ec452452c0bac0"
+        },
+        {
+          "file": "assets/TrainingCheckpointPanel-C9vnSyEa.js",
+          "bytes": 5294,
+          "gzip1Bytes": 2468,
+          "sha256": "9e40ff3e76e91dc9cc99ed4941244b053d5fb11f504db355c246e03a4421ba3a"
+        },
+        {
+          "file": "assets/TrainingMaterials-C66BorG6.js",
+          "bytes": 350,
+          "gzip1Bytes": 275,
+          "sha256": "3e362db760e66ba6fd7494acd2ef844d220e66eb764f096d5bcb7b9d06823bb3"
+        },
+        {
+          "file": "assets/api-BwzgHkMa.js",
+          "bytes": 7804,
+          "gzip1Bytes": 2152,
+          "sha256": "092e04268706d2ae1ec38a804e08a80e175ee95d16e959aa3f51655c65bd39eb"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/checkpointTypes-CE0Ib90y.js",
+          "bytes": 193,
+          "gzip1Bytes": 172,
+          "sha256": "be69094ba668feed9d8680389067e06cb07387ebcc066fe58e525719d415c4d4"
+        },
+        {
+          "file": "assets/chevron-left-V2twzkBj.js",
+          "bytes": 314,
+          "gzip1Bytes": 258,
+          "sha256": "cb4145872188b3619dcef292d39643e7d56e88ab9c606512f54dfb336209bc0e"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/child-route-context-CQZoqJHU.js",
+          "bytes": 1417,
+          "gzip1Bytes": 705,
+          "sha256": "47ae80381fe762cb2f3ed081707b5c28796c8a6567f9b31e877e70fb403fac57"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/circle-check-big-3MNKlsTs.js",
+          "bytes": 373,
+          "gzip1Bytes": 291,
+          "sha256": "4cc368adea04bc052835a5e1f18fbe150977671a135b1139dce48734ed949f6f"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Defg3fcW.js",
+          "bytes": 483,
+          "gzip1Bytes": 340,
+          "sha256": "acbf17bfc3bb2d892b05e3e5cba20069d9acc1d51402116a8386e68eac3320ed"
+        },
+        {
+          "file": "assets/completionRetry-z9jthbVU.js",
+          "bytes": 642,
+          "gzip1Bytes": 439,
+          "sha256": "48aeb1331e58f7bea8a0ece5f5c74356c290fff27dbabe50862fb3bc2b7b99a4"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/deferred-media-4ZwrHgG8.js",
+          "bytes": 685,
+          "gzip1Bytes": 497,
+          "sha256": "d547bb1cca050aae2ead7c382c124634eae9c713ad3e75878984cecaf903fc0b"
+        },
+        {
+          "file": "assets/device-input-provenance-DEEM1AsM.js",
+          "bytes": 7282,
+          "gzip1Bytes": 2855,
+          "sha256": "fa18fd5d96345f556937f7c0041a37c7edd613fffe7d223a8531809e621666d9"
+        },
+        {
+          "file": "assets/file-text-BGQ3fTaF.js",
+          "bytes": 569,
+          "gzip1Bytes": 360,
+          "sha256": "0fb2ce72d4e8845f41d7709121ca6b397b8edd9683ad063d4ed6c23c20cb834d"
+        },
+        {
+          "file": "assets/finalDraftCapacityRetry-Dmo5Oq8l.js",
+          "bytes": 6311,
+          "gzip1Bytes": 2498,
+          "sha256": "beed109dd9eec92e747a41594ac8cc94f4b7bc8a9f6c6418dc1c4382c0a74edc"
+        },
+        {
+          "file": "assets/finalDraftStore-Dm59dNEG.js",
+          "bytes": 20314,
+          "gzip1Bytes": 6713,
+          "sha256": "ce55bcd1f018aa34e8810faaa8e144208f731427b0716a30de30f1a20d584539"
+        },
+        {
+          "file": "assets/finalSubmissionFailure-ztKBt7NC.js",
+          "bytes": 13480,
+          "gzip1Bytes": 5386,
+          "sha256": "a86be9ecd23ed8f1407e2fab20661d01f45ef74f90ea7ad35b56456aa7016ec8"
+        },
+        {
+          "file": "assets/form-visibility-DWnADqY8.js",
+          "bytes": 632,
+          "gzip1Bytes": 333,
+          "sha256": "7c275eea7e6bfdcc5853be84a14158dab89af34d43630eaec917519a1577a00c"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-BaxA8rk5.js",
+          "bytes": 16710,
+          "gzip1Bytes": 6794,
+          "sha256": "213c4402d69dc965bf04510179b0080a851ad2aff9c1efd5f5b30b39c35e81b8"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/item-timing--zuEGF8Q.js",
+          "bytes": 3345,
+          "gzip1Bytes": 1269,
+          "sha256": "480b717354d7f0e26529805cfc3c6b5526ec3d74caf1ad1153103ec24228ca9b"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/lock-keyhole-CrM2kkvo.js",
+          "bytes": 439,
+          "gzip1Bytes": 327,
+          "sha256": "8e438d888cd14ae75ea593e53b431e8c3decfce29b80587e57e5d9142f2390ea"
+        },
+        {
+          "file": "assets/participation-link-CnLAbyD5.js",
+          "bytes": 691,
+          "gzip1Bytes": 433,
+          "sha256": "92ece1c22bf601a554f8ff5ba2056b2682cc25e5361aed71096f46503458c536"
+        },
+        {
+          "file": "assets/play-BdcUs7wV.js",
+          "bytes": 374,
+          "gzip1Bytes": 292,
+          "sha256": "f381e89ef266259447aeed5f7d9249f0fa94a37d6632dadeb1228c26af6bda08"
+        },
+        {
+          "file": "assets/readiness-CA7SeYHK.js",
+          "bytes": 2797,
+          "gzip1Bytes": 1263,
+          "sha256": "002a9f33185ae4f6ee4169725d78b49549f01b5962394538ffd8e000520725a8"
+        },
+        {
+          "file": "assets/receipt-recovery-Ci-Eu2lI.js",
+          "bytes": 1294,
+          "gzip1Bytes": 811,
+          "sha256": "891193472b6a3b56611dea95ce1773988bf0212bbf4478a55578d3bbdd47a804"
+        },
+        {
+          "file": "assets/recovery-credential-DTG-RQ8c.js",
+          "bytes": 194,
+          "gzip1Bytes": 156,
+          "sha256": "8e4033478611cd80765f4a4c3072c7bfe7b666f3a311df2de982b93c5295048f"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 159,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/save-BxLpChRB.js",
+          "bytes": 511,
+          "gzip1Bytes": 338,
+          "sha256": "e6ccffec17df5a2052ce4455ae15fa7bb10096680f473de275444cf48e00ad93"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/training-form-surface-BhEY1h6v.css",
+          "bytes": 1734,
+          "gzip1Bytes": 565,
+          "sha256": "6dfa74e40d2882d2bb8606a9a4f535cf2a834027f18b5b846d61b2a34cddd4d2"
+        },
+        {
+          "file": "assets/training-participation-link-D9SaThRF.js",
+          "bytes": 417,
+          "gzip1Bytes": 234,
+          "sha256": "c5b0e8ca665e1cf16d636c0256d0c57791ad1a37283872018eff8007c2ace208"
+        },
+        {
+          "file": "assets/usePageSignal-BkFlzhZb.js",
+          "bytes": 231,
+          "gzip1Bytes": 183,
+          "sha256": "3d70808bca3cdcdbafab8892d23b703b9add30f9da41a473c73aa7f14718031b"
+        },
+        {
+          "file": "assets/useScaleAutoAdvance-Dd40yCYz.js",
+          "bytes": 1129,
+          "gzip1Bytes": 560,
+          "sha256": "99d1c56d808db027d1f51d9526725c2a3bcf57946758584bed6e61a6a4a90274"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        }
+      ],
+      "count": 57,
+      "rawBytes": 1137763,
+      "gzip1Bytes": 350982,
+      "incrementalAfterHomepage": {
+        "files": 36,
+        "gzip1Bytes": 72808
+      }
+    },
+    {
+      "name": "Training standalone scale answer",
+      "rootEntries": [
+        "_App-DmcHk_fo.js",
+        "src/pages/student/ScaleAssessment.tsx"
+      ],
+      "files": [
+        {
+          "file": "assets/ActionBar-Zp3VNJ_i.js",
+          "bytes": 211,
+          "gzip1Bytes": 184,
+          "sha256": "dbc2f921723908ca985bd42a48787fd58f42d1cdf6c3476971408adff4cbe787"
+        },
+        {
+          "file": "assets/App-DmcHk_fo.js",
+          "bytes": 130873,
+          "gzip1Bytes": 44302,
+          "sha256": "e2489eccf0f471c6c8e17f346564485906aa0b422b393b0b89a1d3cefa212233"
+        },
+        {
+          "file": "assets/App-fRTZbItP.css",
+          "bytes": 420032,
+          "gzip1Bytes": 85149,
+          "sha256": "aa1ec482d28cc308eb78b5d5bfbc6553cb943d01ece59842f148e5e967cbf931"
+        },
+        {
+          "file": "assets/AssessmentImageGate-CvIN20zQ.js",
+          "bytes": 682,
+          "gzip1Bytes": 412,
+          "sha256": "51c4418d365ec147bc90e9e3fd52edfe294e2ebfd843cd66bff8c61c9be2adda"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1046,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-Cb9rtb42.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1092,
+          "sha256": "0380c4f20264f7249435fc6e27e78d66e5cdbe4e96f0f6aad03624c969ba6f72"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/ScaleAssessment-COZxlCJQ.js",
+          "bytes": 19506,
+          "gzip1Bytes": 8450,
+          "sha256": "e509635826e756881aff09c05d75920bd84dafd5f27ad410a55596cf312f1a4d"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/TrainingMaterials-C66BorG6.js",
+          "bytes": 350,
+          "gzip1Bytes": 275,
+          "sha256": "3e362db760e66ba6fd7494acd2ef844d220e66eb764f096d5bcb7b9d06823bb3"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/checkpointTypes-CE0Ib90y.js",
+          "bytes": 193,
+          "gzip1Bytes": 172,
+          "sha256": "be69094ba668feed9d8680389067e06cb07387ebcc066fe58e525719d415c4d4"
+        },
+        {
+          "file": "assets/chevron-left-V2twzkBj.js",
+          "bytes": 314,
+          "gzip1Bytes": 258,
+          "sha256": "cb4145872188b3619dcef292d39643e7d56e88ab9c606512f54dfb336209bc0e"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/circle-check-big-3MNKlsTs.js",
+          "bytes": 373,
+          "gzip1Bytes": 291,
+          "sha256": "4cc368adea04bc052835a5e1f18fbe150977671a135b1139dce48734ed949f6f"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Defg3fcW.js",
+          "bytes": 483,
+          "gzip1Bytes": 340,
+          "sha256": "acbf17bfc3bb2d892b05e3e5cba20069d9acc1d51402116a8386e68eac3320ed"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/deferred-media-4ZwrHgG8.js",
+          "bytes": 685,
+          "gzip1Bytes": 497,
+          "sha256": "d547bb1cca050aae2ead7c382c124634eae9c713ad3e75878984cecaf903fc0b"
+        },
+        {
+          "file": "assets/device-input-provenance-DEEM1AsM.js",
+          "bytes": 7282,
+          "gzip1Bytes": 2855,
+          "sha256": "fa18fd5d96345f556937f7c0041a37c7edd613fffe7d223a8531809e621666d9"
+        },
+        {
+          "file": "assets/finalDraftCapacityRetry-Dmo5Oq8l.js",
+          "bytes": 6311,
+          "gzip1Bytes": 2498,
+          "sha256": "beed109dd9eec92e747a41594ac8cc94f4b7bc8a9f6c6418dc1c4382c0a74edc"
+        },
+        {
+          "file": "assets/finalDraftStore-Dm59dNEG.js",
+          "bytes": 20314,
+          "gzip1Bytes": 6713,
+          "sha256": "ce55bcd1f018aa34e8810faaa8e144208f731427b0716a30de30f1a20d584539"
+        },
+        {
+          "file": "assets/flushLifecycle-DApca_Ml.js",
+          "bytes": 10023,
+          "gzip1Bytes": 3693,
+          "sha256": "b4f6de46b021475a7b64796113aa40cc1b0ac8b7ba0437f5a0de76a0e7504692"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/required-video-completion-zGCnAAFE.js",
+          "bytes": 926,
+          "gzip1Bytes": 574,
+          "sha256": "8c394c5b0d5ad6eb205ed2a18f14d3d21e68b3fb82911d6548c3f989329bfd94"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 159,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/useRunnerSaveState-jlhAWI_x.js",
+          "bytes": 259,
+          "gzip1Bytes": 216,
+          "sha256": "d2b1ac76558bd8238bcb291e8b7c6700b4674fd4d2214d9368427bb5a469d8d0"
+        },
+        {
+          "file": "assets/useScaleAutoAdvance-Dd40yCYz.js",
+          "bytes": 1129,
+          "gzip1Bytes": 560,
+          "sha256": "99d1c56d808db027d1f51d9526725c2a3bcf57946758584bed6e61a6a4a90274"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        }
+      ],
+      "count": 39,
+      "rawBytes": 1029875,
+      "gzip1Bytes": 308119,
+      "incrementalAfterHomepage": {
+        "files": 18,
+        "gzip1Bytes": 29945
+      }
+    },
+    {
+      "name": "Training composite report",
+      "rootEntries": [
+        "_App-DmcHk_fo.js",
+        "src/modules/composite/CompositeReportPage.tsx"
+      ],
+      "files": [
+        {
+          "file": "assets/ActionBar-Zp3VNJ_i.js",
+          "bytes": 211,
+          "gzip1Bytes": 184,
+          "sha256": "dbc2f921723908ca985bd42a48787fd58f42d1cdf6c3476971408adff4cbe787"
+        },
+        {
+          "file": "assets/App-DmcHk_fo.js",
+          "bytes": 130873,
+          "gzip1Bytes": 44302,
+          "sha256": "e2489eccf0f471c6c8e17f346564485906aa0b422b393b0b89a1d3cefa212233"
+        },
+        {
+          "file": "assets/App-fRTZbItP.css",
+          "bytes": 420032,
+          "gzip1Bytes": 85149,
+          "sha256": "aa1ec482d28cc308eb78b5d5bfbc6553cb943d01ece59842f148e5e967cbf931"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1046,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-Cb9rtb42.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1092,
+          "sha256": "0380c4f20264f7249435fc6e27e78d66e5cdbe4e96f0f6aad03624c969ba6f72"
+        },
+        {
+          "file": "assets/CognitiveSingleTaskReportCard-CaJ0z5rV.js",
+          "bytes": 7671,
+          "gzip1Bytes": 3428,
+          "sha256": "727cf9eb027b36107a677f8f430434d05dfaa61f2d8ef60d49ff5ba487cc77c8"
+        },
+        {
+          "file": "assets/CompositeReportPage-C9FeW8no.js",
+          "bytes": 46407,
+          "gzip1Bytes": 17335,
+          "sha256": "f316bd448f0babb5ab4953c1d506ab0236cb8e84aebcbfc7ec0685d41f6462cf"
+        },
+        {
+          "file": "assets/PageHeader-DLwriSLW.js",
+          "bytes": 477,
+          "gzip1Bytes": 260,
+          "sha256": "1a8b971cd4378066590c19d5bbb1db5b800b924c347d1ada7014a25c19a28baa"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/ReportPrimitives-BJQ-FC7T.css",
+          "bytes": 13331,
+          "gzip1Bytes": 3613,
+          "sha256": "3b681a6c4ed245e66a8a889f44060d4691b2143e8d47521cd99ea6e31f92ecdd"
+        },
+        {
+          "file": "assets/ReportPrimitives-DwUdzPTf.js",
+          "bytes": 3434,
+          "gzip1Bytes": 1271,
+          "sha256": "0e99e3a3a7163bb780f96bfce2bbf24cd0a768230920bcd1eb7bc3119dc2173f"
+        },
+        {
+          "file": "assets/ReportShell-D7YpUwCo.js",
+          "bytes": 1734,
+          "gzip1Bytes": 810,
+          "sha256": "3f7dc8b74b081a22b78df3a22f78341398ae47ae87070e45f2bee44c5eb891eb"
+        },
+        {
+          "file": "assets/ScaleUnitReportCard-BSt9OaE_.js",
+          "bytes": 12055,
+          "gzip1Bytes": 4731,
+          "sha256": "71ebcb275ad7dc1c68873c0a211a411d71e886d8557a3985976e15fec5f6485d"
+        },
+        {
+          "file": "assets/SituationalReportCard-DrTqCW0r.js",
+          "bytes": 6984,
+          "gzip1Bytes": 3003,
+          "sha256": "e569a90314019e87573cf3e0acad2341a9909fe09671bf3f945bca621b2b6d54"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/TrainingContentReports-S-kz3LEV.js",
+          "bytes": 4112,
+          "gzip1Bytes": 1974,
+          "sha256": "24dbf476bbfd0f080429e9de27845d8ee00443fdd7c17f9721d9bc89661b5b64"
+        },
+        {
+          "file": "assets/TrainingMaterials-C66BorG6.js",
+          "bytes": 350,
+          "gzip1Bytes": 275,
+          "sha256": "3e362db760e66ba6fd7494acd2ef844d220e66eb764f096d5bcb7b9d06823bb3"
+        },
+        {
+          "file": "assets/api-BwzgHkMa.js",
+          "bytes": 7804,
+          "gzip1Bytes": 2152,
+          "sha256": "092e04268706d2ae1ec38a804e08a80e175ee95d16e959aa3f51655c65bd39eb"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-check-Defg3fcW.js",
+          "bytes": 483,
+          "gzip1Bytes": 340,
+          "sha256": "acbf17bfc3bb2d892b05e3e5cba20069d9acc1d51402116a8386e68eac3320ed"
+        },
+        {
+          "file": "assets/completionRetry-z9jthbVU.js",
+          "bytes": 642,
+          "gzip1Bytes": 439,
+          "sha256": "48aeb1331e58f7bea8a0ece5f5c74356c290fff27dbabe50862fb3bc2b7b99a4"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/receipt-recovery-Ci-Eu2lI.js",
+          "bytes": 1294,
+          "gzip1Bytes": 811,
+          "sha256": "891193472b6a3b56611dea95ce1773988bf0212bbf4478a55578d3bbdd47a804"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/training-form-surface-BhEY1h6v.css",
+          "bytes": 1734,
+          "gzip1Bytes": 565,
+          "sha256": "6dfa74e40d2882d2bb8606a9a4f535cf2a834027f18b5b846d61b2a34cddd4d2"
+        },
+        {
+          "file": "assets/useAssessmentImageAssets-CcgP-2K4.js",
+          "bytes": 1726,
+          "gzip1Bytes": 871,
+          "sha256": "f23e75a47eaffe05aefa63ba797ce5f3e577e8d30518d93fa430b418ae95cedf"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        }
+      ],
+      "count": 39,
+      "rawBytes": 1071085,
+      "gzip1Bytes": 322034,
+      "incrementalAfterHomepage": {
+        "files": 18,
+        "gzip1Bytes": 43860
+      }
+    },
+    {
+      "name": "School app homepage and shell",
+      "rootEntries": [
+        "src/school/SchoolApp.tsx"
+      ],
+      "files": [
+        {
+          "file": "assets/AssessmentImageGate-CvIN20zQ.js",
+          "bytes": 682,
+          "gzip1Bytes": 412,
+          "sha256": "51c4418d365ec147bc90e9e3fd52edfe294e2ebfd843cd66bff8c61c9be2adda"
+        },
+        {
+          "file": "assets/AssessmentImagePresentation-C0GkHTx1.js",
+          "bytes": 1557,
+          "gzip1Bytes": 733,
+          "sha256": "8c86a36c047b0d7fbfb27941900fd54f44aff4d8915b009d02167fe268072ccd"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1046,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-Cb9rtb42.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1092,
+          "sha256": "0380c4f20264f7249435fc6e27e78d66e5cdbe4e96f0f6aad03624c969ba6f72"
+        },
+        {
+          "file": "assets/AssessmentMaterialPicker-3VhS-uuV.js",
+          "bytes": 5551,
+          "gzip1Bytes": 2301,
+          "sha256": "424a1b65b2d3593e25f4f49b0a5838d7bc0c48fdd75f3cff0ce887e36308ca54"
+        },
+        {
+          "file": "assets/AssessmentVideoPlayer-YuW8Aocj.js",
+          "bytes": 9823,
+          "gzip1Bytes": 3937,
+          "sha256": "e3a35d07f0d2c376af7ac152a8eb42dbf89b82d93c49a9375f6164af3518596d"
+        },
+        {
+          "file": "assets/BasicFormConstraints-CLkwDwJf.js",
+          "bytes": 11091,
+          "gzip1Bytes": 4581,
+          "sha256": "af23fdf7bc465129153de3fd10b7f9144863a769067856a4364b54907fd7c3e4"
+        },
+        {
+          "file": "assets/CognitiveRunner-BY1Fi_WP.js",
+          "bytes": 39979,
+          "gzip1Bytes": 14642,
+          "sha256": "eebc4d1076f143a789f3e77b4c582e5641d98823a1f47fd74aa02e3a2b76d84d"
+        },
+        {
+          "file": "assets/CognitiveRunner-DNoKZRd3.css",
+          "bytes": 6309,
+          "gzip1Bytes": 1745,
+          "sha256": "f81cb34cac2cd72108522f433f4c110d083a7bcfafe6ea430701bf84c0d26a48"
+        },
+        {
+          "file": "assets/CognitiveSessionEntry-CCEcvmdq.js",
+          "bytes": 2504,
+          "gzip1Bytes": 1477,
+          "sha256": "d9d4fb9efc00759572af6c65282194436984db8eebfd2386a157e568b96ea65f"
+        },
+        {
+          "file": "assets/EducationApplicabilityFields-A48pOuKW.js",
+          "bytes": 3623,
+          "gzip1Bytes": 1781,
+          "sha256": "0a5724f310c5a713e022661a5d1ad62b27fbf1d0b8865535f0519e8790dc7223"
+        },
+        {
+          "file": "assets/FinalCompositeAssessment-BSi8rszi.js",
+          "bytes": 33178,
+          "gzip1Bytes": 12539,
+          "sha256": "6888cf31556af4adc99dc229de75cbf73782f8e4b03f1b0d73275aa769cdf694"
+        },
+        {
+          "file": "assets/FormChoiceExtras-BZA_k_g7.js",
+          "bytes": 7309,
+          "gzip1Bytes": 2839,
+          "sha256": "505fe936542cdf6827da838ce177b9a098945ee1cb2ac4a4c9aa06dc05a0a1d5"
+        },
+        {
+          "file": "assets/LocalDateTimeInput-C6llGhwr.js",
+          "bytes": 1296,
+          "gzip1Bytes": 755,
+          "sha256": "31e04570350d0ef37de00ab3c85318f9227b13b138b4e23d65ed949b8f3255ec"
+        },
+        {
+          "file": "assets/OnlineAnswerField-Dr_oGeML.js",
+          "bytes": 1507,
+          "gzip1Bytes": 777,
+          "sha256": "34d6fc854df551d97427c70d86e6966502315708f0832b0c05c78c10a2a92834"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductPasswordChange-BDnvATqs.js",
+          "bytes": 1785,
+          "gzip1Bytes": 966,
+          "sha256": "0fb997501254f4c1bfb5f6bfbbb36c6709c13f106184901ecd8e41a9ae7979fa"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/ProductThemeControl-BCXvb6Vo.js",
+          "bytes": 2675,
+          "gzip1Bytes": 1375,
+          "sha256": "6ef55e83071a690942431d6516567f5a4b9a58fc5fc2974969f76d9393444e95"
+        },
+        {
+          "file": "assets/ProductThemeControl-lELuWh9q.css",
+          "bytes": 1021,
+          "gzip1Bytes": 466,
+          "sha256": "e97c1ab064bef369f6548ccc8e8da5283c1ca39296d110e1b5cf9991c071f203"
+        },
+        {
+          "file": "assets/RawScoreFeedbackFields-C-ruxYt2.js",
+          "bytes": 4916,
+          "gzip1Bytes": 2239,
+          "sha256": "92112c84e3db4ace8df86d2fb2c11e528fda289b2869b3e10c3bcb60c7fefd5f"
+        },
+        {
+          "file": "assets/ReportPrimitives-BJQ-FC7T.css",
+          "bytes": 13331,
+          "gzip1Bytes": 3613,
+          "sha256": "3b681a6c4ed245e66a8a889f44060d4691b2143e8d47521cd99ea6e31f92ecdd"
+        },
+        {
+          "file": "assets/ReportPrimitives-DwUdzPTf.js",
+          "bytes": 3434,
+          "gzip1Bytes": 1271,
+          "sha256": "0e99e3a3a7163bb780f96bfce2bbf24cd0a768230920bcd1eb7bc3119dc2173f"
+        },
+        {
+          "file": "assets/ResearchFormEditor-C24I2AKZ.css",
+          "bytes": 22206,
+          "gzip1Bytes": 5027,
+          "sha256": "4dbe27918a027baacd01499f1d79838271686a08dd6a09b94abbd54911853e12"
+        },
+        {
+          "file": "assets/ResearchFormEditor-D6rgebDX.js",
+          "bytes": 28302,
+          "gzip1Bytes": 10144,
+          "sha256": "fdf3d6e89e2e9a0541c5f59009b0ca5a6faa06f971a6f7fb72467ec6b51cd6d4"
+        },
+        {
+          "file": "assets/ScaleDefinitionEditor-Br9eg9gk.js",
+          "bytes": 27676,
+          "gzip1Bytes": 10297,
+          "sha256": "495d091e839f77b9ee42a6d6fbdb8d5b0e3f0723007bc84b1fb61f91bcf6493c"
+        },
+        {
+          "file": "assets/ScaleEdit-Bo3TIrG7.css",
+          "bytes": 29358,
+          "gzip1Bytes": 3864,
+          "sha256": "1539d6c3e266d7980ebeb9ed9a3e842cd4874008e765ed30b12273b25ce3fc6a"
+        },
+        {
+          "file": "assets/ScaleEdit-CSL-H9Yv.js",
+          "bytes": 2213,
+          "gzip1Bytes": 1119,
+          "sha256": "d2291aebc2434ab87eea7f370dc0a96c9b7660951720162f68666087c452a94a"
+        },
+        {
+          "file": "assets/ScaleUnitReportCard-BSt9OaE_.js",
+          "bytes": 12055,
+          "gzip1Bytes": 4731,
+          "sha256": "71ebcb275ad7dc1c68873c0a211a411d71e886d8557a3985976e15fec5f6485d"
+        },
+        {
+          "file": "assets/SchoolApp-Ca9dbmE9.css",
+          "bytes": 274891,
+          "gzip1Bytes": 52256,
+          "sha256": "d9ab2e8483181d0918502ac4aa5360041ac39ad10d90f7246ea8eb0b72115069"
+        },
+        {
+          "file": "assets/SchoolApp-fqZcsrpM.js",
+          "bytes": 205567,
+          "gzip1Bytes": 69898,
+          "sha256": "efb56a39dfc29cb53f36eff1881c0ead17a1ba83a342d77122c845654bfc58bd"
+        },
+        {
+          "file": "assets/SchoolMark-CPAJGspl.js",
+          "bytes": 858,
+          "gzip1Bytes": 462,
+          "sha256": "816c524d03341b3b9de3e30862df82017229bdba6edb430f13f7750257e878b4"
+        },
+        {
+          "file": "assets/SchoolMark-CcA7i-Iq.css",
+          "bytes": 1120,
+          "gzip1Bytes": 280,
+          "sha256": "53f1b3e19045174122c460f63208d3f32d8cea040af4e2b177e62662afaf5a01"
+        },
+        {
+          "file": "assets/SituationalRunner-D8ZAlZjl.js",
+          "bytes": 38335,
+          "gzip1Bytes": 15172,
+          "sha256": "37cda8f0217d0a1babc63ad8c5291277f075f284f7dda9083f2838676786a990"
+        },
+        {
+          "file": "assets/SurveyImageField-BnPbZJeQ.js",
+          "bytes": 7952,
+          "gzip1Bytes": 3459,
+          "sha256": "3a50f57546871f34628501337abe5c6fa1c8931c9b5549a32235f07cd01dc9b7"
+        },
+        {
+          "file": "assets/SurveyImageField-CdVbhkUi.css",
+          "bytes": 4050,
+          "gzip1Bytes": 1237,
+          "sha256": "8d8a0f0ae28d36e3d5657592d6af38f4f7b331a1830f698188b0ed5420ccbbd7"
+        },
+        {
+          "file": "assets/SurveyMaterialPicker-IPhBxbu4.js",
+          "bytes": 2323,
+          "gzip1Bytes": 1392,
+          "sha256": "55bbc4f6c8cd183da928f48bdc28c1f333a68812744112eb7ff3ac40dacab5e1"
+        },
+        {
+          "file": "assets/SurveyPersonalLink-CrUxUCda.js",
+          "bytes": 3722,
+          "gzip1Bytes": 1696,
+          "sha256": "0283ddd2ea8ef1339cc3286f26f3bbe85b236f86a59c74b382ec452452c0bac0"
+        },
+        {
+          "file": "assets/TrainingCheckpointPanel-C9vnSyEa.js",
+          "bytes": 5294,
+          "gzip1Bytes": 2468,
+          "sha256": "9e40ff3e76e91dc9cc99ed4941244b053d5fb11f504db355c246e03a4421ba3a"
+        },
+        {
+          "file": "assets/TrainingContentReports-S-kz3LEV.js",
+          "bytes": 4112,
+          "gzip1Bytes": 1974,
+          "sha256": "24dbf476bbfd0f080429e9de27845d8ee00443fdd7c17f9721d9bc89661b5b64"
+        },
+        {
+          "file": "assets/TrainingMaterials-C66BorG6.js",
+          "bytes": 350,
+          "gzip1Bytes": 275,
+          "sha256": "3e362db760e66ba6fd7494acd2ef844d220e66eb764f096d5bcb7b9d06823bb3"
+        },
+        {
+          "file": "assets/api-Db39fbY9.js",
+          "bytes": 12477,
+          "gzip1Bytes": 5840,
+          "sha256": "08771138816e9d57a459f98bcc9b1c03a240857819f9922ad49017ac2481964b"
+        },
+        {
+          "file": "assets/api-ZP4Ewl9G.js",
+          "bytes": 3416,
+          "gzip1Bytes": 1193,
+          "sha256": "5a71a392bfddefeff71d15b05a9fc6b62328110293d3f01981c60fa6eb740e47"
+        },
+        {
+          "file": "assets/arrow-down-fol4R5P5.js",
+          "bytes": 349,
+          "gzip1Bytes": 272,
+          "sha256": "13f9817b5713c557cbac76e60df223917d9b9e92f821fe7065655dfa6a4ec0d2"
+        },
+        {
+          "file": "assets/arrow-right-DF1j1Xdq.js",
+          "bytes": 349,
+          "gzip1Bytes": 273,
+          "sha256": "c0bc9f048b7601f64a02459414b016c80c10075a0092d24511ddb27e56a2ded1"
+        },
+        {
+          "file": "assets/arrow-up-DtgGWEf9.js",
+          "bytes": 346,
+          "gzip1Bytes": 271,
+          "sha256": "073551aa4f9103d2c74c6160263be1252d331448d9498906ac4cf5b56ad3941f"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/builder.types-QEWBrg2F.js",
+          "bytes": 645,
+          "gzip1Bytes": 414,
+          "sha256": "00a151eed12fd8afa8f5199ad5efead6e953fb89285f85ef26aaec990c935fb9"
+        },
+        {
+          "file": "assets/calendar-days-vgm2WOeL.js",
+          "bytes": 678,
+          "gzip1Bytes": 380,
+          "sha256": "48aba602539bbe902c70f4d6ae1dc7a4a8acda40b2498c92bde16bc505286a76"
+        },
+        {
+          "file": "assets/catalogDiscovery-Dbb-xHPA.js",
+          "bytes": 989,
+          "gzip1Bytes": 605,
+          "sha256": "01833d95c27f22e9c66f75f25b070428564bd6c6ac21366d4099eba40af6b14c"
+        },
+        {
+          "file": "assets/chart-no-axes-combined-DzkwLJHs.js",
+          "bytes": 564,
+          "gzip1Bytes": 366,
+          "sha256": "616cc46a375f8a2d046c2ad74bfac62579473cfe66e7aa92130bc186035ff9be"
+        },
+        {
+          "file": "assets/checkpointTypes-CE0Ib90y.js",
+          "bytes": 193,
+          "gzip1Bytes": 172,
+          "sha256": "be69094ba668feed9d8680389067e06cb07387ebcc066fe58e525719d415c4d4"
+        },
+        {
+          "file": "assets/chevron-left-V2twzkBj.js",
+          "bytes": 314,
+          "gzip1Bytes": 258,
+          "sha256": "cb4145872188b3619dcef292d39643e7d56e88ab9c606512f54dfb336209bc0e"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/child-route-context-CQZoqJHU.js",
+          "bytes": 1417,
+          "gzip1Bytes": 705,
+          "sha256": "47ae80381fe762cb2f3ed081707b5c28796c8a6567f9b31e877e70fb403fac57"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/circle-alert-Bved_1MA.js",
+          "bytes": 434,
+          "gzip1Bytes": 299,
+          "sha256": "d47cd18f628f2d7fd4fb38c600282220b696e13e32a68f54a9638563f28c5fab"
+        },
+        {
+          "file": "assets/circle-check-BijsoGZO.js",
+          "bytes": 357,
+          "gzip1Bytes": 277,
+          "sha256": "955b3ae41e0b696aed7f5e29699c02f6890904516fe7394fd8128dc742c7978e"
+        },
+        {
+          "file": "assets/circle-check-big-3MNKlsTs.js",
+          "bytes": 373,
+          "gzip1Bytes": 291,
+          "sha256": "4cc368adea04bc052835a5e1f18fbe150977671a135b1139dce48734ed949f6f"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-list-D92Uiadj.js",
+          "bytes": 595,
+          "gzip1Bytes": 374,
+          "sha256": "461b4e7c7e9872baa4b1ef6af19a2f0e758a922e08cf4438a17dab1346209f85"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/copy-DU24Fu6H.js",
+          "bytes": 415,
+          "gzip1Bytes": 314,
+          "sha256": "828bbaf90c3165c483961fa99c241e2b3b7abde68f32dc61bd25dfed6733cc80"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/dateTime-DxAJh_G7.js",
+          "bytes": 843,
+          "gzip1Bytes": 505,
+          "sha256": "2e3b9b379ba27b54cd4e7ecf3ace3463e5a0bbd340d0b74568e71b324f4dff0b"
+        },
+        {
+          "file": "assets/deferred-media-4ZwrHgG8.js",
+          "bytes": 685,
+          "gzip1Bytes": 497,
+          "sha256": "d547bb1cca050aae2ead7c382c124634eae9c713ad3e75878984cecaf903fc0b"
+        },
+        {
+          "file": "assets/device-input-provenance-DEEM1AsM.js",
+          "bytes": 7282,
+          "gzip1Bytes": 2855,
+          "sha256": "fa18fd5d96345f556937f7c0041a37c7edd613fffe7d223a8531809e621666d9"
+        },
+        {
+          "file": "assets/education-entry-layout-BCi3Wds2.css",
+          "bytes": 45257,
+          "gzip1Bytes": 10172,
+          "sha256": "e7bcecf7245ef08d37c8429f9a2f71517d00d86e2f31fb9428a097e4c0ccd7ff"
+        },
+        {
+          "file": "assets/education-entry-layout-D0fTIxUu.js",
+          "bytes": 182547,
+          "gzip1Bytes": 66283,
+          "sha256": "1559e2d7564a117eecec92f96b29e6f2384923099741aff6b5571f2f412f5073"
+        },
+        {
+          "file": "assets/file-text-BGQ3fTaF.js",
+          "bytes": 569,
+          "gzip1Bytes": 360,
+          "sha256": "0fb2ce72d4e8845f41d7709121ca6b397b8edd9683ad063d4ed6c23c20cb834d"
+        },
+        {
+          "file": "assets/finalDraftCapacityRetry-Dmo5Oq8l.js",
+          "bytes": 6311,
+          "gzip1Bytes": 2498,
+          "sha256": "beed109dd9eec92e747a41594ac8cc94f4b7bc8a9f6c6418dc1c4382c0a74edc"
+        },
+        {
+          "file": "assets/finalDraftStore-Dm59dNEG.js",
+          "bytes": 20314,
+          "gzip1Bytes": 6713,
+          "sha256": "ce55bcd1f018aa34e8810faaa8e144208f731427b0716a30de30f1a20d584539"
+        },
+        {
+          "file": "assets/finalSubmissionFailure-ztKBt7NC.js",
+          "bytes": 13480,
+          "gzip1Bytes": 5386,
+          "sha256": "a86be9ecd23ed8f1407e2fab20661d01f45ef74f90ea7ad35b56456aa7016ec8"
+        },
+        {
+          "file": "assets/flushLifecycle-DApca_Ml.js",
+          "bytes": 10023,
+          "gzip1Bytes": 3693,
+          "sha256": "b4f6de46b021475a7b64796113aa40cc1b0ac8b7ba0437f5a0de76a0e7504692"
+        },
+        {
+          "file": "assets/form-visibility-DWnADqY8.js",
+          "bytes": 632,
+          "gzip1Bytes": 333,
+          "sha256": "7c275eea7e6bfdcc5853be84a14158dab89af34d43630eaec917519a1577a00c"
+        },
+        {
+          "file": "assets/gonogo.registry-CDsi7RxQ.js",
+          "bytes": 3368,
+          "gzip1Bytes": 1768,
+          "sha256": "1246335a50240b96d1645afc7180d2776c650333b1052535aa4bbf710ab10d6f"
+        },
+        {
+          "file": "assets/heart-handshake-6VFKkfAA.js",
+          "bytes": 642,
+          "gzip1Bytes": 415,
+          "sha256": "bca6ef99ac93cb86c59e2736fbb68c481d138be845685267ea2ff0492af670e7"
+        },
+        {
+          "file": "assets/history-CRjwuvYV.js",
+          "bytes": 421,
+          "gzip1Bytes": 309,
+          "sha256": "a913148d04469218868f1d6fd17f8dee52c5b71facfdf7fee6a00ecddc49f49f"
+        },
+        {
+          "file": "assets/image-Ce-BWUsU.js",
+          "bytes": 453,
+          "gzip1Bytes": 332,
+          "sha256": "d527f9201ffeeceb21b7264aaf7ffc67b64f77d06bad048f5dcdbb6e503ff30a"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-BaxA8rk5.js",
+          "bytes": 16710,
+          "gzip1Bytes": 6794,
+          "sha256": "213c4402d69dc965bf04510179b0080a851ad2aff9c1efd5f5b30b39c35e81b8"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/info-d_r4dA-n.js",
+          "bytes": 383,
+          "gzip1Bytes": 285,
+          "sha256": "fa20744bd50a2b4d71f6307622310280a554d49db6603f6b405a2ef77aeeb7a3"
+        },
+        {
+          "file": "assets/item-timing--zuEGF8Q.js",
+          "bytes": 3345,
+          "gzip1Bytes": 1269,
+          "sha256": "480b717354d7f0e26529805cfc3c6b5526ec3d74caf1ad1153103ec24228ca9b"
+        },
+        {
+          "file": "assets/learnerNavigation--_gySDQV.js",
+          "bytes": 6003,
+          "gzip1Bytes": 2522,
+          "sha256": "af0b83fd8f3ecf8b457e8899fb727430965476cb71a18af631fc73d70d9a4659"
+        },
+        {
+          "file": "assets/list-xZv-Zp98.js",
+          "bytes": 486,
+          "gzip1Bytes": 304,
+          "sha256": "6d4204c3915735e3016166e5884ef4c2985141df4aa48e23b21ef1fdfe091e21"
+        },
+        {
+          "file": "assets/loader-circle-ismh_Nml.js",
+          "bytes": 323,
+          "gzip1Bytes": 265,
+          "sha256": "0c2573020acdbb180b23b408f1f76b714c450d1974dffdb92fbe17156c94eb89"
+        },
+        {
+          "file": "assets/message-square-text-Cp1D6jDa.js",
+          "bytes": 530,
+          "gzip1Bytes": 356,
+          "sha256": "652e82aeca32d6f2789609cca1f2007f35a19ab5d898b1cbb81bd2e485756f8c"
+        },
+        {
+          "file": "assets/participation-link-CnLAbyD5.js",
+          "bytes": 691,
+          "gzip1Bytes": 433,
+          "sha256": "92ece1c22bf601a554f8ff5ba2056b2682cc25e5361aed71096f46503458c536"
+        },
+        {
+          "file": "assets/pause-CIc3IYkJ.js",
+          "bytes": 395,
+          "gzip1Bytes": 280,
+          "sha256": "c4eca626c04e61f1616a1a221d560dcddb7e8248fb771dc87b4574ecbb151ad7"
+        },
+        {
+          "file": "assets/pencil-B-h6GN4I.js",
+          "bytes": 460,
+          "gzip1Bytes": 334,
+          "sha256": "ba6f6973970dd6309a6e9f4efe88037fb3699ef0d66581a7c9c0b8a5a5a1e70b"
+        },
+        {
+          "file": "assets/play-BdcUs7wV.js",
+          "bytes": 374,
+          "gzip1Bytes": 292,
+          "sha256": "f381e89ef266259447aeed5f7d9249f0fa94a37d6632dadeb1228c26af6bda08"
+        },
+        {
+          "file": "assets/plus-Bu5Ob2oO.js",
+          "bytes": 337,
+          "gzip1Bytes": 261,
+          "sha256": "ec6d251235b76654e5e1d645fe060d36620eafb5238caba95c6669e283eb3eb4"
+        },
+        {
+          "file": "assets/rawScoreFeedback-BhRRsO3Z.js",
+          "bytes": 1335,
+          "gzip1Bytes": 773,
+          "sha256": "3a6926fedf7b8eb1f09d7c8a68cf6dedc2b5058ecc53cb49987ab3eb045ab45d"
+        },
+        {
+          "file": "assets/readiness-CA7SeYHK.js",
+          "bytes": 2797,
+          "gzip1Bytes": 1263,
+          "sha256": "002a9f33185ae4f6ee4169725d78b49549f01b5962394538ffd8e000520725a8"
+        },
+        {
+          "file": "assets/recovery-credential-DTG-RQ8c.js",
+          "bytes": 194,
+          "gzip1Bytes": 156,
+          "sha256": "8e4033478611cd80765f4a4c3072c7bfe7b666f3a311df2de982b93c5295048f"
+        },
+        {
+          "file": "assets/refresh-cw-DCyrw0kk.js",
+          "bytes": 505,
+          "gzip1Bytes": 333,
+          "sha256": "965446f93fffe0365b3d9a1717e12c8e581dee610900139ba38ba56cf31c975a"
+        },
+        {
+          "file": "assets/registry-DAQ2BJ65.js",
+          "bytes": 26369,
+          "gzip1Bytes": 6825,
+          "sha256": "8d967eff294e02fa71502c58805f9debde4a806c3a5034c090e565e02a95c58e"
+        },
+        {
+          "file": "assets/required-video-completion-zGCnAAFE.js",
+          "bytes": 926,
+          "gzip1Bytes": 574,
+          "sha256": "8c394c5b0d5ad6eb205ed2a18f14d3d21e68b3fb82911d6548c3f989329bfd94"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 159,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/save-BxLpChRB.js",
+          "bytes": 511,
+          "gzip1Bytes": 338,
+          "sha256": "e6ccffec17df5a2052ce4455ae15fa7bb10096680f473de275444cf48e00ad93"
+        },
+        {
+          "file": "assets/scaleLibraryGovernance-Bqp_F6p5.js",
+          "bytes": 3899,
+          "gzip1Bytes": 1698,
+          "sha256": "1ea5dbe4a20c25bae6c5d156af3da99d4b820e8616f7840dc77f2e5c57510cf5"
+        },
+        {
+          "file": "assets/send-CHAp2Jdd.js",
+          "bytes": 474,
+          "gzip1Bytes": 340,
+          "sha256": "9c8bbb597512a6e6cd67bd7fcbbb7e559ae85dc3d936bdb4a9f7299891211a7a"
+        },
+        {
+          "file": "assets/session-ledger-nXD8DOYS.js",
+          "bytes": 463,
+          "gzip1Bytes": 258,
+          "sha256": "3f36b81a6a51443f57f9ca8dc3b515a4c3e3d9629abdf111a712da301fb66abb"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/tool-library-api-C8Z5YAcU.js",
+          "bytes": 969,
+          "gzip1Bytes": 695,
+          "sha256": "2197d271f78791bb7e88100d829abf87749420001005f43fb81d656198cd7f01"
+        },
+        {
+          "file": "assets/training-form-surface-BhEY1h6v.css",
+          "bytes": 1734,
+          "gzip1Bytes": 565,
+          "sha256": "6dfa74e40d2882d2bb8606a9a4f535cf2a834027f18b5b846d61b2a34cddd4d2"
+        },
+        {
+          "file": "assets/training-participation-link-D9SaThRF.js",
+          "bytes": 417,
+          "gzip1Bytes": 234,
+          "sha256": "c5b0e8ca665e1cf16d636c0256d0c57791ad1a37283872018eff8007c2ace208"
+        },
+        {
+          "file": "assets/trash-2-Dlusi3J-.js",
+          "bytes": 512,
+          "gzip1Bytes": 329,
+          "sha256": "317dbcfa08926522613523504a43484a336b736db5866a827e102f45bc9e7185"
+        },
+        {
+          "file": "assets/traversal-B-tb21LO.js",
+          "bytes": 3243,
+          "gzip1Bytes": 1471,
+          "sha256": "03f75983edaa120dedc2aff6a614d4c08bd62d39e4883b485d9004c18317b56d"
+        },
+        {
+          "file": "assets/upload-DPpe9DOQ.js",
+          "bytes": 414,
+          "gzip1Bytes": 305,
+          "sha256": "7fc1f8674b2a541e474955a00d3267ae6663b9b98f37528d8dce576623921d97"
+        },
+        {
+          "file": "assets/useAssessmentImageAssets-CcgP-2K4.js",
+          "bytes": 1726,
+          "gzip1Bytes": 871,
+          "sha256": "f23e75a47eaffe05aefa63ba797ce5f3e577e8d30518d93fa430b418ae95cedf"
+        },
+        {
+          "file": "assets/useFormBulkDraft-C07erjAN.js",
+          "bytes": 774,
+          "gzip1Bytes": 468,
+          "sha256": "c9def465c6abc752a42d584bfe7b8355d73e48821dba1c045d673f16f1359076"
+        },
+        {
+          "file": "assets/useRunnerPreparation-cUpS0VYW.js",
+          "bytes": 486,
+          "gzip1Bytes": 370,
+          "sha256": "3a509957e0734223a232e5c9f1365ab67b60f30ee839b8b0cf2054704a94754c"
+        },
+        {
+          "file": "assets/useScaleAutoAdvance-Dd40yCYz.js",
+          "bytes": 1129,
+          "gzip1Bytes": 560,
+          "sha256": "99d1c56d808db027d1f51d9526725c2a3bcf57946758584bed6e61a6a4a90274"
+        },
+        {
+          "file": "assets/users-Dp-lsGLB.js",
+          "bytes": 490,
+          "gzip1Bytes": 333,
+          "sha256": "f3b4fe12a897b4911b67e014ca9ab98ab0935f0b884e380fae38f634116ff8e9"
+        },
+        {
+          "file": "assets/users-round-wEmBB15P.js",
+          "bytes": 432,
+          "gzip1Bytes": 326,
+          "sha256": "a844c606778794e5c817ab818d925535ea3239dc356d4dd9b5baac0021febffc"
+        },
+        {
+          "file": "assets/x-BmSjsqVm.js",
+          "bytes": 338,
+          "gzip1Bytes": 265,
+          "sha256": "e52776e596e83d9b64f878d929b127ec8520cef813053741f5eb00befcd9ef82"
+        }
+      ],
+      "count": 119,
+      "rawBytes": 1605641,
+      "gzip1Bytes": 533610
+    },
+    {
+      "name": "Teacher app homepage and shell",
+      "rootEntries": [
+        "_HuiteacherApp-BUcR8DWk.js"
+      ],
+      "files": [
+        {
+          "file": "assets/AssessmentImageGate-CvIN20zQ.js",
+          "bytes": 682,
+          "gzip1Bytes": 412,
+          "sha256": "51c4418d365ec147bc90e9e3fd52edfe294e2ebfd843cd66bff8c61c9be2adda"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1046,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-Cb9rtb42.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1092,
+          "sha256": "0380c4f20264f7249435fc6e27e78d66e5cdbe4e96f0f6aad03624c969ba6f72"
+        },
+        {
+          "file": "assets/AssessmentMaterialPicker-3VhS-uuV.js",
+          "bytes": 5551,
+          "gzip1Bytes": 2301,
+          "sha256": "424a1b65b2d3593e25f4f49b0a5838d7bc0c48fdd75f3cff0ce887e36308ca54"
+        },
+        {
+          "file": "assets/BasicFormConstraints-CLkwDwJf.js",
+          "bytes": 11091,
+          "gzip1Bytes": 4581,
+          "sha256": "af23fdf7bc465129153de3fd10b7f9144863a769067856a4364b54907fd7c3e4"
+        },
+        {
+          "file": "assets/EducationApplicabilityFields-A48pOuKW.js",
+          "bytes": 3623,
+          "gzip1Bytes": 1781,
+          "sha256": "0a5724f310c5a713e022661a5d1ad62b27fbf1d0b8865535f0519e8790dc7223"
+        },
+        {
+          "file": "assets/FinalCompositeAssessment-BSi8rszi.js",
+          "bytes": 33178,
+          "gzip1Bytes": 12539,
+          "sha256": "6888cf31556af4adc99dc229de75cbf73782f8e4b03f1b0d73275aa769cdf694"
+        },
+        {
+          "file": "assets/FormChoiceExtras-BZA_k_g7.js",
+          "bytes": 7309,
+          "gzip1Bytes": 2839,
+          "sha256": "505fe936542cdf6827da838ce177b9a098945ee1cb2ac4a4c9aa06dc05a0a1d5"
+        },
+        {
+          "file": "assets/HuiteacherApp-BUcR8DWk.js",
+          "bytes": 144293,
+          "gzip1Bytes": 49875,
+          "sha256": "6d98bbc6e78f68c1b8d5da22a0f133ce6351426787c8446ac91ad9cb2a4a88be"
+        },
+        {
+          "file": "assets/HuiteacherApp-ClGL_1jI.css",
+          "bytes": 66088,
+          "gzip1Bytes": 15624,
+          "sha256": "d5b77a2e973e3ba120f9a5ad78d01ac73d41d073b2ab2efdf25823901a3aa6e2"
+        },
+        {
+          "file": "assets/LocalDateTimeInput-C6llGhwr.js",
+          "bytes": 1296,
+          "gzip1Bytes": 755,
+          "sha256": "31e04570350d0ef37de00ab3c85318f9227b13b138b4e23d65ed949b8f3255ec"
+        },
+        {
+          "file": "assets/ParticipationCode-BoeqGOjm.js",
+          "bytes": 5586,
+          "gzip1Bytes": 2218,
+          "sha256": "f981b25d876976bba48915656f53d277d3aade7febbbebed4bd29b2654d0e0d5"
+        },
+        {
+          "file": "assets/ProductButton-CG8MrZaQ.js",
+          "bytes": 275,
+          "gzip1Bytes": 221,
+          "sha256": "30ff458a7372c4abb32a7446be4c389a03ffb5d6214167a4e46bb1803cab0173"
+        },
+        {
+          "file": "assets/ProductButton-CSdvJMrA.css",
+          "bytes": 7883,
+          "gzip1Bytes": 2173,
+          "sha256": "10a80513e2752d0ebca6da1b01e3513075a3cac2387aba9fc1abdb198f5a239b"
+        },
+        {
+          "file": "assets/ProductPasswordChange-BDnvATqs.js",
+          "bytes": 1785,
+          "gzip1Bytes": 966,
+          "sha256": "0fb997501254f4c1bfb5f6bfbbb36c6709c13f106184901ecd8e41a9ae7979fa"
+        },
+        {
+          "file": "assets/ProductStatus-BoYqqD34.js",
+          "bytes": 850,
+          "gzip1Bytes": 464,
+          "sha256": "fcbc55240861092a93eb41889957b4fbbf2b36bddb53a7af7145e2d9cb5a1636"
+        },
+        {
+          "file": "assets/ProductThemeControl-BCXvb6Vo.js",
+          "bytes": 2675,
+          "gzip1Bytes": 1375,
+          "sha256": "6ef55e83071a690942431d6516567f5a4b9a58fc5fc2974969f76d9393444e95"
+        },
+        {
+          "file": "assets/ProductThemeControl-lELuWh9q.css",
+          "bytes": 1021,
+          "gzip1Bytes": 466,
+          "sha256": "e97c1ab064bef369f6548ccc8e8da5283c1ca39296d110e1b5cf9991c071f203"
+        },
+        {
+          "file": "assets/RawScoreFeedbackFields-C-ruxYt2.js",
+          "bytes": 4916,
+          "gzip1Bytes": 2239,
+          "sha256": "92112c84e3db4ace8df86d2fb2c11e528fda289b2869b3e10c3bcb60c7fefd5f"
+        },
+        {
+          "file": "assets/ReportPrimitives-BJQ-FC7T.css",
+          "bytes": 13331,
+          "gzip1Bytes": 3613,
+          "sha256": "3b681a6c4ed245e66a8a889f44060d4691b2143e8d47521cd99ea6e31f92ecdd"
+        },
+        {
+          "file": "assets/ReportPrimitives-DwUdzPTf.js",
+          "bytes": 3434,
+          "gzip1Bytes": 1271,
+          "sha256": "0e99e3a3a7163bb780f96bfce2bbf24cd0a768230920bcd1eb7bc3119dc2173f"
+        },
+        {
+          "file": "assets/ResearchFormEditor-C24I2AKZ.css",
+          "bytes": 22206,
+          "gzip1Bytes": 5027,
+          "sha256": "4dbe27918a027baacd01499f1d79838271686a08dd6a09b94abbd54911853e12"
+        },
+        {
+          "file": "assets/ResearchFormEditor-D6rgebDX.js",
+          "bytes": 28302,
+          "gzip1Bytes": 10144,
+          "sha256": "fdf3d6e89e2e9a0541c5f59009b0ca5a6faa06f971a6f7fb72467ec6b51cd6d4"
+        },
+        {
+          "file": "assets/ScaleDefinitionEditor-Br9eg9gk.js",
+          "bytes": 27676,
+          "gzip1Bytes": 10297,
+          "sha256": "495d091e839f77b9ee42a6d6fbdb8d5b0e3f0723007bc84b1fb61f91bcf6493c"
+        },
+        {
+          "file": "assets/ScaleEdit-Bo3TIrG7.css",
+          "bytes": 29358,
+          "gzip1Bytes": 3864,
+          "sha256": "1539d6c3e266d7980ebeb9ed9a3e842cd4874008e765ed30b12273b25ce3fc6a"
+        },
+        {
+          "file": "assets/ScaleEdit-CSL-H9Yv.js",
+          "bytes": 2213,
+          "gzip1Bytes": 1119,
+          "sha256": "d2291aebc2434ab87eea7f370dc0a96c9b7660951720162f68666087c452a94a"
+        },
+        {
+          "file": "assets/ScaleUnitReportCard-BSt9OaE_.js",
+          "bytes": 12055,
+          "gzip1Bytes": 4731,
+          "sha256": "71ebcb275ad7dc1c68873c0a211a411d71e886d8557a3985976e15fec5f6485d"
+        },
+        {
+          "file": "assets/SurveyImageField-BnPbZJeQ.js",
+          "bytes": 7952,
+          "gzip1Bytes": 3459,
+          "sha256": "3a50f57546871f34628501337abe5c6fa1c8931c9b5549a32235f07cd01dc9b7"
+        },
+        {
+          "file": "assets/SurveyImageField-CdVbhkUi.css",
+          "bytes": 4050,
+          "gzip1Bytes": 1237,
+          "sha256": "8d8a0f0ae28d36e3d5657592d6af38f4f7b331a1830f698188b0ed5420ccbbd7"
+        },
+        {
+          "file": "assets/SurveyMaterialDisplay-gnt_EQTp.js",
+          "bytes": 803,
+          "gzip1Bytes": 503,
+          "sha256": "ed38e7458fdddb177f5bc78d7565f3d630f976f0d4b98a4b543f5fce2c2c6b2e"
+        },
+        {
+          "file": "assets/SurveyMaterialPicker-IPhBxbu4.js",
+          "bytes": 2323,
+          "gzip1Bytes": 1392,
+          "sha256": "55bbc4f6c8cd183da928f48bdc28c1f333a68812744112eb7ff3ac40dacab5e1"
+        },
+        {
+          "file": "assets/SurveyPublicApp-BUaAwE3x.css",
+          "bytes": 31231,
+          "gzip1Bytes": 6691,
+          "sha256": "15aef12a23f09cb7e60a51b8d0c8933e767877ce577f2df6e2e89e6dd9a70d3e"
+        },
+        {
+          "file": "assets/SurveyPublicApp-K6Q2U8OF.js",
+          "bytes": 92495,
+          "gzip1Bytes": 33629,
+          "sha256": "b4c4a82e295de6e4ec45a226f933ecace70b5c69fd737563308acce166d5a9ad"
+        },
+        {
+          "file": "assets/TeacherBrand-xjTeQRP4.js",
+          "bytes": 678,
+          "gzip1Bytes": 426,
+          "sha256": "fe28d0329d73ce125cc60282bf36af36f5c67393226ccfb1c7b63ff1a9fdd227"
+        },
+        {
+          "file": "assets/TrainingCheckpointPanel-C9vnSyEa.js",
+          "bytes": 5294,
+          "gzip1Bytes": 2468,
+          "sha256": "9e40ff3e76e91dc9cc99ed4941244b053d5fb11f504db355c246e03a4421ba3a"
+        },
+        {
+          "file": "assets/TrainingContentReports-S-kz3LEV.js",
+          "bytes": 4112,
+          "gzip1Bytes": 1974,
+          "sha256": "24dbf476bbfd0f080429e9de27845d8ee00443fdd7c17f9721d9bc89661b5b64"
+        },
+        {
+          "file": "assets/TrainingMaterials-C66BorG6.js",
+          "bytes": 350,
+          "gzip1Bytes": 275,
+          "sha256": "3e362db760e66ba6fd7494acd2ef844d220e66eb764f096d5bcb7b9d06823bb3"
+        },
+        {
+          "file": "assets/arrow-down-fol4R5P5.js",
+          "bytes": 349,
+          "gzip1Bytes": 272,
+          "sha256": "13f9817b5713c557cbac76e60df223917d9b9e92f821fe7065655dfa6a4ec0d2"
+        },
+        {
+          "file": "assets/arrow-right-DF1j1Xdq.js",
+          "bytes": 349,
+          "gzip1Bytes": 273,
+          "sha256": "c0bc9f048b7601f64a02459414b016c80c10075a0092d24511ddb27e56a2ded1"
+        },
+        {
+          "file": "assets/arrow-up-DtgGWEf9.js",
+          "bytes": 346,
+          "gzip1Bytes": 271,
+          "sha256": "073551aa4f9103d2c74c6160263be1252d331448d9498906ac4cf5b56ad3941f"
+        },
+        {
+          "file": "assets/book-open-rxEPjcBC.js",
+          "bytes": 463,
+          "gzip1Bytes": 323,
+          "sha256": "433d0ee7a3f30ebbcb68631d884145ec0bf16c89732c97c50c02949fd52e5877"
+        },
+        {
+          "file": "assets/builder.types-QEWBrg2F.js",
+          "bytes": 645,
+          "gzip1Bytes": 414,
+          "sha256": "00a151eed12fd8afa8f5199ad5efead6e953fb89285f85ef26aaec990c935fb9"
+        },
+        {
+          "file": "assets/catalogDiscovery-Dbb-xHPA.js",
+          "bytes": 989,
+          "gzip1Bytes": 605,
+          "sha256": "01833d95c27f22e9c66f75f25b070428564bd6c6ac21366d4099eba40af6b14c"
+        },
+        {
+          "file": "assets/checkpointTypes-CE0Ib90y.js",
+          "bytes": 193,
+          "gzip1Bytes": 172,
+          "sha256": "be69094ba668feed9d8680389067e06cb07387ebcc066fe58e525719d415c4d4"
+        },
+        {
+          "file": "assets/chevron-left-V2twzkBj.js",
+          "bytes": 314,
+          "gzip1Bytes": 258,
+          "sha256": "cb4145872188b3619dcef292d39643e7d56e88ab9c606512f54dfb336209bc0e"
+        },
+        {
+          "file": "assets/chevron-right-gQnbku0V.js",
+          "bytes": 314,
+          "gzip1Bytes": 255,
+          "sha256": "51bce35314871439c1b07541cd1e83b20b2a8ee68af1fc8a05a9a4af66213b29"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/circle-alert-Bved_1MA.js",
+          "bytes": 434,
+          "gzip1Bytes": 299,
+          "sha256": "d47cd18f628f2d7fd4fb38c600282220b696e13e32a68f54a9638563f28c5fab"
+        },
+        {
+          "file": "assets/circle-check-BijsoGZO.js",
+          "bytes": 357,
+          "gzip1Bytes": 277,
+          "sha256": "955b3ae41e0b696aed7f5e29699c02f6890904516fe7394fd8128dc742c7978e"
+        },
+        {
+          "file": "assets/circle-check-big-3MNKlsTs.js",
+          "bytes": 373,
+          "gzip1Bytes": 291,
+          "sha256": "4cc368adea04bc052835a5e1f18fbe150977671a135b1139dce48734ed949f6f"
+        },
+        {
+          "file": "assets/client-DLEYkVg8.js",
+          "bytes": 56979,
+          "gzip1Bytes": 24505,
+          "sha256": "824841cd8e60d23aa8adfcd46c5fa154a4c32c967c991eda6fa4ae582ad80f77"
+        },
+        {
+          "file": "assets/clipboard-list-D92Uiadj.js",
+          "bytes": 595,
+          "gzip1Bytes": 374,
+          "sha256": "461b4e7c7e9872baa4b1ef6af19a2f0e758a922e08cf4438a17dab1346209f85"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/copy-DU24Fu6H.js",
+          "bytes": 415,
+          "gzip1Bytes": 314,
+          "sha256": "828bbaf90c3165c483961fa99c241e2b3b7abde68f32dc61bd25dfed6733cc80"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/dateTime-DxAJh_G7.js",
+          "bytes": 843,
+          "gzip1Bytes": 505,
+          "sha256": "2e3b9b379ba27b54cd4e7ecf3ace3463e5a0bbd340d0b74568e71b324f4dff0b"
+        },
+        {
+          "file": "assets/deferred-media-4ZwrHgG8.js",
+          "bytes": 685,
+          "gzip1Bytes": 497,
+          "sha256": "d547bb1cca050aae2ead7c382c124634eae9c713ad3e75878984cecaf903fc0b"
+        },
+        {
+          "file": "assets/device-input-provenance-DEEM1AsM.js",
+          "bytes": 7282,
+          "gzip1Bytes": 2855,
+          "sha256": "fa18fd5d96345f556937f7c0041a37c7edd613fffe7d223a8531809e621666d9"
+        },
+        {
+          "file": "assets/education-entry-layout-BCi3Wds2.css",
+          "bytes": 45257,
+          "gzip1Bytes": 10172,
+          "sha256": "e7bcecf7245ef08d37c8429f9a2f71517d00d86e2f31fb9428a097e4c0ccd7ff"
+        },
+        {
+          "file": "assets/education-entry-layout-D0fTIxUu.js",
+          "bytes": 182547,
+          "gzip1Bytes": 66283,
+          "sha256": "1559e2d7564a117eecec92f96b29e6f2384923099741aff6b5571f2f412f5073"
+        },
+        {
+          "file": "assets/file-text-BGQ3fTaF.js",
+          "bytes": 569,
+          "gzip1Bytes": 360,
+          "sha256": "0fb2ce72d4e8845f41d7709121ca6b397b8edd9683ad063d4ed6c23c20cb834d"
+        },
+        {
+          "file": "assets/finalDraftCapacityRetry-Dmo5Oq8l.js",
+          "bytes": 6311,
+          "gzip1Bytes": 2498,
+          "sha256": "beed109dd9eec92e747a41594ac8cc94f4b7bc8a9f6c6418dc1c4382c0a74edc"
+        },
+        {
+          "file": "assets/finalDraftStore-Dm59dNEG.js",
+          "bytes": 20314,
+          "gzip1Bytes": 6713,
+          "sha256": "ce55bcd1f018aa34e8810faaa8e144208f731427b0716a30de30f1a20d584539"
+        },
+        {
+          "file": "assets/finalSubmissionFailure-ztKBt7NC.js",
+          "bytes": 13480,
+          "gzip1Bytes": 5386,
+          "sha256": "a86be9ecd23ed8f1407e2fab20661d01f45ef74f90ea7ad35b56456aa7016ec8"
+        },
+        {
+          "file": "assets/flow.client-CD4zNBOs.js",
+          "bytes": 1994,
+          "gzip1Bytes": 1013,
+          "sha256": "af3d3dcbd1845ba439b428443d0dfaeee31c8aef591cd22313e1cc81bb8d97b4"
+        },
+        {
+          "file": "assets/form-visibility-DWnADqY8.js",
+          "bytes": 632,
+          "gzip1Bytes": 333,
+          "sha256": "7c275eea7e6bfdcc5853be84a14158dab89af34d43630eaec917519a1577a00c"
+        },
+        {
+          "file": "assets/history-CRjwuvYV.js",
+          "bytes": 421,
+          "gzip1Bytes": 309,
+          "sha256": "a913148d04469218868f1d6fd17f8dee52c5b71facfdf7fee6a00ecddc49f49f"
+        },
+        {
+          "file": "assets/image-Ce-BWUsU.js",
+          "bytes": 453,
+          "gzip1Bytes": 332,
+          "sha256": "d527f9201ffeeceb21b7264aaf7ffc67b64f77d06bad048f5dcdbb6e503ff30a"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-BaxA8rk5.js",
+          "bytes": 16710,
+          "gzip1Bytes": 6794,
+          "sha256": "213c4402d69dc965bf04510179b0080a851ad2aff9c1efd5f5b30b39c35e81b8"
+        },
+        {
+          "file": "assets/index-Bp1pfIr8.js",
+          "bytes": 66,
+          "gzip1Bytes": 79,
+          "sha256": "93dfcbcbd1d53d869ee0a6a3760ece8531836a695722c1c9897ec100f81b2a6b"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/info-d_r4dA-n.js",
+          "bytes": 383,
+          "gzip1Bytes": 285,
+          "sha256": "fa20744bd50a2b4d71f6307622310280a554d49db6603f6b405a2ef77aeeb7a3"
+        },
+        {
+          "file": "assets/item-timing--zuEGF8Q.js",
+          "bytes": 3345,
+          "gzip1Bytes": 1269,
+          "sha256": "480b717354d7f0e26529805cfc3c6b5526ec3d74caf1ad1153103ec24228ca9b"
+        },
+        {
+          "file": "assets/list-xZv-Zp98.js",
+          "bytes": 486,
+          "gzip1Bytes": 304,
+          "sha256": "6d4204c3915735e3016166e5884ef4c2985141df4aa48e23b21ef1fdfe091e21"
+        },
+        {
+          "file": "assets/loader-circle-ismh_Nml.js",
+          "bytes": 323,
+          "gzip1Bytes": 265,
+          "sha256": "0c2573020acdbb180b23b408f1f76b714c450d1974dffdb92fbe17156c94eb89"
+        },
+        {
+          "file": "assets/participation-link-CnLAbyD5.js",
+          "bytes": 691,
+          "gzip1Bytes": 433,
+          "sha256": "92ece1c22bf601a554f8ff5ba2056b2682cc25e5361aed71096f46503458c536"
+        },
+        {
+          "file": "assets/pause-CIc3IYkJ.js",
+          "bytes": 395,
+          "gzip1Bytes": 280,
+          "sha256": "c4eca626c04e61f1616a1a221d560dcddb7e8248fb771dc87b4574ecbb151ad7"
+        },
+        {
+          "file": "assets/pencil-B-h6GN4I.js",
+          "bytes": 460,
+          "gzip1Bytes": 334,
+          "sha256": "ba6f6973970dd6309a6e9f4efe88037fb3699ef0d66581a7c9c0b8a5a5a1e70b"
+        },
+        {
+          "file": "assets/plus-Bu5Ob2oO.js",
+          "bytes": 337,
+          "gzip1Bytes": 261,
+          "sha256": "ec6d251235b76654e5e1d645fe060d36620eafb5238caba95c6669e283eb3eb4"
+        },
+        {
+          "file": "assets/rawScoreFeedback-BhRRsO3Z.js",
+          "bytes": 1335,
+          "gzip1Bytes": 773,
+          "sha256": "3a6926fedf7b8eb1f09d7c8a68cf6dedc2b5058ecc53cb49987ab3eb045ab45d"
+        },
+        {
+          "file": "assets/readiness-CA7SeYHK.js",
+          "bytes": 2797,
+          "gzip1Bytes": 1263,
+          "sha256": "002a9f33185ae4f6ee4169725d78b49549f01b5962394538ffd8e000520725a8"
+        },
+        {
+          "file": "assets/refresh-cw-DCyrw0kk.js",
+          "bytes": 505,
+          "gzip1Bytes": 333,
+          "sha256": "965446f93fffe0365b3d9a1717e12c8e581dee610900139ba38ba56cf31c975a"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 159,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/save-BxLpChRB.js",
+          "bytes": 511,
+          "gzip1Bytes": 338,
+          "sha256": "e6ccffec17df5a2052ce4455ae15fa7bb10096680f473de275444cf48e00ad93"
+        },
+        {
+          "file": "assets/scaleLibraryGovernance-Bqp_F6p5.js",
+          "bytes": 3899,
+          "gzip1Bytes": 1698,
+          "sha256": "1ea5dbe4a20c25bae6c5d156af3da99d4b820e8616f7840dc77f2e5c57510cf5"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/survey-participant-Be5qZXqZ.css",
+          "bytes": 22839,
+          "gzip1Bytes": 6187,
+          "sha256": "b036593c4c36fa6f7669c753260ab07ae481c44ecd9628928358cc74cf4d2b0f"
+        },
+        {
+          "file": "assets/tool-library-api-C8Z5YAcU.js",
+          "bytes": 969,
+          "gzip1Bytes": 695,
+          "sha256": "2197d271f78791bb7e88100d829abf87749420001005f43fb81d656198cd7f01"
+        },
+        {
+          "file": "assets/training-form-surface-BhEY1h6v.css",
+          "bytes": 1734,
+          "gzip1Bytes": 565,
+          "sha256": "6dfa74e40d2882d2bb8606a9a4f535cf2a834027f18b5b846d61b2a34cddd4d2"
+        },
+        {
+          "file": "assets/trash-2-Dlusi3J-.js",
+          "bytes": 512,
+          "gzip1Bytes": 329,
+          "sha256": "317dbcfa08926522613523504a43484a336b736db5866a827e102f45bc9e7185"
+        },
+        {
+          "file": "assets/upload-DPpe9DOQ.js",
+          "bytes": 414,
+          "gzip1Bytes": 305,
+          "sha256": "7fc1f8674b2a541e474955a00d3267ae6663b9b98f37528d8dce576623921d97"
+        },
+        {
+          "file": "assets/useAssessmentImageAssets-CcgP-2K4.js",
+          "bytes": 1726,
+          "gzip1Bytes": 871,
+          "sha256": "f23e75a47eaffe05aefa63ba797ce5f3e577e8d30518d93fa430b418ae95cedf"
+        },
+        {
+          "file": "assets/useFormBulkDraft-C07erjAN.js",
+          "bytes": 774,
+          "gzip1Bytes": 468,
+          "sha256": "c9def465c6abc752a42d584bfe7b8355d73e48821dba1c045d673f16f1359076"
+        },
+        {
+          "file": "assets/useScaleAutoAdvance-Dd40yCYz.js",
+          "bytes": 1129,
+          "gzip1Bytes": 560,
+          "sha256": "99d1c56d808db027d1f51d9526725c2a3bcf57946758584bed6e61a6a4a90274"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        },
+        {
+          "file": "assets/users-round-wEmBB15P.js",
+          "bytes": 432,
+          "gzip1Bytes": 326,
+          "sha256": "a844c606778794e5c817ab818d925535ea3239dc356d4dd9b5baac0021febffc"
+        },
+        {
+          "file": "assets/x-BmSjsqVm.js",
+          "bytes": 338,
+          "gzip1Bytes": 265,
+          "sha256": "e52776e596e83d9b64f878d929b127ec8520cef813053741f5eb00befcd9ef82"
+        }
+      ],
+      "count": 98,
+      "rawBytes": 1313349,
+      "gzip1Bytes": 458974
+    },
+    {
+      "name": "Survey researcher entry",
+      "rootEntries": [
+        "_SurveyApp-Y3If5IaT.js"
+      ],
+      "files": [
+        {
+          "file": "assets/ModalSurface-B-CSFw3F.js",
+          "bytes": 2541,
+          "gzip1Bytes": 1249,
+          "sha256": "80231bc663c15c648c6a057d627d4603abc15761db9e1f8d3c7b894718e4f821"
+        },
+        {
+          "file": "assets/ParticipationSettings-BkbX57WK.js",
+          "bytes": 7642,
+          "gzip1Bytes": 3418,
+          "sha256": "b418e798e348595d55cb2a2ce583b1abe693d423b4fc145ef1e75e2ee6af492f"
+        },
+        {
+          "file": "assets/ProductPasswordChange-BDnvATqs.js",
+          "bytes": 1785,
+          "gzip1Bytes": 966,
+          "sha256": "0fb997501254f4c1bfb5f6bfbbb36c6709c13f106184901ecd8e41a9ae7979fa"
+        },
+        {
+          "file": "assets/SurveyApp-Y3If5IaT.js",
+          "bytes": 54454,
+          "gzip1Bytes": 19479,
+          "sha256": "fa4ff604984babc0adf0ff062fe0c6787b9dbdbb57e5321c8a03fd7e85a10dfc"
+        },
+        {
+          "file": "assets/SurveyApp-klBqdmlV.css",
+          "bytes": 39331,
+          "gzip1Bytes": 8633,
+          "sha256": "d153d28285d4878e39c8b9d243ddc596eff6bd69e034acd2a65d5ed6df61fedf"
+        },
+        {
+          "file": "assets/SurveyAppearance-C7j5YiIH.css",
+          "bytes": 6925,
+          "gzip1Bytes": 2012,
+          "sha256": "c2deb038b7b1f940f39a30df80f65e5c247f40f74f400279d95931aa404df584"
+        },
+        {
+          "file": "assets/SurveyAppearance-D687hfpm.js",
+          "bytes": 2564,
+          "gzip1Bytes": 1301,
+          "sha256": "e2ac29cfd74f77f28b05c08edf9f5f9ba856e147d29558aeb6f7a7ee6d0d4aaf"
+        },
+        {
+          "file": "assets/SurveyBrand-CzGZEkwd.css",
+          "bytes": 12889,
+          "gzip1Bytes": 3698,
+          "sha256": "5fed2e933a410643d3f407149817c5e0750a4724a412f710084526fdd7843480"
+        },
+        {
+          "file": "assets/SurveyBrand-It0N8IZQ.js",
+          "bytes": 3194,
+          "gzip1Bytes": 1439,
+          "sha256": "57161005566deda5f38b369bf9ea4d909f0131673f0e38fd43e00121f4435b64"
+        },
+        {
+          "file": "assets/SurveyEntryPanel-D85vHzmN.js",
+          "bytes": 21996,
+          "gzip1Bytes": 8740,
+          "sha256": "d0a3b3bc41d9bce5e2d9b9dc80b77af714f29f94445811d587b7bdfd0e1aee6c"
+        },
+        {
+          "file": "assets/SurveyEntryPanel-DT7vVWQ-.css",
+          "bytes": 28667,
+          "gzip1Bytes": 6864,
+          "sha256": "168d6bf069b0ceb6583f0a241c14a3bc750dcb20fdfa7cac80020ffb27c203e4"
+        },
+        {
+          "file": "assets/arrow-right-DF1j1Xdq.js",
+          "bytes": 349,
+          "gzip1Bytes": 273,
+          "sha256": "c0bc9f048b7601f64a02459414b016c80c10075a0092d24511ddb27e56a2ded1"
+        },
+        {
+          "file": "assets/arrow-up-right-DyECV-PZ.js",
+          "bytes": 351,
+          "gzip1Bytes": 273,
+          "sha256": "3543c217c92899249a40d532586ee765e474a7a64845fa2953512c21e4a753d6"
+        },
+        {
+          "file": "assets/calendar-days-vgm2WOeL.js",
+          "bytes": 678,
+          "gzip1Bytes": 380,
+          "sha256": "48aba602539bbe902c70f4d6ae1dc7a4a8acda40b2498c92bde16bc505286a76"
+        },
+        {
+          "file": "assets/chart-no-axes-combined-DzkwLJHs.js",
+          "bytes": 564,
+          "gzip1Bytes": 366,
+          "sha256": "616cc46a375f8a2d046c2ad74bfac62579473cfe66e7aa92130bc186035ff9be"
+        },
+        {
+          "file": "assets/check-BhdW9H3s.js",
+          "bytes": 303,
+          "gzip1Bytes": 251,
+          "sha256": "2cf5e84bd6127331eb7606067eebc3b89599f311378658aecca59ce168be3915"
+        },
+        {
+          "file": "assets/chevron-up-DCd0hz1W.js",
+          "bytes": 312,
+          "gzip1Bytes": 256,
+          "sha256": "65ecdc62a8e1b77de48f9c21b61fdcfdc60fcfcfcb0db3cce24c9fa3439cc8e8"
+        },
+        {
+          "file": "assets/clipboard-list-D92Uiadj.js",
+          "bytes": 595,
+          "gzip1Bytes": 374,
+          "sha256": "461b4e7c7e9872baa4b1ef6af19a2f0e758a922e08cf4438a17dab1346209f85"
+        },
+        {
+          "file": "assets/context-DH9TJPZn.js",
+          "bytes": 747,
+          "gzip1Bytes": 450,
+          "sha256": "66736b9f539dda7f46c18c2d1f5f5b3b605624fba0d4f6247ddd53675c137035"
+        },
+        {
+          "file": "assets/createLucideIcon-CbJkl8OG.js",
+          "bytes": 2578,
+          "gzip1Bytes": 831,
+          "sha256": "22f08fd75b627f92d2cd16973b1583fb6acf0a4e6268229b706a4a65045f11c9"
+        },
+        {
+          "file": "assets/file-text-BGQ3fTaF.js",
+          "bytes": 569,
+          "gzip1Bytes": 360,
+          "sha256": "0fb2ce72d4e8845f41d7709121ca6b397b8edd9683ad063d4ed6c23c20cb834d"
+        },
+        {
+          "file": "assets/images-MWAMo_C5.js",
+          "bytes": 554,
+          "gzip1Bytes": 383,
+          "sha256": "4ab761d3e72f4418f8fe0d94688c8cb032a108b7c75e72d1558df10033dab50e"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/lock-keyhole-CrM2kkvo.js",
+          "bytes": 439,
+          "gzip1Bytes": 327,
+          "sha256": "8e438d888cd14ae75ea593e53b431e8c3decfce29b80587e57e5d9142f2390ea"
+        },
+        {
+          "file": "assets/plus-Bu5Ob2oO.js",
+          "bytes": 337,
+          "gzip1Bytes": 261,
+          "sha256": "ec6d251235b76654e5e1d645fe060d36620eafb5238caba95c6669e283eb3eb4"
+        },
+        {
+          "file": "assets/sun-BNLAta1N.js",
+          "bytes": 3282,
+          "gzip1Bytes": 1029,
+          "sha256": "50dd547d2fe105066f87af8e778e6140dfddb7fb4554802a14570502d860093c"
+        },
+        {
+          "file": "assets/survey-participant-Be5qZXqZ.css",
+          "bytes": 22839,
+          "gzip1Bytes": 6187,
+          "sha256": "b036593c4c36fa6f7669c753260ab07ae481c44ecd9628928358cc74cf4d2b0f"
+        },
+        {
+          "file": "assets/survey-workspace-polish-D6RH9D6F.css",
+          "bytes": 39402,
+          "gzip1Bytes": 7694,
+          "sha256": "3d7364a41a5baf85130ca9d0e2c3d63f102429411dfbfbba206aad80b57caf09"
+        },
+        {
+          "file": "assets/survey-workspace-polish-Dsqrfe2C.js",
+          "bytes": 2605,
+          "gzip1Bytes": 1272,
+          "sha256": "548ae44dcac1cb73315a9272a02475cfcdfe78dc1bcf5e9ec42206ed5c48ad81"
+        },
+        {
+          "file": "assets/user-round-CYqbZ9_n.js",
+          "bytes": 361,
+          "gzip1Bytes": 285,
+          "sha256": "9f5d2ebeb7696eb50cca0526161e578a837ec2b00dfd317fceab5508ee7c7163"
+        },
+        {
+          "file": "assets/x-BmSjsqVm.js",
+          "bytes": 338,
+          "gzip1Bytes": 265,
+          "sha256": "e52776e596e83d9b64f878d929b127ec8520cef813053741f5eb00befcd9ef82"
+        }
+      ],
+      "count": 32,
+      "rawBytes": 469233,
+      "gzip1Bytes": 150917
+    },
+    {
+      "name": "Survey participant entry",
+      "rootEntries": [
+        "_SurveyPublicApp-K6Q2U8OF.js"
+      ],
+      "files": [
+        {
+          "file": "assets/AssessmentMaterialDisplay-B3_-Rx-i.css",
+          "bytes": 3886,
+          "gzip1Bytes": 1046,
+          "sha256": "4cb6e25fa06c7c1bd206436e76a4c526188f66ad0e2adc982a938b717b0e8f92"
+        },
+        {
+          "file": "assets/AssessmentMaterialDisplay-Cb9rtb42.js",
+          "bytes": 1927,
+          "gzip1Bytes": 1092,
+          "sha256": "0380c4f20264f7249435fc6e27e78d66e5cdbe4e96f0f6aad03624c969ba6f72"
+        },
+        {
+          "file": "assets/FormChoiceExtras-BZA_k_g7.js",
+          "bytes": 7309,
+          "gzip1Bytes": 2839,
+          "sha256": "505fe936542cdf6827da838ce177b9a098945ee1cb2ac4a4c9aa06dc05a0a1d5"
+        },
+        {
+          "file": "assets/ParticipationCode-BoeqGOjm.js",
+          "bytes": 5586,
+          "gzip1Bytes": 2218,
+          "sha256": "f981b25d876976bba48915656f53d277d3aade7febbbebed4bd29b2654d0e0d5"
+        },
+        {
+          "file": "assets/SurveyMaterialDisplay-gnt_EQTp.js",
+          "bytes": 803,
+          "gzip1Bytes": 503,
+          "sha256": "ed38e7458fdddb177f5bc78d7565f3d630f976f0d4b98a4b543f5fce2c2c6b2e"
+        },
+        {
+          "file": "assets/SurveyPublicApp-BUaAwE3x.css",
+          "bytes": 31231,
+          "gzip1Bytes": 6691,
+          "sha256": "15aef12a23f09cb7e60a51b8d0c8933e767877ce577f2df6e2e89e6dd9a70d3e"
+        },
+        {
+          "file": "assets/SurveyPublicApp-K6Q2U8OF.js",
+          "bytes": 92495,
+          "gzip1Bytes": 33629,
+          "sha256": "b4c4a82e295de6e4ec45a226f933ecace70b5c69fd737563308acce166d5a9ad"
+        },
+        {
+          "file": "assets/chunk-BV7QT456-DXjZbrEz.js",
+          "bytes": 97350,
+          "gzip1Bytes": 38093,
+          "sha256": "561c104070c2cfe2d6aad016bb6e4f9ceba17f2d22c3b6f0675c9cc1a4bf271e"
+        },
+        {
+          "file": "assets/deferred-media-4ZwrHgG8.js",
+          "bytes": 685,
+          "gzip1Bytes": 497,
+          "sha256": "d547bb1cca050aae2ead7c382c124634eae9c713ad3e75878984cecaf903fc0b"
+        },
+        {
+          "file": "assets/flow.client-CD4zNBOs.js",
+          "bytes": 1994,
+          "gzip1Bytes": 1013,
+          "sha256": "af3d3dcbd1845ba439b428443d0dfaeee31c8aef591cd22313e1cc81bb8d97b4"
+        },
+        {
+          "file": "assets/form-visibility-DWnADqY8.js",
+          "bytes": 632,
+          "gzip1Bytes": 333,
+          "sha256": "7c275eea7e6bfdcc5853be84a14158dab89af34d43630eaec917519a1577a00c"
+        },
+        {
+          "file": "assets/index-BDK87uTh.js",
+          "bytes": 153422,
+          "gzip1Bytes": 58688,
+          "sha256": "2d5dbdd467f6440e0d79133f7eeeb92528a08362f550f22441aef41aaa515fd9"
+        },
+        {
+          "file": "assets/index-RCBHkAFU.css",
+          "bytes": 56620,
+          "gzip1Bytes": 12913,
+          "sha256": "245951723c3ee46dee385e238c29586d9b4a17f7f2d951e607ab772ba14db870"
+        },
+        {
+          "file": "assets/item-timing--zuEGF8Q.js",
+          "bytes": 3345,
+          "gzip1Bytes": 1269,
+          "sha256": "480b717354d7f0e26529805cfc3c6b5526ec3d74caf1ad1153103ec24228ca9b"
+        },
+        {
+          "file": "assets/participation-link-CnLAbyD5.js",
+          "bytes": 691,
+          "gzip1Bytes": 433,
+          "sha256": "92ece1c22bf601a554f8ff5ba2056b2682cc25e5361aed71096f46503458c536"
+        },
+        {
+          "file": "assets/response-timing-NEHx8NlB.js",
+          "bytes": 198,
+          "gzip1Bytes": 159,
+          "sha256": "1567cc9efcd1aca39dc500d65df939fe34aa7a5def12a2443310f9950d76a433"
+        },
+        {
+          "file": "assets/survey-participant-Be5qZXqZ.css",
+          "bytes": 22839,
+          "gzip1Bytes": 6187,
+          "sha256": "b036593c4c36fa6f7669c753260ab07ae481c44ecd9628928358cc74cf4d2b0f"
+        }
+      ],
+      "count": 17,
+      "rawBytes": 481013,
+      "gzip1Bytes": 167603
+    }
+  ]
+}

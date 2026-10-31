@@ -1,0 +1,13 @@
+{
+  "command": "node node_modules/eslint/bin/eslint.js src/huiteacher/HuiteacherEvaluationStudio.tsx src/huiteacher/TeacherFormGroupReport.tsx src/huiteacher/HuiteacherGroupReportReading.test.tsx",
+  "node": "v24.21.0",
+  "componentTreeBefore": "00a843d3164e16ae7b7b4045ee0597db2812d790",
+  "componentTreeAfter": "00a843d3164e16ae7b7b4045ee0597db2812d790",
+  "startedAt": "2026-10-30T10:45:19.644Z",
+  "finishedAt": "2026-10-30T10:45:20.861Z",
+  "exitCode": 0,
+  "logSHA256": "c3020261636e9c6d7d15d74822089fce74a31643ab3b4bf2517600bdaecb62eb",
+  "ciExecuted": false,
+  "logFile": "frontend-lint.log.gz",
+  "logEncoding": "gzip; logSHA256 refers to decompressed original bytes"
+}

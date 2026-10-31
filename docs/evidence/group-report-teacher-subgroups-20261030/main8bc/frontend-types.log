@@ -1,0 +1,4 @@
+src/huiteacher/HuiteacherGroupReportReading.test.tsx(21,35): error TS2322: Type 'Mock<(<T>(_path: string, method?: string | undefined) => Promise<T>)>' is not assignable to type 'Api'.
+  Type 'Promise<unknown>' is not assignable to type 'Promise<T>'.
+    Type 'unknown' is not assignable to type 'T'.
+      'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.

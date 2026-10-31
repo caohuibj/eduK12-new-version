@@ -24,9 +24,12 @@ type RawFeedbackChoice={metricKeys:string[];release:'AFTER_FINAL'|'AFTER_COLLECT
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string;instrumentKey:string}
 type InstrumentDetails=Instrument&{catalogGrantId?:string|null;readOnly?:boolean;revision?:number;definition:FormDraft|Record<string,unknown>}
-type Project={participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
+type Project={firstPublishedAt?:string|null;longitudinalPlan?:{metrics:Array<{id:string;label:string}>}|null;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type GroupIpPolicy={schemaVersion:1;timeZone:string;activationDate?:string}
 type Wave={
+  inheritedTrackingUnits?:InstrumentDetails[]
+  longitudinal?:{planId:string}|null
+  longitudinalSourceWaveId?:string|null
   frozenContentSelections?:FrozenWaveContent[]
   frozenParticipantFeedback?:{draftId:string;instrumentKey:string;title:string;participantFeedback:({mode:'GENERAL'|'DESCRIPTIVE'}&RawFeedbackChoice)|null}[]
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
@@ -51,7 +54,9 @@ type FlowAnalytics={flowDigest:string;asOf:string;total:FlowCounts;
     groups:{groupKey:string;respondentN:number;scoreValidN:number;
       mean:number|null;sampleSd:number|null}[];note:string};
   limits:{complete:boolean;maxAttempts:number;noTruncation:boolean}}
-type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
+type TrackingOption={instrumentId:string;instrumentKey:string;scoreKey:string;label:string;unit:string}
+type TrackingChoice={mode:'SINGLE'|'LONGITUDINAL';metrics:Array<{instrumentId:string;scoreKey:string}>}
+type Preflight={trackingOptions?:TrackingOption[];ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
 const surveyApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   let token=''
@@ -105,9 +110,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const sharedLibrary=useMemo(()=>instrumentLibrary??createInstrumentLibrary(projectId),[instrumentLibrary,projectId])
   const {list:tools,page:toolPage,refresh:refreshTools,error:toolsError,loading:toolsLoading,revision:instrumentsRevision}=useInstrumentLibrary(projectId,sharedLibrary)
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
+  const [tracking,setTracking]=useState<TrackingChoice>({mode:'SINGLE',metrics:[]})
   const [participantFeedback,setParticipantFeedback]=useState<Record<string,RawFeedbackChoice>>({})
   const [contentSelections,setContentSelections]=useState<WaveContentSelection[]>([])
-  const [pendingFreeze,setPendingFreeze]=useState<{projectId:string;waveId:string;body:{revision:number;contentSelections?:WaveContentSelection[];participantFeedback?:unknown[]};canRetry:boolean}|null>(null)
+  const [pendingFreeze,setPendingFreeze]=useState<{projectId:string;waveId:string;body:{revision:number;tracking?:TrackingChoice;contentSelections?:WaveContentSelection[];participantFeedback?:unknown[]};canRetry:boolean}|null>(null)
   const freezeLock=useRef(false)
   const activePending=pendingFreeze?.projectId===projectId?pendingFreeze:null
 
@@ -164,6 +170,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
     return()=>{projects.current++;selections.current++;previews.current++}
   },[refreshWaves,refreshProject])
   useEffect(()=>{setParticipantFeedback({})},[path,instrumentsRevision,form.instrumentIds])
+  useEffect(()=>{setTracking({mode:'SINGLE',metrics:[]})},[path,editing?.id,instrumentsRevision])
   const contentScope=JSON.stringify([path,editing?.id,editing?.revision,instrumentsRevision,form.instrumentIds])
   useEffect(()=>{
     setContentSelections(previous=>{if(previous.length&&!editing?.publicationId)setNotice('波次或工具已更新，未冻结的报告／参考选择已清空，请重新核对选择。');return []})
@@ -193,10 +200,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         requests.set(id,request)
       }
       return request
-    })).then(items=>{if(current)setDetails(Object.fromEntries(items.map(item=>[item.id,item])))})
+    })).then(items=>{if(current)setDetails(Object.fromEntries(items.map(item=>[item.id,{...item,...editing?.inheritedTrackingUnits?.find(unit=>unit.id===item.id)}])))})
       .catch(e=>{if(current)setDetailsError(message(e))})
     return()=>{current=false}
-  },[path,instrumentsRevision,form.instrumentIds,detailsRetry])
+  },[path,instrumentsRevision,form.instrumentIds,detailsRetry,editing?.inheritedTrackingUnits])
   const act=async(action:()=>Promise<void>)=>{
     const epoch=projectEpoch.current,request=++actionRequest.current
     setError('');setNotice('');setBusy(true)
@@ -229,7 +236,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const previewStudy=()=>void act(async()=>{
     const epoch=++previewEpoch.current,saved=structuredClone(form)
     setStudyPreview(null)
-    const drafts=await Promise.all(form.instrumentIds.map(id=>surveyApi<ResearchDraft>(path+'/instruments/'+id)))
+    const drafts=(await Promise.all(form.instrumentIds.map(id=>surveyApi<ResearchDraft>(path+'/instruments/'+id)))).map(draft=>({...draft,...editing?.inheritedTrackingUnits?.find(unit=>unit.id===draft.id)}) as ResearchDraft)
     const snapshots:Record<string,CognitivePreviewSnapshot>={}
     for(const draft of drafts.filter(d=>d.kind==='COGNITIVE')){
       const result=await surveyApi<{ok:boolean;cognitivePreview?:CognitivePreviewSnapshot}>(path+'/instruments/'+draft.id+'/validate','POST',{})
@@ -294,6 +301,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const freezeWave=(retry=false)=>{
     if(!editing||freezeLock.current||busy||(!retry&&activePending))return
     const pending=retry?activePending:{projectId,waveId:editing.id,canRetry:false,body:{revision:editing.revision,
+      ...(!project?.longitudinalPlan&&tracking.mode==='LONGITUDINAL'?{tracking:structuredClone(tracking)}:{}),
       ...(contentSelections.length?{contentSelections:structuredClone(contentSelections)}:{}),
       ...(Object.keys(participantFeedback).length?{participantFeedback:Object.entries(participantFeedback).map(([instrumentId,choice])=>({instrumentId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',...choice}}))}:{}),
     }}
@@ -666,6 +674,27 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           </fieldset><div className="survey-workflow-save"><span>保存草稿后，再检查与冻结</span><button type="submit" className="btn-primary" disabled={busy||!form.title||form.consentText.length<20}>
             {editing?'保存波次草稿':'创建波次'}</button></div>
         </form>}
+        {editing&&project?.collectionMode==='LINKED_WAVES'&&<section className="rounded-xl border p-3 space-y-3" aria-label="纵向追踪计划">
+          <h3 className="font-semibold">纵向追踪计划</h3>
+          <p>追踪具体子工具的原始指标；本人只能查看工具原披露允许的指标。分量表选择不会删除评分所需题目。</p>
+          {!!editing.inheritedTrackingUnits?.length&&<p>追踪项沿用原轮次冻结的题目与计分：{editing.inheritedTrackingUnits.map(unit=>unit.title).join('、')}。工具库中的后续修订不会替换本计划。</p>}
+          {project.longitudinalPlan?<><p>首次发布已冻结，后续波次自动继承全部追踪指标。</p>{project.longitudinalPlan.metrics.map(m=><p key={m.id}>{m.label}</p>)}</>:
+            !editing.publicationId&&!project.firstPublishedAt&&editing.ordinal===1?<>
+              <label><input type="radio" name="survey-tracking-mode" checked={tracking.mode==='SINGLE'} disabled={busy||!!activePending} onChange={()=>setTracking({mode:'SINGLE',metrics:[]})}/>单次报告</label>
+              <label><input type="radio" name="survey-tracking-mode" checked={tracking.mode==='LONGITUDINAL'} disabled={busy||!!activePending} onChange={()=>setTracking({mode:'LONGITUDINAL',metrics:[]})}/>Longitudinal · 我的变化</label>
+              {tracking.mode==='LONGITUDINAL'&&<><p>先检查研究定义，再选择追踪指标。反馈权限在“本次反馈”中独立设置；未披露指标不会进入本人变化报告。</p>
+                {ready?.trackingOptions?.map(option=><label className="block" key={option.instrumentId+':'+option.scoreKey}><input type="checkbox" disabled={busy||!!activePending}
+                  checked={tracking.metrics.some(m=>m.instrumentId===option.instrumentId&&m.scoreKey===option.scoreKey)}
+                  onChange={e=>setTracking(old=>({...old,metrics:e.target.checked?[...old.metrics,{instrumentId:option.instrumentId,scoreKey:option.scoreKey}]:old.metrics.filter(m=>m.instrumentId!==option.instrumentId||m.scoreKey!==option.scoreKey)}))}/>{option.label}（{option.unit}）</label>)}
+              </>}
+            </>:<p>此研究未在首次发布时配置纵向追踪，不能事后拼接历史。</p>}
+          {editing.publicationId&&editing.status!=='DRAFT'&&editing.longitudinal&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>void act(async()=>{
+            const next=await surveyApi<Wave>(path+'/waves/'+editing.id+'/next','POST',{requestId:crypto.randomUUID()})
+            selectionEpoch.current++;setEditing(next);setReady(null);setParticipantFeedback({});setShareLink('');setLibrarySelectionDirty(false)
+            setForm({...form,title:next.title,opensAt:'',closesAt:'',quotaStarts:'',allowNewParticipants:false,groupIpPolicy:null})
+            await refreshWaves(1);setNotice('下一轮草稿已创建，追踪来源自动继承；请核对时间与非追踪内容后发布。')
+          })}>创建下一轮</button>}
+        </section>}
         {studyPreview&&<SurveyStudyPreview drafts={studyPreview.drafts} cognitiveSnapshots={studyPreview.snapshots} flow={studyPreview.flow} consentText={studyPreview.consentText} generalText={studyPreview.generalText} onClose={()=>{previewEpoch.current++;setStudyPreview(null)}}/>}
         {editing&&<div className="survey-wave-publishing rounded-lg border p-4 space-y-4">
           <div className="survey-workflow-heading"><h3 className="font-semibold">T{editing.ordinal} · {editing.title}</h3><span className="survey-workflow-status">检查与发布</span></div>
@@ -673,7 +702,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           <div className="survey-wave-lifecycle flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>
-              <button type="button" className="btn-secondary" aria-describedby="survey-freeze-reason" disabled={busy||!ready?.ok||feedbackInvalid} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
+              <button type="button" className="btn-secondary" aria-describedby="survey-freeze-reason" disabled={busy||!ready?.ok||feedbackInvalid||tracking.mode==='LONGITUDINAL'&&!project?.longitudinalPlan&&!tracking.metrics.length} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
               <p id="survey-freeze-reason" className="w-full text-sm text-slate-600">{busy?'本次操作尚未完成，暂不能冻结。':!ready?'请先运行检查，通过后才能冻结。':!ready.ok?'检查尚未通过，请按检查结果修正后重新检查。':feedbackInvalid?'已启用的反馈须至少选择一个当前有效指标，才能冻结。':'检查已通过，可冻结当前研究定义；冻结不等于开放招募。'}</p>
             </>}
             {editing.status==='DRAFT'&&editing.publicationId&&

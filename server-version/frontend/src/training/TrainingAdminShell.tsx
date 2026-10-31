@@ -7,6 +7,7 @@ import {trainingAdminPage,trainingAdminPages,trainingAdminProfilePath} from '../
 import TrainingBrand from './TrainingBrand'
 import TrainingAppearanceControl from './TrainingAppearanceControl'
 import {useTrainingAppearance} from './appearanceContext'
+import '../pages/admin/admin-training.css'
 import './training-admin-workspace.css'
 
 /** Product navigation only; route and API guards retain authority. */

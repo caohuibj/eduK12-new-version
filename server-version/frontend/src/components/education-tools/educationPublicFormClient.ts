@@ -1,0 +1,29 @@
+import type {ImageAuthoringAdapter} from '../../modules/assessment-media/AssessmentImageField'
+import type {PublicMaterial} from '../../modules/assessment-media/material'
+import {privateToolBase,type PrivateToolApi} from './privateToolClient'
+import type {CompositionResponseMode,ExpertTargetKind} from './educationCompositionAdministration'
+
+export type EducationPublicSourceSummary={catalogKey:string;kind:'FORM'|'SCALE'|'COGNITIVE'|'SJT';sourceProvider:'FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'|'COGNITIVE_CONFIG'|'SJT_RELEASE';sourceId:string;contentHash:string;artifactHash?:string;title:string;language:string|null;
+ versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>;profile?:'experience'|'standard'|'research'};profile?:'experience'|'standard'|'research';configurationName?:string;selectedBinding?:import('./educationCompositionClient').SelectedConfigurationPointer;requiredContextKeys?:string[];referenceContextKeys?:string[];allowedActions:string[];canEditOriginal:false;canDistribute:false;unavailableReason?:string}
+export const publicNativePreviewPath=(organizationId:string,source:Extract<import('./educationCompositionClient').CompositionSource,{provider:'COGNITIVE_CONFIG'|'SJT_RELEASE'}>)=>
+ `${privateToolBase(organizationId)}/public-sources/native/${source.provider}/${encodeURIComponent(source.versionId)}?contentHash=${encodeURIComponent(source.contentHash)}${source.provider==='COGNITIVE_CONFIG'?'&profile='+source.profile+(source.artifactHash?'&artifactHash='+source.artifactHash:''):''}`
+export type EducationPublicFormSummary=EducationPublicSourceSummary
+const responseModeQuery=(mode:CompositionResponseMode,targetKind?:ExpertTargetKind)=>mode==='SELF'?'':'&responseMode='+mode+(mode==='EXPERT_REPORT'&&targetKind?'&targetKind='+targetKind:'')
+export const publicStandardPreviewPath=(organizationId:string,versionId:string,contentHash:string,responseMode:CompositionResponseMode='SELF',targetKind?:ExpertTargetKind)=>
+ `${privateToolBase(organizationId)}/public-sources/standard/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}${responseModeQuery(responseMode,targetKind)}`
+export const publicFormPreviewPath=(organizationId:string,versionId:string,contentHash:string,responseMode:CompositionResponseMode='SELF',targetKind?:ExpertTargetKind)=>
+ `${privateToolBase(organizationId)}/public-sources/form/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}${responseModeQuery(responseMode,targetKind)}`
+export const libraryScalePreviewPath=(organizationId:string,versionId:string,contentHash:string,responseMode:CompositionResponseMode='SELF',targetKind?:ExpertTargetKind)=>
+ `${privateToolBase(organizationId)}/library-sources/${encodeURIComponent(versionId)}?contentHash=${encodeURIComponent(contentHash)}${responseModeQuery(responseMode,targetKind)}`
+export function educationPublicFormPreviewMedia({api,organizationId,versionId,contentHash,entry,actorId,provider='PUBLIC_FORM'}:{api:PrivateToolApi;organizationId:string;versionId:string;contentHash:string;entry:'SCHOOL'|'TEACHER';actorId:string;provider?:'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'}){
+ const loadContent=async(asset:PublicMaterial['asset'])=>{
+  const sourcePath=provider==='LIBRARY_SCALE'?'library-sources':`public-sources/${provider==='STANDARD_SCALE'?'standard':'form'}`
+  const path=`${privateToolBase(organizationId)}/${sourcePath}/${encodeURIComponent(versionId)}/assets/${encodeURIComponent(asset.assetId)}/content?contentHash=${encodeURIComponent(contentHash)}`
+  const blob=await api<Blob>(path,'GET',undefined,{responseType:'blob'})
+  if(!(blob instanceof Blob)||blob.type!==asset.mimeType||!blob.size)throw Error('固定公共版本的素材暂不可读取。')
+  return blob
+ }
+ const imageAdapter:ImageAuthoringAdapter={scopeKey:JSON.stringify([entry,organizationId,actorId,provider,versionId,contentHash]),
+  async upload(){throw Error('公共原版仅供预览和引用。')},loadPreview:loadContent}
+ return {loadContent,imageAdapter}
+}

@@ -46,3 +46,4 @@ dialog.hui-modal-surface.assessment-tool-modal::backdrop { background: #152d2a80
 .assessment-tool-dialog button:focus-visible,.assessment-tool-trigger:focus-visible { outline: 2px solid #294b3f; outline-offset: 3px; }
 @media(max-width: 760px) { .assessment-tool-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media(max-width: 480px) { .assessment-tool-dialog { width: calc(100vw - 20px); height: calc(100dvh - 28px); border-radius: 12px; padding: 20px 16px; }.assessment-tool-grid { grid-template-columns: minmax(0,1fr); }.assessment-tool-dialog h2 { font-size: 22px; } }
+.assessment-tool-card:disabled { opacity: .6; cursor: not-allowed; }

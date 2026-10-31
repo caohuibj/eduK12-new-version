@@ -134,11 +134,22 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
     return r.stdout
   }
   try {
+    const legacy = env.GITHUB_REF === 'refs/pull/338/merge' && env.GITHUB_HEAD_REF === 'work/school-teacher-review-20261022' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-temporary-runner'
+    const selfOptOnly = env.GITHUB_REF === 'refs/pull/382/merge' && env.GITHUB_HEAD_REF === 'release/education-self-scale-form-20261028' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-self-opt-only'
+    const selfPackageScope = env.GITHUB_REF === 'refs/pull/382/merge' && env.GITHUB_HEAD_REF === 'release/education-self-scale-form-20261028' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-self-package-scope'
+    const observerPackageScope = env.GITHUB_REF === 'refs/pull/385/merge' && env.GITHUB_HEAD_REF === 'release/education-observer-native-20261029' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-observer-package-scope'
+    const packageScope = env.GITHUB_REF === 'refs/pull/392/merge' && env.GITHUB_HEAD_REF === 'feat/education-package-runtime-20261029' &&
+      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-public-package-scope'
+    const selfEnvironmentProbe = env.GITHUB_REF === 'refs/heads/ci/pr382-chrome-environment-20261029' &&
+      env.GITHUB_EVENT_NAME === 'push' && env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-self-package-scope'
     check(env.CI === 'true' && env.GITHUB_ACTIONS === 'true' && env.RUNNER_ENVIRONMENT === 'github-hosted' &&
       env.RUNNER_OS === 'Linux' && env.RUNNER_ARCH === 'X64' && env.ImageOS === 'ubuntu24' &&
-      env.GITHUB_REPOSITORY === 'caohuibj/eduK12-new-version' && env.GITHUB_EVENT_NAME === 'pull_request' &&
-      env.GITHUB_REF === 'refs/pull/338/merge' && env.GITHUB_HEAD_REF === 'work/school-teacher-review-20261022' &&
-      env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-temporary-runner', 'UNAPPROVED_CI_CONTEXT')
+      env.GITHUB_REPOSITORY === 'caohuibj/eduK12-new-version' &&
+      (env.GITHUB_EVENT_NAME === 'pull_request' && (legacy || selfOptOnly || selfPackageScope || observerPackageScope || packageScope) || selfEnvironmentProbe), 'UNAPPROVED_CI_CONTEXT')
     check(facts.platform === 'linux' && facts.arch === 'x64' && Number.isSafeInteger(facts.getuid?.()) &&
       facts.getuid() > 0 && facts.geteuid?.() === facts.getuid(), 'NONROOT_RUNNER_REQUIRED')
     check(!['CHROME_DEVEL_SANDBOX', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'NODE_OPTIONS', 'NODE_PATH'].some(k => env[k]), 'EXECUTION_OVERRIDE_PRESENT')
@@ -151,6 +162,28 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
     report.source = { head: env.GITHUB_SHA, runId: env.GITHUB_RUN_ID }
     stage = 'PACKAGE_CONSISTENCY'
     const before = inspectInstallation(io, query)
+    if (selfOptOnly) {
+      const opt = before.entries.find(entry => entry.path === '/opt')
+      const unexpected = before.entries.filter(entry => (entry.stat.mode & 0o022) !== 0 && entry.path !== '/opt')
+      report.selfScopeInspection = {
+        opt: opt ? { uid: opt.stat.uid, gid: opt.stat.gid, permissionMode: opt.stat.mode & 0o7777 } : null,
+        unexpectedWritableCount: unexpected.length,
+        unexpectedWritable: unexpected.slice(0, 32).map(entry => ({ path: entry.path, uid: entry.stat.uid,
+          gid: entry.stat.gid, permissionMode: entry.stat.mode & 0o7777 })),
+        truncated: unexpected.length > 32,
+      }
+      check(opt && opt.kind === 'directory' && opt.stat.gid === 0 && [0o755, 0o777].includes(opt.stat.mode & 0o7777) &&
+        before.entries.filter(entry => (entry.stat.mode & 0o022) !== 0).every(entry => entry.path === '/opt'),
+      'SELF_UNOBSERVED_WRITABLE_RUNTIME_PATH')
+    }
+    if (selfPackageScope || selfEnvironmentProbe || observerPackageScope || packageScope) {
+      // Current approval is bounded to these two parents and the installation
+      // inventory just verified above, not an unrestricted recursive chmod.
+      check(before.entries.every(entry => entry.stat.uid === 0 && entry.stat.gid === 0 &&
+        (PARENTS.includes(entry.path) || inChrome(entry.path))), 'SELF_PACKAGE_SCOPE_MISMATCH')
+      report.authorizationScope = packageScope ? 'PR392_VERIFIED_CHROME_PACKAGE_GO_WRITE' : observerPackageScope ? 'PR385_VERIFIED_CHROME_PACKAGE_GO_WRITE' : 'PR382_VERIFIED_CHROME_PACKAGE_GO_WRITE'
+      report.environmentOnly = selfEnvironmentProbe
+    }
     report.package = before.package; report.packageConsistency = 'LOCAL_DPKG_MD5_BYTES_MATCH'
     report.consistencyScope = 'Installed package records, not cryptographic publisher authentication'
     report.recordsDigest = before.recordsDigest; report.checkedEntries = before.entries.length

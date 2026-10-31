@@ -4,7 +4,8 @@ import {
   reportingFail,
   type ReportingAnalysisSpecRecord,
   type ReportingCohortSnapshotRecord,
-  type ReportingGroupArtifactPayloadV1,
+  type ReportingGroupArtifactPayload,
+  type ReportingLeafSourceV2,
   type ReportingMaturity,
   type ReportingResolvedExecutionV1,
   type ReportingResultBatchV1,
@@ -48,7 +49,9 @@ export const buildReportingArtifact = (input: {
   cohort: ReportingCohortSnapshotRecord
   batch: ReportingResultBatchV1
   options?: Record<string, never>
-}): { payload: ReportingGroupArtifactPayloadV1; snapshotHash: string; analysisIdentityHash: string } => {
+  leaf?: ReportingLeafSourceV2
+  presentation?: { sourceLabel: string; populationLabel: string }
+}): { payload: ReportingGroupArtifactPayload; snapshotHash: string; analysisIdentityHash: string } => {
   if (input.spec.status !== 'PUBLISHED') reportingFail('REPORT_SPEC_NOT_PUBLISHED', 'analysis requires a published reporting spec', 409)
   const definition = input.spec.definition
   if (definition.analysisKind !== 'GROUP') return reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'generic group engine requires GROUP spec', 409)
@@ -82,8 +85,17 @@ export const buildReportingArtifact = (input: {
   const contributorFloor = Math.max(definition.minimumContributorN, resourceFloor)
   const overallPresent = input.cohort.eligibleN >= definition.minimumCohortN && input.batch.resolved.length >= contributorFloor
   const metrics: ReportingSafeProjectionV1['metrics'] = {}
+  const metricMetadata: Record<string, { unit: string | null; minimumN: number }> = {}
+  const metricContributorExecutionIds:Record<string,string[]>={}
   for (const rule of definition.metricRules) {
+    if (input.leaf) {
+      const units = new Set(input.batch.resolved.flatMap(result => result.metrics
+        .filter(metric => metric.key === rule.sourceMetricKey).map(metric => metric.unit ?? null)))
+      if (units.size > 1) reportingFail('REPORT_MEASUREMENT_MISMATCH', 'selected metric has mixed units', 409)
+      metricMetadata[rule.metricId] = { unit: [...units][0] ?? null, minimumN: Math.max(rule.minimumMetricN, resourceFloor) }
+    }
     const values: number[] = []
+    const contributingExecutionIds:string[]=[]
     for (const result of input.batch.resolved) {
       const candidates = result.metrics.filter((metric) => metric.key === rule.sourceMetricKey)
       if (candidates.length > 1) reportingFail('AMBIGUOUS_OBSERVATION', `metric ${rule.sourceMetricKey} is ambiguous`, 409)
@@ -93,7 +105,7 @@ export const buildReportingArtifact = (input: {
         if (!metric.metricQuality || !rule.acceptedMetricQuality.includes(metric.metricQuality)) continue
       }
       const numeric = finiteReportingNumber(metric.value)
-      if (numeric !== null) values.push(numeric)
+      if (numeric !== null){values.push(numeric);contributingExecutionIds.push(result.executionId)}
     }
     const validN = values.length
     const missingN = input.cohort.eligibleN - validN
@@ -102,6 +114,7 @@ export const buildReportingArtifact = (input: {
       metrics[rule.metricId] = { state: 'suppressed' }
       continue
     }
+    if(input.leaf&&validN!==input.batch.resolved.length)metricContributorExecutionIds[rule.metricId]=contributingExecutionIds
     metrics[rule.metricId] = {
       state: 'present', validN, missingN,
       aggregations: reportingAggregations({ values, aggregations: rule.aggregations, distributionCellFloor: metricFloor }),
@@ -130,13 +143,15 @@ export const buildReportingArtifact = (input: {
     spec: { id: input.spec.id, hash: input.spec.specHash },
     resource: { family: input.batch.resourceFamily, key: input.batch.resourceKey, version: input.batch.resourceVersion, effectiveMinimumN: input.batch.resourceMinimumN },
     inputs: inputManifest,
-    options: input.options ?? {},
+    options: input.leaf ? { leaf: input.leaf, descriptionVersion: 'group-descriptive-v1', ...(input.presentation ? { presentation: input.presentation } : {}) } : input.options ?? {},
   })
-  const payload: ReportingGroupArtifactPayloadV1 = {
-    schemaVersion: 1,
+  const payload: ReportingGroupArtifactPayload = {
+    ...(input.leaf ? { schemaVersion: 2 as const, source: { runId: input.cohort.sourceRunId, trackId: input.cohort.sourceTrackId, leaf: input.leaf }, metricMetadata,
+      ...(Object.keys(metricContributorExecutionIds).length?{metricContributorExecutionIds}:{}),
+      descriptionVersion: 'group-descriptive-v1' as const, ...(input.presentation ? { presentation: input.presentation } : {}) }
+      : { schemaVersion: 1 as const, source: { runId: input.cohort.sourceRunId, trackId: input.cohort.sourceTrackId } }),
     artifactId: input.artifactId,
     organizationId: input.cohort.organizationId,
-    source: { runId: input.cohort.sourceRunId, trackId: input.cohort.sourceTrackId },
     cohortSnapshotId: input.cohort.id,
     cohortIdentityHash: input.cohort.cohortIdentityHash,
     specId: input.spec.id,

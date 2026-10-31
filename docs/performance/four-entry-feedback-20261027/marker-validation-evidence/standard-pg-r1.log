@@ -1,0 +1,32 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ × src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > performs actual approval/trials and preserves original Training rights in a separately authorized School runtime 278ms
+   → 系统管理员不能代替入口管理员分配使用权
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > performs actual approval/trials and preserves original Training rights in a separately authorized School runtime
+ScaleLibraryError: 系统管理员不能代替入口管理员分配使用权
+ ❯ fail src/modules/scale-library-governance/contracts.ts:43:9
+     41| // Keep the same exception/status: this is not an authorization fallba…
+     42| export function fail(message: string, status = 409): never {
+     43|   throw new ScaleLibraryError(status, message)
+       |         ^
+     44| }
+     45| export const LIBRARY_SCOPE='scale-library-governance'
+ ❯ assertLibraryAuthority src/modules/scale-library-governance/authority.ts:19:103
+ ❯ src/modules/measurement-content/standard-combination-use.ts:85:19
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/runtime/library.js:130:8000
+ ❯ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts:34:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { statusCode: 403 }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  10:09:36
+   Duration  4.90s (transform 3.28s, setup 0ms, import 4.49s, tests 305ms, environment 0ms)
+

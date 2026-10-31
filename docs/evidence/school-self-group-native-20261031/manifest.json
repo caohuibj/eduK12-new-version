@@ -1,0 +1,232 @@
+{
+  "branch": "feat/school-self-group-native-journey-20261030",
+  "base": "a241691f303e47060b66b519c83e28947f4c6f4b",
+  "sharedRemoteCommit": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+  "sharedLocalCherryPick": "a241691f303e47060b66b519c83e28947f4c6f4b",
+  "organizationId": "43c3a668-0f7d-449d-aebe-11cb804bcd05",
+  "waves": [
+    {
+      "runId": "f29c65d8-1aa8-4ae2-b5ce-897037b5c2bc",
+      "trackId": "89d03cb4-4c73-4bfc-af53-d2665378ef26",
+      "courseId": "58f92b40-f4fc-4201-bde5-3b3eb31dbe01",
+      "completedNInternal": 10
+    },
+    {
+      "runId": "7725af52-7668-4005-ba4f-7356069d59b4",
+      "trackId": "4807df69-c73a-49e3-8805-e21a1b4d9a8f",
+      "courseId": "5b6795cf-d017-4fb8-b40f-7c6c847ea051",
+      "completedNInternal": 10
+    }
+  ],
+  "longitudinalArtifactId": "c946017c-c5a9-411b-a0fc-ea6588cc8179",
+  "oldLongitudinalArtifactRetained": "07ef2a47-fd44-4e1f-b26d-671d72e54a7d",
+  "sameActualFinalsForOwnAndAggregate": true,
+  "ownReportAndOwnChanges": true,
+  "publicRawGroupRejected": true,
+  "studentGroupReadRejected": true,
+  "aggregateMeans": [
+    1,
+    2
+  ],
+  "publicCounts": "null under original restricted privacy policy",
+  "storedReadCanonicalMaterializations": 0,
+  "registryMock": false,
+  "realSpecReview": true,
+  "newTableOrStatisticsEngine": false,
+  "timeFixture": {
+    "realCloseServices": true,
+    "closedAtOnlyAgedInIsolatedDb": true,
+    "physicallyElapsed24Hours": false,
+    "answersOrFinalTimesEdited": false
+  },
+  "verificationLimitations": [
+    "real services with isolated PG; no new browser or HTTP-auth journey in this slice",
+    "no formal migration/restore, mirror security or SAST qualification",
+    "ordinary composition has previous real publication proof, not this new two-wave FINAL proof",
+    "backend typecheck final invocation exited 0; subsequent delta only JSON Date normalization in test assertion and count-null Boolean projection guard with focused contract; no new type shapes"
+  ],
+  "reports": {
+    "native-groups-unit-fix.json": {
+      "success": false,
+      "passed": 1,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "binds the authorized slot and actual source identity without same-key or audience fallback (synthetic core only)",
+          "status": "passed"
+        },
+        {
+          "name": "School same-FINAL GROUP snapshots / native checkpoint continuation generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights",
+          "status": "failed"
+        }
+      ]
+    },
+    "native-groups-first.json": {
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "School same-FINAL GROUP snapshots / native checkpoint continuation generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights",
+          "status": "failed"
+        }
+      ]
+    },
+    "native-hidden-count-contract.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 4,
+      "cases": [
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics isolates same-named leaf totals and keeps raw comparison when only P/R provenance changes",
+          "status": "skipped"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics preserves null and zero, signed baseline change, and breaks adjacency through missing rounds",
+          "status": "skipped"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics retains disclosure suppression and never turns hidden counts or means into zero",
+          "status": "skipped"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics keeps explicitly disclosed means when source privacy independently hides counts",
+          "status": "passed"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics requires actual Cognitive protocol and consistent units; category codes stay categorical",
+          "status": "skipped"
+        }
+      ]
+    },
+    "native-personal-roster-fix.json": {
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "School explicit SELF GROUP source / real native lifecycle publishes and completes two real ten-person waves, keeping authorized own feedback while raw cohort summaries stay hidden",
+          "status": "failed"
+        }
+      ]
+    },
+    "native-groups-json-fix.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "School same-FINAL GROUP snapshots / native checkpoint continuation generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights",
+          "status": "passed"
+        }
+      ]
+    },
+    "native-personal-publish-fix.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "School explicit SELF GROUP source / real native lifecycle publishes and completes two real ten-person waves, keeping authorized own feedback while raw cohort summaries stay hidden",
+          "status": "passed"
+        }
+      ]
+    },
+    "native-personal-first.json": {
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "cases": [
+        {
+          "name": "School explicit SELF GROUP source / real native lifecycle publishes and completes two real ten-person waves, keeping authorized own feedback while raw cohort summaries stay hidden",
+          "status": "failed"
+        }
+      ]
+    },
+    "native-groups-count-fix.json": {
+      "success": false,
+      "passed": 1,
+      "failed": 1,
+      "pending": 4,
+      "cases": [
+        {
+          "name": "School same-FINAL GROUP snapshots / native checkpoint continuation generates real single-wave and plan snapshots from the two native FINAL waves with current manager/leaf rights",
+          "status": "failed"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics isolates same-named leaf totals and keeps raw comparison when only P/R provenance changes",
+          "status": "skipped"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics preserves null and zero, signed baseline change, and breaks adjacency through missing rounds",
+          "status": "skipped"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics retains disclosure suppression and never turns hidden counts or means into zero",
+          "status": "skipped"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics keeps explicitly disclosed means when source privacy independently hides counts",
+          "status": "passed"
+        },
+        {
+          "name": "frozen leaf group longitudinal assembly reuses disclosed wave statistics requires actual Cognitive protocol and consistent units; category codes stay categorical",
+          "status": "skipped"
+        }
+      ]
+    }
+  },
+  "sourceBlobs": {
+    "server-version/backend/src/__tests__/campus/school-private-group-leaf.test.ts": "07935c4b91eded0ef9dbc28486a2d0794f522b49",
+    "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts": "e5582c317ca65a70869bad576967bfbbe39995d5",
+    "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts": "f7cad3da44abea42c73d974b5625e59e3ab65fae",
+    "server-version/backend/src/modules/assessment-run/registeredResources.ts": "8d290123929e9f6dca82492572e08118f6dd2546",
+    "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts": "48ed9795ce910a200e8fa989575d784f65fceab1",
+    "server-version/backend/src/modules/reporting/governedDisclosure.ts": "2237597e5f3b2da6b6e5f1698aac578226bd5435",
+    "server-version/backend/src/modules/reporting/group-longitudinal.ts": "7e6c7c0a350e1f09b9240830ae32036a232dbc53",
+    "server-version/backend/src/modules/reporting/resultSource.ts": "3130744967e8211ccea5aab719cd07eaf032643b",
+    "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts": "9f6091fced6ee58c70b76795fc5831645b1e29f0",
+    "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts": "d30dd915a8b214b6c06860e60d3fd64ee62daff8"
+  },
+  "evidenceSha256": {
+    "native-groups-count-fix.log": "137e8cd2734c3919bec0770873a9328d0ddeeb2c78d40579509e2715e43f6d47",
+    "native-groups-unit-fix.json": "a35aa750bfdf8522ec38011814404508daff9aeded5d0782bdd53d8af154f0a0",
+    "native-groups-first.json": "b32ef78b9b1e23edc4077c3391ae5887f8b5137a6978e2828f5c23fa1794f80a",
+    "native-groups-json-fix.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "native-leaf-diagnosis.log": "758623627882d019b677a452a6f825f380cd7079a13195f2dcc2ae068071425f",
+    "native-hidden-count-contract.json": "f9bf8c22e4b86c2435ccf09a79fbcfaa66f2e65655fed9d5c0954e45de7c7263",
+    "native-hooks-types-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-hooks-types-first.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "native-personal-roster-fix.json": "46e936ec26ca49163df1550a30db4bd983e707ec3fda45f8369b55250d52b75d",
+    "native-personal-publish-fix.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "native-groups-json-fix.json": "27a4e072ac786ac2f04ebbb2aecf1bac2a30d3fbb06e3da385388fce6c30d827",
+    "native-personal-publish-fix.log": "8007d24cd193879899aded99e75ff43171c6021982b53c775360360052294a22",
+    "native-personal-roster-fix.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "native-catalog-diagnosis.log": "5f4695ae9788b35106e9d925e2d6b8a4e9e210908a2e80249e835eb51d4e710e",
+    "native-groups-unit-fix.log": "a0ffe161001f8a5087e91f52b02f9aebf1aaa58c01c72989a83849aa2d773045",
+    "native-groups-first.log": "a22416dc48cdcbcd00c5a77c5720d7805449be8e0a692f0894e3d6dd8a46a400",
+    "native-groups-first.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "native-personal-roster-fix.log": "2b3629922334c8a2c352d323a4be86cdca33055e59a825e403f2f3fd86b21690",
+    "native-groups-count-fix.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "native-hooks-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-personal-publish-fix.json": "d0db4b78a0319154eb1d302b91cfd254fe56ad0fb29784302ffc04a4792b552f",
+    "native-hidden-count-contract.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "863-binary-inventory.json": "2f67e2e17001d7a863d1c06b12ab987f881bc5a29988cbfa566c17d2056fca2a",
+    "native-leaf-diagnosis-env-fix.log": "e39922136db9ded0d3b227044126b1ac13bae70e77a78f132445d7a7fb038013",
+    "native-personal-first.log": "d363d72fea62e2813936ae1861a4c8b81854cac978d65e34be34f26a09a6a3f0",
+    "native-personal-first.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "native-personal-first.json": "568da8481302c2d5a4c7ffbbcb9d2a9cc8c7af140de6c8405e22adeea19fee4b",
+    "native-hooks-types-final.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "native-groups-unit-fix.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "native-groups-count-fix.json": "9339458e301472730235d3027e6e0943b45cf30848bfbe8dbcafaceba1260656",
+    "native-hidden-count-contract.log": "d6f1d45dccc467a8425ec60b2c25fcb6cd80c667894aeebac39840d129a2a605",
+    "native-groups-json-fix.log": "07d437478957b11c67be72fe1c882602c87d9c9c9c9d3e0e268efdeb3e3e4580"
+  }
+}

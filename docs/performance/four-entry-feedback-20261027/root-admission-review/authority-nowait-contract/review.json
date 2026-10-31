@@ -1,0 +1,121 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "authority-nowait-contract",
+  "outcomes": [
+    "exact education delivery use authority reuses the persisted workflow and checks all original authorities, not current admin as replacement",
+    "exact education delivery use authority refuses substituted product without issuer lookup",
+    "exact education delivery use authority refuses substituted organizationId without issuer lookup",
+    "exact education delivery use authority refuses substituted family without issuer lookup",
+    "exact education delivery use authority refuses when the actual product workflow changes while acquiring its organization lock",
+    "exact education delivery use authority rejects a revoked original reviewer even if the requesting manager remains qualified",
+    "exact education delivery use authority accepts a currently authorized professional through the existing capability resolver",
+    "does not accept a later valid administrator role when the original grant row is gone",
+    "rejects withdrawn exact distribution authority before returning new-use permission"
+  ],
+  "originalSHA256": {
+    "report": "d4688196525329ff17b5fb8fdb12959ce26dc02d74ac979d820ce2bd55b77831",
+    "execution": "c9f0c67599a738d41674ddd098c6d60a860a00d98eb643cc979c7c07ebb41b3a",
+    "log": "c207b673f19a93652ff6ac405fec521de7940650274403438db063412bb8c350",
+    "inputs": "f49f05b55953e79f379f1d015fb56831b22280957189daaf28004f28713430be"
+  },
+  "currentInputsSHA256": "7c983f010b70d51f8edac2cfdb8ecbeb7f9897f5af89a40cb884cc3632c3b8ce",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/backend/src/__tests__/education-tools/assessment-resource.authority.test.ts; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/backend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 9,
+    "numPassedTests": 9,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "exact education delivery use authority reuses the persisted workflow and checks all original authorities, not current admin as replacement",
+      "status": "passed"
+    },
+    {
+      "fullName": "exact education delivery use authority refuses substituted product without issuer lookup",
+      "status": "passed"
+    },
+    {
+      "fullName": "exact education delivery use authority refuses substituted organizationId without issuer lookup",
+      "status": "passed"
+    },
+    {
+      "fullName": "exact education delivery use authority refuses substituted family without issuer lookup",
+      "status": "passed"
+    },
+    {
+      "fullName": "exact education delivery use authority refuses when the actual product workflow changes while acquiring its organization lock",
+      "status": "passed"
+    },
+    {
+      "fullName": "exact education delivery use authority rejects a revoked original reviewer even if the requesting manager remains qualified",
+      "status": "passed"
+    },
+    {
+      "fullName": "exact education delivery use authority accepts a currently authorized professional through the existing capability resolver",
+      "status": "passed"
+    },
+    {
+      "fullName": "does not accept a later valid administrator role when the original grant row is gone",
+      "status": "passed"
+    },
+    {
+      "fullName": "rejects withdrawn exact distribution authority before returning new-use permission",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend",
+      "currentObject": "3f56dbc63c9be94321c5f3d81dc10fffee5a9240",
+      "rationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node 24.22.1 is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance."
+  ],
+  "rootReadRationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+}

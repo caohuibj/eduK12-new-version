@@ -53,16 +53,17 @@ export async function freezePrivacyForRunPublication(tx:Prisma.TransactionClient
 }
 /** Missing V1 evidence means LEGACY_STRICT, never an implicit standard-mode upgrade. */
 export async function readFrozenPrivacyForRun(tx:Prisma.TransactionClient,input:{
-  organizationId:string;runId:string;product:EducationProduct;scenario:PrivacyScenario
+  organizationId:string;runId:string;product:EducationProduct;scenario:PrivacyScenario|readonly PrivacyScenario[]
 }){
   const row=await tx.educationReportPolicySnapshot.findUnique({
     where:{organizationId_runId:{
       organizationId:input.organizationId,runId:input.runId}},
   })
   if(!row)return {mode:'LEGACY_STRICT' as const}
-  if(row.product!==input.product||row.scenario!==input.scenario
+  const scenarios=typeof input.scenario==='string'?[input.scenario]:input.scenario
+  if(row.product!==input.product||!scenarios.includes(row.scenario as PrivacyScenario)
     ||row.policyVersion!==1||row.effectiveHash!==policyFingerprint(row.effective))
     throw new ReportPrivacyError('PRIVACY_SNAPSHOT_INTEGRITY',409)
   return {mode:'FROZEN_V1' as const,effective:row.effective,
-    fingerprint:row.fingerprint,policySnapshotId:row.id}
+    scenario:row.scenario as PrivacyScenario,fingerprint:row.fingerprint,policySnapshotId:row.id}
 }

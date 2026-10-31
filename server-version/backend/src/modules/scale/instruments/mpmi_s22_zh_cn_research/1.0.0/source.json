@@ -1,0 +1,2029 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mpmi_s22_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "日常记事与提醒习惯问卷（MPMI-s，22题中文工作稿）",
+      "abbreviation": "MPMI-s-22-ZH",
+      "instrumentFamily": "Metacognitive Prospective Memory Inventory, short version"
+    },
+    "construct": {
+      "primaryDomain": "EXECUTIVE_FUNCTION",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "自我报告能否在合适的时候记住原本打算做的事情，以及在脑中排练和借助外部提醒的频率；不是客观记忆表现、疾病筛查或智力测试。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mpmi_s22_zh_cn_research",
+        "domain:selfreg_executive",
+        "domain:everyday_memory",
+        "construct:prospective_memory",
+        "construct:metamemory",
+        "construct:prospective_memory_ability",
+        "construct:internal_memory_strategies",
+        "construct:external_memory_aids",
+        "construct:intention_remembering",
+        "orientation:prospective_memory_framework",
+        "orientation:not_therapy_specific",
+        "population:adult",
+        "population:adult_19_to_71",
+        "population:source_german_adults",
+        "population:self_report",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:fixed_order",
+        "response:22_items",
+        "response:five_point_frequency",
+        "response:four_reverse_items",
+        "response:optional_items_with_dimension_missing_limit",
+        "use:research",
+        "use:individual_reflection",
+        "use:everyday_planning",
+        "use:not_diagnostic",
+        "use:not_cognitive_performance_test",
+        "use:not_high_stakes_selection",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:source_administration_de",
+        "language_validation:author_published_english_translation",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established",
+        "日常记事",
+        "记住要做的事",
+        "前瞻记忆",
+        "待办清单",
+        "备忘录",
+        "日历提醒",
+        "购物清单",
+        "记事策略",
+        "成人自评",
+        "中文工作译稿",
+        "非诊断",
+        "可署名再分发"
+      ]
+    },
+    "population": {
+      "minAge": 19,
+      "maxAge": 71,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原研究为德国成人GESIS面板，19–71岁，两波N=4069/3857，实际德语施测。本平台暂设19–71岁成人自评范围，属于版本使用边界，并非证明所有同龄中国成人均已验证；不自动推广至K12、临床筛查或认知障碍评估。"
+    },
+    "administration": {
+      "itemCount": 22,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般日常记事与使用提醒办法的频率；原来源未规定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按2019作者附录PMA8、PMSi7、PMSe7的顺序，完整保留22题；不采用正文三组各8题的误写。",
+        "选项1–5为rarely/rather rarely/sometimes/rather often/often，中文为平台工作翻译。",
+        "既有独立中文工作指导语已逐字绑定到顶层instruction，不拼进第1题，不增加固定回顾时窗；具体页面展示以实际消费者核验为准。",
+        "第1、4、5、8题转换为6减原始值。每维等权均分；不制造全表总分。",
+        "每维最多漏1题，按已答题均分；超过1题该维不可计算。当前引擎技术字段prorated=true不代表按比例扩成总分或插补缺失题。",
+        "6分钟是平台估计，非原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "源德语成人研究可追溯，当前中文稿不自动继承其验证结论。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于回顾日常记事和提醒习惯，不据此评定记忆疾病或工作能力。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "mpmi-rummel2019-de-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "德国成人GESIS面板，原研究德语施测；两波含相同参与者，非两个独立样本",
+        "ageRange": "19–71岁",
+        "locale": "de",
+        "territory": "DE",
+        "sampleSize": 4069,
+        "studyDesign": "两波面板验证PMA、PMSi、PMSe结构；第二波3857人；不把结构方程中未反向的分析编码用于个人计分。",
+        "rating": "MIXED",
+        "citation": "Rummel, J., Danner, D., & Kuhlmann, B. G. (2019). The short version of the Metacognitive Prospective Memory Inventory (MPMI-s): factor structure, reliability, validity, and reference data. Measurement Instruments for the Social Sciences. https://doi.org/10.1186/s42409-019-0008-6.",
+        "doi": "10.1186/s42409-019-0008-6",
+        "url": "https://link.springer.com/article/10.1186/s42409-019-0008-6",
+        "notes": "作者附录实际8/7/7=22题；正文三组各8题与题本矛盾，依据附录及GESIS计分页闭合。"
+      },
+      {
+        "evidenceId": "mpmi-rummel2019-de-reliability",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "同一德国成人面板，非中国样本",
+        "locale": "de",
+        "territory": "DE",
+        "sampleSize": 4069,
+        "studyDesign": "作者报告三维内部一致性与约6个月重测；结果不迁移至本中文工作译稿。",
+        "rating": "MIXED",
+        "citation": "Rummel, J., Danner, D., & Kuhlmann, B. G. (2019). The short version of the Metacognitive Prospective Memory Inventory (MPMI-s): factor structure, reliability, validity, and reference data. Measurement Instruments for the Social Sciences. https://doi.org/10.1186/s42409-019-0008-6.",
+        "doi": "10.1186/s42409-019-0008-6",
+        "url": "https://link.springer.com/article/10.1186/s42409-019-0008-6",
+        "notes": "德国年龄/性别参考分布不作为平台中国常模；无临床阈值绑定。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "2019作者附录A中公开的完整英文译文；原研究用德语。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿，与原语言工具保留来源关系但独立管理版本；没有作者认可、专家译审或中国人群验证声明。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "mpmi_s22_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 228,
+        "maxExclusive": 864
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "mpmi_s22_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "mpmi_s22_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2019 Rummel, Danner and Kuhlmann. Rummel, J., Danner, D., & Kuhlmann, B. G. (2019). The short version of the Metacognitive Prospective Memory Inventory (MPMI-s): factor structure, reliability, validity, and reference data. Measurement Instruments for the Social Sciences. https://doi.org/10.1186/s42409-019-0008-6. 原论文及作者附录A为CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；复制、中文翻译和原创反馈保留署名、许可链接与修改说明。采用作者2019附录的英文表述，不复制GESIS 2024 Standard License载体为开放题本；GESIS网页仅核对22题、均分和缺失规则事实。中文工作稿不等于作者验证中文版；图片如有为EDUK12.TOP原创AI辅助素材，不属于原作者研究图。",
+      "许可标签用于分类与检索，系统实际授权沿用既有事实源；本包DRAFT，不授予或激活任何产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "MPMI-s 2019 author Supplement A English translations; independently prepared Chinese working version",
+        "citation": "Rummel, J., Danner, D., & Kuhlmann, B. G. (2019). The short version of the Metacognitive Prospective Memory Inventory (MPMI-s): factor structure, reliability, validity, and reference data. Measurement Instruments for the Social Sciences. https://doi.org/10.1186/s42409-019-0008-6.",
+        "url": "https://link.springer.com/article/10.1186/s42409-019-0008-6",
+        "publicationYear": 2019
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2019 Rummel, Danner and Kuhlmann. Rummel, J., Danner, D., & Kuhlmann, B. G. (2019). The short version of the Metacognitive Prospective Memory Inventory (MPMI-s): factor structure, reliability, validity, and reference data. Measurement Instruments for the Social Sciences. https://doi.org/10.1186/s42409-019-0008-6. 原论文及作者附录A为CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；复制、中文翻译和原创反馈保留署名、许可链接与修改说明。采用作者2019附录的英文表述，不复制GESIS 2024 Standard License载体为开放题本；GESIS网页仅核对22题、均分和缺失规则事实。中文工作稿不等于作者验证中文版；图片如有为EDUK12.TOP原创AI辅助素材，不属于原作者研究图。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "mpmi_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "很少",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较经常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "经常",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "MPMI_01",
+          "content": "我会忘记在截止日期前取消合约，比如报纸的试订服务。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_02",
+          "content": "我会记得在规定时间内办好事情，比如在干洗店关门前取回衣物。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_03",
+          "content": "如果向别人借东西有一段时间了，下次见面时我会记得还给对方。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_04",
+          "content": "第一次没打通朋友的电话后，我会忘记再打一次。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_05",
+          "content": "我会因为忘记按时支付账单而收到催缴通知。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_06",
+          "content": "我能够自己想起还没打的电话，比如今天需要给过生日的朋友打电话。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_07",
+          "content": "即使没有写下来，我也会及时想起这几天要赴的约。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_08",
+          "content": "即使已经写下提醒，我还是没能按时发出该发的邮件或信件。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_09",
+          "content": "即使正在忙别的事，我也会有意识地反复想着还没做完的事情，以免忘记。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_10",
+          "content": "早上我会在脑中把当天要做的事情过一遍，以免忘记。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_11",
+          "content": "如果有几件事需要按顺序完成，比如烘焙，我会在开始前想象整个步骤。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_12",
+          "content": "做完一件事后，我会再检查是否都处理好了，比如做完饭后是否关了炉灶。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_13",
+          "content": "我会在脑中列一份还有哪些事情没做的清单。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_14",
+          "content": "忙着做其他事情时，比如洗碗或运动，我会在脑中回想待办清单。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_15",
+          "content": "购物前，我会想象需要的商品在店里的什么位置，以免经过货架时忘记拿。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_16",
+          "content": "我会写一份待办清单，提醒自己还有哪些事情要做。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_17",
+          "content": "我会写购物清单。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_18",
+          "content": "第二天早上要带的东西，比如信件或借的图书，我会在前一晚放进包里，以免早上忘记。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_19",
+          "content": "我会用日历记下所有约定和安排。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_20",
+          "content": "我会把写有待办事项的便条贴在显眼的地方，提醒自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_21",
+          "content": "我会把物品放在显眼的位置，提醒自己要做的事，比如把装满的垃圾袋放在门口，以免忘记拿出去。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MPMI_22",
+          "content": "对于需要定期做的事情，我会安排在每天同一时间做，比如每天晚上刷牙前服药。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "mpmi_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "MPMI_01",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MPMI_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MPMI_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MPMI_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "MPMI_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MPMI_22",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "pma",
+            "type": "dimension",
+            "label": "记住要做的事",
+            "description": "更多表示你自述较常记住原本打算做的事情，不是客观记忆能力测验。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 7
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPMI_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "pmsi",
+            "type": "dimension",
+            "label": "在脑中过一遍",
+            "description": "更多表示较常在脑中排练或回想待办事项，不能当作能力高低。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 6
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPMI_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "pmse",
+            "type": "dimension",
+            "label": "借助身边的提醒",
+            "description": "更多表示较常使用清单、日历和环境提示，不表示记忆更差或更好。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "prorate_if_min_answered",
+              "minimumAnswered": 6
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MPMI_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MPMI_22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "pma",
+          "pmsi",
+          "pmse"
+        ],
+        "scoreOrder": [
+          "pma",
+          "pmsi",
+          "pmse"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "pma",
+            "headline": "记住原定事项：自述习惯，不是记忆测试",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份报告带走一句话：让提醒替自己分担，不用独自记住一切证明能力。\n\n题目问一般日常频率，没有固定最近七天或一个月。三项均分各1–5，没有总分；记事这一项已统一计分方向，越大表示较常自述能及时想起原本打算做的事情，不是更常忘记，也不是客观记忆成绩。\n\n例如，到约定时间想起还一本借书，是可回顾的情境，不是报告已认定的表现。精力、任务数量、重要性和提醒条件都可能影响体验。已有好用线索可保留；一次错过也不能据此贴“记性差”标签或判断疾病。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一件普通待办，想想行动前什么线索最容易被看到。只了解当时安排，不把忘记一次扩大成整体能力结论。"
+              },
+              {
+                "category": "strategy",
+                "text": "为一件非紧急小事设置一个与行动地点或时间接近的提醒，再看实际有没有帮上忙。重要安排仍使用可靠方式核实，不把问卷分数当安全保证。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pmsi",
+            "headline": "内部提醒：在脑中过一遍，不必一直惦记",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "七题均分1–5，越大表示更常在心里排练步骤、回想待办或检查是否完成，不代表记忆更强或方法更有效。\n\n例如，做事前在脑中过一下第一步，只是可能的习惯，报告没有读出你的具体策略。对有些任务有帮助的方式，对另一些任务可能只是增加惦记和负担。\n\n已有轻松、够用的安排可以保留。不要求反复检查或持续把所有事情挂在脑中，使用得更多也不是目标。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "只为一件小事简短想清第一步，之后转到行动。若反复回想让自己更累，可以把要点交给一份清单或合适提醒，不增加检查次数来提高分数。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pmse",
+            "headline": "外部提醒：用工具不是能力不足",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "七题均分1–5，越大表示较常使用清单、日历、便条、提前摆放物品或稳定时间安排，不代表记性更差，也不保证一定记得。\n\n例如，把要归还的书提前放进包里，是一种可能线索，不是系统已判断你依赖工具。方法还需要在正确时点被注意到，并适合实际行动。\n\n已有有效提醒可保留。工具不是越多越好，重复通知、摆放位置和隐私也值得考虑，不必把生活安排成一套复杂系统。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "选一个会在行动前看到、又安全且不暴露隐私的提醒位置或时间。试用后只调整一处，避免挡路或堆叠通知；不需要换掉已有好用的办法。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅供19–71岁成人回顾日常习惯，本独立中文稿未验证；三项不是客观记忆、疾病或工作能力判断。 若有漏答但仍能计算，均分只依据已答题，解释需更谨慎；漏答不算零分。"
+        ],
+        "disclaimer": "用于回顾成年人的日常记事与提醒习惯，不是考试，也不能用于诊断。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:52:24Z",
+            "basis": "本次AI文字自审对应mpmi_s22_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mpmi_s22",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "pma": 1.0,
+            "pmsi": 1.0,
+            "pmse": 1.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "pma": 5.0,
+            "pmsi": 5.0,
+            "pmse": 5.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": 3.0,
+            "pmse": 3.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_one",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": 1.0,
+            "pmse": 1.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_five",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": 5.0,
+            "pmse": 5.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "pma": 2.375,
+            "pmsi": 3.4285714285714284,
+            "pmse": 2.5714285714285716
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "one_missing_pma",
+        "answers": [
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": 3.0,
+            "pmse": 3.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "one_missing_each",
+        "answers": [
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "limited",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": 3.0,
+            "pmse": 3.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "two_missing_pma",
+        "answers": [
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "pma": null,
+            "pmsi": 3.0,
+            "pmse": 3.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "two_missing_pmsi",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": null,
+            "pmse": 3.0
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "two_missing_pmse",
+        "answers": [
+          {
+            "itemCode": "MPMI_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MPMI_22",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "pma": 3.0,
+            "pmsi": 3.0,
+            "pmse": null
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "pma": null,
+            "pmsi": null,
+            "pmse": null
+          },
+          "totalScoreKeys": [
+            "pma",
+            "pmsi",
+            "pmse"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请根据自己的日常情况，判断下面的说法多常符合你。想想一般的生活习惯，不必只回忆某一天。请选择最接近自己情况的选项，没有标准答案。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/administration.md @ b92c69aefa2472775fa7ee86b9c208366886c908；既有项目中文工作指导语，与instruction.for-pr356.json正文一致，不增加固定回顾时窗。"
+  }
+}

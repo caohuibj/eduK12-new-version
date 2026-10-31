@@ -1,3 +1,4 @@
+import {schoolTrackingOptions,createNextSchoolTrackingActivity,removeSchoolTrackingDraftSource} from './personal-tracking'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
 import { authenticateSchool } from '../../middleware/auth'
@@ -11,6 +12,7 @@ import {
   createCampusActivityRunDraft,bindCampusActivityRun,
 } from './activity.runs'
 import { prisma } from '../../config/database'
+import {listEducationAssessmentResources} from '../education-tools/assessment-resource.catalog'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -37,6 +39,19 @@ router.get('/organizations/:organizationId/activities/:courseId/run-resources',
     return assessmentRunController.schoolActivityResources(req,res,path.parse(req.params))
   })
 )
+router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/assessment-resources',
+  authenticateSchool,wrap(async(req,res)=>{
+    const scope=runPath.parse(req.params)
+    await assertCampusActivityRunEditor({actor:req.user!,...scope})
+    const query=z.object({expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional()}).strict().parse(req.query)
+    return success(res,await listEducationAssessmentResources({product:'SCHOOL',...scope,workflowId:scope.courseId,...query,actor:req.user!}))
+  })
+)
+
+router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/tracking',authenticateSchool,wrap(async(req,res)=>success(res,await schoolTrackingOptions({actor:req.user!,...runPath.parse(req.params)}))))
+router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/next-wave',authenticateSchool,wrap(async(req,res)=>success(res,await createNextSchoolTrackingActivity({actor:req.user!,...runPath.parse(req.params),...z.object({requestId:uuid}).strict().parse(req.body)}))))
+
+router.delete('/organizations/:organizationId/activities/:courseId/runs/:runId/tracks/:trackId',authenticateSchool,wrap(async(req,res)=>success(res,await removeSchoolTrackingDraftSource({actor:req.user!,...runPath.extend({trackId:uuid}).parse(req.params),...z.object({expectedVersion:z.number().int().positive()}).strict().parse(req.body)}))))
 
 router.post('/organizations/:organizationId/activities/:courseId/runs',
   authenticateSchool,wrap(async(req,res)=>{
@@ -67,6 +82,10 @@ router.get('/organizations/:organizationId/activities/:courseId/runs/:runId',
 )
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/tracks',
   authenticateSchool,wrap(async(req,res)=>{
+    // Ordinary attachment owns current editor/own activity, author, draft CAS
+    // and source checks inside its single write transaction. Do not repeat the
+    // same read-only editor preflight before that authoritative boundary.
+    if(req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateComposition'))return assessmentRunController.addTrack(req,res)
     const result=await assertCampusActivityRunEditor({
       actor:req.user!,...runPath.parse(req.params),
     })

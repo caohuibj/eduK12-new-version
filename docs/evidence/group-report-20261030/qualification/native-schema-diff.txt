@@ -1,0 +1,54 @@
+--- /tmp/group-report-native-schema-upgrade.sql	2026-10-30 07:37:52.524774328 +0000
++++ /tmp/group-report-native-schema-restore.sql	2026-10-30 07:37:52.764778569 +0000
+@@ -2,7 +2,7 @@
+ -- PostgreSQL database dump
+ --
+ 
+-\restrict VkiYZvP9SPichGq0G6J9q3qP2FKO3sJ57Uk5CrihpongiDFY03wvuiVUH6mfU0J
++\restrict JSOgVOtC4hYXDEmMgzgfwngTM16bi35QraEbkIt8dszVWhcWdFWUCPJQuRhIk6c
+ 
+ -- Dumped from database version 16.15 (Debian 16.15-1.pgdg12+2)
+ -- Dumped by pg_dump version 16.15 (Debian 16.15-1.pgdg12+2)
+@@ -5649,7 +5649,7 @@
+     login_name text NOT NULL,
+     normalized_login text NOT NULL,
+     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+-    CONSTRAINT campus_accounts_login_shape_check CHECK ((((length(login_name) >= 4) AND (length(login_name) <= 32)) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))
++    CONSTRAINT campus_accounts_login_shape_check CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))
+ );
+ 
+ 
+@@ -6710,7 +6710,7 @@
+     revoked_by text,
+     revoke_reason text,
+     CONSTRAINT content_capability_grants_ancestry_check CHECK (((cardinality(ancestry) >= 1) AND (cardinality(ancestry) <= 2))),
+-    CONSTRAINT content_capability_grants_capabilities_check CHECK ((((cardinality(capabilities) >= 1) AND (cardinality(capabilities) <= 12)) AND (capabilities <@ ARRAY['measurement.edit'::text, 'measurement.publish'::text, 'reference.analyze'::text, 'reference.review'::text, 'reference.publish'::text, 'report.edit'::text, 'report.publish'::text, 'catalog.manage'::text, 'material.use'::text, 'material.adapt'::text, 'material.distribute'::text, 'data.reinterpret'::text]))),
++    CONSTRAINT content_capability_grants_capabilities_check CHECK (((cardinality(capabilities) >= 1) AND (cardinality(capabilities) <= 12) AND (capabilities <@ ARRAY['measurement.edit'::text, 'measurement.publish'::text, 'reference.analyze'::text, 'reference.review'::text, 'reference.publish'::text, 'report.edit'::text, 'report.publish'::text, 'catalog.manage'::text, 'material.use'::text, 'material.adapt'::text, 'material.distribute'::text, 'data.reinterpret'::text]))),
+     CONSTRAINT content_capability_grants_check CHECK ((delegable_capabilities <@ capabilities)),
+     CONSTRAINT content_capability_grants_check1 CHECK ((expires_at > valid_from)),
+     CONSTRAINT content_capability_grants_check2 CHECK (((remaining_delegation_depth > 0) OR (cardinality(delegable_capabilities) = 0))),
+@@ -7492,7 +7492,7 @@
+     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+     CONSTRAINT huiteacher_improvement_actions_audience_check CHECK ((audience = ANY (ARRAY['PRIVATE_PERSONAL'::text, 'SCHOOL_SHARED'::text]))),
+-    CONSTRAINT huiteacher_improvement_actions_cipher_check CHECK ((((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000)) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000)))),
++    CONSTRAINT huiteacher_improvement_actions_cipher_check CHECK (((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000)))),
+     CONSTRAINT huiteacher_improvement_actions_completion_check CHECK (((status = 'COMPLETED'::text) = (completed_at IS NOT NULL))),
+     CONSTRAINT huiteacher_improvement_actions_evidence_check CHECK (((evidence_cipher IS NULL) = (evidence_hash IS NULL))),
+     CONSTRAINT huiteacher_improvement_actions_hash_check CHECK (((goal_hash ~ '^[a-f0-9]{64}$'::text) AND (plan_hash ~ '^[a-f0-9]{64}$'::text) AND ((evidence_hash IS NULL) OR (evidence_hash ~ '^[a-f0-9]{64}$'::text)))),
+@@ -9316,7 +9316,7 @@
+     login_name text NOT NULL,
+     normalized_login text NOT NULL,
+     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+-    CONSTRAINT survey_login_shape_check CHECK ((((length(login_name) >= 4) AND (length(login_name) <= 32)) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))
++    CONSTRAINT survey_login_shape_check CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))
+ );
+ 
+ 
+@@ -23660,5 +23660,5 @@
+ -- PostgreSQL database dump complete
+ --
+ 
+-\unrestrict VkiYZvP9SPichGq0G6J9q3qP2FKO3sJ57Uk5CrihpongiDFY03wvuiVUH6mfU0J
++\unrestrict JSOgVOtC4hYXDEmMgzgfwngTM16bi35QraEbkIt8dszVWhcWdFWUCPJQuRhIk6c
+ 

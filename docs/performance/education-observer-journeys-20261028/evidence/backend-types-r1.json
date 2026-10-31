@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "actualInvocation": [
+    "./node_modules/.bin/tsc",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "componentTree": "e2812baf6d8ff641ff40f32443ee318a56e28563",
+  "node": "v24.22.1",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAssociationBasis": "Compiler completed on identical new test plus unchanged backend files before the first remote commit; tree association recorded after completion. Original shell exit was 0. No signed execution claim."
+}

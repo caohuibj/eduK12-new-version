@@ -1,6 +1,6 @@
 import { verifyPackageFixtures } from '../assessment-bundle/onboarding/fixtures'
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient, type BundlePackageRelease } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-bundle/onboarding/contract'
@@ -58,6 +58,7 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     if(row.status==='HOLD' && (!review.reviewedAt || Date.parse(review.reviewedAt)<=row.updatedAt.getTime() || (row.review as any)?.signature===review.signature))throw new Error('BUNDLE_HOLD_REVIEW_REQUIRED')
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
     const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
+    if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     if(p.rules.items.some(r=>r.kind!=='limitation'&&!review.claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     await assertPublishedDependencies(tx, p)
     return tx.bundlePackageRelease.update({where,data:{status:'PUBLISHED',review:review as Prisma.InputJsonValue,publishedBy:actorId}})
@@ -78,11 +79,24 @@ export async function assertPackageAdmission(db:Prisma.TransactionClient,raw:unk
   const p=parseDeclarativePackage(raw),d=p.manifest.definition
   await db.$queryRaw`SELECT id FROM bundle_package_releases WHERE "bundleKey"=${d.bundleKey} AND "bundleVersion"=${d.bundleVersion} FOR SHARE`
   const row=await db.bundlePackageRelease.findUnique({where:{bundleKey_bundleVersion:{bundleKey:d.bundleKey,bundleVersion:d.bundleVersion}}})
+  return validatePackageAdmission(db,p,row)
+}
+async function validatePackageAdmission(db:Prisma.TransactionClient,p:ReturnType<typeof parseDeclarativePackage>,row:BundlePackageRelease|null){
   if(!row||row.status!=='PUBLISHED'||row.contentHash!==hashDeclarativePackage(p))throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
   const review=validateReview(row.review,row.contentHash,process.env.BUNDLE_REVIEW_SIGNING_KEY)
   await admin(db,review.reviewerId)
   if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
+  if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
   const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row
+}
+/** Exact public-directory consumption: one locked source read, with the SAME
+ * review/dependency admission as native Training. No duplicate body lookup. */
+export async function readPackageReleaseAdmission(db:Prisma.TransactionClient,versionId:string,contentHash:string){
+  const [row]=await db.$queryRaw<BundlePackageRelease[]>`SELECT * FROM bundle_package_releases WHERE id=${versionId} AND "contentHash"=${contentHash} FOR SHARE`
+  if(!row)throw new Error('BUNDLE_PACKAGE_NOT_PUBLISHED')
+  const p=parseDeclarativePackage(row.content),d=p.manifest.definition
+  if(d.bundleKey!==row.bundleKey||d.bundleVersion!==row.bundleVersion)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
+  return validatePackageAdmission(db,p,row)
 }

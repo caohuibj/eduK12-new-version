@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "base": "f4a842b71306a6e4a5de08e0cb904b06f26f28b7",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "recordedAt": "2026-10-29T23:00:34.216918+00:00",
+  "scope": "Unchanged repository role/table/schema contracts on one new local clone; ordinary Training exact use write/replay/original request and frozen full-R report read via actual restricted DB identity. Test-only repository delta.",
+  "results": {
+    "runtimeTables": 267,
+    "runtimeSequences": 1,
+    "migrationCount": 255,
+    "migrationFingerprint": "4bd42b7e74dff5c3999ce84425aee16ce10b27df2eda3c8450acf200fb8d164a",
+    "actualRoleRestricted": true,
+    "actualCurrentAndSessionUserEqual": true,
+    "ledgerWriteDenied": "42501",
+    "httpPostgresCasesPassed": 2,
+    "recordedHttpRequests": 5,
+    "originalFailures": 0,
+    "backendClosureTypesExit": 0,
+    "historicalBindingRevision": 7,
+    "physicalUseBefore": 8,
+    "newUseAfter": 9,
+    "taskRowsUnchanged": 13,
+    "userRowsUnchanged": 6,
+    "physicalGrantRows": 4
+  },
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost:55439",
+    "database": "precise_runtime_role_test_20261029",
+    "template": "precise_training_course_journey_test_20261029 unchanged",
+    "runtimeRole": "precise_task1_runtime",
+    "provisioningOwner": "materials_owner (provision only, never application identity)",
+    "redis": "localhost:56389/6 normal limits",
+    "productionAccessed": false
+  },
+  "raw": {
+    "file": "runtime-role-raw.json",
+    "sha256": "b8ad73124f7aa7800cdb2dc488862005dd95490911125a621c9593d0584899b9"
+  },
+  "finalFilesSha256": {
+    "server-version/backend/src/__tests__/assessment-authorization/exact-use-runtime-role.http.postgres.integration.test.ts": "2c72a9e0349778399000d419f6c5170f93ac2ab6f68a7e94a802d020838cf388"
+  },
+  "contractsSha256": {
+    "server-version/backend/scripts/runtime-role-defaults.sql": "074b528ae8077fd2df073143ba4bb55c981f409e4a12eb35ba3abdf1d955c30b",
+    "server-version/backend/scripts/runtime-table-policy.json": "c1470d376dd84d2ac57371889211167693bd16b4c6f4a435db1de96655fa99d1",
+    "server-version/backend/scripts/runtime-role-contract.mjs": "f252be0d53b63a22495e5b0894cfd394fac79ab9c1bacfd23f16d890db2cfd81"
+  },
+  "evidenceLimit": "Post-execution source inventory. Real restricted DB role, synthetic JWT recent-MFA proof; not signed CI evidence or all-entry runtime-role qualification.",
+  "notExecuted": [
+    "School/Teacher/Survey write flows under this role",
+    "browser-connected real MFA",
+    "same-environment latency/load/batch baseline",
+    "formal CI/PR/merge/deployment"
+  ]
+}

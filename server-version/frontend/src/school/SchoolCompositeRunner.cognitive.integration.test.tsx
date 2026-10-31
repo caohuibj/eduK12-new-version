@@ -42,7 +42,7 @@ const makeApi=(trialCount=1,presentation?:unknown)=>{
     if(path===startUrl&&method==='POST')return {
       state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-A',
     }
-    if(path===parent&&method==='GET')return {
+    if(path===parent+'?view=current-unit'&&method==='GET')return {
       id:'parent-A',status:submitted?'COMPLETED':'IN_PROGRESS',
       deliveryMode:'FINAL_ONLY',
       currentItem:submitted?null:{id:'slot-cognitive-A',type:'COGNITIVE',position:1,

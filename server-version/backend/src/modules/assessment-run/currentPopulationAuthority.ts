@@ -1,6 +1,8 @@
 import {privateFormTrackIdentitySql} from './educationPrivateFormIdentitySql'
+import {educationCompositionTrackIdentitySql} from './educationCompositionIdentitySql'
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
+import {studentEvaluationTrackConfigSql} from '../huiteacher/studentCompositionResource'
 import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
 
 /** Shared current population gate. Intake deadlines do not remove own history.
@@ -90,6 +92,10 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
         (relation.relationship_kind='SELF'
         AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
         AND subject.user_id=respondent.user_id
+        AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks ordinary_track WHERE ordinary_track.id=x.track_id
+         AND ordinary_track.organization_id=x.organization_id AND ordinary_track.run_id=x.run_id
+         AND ordinary_track.resource_key LIKE 'education-composition:%'
+         AND NOT ${educationCompositionTrackIdentitySql({track:Prisma.sql`ordinary_track`,organizationId:Prisma.sql`org.id`,product:'TEACHER'})})
         AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks private_form_track
           WHERE private_form_track.id=x.track_id AND private_form_track.organization_id=x.organization_id
            AND private_form_track.run_id=x.run_id AND private_form_track.resource_key LIKE 'private-form:%'
@@ -144,9 +150,7 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
             JOIN assessment_run_tracks track
               ON track.organization_id=h.organization_id AND track.run_id=h.run_id
               AND track.id=x.track_id
-              AND track.resource_family='FORM'
-              AND track.resource_key='huiteacher-student-form:'||cfg.form_id
-              AND track.resource_version=cfg.definition_digest
+              AND ${studentEvaluationTrackConfigSql(Prisma.sql`track`,Prisma.sql`cfg`)}
             JOIN huiteacher_evaluation_targets target
               ON target.organization_id=cfg.organization_id
               AND target.id=event.target_id AND target.kind='PERSON'
@@ -184,6 +188,10 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
    ) OR (
     NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
       WHERE h.organization_id=org.id AND h.run_id=x.run_id)
+    AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks school_ordinary
+      WHERE school_ordinary.id=x.track_id AND school_ordinary.organization_id=x.organization_id
+       AND school_ordinary.run_id=x.run_id AND school_ordinary.resource_key LIKE 'education-composition:%'
+       AND NOT ${educationCompositionTrackIdentitySql({track:Prisma.sql`school_ordinary`,organizationId:Prisma.sql`org.id`,product:'SCHOOL'})})
     AND ${purpose === 'REPORT_READ' ? Prisma.sql`TRUE` : Prisma.sql`NOT EXISTS (
       SELECT 1 FROM assessment_run_tracks school_scale
       WHERE school_scale.id=x.track_id AND school_scale.organization_id=x.organization_id

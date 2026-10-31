@@ -13,7 +13,11 @@ export type RelationalPerspectiveV1 =
   | 'OBSERVER_REPORT'
   | 'RELATIONAL_EXPERIENCE'
 
-export type RelationalResourceKindV1 = 'BUNDLE' | 'SCALE' | 'FORM' | 'SITUATIONAL'
+// A supported contract family is not a content publication or a runtime grant.
+export const RELATIONAL_RESOURCE_KINDS = ['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL', 'COGNITIVE'] as const
+export type RelationalResourceKindV1 = typeof RELATIONAL_RESOURCE_KINDS[number]
+export const isRelationalResourceKind = (value: unknown): value is RelationalResourceKindV1 =>
+  typeof value === 'string' && (RELATIONAL_RESOURCE_KINDS as readonly string[]).includes(value)
 
 export type RelationalAnalysisModeV1 =
   | 'INDIVIDUAL_ONLY'

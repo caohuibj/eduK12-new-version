@@ -1,3 +1,4 @@
+import type {SurveyNativeBundle} from '../bundle-product/survey-native'
 import {governedMediaBlocker} from './governed-tool.media'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -25,8 +26,8 @@ export const packageReportSchema=z.object({version:z.string().trim().min(1).max(
 }).strict()
 export type PackageReport=z.infer<typeof packageReportSchema>
 export type GovernedParameter=Extract<StoredRelease,{layer:'REFERENCE'}>&{sourceMeasurementHash:string}
-export type GovernedArtifact={schemaVersion:1;family:GovernedFamily;toolKey:string;version:string;title:string;
- unit:CatalogSourceSnapshot|null;parameters:GovernedParameter|null;report:{version:string;template:ReportTemplate}|null;
+export type GovernedArtifact={nativeBundle?:SurveyNativeBundle;schemaVersion:1;family:GovernedFamily;toolKey:string;version:string;title:string;
+ unit:CatalogSourceSnapshot|null;parameters:GovernedParameter|null;report:{version:string;template:ReportTemplate;audience?:'student'|'researcher'}|null;
  components:Array<{slotKey:string;title:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string};unit:CatalogSourceSnapshot}>;
  packageReport:PackageReport|null;reference:ToolReference}
 export type GovernedRow={id:string;family:GovernedFamily;tool_key:string;tool_version:string;title:string;snapshot:GovernedArtifact;snapshot_hash:string;reference:ToolReference;
@@ -61,7 +62,7 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
    if(!a.components.length||a.components.length>30)blockers.push('组合需要 1–30 个固定组件')
    if(new Set(a.components.map(c=>c.slotKey)).size!==a.components.length)blockers.push('组合组件编码重复')
    if(a.family==='COMBINATION'&&a.packageReport)blockers.push('单纯组合没有组合报告；有组合报告时请选择组合包')
-   if(a.family==='BUNDLE'&&!a.packageReport)blockers.push('组合包缺少组合报告设计')
+   if(a.family==='BUNDLE'&&!a.packageReport&&!a.nativeBundle)blockers.push('组合包缺少组合报告设计')
    if(a.packageReport&&!a.packageReport.introduction.trim()&&!a.packageReport.blocks.length)blockers.push('组合报告需要说明或至少一个报告区块')
    if(a.packageReport){for(const b of a.packageReport.blocks){if(b.type==='TEXT')continue
     const component=a.components.find(c=>c.slotKey===b.slotKey)
@@ -106,6 +107,6 @@ export function governedSnapshot(row:GovernedRow):CatalogSourceSnapshot{
  if(!row.snapshot.unit||packageFamily(row.family))throw new Error('组合只能整包导入，禁止按单个工具使用')
  const s=clone(row.snapshot.unit)
  return {...s,ref:{kind:s.ref.kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},provenance:{...s.provenance,surveyToolReleaseId:row.id,governedInstrumentVersion:s.ref.sourceVersion,
- reportConfigured:row.snapshot.report!==null,parametersConfigured:row.snapshot.parameters!==null,toolReference:row.reference,...(row.measurement_release?{sourceMeasurementRelease:row.measurement_release}:{})}}
+ reportConfigured:row.snapshot.report!==null,...(row.snapshot.report?.audience?{reportAudience:row.snapshot.report.audience}:{}),parametersConfigured:row.snapshot.parameters!==null,toolReference:row.reference,...(row.measurement_release?{sourceMeasurementRelease:row.measurement_release}:{})}}
 }
 export const isGovernedSource=(id:string)=>id.startsWith('survey-tool:')

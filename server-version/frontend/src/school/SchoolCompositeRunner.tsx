@@ -1,12 +1,13 @@
+import {deferredPage} from '../components/page-loading/deferredPage'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {ArrowLeft,CircleCheck} from 'lucide-react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
-import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
+const CognitiveRunner=deferredPage(async()=>({default:(await import('../modules/cognitive/pages/CognitiveRunner')).CognitiveRunner}))
 import type { CognitiveSessionApi } from '../modules/cognitive/api'
 import type { CognitiveSession } from '../modules/cognitive/types'
-import SituationalRunner from '../modules/situational/pages/SituationalRunner'
+const SituationalRunner=deferredPage(()=>import('../modules/situational/pages/SituationalRunner'))
 import type { SituationalRunnerClient, SituationalFinalSubmitPayload } from '../modules/situational/api'
 import type { SituationalAttemptResponse } from '../modules/situational/types'
 import type { AssessmentVideoCapabilitySources } from '../modules/assessment-media/types'
@@ -20,10 +21,15 @@ export type CampusExecutionRef={
   resumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
-export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,observer=false,observerTaskTitle,observerRole='teacher'}:{
+export function SchoolCompositeRunner({api,execution,onExit,onFinished,onParentCompleted,title,observer=false,observerTaskTitle,observerRole='teacher'}:{
   api:SchoolApi;execution:CampusExecutionRef;title?:string;observer?:boolean;observerTaskTitle?:string;observerRole?:'teacher'|'parent'
-  onExit:()=>void;onFinished:()=>void
+  onExit:()=>void;onFinished:()=>void;onParentCompleted?:()=>void
 }){
+  const identity=useMemo(()=>({api,executionId:execution.executionId,organizationId:execution.organizationId,courseId:execution.courseId,runId:execution.runId}),[api,execution.executionId,execution.organizationId,execution.courseId,execution.runId])
+  const currentIdentity=useRef<typeof identity|null>(identity);currentIdentity.current=identity
+  const completion=useRef<string|null>(null),onParentCompletedRef=useRef(onParentCompleted)
+  onParentCompletedRef.current=onParentCompleted
+  useEffect(()=>{currentIdentity.current=identity;completion.current=null;return()=>{currentIdentity.current=null}},[identity])
   const panelRef=useRef<HTMLElement>(null)
   useEffect(()=>{
     panelRef.current?.focus({preventScroll:true})
@@ -43,9 +49,15 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
   const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
   const load=useCallback(async(id:string)=>{
     const result=await api<CompositeAttemptState>('/composite-attempts/'+encodeURIComponent(id)+'?view=current-unit')
+    if(currentIdentity.current!==identity)return
+    if(result.id!==id)throw new Error('测评记录与当前任务不一致，请重新读取。')
     if(result.deliveryMode!=='FINAL_ONLY')throw new Error('不支持通过校园入口重启历史旧版测评')
-    setState(result);if(result.status==='COMPLETED')setDone(true)
-  },[api])
+    setState(result)
+    if(result.status==='COMPLETED'){
+      setDone(true)
+      if(!observer&&completion.current!==result.id){completion.current=result.id;onParentCompletedRef.current?.()}
+    }
+  },[api,identity,observer])
   const start=async()=>{
     setBusy(true);setError('')
     try{
@@ -165,7 +177,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
     {done?<div role="status" className="hs-message">
       {observer?<><CircleCheck className="hs-observer-complete-icon" size={36} aria-hidden="true"/><h1>本次测评已完成</h1></>:<h3>本次测评已完成</h3>}
       <p>{observer?'作答已提交。报告会按学校的授权与隐私规则开放。':'已收到正式完成确认。报告是否可查看由独立披露政策决定。'}</p>
-      <button onClick={onFinished}>{observer?'返回任务列表':'返回我的校园活动'}</button>
+      <button onClick={()=>{if(state?.status==='COMPLETED')onFinished();else onExit()}}>{observer?'返回任务列表':'返回我的校园活动'}</button>
     </div>:
     child?.type==='COGNITIVE'&&child.cognitiveSession?.sessionId&&state&&cognitiveClient?
       <MemoryRouter key={child.cognitiveSession.sessionId}
@@ -202,7 +214,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
       }}
       onReload={()=>load(state.id)}
       onExit={onExit}
-      onCompleted={()=>setDone(true)}
+      onCompleted={()=>{if(state.status==='COMPLETED')setDone(true)}}
       onEnterCognitive={item=>{
         if(!item.cognitiveSession?.sessionId){
           setError('认知子测评缺少经过冻结的会话，请联系学校')

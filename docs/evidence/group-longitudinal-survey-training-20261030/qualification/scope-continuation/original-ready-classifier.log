@@ -1,0 +1,19 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Ready requires a separately reviewed affected qualification plan
+
+'false' !== 'true'
+
+    at groupReportDraftPlan (file:///workspace/group-scope-repro-427/.github/scripts/group-report-draft.mjs:158:10)
+    at file:///workspace/group-scope-repro-427/.early-scope-repro.mjs:13:34 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'false',
+  expected: 'true',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

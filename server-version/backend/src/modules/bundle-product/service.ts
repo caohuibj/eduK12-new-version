@@ -1,3 +1,7 @@
+import {readInstance,type BundleBindings} from './instance'
+export {readInstance} from './instance'
+export type {BundleBindings} from './instance'
+import { profileContextForm } from '../assessment-bundle/profile/admission'
 import { assertPackageAdmission } from '../bundle-product/package-release'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import type { EffectiveScaleDisclosureSnapshot } from '../scale/projection/types'
@@ -7,36 +11,24 @@ import { z } from 'zod'
 import { canInstantiateConfig } from '../../services/materialGrant'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { encryptCognitivePayload, decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { encryptCognitivePayload } from '../cognitive/cognitive.security'
 import { assertValidItem, publishComposite } from '../composite/composite.service'
+import {readTrainingTracking,copiedTrainingTracking,trainingTrackingPreviewChoices} from '../composite/personal-tracking'
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { freezeDataForWrite, freezeAssignmentProfile } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
-import { BundleDefinitionProvider, freezeBundleProductionDefinition, readFrozenBundleProductionDefinition } from './definition-provider'
+import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
 
 export type BundleActor = { userId: string; role: UserRole }
-export type BundleBindings = {
-  schemaVersion: 1
-  slots: Array<{ slotKey: string; itemId: string; unitType: string; scaleDisclosure?: EffectiveScaleDisclosureSnapshot }>
-  context: Array<{ contextKey: string; itemId: string; valueType: string }>
-}
 export const author = (actor: BundleActor) => {
   if (!['ADMIN', 'TEACHER'].includes(actor.role)) throw compositeForbidden()
 }
 export const owner = (actor: BundleActor, row: { createdBy: string | null }) => {
   author(actor)
   if (actor.role !== 'ADMIN' && row.createdBy !== actor.userId) throw compositeForbidden()
-}
-export function readInstance(row: { definitionEncrypted: string; definitionHash: string; bindingsEncrypted: string; bindingsHash: string }) {
-  const frozen = readFrozenBundleProductionDefinition(decryptCognitivePayload(row.definitionEncrypted))
-  const bindings = decryptCognitivePayload<BundleBindings>(row.bindingsEncrypted)
-  if (frozen.contentHash !== row.definitionHash || canonicalHash(bindings) !== row.bindingsHash || bindings.schemaVersion !== 1) {
-    throw compositeConflict('Bundle 冻结定义或绑定校验失败')
-  }
-  return { frozen, bindings }
 }
 const createSchema = z.object({
   requestId: z.string().guid(), bundleKey: z.string().min(1), bundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
@@ -62,20 +54,23 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
   }
   async function detail(actor: BundleActor, id: string) {
     const row = await prisma.compositeAssessment.findUnique({ where: { id }, include: { bundleInstance: true,
-      items: { orderBy: { position: 'asc' } }, attempts: { select: { id: true, status: true, completedAt: true }, orderBy: { startedAt: 'desc' }, take: 100 } } })
+      items: { orderBy: { position: 'asc' },include:{scale:true,cognitiveAssignment:true} }, attempts: { select: { id: true, status: true, completedAt: true }, orderBy: { startedAt: 'desc' }, take: 100 } } })
     if (!row || row.productKind !== 'ASSESSMENT_BUNDLE' || !row.bundleInstance) throw compositeNotFound()
     owner(actor, row)
     const { frozen } = readInstance(row.bundleInstance)
     return { id, name: row.name, status: row.status, revision: row.revision, courseId: row.courseId, publicEnabled: row.publicEnabled,
-      bundle: frozen.bundleSnapshot.bundleDefinition, definitionHash: frozen.contentHash, items: row.items, attempts: row.attempts }
+      bundle: frozen.bundleSnapshot.bundleDefinition, definitionHash: frozen.contentHash,
+      items: row.items.map(({scale:_scale,cognitiveAssignment:_assignment,...item})=>item), attempts: row.attempts,
+      trackingCandidates:trainingTrackingPreviewChoices(row.items),
+      ...(row.personalTracking?{personalTracking:{baselineId:row.personalTrackingBaselineId,ordinal:row.personalTrackingOrdinal}}:{}) }
   }
-  async function create(actor: BundleActor, raw: unknown) {
+  async function create(actor: BundleActor, raw: unknown,trackingSourceId?:string) {
     author(actor)
     if (process.env.BUNDLE_PRODUCTS_ENABLED !== 'true') throw compositeConflict('尚未开放 Bundle 新建')
     const input = createSchema.parse(raw)
     if (!input.courseId && !input.publicEnabled) throw compositeBadRequest('请选择课程或公开投放')
     if (input.publicEnabled && (!input.expiresAt || Date.parse(input.expiresAt) <= Date.now())) throw compositeBadRequest('公开投放需要未来的有效期')
-    const key = 'bundle:' + actor.userId + ':' + input.requestId, hash = canonicalHash(input)
+    const key = 'bundle:' + actor.userId + ':' + input.requestId, hash = canonicalHash(trackingSourceId?{input,trackingSourceId}:input)
     const run = () => prisma.$transaction(async tx => {
       const existing = await tx.compositeAssessment.findUnique({ where: { creationKey: key } })
       if (existing) {
@@ -83,6 +78,9 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
         return existing.id
       }
       const entry = await eligible(actor, input.bundleKey, input.bundleVersion, tx)
+      const trackingSource=trackingSourceId?await tx.compositeAssessment.findUnique({where:{id:trackingSourceId},include:{bundleInstance:true}}):null
+      if(trackingSourceId&&(!trackingSource||trackingSource.status!=='PUBLISHED'||!trackingSource.personalTrackingBaselineId||!readTrainingTracking(trackingSource.personalTracking)))throw compositeConflict('纵向包来源不可用')
+      if(trackingSource)owner(actor,trackingSource)
       const definition = entry.definition
       if (input.publicEnabled && !definition.initiationModes.includes('ANONYMOUS_SELF')) throw compositeForbidden('此包不支持匿名投放')
       if (input.courseId && !definition.initiationModes.includes('TEACHER_ASSIGNMENT')) throw compositeForbidden('此包不支持课程投放')
@@ -102,12 +100,16 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       const bindings: BundleBindings = { schemaVersion: 1, slots: [], context: [] }
       let position = 0
       for (const field of entry.contextDefinition?.fields ?? []) {
+        const profileForm=profileContextForm(entry.declarativePackage,field)
         const boolean = field.valueType === 'boolean'
         const choices = boolean ? ['true', 'false'] : field.enumValues
-        const item = await tx.compositeAssessmentItem.create({ data: {
-          compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
+        const form=profileForm??{
           formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey,
           formOptions: choices ? choices.map(value => ({ label: value, value })) : Prisma.JsonNull,
+        }
+        const item = await tx.compositeAssessmentItem.create({ data: {
+          compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
+          ...form,
         } })
         bindings.context.push({ contextKey: field.contextKey, valueType: field.valueType, itemId: item.id })
       }
@@ -152,13 +154,24 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       await tx.bundleInstance.create({ data: { compositeId: row.id, bundleKey: definition.bundleKey, bundleVersion: definition.bundleVersion,
         definitionHash: frozen.contentHash, definitionEncrypted: encryptCognitivePayload(frozen),
         bindingsHash: canonicalHash(bindings), bindingsEncrypted: encryptCognitivePayload(bindings) } })
+      if(trackingSource){
+        const original=readInstance(trackingSource.bundleInstance!)
+        if(original.frozen.contentHash!==frozen.contentHash)throw compositeConflict('后续轮次必须沿用同一固定包版本')
+        await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${trackingSource.personalTrackingBaselineId} FOR UPDATE`
+        const last=await tx.compositeAssessment.findFirst({where:{personalTrackingBaselineId:trackingSource.personalTrackingBaselineId},orderBy:{personalTrackingOrdinal:'desc'}})
+        const ordinal=(last?.personalTrackingOrdinal??0)+1
+        if(ordinal>100)throw compositeBadRequest('纵向计划最多100轮')
+        const mapped=new Map(original.bindings.slots.map(slot=>[slot.itemId,bindings.slots.find(next=>next.slotKey===slot.slotKey)!.itemId]))
+        await tx.compositeAssessment.update({where:{id:row.id},data:{personalTrackingBaselineId:trackingSource.personalTrackingBaselineId,
+          personalTrackingOrdinal:ordinal,personalTracking:copiedTrainingTracking(trackingSource,mapped)}})
+      }
       return row.id
     }, { timeout: 30000 })
     let id: string
     try { id = await run() } catch (error: any) { if (error.code !== 'P2002') throw error; id = await run() }
     return detail(actor, id)
   }
-  async function publish(actor: BundleActor, id: string, revision: number) {
+  async function publish(actor: BundleActor, id: string, revision: number,tracking?:unknown) {
     if (process.env.BUNDLE_PRODUCTS_ENABLED !== 'true') throw compositeConflict('尚未开放 Bundle 发布')
     await prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id = ${id} FOR UPDATE`
@@ -185,7 +198,7 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
             await publishAssignmentMeasurementRelease(tx, actor.userId, item.cognitiveAssignment.id)
         }
       }
-      await publishComposite(actor.userId, actor.role, id, tx)
+      await publishComposite(actor.userId, actor.role, id, tx,undefined,tracking)
       await tx.compositeAssessment.update({ where: { id }, data: { revision: { increment: 1 } } })
     }, { timeout: 30000 })
     return detail(actor, id)
@@ -218,7 +231,18 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       select: { id: true, name: true, status: true, revision: true, bundleInstance: { select: { bundleKey: true, bundleVersion: true } } },
       orderBy: { createdAt: 'desc' }, take: 100 })
   }
-  return { eligible, detail, create, publish, archive, catalog, list }
+  async function nextWave(actor:BundleActor,id:string,raw:unknown){
+    const {requestId}=z.object({requestId:z.string().guid()}).strict().parse(raw)
+    const source=await prisma.compositeAssessment.findUnique({where:{id},include:{bundleInstance:true,items:true}})
+    if(!source?.bundleInstance||source.status!=='PUBLISHED'||!source.personalTrackingBaselineId)throw compositeConflict('来源不是已发布的纵向固定包')
+    owner(actor,source)
+    const {bindings}=readInstance(source.bundleInstance)
+    return create(actor,{requestId,bundleKey:source.bundleInstance.bundleKey,bundleVersion:source.bundleInstance.bundleVersion,
+      name:source.name+'（下一轮）',courseId:source.courseId,publicEnabled:source.publicEnabled,expiresAt:source.expiresAt?.toISOString()??null,
+      bindings:bindings.slots.map(slot=>{const item=source.items.find(i=>i.id===slot.itemId);if(!item)throw compositeConflict('固定包槽位不完整')
+        return {slotKey:slot.slotKey,...(item.scaleId||item.cognitiveAssignmentId?{resourceId:item.scaleId??item.cognitiveAssignmentId!}:{})}})},id)
+  }
+  return { eligible, detail, create, publish, archive, catalog, list,nextWave }
 }
 export const bundleDefinitionProvider = createCodeBundleDefinitionProvider()
 export const bundleProductService = createBundleProductService(bundleDefinitionProvider)

@@ -1,3 +1,4 @@
+import {assertTeacherGroupAuthority} from '../huiteacher/groupReportAuthority'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext, type OrganizationAccessContext } from '../organization/access'
 import { ReportingError, reportingFail } from './types'
@@ -5,9 +6,10 @@ import { ReportingError, reportingFail } from './types'
 export interface ReportingPrincipal {
   userId: string
   platformRole: 'SYSTEM_ADMIN' | 'STANDARD'
+  product?: 'HUITEACHER'
 }
 
-type RunAuthorityRow = { runId: string; createdByUserId: string }
+type RunAuthorityRow = { runId: string; createdByUserId: string;teacherSelfGroup?:boolean }
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
 
@@ -15,8 +17,10 @@ const readScopedRuns = async (organizationId: string, runIds: string[]): Promise
   const ids = [...new Set(runIds)]
   if (!ids.length) return []
   const rows = await prisma.$queryRaw<RunAuthorityRow[]>`
-    SELECT "id" AS "runId", "created_by_user_id" AS "createdByUserId"
-    FROM "assessment_runs"
+    SELECT r."id" AS "runId", r."created_by_user_id" AS "createdByUserId",
+      EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links l JOIN assessment_run_tracks t ON t.run_id=l.run_id AND t.organization_id=l.organization_id
+        WHERE l.run_id=r.id AND l.organization_id=r.organization_id AND t.frozen_resource_policy->'resultDisclosure'->>'policyKey'='EDUCATION_SELF_GROUP_V2') AS "teacherSelfGroup"
+    FROM "assessment_runs" r
     WHERE "organization_id"=${organizationId} AND "id" = ANY(${ids}::text[])
   `
   if (rows.length !== ids.length) hidden()
@@ -37,6 +41,9 @@ const assertCurrentGroupAudience = (input: {
   run: RunAuthorityRow
 }): void => {
   if (input.context.membershipId === null) hidden()
+  if(input.run.teacherSelfGroup&&input.principal.product!=='HUITEACHER')hidden()
+  // The scoped-context resolver has independently established this live product grant.
+  if(input.principal.product==='HUITEACHER')return
   if (input.context.orgRole === 'ORG_ADMIN' || input.context.capabilities.includes('PSYCHOLOGY_STAFF')) return
   if (!input.context.personas.includes('TEACHER') && !input.context.personas.includes('COUNSELOR')) hidden()
   if (input.run.createdByUserId !== input.principal.userId) hidden()
@@ -49,14 +56,16 @@ export const assertOrganizationGroupSubgroupSubjectsAccess = async (input: {
 }): Promise<{ organizationManager: boolean }> => {
   const subjectUserIds = [...new Set(input.subjectUserIds)]
   if (!subjectUserIds.length) hidden()
-  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId })
+  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId,educationProduct:input.principal.product })
     ?? hidden()
   assertNoReportDeny(context)
   if (context.membershipId === null) hidden()
   if (context.organizationStatus !== 'ACTIVE') {
     reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
   }
-  const organizationManager = context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
+  const teacherManager=input.principal.product==='HUITEACHER'
+    ?!!await assertTeacherGroupAuthority({actorUserId:input.principal.userId,organizationId:input.organizationId}):false
+  const organizationManager = teacherManager || context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')
   if (organizationManager) return { organizationManager: true }
   const teacher = context.personas.includes('TEACHER')
   const counselor = context.personas.includes('COUNSELOR')
@@ -118,11 +127,12 @@ const resolveScopedContextBatch = async (input: {
   const ids = [...new Set(input.runIds)]
   if (!ids.length) hidden()
   const [resolved, runs] = await Promise.all([
-    resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId }),
+    resolveOrganizationAccessContext({ principal: input.principal, organizationId: input.organizationId,educationProduct:input.principal.product }),
     readScopedRuns(input.organizationId, ids),
   ])
   const context = resolved ?? hidden()
   assertNoReportDeny(context)
+  if(input.principal.product==='HUITEACHER')await assertTeacherGroupAuthority({actorUserId:input.principal.userId,organizationId:input.organizationId,runIds:ids})
   return { context, runs }
 }
 

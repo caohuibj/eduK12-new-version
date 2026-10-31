@@ -1,3 +1,4 @@
+import {assertSurveyNativeAdmission} from '../bundle-product/survey-source'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -129,7 +130,8 @@ export async function freezeGovernedPackages(tx:Prisma.TransactionClient,actor:s
   if(flow){const last=Math.max(...instance.bindings.map(b=>flow.blocks.findIndex(block=>block.kind==='INSTRUMENT'&&block.instrumentKey===b.instrumentKey)));if(flow.blocks.slice(0,last+1).some(block=>block.kind==='END'||block.when))governedFail(409,'整包组件完成前不能结束或使用条件分支')}
   if(flow?.experiment)governedFail(409,'整包版本不能拆入实验分支；请将完整组合独立投放')
   if(tool.snapshot.packageReport){reportBytes+=packageReportWorstCaseBytes(tool.snapshot.packageReport,tool.snapshot.components,tool.title);assertPackageReportBytes(reportBytes,'波次所有整包最坏展开合计')}
-  frozen.push({schemaVersion:1,importId:id,toolId:tool.id,hash:tool.snapshot_hash,title:tool.title,family:tool.family as 'COMBINATION'|'BUNDLE',parentGrantId:grant.id,report:clone(tool.snapshot.packageReport),slots:instance.bindings.map(b=>({slotKey:b.slotKey,draftId:b.draftId,instrumentKey:b.instrumentKey,kind:members.find(u=>u.draftId===b.draftId)!.kind}))})
+  if(tool.snapshot.nativeBundle){const native=tool.snapshot.nativeBundle;reportBytes+=Buffer.byteLength(JSON.stringify(native.definition),'utf8')*3+4096;assertPackageReportBytes(reportBytes,'原生整包报告最坏展开合计');for(const b of instance.bindings){const policy=native.policies[b.slotKey];if(policy)members.find(u=>u.draftId===b.draftId)!.nativeBundleReport={definitionHash:native.source.definitionHash,audience:native.reportAudiences[b.slotKey]??null,policy:clone(policy)}}}
+  frozen.push({...(tool.snapshot.nativeBundle?{nativeBundle:clone(tool.snapshot.nativeBundle)}:{}),schemaVersion:1,importId:id,toolId:tool.id,hash:tool.snapshot_hash,title:tool.title,family:tool.family as 'COMBINATION'|'BUNDLE',parentGrantId:grant.id,report:clone(tool.snapshot.packageReport),slots:instance.bindings.map(b=>({slotKey:b.slotKey,draftId:b.draftId,instrumentKey:b.instrumentKey,kind:members.find(u=>u.draftId===b.draftId)!.kind}))})
  }
  return frozen
 }
@@ -140,6 +142,7 @@ export async function assertFrozenPackageAdmissions(tx:Prisma.TransactionClient,
  if(!project)governedFail(403,'研究项目不可用')
  const verifiedTools=new Map<string,GovernedRow>()
  for(const p of snapshot.governedPackages??[]){
+  if(p.nativeBundle)await assertSurveyNativeAdmission(tx,p.nativeBundle)
   const grant=await currentPackageGrant(tx,p.parentGrantId,project.owner_user_id,true,verifiedTools)
   if(grant.tool_id!==p.toolId||grant.snapshot_hash!==p.hash)governedFail(409,'冻结组合与当前授权不一致')
  }

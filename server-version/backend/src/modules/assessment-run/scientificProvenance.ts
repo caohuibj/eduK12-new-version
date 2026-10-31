@@ -1,6 +1,8 @@
+import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
+import {readFrozenCompositionIdentity} from './educationCompositionExecution'
 import {readEducationScaleExecutionSource} from './educationScaleExecutionSource'
-import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily } from './resourceAuthority'
+import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily, type RunResourcePolicy } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -84,7 +86,10 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
   // Private resources intentionally cannot enter the generic registry. Derive
   // their baseline only from the exact immutable version bound to this real
   // product execution, not author roles or a caller-supplied trusted flag.
-  const current = row.resourceKey.startsWith('private-form:')
+  const current = row.resourceKey.startsWith('education-composition:')
+    ? (await readFrozenCompositionIdentity(tx,{policy:row.frozenResourcePolicy as RunResourcePolicy,policyHash:row.resourcePolicyHash,
+       organizationId:row.organizationId,key:row.resourceKey,version:row.resourceVersion})).policy
+    : row.resourceKey.startsWith('private-form:')
     ? relationalEntryToRunPolicy((await readPrivateFormExecutionSource(tx,{executionId})).resourceEntry)
     : row.resourceKey.startsWith('private-scale:') ? await (async () => {
     if(row.resourceFamily!=='SCALE'||row.school===row.teacher)
@@ -96,6 +101,11 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
       ||canonicalHash(policy)!==row.resourcePolicyHash)
       throw new RunScientificProvenanceError('RUN_PRIVATE_SOURCE_POLICY_MISMATCH','Private Scale source differs from the published frozen policy')
     return policy
+  })() : row.resourceKey.startsWith('education-assessment:') ? await (async()=>{
+    const frozen=row.frozenResourcePolicy as RunResourcePolicy
+    if(frozen.runtimeLaunchTarget?.kind!=='COMPOSITE')throw new RunScientificProvenanceError('RUN_RESOURCE_RUNTIME_UNAVAILABLE','Missing frozen runtime')
+    const source=await assertEducationAssessmentExecutionSource(tx,{executionId,compositeId:frozen.runtimeLaunchTarget.ref,purpose:'NEW_START'})
+    return relationalEntryToRunPolicy(source.entry)
   })() : await registry.resolveExact({ family: row.resourceFamily as RunResourceFamily, key: row.resourceKey, version: row.resourceVersion })
   const maturity = current.scientificMaturity
   if (typeof maturity !== 'string' || !MATURITIES.has(maturity as RunScientificMaturity)) {

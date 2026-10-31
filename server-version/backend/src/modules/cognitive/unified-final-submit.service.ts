@@ -1,4 +1,5 @@
 import {assertCurrentStudyPrincipal} from '../anonymous-study/admission-principal'
+import {assertPrivateFormFinalCurrent} from '../assessment-run/educationPrivateFormExecution'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import { encryptCompactCognitivePayload } from './cognitive.security'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
@@ -304,6 +305,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
   child: UnifiedCognitiveAdmission,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
+  const educationComposition=child.compositeAttempt?.compositeAssessment?.creationKey?.startsWith('education-composition:')===true
   const admission = await measureRequestPhase('final_submit_admission', () => activateCognitiveAdmission(child))
   await assertFrozenAdmission(child, admission, input)
   const prepared = await measureRequestPhase('final_submit_definition_prepare', () => prepareRuntime(child, admission, input))
@@ -311,8 +313,9 @@ export const submitUnifiedCognitiveSessionFinal = async (
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, prepared.payloadHash)
     if (replay === 'replay') {
-      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash})) {
+      if (educationComposition||requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash})) {
         await withFinalOnlyCompletionTransaction(async tx => {
+          if(educationComposition)await assertPrivateFormFinalCurrent(tx,{attemptId:child.compositeAttemptId!,actorUserId:input.userId})
           await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash},true)
           const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
           assertFlowFinal(true)
@@ -448,6 +451,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
   }))
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    if(educationComposition)await assertPrivateFormFinalCurrent(tx,{attemptId:child.compositeAttemptId!,actorUserId:input.userId})
     await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash},true)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.cognitiveSession.findUnique({

@@ -1,0 +1,64 @@
+{
+  "recordKind": "prepared browser consumer: syntax/control observations only",
+  "browserStatus": "NOTRUN",
+  "fixtureSeedStatus": "NOTRUN",
+  "productionStartupStatus": "NOTRUN",
+  "appBuildStatus": "NOTRUN",
+  "checks": [
+    {
+      "command": "node --check server-version/e2e/pr363-fixture.cjs",
+      "exit": 0
+    },
+    {
+      "command": "node --check server-version/e2e/pr363-browser.cjs",
+      "exit": 0
+    },
+    {
+      "command": "node --test server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 3,
+      "note": "tool reporter stdout only, not an original saved log"
+    },
+    {
+      "command": "node --test --test-name-pattern='entry origins' server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 1,
+      "note": "new production canonical port constraint; other two control assertions not repeated"
+    },
+    {
+      "command": "node --test --test-name-pattern='fixture scope' server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 1,
+      "note": "new exact-case scope: rejects empty, duplicate or missing-product runs; prior controls not repeated"
+    },
+    {
+      "command": "node --test --test-name-pattern='management acceptance' server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 1,
+      "note": "new management success scope guard; previous controls not repeated"
+    }
+  ],
+  "files": [
+    {
+      "path": "server-version/e2e/pr363-fixture.cjs",
+      "sha256": "92868f991f71de69f666eaf19af362e2e06a868a9c139af68e732270ecde9699"
+    },
+    {
+      "path": "server-version/e2e/pr363-browser.cjs",
+      "sha256": "847394073e7e99a9b7bb0475028c1120c9fd4d5d69af285ddd51a7b887d86d8b"
+    },
+    {
+      "path": "server-version/e2e/pr363-browser.test.cjs",
+      "sha256": "84735d52e2c85b3cd76b20341fe7b5d65e613a924c571afcffa715cb9ff88e90"
+    },
+    {
+      "path": "server-version/e2e/pr363-native-template.json",
+      "sha256": "8c43e814b1c58af6ae74c37c5f4ea3ef25721072203e6fd9b757961c7d979b66"
+    }
+  ],
+  "nativeDataSource": "backend/src/__tests__/fixtures/sjt-native-staged.fixture.ts: JSON data extraction only; no engine/App build",
+  "inputNote": "final file hashes recorded after syntax/control checks; controls are not browser or production startup results",
+  "absorbedRegistrationInterface": "85e9ee0c66ada6a2b0550b9e11f3e31b96ab62ce",
+  "networkContract": "real canonical HTTPS443, loopback DNS and actual peer, network document/static bytes equal official artifact before credentials; no route fulfillment or TLS bypass",
+  "uniqueControlCasesObservedPassed": 5
+}

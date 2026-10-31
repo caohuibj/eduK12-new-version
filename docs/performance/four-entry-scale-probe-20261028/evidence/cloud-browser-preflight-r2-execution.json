@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "/tmp/pr374-cloud/browser-preflight.cjs"
+  ],
+  "startedAt": "2026-10-28T03:48:56.670098+00:00",
+  "exitCode": 1,
+  "head": "3ad550800119b87ad355b52b5268a6fc38a542b0",
+  "sandbox": true,
+  "securityChanges": false,
+  "pageExecuted": false,
+  "logSHA256": "7818dfd97929f0a700366d2617c217c35bbaee8505082daa2e0bc9e0ecf06583",
+  "notes": "First availability call is retained in the tool transcript; this call uses existing writable XDG directories to distinguish the crashpad-path issue. SUID helper remains unchanged; no escalation or unsafe relaunch."
+}

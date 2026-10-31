@@ -12,8 +12,10 @@ import {
   readOwnHuiteacherObservations,readFormalHuiteacherObservations,
   updateHuiteacherObservation,submitHuiteacherObservation,
 } from '../../modules/huiteacher/observer.service'
-import {createHuiteacherForm,updateHuiteacherForm,publishHuiteacherForm}
-  from '../../modules/huiteacher/forms.service'
+import * as tools from '../../modules/education-tools/private-tool.service'
+import {startInvitedFieldComposition} from '../../modules/huiteacher/fieldComposition.service'
+import {getAttemptState} from '../../modules/composite/composite.service'
+import {submitCompositeFormSectionFinal} from '../../modules/composite/final-submit.service'
 import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm,
   readSubmittedHuiteacherFieldFormEvidence}
   from '../../modules/huiteacher/fieldForm.service'
@@ -40,6 +42,7 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
     await db?.$disconnect()
     if(originalKey===undefined)delete process.env.DATA_ENCRYPTION_KEY
   })
+  // R executes this on a migrated disposable PG; no qualification is claimed by collection alone.
   it('keeps invited outside expert separate from School membership and private reflection',async()=>{
     const manager=await makeUser()
     const expert=await makeUser()
@@ -71,33 +74,33 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,eventId:event.id,actorUserId:manager.id,
       action:'OPEN',expectedVersion:1,
     })).rejects.toThrow()
-    const draft=await createHuiteacherForm({
-      organizationId:school.id,actorUserId:manager.id,
-      title:'课堂观察指标',
-    })
-    await updateHuiteacherForm({
-      organizationId:school.id,actorUserId:manager.id,formId:draft.id,
-      expectedRevision:draft.revision,title:'课堂观察指标',
-      definition:{schemaVersion:2,pages:[{pageKey:'p1',title:'课堂观察',
-        questions:[{itemKey:'q1',type:'LIKERT',prompt:'课堂讨论证据',
-          required:true,options:[{optionKey:'low',label:'不足'},
-            {optionKey:'high',label:'充分'}],rows:[]}]}]},
-    })
-    const published=await db.huiteacherFormInstrument.findUniqueOrThrow({
-      where:{id:draft.id},
-    })
-    await publishHuiteacherForm({
-      organizationId:school.id,actorUserId:manager.id,formId:draft.id,
-      expectedRevision:published.revision,
-    })
-    await bindHuiteacherFieldForm({
-      actorUserId:manager.id,organizationId:school.id,
-      eventId:event.id,formId:draft.id,
-    })
-    await expect(bindHuiteacherFieldForm({
-      actorUserId:manager.id,organizationId:school.id,
-      eventId:event.id,formId:draft.id,
-    })).rejects.toThrow()
+    const context={entry:'TEACHER' as const,organizationId:school.id,principal:{userId:manager.id,accountDomain:'SCHOOL' as const}}
+    const fixed=async(kind:'FORM'|'COMPOSITION',title:string,definition:unknown)=>{
+      const draft=await tools.createPrivateTool(context,{kind,title})
+      const saved=await tools.updatePrivateTool(context,draft.id,{expectedRevision:1,title,definition})
+      return tools.freezePrivateTool(context,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
+    }
+    const formVersion=await fixed('FORM','课堂观察指标',{schemaVersion:2,pages:[{pageKey:'p1',title:'课堂观察',questions:[
+      {itemKey:'q1',type:'LIKERT',prompt:'课堂讨论证据',required:true,options:[{optionKey:'low',label:'不足'},{optionKey:'high',label:'充分'}],rows:[]},
+    ]}]})
+    const version=await fixed('COMPOSITION','团队专家观察',{schemaVersion:2,adapterVersion:'2.0.0',administration:{population:'TEACHER',responseMode:'EXPERT_REPORT',targetKind:'TEAM'},instruction:'观察真实团队',
+      blocks:[{blockId:randomUUID(),instruction:'',source:{provider:'PRIVATE_VERSION',kind:'FORM',versionId:formVersion.id,contentHash:formVersion.contentHash}}]})
+    const binding={actorUserId:manager.id,organizationId:school.id,eventId:event.id,privateComposition:{versionId:version.id,contentHash:version.contentHash}}
+    await expect(bindHuiteacherFieldForm({...binding,privateComposition:undefined,formId:formVersion.id})).rejects.toMatchObject({code:'HUITEACHER_FIELD_FIXED_QUESTIONNAIRE_REQUIRED'})
+    await bindHuiteacherFieldForm(binding)
+    await expect(bindHuiteacherFieldForm(binding)).rejects.toThrow()
+    const completeForm=async(invitationId:string,actorUserId:string)=>{
+      const start=await startInvitedFieldComposition({invitationId,actorUserId})
+      expect((await startInvitedFieldComposition({invitationId,actorUserId})).attemptId).toBe(start.attemptId)
+      const parent=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:start.attemptId}})
+      expect(parent).toMatchObject({subjectUserId:null,respondentUserId:actorUserId,userId:actorUserId,assignmentRef:null,episodeId:null,consentId:null,respondentType:'OBSERVER'})
+      const state=await getAttemptState(start.attemptId,{userId:actorUserId},undefined,'current-unit'),item=state.currentItem as any
+      const payload={attemptId:start.attemptId,sectionId:item.formSectionId,userId:actorUserId,submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:state.contextSnapshotHash,
+        answers:item.answers.map((question:any)=>({formItemId:question.formItemId,value:'high'}))}
+      await submitCompositeFormSectionFinal(payload)
+      expect((await getAttemptState(start.attemptId,{userId:actorUserId})).status).toBe('COMPLETED')
+      return start.attemptId
+    }
     const invitation=await inviteHuiteacherObserver({
       organizationId:school.id,eventId:event.id,
       actorUserId:manager.id,observerUserId:expert.id,
@@ -125,8 +128,8 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
     const fieldForm=await readInvitedHuiteacherFieldForm({
       invitationId:invitation.id,actorUserId:expert.id,
     })
-    expect(fieldForm?.formId).toBe(draft.id)
-    expect(fieldForm?.pages).toHaveLength(1)
+    expect(fieldForm?.assessmentRef.origin.versionId).toBe(version.id)
+    expect(fieldForm?.assessmentRef.origin.targetKind).toBe('TEAM')
     await expect(readInvitedHuiteacherFieldForm({
       invitationId:invitation.id,actorUserId:stranger.id,
     })).rejects.toThrow()
@@ -160,15 +163,16 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
     })).rejects.toThrow()
     await expect(submitHuiteacherObservation({
       id:raw.id,actorUserId:expert.id,expectedRevision:2,
-      fieldFormId:draft.id,answers:{q1:'unknown'},
+      fieldFormId:formVersion.id,answers:{q1:'unknown'},
     })).rejects.toThrow()
     const staleDraft=await createHuiteacherObservation({
       organizationId:school.id,eventId:event.id,actorUserId:expert.id,
       kind:'FORMAL_FEEDBACK',content:'另一标签页预先保存的草稿',
     })
+    const attemptId=await completeForm(invitation.id,expert.id)
     const submitted=await submitHuiteacherObservation({
       id:raw.id,actorUserId:expert.id,expectedRevision:2,
-      fieldFormId:draft.id,answers:{q1:'high'},
+      assessmentAttemptId:attemptId,
     })
     await expect(createHuiteacherObservation({
       organizationId:school.id,eventId:event.id,actorUserId:expert.id,
@@ -176,12 +180,13 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
     })).rejects.toMatchObject({code:'HUITEACHER_FORMAL_FEEDBACK_ALREADY_SUBMITTED',statusCode:409})
     await expect(submitHuiteacherObservation({
       id:staleDraft.id,actorUserId:expert.id,expectedRevision:1,
-      fieldFormId:draft.id,answers:{q1:'low'},
+      assessmentAttemptId:attemptId,
     })).rejects.toMatchObject({code:'HUITEACHER_FORMAL_FEEDBACK_ALREADY_SUBMITTED',statusCode:409})
     const structured=await db.huiteacherFieldFormEvidence.findUniqueOrThrow({
       where:{recordId:raw.id},
     })
-    expect(structured.definitionDigest).toBe(published.definitionDigest)
+    expect(structured.attemptId).toBe(attemptId)
+    expect(structured.formId).toBeNull();expect(structured.definitionDigest).toBeNull();expect(structured.finalHash).toMatch(/^[a-f0-9]{64}$/)
     expect(structured.answersCipher).not.toContain('high')
     await expect(db.huiteacherFieldFormEvidence.delete({
       where:{recordId:raw.id},
@@ -191,8 +196,8 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,eventId:event.id,recordId:raw.id,
       actorUserId:manager.id,
     })
-    expect(evidence.formId).toBe(draft.id)
-    expect(evidence.answers.q1).toBe('high')
+    expect(evidence.assessmentRef.origin.versionId).toBe(version.id)
+    expect(evidence.units).toMatchObject([{kind:'FORM',items:[{state:'ANSWERED',value:'high'}]}])
     expect(JSON.stringify(evidence)).not.toContain('独立反思')
     expect(JSON.stringify(evidence)).not.toContain(expert.id)
     await expect(readSubmittedHuiteacherFieldFormEvidence({
@@ -239,9 +244,10 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,eventId:event.id,actorUserId:concurrentExpert.id,
       kind:'FORMAL_FEEDBACK',content,
     }))
+    const racingAttempt=await completeForm(concurrentInvite.id,concurrentExpert.id)
     const outcomes=await Promise.allSettled(racing.map(row=>submitHuiteacherObservation({
       id:row.id,actorUserId:concurrentExpert.id,expectedRevision:1,
-      fieldFormId:draft.id,answers:{q1:'high'},
+      assessmentAttemptId:racingAttempt,
     })))
     expect(outcomes.filter(row=>row.status==='fulfilled')).toHaveLength(1)
     expect(outcomes.filter(row=>row.status==='rejected').map(row=>(row as PromiseRejectedResult).reason.code))

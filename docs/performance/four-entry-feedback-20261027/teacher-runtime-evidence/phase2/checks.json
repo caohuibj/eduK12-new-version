@@ -1,0 +1,744 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "post-execution diagnostic index; unsigned, not CI admission",
+  "recordedAt": "2026-10-27T09:54:29.206504+00:00",
+  "branch": "feat/pr363-teacher-runtime",
+  "initialBase": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+  "rootSourceDependency": "282e9fb353d3216d33a58306db2dbf9ae3d3d04a",
+  "productCommit": "f299f7247a37a11a1cb53d99c4ead57eb5274d11",
+  "productTree": "3f31d61e2988f026ab3ef121c658e77c9e5d2131",
+  "backendTree": "23833e4bd60ffe9d04294101f5cb6542c4502817",
+  "frontendTree": "355f302d52d35b5092a7d4beb64ca1970b7a6f06",
+  "latestIntegrationObservedReadOnly": "1b3cdd171361f63f348069717294671277300541",
+  "futureSourceContractReadOnly": "8fcfadcadeb7fd09fd8e453aa6eb16d87d53e686",
+  "qualification": {
+    "formalCI": false,
+    "finalFullTestInvocation": false,
+    "realPGAuthorizationPassedAcrossTargetedRuns": true,
+    "canonicalEncryptedFinalDurabilityObserved": true,
+    "producerFixture": "synthetic, direct owner preparation; not production source publication",
+    "browserExecuted": false,
+    "redisRevocationStoreTested": false,
+    "concurrentRevocationTested": false,
+    "futureDistributionContractTested": false
+  },
+  "postgres": {
+    "database": "pr363_runtime_test",
+    "version": "16.15",
+    "restrictedRuntimeRole": true,
+    "tables": 267,
+    "sequences": 1,
+    "migrationCount": 240,
+    "migrationFingerprint": "25554d1bc211833c31302fad5a8093adede3e3959c1af6cfdacd21856d8111c0",
+    "oldDatabaseModified": false,
+    "newFixtureDatabasePreserved": true,
+    "postgresStoppedAfterChecks": true
+  },
+  "casePassesAcrossInvocations": {
+    "realPGCases": 5,
+    "sharedFormRegression": 2,
+    "existingFrontendAccountGate": 1
+  },
+  "futureInterfaceDelta": {
+    "requiredOriginField": "distribution={actorId,grants:[{resourceId,grantId,version}]}",
+    "participantPermission": "root source NEW_USE/NEW_START must validate exact original distribution grants; no grant inferred from identityOnly reader",
+    "fixture": "prepare real corresponding original grant rows and rehash source/runtime origin after integrating source producer; old PG evidence does not cover distribution"
+  },
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+      "sha256": "28a37258179a88d5ef8648d1a9772214b55237041f335f92b9080c5928cbe891",
+      "gitBlob": "ce531d4e34380a94e0515da022e10f715563d81a"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+      "sha256": "0f6df1fc852231466d02c30bcc54dd0877ea87739a98843b7217e85cfe6615e8",
+      "gitBlob": "d85edf2bfc3a3a8f6fab341a16244cef0cbb8b3e"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.query.postgres.integration.test.ts",
+      "sha256": "115a2bc6bed7290294eaeee6f0165e600ce13d7781dc4d48a07107e07c364e82",
+      "gitBlob": "4829d8a8ccb22425ac578c223467fa14ca072130"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.routes.test.ts",
+      "sha256": "552d921a3a029252b12efc27d6a99e55202d6291c3fae7334f984993bbacaf1d",
+      "gitBlob": "0dc41a350e5efda388ed86fd20c89b98e505111c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/typed-form-flow-identity.test.ts",
+      "sha256": "ab1d29a412b1625af10595dbec3dcf514bf6556bdc0c4503a40b3633ead9af0e",
+      "gitBlob": "f4ee759fde590cead60adfc687a193139491bace"
+    },
+    {
+      "path": "server-version/backend/src/index.ts",
+      "sha256": "c4951ccac1ab27853a802ccee81f98d8dd6368d6b14595f6a6a5e1797ff04563",
+      "gitBlob": "c54a7dc1936ae727d52e86269c20ddf8ac32e5dd"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/consent.ts",
+      "sha256": "6712261e8a3ef563fa91a6093d74825a5bc0482c30e4fdd6c8833ebafed41d64",
+      "gitBlob": "3a22f174140ac4d3e29942ae8631208f673df165"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/publish.ts",
+      "sha256": "69630668b0a0ca9fbf849232f0f108ba7ae82b6f4cca781b190a70bad2037944",
+      "gitBlob": "30323cce714cd062d25cbc71b6bf6b2fed030356"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/typed-form.ts",
+      "sha256": "1295cdb7b08bd53ccd5301104366c4562d9f208a820ee719df86c96f664c8e62",
+      "gitBlob": "d77aebb0416c74ac7605e7cdf73d36cf5034f539"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+      "sha256": "374094addd1cc212a51f04cfbfd2f2389cbf46aee871f23903cf0cc36115b406",
+      "gitBlob": "8d7e339b26d7ca685289953a1d555258eebdfdb4"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+      "sha256": "33dcd98d06fb07487b6501e471fa101dc201fdf9382cffbdb844c7e866cfc6af",
+      "gitBlob": "2e17e6eea866928056a2ac77686f59b5b5574e50"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRuntime.source.ts",
+      "sha256": "61b30624e30cb8f1fcc330def1182e6986562d070a27537cd3c6f06d80a0d065",
+      "gitBlob": "e9450c911fa531b2662ad581588f42efb052e4c7"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherApp.tsx",
+      "sha256": "8fe4eba31fe7cf6f4a307490b9dc51d12f8428b09ffdce86a3beb6f8d908b3e7",
+      "gitBlob": "e1da2955d04dc256f0e416dcacbfeaa9db158d3f"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx",
+      "sha256": "06005c07c12d222ed21763cddce1265e20b62bad64bf685287721efd1a9942f7",
+      "gitBlob": "7574d59b854350ddd01979afd20648a47cdc9ec5"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.tsx",
+      "sha256": "05bfaf2b7e2e4318857b85fe47e9eaa96d1688f683037666062f3dab160776e0",
+      "gitBlob": "51e1a49d95bd36906bcf163aacf312dc6d3d4e03"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.test.tsx",
+      "sha256": "2e9f5c449aff56420bacf15702f253884055045ac50f42e87784590ee2e67f05",
+      "gitBlob": "f7fa7a5551e24a007fb75b2995b1767f369507ee"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+      "sha256": "878fd10a12ccc028d4dcfda61bd6daa0f68493cfa6d6d7a63347c9a20e740d11",
+      "gitBlob": "9757f9de8c7b6931e6a6fa75bb8d28e1d9a5be14"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/assessmentRuntime.client.test.ts",
+      "sha256": "d89a3e3b245d04ec9999d1a6d7fc1b2f828065b3403f944b2729d432e0eb44f7",
+      "gitBlob": "5331f37cc92f6a7e6e7475ddf9d30b276e1af903"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/assessmentRuntime.client.ts",
+      "sha256": "380b8d8e67da63592370cb70d519886b9e56b6d125adc50b70f92abe427032a9",
+      "gitBlob": "93107cd133e1e321d83a874b371a2df226bceb74"
+    }
+  ],
+  "checks": [
+    {
+      "log": "backend-types-f299.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "note": "fixed final production inputs, no source edits during execution",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "server-version/backend",
+      "commandRecord": "exact current-turn command"
+    },
+    {
+      "log": "backend-types-final.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "note": "check overlapped final Teacher-only consent narrowing; not immutable final inputs",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "server-version/backend",
+      "commandRecord": "exact current-turn command"
+    },
+    {
+      "log": "backend-types.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "note": "check overlapped root282 merge; not immutable final inputs",
+      "exit": 0,
+      "exitEvidence": "observed tool completion; no original .exit file",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "--noEmit"
+      ],
+      "cwd": "server-version/backend",
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter"
+    },
+    {
+      "log": "frontend-app-account.log",
+      "rawSha256": "55446685bf12e1343fb0b51821d5b53f704d19813bb852f9ec925654e14adff3",
+      "rawBytes": 415,
+      "note": "existing forced-password-change gate consumer, jsdom",
+      "exit": 0,
+      "exitEvidence": "observed tool completion; no original .exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/huiteacher/HuiteacherAccountChange.test.tsx",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/frontend",
+      "archive": "frontend-app-account.log.gz",
+      "archiveSha256": "5702e6df661c04b8f582b53ea83cbafbef3d2dbca6154ee0a47cb320f67f7734",
+      "archiveBytes": 303,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter"
+    },
+    {
+      "log": "frontend-app-lint.log",
+      "rawSha256": "e35e9f87faedf3031fcfaea9c3f65290163f7d6cd793473d36da168ef2311072",
+      "rawBytes": 276,
+      "note": "exit0 with one preexisting useEffect dependency warning at line279, baseline hunk unchanged",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/eslint/bin/eslint.js",
+        "src/huiteacher/HuiteacherApp.tsx"
+      ],
+      "cwd": "server-version/frontend",
+      "archive": "frontend-app-lint.log.gz",
+      "archiveSha256": "19a443390999a781dc7f187bace6e3effee1c16ac7de112aedd36ef3abf71f6c",
+      "archiveBytes": 221,
+      "commandRecord": "exact current-turn command"
+    },
+    {
+      "log": "frontend-types-final.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "note": "final frontend source tree unchanged during execution",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "cwd": "server-version/frontend",
+      "commandRecord": "exact current-turn command"
+    },
+    {
+      "log": "migrate-deploy.log",
+      "rawSha256": "40b9f0d00f6c4c1740e9d5ce691f829efc3732999590c6988918fdbd2a8c2390",
+      "rawBytes": 34097,
+      "note": "all 240 actual candidate migrations applied in new disposable database",
+      "exit": 0,
+      "exitEvidence": "observed tool completion; no original .exit file",
+      "commandAfterNode": [
+        "node_modules/prisma/build/index.js",
+        "migrate",
+        "deploy"
+      ],
+      "archive": "migrate-deploy.log.gz",
+      "archiveSha256": "b076e0b1e24e3b913de81a29d2abb061f416957e3a630c3e2668bdcb332dad94",
+      "archiveBytes": 4681,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter"
+    },
+    {
+      "log": "pg-consent-f299.log",
+      "rawSha256": "5b9f8f4084d10fa89edd51518a6455af4b8a37efcb9b752574a197173bd70e0d",
+      "rawBytes": 1518,
+      "note": "same only affected case after Teacher-only SELF predicate narrowing; fixed product snapshot",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "explicitly required SELF",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "f299f7247a37a11a1cb53d99c4ead57eb5274d11",
+      "archive": "pg-consent-f299.log.gz",
+      "archiveSha256": "67b54734b87d659f888f968e8da2ec3e7a391ba3c724f8861a1dd46ab4d0f15a",
+      "archiveBytes": 591,
+      "commandRecord": "exact current-turn command",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-consent-f299",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "explicitly required SELF"
+      ]
+    },
+    {
+      "log": "pg-consent-r13.log",
+      "rawSha256": "071dfa1e354f693b35ed47839f33d2022291210f3e9d37c9bcb2564dc92c65b7",
+      "rawBytes": 1518,
+      "note": "required consent/withdrawal/completed-parent replay passed",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "explicitly required SELF",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-consent-r13.log.gz",
+      "archiveSha256": "cedd9efe21b66fdea54db9c74a48394ba4dce1c5366d89a0f630dbef664fe352",
+      "archiveBytes": 592,
+      "commandRecord": "exact current-turn command",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-consent-r13",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "explicitly required SELF"
+      ]
+    },
+    {
+      "log": "pg-continuation-consent-r12.log",
+      "rawSha256": "9ae1090a23a4d001283f41afa51dfcbc0969b0b6057502b7bd9b569412aeae3c",
+      "rawBytes": 2881,
+      "note": "continuation/closed intake/access deny passed; test incorrectly equated child receipt with completed parent",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "continues an unfinished|explicitly required SELF",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-continuation-consent-r12.log.gz",
+      "archiveSha256": "73215488fb08f79ee8bfb3de7fc6f615122c08733919fd4e1493a966c947f1d7",
+      "archiveBytes": 1026,
+      "commandRecord": "exact current-turn command",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-continuation-consent-r12",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "continues an unfinished|explicitly required SELF"
+      ]
+    },
+    {
+      "log": "pg-mixed-cognitive-r8.log",
+      "rawSha256": "0c1ee6e998a6f867f4f4c83f0f44d02212c226bebb03ae04dedb833aac29bb51",
+      "rawBytes": 2247,
+      "note": "dedicated Cognitive passed; mixed fixture lacks public typed Form definition",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|dedicated Cognitive",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-cognitive-r8.log.gz",
+      "archiveSha256": "f7bdcd054f966957ca6fc6c49e829cffa54ac0185aeae1edf51e44416bd83419",
+      "archiveBytes": 854,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-cognitive-r8",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|dedicated Cognitive"
+      ]
+    },
+    {
+      "log": "pg-mixed-r10.log",
+      "rawSha256": "cfdd5a8d307c41fab983b0b69d88af7dd9c33edbbc9cf77b9902492791519e9f",
+      "rawBytes": 2332,
+      "note": "actual mixed FINAL completed; test hash Date must normalize ISO",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r10.log.gz",
+      "archiveSha256": "4b1f818e652ceb451e8cea381abd09b2a10ef05377ea84e8da695b7393dd0e25",
+      "archiveBytes": 792,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r10",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-r11.log",
+      "rawSha256": "feb6a502e0c7cce5fe49c04d96613c71c28d58a62a8988768b7f817a8f04eff2",
+      "rawBytes": 970,
+      "note": "mixed flow, conflict/replay/durability and retirement passed",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r11.log.gz",
+      "archiveSha256": "e80fbd6a815f185b4cbd828cf2b807afeebbbf5ae6e15eb812ca29f3dc894393",
+      "archiveBytes": 455,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r11",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-r2.log",
+      "rawSha256": "bda2c79a4aea1dfd22e7408587dbbacf602f53dd65620482e506250a915d0f41",
+      "rawBytes": 4253,
+      "note": "fixture C measurement assignment scope mismatch",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r2.log.gz",
+      "archiveSha256": "3515d054a7d75fbfb59acb2a3324369182868b2cd518cddbd2e216bea712bedf",
+      "archiveBytes": 1219,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r2",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-r3.log",
+      "rawSha256": "11c7c6c7a06a0fc6168f1bcacb32a7f8bb0f1d12ca6167d125a8f7de964b2a84",
+      "rawBytes": 2674,
+      "note": "actual guard PostgreSQL enum=text 42883; fixed slot.type::text",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r3.log.gz",
+      "archiveSha256": "c2449f1c2e6c3f65cb6d4e3032eb5318a1e2a5ad1afb5cca75ac71669e73d07d",
+      "archiveBytes": 907,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r3",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-r4.log",
+      "rawSha256": "4592d102e69b428e2e8f909cbbc852dc083e77ff450cc34a358a33dedd0db57b",
+      "rawBytes": 2406,
+      "note": "fixture missing shared frozen assignment profile",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r4.log.gz",
+      "archiveSha256": "c824d70ab5f57a0bda147cdb5ebfb0106e28a9188b85a0db88003ea1c9ff66b7",
+      "archiveBytes": 882,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r4",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-r5.log",
+      "rawSha256": "91243d7099d5c2ebb5f4c48185244e7eea3364170d0cbb7a1fbc99379b167ace",
+      "rawBytes": 2169,
+      "note": "test conflict payload reversed trials invalidated schema before intended 409",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r5.log.gz",
+      "archiveSha256": "a76560e4f135f8e1a7d2d94bee31ebec646f351efba85a95005bf63de3f630a5",
+      "archiveBytes": 769,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r5",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-r9.log",
+      "rawSha256": "581260b332ab679cd274bcd5830d5951ec388c2cc2927708266360481514f364",
+      "rawBytes": 2519,
+      "note": "actual shared temporary undefined displayIf not canonical JSON",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-r9.log.gz",
+      "archiveSha256": "60fd4a493859d6a031674f911d1811ba2794a01bb1138ba0efd9fb4b32a3e186",
+      "archiveBytes": 730,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-r9",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE"
+      ]
+    },
+    {
+      "log": "pg-mixed-sjt-r6.log",
+      "rawSha256": "f3323d6a667eaea8e9c934e07b15732122d4a42d86e9bdd920ce4bd1158c18a4",
+      "rawBytes": 2173,
+      "note": "dedicated SJT passed; mixed test wrong Form DTO",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|dedicated SJT",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-mixed-sjt-r6.log.gz",
+      "archiveSha256": "91aa26b69c55958da841d6d7120159a4d07f1070fdb8d0ecdb156c50ad80a54b",
+      "archiveBytes": 800,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-mixed-sjt-r6",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "-t",
+        "mixed BUNDLE|dedicated SJT"
+      ]
+    },
+    {
+      "log": "pg-root282-runtime-r7.log",
+      "rawSha256": "3271dc9580f055cada8f1ad182384b30e7212deacc075396040bf325c56b7607",
+      "rawBytes": 3181,
+      "note": "SJT passed; mixed wrong DTO; production Cognitive publication hard rejection",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-root282-runtime-r7.log.gz",
+      "archiveSha256": "5b10b32e5e9b1a8f9f7facd5f3ed69f2ba76f82926dc000220613394aee983d2",
+      "archiveBytes": 1075,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-root282-runtime-r7",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts"
+      ]
+    },
+    {
+      "log": "pg-runtime-initial.log",
+      "rawSha256": "efc0d7f1a481feb768db7bab845e7900f23beeec16c8f3418f1096db9b21fbaf",
+      "rawBytes": 6362,
+      "note": "fixture entitlement/role grant FK order",
+      "exit": 1,
+      "exitEvidence": "explicit exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "inputBinding": "mutable diagnostic inputs; no contemporaneous full manifest",
+      "archive": "pg-runtime-initial.log.gz",
+      "archiveSha256": "068f186bbea8b92ccc5ad3bba6147d6bc0597f4fc4b035701c09dbc0c51906fc",
+      "archiveBytes": 1100,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter",
+      "orchestrationCommand": [
+        "NODE",
+        "/tmp/pr363-runtime/run-tests.cjs",
+        "pg-runtime-initial",
+        "src/__tests__/huiteacher/assessment-runtime.postgres.integration.test.ts"
+      ]
+    },
+    {
+      "log": "postgres-stop.log",
+      "rawSha256": "b55c5f4e738ea245660b9778fd0dff4f6cf9c6c211eae2b4eeae6824f35db9da",
+      "rawBytes": 89,
+      "note": "only worker-started PostgreSQL stopped; dedicated fixture database preserved",
+      "exit": 0,
+      "exitEvidence": "explicit exit file",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "eduk12-cloud",
+        "--env-file",
+        "/workspace/eduk12-cloud/local.env",
+        "-f",
+        "/workspace/eduk12-cloud/services.yml",
+        "stop",
+        "postgres"
+      ],
+      "archive": "postgres-stop.log.gz",
+      "archiveSha256": "64d06af259c92750d164da5133ee5554a916bbdff17874b21153b327b210aee9",
+      "archiveBytes": 71,
+      "commandRecord": "exact current-turn command"
+    },
+    {
+      "log": "prisma-generate.log",
+      "rawSha256": "76b8fb0c2dabe9136b65491156c93d5bb54bca14794ca13ff96ce02b99b21329",
+      "rawBytes": 343,
+      "note": "matching Prisma Client 5.22.0",
+      "exit": 0,
+      "exitEvidence": "observed tool completion; no original .exit file",
+      "commandAfterNode": [
+        "node_modules/prisma/build/index.js",
+        "generate"
+      ],
+      "archive": "prisma-generate.log.gz",
+      "archiveSha256": "e80b8d452095dbba6b046891c61876e1df8aeec7646accc0ac7ff32d447761cc",
+      "archiveBytes": 244,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter"
+    },
+    {
+      "log": "runtime-role-preflight.log",
+      "rawSha256": "25873363a4cd5447f5e1d8125f2bab903828c15cf37da7b637ded37329f8066f",
+      "rawBytes": 193,
+      "note": "actual restricted runtime principal and full migration fingerprint",
+      "exit": 0,
+      "exitEvidence": "observed tool completion; no original .exit file",
+      "commandAfterNode": [
+        "scripts/runtime-role-contract.mjs",
+        "verify-current"
+      ],
+      "archive": "runtime-role-preflight.log.gz",
+      "archiveSha256": "090585052e4b65a0e2b0baa92de2ccead02fc105a5950596f00e1b8fe26430fc",
+      "archiveBytes": 162,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter"
+    },
+    {
+      "log": "typed-form-identity.log",
+      "rawSha256": "ceb669757e34721e0b0bbab8b49b82850fefeb0ac3840abdc9b03fa59c6cac42",
+      "rawBytes": 640,
+      "note": "2 shared typed Form hash/explicit condition regression cases",
+      "exit": 0,
+      "exitEvidence": "observed tool completion; no original .exit file",
+      "commandAfterNode": [
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/huiteacher/typed-form-flow-identity.test.ts",
+        "--reporter=verbose"
+      ],
+      "cwd": "server-version/backend",
+      "archive": "typed-form-identity.log.gz",
+      "archiveSha256": "87f9384bb7a79d7e021d0205d42f3bd5c18f4b8a65c26d89d9ce5d351afa5d89",
+      "archiveBytes": 366,
+      "commandRecord": "reconstructed from retained task history and log; exact command line not captured in reporter"
+    }
+  ]
+}

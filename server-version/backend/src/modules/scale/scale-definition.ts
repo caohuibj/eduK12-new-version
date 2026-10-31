@@ -137,7 +137,7 @@ export type ScaleInterpretationDefinition = z.infer<typeof interpretationSchema>
 
 export const scaleReportDefinitionSchema = z.object({
   rawScoreFeedback: rawScoreFeedbackSchema.optional(),
-  audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict() }).strict().optional(),
+  audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), longitudinalMetricKeys: z.array(z.string().min(1)).max(100).optional(), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict().optional() }).strict().optional(),
   reportVersion: z.string().min(1),
   primaryScoreKeys: z.array(z.string().min(1)).min(1),
   scoreOrder: z.array(z.string().min(1)).min(1),
@@ -382,6 +382,13 @@ export const validateScaleDefinition = (
       issues.push({ path: `report.interpretations.${index}.source`, message: 'reference 解释必须对应 declared referencePolicy', severity: 'error' })
     }
   })
+  const longitudinal = definition.report.audienceContract?.longitudinalMetricKeys ?? []
+  if (new Set(longitudinal).size !== longitudinal.length || longitudinal.some(key => !scoreKeys.has(key)))
+    issues.push({path:'report.audienceContract.longitudinalMetricKeys',message:'本人纵向指标必须是不重复的已有计分指标子集',severity:'error'})
+  const audience = definition.report.audienceContract
+  if (longitudinal.length && !(audience?.respondent === 'STUDENT_SELF' && audience.audience === 'student' && definition.respondentType === 'participant_self_report'
+    || audience?.respondent === 'ADULT_SELF' && audience.audience === 'teacher' && ['participant_self_report','teacher_self_report'].includes(definition.respondentType)))
+    issues.push({path:'report.audienceContract.longitudinalMetricKeys',message:'本人纵向披露只适用于明确的学生或教师 SELF 数值反馈',severity:'error'})
   definition.report.primaryScoreKeys.forEach((key) => {
     if (!scoreKeys.has(key)) issues.push({ path: 'report.primaryScoreKeys', message: `报告主 score 不存在：${key}`, severity: 'error' })
   })

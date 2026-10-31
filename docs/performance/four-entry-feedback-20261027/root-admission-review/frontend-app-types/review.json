@@ -1,0 +1,75 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "frontend-app-types-original85",
+  "outcomes": [
+    "frontend-app-types-original85"
+  ],
+  "originalSHA256": {
+    "report": "239113f88b86714297eeee77347ae010bd04d41f7088ad96e2a40fcd704a3699",
+    "execution": "239113f88b86714297eeee77347ae010bd04d41f7088ad96e2a40fcd704a3699",
+    "log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "inputs": "be0d7be765d162b3f3fb35ff3ad4f14d751619ddd1e2e7d2d2a896ff06cc0508"
+  },
+  "currentInputsSHA256": "859c828b312c948f36228066c420b79f09773290d749316991e8a0bbe005d392",
+  "originalExecution": {
+    "argv": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+    "cwd": "server-version/frontend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "signalBasis": "inferred only from recorded normal exit 0; no original signal field was retained",
+  "originalInvocationCases": [],
+  "commandOutcome": {
+    "id": "frontend-app-types-original85",
+    "argv": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+    "exitCode": 0,
+    "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "commandLogAssociationRationale": "The original root tool returned EXIT:0 after this precise command and recorded it in registration-integration-review.json at85. An empty log alone is not used as success. Current actual compiler source resolution/config/lock exactly matches85; no new current invocation is claimed.",
+  "completeSourceBindings": [
+    {
+      "path": "server-version/frontend",
+      "currentObject": "361fcbf63584d4e07cef72192a47d27e9392e050",
+      "rationale": "Whole frontend component equals original85; resolved backend imports additionally frozen individually in currentInputs."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "root observed local original execution, not target Actions"
+      },
+      "dependencies": {
+        "lockBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+        "installedByteManifest": "not captured"
+      },
+      "tools": {
+        "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+        "compilerBinaryHash": "not contemporaneously captured"
+      },
+      "generated": {
+        "kind": "Actual TypeScript --listFilesOnly later resolution of 1428 tracked consumed source files; every byte and config/lock matches original85 checkpoint. No typecheck rerun."
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "TypeScript source/config/lock and all1428 tracked resolved compiler inputs byte-identical. Root24.22.1 result is accepted as historical type analysis only, not a24.21 runtime execution; original installed binary hashes absent and disclosed. Fresh official Vite build/browser/security checks remain required."
+  },
+  "deltas": [],
+  "limitations": [
+    "Original execution unsigned and exact installed compiler bytes not contemporaneously captured.",
+    "No tsc.cognitive claim: unaffected separate project is not re-run."
+  ]
+}

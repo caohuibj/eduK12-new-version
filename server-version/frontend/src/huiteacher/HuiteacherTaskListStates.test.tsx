@@ -7,7 +7,7 @@ import {HuiteacherMyPrivateFormTasks} from './HuiteacherMyPrivateFormTasks'
 import {HuiteacherPersonalSelf} from './HuiteacherPersonalSelf'
 
 type Api=Parameters<typeof HuiteacherMyFormTasks>[0]['api']
-vi.mock('../survey/SurveyPublicApp',()=>({TaskForm:({answer,onChange}:{answer:Record<string,string>;onChange:(key:string,value:string)=>void})=><input aria-label="当前答案" value={answer.q??''} onChange={e=>onChange('q',e.target.value)}/>}))
+vi.mock('../survey/TaskForm',()=>({TaskForm:({answer,onChange}:{answer:Record<string,string>;onChange:(key:string,value:string)=>void})=><input aria-label="当前答案" value={answer.q??''} onChange={e=>onChange('q',e.target.value)}/>}))
 vi.mock('../components/FinalCompositeAssessment',()=>({default:function Runner(){
  const [answer,setAnswer]=useState('')
  return <input aria-label="当前答案" value={answer} onChange={e=>setAnswer(e.target.value)}/>
@@ -113,7 +113,7 @@ describe('List-only retry preserves current answering',()=>{
   await screen.findByRole('alert')
   expect(screen.getByText('已分配任务',{selector:'strong'})).toBeInTheDocument()
   if(key==='personal')fireEvent.click(screen.getByRole('button',{name:'我的选择'}))
-  else fireEvent.change(screen.getByRole('textbox',{name:'当前答案'}),{target:{value:'未提交的答案'}})
+  else fireEvent.change(await screen.findByRole('textbox',{name:'当前答案'}),{target:{value:'未提交的答案'}})
   const posts=api.mock.calls.filter(([,method])=>method==='POST').length
   fireEvent.click(screen.getByRole('button',{name:'重试读取任务列表'}))
   await waitFor(()=>expect(screen.queryByRole('alert')).not.toBeInTheDocument())

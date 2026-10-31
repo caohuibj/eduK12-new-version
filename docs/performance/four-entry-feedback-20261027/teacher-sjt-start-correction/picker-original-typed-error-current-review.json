@@ -1,0 +1,98 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "picker-original-typed-error",
+  "outcomes": [
+    "source picker typed unavailable failures projects known invalid source definitions but not unknown HTTP-shaped or SQL errors"
+  ],
+  "originalSHA256": {
+    "report": "844ea7a1e954a849cb3db333ea03700a75cfe38b117730110f6b594966cf9980",
+    "execution": "0b54a892c520183f631dc9c86c0039cb93b70f54adb59c37faec908578dcf7bd",
+    "log": "e8dc51cb0dea9d689c24122f176cedf9e93858827847193c3ce54be279868547",
+    "inputs": "04dbd4261801f6c20e8efb3e8010875acf75ed6140d21f41f5c62f91142b60d4"
+  },
+  "currentInputsSHA256": "e5f323918c6be6fbc83e140c231ad103d42901c811f463485bf8ab922ac6cda3",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/backend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 1,
+    "numPassedTests": 1,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "source picker typed unavailable failures projects known invalid source definitions but not unknown HTTP-shaped or SQL errors",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend",
+      "currentObject": "857b09f27913b2d630a306d339a87ecec974e68e",
+      "rationale": "Root read both revisions of the exact classifier: earlier unknown HTTP/SQL and NOWAIT assertions are unaffected by adding the precise InstrumentFinalSubmitError FORM_ANSWER_INVALID400 branch; the new actual-validator case is independently selected from its own report. Current delta 243c8667 was independently reviewed: authority/NOWAIT, typed error classifier, FINAL receipts and report projection implementations exercised by these mocked/pure cases are unchanged. New transaction/parent proofs and exact Teacher SJT resolver affect START only; those are separately checked by new local context cases and fresh real runtime/browser consumers. This does not reuse the old PostgreSQL START journeys."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node 24.22.1 is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "913891ebad8f91092dd6de64d9d823938d7f6dc6"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "8b77d6ab7889d27247ae9e4c9f5649d75647f0d9"
+      },
+      "outcomes": [
+        "source picker typed unavailable failures projects known invalid source definitions but not unknown HTTP-shaped or SQL errors"
+      ],
+      "rationale": "Root read both revisions of the exact classifier: earlier unknown HTTP/SQL and NOWAIT assertions are unaffected by adding the precise InstrumentFinalSubmitError FORM_ANSWER_INVALID400 branch; the new actual-validator case is independently selected from its own report."
+    }
+  ],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance.",
+    "Old PG START evidence is excluded from current admission after the education START change; it must execute in its affected current runtime consumer."
+  ],
+  "rootReadRationale": "Root read both revisions of the exact classifier: earlier unknown HTTP/SQL and NOWAIT assertions are unaffected by adding the precise InstrumentFinalSubmitError FORM_ANSWER_INVALID400 branch; the new actual-validator case is independently selected from its own report."
+}

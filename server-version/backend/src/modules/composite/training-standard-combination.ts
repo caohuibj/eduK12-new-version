@@ -1,3 +1,4 @@
+import {readEducationMarkerSource,prelockEducationStandardSourceActors} from '../education-tools/assessment-resource.marker'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -16,14 +17,15 @@ import {resolveScaleStartDeployment} from '../scale/deployment/service'
 import {lockInstrumentSourceIdentity} from '../assessment-authorization/source-identity-lock'
 import {freezeScaleRuntimeAtAttemptStart} from '../assessment-runtime/runtime-snapshot'
 import {referenceSetHash,freezeExactReferenceBindings} from '../assessment-runtime/reference-binding'
+import {readTrainingStandardUseConfigurationReceipt,sealTrainingStandardUseConfiguration,selectedConfigurationPointer,selectedConfigurationPointerSchema,trainingStandardSelectionSchema} from '../assessment-authorization/standard-configuration-binding'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().min(1).max(240)
-export const trainingStandardSourceInput=z.object({itemId:uuid,combination:standardCombinationPointerSchema,useGrantId:uuid.optional()}).strict()
+export const trainingStandardSourceInput=z.object({itemId:uuid,combination:trainingStandardSelectionSchema,useGrantId:uuid.optional()}).strict()
 const axis=z.object({version:text,axisHash:hash,sourceVersion:text}).strict()
 export const trainingStandardReferenceSchema=z.object({schemaVersion:z.literal(1),compositeId:uuid,itemId:uuid,ownerId:text,scaleId:uuid,
  combination:standardCombinationPointerSchema.extend({toolKey:text,instrumentVersion:text,axes:z.object({CONTENT:axis,PARAMETERS:axis,REPORT:axis}).strict()}).strict(),
  measurement:z.object({releaseId:uuid,contentHash:hash,measurementHash:hash}).strict(),
- authority:trainingStandardUseAuthoritySchema,reportDisclosure:z.literal('EXISTING_TRAINING_POLICY'),
+ authority:trainingStandardUseAuthoritySchema,selectedBinding:selectedConfigurationPointerSchema.optional(),configurationName:z.string().trim().min(1).max(120).optional(),reportDisclosure:z.literal('EXISTING_TRAINING_POLICY'),
 }).strict()
 export const trainingStandardItemSourceSchema=z.object({reference:trainingStandardReferenceSchema,referenceHash:hash}).strict()
 export type TrainingStandardReference=z.infer<typeof trainingStandardReferenceSchema>
@@ -32,13 +34,15 @@ export class TrainingStandardSourceError extends ContentReleaseError {readonly s
 function fail(code:string):never{throw new TrainingStandardSourceError('CONTENT_TRAINING_STANDARD_'+code)}
 type Purpose='NEW_REFERENCE'|'COLLECTION'
 
-/** Course ownership is a business boundary, not another use-grant scope. Only
+/** Course/public ownership is a business boundary, not another use-grant scope. Only
  * server-loaded composites/items may reach this helper. New and frozen use both
  * resolve the user's one exact MaterialGrant, never legacy canUseScale as well. */
 export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionClient,actorId:string,composite:any,
- item:{id:string;scaleId:string},selection:{releaseId:string;combinationHash:string},purpose:Purpose='NEW_REFERENCE',useGrantId?:string,useGrantVersion?:number){
+ item:{id:string;scaleId:string},selection:z.infer<typeof trainingStandardSelectionSchema>,purpose:Purpose='NEW_REFERENCE',useGrantId?:string,useGrantVersion?:number){
  const pointer=standardCombinationPointerSchema.parse({releaseId:selection.releaseId,combinationHash:selection.combinationHash})
- if(composite.productKind!=='QUESTIONNAIRE'||composite.questionnaireType!=='COURSE'
+ const expected=selection.selectedBinding===undefined?null:selectedConfigurationPointerSchema.parse(selection.selectedBinding)
+ if(composite.productKind!=='QUESTIONNAIRE'||!['COURSE','GENERAL'].includes(composite.questionnaireType)
+  ||composite.questionnaireType==='GENERAL'&&(composite.courseId!=null||(composite.questionnaireCourses??[]).length>0)
   ||purpose==='NEW_REFERENCE'&&!['DRAFT','PUBLISHED'].includes(composite.status))fail('COMPOSITE_UNAVAILABLE')
  const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
   SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,measurement_release FROM survey_standard_releases WHERE id=${pointer.releaseId}`)
@@ -49,9 +53,12 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
  const scale=await tx.scale.findUnique({where:{id:item.scaleId}})
  if(!scale||purpose==='NEW_REFERENCE'&&(scale.instrumentClass!=='STANDARD'||scale.libraryEntryId||scale.status!=='PUBLISHED'))fail('SCALE_SOURCE_REQUIRED')
  if(purpose==='NEW_REFERENCE'&&(scale.code!==header.tool_key||scale.instrumentVersion!==header.instrument_version))fail('SCALE_SOURCE_CHANGED')
- const authority=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:header.measurement_release.releaseId,useGrantId,useGrantVersion})
+ const authority=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:header.measurement_release.releaseId,
+  useGrantId:useGrantId??expected?.authorizationId,useGrantVersion:useGrantVersion??expected?.authorizationRevision})
  if(purpose==='NEW_REFERENCE')await tx.$queryRaw(Prisma.sql`SELECT id FROM scale_deployment_policies WHERE scale_id=${scale.id} AND status='ACTIVE' FOR SHARE`)
  const resolved=await readCurrentStandardCombination(tx,pointer,purpose),t=resolved.row.snapshot
+ const selected=await readTrainingStandardUseConfigurationReceipt(tx,resolved,actorId,authority),selectedBinding=selected?.selectedBinding
+ if(expected&&(!selectedBinding||canonicalHash(selectedConfigurationPointer(selectedBinding))!==canonicalHash(expected)))fail('SELECTED_BINDING_MISMATCH')
  await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+pointer.releaseId,fingerprint:pointer.combinationHash},'TRAINING')
  if(resolved.measurement.releaseId!==header.measurement_release.releaseId||header.tool_key!==t.toolKey||header.instrument_version!==t.instrumentVersion)fail('TOOL_VERSION_MISMATCH')
  if(purpose==='NEW_REFERENCE'){
@@ -69,7 +76,7 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
   combination:{...pointer,toolKey:t.toolKey,instrumentVersion:t.instrumentVersion,
    axes:Object.fromEntries(Object.entries(t.parts).map(([a,p])=>[a,{version:p.version,axisHash:p.hash,sourceVersion:p.sourceVersion}]))},
   measurement:{releaseId:resolved.measurement.releaseId,contentHash:resolved.measurement.contentHash,measurementHash:resolved.measurement.content.measurementHash},
-  authority,reportDisclosure:'EXISTING_TRAINING_POLICY'})
+  authority,...(selectedBinding?{selectedBinding:selectedConfigurationPointer(selectedBinding)}:{}),...(selected?.configurationName?{configurationName:selected.configurationName}:{}),reportDisclosure:'EXISTING_TRAINING_POLICY'})
  const current=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:resolved.measurement.releaseId,
   useGrantId:authority.useGrantId,useGrantVersion:authority.useGrantVersion})
  if(canonicalHash(current)!==canonicalHash(authority))fail('USE_AUTHORITY_CHANGED')
@@ -87,6 +94,13 @@ export function decodeTrainingStandardItemSource(raw:unknown,context?:{composite
  if(canonicalHash(r)!==source.referenceHash)fail('REFERENCE_HASH_MISMATCH')
  const hashes=Object.fromEntries(Object.entries(r.combination.axes).map(([a,p])=>[a,p.axisHash])) as ReturnType<typeof standardAxisHashes>
  if(standardCombinationHash(r.combination.toolKey,hashes)!==r.combination.combinationHash)fail('COMBINATION_HASH_MISMATCH')
+ if(r.selectedBinding){
+  const axis=(a:'CONTENT'|'PARAMETERS'|'REPORT')=>({version:r.combination.axes[a].version,hash:r.combination.axes[a].axisHash})
+  const sourceIdentity={row:{id:r.combination.releaseId,combination_hash:r.combination.combinationHash,snapshot:{
+   toolKey:r.combination.toolKey,instrumentVersion:r.combination.instrumentVersion,parts:{CONTENT:axis('CONTENT'),PARAMETERS:axis('PARAMETERS'),REPORT:axis('REPORT')}}},measurement:r.measurement}
+  const sealed=sealTrainingStandardUseConfiguration(sourceIdentity,r.ownerId,r.authority,1)
+  if(canonicalHash(selectedConfigurationPointer(sealed))!==canonicalHash(r.selectedBinding))fail('SELECTED_BINDING_MISMATCH')
+ }
  if(context&&(r.compositeId!==context.compositeId||r.itemId!==context.itemId||r.scaleId!==context.scaleId||r.ownerId!==context.ownerId))fail('BINDING_IDENTITY_MISMATCH')
  return source
 }
@@ -94,12 +108,25 @@ export function decodeTrainingStandardItemSource(raw:unknown,context?:{composite
 /** Teacher display after the caller's container/data ACL. This is a frozen
  * identity summary, never current authority or a source body. */
 export function trainingStandardCombinationSummary(raw:unknown){
- const {combination}=decodeTrainingStandardItemSource(raw).reference
- return {instrumentVersion:combination.instrumentVersion,axisVersions:{
+ const {combination,configurationName,selectedBinding}=decodeTrainingStandardItemSource(raw).reference
+ return {instrumentVersion:combination.instrumentVersion,configurationName:configurationName??null,authorizationMode:selectedBinding?'PRECISE':'LEGACY',axisVersions:{
   CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}}
 }
 
-export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'){
+export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'):Promise<Awaited<ReturnType<typeof prepareTrainingStandardItemSource>>>{
+ if(composite.productKind==='ORGANIZATION_RESOURCE'){
+  const snapshot=composite.trainingContentSnapshot as {units?:Array<{itemId:string;source:{educationBinding?:unknown}}> }|null
+  const binding=snapshot?.units?.find(unit=>unit.itemId===item.id)?.source.educationBinding
+  if(!binding)fail('EDUCATION_BINDING_REQUIRED')
+  const exact=await readEducationMarkerSource(tx,binding,{compositeId:composite.id,itemId:item.id,ownerId:composite.createdBy},'NEW_USE')
+  if(canonicalHash(item.standardCombinationSource)!==canonicalHash(exact.item.standardCombinationSource))fail('BINDING_IDENTITY_MISMATCH')
+  // The independently published education delivery and its pinned target
+  // distribution grants authorize this entry; original Training source rights
+  // are separately rechecked by the recursive original-container verifier.
+  if(!exact.source.createdBy)fail('BINDING_IDENTITY_MISMATCH')
+  await prelockEducationStandardSourceActors(tx,exact.source.createdBy,[exact.item])
+  return verifyStoredTrainingStandardItem(tx,exact.source,exact.item,purpose)
+ }
  const stored=decodeTrainingStandardItemSource(item.standardCombinationSource,{compositeId:composite.id,itemId:item.id,scaleId:item.scaleId,ownerId:composite.createdBy})
  const r=stored.reference,current=await prepareTrainingStandardItemSource(tx,r.ownerId,composite,item,r.combination,purpose,r.authority.useGrantId,r.authority.useGrantVersion)
  if(current.referenceHash!==stored.referenceHash)fail('FROZEN_IDENTITY_CHANGED')
@@ -121,11 +148,20 @@ export async function freezeTrainingStandardReference(tx:Prisma.TransactionClien
 /** The approved P/R definition reaches the native runtime. Existing exact native
  * P records must match the immutable approved P, never a latest/default set. */
 export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionClient,source:Awaited<ReturnType<typeof verifyStoredTrainingStandardItem>>){
- const t=source.resolved.row.snapshot
+ return freezeExactStandardScaleRuntime(tx,source.resolved.row.snapshot)
+}
+
+/** Native freezing only. Each product must supply its own source/use proof. */
+export async function freezeExactStandardScaleRuntime(tx:Prisma.TransactionClient,t:import('../survey/standard-triplet.model').Triplet){
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
- const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',
-  instruction:frozenTripletInstruction(t)})
+ return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t)})
+}
+
+/** Pure native seam for an independently authorized immutable source. Instruction
+ * provenance is validated by that source's seal, not reconstructed on resume. */
+export async function freezeExactStandardScaleDefinition(tx:Prisma.TransactionClient,t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null}){
+ const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }

@@ -170,3 +170,32 @@ it('sends only one campus task POST while a submission is pending',async()=>{
  await act(async()=>{finish({id:'saved'});await pending})
  expect(await screen.findByText('提交成功。感谢你完成今天的校园活动。')).toHaveAttribute('role','status')
 })
+
+it('navigates task breadcrumbs in-app only for ordinary clicks and rereads an explicit activity scope',async()=>{
+ const api=vi.fn(async(path:string)=>path==='/my/student-reference'?{reference:'SYNTHETIC'}:{list:[],total:0,page:1,hasMore:false,truncated:false})
+ const onNavigate=vi.fn()
+ // Observe the host's decision before suppressing jsdom's unsupported native navigation.
+ const click=(link:HTMLElement,options:Record<string,unknown>={button:0})=>{
+  let prevented=false
+  document.addEventListener('click',event=>{prevented=event.defaultPrevented;event.preventDefault()},{once:true})
+  fireEvent.click(link,options);return prevented
+ }
+ const view=render(<SchoolStudentTasks api={api as unknown as SchoolApi} activityId="first activity" onNavigate={onNavigate}/>)
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/my/activity-tasks?page=1&pageSize=25&activityId=first%20activity'))
+ const overview=screen.getByRole('link',{name:'返回概览'}),all=screen.getByRole('link',{name:'查看全部任务'})
+ expect(overview).toHaveAttribute('href','/workspace');expect(all).toHaveAttribute('href','/workspace/tasks')
+ expect(click(overview)).toBe(true)
+ expect(onNavigate).toHaveBeenLastCalledWith('overview')
+ expect(click(all)).toBe(true)
+ expect(onNavigate).toHaveBeenLastCalledWith('tasks')
+ for(const modifier of ['metaKey','ctrlKey','shiftKey','altKey'])expect(click(all,{button:0,[modifier]:true})).toBe(false)
+ expect(click(all,{button:1})).toBe(false)
+ expect(onNavigate).toHaveBeenCalledTimes(2)
+ view.rerender(<SchoolStudentTasks api={api as unknown as SchoolApi} activityId="second" onNavigate={onNavigate}/>)
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/my/activity-tasks?page=1&pageSize=25&activityId=second'))
+ view.rerender(<SchoolStudentTasks api={api as unknown as SchoolApi}/> )
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/my/activity-tasks?page=1&pageSize=25'))
+ expect(screen.queryByRole('link',{name:'查看全部任务'})).not.toBeInTheDocument()
+ expect(click(screen.getByRole('link',{name:'返回概览'}))).toBe(false)
+ expect(onNavigate).toHaveBeenCalledTimes(2)
+})

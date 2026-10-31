@@ -1,0 +1,523 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "orvis92_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "originalSourceSha256": "6ca8b6fabd597362a58fd54a5437a531ef21e0e3da306ee85d1119392b56cab9",
+  "oldReport": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "scoreOrder": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "leadership",
+        "headline": "带领与影响",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕带领团队、表达主张和推动事情。喜欢这些活动不等于已经具备管理能力。一起筹备活动时，你可能更关注提出方向、协调大家，或更愿意承担其他角色。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "试着为一次小型自愿活动提出一个方案，再观察你更享受发起、协调还是执行。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "organization",
+        "headline": "组织与安排",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕预算、记录、流程和时间安排。关注的是你喜不喜欢做，而不是你是否足够细心。面对一次出游，你可能喜欢排日程、算预算，也可能更喜欢随行体验。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "为一件小事做一张简单清单，做完后留意：安排过程让你觉得有趣还是消耗？"
+          }
+        ]
+      },
+      {
+        "scoreKey": "altruism",
+        "headline": "助人与照顾",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕教学、照顾和支持他人。不喜欢某些助人职业，并不等于缺少善意。在朋友学习新东西时，你可能享受讲解与陪伴，也可能更喜欢独立探索。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "在对方愿意的前提下，花十分钟分享一项你熟悉的小技能；不需要承担专业照护责任。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "creativity",
+        "headline": "艺术与创作",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕写作、设计、表演和视觉创作。兴趣不需要先有拿得出手的作品。同一个周末，你可能想画画、写故事或看表演，也可能有别的充电方式。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "用十分钟做一张小画或写一段故事，只记录过程是否让你愿意继续，不评比作品。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "analysis",
+        "headline": "分析与探究",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕科学问题、实验、计算和复杂谜题。它不是智力或学业能力测验。遇到一个“为什么”，你可能愿意查资料、试着验证，也可能更想先把眼前事情做好。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "选一个生活中的小问题，找两条可信资料并写下自己的解释，不必做危险实验。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "production",
+        "headline": "动手与自然",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕植物、自然、制作和机械操作。不同具体活动的吸引力可能相差很大。照顾一盆植物、整理工具或做个小物件，都可以让你看看自己喜欢哪种动手体验。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个安全、低成本的小任务，如给植物换盆或拼装简单模型；操作工具前了解安全要求。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "adventure",
+        "headline": "运动与冒险",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕运动、挑战和部分带有危险的职业想象。偏好不等于你应该冒险，也不代表现实中的风险承受能力。有的人喜欢运动中的变化和挑战，有的人更享受可预测、安稳的活动；两种偏好都可以。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "如果你想探索挑战感，可以选择规则清楚、风险低、量力而行的运动体验；不要用冒险证明分数。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "erudition",
+        "headline": "语言与阅读",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这组活动围绕语言、阅读、写作和知识交流。它不是知识量或文化水平评定。读一本书、学一句外语、写一段观察，都是体验这类兴趣的日常入口。回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。"
+          },
+          {
+            "category": "strategy",
+            "text": "从感兴趣的主题读一篇短文，或学几个外语表达，再看看哪一部分让你想继续。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文题本是尚未验证的工作译稿。结果只整理这一次的兴趣自述，不测能力、人格好坏或职业适配，也不能决定选科、升学、录用、晋升或职业资格。兴趣会随体验与环境改变。",
+      "研究样本为美国社区成人及加拿大大学新生；不外推为中国常模或中小学生适用性证据。",
+      "八个维度分别看，没有总分、阈值、常模百分位或职业适配率；均分使用原1–5喜欢程度单位，不能当能力排名。",
+      "原文没有明确缺失算法；本项目要求92题完整才生成可解释画像，不用中立替代不知道/没回答。",
+      "部分北美职业名称和情境尚未本地文化适配；陌生并不意味着不适合，也不要求为了算分而猜答。"
+    ],
+    "disclaimer": "这份中文题本是尚未验证的工作译稿。结果只整理这一次的兴趣自述，不测能力、人格好坏或职业适配，也不能决定选科、升学、录用、晋升或职业资格。兴趣会随体验与环境改变。 八维独立，不提供职业推荐裁决。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T17:10:00Z",
+        "basis": "AI editorial review only: adult activity liking, not aptitude, selection, career fit or moral worth; no norms or cutoff labels; pending expert translation review."
+      }
+    }
+  },
+  "standardReport": {
+    "reportVersion": "1.1.0",
+    "primaryScoreKeys": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "scoreOrder": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "leadership",
+        "headline": "带领与影响：喜欢推动，不等于擅长管理",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这份报告带走一句话：用兴趣提出探索问题，不用它替自己选定职业。\n\n八类活动各取1–5喜欢程度均分，没有总分、职业适配率或固定回顾期；越大表示对相应一组活动平均更喜欢，不是能力更强。以下只是自愿探索的场景，不是个人结论。\n\n带领与影响包括提出方向、主持、说服和推动事情。例如，筹备活动时享受提出方案，可以回顾是否喜欢这个过程；它不证明管理能力、社会地位或一定适合某职位。已有喜欢的角色可保留，不需要因此承担领导责任。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次自愿参与的小事，分开自己喜欢的环节与“听起来有地位”的角色。若愿意，可试提一个方案，再看实际体验，不承担超出权限或经验的责任。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "organization",
+        "headline": "组织与安排：喜欢有序过程，不是细心考试",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示平均更喜欢预算、记录、流程、数据与时间安排类活动，不是更自律、细心或适合财务岗位。\n\n例如，为一次出行排日程和预算，可能有趣，也可能只是不得不做；场景并不代表你的偏好。兴趣与熟练、责任和资源条件要分开。\n\n已有顺手方式可保留；不喜欢安排也不等于做不好，不必把生活管理得更复杂来证明分数。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "在愿意且低负担时，为一件普通小事做个简单安排，留意喜欢的是整理、核对还是完成后的方便。只了解过程，不用真实投资、公司数据或重大责任试兴趣。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "altruism",
+        "headline": "助人与照顾：偏好不决定善意",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示更喜欢教学、照顾、咨询与支持等活动，不是更善良或已经具备专业照护能力。\n\n例如，享受把一个熟悉概念讲清楚，是可能的入口，不是系统认定你适合教学或医疗职业。喜欢与现实培训、资质、劳动条件不同。\n\n已有有边界的帮助可保留；不喜欢某类助人活动也不代表冷漠，更不要求牺牲自己来证实关心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "对方愿意时，可分享一个熟悉的小技能或提供一项力所能及的帮助，然后留意过程是否合适。保留双方边界，不承担医疗、心理或其他专业职责来试兴趣。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "creativity",
+        "headline": "艺术与创作：看过程吸引力，不评作品高下",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示对写作、设计、表演、绘画等一组创作活动平均更喜欢，不是天赋、作品质量或创造力考试。\n\n例如，画一张小图和登台表演可能吸引力不同，一个均分装不下所有偏好；这也不是问卷已查到你的具体组合。\n\n喜欢的创作可以继续，不需要先有拿得出手的成品；暂时没兴趣也不用硬培养成职业方向。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "若愿意，选一种低成本材料写几句或做个小作品，不公开也可以。只留意过程哪一段想继续，不比较成品，不用购买昂贵设备来验证兴趣。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "analysis",
+        "headline": "分析与探究：想研究，不是智力分数",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示平均更喜欢科学问题、实验设计、数学、程序或复杂谜题，不等于客观分析能力、学业成绩或科研潜力更高。\n\n例如，想找证据解释一个生活现象，是可能的兴趣入口；问卷没有证明你会怎样研究。熟悉程度与学习机会也会影响想象。\n\n已有想了解的问题可保留，不喜欢某些科学职业名称，也不能推出不能学会相关技能。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一个安全的小问题，读一份可靠介绍并写一个仍想核实的问题即可。不做危险实验，不用考试难度、付费课程或职业决定来检验兴趣。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "production",
+        "headline": "动手与自然：不同具体活动可以不同",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示对植物、自然、制作、机械与工具等活动平均更喜欢，不是动手能力、体力或某类劳动身份评价。\n\n例如，喜欢照料植物却不想修车，都可能出现在同一组；一个均分不能替这些活动各作结论。这只是说明组合的例子。\n\n已有合适活动可保留，也不需要按性别或职业刻板印象挑选。陌生可能只是缺少体验，不能被叫作不适合。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "想了解时先从安全、低成本且愿意的一种体验入手，如观察植物或简单拼装。工具与机器需相应安全条件，不因兴趣分尝试没有准备的操作。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "adventure",
+        "headline": "运动与冒险：偏好不能换成危险任务",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示对运动、挑战及部分有风险的职业想象平均更喜欢，不是更勇敢、身体更强或能安全处理危险。\n\n例如，喜欢体育竞赛与想从事危险职业并不一样，均分不能给每个活动作资格判断。题中保留北美职业语境，陌生不等于缺点。\n\n现有安全偏好可以保留。不想冒险也不必补齐胆量，更不能用危险行为证明问卷结果。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "若愿意探索挑战感，只选规则清楚、量力而行、风险低且可退出的活动，并遵守安全要求。不要尝试危险职业情境或极限行为来验证偏好。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "erudition",
+        "headline": "语言与阅读：喜欢交流，不是文化水平排名",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项越大，表示对语言、阅读、写作、编辑和知识交流类活动平均更喜欢，不是掌握语言多少或文化水平更高。\n\n例如，喜欢读短文却不喜欢公开表达，可能同时存在，均分不能把它们都说成擅长；这只是解释兴趣多样的场景。\n\n已有喜欢的阅读或表达方式可保留。兴趣可变化，不需要为了量表名称变成博学的人，或据此决定专业。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "从愿意的主题读一小段、写几句观察或了解一个外语表达，留意哪种过程吸引自己。无须一次尝试全部，不以阅读量或语言考试成绩证明偏好。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本独立中文稿未验证，北美情境尚未文化适配；八项仅为兴趣，不用于能力排名、职业推荐裁决或录用。"
+    ],
+    "disclaimer": "这份中文题本是尚未验证的工作译稿。结果只整理这一次的兴趣自述，不测能力、人格好坏或职业适配，也不能决定选科、升学、录用、晋升或职业资格。兴趣会随体验与环境改变。 八维独立，不提供职业推荐裁决。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:52:24Z",
+        "basis": "本次AI文字自审对应orvis92_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "funReport": {
+    "reportVersion": "1.2.0",
+    "primaryScoreKeys": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "scoreOrder": [
+      "leadership",
+      "organization",
+      "altruism",
+      "creativity",
+      "analysis",
+      "production",
+      "adventure",
+      "erudition"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "leadership",
+        "headline": "兴趣是探索地图，不是录用通知",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "一句带走的话：地图帮你提问题，不替你签职业选择书。\n\n八类活动各1–5喜欢程度均分，没有总分、适配率或固定回顾天数。越大是平均更喜欢这一组，不是技能更强。下面的体验只是可选入口，不是系统配好的职业路线。\n\n带领与影响包括发起、主持、说服和推动事情。比如愿意为一件小事提方案，是可能的兴趣，不是“天生领导者”证书。已有喜欢的角色就留着，不必为了数字去当负责人。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "只看一次自愿活动：享受的是提想法、协调，还是别的环节？分开真实喜欢与听起来体面的头衔；愿意才试提一个小方案，不越权领责任。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "organization",
+        "headline": "喜欢整理，不等于必须管全场",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "组织安排越大，是平均更喜欢预算、记录、流程与数据，不是更细心或已具备岗位资格。\n\n排一次行程可能有趣，也可能只是轮到自己做；这是场景，不是报告读出的偏好。喜欢过程、做得熟练和承担责任是三件事。\n\n好用安排继续用，不喜欢也不欠一套更复杂的管理系统。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只拿一件普通小事试个简短安排，看享受整理还是只想赶快结束。不碰真实投资、机密数据或重大责任，不用把兴趣试玩升级为工作考核。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "altruism",
+        "headline": "喜欢帮忙，不领善良积分",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "助人与照顾越大，是更喜欢相关教学、照护和支持活动，不是好人等级，也没赋予专业资格。\n\n讲清一个熟悉概念，是可能入口，不等于系统推荐你做教师或治疗师。资格、培训和实际工作条件仍是别的事情。\n\n有边界的帮助留下；不喜欢某类助人职业，也不必反过来证明自己有爱心。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "双方愿意时只分享一项熟悉小技能或提供力所能及的协助，做完看看感受。不包揽照护、不牺牲边界，也不拿专业职责当兴趣体验。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "creativity",
+        "headline": "想创作，不必先交代表作",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "艺术创作越大，是对这组写作、设计、表演与视觉活动平均更喜欢，不是天赋鉴定。\n\n喜欢画图却不想登台，是可以并存的例子，均分没有替每项具体活动表态。没有作品也不取消兴趣资格。\n\n能享受的过程继续用，不需要把每个爱好升级成作品集或职业。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "用现有材料做一点小创作，不公开也行。看看哪一小段愿意再做，不评比作品、不为验证兴趣买一整套装备。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "analysis",
+        "headline": "想追问为什么，不是智商提示条",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "分析探究越大，是更喜欢科学、数学、程序或谜题这组活动，不是聪明程度或科研前途。\n\n想查证一个生活现象，是可能的入口；报告没知道你怎样解题。陌生职业名称和学习机会也会影响想象。\n\n有好奇的问题就留着，不喜欢某些题也不代表学不会。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "只找一份可靠介绍，留一个待核实问题即可。不做危险实验，不用刷难题、购买课程或决定专业给兴趣验明正身。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "production",
+        "headline": "同组有花盆，也有机器，不必都喜欢",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "动手自然越大，是平均更喜欢自然、种植、制作与机械活动，不是体力或技术排名。\n\n喜欢植物但不爱修车，是可能组合，数字不会替每项盖“擅长”章。兴趣也不按性别或劳动身份分配。\n\n已有喜欢的留下，没机会接触的可以暂时不知道，不必急着定义适不适合。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "愿意时选一种安全低成本体验，观察植物或简单拼装即可。工具操作先有安全条件，不把兴趣地图变成未经准备的机器操作单。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "adventure",
+        "headline": "喜欢挑战，也不用接危险支线",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "运动冒险越大，是更喜欢这组挑战和部分有风险的职业想象，不是勇敢通行证或身体能力分。\n\n体育比赛和危险职业不是同一回事，一个均分也没给谁发资格。陌生北美情境不必被解释成个人短板。\n\n安全偏好留着，不喜欢刺激也不需要补一场胆量考试。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "若愿意，只选规则清楚、低风险、量力且可退出的活动，遵守安全要求。不模拟危险职业，不用极限行动证明兴趣数字。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "erudition",
+        "headline": "喜欢文字，不领博学勋章",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "语言阅读越大，是对阅读、写作、编辑与语言交流平均更喜欢，不是知识量或文化高低。\n\n爱读短文但不爱公开发言，是可并存的例子；报告没有替具体活动都写成擅长。喜欢可以变化，也不必从此选一个专业。\n\n合适的阅读与表达继续用，不把爱好改造成阅读量竞赛。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "strategy",
+            "text": "选一小段愿意读的内容、几句想写的观察或一个外语表达，尝一点即可。不集齐所有项目，不用考试成绩证明自己真的喜欢。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "本独立中文稿未验证，北美情境尚未文化适配；八项仅为兴趣，不用于能力排名、职业推荐裁决或录用。"
+    ],
+    "disclaimer": "这份中文题本是尚未验证的工作译稿。结果只整理这一次的兴趣自述，不测能力、人格好坏或职业适配，也不能决定选科、升学、录用、晋升或职业资格。兴趣会随体验与环境改变。 八维独立，不提供职业推荐裁决。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+        "reviewedAt": "2026-10-29T16:52:24Z",
+        "basis": "本次AI文字自审对应orvis92_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+      }
+    }
+  },
+  "status": "MATERIALS_ONLY_ALTERNATIVE_R_NOT_AUTO_REGISTERED"
+}

@@ -1,0 +1,643 @@
+{
+  "sourceMain": "93235b6c6a61cefb30fd525eea13ee9c6d4cc0fe",
+  "businessSource": "90c0a9a5c0ba24a5a9d8cb8003279dfb668650ba",
+  "origin": "PR376 observer-http-r4 database retained after actual synthetic HTTP journeys; no new FINAL or scoring",
+  "readOnly": true,
+  "postgres": "17.11",
+  "identities": [
+    {
+      "respondent_type": "PARENT",
+      "status": "COMPLETED",
+      "count": 1
+    },
+    {
+      "respondent_type": "TEACHER",
+      "status": "COMPLETED",
+      "count": 1
+    }
+  ],
+  "completed": {
+    "completedScales": 2,
+    "unitFinals": 2,
+    "externalFieldEvidence": 1
+  },
+  "tables": [
+    {
+      "table": "assessment_attempt_consents",
+      "rows": 4,
+      "totalRelationBytes": 81920,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 65536,
+      "fields": []
+    },
+    {
+      "table": "assessment_episodes",
+      "rows": 2,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": []
+    },
+    {
+      "table": "assessment_run_actor_snapshots",
+      "rows": 4,
+      "totalRelationBytes": 98304,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 81920,
+      "fields": [
+        {
+          "column": "snapshot_payload",
+          "nonNullRows": 4,
+          "datumBytes": 993,
+          "textRepresentationBytes": 921
+        },
+        {
+          "column": "snapshot_hash",
+          "nonNullRows": 4,
+          "datumBytes": 260,
+          "textRepresentationBytes": 256
+        }
+      ]
+    },
+    {
+      "table": "assessment_run_execution_start_claims",
+      "rows": 2,
+      "totalRelationBytes": 81920,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 65536,
+      "fields": []
+    },
+    {
+      "table": "assessment_run_executions",
+      "rows": 2,
+      "totalRelationBytes": 114688,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 98304,
+      "fields": [
+        {
+          "column": "subject_actor_snapshot_id",
+          "nonNullRows": 2,
+          "datumBytes": 74,
+          "textRepresentationBytes": 72
+        },
+        {
+          "column": "respondent_actor_snapshot_id",
+          "nonNullRows": 2,
+          "datumBytes": 74,
+          "textRepresentationBytes": 72
+        },
+        {
+          "column": "relationship_snapshot_id",
+          "nonNullRows": 2,
+          "datumBytes": 74,
+          "textRepresentationBytes": 72
+        },
+        {
+          "column": "runtime_binding_kind",
+          "nonNullRows": 2,
+          "datumBytes": 20,
+          "textRepresentationBytes": 18
+        },
+        {
+          "column": "runtime_binding_ref",
+          "nonNullRows": 2,
+          "datumBytes": 74,
+          "textRepresentationBytes": 72
+        }
+      ]
+    },
+    {
+      "table": "assessment_run_relationship_snapshots",
+      "rows": 2,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": [
+        {
+          "column": "subject_actor_snapshot_id",
+          "nonNullRows": 2,
+          "datumBytes": 74,
+          "textRepresentationBytes": 72
+        },
+        {
+          "column": "respondent_actor_snapshot_id",
+          "nonNullRows": 2,
+          "datumBytes": 74,
+          "textRepresentationBytes": 72
+        },
+        {
+          "column": "snapshot_payload",
+          "nonNullRows": 2,
+          "datumBytes": 1220,
+          "textRepresentationBytes": 1166
+        },
+        {
+          "column": "snapshot_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        }
+      ]
+    },
+    {
+      "table": "assessment_run_tracks",
+      "rows": 2,
+      "totalRelationBytes": 81920,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 65536,
+      "fields": []
+    },
+    {
+      "table": "assessment_runs",
+      "rows": 2,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": []
+    },
+    {
+      "table": "assessment_unit_snapshots",
+      "rows": 2,
+      "totalRelationBytes": 147456,
+      "tableBytesIncludingToast": 32768,
+      "indexesBytes": 114688,
+      "fields": [
+        {
+          "column": "payload_kind",
+          "nonNullRows": 2,
+          "datumBytes": 8,
+          "textRepresentationBytes": 22
+        },
+        {
+          "column": "source_definition_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        },
+        {
+          "column": "canonical_result_encrypted",
+          "nonNullRows": 2,
+          "datumBytes": 6340,
+          "textRepresentationBytes": 6340
+        },
+        {
+          "column": "collection_facts_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        }
+      ]
+    },
+    {
+      "table": "assessments",
+      "rows": 2,
+      "totalRelationBytes": 294912,
+      "tableBytesIncludingToast": 90112,
+      "indexesBytes": 204800,
+      "fields": [
+        {
+          "column": "answers",
+          "nonNullRows": 2,
+          "datumBytes": 340,
+          "textRepresentationBytes": 320
+        },
+        {
+          "column": "result",
+          "nonNullRows": 2,
+          "datumBytes": 7148,
+          "textRepresentationBytes": 7136
+        },
+        {
+          "column": "answers_revision",
+          "nonNullRows": 2,
+          "datumBytes": 8,
+          "textRepresentationBytes": 2
+        },
+        {
+          "column": "submission_payload_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        },
+        {
+          "column": "runtime_snapshot_encrypted",
+          "nonNullRows": 2,
+          "datumBytes": 21906,
+          "textRepresentationBytes": 21906
+        },
+        {
+          "column": "frozen_admission_snapshot_encrypted",
+          "nonNullRows": 2,
+          "datumBytes": 3892,
+          "textRepresentationBytes": 3892
+        },
+        {
+          "column": "frozen_admission_snapshot_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        },
+        {
+          "column": "context_snapshot_ref",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "timing_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        }
+      ]
+    },
+    {
+      "table": "composite_assessment_attempts",
+      "rows": 2,
+      "totalRelationBytes": 229376,
+      "tableBytesIncludingToast": 65536,
+      "indexesBytes": 163840,
+      "fields": [
+        {
+          "column": "context_snapshot_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "context_snapshot_hash",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "frozen_active_slot_set_encrypted",
+          "nonNullRows": 2,
+          "datumBytes": 2844,
+          "textRepresentationBytes": 2844
+        },
+        {
+          "column": "context_snapshot_ref",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "async_report_epoch",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_timing_snapshot",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_variant_allocation_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_flow_snapshot_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_flow_snapshot_hash",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_flow_path_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_persistence_snapshot",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_persistence_snapshot_hash",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_feedback_snapshot",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_feedback_snapshot_hash",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_content_binding",
+          "nonNullRows": 2,
+          "datumBytes": 1576,
+          "textRepresentationBytes": 1466
+        },
+        {
+          "column": "training_content_binding_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        },
+        {
+          "column": "training_content_interpretation_encrypted",
+          "nonNullRows": 2,
+          "datumBytes": 3068,
+          "textRepresentationBytes": 3068
+        },
+        {
+          "column": "training_reference_binding",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_reference_binding_hash",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        }
+      ]
+    },
+    {
+      "table": "composite_assessment_items",
+      "rows": 2,
+      "totalRelationBytes": 114688,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 98304,
+      "fields": [
+        {
+          "column": "form_definition",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        }
+      ]
+    },
+    {
+      "table": "composite_assessments",
+      "rows": 2,
+      "totalRelationBytes": 172032,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 155648,
+      "fields": [
+        {
+          "column": "analysis_protocol_snapshot_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "report_package_key",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "report_package_version",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "report_package_profile",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "report_package_snapshot_encrypted",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        },
+        {
+          "column": "training_content_snapshot",
+          "nonNullRows": 2,
+          "datumBytes": 1256,
+          "textRepresentationBytes": 1162
+        },
+        {
+          "column": "training_content_snapshot_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        },
+        {
+          "column": "training_report_selection_draft",
+          "nonNullRows": 0,
+          "datumBytes": 0,
+          "textRepresentationBytes": 0
+        }
+      ]
+    },
+    {
+      "table": "composite_report_queue_budget",
+      "rows": 1,
+      "totalRelationBytes": 32768,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 16384,
+      "fields": []
+    },
+    {
+      "table": "huiteacher_field_event_forms",
+      "rows": 1,
+      "totalRelationBytes": 49152,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 32768,
+      "fields": [
+        {
+          "column": "definition_digest",
+          "nonNullRows": 1,
+          "datumBytes": 65,
+          "textRepresentationBytes": 64
+        }
+      ]
+    },
+    {
+      "table": "huiteacher_field_form_evidence",
+      "rows": 1,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": [
+        {
+          "column": "definition_digest",
+          "nonNullRows": 1,
+          "datumBytes": 65,
+          "textRepresentationBytes": 64
+        },
+        {
+          "column": "answers_cipher",
+          "nonNullRows": 1,
+          "datumBytes": 864,
+          "textRepresentationBytes": 860
+        },
+        {
+          "column": "answers_hash",
+          "nonNullRows": 1,
+          "datumBytes": 65,
+          "textRepresentationBytes": 64
+        }
+      ]
+    },
+    {
+      "table": "huiteacher_observation_records",
+      "rows": 2,
+      "totalRelationBytes": 81920,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 65536,
+      "fields": [
+        {
+          "column": "body_cipher",
+          "nonNullRows": 2,
+          "datumBytes": 702,
+          "textRepresentationBytes": 694
+        }
+      ]
+    },
+    {
+      "table": "measurement_content_releases",
+      "rows": 2,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": []
+    },
+    {
+      "table": "relational_assessment_assignments",
+      "rows": 2,
+      "totalRelationBytes": 147456,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 131072,
+      "fields": [
+        {
+          "column": "relationship_snapshot_json",
+          "nonNullRows": 2,
+          "datumBytes": 1220,
+          "textRepresentationBytes": 1166
+        },
+        {
+          "column": "relationship_snapshot_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        }
+      ]
+    },
+    {
+      "table": "scale_library_entries",
+      "rows": 2,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": []
+    },
+    {
+      "table": "scale_library_events",
+      "rows": 6,
+      "totalRelationBytes": 32768,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 16384,
+      "fields": []
+    },
+    {
+      "table": "scale_library_submissions",
+      "rows": 2,
+      "totalRelationBytes": 81920,
+      "tableBytesIncludingToast": 32768,
+      "indexesBytes": 49152,
+      "fields": [
+        {
+          "column": "snapshot",
+          "nonNullRows": 2,
+          "datumBytes": 4980,
+          "textRepresentationBytes": 11073
+        },
+        {
+          "column": "snapshot_hash",
+          "nonNullRows": 2,
+          "datumBytes": 130,
+          "textRepresentationBytes": 128
+        }
+      ]
+    },
+    {
+      "table": "scale_library_use_grants",
+      "rows": 2,
+      "totalRelationBytes": 65536,
+      "tableBytesIncludingToast": 16384,
+      "indexesBytes": 49152,
+      "fields": []
+    },
+    {
+      "table": "scales",
+      "rows": 4,
+      "totalRelationBytes": 139264,
+      "tableBytesIncludingToast": 32768,
+      "indexesBytes": 106496,
+      "fields": [
+        {
+          "column": "definition",
+          "nonNullRows": 4,
+          "datumBytes": 7386,
+          "textRepresentationBytes": 9556
+        },
+        {
+          "column": "definition_hash",
+          "nonNullRows": 4,
+          "datumBytes": 260,
+          "textRepresentationBytes": 256
+        }
+      ]
+    }
+  ],
+  "emptySelectedTables": [
+    "assessment_composition_templates",
+    "assessment_frozen_bindings",
+    "assessment_management_events",
+    "assessment_public_templates",
+    "assessment_reference_sets",
+    "assessment_result_facts",
+    "assessment_runtime_artifacts",
+    "composite_analysis_snapshots",
+    "composite_assessment_access_tokens",
+    "composite_form_answers",
+    "composite_form_section_attempts",
+    "composite_form_sections",
+    "composite_report_jobs",
+    "education_report_policy_snapshots",
+    "huiteacher_field_consensus_approvals",
+    "huiteacher_field_consensus_sources",
+    "huiteacher_field_consensuses",
+    "huiteacher_field_feedback_releases",
+    "measurement_content_release_events",
+    "measurement_reference_candidates",
+    "measurement_reference_reviews",
+    "relational_analysis_snapshots",
+    "scale_library_emergency_stops",
+    "scale_library_media"
+  ],
+  "limitations": [
+    "Two School observer scale finals and one Teacher external field form only, not four-entry distribution or capacity.",
+    "Actual complete database schema but small fixture sample includes setup/governance records; page allocation is not per-user amortized cost.",
+    "Column datum bytes and text representation are distinct; sums do not equal heap/index/TOAST totals.",
+    "No prior WAL baseline or before-START table baseline; no backup/restore/COS or decrypted payload equivalence claim.",
+    "Original ephemeral encryption keys are not retained; only metadata/size and existing committed completion identities read. No changes to business rows."
+  ]
+}

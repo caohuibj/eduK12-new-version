@@ -1,0 +1,169 @@
+{
+  "run": 40511522009,
+  "head": "b6a5e9ede0dcd339d93570f76bf046dcb06c5a2d",
+  "checkout": "002be00ba9cd52a21475dac916ab495506940750",
+  "tree": "7096629d16749d49884ac0f76adda03636228d8b",
+  "components": {
+    "backend": "3f56dbc63c9be94321c5f3d81dc10fffee5a9240",
+    "frontend": "361fcbf63584d4e07cef72192a47d27e9392e050"
+  },
+  "jobs": {
+    "classify changed content": 122214389493,
+    "pr363-frontend-build": 122214562926,
+    "pr363-backend-build": 122214563790,
+    "pr363-backend-checks": 122216613271,
+    "pr363-backend-scan": 122216613358,
+    "pr363-pg": 122216613374,
+    "pr363-frontend-checks": 122216613395,
+    "pr363-frontend-scan": 122216613410,
+    "pr363-audit": 122216613435,
+    "codeql (javascript/typescript SAST)": 122214562102
+  },
+  "artifacts": {
+    "backend-dist": {
+      "id": 12738315529,
+      "name": "pr363-backend-dist-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "fab09b2eca1d73dec17b53a93277b7e3b70b7bc750fa3343d6bac2813e146443",
+      "size": 8205122
+    },
+    "frontend-scan-reports": {
+      "id": 12738016731,
+      "name": "pr363-frontend-scan-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "cb10fa6f4472b2c61ba5a67e079fd571e88ad8a3e9e2e1545f2853edc0b1d35a",
+      "size": 29036
+    },
+    "frontend-images": {
+      "id": 12737971070,
+      "name": "pr363-frontend-images-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "98dba36f16d55b2dd9bd148eb9bf67181e6c33e97fbf401680ce30fb56629cb5",
+      "size": 371572863
+    },
+    "frontend-checks-reports": {
+      "id": 12737871860,
+      "name": "pr363-frontend-checks-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "7cfc1aa9bfed74bb0012d63b1879f414a0068869aae3c635ee29f5299ab7f01b",
+      "size": 27748
+    },
+    "backend-checks-reports": {
+      "id": 12737811957,
+      "name": "pr363-backend-checks-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "43dc27f73c8fe93105223eab4b06c2b1440aaff28e3e0226552e823da2b5828d",
+      "size": 24221
+    },
+    "backend-scan-reports": {
+      "id": 12737782093,
+      "name": "pr363-backend-scan-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "2ed09e7547911968bac212dc4b28b8cf49bbe807e950316178894ede4d2ac8d9",
+      "size": 109006
+    },
+    "frontend-build-reports": {
+      "id": 12737682012,
+      "name": "pr363-frontend-build-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "0a167aa8e9c35cf09b5723ad1846efc7c2854a22285aa66beb5ec07df0cf9ac8",
+      "size": 34985
+    },
+    "backend-build-reports": {
+      "id": 12737537781,
+      "name": "pr363-backend-build-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "dfd2d60bb10919a2a8db2aaf2ff976f620f7b9a3e91b16d859870c709a38f357",
+      "size": 56401
+    },
+    "frontend-dist": {
+      "id": 12737457473,
+      "name": "pr363-frontend-dist-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "9af01955e4fcb6920e8372f6a516c1df3e1c71ec38bf0a8c7edcc304457a9af3",
+      "size": 22064587
+    },
+    "pg-reports": {
+      "id": 12737357805,
+      "name": "pr363-pg-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "610c33763d538058feeefafa13b0f394a5e8cfecc79f2c44bdade5dc0e2e2d68",
+      "size": 25068
+    },
+    "backend-images": {
+      "id": 12737202701,
+      "name": "pr363-backend-images-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "2472657bc5b9f78457c4ea1bdecf360e33426a740da3d61c80dbbdc99547a9b5",
+      "size": 831925268
+    },
+    "audit-reports": {
+      "id": 12737163332,
+      "name": "pr363-audit-reports-002be00ba9cd52a21475dac916ab495506940750",
+      "sha256": "c7db12873b845c27e5c2a72e13af3b2150ee608489f21703d84604a61d0cbff5",
+      "size": 20920
+    }
+  },
+  "backendRevision": {
+    "checkpoint": "243c866789f67d2d85c61c70daa1e3f7e491de30",
+    "tree": "857b09f27913b2d630a306d339a87ecec974e68e",
+    "files": {
+      "server-version/backend/src/__tests__/integration/education-start-context.test.ts": "9c68a23244ba35ffd12e3afa8929a26693ed3978",
+      "server-version/backend/src/modules/assessment-run/education-start-context.ts": "eaaf9def6fba07c36979908548737b27116da99c",
+      "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": "6f496c3f92905bbe1ca44817a7b65821036acae0",
+      "server-version/backend/src/modules/assessment-run/startExecution.ts": "2c57e5935e521bddd71833150335db2634f9bbe9",
+      "server-version/backend/src/modules/composite/composite.service.ts": "457d5a794df63a85e4b212f2f33b0ca0d97aa242",
+      "server-version/backend/src/modules/education-tools/assessment-resource.source.ts": "9c26307f0e29d19ecfd7b92504d1cd56146fbec0",
+      "server-version/backend/src/modules/situational/situational-runtime.service.ts": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
+    },
+    "basis": "Teacher-only transaction/parent context correction; current backend build and current PG START/FINAL/report consumers mandatory. Original schema/dependency/frontend qualifications remain exact."
+  },
+  "qualifiedBackend": {
+    "run": 40525412926,
+    "head": "893f61b94deaf191d552f3145c03a8d1a750a666",
+    "checkout": "e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+    "tree": "c9abc8fdad3b606e076c321c8178c5341ff86e05",
+    "jobs": {
+      "classify changed content": 122263543154,
+      "codeql (javascript/typescript SAST)": 122263792858,
+      "pr363-backend-build": 122263793504,
+      "pr363-backend-checks": 122265990762,
+      "pr363-backend-scan": 122265991024,
+      "pr363-pg (reports)": 122265990838,
+      "pr363-pg (scales)": 122265990848
+    },
+    "artifacts": {
+      "pg-reports-reports": {
+        "id": 12744805743,
+        "name": "pr363-pg-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c-reports",
+        "sha256": "ab5a448f031f30e254e5bcf6b20aa1400e6098cb620accacbd617bcada0bd3c1",
+        "size": 19100
+      },
+      "backend-build-reports": {
+        "id": 12744241749,
+        "name": "pr363-backend-build-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "f6b7365e38b24a8584d9859fa98516fbb139c5bb98731e1b8f22be74f6747b34",
+        "size": 53375
+      },
+      "backend-images": {
+        "id": 12744226705,
+        "name": "pr363-backend-images-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "ea5a595d7362be27d2079692ba9c003a1101060c6105c3ce5e26b7c7b8d95eb5",
+        "size": 831937656
+      },
+      "backend-dist": {
+        "id": 12743832366,
+        "name": "pr363-backend-dist-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "18823d3d79f3876e52320d261864a78eb1421409fa5c4bb3121a1e2bc8dac5d3",
+        "size": 8209372
+      },
+      "backend-checks-reports": {
+        "id": 12743219596,
+        "name": "pr363-backend-checks-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "69d8e7312bb9e9d1ea71eb4467c7d648e17c2956082212d4cc6ea322177506c2",
+        "size": 23542
+      },
+      "pg-reports-scales": {
+        "id": 12743189877,
+        "name": "pr363-pg-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c-scales",
+        "sha256": "8b56d7f66be4946451039922ee40733ec58495edf0d5b23042a86bbaae49233e",
+        "size": 18815
+      },
+      "backend-scan-reports": {
+        "id": 12742589592,
+        "name": "pr363-backend-scan-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "49a5796ca5c02e3b7a1e87fbc6ecb63ace0ef2aa92ed61fd0d8efc13cffeda42",
+        "size": 105917
+      }
+    }
+  }
+}

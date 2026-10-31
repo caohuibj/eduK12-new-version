@@ -11,7 +11,7 @@ const id='30000000-0000-4000-8000-000000000001'
 function context(){
   const {row,measurement}=combinationFixture(),unit={itemId:'40000000-0000-4000-8000-000000000001',family:'SCALE' as const,
     source:{kind:'SCALE' as const,id:'scale',ownerId:'teacher'},measurement:{releaseId:measurement.releaseId,contentHash:measurement.contentHash,measurementHash:measurement.layer==='MEASUREMENT'?measurement.content.measurementHash:''}}
-  const db={$queryRaw:vi.fn(async()=>{throw new Error('unexpected database read')}),$executeRaw:vi.fn(async()=>{throw new Error('unexpected write')})}
+  const db={$queryRaw:vi.fn(async():Promise<unknown[]>=>{throw new Error('unexpected database read')}),$executeRaw:vi.fn(async()=>{throw new Error('unexpected write')})}
   return {row,measurement,unit,db}
 }
 const stored=(raw:unknown):StoredRelease=>({...prepareRelease(raw),releaseId:id,status:'PUBLISHED',publishedBy:'system',publishedAt:new Date('2026-10-25T00:00:00Z')})
@@ -22,6 +22,18 @@ describe('current Training consumers do not borrow Survey approval or PRIVATE sc
       source:{kind:'STANDARD_COMBINATION',id:c.row.id,combinationHash:c.row.combination_hash}}]}
     expect(trainingContentSnapshotSchema.safeParse(snapshot).success).toBe(false)
     expect(trainingContentSnapshotSchema.safeParse({...snapshot,units:[{...c.unit,source:{...c.unit.source,combinationHash:c.row.combination_hash}}]}).success).toBe(false)
+  })
+  it('does not turn a forged education Standard descriptor into an ordinary sealed parent',async()=>{
+    const c=context(),{canonicalHash}=await import('../../modules/assessment-runtime/canonical'),{DISCLOSURE_PRESETS}=await import('../../modules/scale/policy/disclosure')
+    if(c.measurement.layer!=='MEASUREMENT')throw Error('fixture')
+    const report=stored({layer:'REPORT',family:'SCALE',key:'synthetic-forged-education-report',version:'R1',scope:{kind:'PLATFORM',ownerId:'system'},provenance:{},assetRefs:[],sourceReleaseId:null,
+      content:{projectionVersion:1,measurements:[{releaseId:c.measurement.releaseId,contentHash:c.measurement.contentHash}],metricKeys:['effort'],audience:'teacher',language:'zh-CN',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:{title:'Synthetic forged report',blocks:[],limitations:[]}}})
+    const unit={...c.unit,report:{releaseId:report.releaseId,contentHash:report.contentHash},source:{...c.unit.source,educationStandard:{releaseId:c.row.id,combinationHash:c.row.combination_hash,
+      toolKey:c.row.snapshot.toolKey,instrumentVersion:c.row.snapshot.instrumentVersion,nativeDefinitionHash:canonicalHash(c.row.snapshot.definition),
+      parametersAxisHash:c.row.snapshot.parts.PARAMETERS.hash,reportAxisHash:c.row.snapshot.parts.REPORT.hash,reportAudience:'teacher' as const,respondentDisclosure:DISCLOSURE_PRESETS.NONE()}}}
+    c.db.$queryRaw.mockResolvedValue([])
+    await expect(validateTrainingReportPointer(c.db as never,{unit,compositeId:'invented-composite',ownerId:'teacher',reportReleaseId:report.releaseId,publication:false,releases:new Map([[report.releaseId,report]])})).rejects.toThrow('PRIVATE_COMPOSITION_IDENTITY_INVALID')
+    expect(c.db.$queryRaw).toHaveBeenCalledOnce();expect(c.db.$executeRaw).not.toHaveBeenCalled()
   })
   it.each(['theoretical_range','descriptive_sample','criterion_threshold'] as const)(
     'a PLATFORM %s parameter snapshot is not a formal normative publication just because its Survey combo is approved',async referenceKind=>{
@@ -45,12 +57,17 @@ describe('current Training consumers do not borrow Survey approval or PRIVATE sc
   })
   it.each(['SURVEY','PLATFORM'] as const)('does not treat a %s report pointer as an existing Training private report binding',async product=>{
     const c=context(),scope=product==='PLATFORM'?{kind:'PLATFORM',ownerId:'system'}:{kind:'PRIVATE',product,ownerId:'teacher',resourceId:'composite'}
+    if(product==='PLATFORM')c.db.$queryRaw.mockImplementationOnce(async()=>[])
     const report=stored({layer:'REPORT',family:'SCALE',key:'synthetic-report',version:'R1',scope,provenance:{surveyApprovedTriplet:c.row.combination_hash},assetRefs:[],sourceReleaseId:null,
       content:{projectionVersion:1,measurements:[{releaseId:c.measurement.releaseId,contentHash:c.measurement.contentHash}],metricKeys:['effort'],
         audience:'researcher',language:'zh-CN',generatorVersion:DECLARATIVE_REPORT_GENERATOR,
         template:{title:'Synthetic',blocks:[{type:'METRIC',metricKey:'effort',label:'Synthetic',display:'RAW'}],limitations:[],disclaimer:'Synthetic only'}}})
     await expect(validateTrainingReportPointer(c.db as never,{unit:c.unit,compositeId:'composite',ownerId:'teacher',reportReleaseId:id,
-      publication:true,releases:new Map([[id,report],[c.measurement.releaseId,c.measurement]])})).rejects.toThrow('CONTENT_TRAINING_REPORT_SELECTION_INVALID')
-    expect(c.db.$queryRaw).not.toHaveBeenCalled();expect(c.db.$executeRaw).not.toHaveBeenCalled()
+      publication:true,releases:new Map([[id,report],[c.measurement.releaseId,c.measurement]])})).rejects.toThrow(product==='PLATFORM'?'CONTENT_EDUCATION_SCOPE_DENIED':'CONTENT_TRAINING_REPORT_SELECTION_INVALID')
+    if(product==='PLATFORM'){
+      expect(c.db.$queryRaw).toHaveBeenCalledTimes(1)
+      expect((c.db.$queryRaw.mock.calls[0] as unknown as [{sql:string}])[0].sql).toContain('FROM education_assessment_deliveries WHERE runtime_composite_id=')
+    }else expect(c.db.$queryRaw).not.toHaveBeenCalled()
+    expect(c.db.$executeRaw).not.toHaveBeenCalled()
   })
 })

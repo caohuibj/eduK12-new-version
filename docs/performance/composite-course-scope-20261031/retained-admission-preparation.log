@@ -1,0 +1,40 @@
+{
+  "caseCount": 8,
+  "admitted": [
+    {
+      "id": "o09-backend-baseline",
+      "caseNames": [
+        "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback"
+      ]
+    },
+    {
+      "id": "o09-backend-candidate",
+      "caseNames": [
+        "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+        "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+        "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+        "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read"
+      ]
+    },
+    {
+      "id": "o09-task-default-candidate",
+      "caseNames": [
+        "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch"
+      ]
+    },
+    {
+      "id": "o09-frontend-before-edit",
+      "caseNames": [
+        "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed"
+      ]
+    },
+    {
+      "id": "o09-frontend-candidate",
+      "caseNames": [
+        "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
+      ]
+    }
+  ]
+}
+{"originalExitCode":0,"originalNode":"v24.22.1","originalSigned":false,"component":"backend","currentComponentTree":"7ec84d552addd9e54ac5a593f2859757893c42ac","currentBackend":"7ec84d552addd9e54ac5a593f2859757893c42ac","coverage":"exact-backend-tree"}
+PENDING: final frontend type receipt and final main registration; not a complete qualification

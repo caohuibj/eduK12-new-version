@@ -1,0 +1,292 @@
+{
+  "startedAt": "2026-10-28T03:34:41.118Z",
+  "scope": "Actual existing assignment/run APIs; only one C1 resource per product; all persons/organization/class fixtures synthetic adult technical roles",
+  "stages": [
+    {
+      "name": "TEACHER-target",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "bc7315e0-e5f3-4de8-8a9f-aa6a89a47552",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "kind": "PERSON",
+        "subjectUserId": "c9394796-ad73-4cd3-bb49-b15ab18084fe",
+        "name": "合成成人本人",
+        "status": "ACTIVE",
+        "createdByUserId": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+        "createdAt": "2026-10-28T03:34:42.272Z",
+        "updatedAt": "2026-10-28T03:34:42.272Z"
+      }
+    },
+    {
+      "name": "TEACHER-event",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "d13a223b-8f71-4679-8b33-6029c6f7054d",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "targetId": "bc7315e0-e5f3-4de8-8a9f-aa6a89a47552",
+        "kind": "ASSESSMENT",
+        "title": "C1单量表系统验收",
+        "notes": null,
+        "status": "DRAFT",
+        "version": 1,
+        "scheduledAt": null,
+        "openedAt": null,
+        "closedAt": null,
+        "createdByUserId": "b8aa179a-9895-429e-b215-17d5cb68d3d4",
+        "createdAt": "2026-10-28T03:34:42.279Z",
+        "updatedAt": "2026-10-28T03:34:42.279Z"
+      }
+    },
+    {
+      "name": "TEACHER-run-draft",
+      "outcome": "RESOLVED",
+      "result": {
+        "eventId": "d13a223b-8f71-4679-8b33-6029c6f7054d",
+        "runId": "bc6ac720-7d58-4535-bb5f-44856d58783e",
+        "status": "DRAFT",
+        "version": 1
+      }
+    },
+    {
+      "name": "TEACHER-add-exact-track",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "4c5b85ca-f9b7-4595-be42-aed05bb34fcb",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "runId": "bc6ac720-7d58-4535-bb5f-44856d58783e",
+        "resourceFamily": "BUNDLE",
+        "resourceKey": "education-assessment:TEACHER:67563cf7-ccd5-4d4b-b622-f62886ea5c11:5cd438f9-e7f9-48ba-a52b-4e8be0ee6447",
+        "resourceVersion": "1.0.0",
+        "subjectSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "9c160e04-0549-4209-91d8-b1777b053adb"
+          ]
+        },
+        "respondentSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "9c160e04-0549-4209-91d8-b1777b053adb"
+          ]
+        },
+        "requestedPolicy": {
+          "analysisMode": "INDIVIDUAL_ONLY",
+          "perspectives": [
+            "SELF_REPORT"
+          ],
+          "subjectRoles": [
+            "TEACHER"
+          ],
+          "respondentRoles": [
+            "TEACHER"
+          ],
+          "relationshipKinds": [
+            "SELF"
+          ],
+          "minimumRespondents": null,
+          "visibilityPolicyKey": "synthetic-one-scale-respondent-only"
+        },
+        "frozenResourcePolicy": null,
+        "resourcePolicyHash": null
+      }
+    },
+    {
+      "name": "TEACHER-event-open",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "d13a223b-8f71-4679-8b33-6029c6f7054d",
+        "status": "OPEN",
+        "version": 2
+      }
+    },
+    {
+      "name": "TEACHER-run-publish",
+      "outcome": "RESOLVED",
+      "result": {
+        "runId": "bc6ac720-7d58-4535-bb5f-44856d58783e",
+        "version": 3,
+        "trackCount": 1,
+        "executionCount": 1
+      }
+    },
+    {
+      "name": "SCHOOL-grade",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "92739f88-fc00-43ba-8b24-c8d3bc565a92",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "unitKind": "GRADE",
+        "name": "成人合成技术年级",
+        "parentUnitId": null,
+        "createdAt": "2026-10-28T03:34:42.637Z",
+        "updatedAt": "2026-10-28T03:34:42.637Z"
+      }
+    },
+    {
+      "name": "SCHOOL-class",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "58e67642-3fb1-4098-a306-2ebeb290e73a",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "unitKind": "CLASS",
+        "name": "合成验收班",
+        "parentUnitId": "92739f88-fc00-43ba-8b24-c8d3bc565a92",
+        "createdAt": "2026-10-28T03:34:42.642Z",
+        "updatedAt": "2026-10-28T03:34:42.642Z"
+      }
+    },
+    {
+      "name": "SCHOOL-roster",
+      "outcome": "RESOLVED",
+      "result": {
+        "rosterVersion": 1,
+        "eligibleCount": 1,
+        "status": "DRAFT"
+      }
+    },
+    {
+      "name": "SCHOOL-registration-open",
+      "outcome": "RESOLVED",
+      "result": {
+        "status": "OPEN"
+      }
+    },
+    {
+      "name": "SCHOOL-real-student-registration",
+      "outcome": "RESOLVED",
+      "result": {
+        "userId": "a18bc320-77ad-49c2-be7c-5aac0ab893d8",
+        "status": "PENDING_CLASS_APPROVAL"
+      }
+    },
+    {
+      "name": "SCHOOL-registration-close",
+      "outcome": "RESOLVED",
+      "result": {
+        "status": "CLOSED"
+      }
+    },
+    {
+      "name": "SCHOOL-class-approve",
+      "outcome": "RESOLVED",
+      "result": {
+        "status": "APPROVED",
+        "approvedCount": 1,
+        "rosterVersion": 1
+      }
+    },
+    {
+      "name": "SCHOOL-activity-create",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "682e3245-809d-42d7-ada7-0531dcde1d1c",
+        "title": "C1单量表成人合成验收",
+        "status": "DRAFT",
+        "version": 1
+      }
+    },
+    {
+      "name": "SCHOOL-allocate-approved-class",
+      "outcome": "RESOLVED",
+      "result": {
+        "selected": 1,
+        "replayed": false,
+        "version": 1
+      }
+    },
+    {
+      "name": "SCHOOL-run-draft",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "c933f629-899f-48f3-b22c-ea929073788f",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "name": "C1本人测评",
+        "status": "DRAFT",
+        "version": 1,
+        "createdByUserId": "be8d65bb-29a3-4b95-8b18-4bde5d222759",
+        "intakeDeadline": null,
+        "publishedAt": null,
+        "closedAt": null,
+        "cancelledAt": null
+      }
+    },
+    {
+      "name": "SCHOOL-add-exact-track",
+      "outcome": "RESOLVED",
+      "result": {
+        "id": "1e0d8088-47a0-412e-b529-dbc5f95ebd57",
+        "organizationId": "67563cf7-ccd5-4d4b-b622-f62886ea5c11",
+        "runId": "c933f629-899f-48f3-b22c-ea929073788f",
+        "resourceFamily": "BUNDLE",
+        "resourceKey": "education-assessment:SCHOOL:67563cf7-ccd5-4d4b-b622-f62886ea5c11:aa2ef62b-6877-405e-9039-08138fc99274",
+        "resourceVersion": "1.0.0",
+        "subjectSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "fea9dadc-2963-4605-ad21-44734af04eca"
+          ]
+        },
+        "respondentSelector": {
+          "kind": "MEMBERSHIP_IDS",
+          "membershipIds": [
+            "fea9dadc-2963-4605-ad21-44734af04eca"
+          ]
+        },
+        "requestedPolicy": {
+          "analysisMode": "INDIVIDUAL_ONLY",
+          "perspectives": [
+            "SELF_REPORT"
+          ],
+          "subjectRoles": [
+            "STUDENT"
+          ],
+          "respondentRoles": [
+            "STUDENT"
+          ],
+          "relationshipKinds": [
+            "SELF"
+          ],
+          "minimumRespondents": null,
+          "visibilityPolicyKey": "synthetic-one-scale-respondent-only"
+        },
+        "frozenResourcePolicy": null,
+        "resourcePolicyHash": null
+      }
+    },
+    {
+      "name": "SCHOOL-activity-submit",
+      "outcome": "RESOLVED",
+      "result": {
+        "status": "SUBMITTED",
+        "version": 2
+      }
+    },
+    {
+      "name": "SCHOOL-activity-open",
+      "outcome": "RESOLVED",
+      "result": {
+        "status": "OPEN",
+        "version": 3
+      }
+    },
+    {
+      "name": "SCHOOL-run-publish",
+      "outcome": "RESOLVED",
+      "result": {
+        "runId": "c933f629-899f-48f3-b22c-ea929073788f",
+        "version": 3,
+        "trackCount": 1,
+        "executionCount": 1
+      }
+    }
+  ],
+  "failures": [],
+  "fixturePreconditions": [
+    {
+      "scope": "Synthetic pre-existing org-admin/counselor authority, not production or governance endpoint acceptance",
+      "membershipId": "d50586a6-3928-47e8-adea-aa7915a34059",
+      "counselorMembershipId": "c2fa04c1-e7bf-4d7d-b820-a4fcb850501f"
+    }
+  ],
+  "endedAt": "2026-10-28T03:34:42.973Z"
+}

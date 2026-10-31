@@ -1,0 +1,25 @@
+[2026-10-30T23:58:18.960Z] [ERROR] 解密数据失败 {
+  name: 'Error',
+  message: '[REDACTED]',
+  stack: 'Error: [REDACTED]\n' +
+    '    at Decipheriv.final (node:internal/crypto/cipher:174:29)\n' +
+    '    at decryptField (/workspace/eduK12-new-version/server-version/backend/src/utils/encryption.ts:100:16)\n' +
+    '    at decryptUnifiedRuntimePayload (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/security.ts:20:20)\n' +
+    '    at <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts:276:42)\n' +
+    '    at Array.map (<anonymous>)\n' +
+    '    at loadStoredCanonicalUnitResults (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts:276:31)\n' +
+    '    at main (/workspace/longitudinal-checkpoints/group-longitudinal-school/diagnose-native-leaf.ts:12:21)'
+}
+/workspace/eduK12-new-version/server-version/backend/src/utils/encryption.ts:106
+    throw new Error('数据解密失败')
+          ^
+
+Error: 数据解密失败
+    at decryptField (/workspace/eduK12-new-version/server-version/backend/src/utils/encryption.ts:106:11)
+    at decryptUnifiedRuntimePayload (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/security.ts:20:20)
+    at <anonymous> (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts:276:42)
+    at Array.map (<anonymous>)
+    at loadStoredCanonicalUnitResults (/workspace/eduK12-new-version/server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts:276:31)
+    at main (/workspace/longitudinal-checkpoints/group-longitudinal-school/diagnose-native-leaf.ts:12:21)
+
+Node.js v24.21.0

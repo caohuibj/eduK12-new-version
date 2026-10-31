@@ -1,0 +1,4 @@
+Exact immutable semantic axes and report templates across all seven current finals Expected values to be strictly equal:
+
+'1.0.0' !== '1.0.1'
+

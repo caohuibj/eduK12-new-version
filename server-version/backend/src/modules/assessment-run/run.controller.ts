@@ -1,9 +1,11 @@
-import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
-import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
+import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
+import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
+import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {prisma} from '../../config/database'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { acceptRunExecutionConsent } from './consent'
+import {educationTrackingSelectionSchema} from '../reporting/education-personal-tracking'
 import { z } from 'zod'
 import type { Request, Response } from 'express'
 import { error, success, unauthorized } from '../../utils/response'
@@ -43,8 +45,10 @@ const createRunSchema = z.object({
   intakeDeadline: z.string().datetime().nullable().optional(),
 })
 const addTrackSchema = z.object({
+  expectedVersion:z.number().int().min(1).max(Number.MAX_SAFE_INTEGER).optional(),
+  expectedRunId:z.string().guid().optional(),
   resource: z.object({
-    family: z.enum(['BUNDLE', 'SCALE', 'FORM', 'SITUATIONAL', 'COGNITIVE']),
+    family: z.enum(RELATIONAL_RESOURCE_KINDS),
     key: z.string().trim().min(1),
     version: z.string().trim().min(1),
   }),
@@ -52,7 +56,9 @@ const addTrackSchema = z.object({
   respondentSelector: selectorSchema.optional(),
   requestedPolicy: policySchema,
 })
+const educationTrackSchema=addTrackSchema.strict().refine(value=>value.expectedVersion!==undefined&&value.expectedRunId!==undefined,{message:'固定教育测评必须绑定当前任务批次和版本'})
 const publishSchema = z.object({ expectedVersion: z.number().int().min(1) })
+const trackingPublishSchema = publishSchema.extend({tracking: educationTrackingSelectionSchema.optional()})
 const listRunSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -163,21 +169,23 @@ export const assessmentRunController = {
 
   async addTrack(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    if(req.body&&(Object.prototype.hasOwnProperty.call(req.body,'privateScale')||Object.prototype.hasOwnProperty.call(req.body,'privateForm'))){
+    if(req.body&&['privateScale','privateForm','privateComposition'].some(key=>Object.prototype.hasOwnProperty.call(req.body,key))){
       if(!req.params.courseId)return error(res,'Private tools require the product activity route',-1,400)
-      const parsed=privateToolRunTrackInput.safeParse(req.body)
+      const parsed=educationPrivateRunTrackInput.safeParse(req.body)
       if(!parsed.success)return error(res,'Invalid private fixed-version track',-1,400)
-      try{return success(res,await ('privateForm' in parsed.data?addPrivateFormRunTrack:addPrivateScaleRunTrack)({organizationId:req.params.organizationId,runId:req.params.runId,actorUserId:req.user.userId,parent:{kind:'SCHOOL_ACTIVITY',id:req.params.courseId}},parsed.data))}
+      try{return success(res,await ('privateComposition' in parsed.data?addPrivateCompositionRunTrack:'privateForm' in parsed.data?addPrivateFormRunTrack:addPrivateScaleRunTrack)({organizationId:req.params.organizationId,runId:req.params.runId,actorUserId:req.user.userId,parent:{kind:'SCHOOL_ACTIVITY',id:req.params.courseId}},parsed.data))}
       catch(err){return fail(res,err)}
     }
-    if((typeof req.body?.resource?.key==='string'&&(req.body.resource.key.startsWith('private-scale:')||req.body.resource.key.startsWith('private-form:')))
+    if((typeof req.body?.resource?.key==='string'&&(req.body.resource.key.startsWith('private-scale:')||req.body.resource.key.startsWith('private-form:')||req.body.resource.key.startsWith('education-composition:')))
       ||req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateFormOrigin')
       ||req.body?.resource&&Object.prototype.hasOwnProperty.call(req.body.resource,'privateFormOrigin')
       ||req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateOrigin')
       ||req.body?.resource&&Object.prototype.hasOwnProperty.call(req.body.resource,'privateOrigin'))
       return error(res,'Private versions require the private fixed-version draft request',-1,400)
-    const parsed = addTrackSchema.safeParse(req.body)
+    const parsed = (typeof req.body?.resource?.key==='string'&&req.body.resource.key.startsWith('education-assessment:')?educationTrackSchema:addTrackSchema).safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
+    if(parsed.data.resource.key.startsWith('education-assessment:')&&parsed.data.expectedRunId!==req.params.runId)
+      return error(res,'任务批次已变化，请重新读取任务配置',-1,409)
     try {
       await assertCurrentRunManagerBoundary({
         organizationId: req.params.organizationId,
@@ -186,6 +194,9 @@ export const assessmentRunController = {
       })
       return success(res, await addAssessmentRunTrackDraft({
         actorUserId:req.user.userId,
+        expectedVersion:parsed.data.expectedVersion,
+        ...(parsed.data.resource.key.startsWith('education-assessment:')?{expectedRunId:parsed.data.expectedRunId,
+          educationWorkflow:req.params.courseId?{product:'SCHOOL' as const,id:req.params.courseId}:undefined}:{}),
         organizationId: req.params.organizationId,
         runId: req.params.runId,
         resource: parsed.data.resource,
@@ -212,7 +223,7 @@ export const assessmentRunController = {
 
   async publish(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    const parsed = publishSchema.safeParse(req.body)
+    const parsed = trackingPublishSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       await assertCurrentRunPublisherBoundary({
@@ -224,7 +235,7 @@ export const assessmentRunController = {
         organizationId: req.params.organizationId,
         runId: req.params.runId,
         actorUserId: req.user.userId,
-        expectedVersion: parsed.data.expectedVersion,
+        expectedVersion: parsed.data.expectedVersion,tracking:parsed.data.tracking,
       }))
     } catch (err) { return fail(res, err) }
   },

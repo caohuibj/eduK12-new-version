@@ -1,0 +1,241 @@
+{
+  "base": "f46336cc45abaa21d4b946029cda2a0dfadec654",
+  "branch": "feat/pr363-education-source-publication",
+  "capturedAt": "2026-10-27T09:38:03.396415+00:00",
+  "evidence": [
+    {
+      "path": "pr363-source-frontend-lint-r1.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-frontend-types-r1.log.gz",
+      "uncompressedSHA256": "2979b84d956151305f360640368d18405f373aaef75039cffcb410a6d9c86b09",
+      "uncompressedBytes": 322
+    },
+    {
+      "path": "pr363-source-frontend-types-r2.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-frontend-types-r3.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-frontend-unit-r1.json.gz",
+      "uncompressedSHA256": "315d9f9e2be0f2efc85ea30d26d474099711ae70a8de7cb45f839efb90be41ca",
+      "uncompressedBytes": 15305
+    },
+    {
+      "path": "pr363-source-frontend-unit-r1.log.gz",
+      "uncompressedSHA256": "fa57d928dc6f34a70bfaa21108664ea5a4b835b77a12438010ce8cd6cd560be5",
+      "uncompressedBytes": 63
+    },
+    {
+      "path": "pr363-source-migrations-r1.log.gz",
+      "uncompressedSHA256": "bb128aea67a7cd276dbff3f079a9eaa9c817ff5b8a2d2c5a74a99a53ba61db67",
+      "uncompressedBytes": 34108
+    },
+    {
+      "path": "pr363-source-pg-r1.json.gz",
+      "uncompressedSHA256": "1b846868b241567f4e1d808d241e04f7d0e0bf0a1dcc5c1ae3845b2dd7eae8ca",
+      "uncompressedBytes": 35949
+    },
+    {
+      "path": "pr363-source-pg-r1.log.gz",
+      "uncompressedSHA256": "3dfc075ad14b3584ee2dc917c9fdc6911c432302964f60b32a07a3be29aebf7f",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r10.json.gz",
+      "uncompressedSHA256": "aae4812b0d21b4ad4fd240be485fa50b406a059d68266723fb733683e6318eec",
+      "uncompressedBytes": 9834
+    },
+    {
+      "path": "pr363-source-pg-r10.log.gz",
+      "uncompressedSHA256": "4e9a693cc54f1ebcbea0c43a1f9ab9d0502ca0c90b4e64760c88d1e0636d66d3",
+      "uncompressedBytes": 53
+    },
+    {
+      "path": "pr363-source-pg-r11.json.gz",
+      "uncompressedSHA256": "208b94a1a3e69706f932b28f9b8d5fa01c19ccee55220f2a4a6d15d3a088c05c",
+      "uncompressedBytes": 9833
+    },
+    {
+      "path": "pr363-source-pg-r11.log.gz",
+      "uncompressedSHA256": "3f0d16e0822bb15d824cbca68a392fd9a7b1c38be04bf489271de3832727391a",
+      "uncompressedBytes": 53
+    },
+    {
+      "path": "pr363-source-pg-r2.json.gz",
+      "uncompressedSHA256": "15fbf21942f82b0db1cf7d4a4d2ae75090afa14600ce8267c51358a3a6c8d95f",
+      "uncompressedBytes": 21600
+    },
+    {
+      "path": "pr363-source-pg-r2.log.gz",
+      "uncompressedSHA256": "70af94dda8308e0e2174e028bb065be566ec1009fdc0c05a95e30d2d382d4e07",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r3.json.gz",
+      "uncompressedSHA256": "57dce417b7e480c446f9c83c784c691a1c9b2df7f36e87f0a8a40c7413e216b3",
+      "uncompressedBytes": 7173
+    },
+    {
+      "path": "pr363-source-pg-r3.log.gz",
+      "uncompressedSHA256": "dce6f1adecb0fa298ffd44ebc22c05d0590dd01bb1d1ebd1045355627d6194e8",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r4.json.gz",
+      "uncompressedSHA256": "4e0fd87c85061807f2f22dc99680e3e34d042f8371de603163e5b5a302118303",
+      "uncompressedBytes": 10219
+    },
+    {
+      "path": "pr363-source-pg-r4.log.gz",
+      "uncompressedSHA256": "e32fd1f3f7a02c3014b418706ed88da5f89a348e1812c7bab858de6c542a15fa",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r5.json.gz",
+      "uncompressedSHA256": "89459c6373afc1c02dffd6528ba65792b2f92ad8c51c9fb3f9ffae5c13fcc0d8",
+      "uncompressedBytes": 9953
+    },
+    {
+      "path": "pr363-source-pg-r5.log.gz",
+      "uncompressedSHA256": "fe89a5d079740802bf9911408e3c49eae076c4cc04f74b97f1453845f71deec7",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r6.json.gz",
+      "uncompressedSHA256": "960b051debe90fd1afe9cf43fc4358a11c61d716040e29987b6f827a83e2a52a",
+      "uncompressedBytes": 8424
+    },
+    {
+      "path": "pr363-source-pg-r6.log.gz",
+      "uncompressedSHA256": "d2ee0ab0bc986c335a37b5c697fc0204686c5c7c21d61ef1c6b8c59e069d9e1f",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r7.json.gz",
+      "uncompressedSHA256": "44f80ec479e97d18a28bdef464fae7421374f5f6721043ce43e133007568e2ce",
+      "uncompressedBytes": 11675
+    },
+    {
+      "path": "pr363-source-pg-r7.log.gz",
+      "uncompressedSHA256": "8068d67f04fd8db839aa2d7c14957f5c20134ec4d1093798b7fb5a7124dfc96e",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r8.json.gz",
+      "uncompressedSHA256": "79c3bcab8236b6cb4f01a59425d1938d7e4864d06a494a8f01eeb5e6a96c714d",
+      "uncompressedBytes": 9389
+    },
+    {
+      "path": "pr363-source-pg-r8.log.gz",
+      "uncompressedSHA256": "e5e9ed0c99153cdd2144fa5886e8a8359d678679a8a4a619f58c6489f1a551c7",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-pg-r9.json.gz",
+      "uncompressedSHA256": "c7be4a88ebe1202e3a8ea153be968be4db85910c4cfc157b4b861f43b1b09b37",
+      "uncompressedBytes": 9360
+    },
+    {
+      "path": "pr363-source-pg-r9.log.gz",
+      "uncompressedSHA256": "ddbd676721ff3a2f7dd5a1cb5ed952accd12f9da4581ed715a63c5b9a4e3eb9b",
+      "uncompressedBytes": 52
+    },
+    {
+      "path": "pr363-source-typed-form-unit-r1.json.gz",
+      "uncompressedSHA256": "2b883d03634fed25227d3690e5c5ace5e9c732deb7e4cdf3b359b838df306693",
+      "uncompressedBytes": 9098
+    },
+    {
+      "path": "pr363-source-typed-form-unit-r1.log.gz",
+      "uncompressedSHA256": "6d062249cec6cf83f756fd0f2f1d1d41d136d840b53437ee24475181bf777791",
+      "uncompressedBytes": 65
+    },
+    {
+      "path": "pr363-source-types-r1.log.gz",
+      "uncompressedSHA256": "1953a7400cdec6a09db26be738940dc4a6ea88667720edeaa17b1921de6abe0a",
+      "uncompressedBytes": 335
+    },
+    {
+      "path": "pr363-source-types-r2.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-types-r3.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-types-r4.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-types-r5.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-types-r6.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-types-r7.log.gz",
+      "uncompressedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "pr363-source-unit-r1.json.gz",
+      "uncompressedSHA256": "2ae71430149d2c697261832b24b64628e2a90d2cdf679c01915a640462e12223",
+      "uncompressedBytes": 7051
+    },
+    {
+      "path": "pr363-source-unit-r1.log.gz",
+      "uncompressedSHA256": "f5ee11f8d9f92209162de67c84836b36df3f59556281ad8d46bdae532a961fcc",
+      "uncompressedBytes": 54
+    }
+  ],
+  "sourceInputs": {
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts": "d089d10d923b07828f1fef442d833e5acb74a8f9459d7eb642127a00bb6910de",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.publication.postgres.integration.test.ts": "f84a65e8193bf6a0083368366116c3b1d15a1d18d4ec12e07c4e33c3748ccda3",
+    "server-version/backend/src/__tests__/education-tools/assessment-resource.repository.test.ts": "b2cb98245372a16d7095be1ca6f616f856ebf909fa3c7402d3e679959ba0dedf",
+    "server-version/backend/src/modules/admin-permissions/routes.ts": "c2cb39ba3bd7bc51b5edfd892f52ae23aa803ac84d2cc72893cd90bc224043c1",
+    "server-version/backend/src/modules/assessment-runtime/typed-form.ts": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d",
+    "server-version/backend/src/modules/campus/organization.routes.ts": "f409adec078b316cd8897f86869ebeb631ee910cc8a39c11e973a56c6bd119a2",
+    "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": "71b75b43f8e8f754189499db1576f327e19f79786480024cae4d4c19d29cb59f",
+    "server-version/backend/src/modules/education-tools/assessment-resource.distribution.ts": "05d9904e8721107de63e5d4aa45bda33e84fd2f8cbb220d8693c9e0b2f7f7e5d",
+    "server-version/backend/src/modules/education-tools/assessment-resource.issuer.ts": "0f7d2985540650b5397a7c926f8f2e6735d6bc4959a4fe1cc1575c4ae1c4d7ef",
+    "server-version/backend/src/modules/education-tools/assessment-resource.routes.ts": "bd92e95aebfb4108c90426ebf4fea986e9ae5ee21a6c394c108843f8980906f3",
+    "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": "ba1157f2749aaacd99c8aa6922bceff049cb0df1f9b830ae4f66df8ce10699b9",
+    "server-version/backend/src/modules/education-tools/assessment-resource.source.ts": "ae0ac2ce7892712e3376d44a3ed942d46aa6b87e58c7f6b72dc77b88865cd273",
+    "server-version/backend/src/modules/huiteacher/organization.routes.ts": "31ff6200056d0ff65595d2ac90c9a5937eaed5d205cfe45cd5b695a9bf00db5e",
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": "3fa0fb665cd3a792201bf58c361536f95bcbea0e486ac9229fa43163a0a08118",
+    "server-version/frontend/src/admin/AdminContentPermissions.test.tsx": "fd080a1a37e06397e034357f86215d286ce3e7e2334d8a0c41572e2ff53ef2bb",
+    "server-version/frontend/src/admin/AdminContentPermissions.tsx": "2a89bf0c6c86d137dc2b0914042801671a4fece1fa9a1659fb0d76ea0e562019",
+    "server-version/frontend/src/admin/contentRequestRecovery.ts": "b8935d2394cdd184ef404778c677043368dd9315b60853ccd29a7cb46928c8ae",
+    "server-version/frontend/src/api/adminContent.ts": "f3f862cdc05aba81b90f391cb2a0d3509a780f32facb9f87fcc32ff5861f420a",
+    "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": "51cdbf84ba932f5db09042b5dcc92a29f612dfa7494135bd33225af88c1261e7"
+  },
+  "configurationInputs": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/prisma/schema.prisma": "3bea3c07159f95eadce9257207648658bc8f10e5996f594667cb6c877a84b515",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+  },
+  "nodeVersion": "24.21.0",
+  "postgresVersion": "16.15",
+  "currentCandidateSnapshotOnly": true
+}

@@ -1,0 +1,54 @@
+{
+  "recordKind": "unsigned targeted code/control observations, not browser or PG rerun",
+  "browserStatus": "NOTRUN",
+  "seedStatus": "NOTRUN",
+  "productionStartupStatus": "NOTRUN",
+  "appBuildStatus": "NOTRUN",
+  "checks": [
+    {
+      "command": "node --check server-version/e2e/pr363-browser.cjs",
+      "exit": 0
+    },
+    {
+      "command": "node --test --test-name-pattern='management acceptance' server-version/e2e/pr363-browser.test.cjs",
+      "exit": 0,
+      "passed": 1,
+      "note": "real-browser functions not invoked; only missing/duplicate/unverified management result refusal"
+    },
+    {
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node /tmp/pr363-runtime/scoped-lint.mjs",
+      "exit": 0,
+      "errors": 0,
+      "warnings": 0,
+      "files": [
+        "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+        "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts"
+      ],
+      "rules": "existing frontend eslint.config.js recommended TypeScript rules; backend Node globals; no rule suppression, no ignored files"
+    }
+  ],
+  "preservedBodies": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+      "priorBodySha256": "64fea4304c6dc16c965cc938ad784cb98f5496c6f0978409c58b0a2d9b685040",
+      "currentBodySha256": "64fea4304c6dc16c965cc938ad784cb98f5496c6f0978409c58b0a2d9b685040",
+      "operationAndAssertionBytesUnchanged": true
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts",
+      "priorBodySha256": "7778745fb4f4a12ec369bb79da88768d83f781087ad3ee6184f2192c54b62f50",
+      "currentBodySha256": "7778745fb4f4a12ec369bb79da88768d83f781087ad3ee6184f2192c54b62f50",
+      "operationAndAssertionBytesUnchanged": true
+    }
+  ],
+  "files": [
+    {
+      "path": "server-version/e2e/pr363-browser.cjs",
+      "sha256": "847394073e7e99a9b7bb0475028c1120c9fd4d5d69af285ddd51a7b887d86d8b"
+    },
+    {
+      "path": "server-version/e2e/pr363-browser.test.cjs",
+      "sha256": "84735d52e2c85b3cd76b20341fe7b5d65e613a924c571afcffa715cb9ff88e90"
+    }
+  ]
+}

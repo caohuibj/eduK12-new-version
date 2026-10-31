@@ -1,0 +1,430 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "l1_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "总体生活满意度简表（1题）（中文研究译稿）",
+      "abbreviation": "L1",
+      "instrumentFamily": "general-life-satisfaction"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "对近来整体生活的满意程度，不是心理健康或人生成功程度。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "l1",
+        "domain:well_being",
+        "construct:life_satisfaction",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_nc_sa_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot",
+        "非商业",
+        "license:noncommercial"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人研究及非诊断自我了解；原英德研究18–69岁不代表本中文版本已验证。ADULT_SELF/student是技术映射，不表示未成年人适用。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 1,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "近来的总体生活",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留英文版1–11编码，仅两端文字，不混德语0–10。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "人工译审、认知访谈及本地心理测量验证待完成。原题说明已包含在唯一题干。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "l1-zh-cn-research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "l1-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "l1-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Nießen, D., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2020). An English-language adaptation of the General Life Satisfaction Short Scale (L-1). ZIS. https://access.gesis.org/zis/624 https://creativecommons.org/licenses/by-nc-sa/4.0/；本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。",
+      "本题本、中文译文与反馈依CC BY-NC-SA 4.0同许可提供，代码仓库许可不覆盖这些内容；不得商业使用。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "PUBLISHED",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "总体生活满意度简表（1题）",
+        "citation": "Nießen, D., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2020). An English-language adaptation of the General Life Satisfaction Short Scale (L-1). ZIS.",
+        "url": "https://access.gesis.org/zis/624"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Nießen, D., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2020). An English-language adaptation of the General Life Satisfaction Short Scale (L-1). ZIS. https://access.gesis.org/zis/624 https://creativecommons.org/licenses/by-nc-sa/4.0/；本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。 本题本、中文译文与反馈依CC BY-NC-SA 4.0同许可提供，代码仓库许可不覆盖这些内容；不得商业使用。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "l1_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不满意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "7",
+              "score": 7
+            },
+            {
+              "value": "8",
+              "label": "8",
+              "score": 8
+            },
+            {
+              "value": "9",
+              "label": "9",
+              "score": 9
+            },
+            {
+              "value": "10",
+              "label": "10",
+              "score": 10
+            },
+            {
+              "value": "11",
+              "label": "完全满意",
+              "score": 11
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "L1_01",
+          "content": "下面的问题关于您对生活的总体满意程度。综合各方面来看，您对近来的生活有多满意？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "l1_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "L1_01",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "life_satisfaction",
+            "type": "total",
+            "label": "对近来生活的总体满意程度",
+            "description": "对近来生活的总体满意程度的自述程度，不是诊断、排名或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "L1_01",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.1.0",
+        "primaryScoreKeys": [
+          "life_satisfaction"
+        ],
+        "scoreOrder": [
+          "life_satisfaction"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "life_satisfaction",
+            "headline": "总体满意度：一题总览，不是人生判决",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份报告带走一句话：保留值得留下的部分，也给真正需要改变的事一点支持，不追求满分。\n\n这道题问的是综合各方面后，对近来生活的总体满意程度，不是只问此刻心情，也没有指定最近七天或一个月。答案1–11，越大表示这次整体评价越满意；数字不是百分比、成功程度或个人价值，没有中文高低等级。\n\n例如，工作比较顺利，同时健康或照护安排很吃力，仍然可能形成某种总体评价。这只是帮助回顾的场景，不是报告从单题查出了你的生活领域。相同答案也可能来自很不同的处境，一题不能分清原因、替每方面打分或诊断疾病。\n\n如果已有让生活较合适的安排，可以继续保留，不必再提高数字；如果有不满意的部分，也可以承认它。经济、健康、环境和他人的支持不全由个人控制，不能把问题都归到心态。先选一个最在意、且有现实调整空间的方面即可；需要更大支持时，也不用先完成一个自我改善任务才有资格求助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "说清一件想保留的事和一件当前想获得支持的事，两者可以同时存在。不必为了平衡而强迫感恩，也不需要给所有生活领域列分数。"
+              },
+              {
+                "category": "strategy",
+                "text": "只选一个安全、可行的下一步，如问清一条信息、减少一项非必要负担或争取具体协助。受条件限制时可以先了解资源，不把“本周一定完成”当新压力。"
+              },
+              {
+                "category": "support",
+                "text": "愿意时再回看真实需要是否得到照顾，不必每天重测或只追数字。若长期不满意带来明显困扰或影响生活，可找可信的人或合适专业支持一起了解，不凭单题判断病因。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅一题总体评价，不能推出生活各领域、变化原因或疾病；本独立中文稿尚未验证，不作等级或排名。"
+        ],
+        "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for standard R1.1.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:43:04Z",
+            "basis": "本次AI文字自审对应l1_zh_cn_research的标准增强版R1.1.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "l1",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "L1_01",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 1.0
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "L1_01",
+            "responseValue": "11"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 11.0
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      },
+      {
+        "name": "all-three",
+        "answers": [
+          {
+            "itemCode": "L1_01",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "life_satisfaction": 3.0
+          },
+          "totalScoreKeys": [
+            "life_satisfaction"
+          ]
+        }
+      }
+    ]
+  }
+}

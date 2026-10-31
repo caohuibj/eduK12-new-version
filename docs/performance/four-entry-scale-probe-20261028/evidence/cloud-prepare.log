@@ -1,0 +1,15 @@
+install-preview RESOLVED
+install-apply RESOLVED
+publication-preview RESOLVED
+publication-apply RESOLVED
+triplet-parts RESOLVED
+triplet-preview RESOLVED
+triplet-approve-and-existing-three-trials RESOLVED
+training-exact-use-grant RESOLVED
+training-exact-marker RESOLVED
+training-composite-business-publish RESOLVED
+SCHOOL-exact-distribution-authority RESOLVED
+SCHOOL-prepare-exact-source RESOLVED
+TEACHER-exact-distribution-authority RESOLVED
+TEACHER-prepare-exact-source RESOLVED
+{"database":"pr374_df46abf6","entries":{"TRAINING":{"stage":"READY_FOR_BROWSER","scaleId":"e1c12e61-f884-4c62-af9e-f017e81ffebd","courseId":"22607efb-0ecc-4df5-83a7-51c4c6ad7e73","compositeId":"7dfcc1f2-55a8-41d5-95c5-e9f7ff46a35e"},"SCHOOL":{"stage":"BLOCKED","message":"registered is not defined"},"TEACHER":{"stage":"BLOCKED","message":"registered is not defined"}},"failures":[]}

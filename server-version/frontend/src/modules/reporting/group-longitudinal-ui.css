@@ -1,0 +1,7 @@
+.group-longitudinal-report { min-width: 0; }
+.group-longitudinal-report__scroll { max-width: 100%; overflow-x: auto; }
+.group-longitudinal-report__scroll table { width: 100%; min-width: 780px; border-collapse: collapse; }
+.group-longitudinal-report__scroll th,
+.group-longitudinal-report__scroll td { padding: 10px; text-align: left; vertical-align: top; border-bottom: 1px solid #dde7f0; }
+.group-longitudinal-report__scroll th { white-space: nowrap; }
+.group-longitudinal-report__scroll td:first-child { min-width: 190px; }

@@ -1,0 +1,14 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts > task group history / actual pointer SQL and Training task authority > pages 26 same-time pointers exactly, preserves submillisecond cursors and reaches an authorized task outside the recent100
+{"kind":"task-group-history-pagination","targetPointers":26,"pages":[25,1],"sameTimeIdTieBreak":true,"microsecondCursorPreserved":true,"existingColumnPrecision":3,"authorizedOldTaskOutsideRecent100":true,"taskMenuContinues":true,"wrongActorRejected":true,"exactProductContainerTaskKindPlanScope":true,"unreadablePayloadsNeverDecrypted":true,"newFinals":0,"newGroupGeneration":0}
+
+ ✓ src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts (1 test) 125ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  01:09:52
+   Duration  5.19s (transform 3.58s, setup 0ms, import 4.95s, tests 125ms, environment 0ms)
+
+JSON report written to /workspace/longitudinal-checkpoints/group-longitudinal-school/history-page-first.json

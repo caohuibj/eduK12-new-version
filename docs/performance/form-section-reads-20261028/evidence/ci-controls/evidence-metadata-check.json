@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "applicationTestsExecuted": false,
+  "typesExecuted": false,
+  "lintExecuted": false,
+  "selectedCaseCounts": [
+    {
+      "id": "pr381-original-r1",
+      "count": 20
+    },
+    {
+      "id": "pr381-errors-r2",
+      "count": 2
+    },
+    {
+      "id": "pr381-nested-r3",
+      "count": 1
+    }
+  ],
+  "decision": "PENDING_DOT_FINAL_REVIEW",
+  "scope": "Only the newly prepared admission metadata and original byte/name links were verified; no historical execution authenticity inferred"
+}

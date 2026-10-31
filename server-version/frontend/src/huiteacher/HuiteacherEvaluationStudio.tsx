@@ -1,6 +1,14 @@
+import {TeacherGroupLongitudinal} from './TeacherGroupLongitudinal'
+import {TeacherNumericGroupReports} from './TeacherNumericGroupReports'
+import {TeacherFormGroupVersions} from './TeacherFormGroupVersions'
+import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
+import {TeacherTrackingPublish,TeacherTrackingNext} from './TeacherPersonalTracking'
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
+import {EducationCompositionRunPicker} from '../components/education-tools/EducationCompositionRunPicker'
+import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
+import type {EducationAssessmentResourceAdapter} from '../api/educationAssessmentResources'
 import {HuiteacherGrowthManager} from './HuiteacherGrowthManager'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import { HuiteacherFieldManager } from './HuiteacherFieldManager'
@@ -10,17 +18,14 @@ type Page<T>={list:T[];nextCursor?:string|null}
 const mergeRows=<T extends {id:string}>(old:T[],next:T[])=>Array.from(new Map([...old,...next].map(item=>[item.id,item])).values())
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
-type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
+type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string;title?:string|null;sourceRevision?:number|null}
 type Run={tracks?:RunTrackSummary[];eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number}
 type RunPreview={runId:string;version:number;tracks:Array<{trackId:string;executionCount:number;subjectCount:number;respondentCount:number;resourcePolicy:unknown}>}
 type PreviewSnapshot={data:RunPreview;base:string;api:Api;actorKey:string;eventVersion:number;eventStatus:string}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type TeacherScale={id:string;key:string;version:string;title:string;hash:string;
-  visibilityPolicyKey?:string;personalReportAvailable?:boolean}
+  visibilityPolicyKey?:string;personalReportAvailable?:boolean;analysisMode?:string;minimumRespondents?:number|null}
 type Progress={runId:string;total:number;counts:Record<string,number>}
-type GroupReport={independentRespondents:number|null;minimumRespondents:number;
-  distributions:Array<{itemKey:string;prompt:string;status:'READY'|'WITHHELD';
-    reason?:string;cells?:Array<{key:string;label:string;count?:number;percentage?:number}>}>}
 const targetLabels:Record<string,string>={
   PERSON:'教师或学校人员',TEAM:'教研组／管理团队',ORGANIZATION:'学校',
   ACTIVITY:'其他活动',ARTIFACT:'教学成果或方案',PROJECT:'改进项目',
@@ -38,7 +43,7 @@ function nextAction(event:Event,run?:Run){
     :'查看已有任务配置；如尚未创建，在活动草稿中建立评价任务。'
   if(run.status==='CANCELLED')return '评价任务已取消，活动状态仍独立保留。'
   if(run.status==='DRAFT')return (run.trackCount??0)<1
-    ?'加入已发布表单或本校获授权量表，再预览任务配置。'
+    ?'加入已发布表单或本校、本入口获授权的固定工具版本，再预览任务配置。'
     :event.status==='DRAFT'?'预览配置并开放活动，然后单独发布评价任务。'
     :event.status==='OPEN'?'活动已开放，但任务尚未发布；先预览配置，再发布任务。'
     :'查看任务配置与活动状态。'
@@ -48,8 +53,8 @@ function nextAction(event:Event,run?:Run){
     :'查看任务配置；群体报告是否可用由原有权限与隐私条件决定。'
   return '查看任务配置与当前活动状态。'
 }
-export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateTools=false,actorKey=''}:{
-  organizationId:string;api:Api;canAuthorPrivateTools?:boolean;actorKey?:string
+export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateTools=false,actorKey='',assessmentResources}:{
+  organizationId:string;api:Api;canAuthorPrivateTools?:boolean;actorKey?:string;assessmentResources?:EducationAssessmentResourceAdapter
 }){
   const base='/organizations/'+organizationId
   const scaleScope=useRef({base,api})
@@ -72,7 +77,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   const [scaleChoice,setScaleChoice]=useState<Record<string,string>>({})
   const [formChoice,setFormChoice]=useState<Record<string,string>>({})
   const [progress,setProgress]=useState<Record<string,Progress>>({})
-  const [reports,setReports]=useState<Record<string,GroupReport>>({})
+  const [reports,setReports]=useState<Record<string,{report:TeacherFormGroupProjection;activityTitle:string;formTitle:string}>>({})
   const [targetName,setTargetName]=useState('')
   const [targetKind,setTargetKind]=useState('PERSON')
   const [subjectUserId,setSubjectUserId]=useState('')
@@ -135,7 +140,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       if(generation===scopeGeneration.current)setFormsError(error instanceof Error?error.message:'已发布表单读取失败')
     })
     return ()=>{scopeGeneration.current++}
-  },[base,api,loadTargets,loadEvents])
+  },[base,api,actorKey,loadTargets,loadEvents])
   useEffect(()=>{previewEpoch.current++;setPreviews({})},[actorKey])
   const actionPending=useRef(false)
   const perform=(fn:()=>Promise<void>)=>{
@@ -209,7 +214,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     if(!selected)throw new Error('请选择拥有学校授权的正式教师自评 Scale')
     const library=selected.key.startsWith('library-scale:')
     const visibilityPolicyKey=selected.visibilityPolicyKey??(library?null:'HUITEACHER_ADULT_SELF_PILOT_V1')
-    if(visibilityPolicyKey!==(library?'EDUCATION_LIBRARY_APPROVED_CONTENT_V1':'HUITEACHER_ADULT_SELF_PILOT_V1'))
+    const group=selected.analysisMode==='COHORT_AGGREGATE'&&visibilityPolicyKey==='EDUCATION_SELF_GROUP_V2'
+    if(!group&&visibilityPolicyKey!==(library?'EDUCATION_LIBRARY_APPROVED_CONTENT_V1':'HUITEACHER_ADULT_SELF_PILOT_V1'))
       throw new Error('量表报告策略缺失或不受支持，请重新读取授权目录。')
     const run=runMap[event.id]??await fetchRun(event)
     if(run.status!=='DRAFT')throw new Error('只允许对草稿任务增配 Scale')
@@ -220,9 +226,9 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       requestedPolicy:{
         subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],
         relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
-        analysisMode:'INDIVIDUAL_ONLY',
+        analysisMode:group?'COHORT_AGGREGATE':'INDIVIDUAL_ONLY',
         visibilityPolicyKey,
-        minimumRespondents:null,
+        minimumRespondents:group?selected.minimumRespondents:null,
       },
     })
     await fetchRun(event)
@@ -265,13 +271,13 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     setPreviews(old=>({...old,[event.id]:{data,base,api,actorKey,eventVersion:event.version,eventStatus:event.status}}))
     setNotice('预览已生成，人数以对应工具为单位；发布时仍会重新校验当前资格。')
   })
-  const publishRun=(event:Event)=>perform(async()=>{
+  const publishRun=(event:Event,tracking?:unknown)=>perform(async()=>{
     const run=await fetchRun(event)
     if(event.status!=='OPEN')throw new Error('请先开放评价活动')
     if(!window.confirm('确认按当前固定版本配置，向本校符合资格的教师分配测评任务吗？发布时将重新校验参与资格。'))return
     const publication=await api<{executionCount:number;version:number}>(
       base+'/evaluation-events/'+event.id+'/run/publish','POST',
-      {expectedVersion:run.version})
+      {expectedVersion:run.version,...(tracking===undefined?{}:{tracking})})
     await fetchRun(event)
     setNotice('评价任务已发布；共冻结 '+publication.executionCount+' 个作答任务。')
   })
@@ -289,16 +295,6 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     await api(base+'/evaluation-events/'+event.id+'/run/cancel','POST',{})
     await fetchRun(event);setNotice('评价任务已取消。')
   })
-  const releaseGroup=(event:Event)=>perform(async()=>{
-    const formId=formChoice[event.id]
-    if(!formId)throw new Error('请先选择报告对应的正式 Form')
-    if(!window.confirm('确认正式发布冻结后的教师群体调查报告？后续读取将使用同一快照。'))return
-    const report=await api<GroupReport>(
-      base+'/evaluation-events/'+event.id+'/forms/'+formId+'/group-report/release',
-      'POST',{})
-    setReports(previous=>({...previous,[event.id]:report}))
-    setNotice('群体报告已正式发布，后续授权访问只读取同一份快照。')
-  })
   const readGroup=(event:Event,historical=false)=>perform(async()=>{
     const formId=formChoice[event.id]||releasedForms[0]?.id
     if(!formId)throw new Error('请先选择报告对应的发布表单')
@@ -306,10 +302,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     // may write the first disclosure ledger, so it retains its own step-up.
     const releasedOnly=import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
       &&!historical
-    const report=await api<GroupReport>(
+    const report=await api<TeacherFormGroupProjection>(
       base+'/evaluation-events/'+event.id+'/forms/'+formId
         +'/group-report'+(releasedOnly?'/released':''))
-    setReports(previous=>({...previous,[event.id]:report}))
+    if(previewContext.current.base!==base||previewContext.current.api!==api||previewContext.current.actorKey!==actorKey)return
+    setReports({[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formId)?.title??formId}})
   })
   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
     const result=await api<{status:string;version:number}>(
@@ -393,8 +390,15 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       </div>
       {runMap[event.id]&&<div>
         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
-        <SelectedToolOutline className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map(track=>({
-          id:track.id,title:track.resourceKey,kind:track.resourceFamily,version:track.resourceVersion,
+        <SelectedToolOutline disabled={working} onRemove={event.status==='DRAFT'&&runMap[event.id].status==='DRAFT'?trackId=>perform(async()=>{
+          if(!window.confirm('从本轮草稿移除此投放？追踪工具缺失或定义变化将阻止发布；请加入保留冻结指标的新问卷版本。'))return
+          await api(base+'/evaluation-events/'+event.id+'/run/tracks/'+encodeURIComponent(trackId),'DELETE',{expectedVersion:runMap[event.id].version})
+          await fetchRun(event)
+        }):undefined} className="ht-selected-tool-outline" items={runMap[event.id].tracks?.map((track,index)=>({
+          id:track.id,title:track.title??((track.resourceKey.startsWith('education-composition:')?'普通问卷':
+            ({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具')+' '+(index+1)),
+          kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具',
+          version:track.sourceRevision?'修订 '+track.sourceRevision:track.resourceVersion,
         }))}/>
         {(()=>{const snapshot=previews[event.id],run=runMap[event.id]
           if(!snapshot||snapshot.base!==base||snapshot.api!==api||snapshot.actorKey!==actorKey||snapshot.eventVersion!==event.version||snapshot.eventStatus!==event.status||snapshot.data.runId!==run.runId||snapshot.data.version!==run.version||run.status!=='DRAFT')return null
@@ -406,6 +410,10 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         })()}
         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
         {runMap[event.id].status==='DRAFT'&&<>
+          <EducationAssessmentResourcePicker
+            scope={{product:'TEACHER',organizationId,actorKey,workflowId:event.id,runId:runMap[event.id].runId,expectedVersion:runMap[event.id].version}}
+            adapter={assessmentResources} disabled={working} onBusy={privateBusy}
+            onRefresh={async()=>{await fetchRun(event)}}/>
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
             entry="TEACHER" organizationId={organizationId} actorKey={actorKey} scopeKey={`${event.id}:${runMap[event.id].runId}`}
@@ -424,6 +432,10 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
             }}/>}
+          {canAuthorPrivateTools&&actorKey&&<EducationCompositionRunPicker
+            key={`composition:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`} api={api} entry="TEACHER"
+            organizationId={organizationId} actorKey={actorKey} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'}
+            expectedVersion={runMap[event.id].version} disabled={working} onBusy={privateBusy} onRefresh={async()=>{await fetchRun(event)}}/>}
           <div className="ht-inline"><button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>
             查询本校授权的教师自评 Scale
           </button></div>
@@ -466,16 +478,17 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               加入表单
             </button>
             <button onClick={()=>previewRun(event)} disabled={working}>预览任务配置</button>
-            <button onClick={()=>publishRun(event)} disabled={working||event.status!=='OPEN'}>
-              发布教师评价任务
-            </button>
+            <TeacherTrackingPublish key={event.id+':'+runMap[event.id].version+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working||event.status!=='OPEN'} publish={tracking=>publishRun(event,tracking)}/>
           </div>
         </>}
+        {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherTrackingNext key={event.id+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working} create={()=>perform(async()=>{await api(base+'/evaluation-events/'+event.id+'/run/next-wave','POST',{requestId:crypto.randomUUID()});await refresh();setNotice('下一轮活动草稿已创建，继承固定追踪来源；请查看配置并开放、发布。')})}/>}
         {runMap[event.id].status==='PUBLISHED'&&<>
           <button onClick={()=>readProgress(event)} disabled={working}>查看正式完成进度</button>
           <button onClick={()=>closeRun(event)} disabled={working||event.status!=='OPEN'}>关闭评价任务</button>
           <button onClick={()=>cancelRun(event)} disabled={working||event.status!=='OPEN'}>取消评价任务</button>
         </>}
+        {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherNumericGroupReports key={event.id+':numeric:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/numeric-group-reports'}/>}
+        {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherGroupLongitudinal key={event.id+':group-longitudinal:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/group-longitudinal-reports'}/>}
         {event.status==='CLOSED'&&runMap[event.id].status==='CLOSED'&&
           <div className="ht-inline">
             <label className="ht-field"><span>报告对应 Form</span><select
@@ -484,14 +497,11 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               <option value="">选择已发布表单</option>
               {releasedForms.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
             </select></label>
-            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
-              <button onClick={()=>releaseGroup(event)} disabled={working||!formChoice[event.id]}>
-                正式发布群体报告
-              </button>}
-            <button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>
-              {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
-                ?'查看已发布群体报告':'查看学校群体报告'}
-            </button>
+            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+              ?formChoice[event.id]&&<TeacherFormGroupVersions key={event.id+':'+formChoice[event.id]}
+                api={api} endpoint={base+'/evaluation-events/'+event.id+'/forms/'+formChoice[event.id]+'/group-report'}
+                onReport={report=>setReports(report?{[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formChoice[event.id])?.title??formChoice[event.id]}}:{})}/>
+              :<button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>查看学校群体报告</button>}
             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
               <button onClick={()=>readGroup(event,true)} disabled={working||!formChoice[event.id]}>
                 查看历史规则报告（首次读取需近期验证）
@@ -513,22 +523,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         <HuiteacherFieldManager key={'field:'+event.id}
           organizationId={organizationId} eventId={event.id}
           eventStatus={event.status} api={api}/>}
-      {reports[event.id]&&<div className="ht-report" aria-label="学校调查群体报告">
-        <p><strong>不同有效参与者：{reports[event.id].independentRespondents??'受限展示'}</strong>
-          （隐私下限 {reports[event.id].minimumRespondents}）</p>
-        <p>仅提供满足隐私保护的选项分布；个人答案、原始文本和作答身份不可见。</p>
-        {reports[event.id].distributions.map(item=><article key={item.itemKey}>
-          <h4>{item.prompt}</h4>
-          {item.status==='WITHHELD'?<p>{
-            item.reason==='PRIVATE_FREE_TEXT'?'开放性文字属于原始评价证据，默认不向管理者披露。':
-            item.reason==='AGGREGATION_NOT_RELEASED'?'该题型尚无正式合规的群体统计规则，暂不发布数值摘要。':
-            item.reason==='SMALL_CELL'?'选择分布存在可识别的小单元，因此隐藏整道题的统计。':
-            '该题因数据来源或权限保护暂不显示。'
-          }</p>:
-            <div className="ht-units">{item.cells?.map(cell=>
-              <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count??(cell.percentage===undefined?'受限':cell.percentage+'%')}</span>)}</div>}
-        </article>)}
-      </div>}
+      {reports[event.id]&&<TeacherFormGroupReport {...reports[event.id]}/>}
+
     </article>)}</div>
     {eventCursor&&<button disabled={eventLoading||working} onClick={()=>void loadEvents(eventCursor)}>加载更多评价活动</button>}
 {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'

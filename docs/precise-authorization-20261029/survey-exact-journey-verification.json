@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "base": "d2e4d4178881cb8d3d64cf9cd8e79155498e778d",
+  "verifiedMain": "e65d87222d351e5dfde52e389f3aa403380443eb",
+  "recordedAt": "2026-10-29T22:16:11.140853+00:00",
+  "scope": "Survey exact no-R grant through real protected author import/publish and anonymous START/FINAL/general; ordinary revocation denies new admission but admitted attempt completes. Test-only delta.",
+  "results": {
+    "distinctPassedCases": 2,
+    "notOneFullCleanInvocation": true,
+    "passedAdmissionFrom": "survey-exact-journey-v2",
+    "passedFinalFrom": "survey-exact-journey-final-v2",
+    "finalInvocationFilteredEarlierCase": 1,
+    "recordedHttpRequestsAcrossInvocations": 20,
+    "initialNonJsonResponseStatusNotRecorded": 1,
+    "originalFailedAssertionsRetained": 4,
+    "lastInvocationFailed": 0,
+    "finalOfficialNodeClosureTypesExit": 0,
+    "admittedAttempts": 1,
+    "finalRowsForNewAttempt": 1,
+    "oldPublicationsUnchanged": 5,
+    "frozenNoReportConfirmed": true
+  },
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15 localhost:55439 owner role",
+    "database": "precise_survey_journey_test_20261029",
+    "template": "precise_survey_replacement_test_20261029 unchanged",
+    "redis": "localhost:56389/4 normal limits",
+    "realMfaCeremony": false,
+    "productionAccessed": false
+  },
+  "raw": {
+    "file": "survey-exact-journey-raw.json",
+    "sha256": "2af5f8a53f2c638f423e4796f664e7e7b7e355e85aac88a32e73b5939f9a3dc7"
+  },
+  "finalFilesSha256": {
+    "server-version/backend/src/__tests__/assessment-authorization/survey-exact-journey.http.postgres.integration.test.ts": "5b3f4b8f13126b47b96d25caa66ed25c5f2c46e441291bcfcd7f99bad26770ad"
+  },
+  "evidenceLimit": "Post-execution source inventory, not signed historical dependencies or formal CI qualification. Initial successful project/import read back and reused; one admitted attempt resumed without regrant/restart/reset.",
+  "notExecuted": [
+    "real MFA/browser",
+    "full-R participant feedback (this authorized R is explicitly absent)",
+    "new engine or three-scale synthetic content/scoring replay",
+    "runtime DB role",
+    "p50/p95 load/batch baseline",
+    "formal CI/PR/merge/deployment"
+  ]
+}

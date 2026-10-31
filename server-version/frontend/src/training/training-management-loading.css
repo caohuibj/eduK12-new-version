@@ -1,0 +1,12 @@
+/* Shared neutral auth/loading frame; full management styles remain deferred. */
+.training-management-frame {
+  --tm-page:#f5f3ed;--tm-surface:#fffefa;--tm-soft:#ebeee5;--tm-ink:#263d32;
+  --tm-muted:#627065;--tm-green:#365a48;--tm-line:#dedfd4;--tm-hover:#f1f3eb;
+  display:flex;flex-direction:column;min-height:100dvh;background:var(--tm-page);color:var(--tm-ink);font-family:inherit;
+}
+.training-management-frame[data-training-theme="dark"] {
+  --tm-page:#15231f;--tm-surface:#1d2d26;--tm-soft:#2b3c30;--tm-ink:#e9eee2;
+  --tm-muted:#b9c7b8;--tm-green:#b9d1ae;--tm-line:#3e5043;--tm-hover:#2c3b2e;
+}
+.training-management-main { min-width:0;outline:none;flex:1;width:100%;padding:34px 36px; }
+@media(max-width:700px) { .training-management-main { padding:24px 18px; } }
