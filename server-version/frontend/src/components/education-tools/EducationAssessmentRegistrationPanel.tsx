@@ -48,7 +48,8 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
  const [sources,setSources]=useState<Sources>([]),[sourceId,setSourceId]=useState(''),[title,setTitle]=useState(''),[family,setFamily]=useState<EducationAssessmentFamily>('BUNDLE')
  const [resourceId,setResourceId]=useState(''),[preparation,setPreparation]=useState<EducationAssessmentPreparation|null>(null),[choices,setChoices]=useState<Choices|null>(null)
  const [selectedP,setP]=useState<Record<string,string[]>>({}),[selectedR,setR]=useState<Record<string,string>>({})
- const policyKey=resourceId?`education-assessment:${resourceId}:disclosure:v1`:''
+ const [group,setGroup]=useState(false),[minimumN,setMinimumN]=useState(3),[groupApprovals,setGroupApprovals]=useState<Record<string,string[]>>({})
+ const policyKey=group?'EDUCATION_SELF_GROUP_V2':resourceId?`education-assessment:${resourceId}:disclosure:v1`:''
  const [disclosure,setDisclosure]=useState<'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY'>('COMPLETION_ONLY')
  const [longitudinalMetricKeys,setLongitudinalMetricKeys]=useState<string[]>([])
  const [feedback,setFeedback]=useState<''|'IMMEDIATE'|'SCHEDULED'>(''),[releaseAt,setReleaseAt]=useState('')
@@ -120,9 +121,27 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
    feedbackPolicy={schemaVersion:1,mode:'SCHEDULED',releaseAt:date.toISOString()}
   }else feedbackPolicy={schemaVersion:1,mode:'IMMEDIATE'}
   const licenses=mergeEducationAssessmentLicenses(...licenseGroups)
+  let groupUnits:Array<{itemId:string;disclosure:EducationAssessmentDisclosure}>|undefined
+  if(group){
+   if(!Number.isInteger(minimumN)||minimumN<3)throw Error('群体人数下限至少为3人。')
+   groupUnits=choices.units.map(unit=>{
+    const keys=unit.groupMetricKeys??[],approved=groupApprovals[unit.itemId]??[]
+    if(!keys.length||!approved.length)throw Error('请逐个工具明确选择群体受众；无已定义指标的工具不能生成数值群报。')
+    const own=unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys??[]
+    const rules=Object.fromEntries(Object.entries(audiences).map(([name,rule])=>[name,{...rule,metricKeys:name==='RESPONDENT'?rule.metricKeys.filter(key=>own.includes(key)):[],
+      longitudinalMetricKeys:name==='RESPONDENT'?rule.longitudinalMetricKeys.filter(key=>own.includes(key)):[]}])) as EducationAssessmentDisclosure['audiences']
+    for(const audience of ['PROFESSIONAL','TEACHER','ORGANIZATION'] as const)if(approved.includes(audience))rules[audience]={mode:'AGGREGATE_ONLY',metricKeys:[...keys],longitudinalMetricKeys:[]}
+    return {itemId:unit.itemId,disclosure:{schemaVersion:1,policyKey,minimumRespondents:minimumN,audiences:rules}}
+   })
+   for(const audience of ['PROFESSIONAL','TEACHER','ORGANIZATION'] as const){
+    const keys=[...new Set(groupUnits.flatMap(unit=>unit.disclosure.audiences[audience].metricKeys))]
+    if(keys.length)audiences[audience]={mode:'AGGREGATE_ONLY',metricKeys:keys,longitudinalMetricKeys:[]}
+   }
+  }
   mutationSent.current=true
   const result=await client.register(preparation.resourceId,{expectedPreparationHash:preparation.preparationHash,
-   disclosure:{schemaVersion:1,policyKey:policyKey.trim(),minimumRespondents:null,audiences},feedbackPolicy,references:preparation.fixedSelection?.references??references,reports,licenses})
+   ...(group?{analysisMode:'COHORT_AGGREGATE' as const,groupUnits}:{}),
+   disclosure:{schemaVersion:1,policyKey:policyKey.trim(),minimumRespondents:group?minimumN:null,audiences},feedbackPolicy,references:preparation.fixedSelection?.references??references,reports,licenses})
   if(!valid())return
   setRegistration(result);setPreparation(null);setChoices(null)
   const frozen=await client.read(result.resourceId);if(valid())setRegistration(frozen)
@@ -161,6 +180,8 @@ function Panel({api,organizationId,actorId,product,publicPackage,onDraftStateCha
     </section>)}
     {choices.nextCursor&&<button onClick={()=>void perform(async valid=>{const next=await client.choices(preparation.resourceId,choices.nextCursor!);if(valid())setChoices(appendEducationAssessmentChoices(choices,next))})}>继续加载参考与报告版本</button>}
     <label>披露政策编号（系统标识）<input readOnly value={policyKey}/></label>
+    {choices.units.length>0&&<label>报告用途<select value={group?'GROUP':'PERSONAL'} onChange={event=>{setGroup(event.target.value==='GROUP');setGroupApprovals({})}}><option value="PERSONAL">本人反馈</option><option value="GROUP">群体汇总并保留获准本人反馈（新版本）</option></select></label>}
+    {group&&<fieldset><legend>逐工具确认群体披露</legend><p>每个受众须明确审核；组织只能看到汇总。本人反馈仍沿所选报告和开放时间。</p><label>群体人数下限<input type="number" min={3} step={1} value={minimumN} onChange={event=>setMinimumN(Number(event.target.value))}/></label>{choices.units.map((unit,index)=><fieldset key={unit.itemId}><legend>{familyNames[unit.family]} {index+1}</legend><p>已定义指标：{unit.groupMetricKeys?.join('、')||'暂无可用指标'}</p>{([['PROFESSIONAL','心理专业人员'],['TEACHER','教师'],['ORGANIZATION','组织管理者']] as const).map(([audience,label])=><label key={audience}><input type="checkbox" checked={groupApprovals[unit.itemId]?.includes(audience)??false} onChange={event=>setGroupApprovals(previous=>({...previous,[unit.itemId]:event.target.checked?[...new Set([...(previous[unit.itemId]??[]),audience])]:(previous[unit.itemId]??[]).filter(value=>value!==audience)}))}/>{familyNames[unit.family]} {index+1}：{label}群体汇总</label>)}</fieldset>)}</fieldset>}
     <label>本人披露<select value={disclosure} onChange={e=>{setDisclosure(e.target.value as typeof disclosure);if(e.target.value!=='INDIVIDUAL_SUMMARY')setLongitudinalMetricKeys([])}}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
     {disclosure==='INDIVIDUAL_SUMMARY'&&<fieldset><legend>允许本人纵向查看的原始指标</legend><p>仅选择已获准本人数字反馈的指标子集；新教育版本固定后生效，不改变历史来源或其他受众。</p>{[...new Set(choices.units.flatMap(unit=>unit.reports.find(row=>row.releaseId===selectedR[unit.itemId])?.metricKeys??[]))].map(key=><label key={key}><input type="checkbox" checked={longitudinalMetricKeys.includes(key)} onChange={event=>setLongitudinalMetricKeys(old=>event.target.checked?[...new Set([...old,key])]:old.filter(value=>value!==key))}/>{key}</label>)}</fieldset>}
     <label>反馈开放方式<select value={feedback} onChange={e=>setFeedback(e.target.value as typeof feedback)}><option value="">请明确选择</option><option value="IMMEDIATE">完成后按权限开放</option><option value="SCHEDULED">按冻结时间开放</option></select></label>

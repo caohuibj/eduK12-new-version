@@ -88,7 +88,7 @@ export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
   if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
-  if(scope.application_route==='onboarding-structure'){let imageRequired=false;try{imageRequired=JSON.parse(scope.onboarding_plan||'{}').pr===421;}catch{}return ['scope','onboarding-structure','codeql',...(imageRequired?['docker']:[])];}
+  if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
   if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
   if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
   if(scope.application_route==='pr356')return requiredPr356Checks();

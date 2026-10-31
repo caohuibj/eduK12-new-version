@@ -6,9 +6,6 @@ on:
       survey_selection:
         type: boolean
         default: false
-      backend_only:
-        type: boolean
-        default: false
       frontend_only:
         type: boolean
         default: false
@@ -98,10 +95,8 @@ jobs:
       - name: build production images
         env:
           FRONTEND_ONLY: ${{ inputs.frontend_only }}
-          BACKEND_ONLY: ${{ inputs.backend_only }}
         run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
       - name: verify production Nginx static asset MIME and security headers
-        if: inputs.backend_only != true
         run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
       - name: install pinned browser for the changed Wave UI
         if: inputs.survey_selection
@@ -127,7 +122,6 @@ jobs:
           skip-setup-trivy: true
           cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
       - name: scan frontend image (high and critical)
-        if: inputs.backend_only != true
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: server-version-frontend:latest

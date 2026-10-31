@@ -3,13 +3,12 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 
-export function selectedTargets(frontendOnly,backendOnly=false) {
+export function selectedTargets(frontendOnly) {
   assert.equal(typeof frontendOnly, 'boolean');
-  assert.equal(typeof backendOnly,'boolean');assert(!(frontendOnly&&backendOnly),'Only one component-only mode may be selected');
-  return frontendOnly ? ['frontend'] : backendOnly ? ['backend','worker'] : ['backend', 'worker', 'frontend'];
+  return frontendOnly ? ['frontend'] : ['backend', 'worker', 'frontend'];
 }
-function validateTargets(plan, frontendOnly, backendOnly=false) {
-  const expected = selectedTargets(frontendOnly,backendOnly);
+function validateTargets(plan, frontendOnly) {
+  const expected = selectedTargets(frontendOnly);
   assert.deepEqual(Object.keys(plan.target ?? {}).sort(), [...expected].sort(), 'Unexpected Compose build targets');
   for (const name of expected) {
     const target = plan.target[name];
@@ -22,9 +21,9 @@ function validateTargets(plan, frontendOnly, backendOnly=false) {
   }
   return expected;
 }
-export function runtimeRefreshPlan(input, frontendOnly, backendOnly=false) {
+export function runtimeRefreshPlan(input, frontendOnly) {
   const plan = structuredClone(input);
-  for (const name of validateTargets(plan, frontendOnly,backendOnly)) {
+  for (const name of validateTargets(plan, frontendOnly)) {
     if (name === 'backend' || name === 'worker')
       plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'deb.debian.org' };
     plan.target[name]['no-cache-filter'] = ['runtime'];
@@ -32,8 +31,8 @@ export function runtimeRefreshPlan(input, frontendOnly, backendOnly=false) {
   }
   return plan;
 }
-export function verifyResolvedPlan(plan, frontendOnly, backendOnly=false) {
-  for (const name of validateTargets(plan, frontendOnly,backendOnly)) {
+export function verifyResolvedPlan(plan, frontendOnly) {
+  for (const name of validateTargets(plan, frontendOnly)) {
     const target = plan.target[name];
     if (name === 'backend' || name === 'worker')
       assert.equal(target.args?.DEBIAN_MIRROR, 'deb.debian.org', 'CI official Debian source was lost');
@@ -48,18 +47,17 @@ export function verifyResolvedPlan(plan, frontendOnly, backendOnly=false) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   assert.ok(['true', 'false'].includes(process.env.FRONTEND_ONLY));
   const frontendOnly = process.env.FRONTEND_ONLY === 'true';
-  assert.ok(['true','false'].includes(process.env.BACKEND_ONLY||'false'));const backendOnly=process.env.BACKEND_ONLY==='true';
   const file = process.argv[2];
   const input = JSON.parse(fs.readFileSync(file, 'utf8'));
-  if (process.argv[3] === '--verify') verifyResolvedPlan(input, frontendOnly,backendOnly);
+  if (process.argv[3] === '--verify') verifyResolvedPlan(input, frontendOnly);
   else {
-    const plan = runtimeRefreshPlan(input, frontendOnly, backendOnly=false);
-    for (const name of selectedTargets(frontendOnly,backendOnly)) {
+    const plan = runtimeRefreshPlan(input, frontendOnly);
+    for (const name of selectedTargets(frontendOnly)) {
       const target = plan.target[name];
       const dockerfile = fs.readFileSync(path.resolve(target.context, target.dockerfile), 'utf8');
       assert.match(dockerfile, /^FROM\s+.*\s+AS\s+runtime\s*$/mi, 'Runtime filter must select an actual Dockerfile stage');
     }
     fs.writeFileSync(file, JSON.stringify(plan, null, 2) + '\n');
   }
-  console.log(JSON.stringify({ targets: selectedTargets(frontendOnly,backendOnly), runtimeSecurityRefresh: true, verify: process.argv[3] === '--verify' }));
+  console.log(JSON.stringify({ targets: selectedTargets(frontendOnly), runtimeSecurityRefresh: true, verify: process.argv[3] === '--verify' }));
 }

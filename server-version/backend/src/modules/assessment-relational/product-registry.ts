@@ -1,4 +1,5 @@
 import { validateResultDisclosureContract, type ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
+import { isSelfGroupV2Entry, assertSelfGroupV2Entry } from '../assessment-policy/self-group-contract'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
 import type { EvaluationTargetMode } from '../assessment-policy/target'
 import { validateRelationalCohortPolicy, type RelationalCohortAnalysisPolicyV1 } from './analysis'
@@ -39,7 +40,8 @@ const validateEntry = (entry: RelationalProductEntryV1): RelationalProductEntryV
   if (resultDisclosure) {
     if (resultDisclosure.minimumRespondents !== applicability.minimumRespondents) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'disclosure minimum-N must equal applicability')
     if (entry.subjectReportMode && resultDisclosure.audiences.SUBJECT.mode !== entry.subjectReportMode) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'subject report mode must match content disclosure')
-    if (applicability.analysisMode === 'COHORT_AGGREGATE' && Object.values(resultDisclosure.audiences).some(rule => rule.mode === 'INDIVIDUAL_SUMMARY')) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'cohort-only content cannot disclose individual summaries')
+    if (isSelfGroupV2Entry(entry)) assertSelfGroupV2Entry(entry)
+    else if (applicability.analysisMode === 'COHORT_AGGREGATE' && Object.values(resultDisclosure.audiences).some(rule => rule.mode === 'INDIVIDUAL_SUMMARY')) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'cohort-only content cannot disclose individual summaries')
   }
   if (!entry.title.trim()) relationalFail('RELATIONAL_PRODUCT_REGISTRY', 'product title is required')
   if (entry.releaseStatus !== 'DRAFT' && entry.releaseStatus !== 'PUBLISHED') {

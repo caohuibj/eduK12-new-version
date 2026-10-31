@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "participantN": 5,
+  "reusedOriginalCompletion": true,
+  "newCompletions": 4,
+  "values": [
+    0,
+    1,
+    0,
+    1,
+    0
+  ],
+  "mean": 0.4,
+  "sdSample": 0.5477225575051662,
+  "sourcePickerDoesNotReadResults": true,
+  "oldSnapshotEqual": true,
+  "readResultReaders": 0,
+  "readFrozenRuntimeReaders": 0,
+  "currentRosterRemovalDoesNotChangeSnapshot": true,
+  "unscopedAttemptNotRelabelled": true,
+  "otherCourseReadDenied": true,
+  "publicIdentityAbsent": true,
+  "rescoredByReport": false,
+  "productionAccessed": false
+}

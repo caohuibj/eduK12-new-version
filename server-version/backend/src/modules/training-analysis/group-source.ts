@@ -7,6 +7,8 @@ import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { groupFormMetricType, type GroupMetricDefinition, type GroupMetricObservation } from '../reporting/group-summary'
 import type { FrozenReportSnapshot } from '../cognitive/profile-freeze'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
+import type { VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import type { ScaleResultV2 } from '../scale/scale-result'
 
 export interface TrainingGroupSource {
   parents: Array<{attemptId: string; attemptEpoch: number; stableIdentity: string | null}>
@@ -35,6 +37,46 @@ export const trainingCognitiveGroupAssignmentId = (taskId:string) => taskId.star
 export interface TrainingStandaloneCognitiveSession {
   id:string;userId:string|null;participantKey:string;attemptNo:number;status:string;finishedAt:Date|string
   result:CognitiveResultSnapshot|null
+}
+
+export const trainingScaleGroupTaskKey = (scaleId: string) => `scale-course:${scaleId}`
+export const trainingScaleGroupId = (taskId: string) => taskId.startsWith('scale-course:') ? taskId.slice('scale-course:'.length) : null
+
+/** Reuse the frozen Scale measurement-only hash. Report/reference text stays in
+ * the original runtime, not in a second scientific-comparability algorithm. */
+export function trainingStandaloneScaleMeasurement(runtime: VersionedFrozenScaleRuntimeSnapshot) {
+  return {instrumentKey: runtime.instrumentKey, version: runtime.instrumentVersion, respondentType: 'SELF',
+    scoringDigest: canonicalHash({definition: runtime.legacyDefinitionHash, scorer: runtime.compiledRuntime.scorerKey, version: runtime.compiledRuntime.scorerVersion}),
+    responseSignature: canonicalHash({items: runtime.definition.items.map(row => ({itemCode: row.itemCode, responseSetKey: row.responseSetKey})), responseSets: runtime.definition.responseSets}),
+    units: Object.fromEntries(runtime.definition.scoring.scores.map(score => [score.key, runtime.compiledRuntime.metricDefinitions[score.key]?.unit ?? null]))}
+}
+
+/** Entries already belong to one selected latest-completed measurement group.
+ * Only official saved total/dimension scores are adapted; no answer rescoring. */
+export function trainingStandaloneScaleFacts(runtime: VersionedFrozenScaleRuntimeSnapshot,
+  entries: Array<{id: string; scaleId: string; runtime: VersionedFrozenScaleRuntimeSnapshot; result: ScaleResultV2 | null}>) {
+  const measurement = trainingStandaloneScaleMeasurement(runtime), configDigest = canonicalHash(measurement)
+  const definitions: GroupMetricDefinition[] = runtime.definition.scoring.scores.map(score => {
+    const saved = entries.find(row => row.result)?.result?.scores.find(row => row.key === score.key)
+    return {key: score.key, label: score.label, type: 'NUMBER', unit: measurement.units[score.key], range: saved?.range ?? null,
+      measurement: {...measurement, scoreKey: score.key, unit: measurement.units[score.key]}}
+  })
+  const observations: GroupMetricObservation[] = []
+  for (const entry of entries) {
+    if (canonicalHash(trainingStandaloneScaleMeasurement(entry.runtime)) !== configDigest)
+      throw compositeConflict('独立量表冻结测量版本不一致，不能混合统计')
+    const result = entry.result
+    if (result && (result.instrument.scaleId !== entry.scaleId || result.instrument.code !== entry.runtime.instrumentKey
+      || result.instrument.instrumentVersion !== entry.runtime.instrumentVersion || result.method.definitionHash !== entry.runtime.legacyDefinitionHash
+      || result.method.scoringVersion !== entry.runtime.compiledRuntime.scorerVersion)) throw compositeConflict('量表正式结果与冻结测量身份不一致')
+    for (const definition of definitions) {
+      const score = result?.scores.find(row => row.key === definition.key)
+      const value = score?.status !== 'not_calculable' && typeof score?.value === 'number' && Number.isFinite(score.value) ? score.value : null
+      observations.push({parentId: entry.id, metricKey: definition.key, value,
+        missingReason: value !== null ? null : result ? 'NOT_CALCULABLE' : 'MISSING_SOURCE', quality: result?.quality.status ?? null})
+    }
+  }
+  return {definitions, observations, configDigest}
 }
 
 /** Adapt already persisted professional-report values, never trials or live
