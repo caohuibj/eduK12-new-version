@@ -19,4 +19,4 @@ export const seeds: CognitiveSeed[] = [
   },
 ]
 
-seeds.push({ testType: 'cogest', configVersion: '1.1.0', name: 'Cogest 1.1.0 HOLD · 20 candidate items; 30/36 unsupported', status: 'DRAFT', engineVersion: '1.1.0', scoringVersion: '1.1.0', config: {totalTrials:18, stimulusSetVersion:'cogest-zh-v1.1.0',fixationMs:400,timeoutMs:15000,validRtFloorMs:300,report:{reportVersion:'1.1.0',referenceMode:'none'}} })
+seeds.push({ testType: 'cogest', configVersion: '1.1.0', name: 'Cogest 1.1.0 HOLD · 36 candidate items; independent item review pending', status: 'DRAFT', engineVersion: '1.1.0', scoringVersion: '1.1.0', config: {totalTrials:18, stimulusSetVersion:'cogest-zh-v1.1.0',fixationMs:400,timeoutMs:15000,validRtFloorMs:300,report:{reportVersion:'1.1.0',referenceMode:'none'}} })

@@ -5,13 +5,13 @@
     "engineVersion": "1.1.0",
     "scoringVersion": "1.1.0"
   },
-  "provenance": "Unpublished revision after rejection of arithmetic-only bank. Twenty candidate items only; not a 30/36-item profile or clinical validation.",
+  "provenance": "36 unapproved reality-estimation candidates; original 20 reviewed at 8b1882cc, corrections in 606aae50, added 16 independently reviewable in next commit. Synthetic scorer consistency only, not live/clinical validation.",
   "cases": [
     {
       "name": "all-correct",
       "input": {
         "config": {
-          "totalTrials": 20,
+          "totalTrials": 36,
           "stimulusSetVersion": "cogest-zh-v1.1.0",
           "fixationMs": 400,
           "timeoutMs": 15000,
@@ -125,7 +125,7 @@
             "trialIndex": 11,
             "payload": {
               "itemId": "ce11-r12",
-              "responseIndex": 2,
+              "responseIndex": 1,
               "rtMs": 500,
               "interrupted": false
             }
@@ -197,6 +197,150 @@
             "trialIndex": 19,
             "payload": {
               "itemId": "ce11-r20",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "itemId": "ce11-r21",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "itemId": "ce11-r22",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "itemId": "ce11-r23",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "itemId": "ce11-r24",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "itemId": "ce11-r25",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "itemId": "ce11-r26",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "itemId": "ce11-r27",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "itemId": "ce11-r28",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "itemId": "ce11-r29",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "itemId": "ce11-r30",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "itemId": "ce11-r31",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "itemId": "ce11-r32",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "itemId": "ce11-r33",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "itemId": "ce11-r34",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "itemId": "ce11-r35",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "itemId": "ce11-r36",
               "responseIndex": 2,
               "rtMs": 500,
               "interrupted": false
@@ -211,7 +355,7 @@
           "medianRtMs": 500,
           "errorCount": 0,
           "timeoutCount": 0,
-          "validRtCount": 20
+          "validRtCount": 36
         },
         "qualityFlags": {
           "interpretable": true,
@@ -225,7 +369,7 @@
       "name": "all-timeout",
       "input": {
         "config": {
-          "totalTrials": 20,
+          "totalTrials": 36,
           "stimulusSetVersion": "cogest-zh-v1.1.0",
           "fixationMs": 400,
           "timeoutMs": 15000,
@@ -415,6 +559,150 @@
               "rtMs": null,
               "interrupted": false
             }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "itemId": "ce11-r21",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "itemId": "ce11-r22",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "itemId": "ce11-r23",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "itemId": "ce11-r24",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "itemId": "ce11-r25",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "itemId": "ce11-r26",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "itemId": "ce11-r27",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "itemId": "ce11-r28",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "itemId": "ce11-r29",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "itemId": "ce11-r30",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "itemId": "ce11-r31",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "itemId": "ce11-r32",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "itemId": "ce11-r33",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "itemId": "ce11-r34",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "itemId": "ce11-r35",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "itemId": "ce11-r36",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
           }
         ]
       },
@@ -424,7 +712,7 @@
           "accuracy": 0,
           "medianRtMs": null,
           "errorCount": 0,
-          "timeoutCount": 20,
+          "timeoutCount": 36,
           "validRtCount": 0
         },
         "qualityFlags": {

@@ -194,7 +194,7 @@ participantPresentations.push({
   "experienceHeadline": "accuracy",
   "hiddenMetrics": [],
   "singleHiddenMetrics": [],
-  "disclaimer": "内部估算候选题；区间是粗粒度量级选项，不是临床容许范围或人口常模。当前20题不足以支撑原30/36题协议，尚不可纳入；一般知识和生活经验影响表现。",
+  "disclaimer": "内部估算候选题；区间是粗粒度量级选项，不是临床容许范围或人口常模。当前36题候选尚待题面/区间与构念独审，尚不可纳入；一般知识和生活经验影响表现。",
   "suppressTips": false,
   "practicalTips": [
     "结合日常经验，检查选项是否明显偏大或偏小。"
@@ -227,7 +227,7 @@ participantPresentations.push({
         "insufficientValidRt"
       ]
     },
-    "nextStep": "结合日常经验，检查选项是否明显偏大或偏小。 内部估算候选题；区间是粗粒度量级选项，不是临床容许范围或人口常模。当前20题不足以支撑原30/36题协议，尚不可纳入；一般知识和生活经验影响表现。",
+    "nextStep": "结合日常经验，检查选项是否明显偏大或偏小。 内部估算候选题；区间是粗粒度量级选项，不是临床容许范围或人口常模。当前36题候选尚待题面/区间与构念独审，尚不可纳入；一般知识和生活经验影响表现。",
     "chart": {
       "kind": "metrics",
       "metricKeys": [

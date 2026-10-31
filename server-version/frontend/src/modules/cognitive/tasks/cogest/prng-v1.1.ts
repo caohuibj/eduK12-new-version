@@ -32,7 +32,7 @@ function mulberry32(seed: number): () => number {
 
 /** 按 seed 从冻结题库中抽取 N 个不重复题目，保持题库内选项顺序（正确项位置由题库冻结）。 */
 export const buildCogestItems = (seed: string, totalTrials: number): CogestStimulus[] => {
-  if (!Number.isInteger(totalTrials) || totalTrials < 1 || totalTrials > COGEST_BANK.length) throw new RangeError('Insufficient reviewed cogest items for requested protocol; standard 30/research 36 remain unavailable')
+  if (!Number.isInteger(totalTrials) || totalTrials < 1 || totalTrials > COGEST_BANK.length) throw new RangeError('Requested count exceeds frozen cogest bank; never truncate or repeat items')
   const random = mulberry32(xmur3(`${seed}:cogest:1.1.0`)())
   const pool = [...COGEST_BANK]
   for (let index = pool.length - 1; index > 0; index -= 1) {
