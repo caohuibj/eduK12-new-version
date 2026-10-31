@@ -1,3 +1,4 @@
+import {GroupLongitudinalPanel} from '../modules/reporting/GroupLongitudinalPanel'
 import { useEffect, useRef, useState } from 'react'
 import { TaskGroupReport, type TaskGroupArtifact } from '../modules/reporting/TaskGroupReport'
 
@@ -22,7 +23,7 @@ export function SurveyGroupReports({ projectId, waveId, request }: { projectId: 
     const artifact = await request<TaskGroupArtifact>(`${base}/${encodeURIComponent(artifactId)}`)
     if (current()) setReport(artifact)
   })
-  return <section aria-label="单次群体报告" className="survey-card">
+  return <><section aria-label="单次群体报告" className="survey-card">
     <h3>单次群体报告</h3><p>选择当前波次中的具体工具生成报告。打开已生成版本直接读取快照；新答卷需主动生成更新版。</p>
     <button type="button" className="btn-secondary" disabled={busy || !waveId} onClick={() => void run(async current => {
       const result = await request<{ tools: Tool[]; artifacts: Pointer[] }>(base)
@@ -46,5 +47,5 @@ export function SurveyGroupReports({ projectId, waveId, request }: { projectId: 
         <option value="">选择已生成版本</option>{catalog.artifacts.map(value => <option key={value.artifactId} value={value.artifactId}>{new Date(value.generatedAt).toLocaleString('zh-CN')} · {value.artifactId.slice(0, 8)}</option>)}</select></label>}
     </>}
     {report && <TaskGroupReport key={report.artifactId} artifact={report} />}
-  </section>
+  </section><GroupLongitudinalPanel key={base+'-longitudinal'} base={`/projects/${encodeURIComponent(projectId)}/analytics/waves/${encodeURIComponent(waveId)}/group-longitudinal`} request={request}/></>
 }

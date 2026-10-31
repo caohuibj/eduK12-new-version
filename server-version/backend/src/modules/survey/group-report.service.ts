@@ -11,6 +11,7 @@ import { rejectPooledVariants } from './analytics.variant'
 const fail = (status: number, message: string): never => { throw new SurveyAnalyticsError(status, message) }
 const sourceOf = (projectId: string, waveId: string) => ({ product: 'SURVEY' as const, containerId: projectId, taskId: waveId })
 type Scope = { actorUserId: string; projectId: string; waveId: string }
+export type SurveyPreparedGroup={source:ReturnType<typeof sourceOf>;selector:{instrumentKey:string;kind:string};sourceBindings:SurveyGroupBindings;projection:TaskGroupProjection;generatedBy:string;definitions:GroupMetricDefinition[];tracking?:import('./publication.service').ResearchFrozenPublication['longitudinal']}
 
 async function authorize(db: Prisma.TransactionClient, input: Scope) {
   await authorizedProject(db, input.actorUserId, input.projectId, false)
@@ -69,8 +70,14 @@ export function surveyGroupFacts(source: SurveySourceProjection, instrumentKey: 
   return { tool, definitions, observations }
 }
 
-export async function generateSurveyGroupReport(input: Scope & { instrumentKey: string }) {
+async function computeSurveyGroupReport<T>(input:Scope&{instrumentKey:string;retainedParentIds?:ReadonlySet<string>;trackedMetricIds?:string[];sourceCutoff?:Date},finish:(db:Prisma.TransactionClient,prepared:SurveyPreparedGroup)=>Promise<T>){
   const dictionary = await loadSurveyItemDictionary({ ...input, includeGroupTools: true })
+  if(input.trackedMetricIds){
+    const bindings=input.trackedMetricIds.map(id=>dictionary.longitudinal?.metrics.find(m=>m.metricId===id))
+    const keys=new Set(bindings.map(b=>b?.instrumentKey))
+    if(bindings.some(b=>!b)||keys.size!==1)return fail(409,'波次没有唯一继承的追踪叶工具')
+    input={...input,instrumentKey:bindings[0]!.instrumentKey}
+  }
   const selectedTool = dictionary.tools?.find(tool => tool.instrumentKey === input.instrumentKey)
   if (!selectedTool) return fail(404, '请选择当前冻结问卷中的工具')
   const expandedFields = selectedTool.kind === 'FORM' ? dictionary.variables.filter(variable =>
@@ -84,7 +91,7 @@ export async function generateSurveyGroupReport(input: Scope & { instrumentKey: 
     const chunk = await loadSurveySource({ ...input, waveIds: [input.waveId], maxFinals: pageSize, pageMode: true,
       stableIdCursor: true, includeWideSchema: source === undefined, includeAttendance: false, includeGroupParents: true,
       selectRaw: expandedFields ? { instrumentKey: input.instrumentKey } : false, selectScore: { instrumentKey: input.instrumentKey },
-      afterFinal, ...(source ? { snapshotCutOff: new Date(source.cutOff), expectedSourceRevision: source.sourceRevision,
+      afterFinal, ...(input.sourceCutoff?{snapshotCutOff:input.sourceCutoff}:{}), ...(source ? { snapshotCutOff: new Date(source.cutOff), expectedSourceRevision: source.sourceRevision,
         expectedFinalCount: source.sourceFinalCount ?? undefined } : {}) })
     rejectPooledVariants(chunk)
     source ??= chunk
@@ -98,21 +105,41 @@ export async function generateSurveyGroupReport(input: Scope & { instrumentKey: 
   const frozen = source!
   if (parents.length !== frozen.sourceFinalCount || new Set(parents.map(parent => parent.attemptId)).size !== parents.length)
     return fail(409, '报告来源数量不一致，请重新生成')
-  const facts = surveyGroupFacts({ ...frozen, scores, raw }, input.instrumentKey)
+  const retained=input.retainedParentIds
+  const selectedParents=retained?parents.filter(p=>retained.has(p.attemptId)):parents
+  const selectedIds=new Set(selectedParents.map(p=>p.attemptId))
+  const facts = surveyGroupFacts({ ...frozen, scores:scores.filter(p=>selectedIds.has(p.attemptId)), raw:raw.filter(p=>selectedIds.has(p.attemptId)) }, input.instrumentKey)
   return prisma.$transaction(async db => {
     const wave = await authorize(db, input)
     const current = await db.surveyProject.findUnique({ where: { id: input.projectId }, select: { revision: true } })
     if (current?.revision !== frozen.sourceRevision) return fail(409, '研究来源在生成期间变化，请重新生成')
     const projection: TaskGroupProjection = { schemaVersion: 1, descriptionVersion: 'group-descriptive-v1',
       title: facts.tool.title + ' · 群体报告', sourceLabel: wave.title, cutoff: frozen.cutOff,
-      populationLabel: '本波次全部合格已完成答卷', completedN: parents.length, countUnit: 'RESPONSE', assignedN: null,
+      populationLabel: '本波次全部合格已完成答卷', completedN: selectedParents.length, countUnit: 'RESPONSE', assignedN: null,
       tool: { key: input.instrumentKey, title: facts.tool.title, kind: facts.tool.kind },
-      metrics: summarizeGroupMetrics(facts.definitions, facts.observations, parents.map(parent => parent.attemptId)),
+      metrics: summarizeGroupMetrics(facts.definitions, facts.observations, selectedParents.map(parent => parent.attemptId)),
       limitations: ['完成答卷数不代表去重人数；各指标使用各自有效样本。', '多选比例以该题有效作答数为分母，合计可能超过 100%。',
         '均值和样本标准差仅作描述，不代表诊断、常模或干预效果。自由文本不自动汇总。'] }
-    return saveTaskGroupArtifact(db, { source: sourceOf(input.projectId, input.waveId), selector: { instrumentKey: input.instrumentKey, kind: 'ALL' },
-      sourceBindings: { revision: frozen.sourceRevision, parents }, projection, generatedBy: input.actorUserId })
+    return finish(db,{source:sourceOf(input.projectId,input.waveId),selector:{instrumentKey:input.instrumentKey,kind:'ALL'},
+      sourceBindings:{revision:frozen.sourceRevision,parents:selectedParents},projection,generatedBy:input.actorUserId,
+      definitions:facts.definitions,tracking:dictionary.longitudinal})
   })
+}
+
+export async function prepareSurveyGroupReport(input:Scope&{instrumentKey:string;retainedParentIds?:ReadonlySet<string>;trackedMetricIds?:string[];sourceCutoff?:Date}){
+ return computeSurveyGroupReport(input,async(_db,prepared)=>prepared)
+}
+export async function generateSurveyGroupReport(input:Scope&{instrumentKey:string}){
+ return computeSurveyGroupReport(input,(db,prepared)=>saveTaskGroupArtifact(db,prepared))
+}
+export type SurveyGroupBindings={revision:number;parents:Array<{finalId:string;sourceFinalHash:string}>}
+export async function assertSurveyGroupBindingsCurrent(db:Prisma.TransactionClient,projectId:string,entries:Array<{waveId:string;bindings:SurveyGroupBindings}>){
+ const pointers=entries.flatMap(e=>e.bindings.parents.map(p=>({...p,waveId:e.waveId})))
+ const rows=pointers.length?await db.surveyWaveFinal.findMany({where:{projectId,id:{in:pointers.map(p=>p.finalId)},
+  waveId:{in:entries.map(e=>e.waveId)},attempt:{status:'COMPLETED',excludedAt:null,OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}],
+   AND:[{OR:[{participant:{is:null}},{participant:{is:{status:{not:'WITHDRAWN'}}}}]}]}},select:{id:true,waveId:true,resultsHash:true}}):[]
+ const found=new Map(rows.map(r=>[r.id,r]))
+ if(rows.length!==pointers.length||pointers.some(p=>found.get(p.finalId)?.resultsHash!==p.sourceFinalHash||found.get(p.finalId)?.waveId!==p.waveId))fail(409,'原快照的纳入资格已变化，请生成更新版报告')
 }
 
 export async function readSurveyGroupReport(input: Scope & { artifactId: string }) {
@@ -120,17 +147,7 @@ export async function readSurveyGroupReport(input: Scope & { artifactId: string 
     await authorize(db, input)
     const artifact = await readTaskGroupArtifact(db, sourceOf(input.projectId, input.waveId), input.artifactId)
     if (!artifact) return fail(404, '群体报告不存在')
-    const bindings = artifact.sourceBindings as { parents: Array<{ finalId: string; sourceFinalHash: string }> }
-    // Read only frozen pointers and current withdrawal/quality state. No FINAL
-    // decryption, score recomputation, or scan of newer responses on reopen.
-    const rows = bindings.parents.length ? await db.surveyWaveFinal.findMany({ where: {
-      projectId: input.projectId, waveId: input.waveId, id: { in: bindings.parents.map(parent => parent.finalId) },
-      attempt: { status: 'COMPLETED', excludedAt: null, OR: [{ sampleReview: { is: null } }, { sampleReview: { is: { verdict: 'INCLUDED' } } }],
-        AND: [{ OR: [{ participant: { is: null } }, { participant: { is: { status: { not: 'WITHDRAWN' } } } }] }] },
-    }, select: { id: true, resultsHash: true } }) : []
-    const hashes = new Map(rows.map(row => [row.id, row.resultsHash]))
-    if (rows.length !== bindings.parents.length || bindings.parents.some(parent => hashes.get(parent.finalId) !== parent.sourceFinalHash))
-      return fail(409, '原快照的纳入资格已变化，请生成更新版报告')
+    await assertSurveyGroupBindingsCurrent(db,input.projectId,[{waveId:input.waveId,bindings:artifact.sourceBindings as SurveyGroupBindings}])
     return publicTaskGroupArtifact(artifact)
   })
 }

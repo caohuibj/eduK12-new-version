@@ -1,0 +1,21 @@
+{
+  "runId": 41166973150,
+  "attempt": 1,
+  "jobId": 124436639519,
+  "head": "380fe66a48eca5e4da4dd6b695751da61f90d068",
+  "failedStep": "select dependency-free documentation or tooling classification",
+  "conclusion": "failure",
+  "annotations": "Process completed with exit code1; official annotation did not contain the Node assertion stack",
+  "rawJobLogDownload": "HTTP403 at signed result-store redirect; stopped, no alternate log download attempted",
+  "localExactStepReproduction": "actual two-parent synthetic merge checkout, same workflow inline: Ready requires a separately reviewed affected qualification plan (false !== true)",
+  "rootCause": "Early lightweight classifier did not consult the configured formal longitudinal plan and called the Draft-only group classifier on Ready. It also omitted exact group source fetch in shallow scope checkout.",
+  "fix": "Reuse existing personalTrackingReadyPlan in the early step and exact immutable-source fetch; no new jobs/checks or application change.",
+  "notExecuted": [
+    "migration",
+    "native restore",
+    "frontend types",
+    "images",
+    "CodeQL"
+  ],
+  "syntheticOnly": true
+}

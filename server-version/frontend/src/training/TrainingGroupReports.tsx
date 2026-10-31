@@ -1,3 +1,4 @@
+import {GroupLongitudinalPanel} from '../modules/reporting/GroupLongitudinalPanel'
 import './training-group-reports.css'
 import { useEffect, useRef, useState } from 'react'
 import apiClient from '../api/client'
@@ -12,6 +13,8 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
   return response.data
 }
 const toolKey = (tool: Tool) => JSON.stringify([tool.key, tool.source.publication, tool.source.configDigest, tool.source.variantKey, tool.source.materialGroupKey ?? null])
+
+const longitudinalRequest=async<T,>(path:string,method?:string,body?:unknown)=>request<T>(path,method==='POST'?body:undefined)
 
 export function TrainingGroupReports({courseId}: {courseId: string}) {
   const [index, setIndex] = useState<Index | null>(null), [tools, setTools] = useState<Tool[]>([])
@@ -30,7 +33,7 @@ export function TrainingGroupReports({courseId}: {courseId: string}) {
     const result = await request<TaskGroupArtifact>(`${base}/${encodeURIComponent(pointer.taskId)}/${encodeURIComponent(pointer.artifactId)}`)
     if (current()) setArtifact(result)
   })
-  return <section className="training-group-reports" aria-label="Training 单次群体报告"><h2>单次群体报告</h2>
+  return <><section className="training-group-reports" aria-label="Training 单次群体报告"><h2>单次群体报告</h2>
     <p>选择一次任务中的具体工具及其冻结版本，生成全部合格作答的统计快照。新作答需主动生成更新版。</p>
     <button type="button" disabled={busy} onClick={() => void run(async current => {
       const result = await request<Index>(base)
@@ -58,5 +61,5 @@ export function TrainingGroupReports({courseId}: {courseId: string}) {
         <option value="">选择已生成版本</option>{index.artifacts.map(pointer => <option key={pointer.artifactId} value={pointer.artifactId}>{index.tasks.find(task => task.id === pointer.taskId)?.name} · {new Date(pointer.generatedAt).toLocaleString('zh-CN')} · {pointer.artifactId.slice(0,8)}</option>)}</select></label>}
     </>}
     {artifact && <TaskGroupReport key={artifact.artifactId} artifact={artifact} />}
-  </section>
+  </section>{taskId&&<GroupLongitudinalPanel key={courseId+':'+taskId} base={`/courses/${encodeURIComponent(courseId)}/training-group-longitudinal/${encodeURIComponent(taskId)}`} request={longitudinalRequest}/>}</>
 }

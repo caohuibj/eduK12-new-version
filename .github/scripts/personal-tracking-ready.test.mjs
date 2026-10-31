@@ -4,7 +4,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,mkdtempSync,statSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
-import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit,verifyOriginalApplicationSast,verifyOriginalQualification,verifyOriginalFrontendAudit,nativeTrainingFixtureSql,nativeTrainingFactsSql,nativeTeacherFixtureSql,nativeTeacherFactsSql} from './personal-tracking-ready.mjs';
+import {binding,personalTrackingReadyPlan,personalTrackingReadyOutputs,admitOriginalReports,admitOriginalReportsInChild,verifyOriginalImages,prepareMainSchema,verifyOriginalBackendAudit,verifyOriginalApplicationSast,verifyOriginalQualification,verifyFollowRedirectsPatchOnly,verifyOriginalFrontendAudit,nativeTrainingFixtureSql,nativeTrainingFactsSql,nativeTeacherFixtureSql,nativeTeacherFactsSql} from './personal-tracking-ready.mjs';
 import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -143,4 +143,32 @@ test('School fixed55 source deltas include native quota controls and reject a ch
  assert(plan.sastPaths.some(p=>p.endsWith('/native-source.cognitive.ts')));assert(plan.frontendLintPaths.includes('src/school/SchoolStudentTasks.tsx'));
  const pin=binding.files['server-version/backend/src/modules/campus/report.routes.ts'],old=pin.originalDeltaSHA256;
  try{pin.originalDeltaSHA256='0'.repeat(64);assert.throws(()=>personalTrackingReadyPlan(entries,binding.base,head,options),/Original longitudinal delta changed/);}finally{pin.originalDeltaSHA256=old;}
+});
+
+test('group longitudinal Ready preserves exact inventory, existing gates and original failures without replay',{skip:binding.slice!=='group'},async()=>{
+ const entries=changedEntries(binding.base,head),plan=personalTrackingReadyPlan(entries,binding.base,head,options);
+ assert.deepEqual(plan.required,['scope','personal-tracking','docker','codeql']);
+ assert.equal(plan.branch,binding.branch);assert(plan.frontendLintPaths.length);assert(plan.sastPaths.includes('.github/scripts/personal-tracking-ready.mjs'));
+ const original=await admitOriginalReports();assert.equal(original.caseCount,binding.originalCaseCount);assert.equal(original.ciExecuted,false);
+ for(const patch of [{forceFull:true},{branch:'other'},{event:'workflow_dispatch'}]){
+  if(patch.forceFull)assert.throws(()=>personalTrackingReadyPlan(entries,binding.base,head,{...options,...patch}));
+  else assert.equal(personalTrackingReadyPlan(entries,binding.base,head,{...options,...patch}),null);
+ }
+ assert.throws(()=>personalTrackingReadyPlan(entries,'a'.repeat(40),head,options));
+ assert.throws(()=>personalTrackingReadyPlan([...entries,{file:'server-version/backend/src/unreviewed.ts',newMode:'100644',oldMode:'000000',status:'A'}],binding.base,head,options));
+ assert.throws(()=>personalTrackingReadyPlan(entries.map((e,i)=>i?e:{...e,newMode:'120000'}),binding.base,head,options));
+});
+
+
+test('group single patched HTTP dependency preserves native and frontend qualification while rejecting other drift',{skip:!binding.qualificationReuse?.followRedirectsPatchOnly},async()=>{
+ const proof=binding.qualificationReuse,from=path=>JSON.parse(execFileSync('git',['show',proof.sourceHead+':'+path],{encoding:'utf8'}));
+ const before=from('server-version/backend/package.json'),lock=from('server-version/backend/package-lock.json'),after=JSON.parse(readFileSync('server-version/backend/package.json')),next=JSON.parse(readFileSync('server-version/backend/package-lock.json'));
+ assert.equal(verifyFollowRedirectsPatchOnly(before,lock,after,next).prismaDependencyGraphUnchanged,true);
+ const changed=structuredClone(next);changed.packages['node_modules/prisma'].version='0.0.0';assert.throws(()=>verifyFollowRedirectsPatchOnly(before,lock,after,changed));
+ const manifest=structuredClone(after);manifest.engines.node='>=99';assert.throws(()=>verifyFollowRedirectsPatchOnly(before,lock,manifest,next));
+ const original=JSON.parse(readFileSync('docs/evidence/group-longitudinal-survey-training-20261030/qualification/follow-redirects-1162/original-qualification-job.json'));
+ const fetcher=job=>async()=>({ok:true,json:async()=>job});
+ const admitted=await verifyOriginalQualification({qualificationReuse:proof},fetcher(original));assert.equal(admitted.frontendAdmitted,true);assert.equal(admitted.reexecuted,false);
+ await assert.rejects(verifyOriginalQualification({qualificationReuse:proof},fetcher({...original,conclusion:'failure'})));
+ await assert.rejects(verifyOriginalQualification({qualificationReuse:proof},fetcher({...original,steps:original.steps.filter(s=>s.name!=='real nonempty main upgrade and native dump restore')})));
 });
