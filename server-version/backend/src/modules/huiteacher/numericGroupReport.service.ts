@@ -13,6 +13,7 @@ import {assertTeacherGroupAuthority} from './groupReportAuthority'
 import {teacherResourceMinimum} from './privacyV2'
 import {unsafeTeacherDisclosureOverlap} from './disclosureOverlap.service'
 import {lockTeacherDisclosure} from './privacyReleaseV2.service'
+import {teacherNativeGroupTrack} from './nativeGroupSource'
 
 export type TeacherNumericScope={organizationId:string;eventId:string;actorUserId:string}
 const hidden=():never=>reportingFail('REPORT_NOT_FOUND','Teacher group report unavailable',404)
@@ -34,8 +35,8 @@ async function source(input:TeacherNumericScope,trackId?:string){
   SELECT resource_family AS family,resource_key AS key,resource_version AS version,frozen_resource_policy AS policy,resource_policy_hash AS hash
   FROM assessment_run_tracks WHERE organization_id=${input.organizationId} AND run_id=${run.runId} AND id=${trackId}`
  if(!track||canonicalHash(track.policy)!==track.hash)hidden()
- if(track.family!=='SCALE'||!track.key.endsWith(':GROUP')
-   ||!['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix)))hidden()
+ const scale=track.family==='SCALE'&&track.key.endsWith(':GROUP')&&['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix))
+ if(!scale&&!teacherNativeGroupTrack(track))hidden()
  const entry=await resolveHistoricalRelationalEntry({resourceKind:track.family,resourceKey:track.key,resourceVersion:track.version} as any)
  if(!entry||!isSelfGroupV2Entry(entry)||!entry.resultDisclosure?.audiences.ORGANIZATION.mode.includes('AGGREGATE')
   ||!track.policy.subjectRoles?.every((r:string)=>r==='TEACHER')||!track.policy.respondentRoles?.every((r:string)=>r==='TEACHER')
@@ -64,10 +65,14 @@ export async function listTeacherNumericGroups(input:TeacherNumericScope,options
  const sources:Array<{trackId:string;title:string;tools:Awaited<ReturnType<typeof listAuthoritativeRunLeafSources>>;minimumN:number;canGenerate:boolean;groups:Awaited<ReturnType<typeof listEducationGroupSelections>>}>=[]
  if(options.configure){
  const tracks=await prisma.$queryRaw<Array<{trackId:string;title:string}>>`
-  SELECT t.id AS "trackId",r.entry->>'title' AS title FROM assessment_run_tracks t
-  JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
-  WHERE t.organization_id=${input.organizationId} AND t.run_id=${run.runId} AND t.resource_family='SCALE'
-    AND (t.resource_key LIKE 'teacher-scale:%:GROUP' OR t.resource_key LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP')
+  SELECT t.id AS "trackId",COALESCE(r.entry,n.entry)->>'title' AS title FROM assessment_run_tracks t
+  LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
+  LEFT JOIN education_assessment_deliveries n ON t.resource_key='education-assessment:TEACHER:'||n.organization_id||':'||n.id
+    AND n.organization_id=t.organization_id AND n.product='TEACHER' AND t.resource_version='2.0.0'
+  WHERE t.organization_id=${input.organizationId} AND t.run_id=${run.runId}
+    AND ((t.resource_family='SCALE' AND (t.resource_key LIKE 'teacher-scale:%:GROUP' OR t.resource_key LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'))
+     OR (t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND n.entry->'educationOrigin'->>'adapterVersion'='2.0.0'
+      AND n.entry->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE')))
   ORDER BY t.id`
  for(const track of tracks){
   const valid=await source(input,track.trackId)
@@ -115,9 +120,13 @@ const countsVisible=(payload:ReportingGroupArtifactPayload,minimumN:number)=>{
 export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>},db:Prisma.TransactionClient|typeof prisma=prisma){
  const metrics=disclosedMetrics(input.payload)
  if(!countsVisible(input.payload,input.minimumN)&&!metrics.length)return {comparedArtifacts:0,measurementHash:null}
- const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT release.content->>'measurementHash' AS hash
-  FROM assessment_run_tracks t JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
-  JOIN scales s ON s.id=r.scale_id JOIN measurement_content_releases release ON release.id=s.measurement_release_id
+ const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
+  FROM assessment_run_tracks t LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
+  LEFT JOIN scales s ON s.id=r.scale_id LEFT JOIN measurement_content_releases release ON release.id=s.measurement_release_id
+  LEFT JOIN education_assessment_deliveries native ON t.resource_key='education-assessment:TEACHER:'||native.organization_id||':'||native.id
+   AND native.organization_id=t.organization_id AND native.product='TEACHER' AND t.resource_version='2.0.0'
+  LEFT JOIN LATERAL jsonb_array_elements(native.entry->'educationOrigin'->'units') native_unit(value)
+   ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=${input.leaf.slotKey}
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${input.cohort.sourceRunId} AND t.id=${input.cohort.sourceTrackId}`
  if(!measurement?.hash)return hidden()
  const prior=await db.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
@@ -132,10 +141,14 @@ export async function assertTeacherNumericDisclosure(input:{organizationId:strin
   LEFT JOIN registered_assessment_resources resource ON resource.resource_key=t.resource_key AND resource.resource_version=t.resource_version
   LEFT JOIN scales prior_scale ON prior_scale.id=resource.scale_id
   LEFT JOIN measurement_content_releases release ON release.id=prior_scale.measurement_release_id
+  LEFT JOIN education_assessment_deliveries native ON t.resource_key='education-assessment:TEACHER:'||native.organization_id||':'||native.id
+   AND native.organization_id=t.organization_id AND native.product='TEACHER' AND t.resource_version='2.0.0'
+  LEFT JOIN LATERAL jsonb_array_elements(native.entry->'educationOrigin'->'units') native_unit(value)
+   ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=a.artifact_payload->'source'->'leaf'->>'slotKey'
   WHERE a.organization_id=${input.organizationId} AND a.analysis_kind='GROUP'
-    AND (a.artifact_payload->'source'->'leaf' IS NULL OR release.content->>'measurementHash' IS NULL
+    AND (a.artifact_payload->'source'->'leaf' IS NULL OR COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') IS NULL
       OR (a.artifact_payload->'source'->'leaf'->>'unitType'=${input.leaf.unitType}
-        AND (release.content->>'measurementHash'=${measurement.hash} OR a.artifact_payload->'source'->'leaf'->>'instrumentKey'=${input.leaf.instrumentKey})))`)
+        AND (COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash')=${measurement.hash} OR a.artifact_payload->'source'->'leaf'->>'instrumentKey'=${input.leaf.instrumentKey})))`)
 
  const currentContributors=contributorUsers(input.payload)!
  for(const old of prior){
@@ -170,7 +183,7 @@ function present(stored:Awaited<ReturnType<typeof readReportingArtifactRecord>>,
   metrics:Object.entries(p.metrics??{}).map(([key,raw])=>{const m=raw as any,ok=p.state==='present'&&m.state==='present'&&m.validN>=floor(key)&&(m.missingN===0||m.missingN>=floor(key));return {
    key,label:key,type:'NUMBER' as const,unit:a.metricMetadata[key]?.unit??null,state:ok?'present' as const:'suppressed' as const,validN:ok?m.validN:null,missingN:ok?m.missingN:null,
    mean:ok?m.aggregations?.mean??null:null,sdSample:ok?m.aggregations?.sdSample??null:null,range:null,observedRange:ok?m.aggregations?.minMax??null:null,qualityCounts:{},measurement:a.source.leaf,frequencies:[]}}),
-  limitations:['沿用已发布 GROUP 合同与方案；每项有效人数独立计算，小缺失补集保持抑制。','本轮只消费固定 Scale 叶数值；原生 Cognitive/SJT 和 Bundle Profile 未包含。','未完成成员不计为零分；有效 N、缺失补集和真实贡献者差分均满足时可展示部分样本。','旧版本读取保存快照；主动更新才重新处理正式结果。']}}
+  limitations:['沿用已发布 GROUP 合同与方案；每项有效人数独立计算，小缺失补集保持抑制。','只消费固定叶的既有正式数值指标，不重算试次；Bundle 整体 Profile 未包含。','未完成成员不计为零分；有效 N、缺失补集和真实贡献者差分均满足时可展示部分样本。','旧版本读取保存快照；主动更新才重新处理正式结果。']}}
 }
 
 export async function readTeacherNumericGroup(input:TeacherNumericScope&{artifactId:string}){

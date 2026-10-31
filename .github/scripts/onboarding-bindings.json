@@ -6178,6 +6178,175 @@
         "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
       }
     },
+    "430": {
+      "schemaVersion": 1,
+      "pr": 430,
+      "enabled": true,
+      "base": "e092be0d57a5a1df7519c23c8a5c2cf078b870c8",
+      "product": "c4a23801d1943333a7dad356ed6fabc1fd7b9365",
+      "controlCheckpoint": "f3fae8d5af0b415640af28521187aa9714eb76f0",
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": "bcac2e624988b59627963fddb8496210a0b3294e",
+          "after": "67455c38854545871385d4dd177861c688843764"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/README.md": {
+          "before": null,
+          "after": "9b09ce9ec5ba39c8d62c98075bf64951a7d2eb04"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/backend-types.json": {
+          "before": null,
+          "after": "7c15d662507c388766b993c50e9137e85ed65302"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/candidate.json": {
+          "before": null,
+          "after": "4f707265b45d2711e6c91aa638fa986c2231d945"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-first.json": {
+          "before": null,
+          "after": "8a2406d81ad8cadbcda523ba1fa50f156af53b18"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-first.log": {
+          "before": null,
+          "after": "8973c4f4b12b6221be0b340b8aa649c098fbf219"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-leaf-header-first.json": {
+          "before": null,
+          "after": "0b412bed772f5c47f5e2fb0f10ba8279e96452f6"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-leaf-header-first.log": {
+          "before": null,
+          "after": "8973c4f4b12b6221be0b340b8aa649c098fbf219"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-registration-first.json": {
+          "before": null,
+          "after": "3b8019c316bde9112f3f628a15840f2d3bf0a745"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-registration-first.log": {
+          "before": null,
+          "after": "8973c4f4b12b6221be0b340b8aa649c098fbf219"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-session-first.json": {
+          "before": null,
+          "after": "33e304086df5b0ccce95cf603a524bde0e00d75d"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-session-first.log": {
+          "before": null,
+          "after": "8973c4f4b12b6221be0b340b8aa649c098fbf219"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-target-first.json": {
+          "before": null,
+          "after": "745705dda39450fffcb3a8fcc333267662c54d08"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres-target-first.log": {
+          "before": null,
+          "after": "8973c4f4b12b6221be0b340b8aa649c098fbf219"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres.json": {
+          "before": null,
+          "after": "563466f08856e31d3d508acfd8cd239554e2eb9a"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/postgres.log": {
+          "before": null,
+          "after": "8973c4f4b12b6221be0b340b8aa649c098fbf219"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/proof.json": {
+          "before": null,
+          "after": "77c24c47ada475c3aeb2a8182cc9b520012b1944"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/raw-sha256.json": {
+          "before": null,
+          "after": "937e47eeb9f5b30d01a3c02ceaea449ee2466133"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/README.md": {
+          "before": null,
+          "after": "6534eba6b78f9c44307af94b88a9b8bc651dcb00"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.json": {
+          "before": null,
+          "after": "0c29cdda2bb2548a588892b53cd3ec465b1d7c35"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/unit-first.json": {
+          "before": null,
+          "after": "08044427628d59a1ec76faed4cbc1cd3078bb8a3"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/unit-first.log": {
+          "before": null,
+          "after": "12e4472a6275601520c4a24519b39e4148a41a63"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/unit.json": {
+          "before": null,
+          "after": "a712a8851c6635d6b674c030ddbd1c5c377de303"
+        },
+        "docs/evidence/teacher-native-group-leaves-20261031/unit.log": {
+          "before": null,
+          "after": "12e4472a6275601520c4a24519b39e4148a41a63"
+        },
+        "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts": {
+          "before": "9126a9221dc3a66b7eccca60df9b797773b0b551",
+          "after": "19b59ee7c2ccce48654a126f5fb0260689bd56c6"
+        },
+        "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts": {
+          "before": null,
+          "after": "19005a26b499a440833ceb1cb53862e54745433a"
+        },
+        "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts": {
+          "before": "60ca8329b8894a22281d1a6032d43c296cae0515",
+          "after": "889620f81f362ce601cdc3ff7e3003374f7139a4"
+        },
+        "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "d8282c00f49f620f9b9685d833c626146f68f738"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": {
+          "before": "386e7395a67aebdba9383aecbdfee2680ecdceac",
+          "after": "cf2893b4bf626313639d4a5a1ebfe95db19c7468"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts": {
+          "before": "441bcf47775d67099c6d1c170dbfe03023f6a766",
+          "after": "4da99570b7216369dca231ac490d78bcfd24d096"
+        },
+        "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts": {
+          "before": null,
+          "after": "f3144182061e30d9adcccdb4408a3fc25bd7f2b4"
+        },
+        "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts": {
+          "before": "990fa9c1864c2fb1e2906049f272e12ce2607a54",
+          "after": "26d6cf32f5689749e96ebde72dfe814363d3d7d8"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "c8376996ebec0da90077db383d21e7d4783dd814",
+        ".github/scripts/onboarding-checks.mjs": "d303798d554fa77fac9101000e4e2c9158f27b8d",
+        ".github/scripts/onboarding-controls.test.mjs": "99bffd299fe472a47597b91e9cccf2197fa2a0f8",
+        ".github/scripts/onboarding-evidence.json": "8f14650ace52e6b01087007dbed18fe98ab20afc",
+        ".github/scripts/onboarding-scope.mjs": "5901bfcec762313b7e6fe44f2f4efb158b2885a9",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "9787125036677b53161c78401afb22b959f2c198"
+      },
+      "components": {
+        "backend": "ace2d78d6cf1ca334ae65d49cfa8701c05df22c6",
+        "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
+      }
+    },
     "421": {
       "schemaVersion": 1,
       "pr": 421,

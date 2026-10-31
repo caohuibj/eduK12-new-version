@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+  "applicationSourceTree": "aaf1b275f42f7d0ef0ad293f4b45114253ae58f1",
+  "backendTree": "b267e25def3e8df6fbef19cb12f0adb1f04c5a49",
+  "frontendTreeUnchanged": "d7eec8052d3c7c14565e34ed80671e94543a158f",
+  "formalCIExecuted": false,
+  "productionAccessed": false,
+  "oldScaleFinalsResubmitted": 0,
+  "newNativeParentCompletions": 10,
+  "newNativeLeafFinals": 20,
+  "rawManifest": "raw-sha256.json"
+}
