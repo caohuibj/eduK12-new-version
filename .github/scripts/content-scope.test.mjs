@@ -59,6 +59,7 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   }
   const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
   assert.match(block('frontend'),/affected_only:.*frontend_affected/);
+  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src\]'/);
   assert.match(frontend,/npm test -- --changed "\$CI_BASE_SHA"/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
   assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true\n        run: npm test/);

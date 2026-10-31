@@ -93,7 +93,7 @@ node --test --test-name-pattern='^(onboarding (accepts unchanged main controls|s
 ## 后续片：工程说明、局部页面和开发 CLI 的实际路由
 
 基线为含 #450 的 main `ac3fe1f000a5b736f39eab886c023b33b5e175aa`。
-源码合成观察点 `0cb593d55cec67014012278a2213544e3085ac1c`，本节随后仅增加说明。
+首轮源码合成观察点 `0cb593d55cec67014012278a2213544e3085ac1c`；公开后再限定局部页面 CodeQL 为 frontend/src，避免扫描未变后台，并仅补验 workflow 一例。
 不增加 workflow、candidate 清单、手工 enabled、签名用途或哈希链。
 
 原问题及本片删减：
