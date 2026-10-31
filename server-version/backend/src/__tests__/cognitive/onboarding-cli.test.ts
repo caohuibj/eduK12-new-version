@@ -8,7 +8,7 @@ function run(args: string[]) {
   return spawnSync(
     process.execPath,
     [
-      'node_modules/tsx/dist/cli.mjs',
+      '--import', 'tsx',
       'src/scripts/cognitive-onboarding-check.ts',
       ...args,
     ],
@@ -20,6 +20,9 @@ describe('offline onboarding CLI transport', () => {
     const a = run(['NO_SUCH_TASK', '--json']),
       b = run(['NO_SUCH_TASK', '--json'])
     expect(a.status).toBe(1)
+    expect(b.status).toBe(1)
+    expect(a.error).toBeUndefined()
+    expect(a.stderr).toContain('COG_SELECTION_INVALID_TASKS')
     expect(a.stdout).toBe(b.stdout)
     const decision = cognitiveOnboardingDecisionV1Schema.parse(
       JSON.parse(a.stdout),
@@ -28,6 +31,7 @@ describe('offline onboarding CLI transport', () => {
       'COG_TASK_NOT_FOUND',
     )
     expect(decision.pilotPublish.ready).toBe(false)
+    expect(decision.identity).toEqual({ testType: 'NO_SUCH_TASK', engineVersion: 'UNKNOWN', scoringVersion: 'UNKNOWN' })
     expect(run(['NO_SUCH_TASK']).stdout).toBe(
       formatCognitiveOnboardingDecision(decision),
     )
@@ -41,8 +45,32 @@ describe('offline onboarding CLI transport', () => {
       '--json',
     ])
     expect(result.status).toBe(1)
+    expect(result.error).toBeUndefined()
+    expect(result.stderr).toContain('COG_COMPATIBILITY_BASE_REQUIRED')
     expect(
       JSON.parse(result.stdout).technical.blockers.map((b: any) => b.code),
     ).toContain('COG_COMPATIBILITY_BASE_REQUIRED')
+  }, 35000)
+  it('rejects an invalid base before acceptance even for a discovered legacy task', () => {
+    const result = run(['reaction', '--content-only', '--base', 'main', '--json'])
+    expect(result.status).toBe(1)
+    expect(result.error).toBeUndefined()
+    const decision = cognitiveOnboardingDecisionV1Schema.parse(JSON.parse(result.stdout))
+    expect(decision.identity.testType).toBe('reaction')
+    expect(decision.technical.blockers.map(blocker => blocker.code)).toEqual(['COG_COMPATIBILITY_BASE_REQUIRED'])
+    expect(decision.technical.ready).toBe(false)
+    expect(decision.pilotPublish.ready).toBe(false)
+  }, 35000)
+  it.each([
+    ['--tasks', 'NO_SUCH_TASK'],
+    ['--tasks-json', '{"tasks":["reaction","NO_SUCH_TASK"]}'],
+  ])('preserves the atomic batch failure envelope for %s', (flag, value) => {
+    const result = run([flag, value, '--json'])
+    expect(result.status).toBe(1)
+    expect(result.error).toBeUndefined()
+    expect(result.stderr).toContain('COG_SELECTION_INVALID_TASKS')
+    expect(JSON.parse(result.stdout)).toMatchObject({ schemaVersion: 1, kind: 'cognitive-onboarding-batch',
+      selectedTasks: [], selectedIdentities: [], identityResults: [], decisions: [],
+      checks: [{ name: 'batch-completion', status: 'FAIL' }], selectionIsScopeEvidence: false, exitCode: 1 })
   }, 35000)
 })
