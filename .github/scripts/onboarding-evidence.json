@@ -12083,6 +12083,491 @@
           "log": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log"
         }
       ]
+    },
+    "424": {
+      "schemaVersion": 1,
+      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Two passed application cases remain original unsigned observations, not fresh CI execution.",
+          "Complete backend equals original reviewed Legacy type receipt; frontend unchanged from aligned423 and not compiled again.",
+          "Picker read-only continuation is retained documentation, not a third application test; no broad browser/PG/migration/FINAL replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "scale-adapter",
+          "path": "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json",
+          "sha256": "c8f65584fcfc0738d72dd82f9b6fb0bbb6096140b480e23454c94f6ad43bac8e",
+          "originalSourceAssociation": "298e1dc960b898327f437f24368d219f5edfb933",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "deltaRationale": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "adapts official Scale zero, missing and signed values with their true ranges; changes to R do not change C",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "scale-native",
+          "path": "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json",
+          "sha256": "8248695a17d724242d358fc16f8b20061e9bc4972358e0da76e0260f98959cfa",
+          "originalSourceAssociation": "298e1dc960b898327f437f24368d219f5edfb933",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "deltaRationale": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "generates and reads a disclosed five-person standalone Scale report from frozen course Episodes without roster inference",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-legacy-course-20261030/backend-types.json",
+          "sha256": "bb78e3cf229e05c6b3d1232bb6ba81fe25ad6cd684386e7f06115cfe75f9e661",
+          "component": "backend",
+          "componentTree": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-legacy-course-20261030/backend-types.log"
+        }
+      ]
+    },
+    "426": {
+      "schemaVersion": 1,
+      "product": "2ae11d44cb43ac00261394b07e24bc46d54334b9",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Seven distinct successful staged contract/registration cases retained, not seven new CI executions; original skipped cases remain skipped.",
+          "F1/F2 have specific passed counterexamples and independent static closure; no all-forms/all-protocol journey or production permission claim.",
+          "Both actual current component receipts cover F1/F2 and aligned chart loading; no application, FINAL, DB or compiler replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "self-group-contract",
+          "path": "docs/evidence/education-self-group-v2-20261030/contract.json",
+          "sha256": "50d6728b46ff4efd2d88d8be6811f3e1edd34d498e96861dc102b1188c798f23",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "new explicit SELF GROUP contract requires a v2 SELF contract, preserves own ceilings and checks each aggregate audience independently",
+              "status": "passed"
+            },
+            {
+              "fullName": "new explicit SELF GROUP contract binds the chosen frozen leaf, keeps container swaps in one disclosure identity and separates real measurement changes",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "native-publisher-own-feedback",
+          "path": "docs/evidence/education-self-group-publishing-20261030/native.json",
+          "sha256": "18103e34b19b0b4e86951dd15df8c79d39591ef2b82b60fe4394d247688cbc8c",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 37
+          },
+          "cases": [
+            {
+              "fullName": "freezes explicit per-leaf GROUP ceilings without upgrading old sources or mixing same-named scores",
+              "status": "passed"
+            },
+            {
+              "fullName": "preserves own saved FINAL summaries under an explicit new GROUP contract and keeps per-leaf NONE private",
+              "status": "passed"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) reads exact saved mixed reports and independently rechecks current source and respondent rights",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses not-own before facts and never treats identity as authorization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses membership before facts and never treats identity as authorization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses source-authority before facts and never treats identity as authorization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong product binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong organization binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong version binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong subject binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong assignment binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) honors current respondent disclosure without materializing raw canonical facts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) shows only completion when the frozen tool permits that mode",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) returns PENDING only for a real matching accepted asynchronous job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for absent report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-epoch report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-slots report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for failed report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects respondent withdrawal during asynchronous materialization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects authority withdrawal during asynchronous materialization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects release withdrawal during asynchronous materialization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses a changed canonical FINAL source rather than displaying a stored template",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) repeated reads do not write FINAL, reinterpretation or queue state",
+              "status": "skipped"
+            },
+            {
+              "fullName": "honors an exact configured education report opening and becomes readable after that time",
+              "status": "skipped"
+            },
+            {
+              "fullName": "refuses a different frozen publication even if unit IDs are the same",
+              "status": "skipped"
+            },
+            {
+              "fullName": "does not replace original source authority proofs with another later administrator during a read",
+              "status": "skipped"
+            },
+            {
+              "fullName": "refuses replacement of the frozen distribution proof while materializing a saved report",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps identically named metrics in distinct approved unit reports instead of flattening a mixed bundle",
+              "status": "skipped"
+            },
+            {
+              "fullName": "production composition consumes HISTORY and original proofs without new-use or current-issuer admission",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form NONE never exposes completion feedback from the measurement-free exception",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form completion obeys the same frozen opening and opens without creating report facts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form uses its frozen education schedule without borrowing a Training course snapshot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "production composition enforces frozen education timing with no injected opening reader",
+              "status": "skipped"
+            },
+            {
+              "fullName": "an optional earlier workflow opening cannot widen the frozen schedule",
+              "status": "skipped"
+            },
+            {
+              "fullName": "rejects malformed present frozen policy instead of silently enabling legacy immediate: null",
+              "status": "skipped"
+            },
+            {
+              "fullName": "rejects malformed present frozen policy instead of silently enabling legacy immediate: {\"schemaVersion\":1,\"mode\":\"SCHEDULED\",\"releaseAt\":\"bad-date\"}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "rejects malformed present frozen policy instead of silently enabling legacy immediate: {\"schemaVersion\":1,\"mode\":\"OTHER\"}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "an elapsed frozen schedule does not open NONE, incomplete or unauthorized Form reads",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "registration-ui",
+          "path": "docs/evidence/education-self-group-publishing-20261030/frontend.json",
+          "sha256": "43b366da3bd71d13850bc397fa2a8c61d90be86b3fddcdd8ad4c42297ed0ee19",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 17
+          },
+          "cases": [
+            {
+              "fullName": "registers explicit per-tool GROUP audiences while preserving the selected own report and scheduled opening",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts does not expose operations before actual issuer read succeeds and keeps denial closed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts freezes only an explicitly selected own longitudinal subset in the new registration",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts recovers a lost registration response by original id without repeating the mutation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts discards a pending read after organization switches",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts disables unavailable sources and P/R without guessing missing authority",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts clears an old source selection when the current source list refreshes",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts cancels a pending permission read without late resurrection",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts reviews an independent frozen registration with its hash and reads the result back",
+              "status": "skipped"
+            },
+            {
+              "fullName": "bounded resource pagination continues an empty eligible source page and preserves the selected source grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "bounded resource pagination appends P/R choices without clearing selections or replacing the original grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "bounded resource pagination refuses a changed measurement on later pages and preserves the prior selection",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "public-inbox-ceiling",
+          "path": "docs/evidence/self-group-inbox-disclosure-20261030/contract.json",
+          "sha256": "bcaa7ae0c2d1ffa82903e460cc5d8189e600d2b3f5d75fc807df527d340ecd8c",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 5
+          },
+          "cases": [
+            {
+              "fullName": "refuses public SELF GROUP summaries while allowing only the internal whitelist without materializing scores",
+              "status": "passed"
+            },
+            {
+              "fullName": "own Run feedback summary projects only content-approved canonical metrics for the exact respondent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "checks current respondent disclosure without flattening same-named canonical unit metrics",
+              "status": "skipped"
+            },
+            {
+              "fullName": "retains the default metric summary refusal for an ambiguous observation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "does not treat disclosure-only as permission after current access is withdrawn",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps internal disclosure and exact historical source rechecks on the supplied report transaction",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "bundle-leaf-ceiling",
+          "path": "docs/evidence/self-group-bundle-leaf-ceiling-20261030/contract.json",
+          "sha256": "fcbe37887503cc4ba7a301c806d9c7934623548858f3fb446221acc4a8c69103",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "withholds Bundle inference when a READY item forbids its selector despite a global grant from another item",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.json",
+          "sha256": "9608eba36d87981255808e67823ee22fabe08c664083135b311f1db68c667c5a",
+          "component": "backend",
+          "componentTree": "770f31e559fb0384eaeb219b3fe1854e5f703799",
+          "exitField": "exitCode",
+          "log": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.json",
+          "sha256": "652e2b3b28fdb84835a2a2a06f92707f34db386cd4204acde400d700a49ca488",
+          "component": "frontend",
+          "componentTree": "351d797491ef24a75dffd40678245a6626e3323c",
+          "exitField": "exitCode",
+          "log": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.log"
+        }
+      ]
     }
   }
 }
