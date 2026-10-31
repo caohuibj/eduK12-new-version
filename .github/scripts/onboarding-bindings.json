@@ -6931,13 +6931,13 @@
       "schemaVersion": 1,
       "pr": 438,
       "enabled": true,
-      "base": "f5fa29314eb731f0479b90ae962b731da8e08d34",
-      "product": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
-      "controlCheckpoint": "47c3e73e5d167834f98d2ef6289dbafaad2ddcb4",
+      "base": "59559b9a8813cdbcfdeac00344d5770468579b18",
+      "product": "543348730d271605753e00aa1ba301d11d30cbaf",
+      "controlCheckpoint": "820c4dfe8bc639f0655b0313cb075b6701acd9be",
       "source": {
         "docs/evidence/teacher-form-group-history-20261031/README.md": {
           "before": null,
-          "after": "770f8c2bcad3ac164800bb93248a7d85728fe621"
+          "after": "74b423512dc292ef4b61c2d413da859114e60fc5"
         },
         "docs/evidence/teacher-form-group-history-20261031/backend-types.json": {
           "before": null,
@@ -7023,6 +7023,26 @@
           "before": null,
           "after": "61184fc8cc76b5fcad1ccb371429b8a677004c9c"
         },
+        "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.json": {
+          "before": null,
+          "after": "41db4fb7361877b2d065e909ef74487036b9da1d"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/main437/candidate-tree.json": {
+          "before": null,
+          "after": "84755fb0ccca1d05c0966ce633c9cab89aa9b4de"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.json": {
+          "before": null,
+          "after": "4ca33efaa15babe44855fd716e173ddc500d386e"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
         "docs/evidence/teacher-form-group-history-20261031/raw-sha256.json": {
           "before": null,
           "after": "2f2dc7662f263417ca55ce7eba9dde05026327cb"
@@ -7059,11 +7079,11 @@
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "635b9266d8a78578f4724852ffb3fda8b382c6f6",
-        ".github/scripts/onboarding-checks.mjs": "18ac0e0729f82660789f03242fd4376477fa3a74",
-        ".github/scripts/onboarding-controls.test.mjs": "bf9d8f4b58e64e244ca4ced2480a069eb9ef899d",
-        ".github/scripts/onboarding-evidence.json": "ad5cdf9e0616dff6891836a5dbeedac50641ebf4",
-        ".github/scripts/onboarding-scope.mjs": "84e181d90c669e50cba5df0017f44ce436d5348c",
+        ".github/scripts/onboarding-bindings.json": "bf60b9f38f6ae271dcbac86d7b8212978d784534",
+        ".github/scripts/onboarding-checks.mjs": "3bfd43d0fed89da2b2660a3d72c941942dc06855",
+        ".github/scripts/onboarding-controls.test.mjs": "8eeee7b90d75eb34b746f020d1df1819f06a39a2",
+        ".github/scripts/onboarding-evidence.json": "be94547253fb465985a743c360ee7f0ba1723bab",
+        ".github/scripts/onboarding-scope.mjs": "8abc9fa27d6ef6de1c3f0bea656f4d3a8971a1de",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -7073,11 +7093,11 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "84d95686d025d1a6073472f00742e741a8cf1ad7"
+        ".github/workflows/ci.yml": "6a5f89a18a17b9909abf3fe6ee43640f3379a461"
       },
       "components": {
-        "backend": "e9dd4a0a1f5f218f5880df5069f0841b61140075",
-        "frontend": "716ffa297676cad39f74fdc7afa5eb5dfdc90c96"
+        "backend": "9940cf26dec648ef1d7b7c4688ce285c3cc9c2b6",
+        "frontend": "b63667c1ad041a74c903b55e37d03b3a122b6afe"
       }
     }
   }
