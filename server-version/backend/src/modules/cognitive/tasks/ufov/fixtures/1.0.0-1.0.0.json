@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "ufov",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreUfovV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusMs": 400,
+          "fixationMs": 500,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "centralTarget": "circle",
+              "peripheralPosition": 7,
+              "centralResponse": 0,
+              "peripheralResponse": 7,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "centralTarget": "circle",
+              "peripheralPosition": 7,
+              "centralResponse": 0,
+              "peripheralResponse": 7,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "centralTarget": "triangle",
+              "peripheralPosition": 6,
+              "centralResponse": 1,
+              "peripheralResponse": 6,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "centralTarget": "circle",
+              "peripheralPosition": 4,
+              "centralResponse": 0,
+              "peripheralResponse": 4,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "dualCorrectRate": 1,
+          "centralAccuracy": 1,
+          "peripheralAccuracy": 1,
+          "medianRtMs": 900,
+          "dualCorrectCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusMs": 400,
+          "fixationMs": 500,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": []
+      },
+      "expectedError": "ufov v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusMs": 400,
+          "fixationMs": 500,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "centralTarget": "circle",
+              "peripheralPosition": 7,
+              "centralResponse": 0,
+              "peripheralResponse": 7,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "ufov v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

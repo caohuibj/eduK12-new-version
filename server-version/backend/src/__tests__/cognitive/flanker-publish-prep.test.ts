@@ -9,9 +9,10 @@ import {
   type FrozenReportSnapshot,
 } from '../../modules/cognitive/profile-freeze'
 
+process.env.DATA_ENCRYPTION_KEY = process.env.DATA_ENCRYPTION_KEY ?? 'a'.repeat(64)
+process.env.DATA_PSEUDONYM_KEY = process.env.DATA_PSEUDONYM_KEY ?? 'b'.repeat(64)
 const entry = getCognitiveRegistryEntry('flanker', '1.0.0', '1.0.0')
 if (!entry) throw new Error('flanker registry entry missing')
-
 const baseConfig = {
   totalTrials: 80,
   congruentRatio: 0.5,
@@ -21,14 +22,12 @@ const baseConfig = {
   stimulusSetVersion: 'arrows-v1.0.0',
   report: { reportVersion: '1.0.0', referenceMode: 'none' },
 }
-
 const frozenFor = (profile: 'standard' | 'research'): FrozenReportSnapshot => {
   const frozen = freezeAssignmentProfile({ entry, baseConfig, profile })
   const report = readFrozenReport(frozen.resolvedReportSnapshotEncrypted)
   if (!report) throw new Error(`missing frozen report for ${profile}`)
   return report
 }
-
 const metrics = {
   flankerEffectMs: 72,
   incongruentAccuracy: 0.85,
@@ -39,7 +38,6 @@ const metrics = {
   medianRtIncongruent: 592,
   omissionRate: 0.02,
 }
-
 const build = (profile: 'standard' | 'research') => buildCognitiveSingleTaskReport({
   testType: 'flanker',
   engineVersion: '1.0.0',
@@ -52,12 +50,10 @@ const build = (profile: 'standard' | 'research') => buildCognitiveSingleTaskRepo
   qualityFlags: { interpretable: true },
   reference: null,
 })
-
 describe('Flanker publish-prep protocol presentation', () => {
   it('keeps balanced standard and research doses', () => {
     expect(entry.profiles.standard.configPatch).toMatchObject({ totalTrials: 80 })
     expect(entry.profiles.research.configPatch).toMatchObject({ totalTrials: 160 })
-
     for (const totalTrials of [80, 160]) {
       const sequence = flankerSequence('publish-prep-balance', totalTrials)
       const count = (target: 'left' | 'right', flanker: 'left' | 'right') => sequence
@@ -68,7 +64,6 @@ describe('Flanker publish-prep protocol presentation', () => {
       expect(count('right', 'left')).toBe(totalTrials / 4)
     }
   })
-
   it('maps the reviewed exact identity to standard and research tiers', () => {
     expect(resolveCognitiveProtocolPresentation({
       testType: 'flanker',
@@ -76,7 +71,6 @@ describe('Flanker publish-prep protocol presentation', () => {
       scoringVersion: '1.0.0',
       profile: 'standard',
     })).toMatchObject({ tier: 'PILOT', profileLabel: '正式版', showProductIndex: false })
-
     expect(resolveCognitiveProtocolPresentation({
       testType: 'flanker',
       engineVersion: '1.0.0',
@@ -84,7 +78,6 @@ describe('Flanker publish-prep protocol presentation', () => {
       profile: 'research',
     })).toMatchObject({ tier: 'PILOT', profileLabel: '研究版', showProductIndex: false })
   })
-
   it('freezes the reviewed tier, wording and product-index policy with the assignment', () => {
     const pilot = frozenFor('standard')
     expect(pilot).toMatchObject({
@@ -94,7 +87,6 @@ describe('Flanker publish-prep protocol presentation', () => {
     })
     expect(pilot.participantConclusion).toContain('提示')
     expect(pilot.reportCaveats.join(' ')).toContain('80')
-
     const ready = frozenFor('research')
     expect(ready).toMatchObject({
       protocolTier: 'PILOT',
@@ -104,7 +96,6 @@ describe('Flanker publish-prep protocol presentation', () => {
     expect(ready.participantConclusion).toContain('显示')
     expect(ready.reportCaveats.join(' ')).toContain('160')
   })
-
   it('uses tentative Pilot language without exposing a misleading 0-100 product index', () => {
     const report = build('standard')
     expect(report).not.toBeNull()
@@ -115,7 +106,6 @@ describe('Flanker publish-prep protocol presentation', () => {
     expect(report?.showProductIndex).toBe(false)
     expect(report?.productIndex).toBeNull()
   })
-
   it('uses task-bounded research-profile language', () => {
     const report = build('research')
     expect(report).not.toBeNull()

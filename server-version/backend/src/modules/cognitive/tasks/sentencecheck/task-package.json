@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "sentencecheck",
+  "order": 107,
+  "identities": [
+    {
+      "testType": "sentencecheck",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 107
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "sentencecheck",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/sentencecheck/sentencecheck.registry.ts",
+      "export": "sentencecheckRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      107
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/sentencecheck/__tests__/SentencecheckTask.test.tsx",
+      "src/modules/cognitive/tasks/sentencecheck/__tests__/prng.test.ts"
+    ]
+  }
+}

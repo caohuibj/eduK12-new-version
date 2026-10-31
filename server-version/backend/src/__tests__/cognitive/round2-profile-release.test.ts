@@ -7,6 +7,9 @@ import { resolveParticipantPresentation } from '../../modules/cognitive/particip
 import { buildCognitiveSingleTaskReport } from '../../modules/cognitive/single-task-report'
 import { flankerSequence } from '../../modules/cognitive/randomization'
 
+process.env.DATA_ENCRYPTION_KEY = process.env.DATA_ENCRYPTION_KEY ?? 'a'.repeat(64)
+process.env.DATA_PSEUDONYM_KEY = process.env.DATA_PSEUDONYM_KEY ?? 'b'.repeat(64)
+
 const profiles = ['experience', 'standard', 'research'] as const
 const doseKeys: Record<string, string> = {
   patterncompare: 'durationSec', flanker: 'totalTrials', cardsort: 'totalTrials',

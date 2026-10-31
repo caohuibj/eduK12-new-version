@@ -40,7 +40,8 @@ const collectSourceFiles = (dir: string): string[] => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) {
-      if (entry.name === 'node_modules' || entry.name === '__tests__') continue
+      // 隐藏目录（如并发测试的 .cognitive-fixture-* 临时目录）与依赖目录不参与边界扫描。
+      if (entry.name === 'node_modules' || entry.name === '__tests__' || entry.name.startsWith('.')) continue
       out.push(...collectSourceFiles(full))
     } else if (entry.name.endsWith('.ts')) {
       out.push(full)
@@ -54,8 +55,8 @@ const realRegistryEntries = listCognitiveRegistryEntries().filter(
 )
 
 describe('cognitive library catalog identity', () => {
-  it('covers exactly the 24 real tasks and excludes fake', () => {
-    expect(listCatalogTestTypes()).toHaveLength(24)
+  it('covers exactly the 56 real tasks and excludes fake', () => {
+    expect(listCatalogTestTypes()).toHaveLength(56)
     expect(listCatalogTestTypes()).not.toContain('fake')
     expect(getCatalogEntry('fake')).toBeUndefined()
   })
@@ -186,6 +187,11 @@ describe('catalog single-source-of-truth boundaries', () => {
         expect(fs.readFileSync(file, 'utf8').match(/from\s+['"][^'"]*cognitive\/library[^'"]*/g))
           .toEqual(["from '../cognitive/library/product-readiness"]); return false
       }
+      if (file === path.join(SRC_DIR, 'src/modules/survey/catalog-discovery.ts')) {
+        // Management-only discovery projection (doc comment in the file); never in snapshot/hash paths.
+        expect(fs.readFileSync(file, 'utf8').match(/from\s+['"][^'"]*cognitive\/library[^'"]*/g))
+          .toEqual(["from '../cognitive/library/catalog"]); return false
+      }
       const content = fs.readFileSync(file, 'utf8')
       return /from\s+['"][^'"]*cognitive\/library/.test(content)
     })
@@ -195,8 +201,8 @@ describe('catalog single-source-of-truth boundaries', () => {
 
 describe('dual contract declarations', () => {
   it('every catalog task has both declarations with the review-mandated shapes', () => {
-    expect(listScoringContractDeclarations()).toHaveLength(24)
-    expect(listResearchCaptureDeclarations()).toHaveLength(24)
+    expect(listScoringContractDeclarations()).toHaveLength(56)
+    expect(listResearchCaptureDeclarations()).toHaveLength(56)
     expect(getScoringContractDeclaration('fake')).toBeUndefined()
     expect(getResearchCaptureDeclaration('fake')).toBeUndefined()
     for (const declaration of listScoringContractDeclarations()) {

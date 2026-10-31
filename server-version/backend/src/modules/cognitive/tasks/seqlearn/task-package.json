@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "seqlearn",
+  "order": 109,
+  "identities": [
+    {
+      "testType": "seqlearn",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 109
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "seqlearn",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/seqlearn/seqlearn.registry.ts",
+      "export": "seqlearnRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      109
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/seqlearn/__tests__/SeqlearnTask.test.tsx",
+      "src/modules/cognitive/tasks/seqlearn/__tests__/prng.test.ts"
+    ]
+  }
+}

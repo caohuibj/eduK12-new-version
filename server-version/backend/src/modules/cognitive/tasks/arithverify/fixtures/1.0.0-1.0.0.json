@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "arithverify",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreArithverifyV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "operandMax": 10,
+          "trueRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 6000,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "leftOperand": 3,
+              "rightOperand": 4,
+              "displayedResult": 7,
+              "response": true,
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "leftOperand": 6,
+              "rightOperand": 2,
+              "displayedResult": 9,
+              "response": false,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "leftOperand": 5,
+              "rightOperand": 5,
+              "displayedResult": 11,
+              "response": false,
+              "rtMs": 600,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "leftOperand": 7,
+              "rightOperand": 1,
+              "displayedResult": 8,
+              "response": true,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianRtMs": 450,
+          "problemSizeSlopeMs": 73.6842,
+          "errorCount": 0,
+          "timeoutCount": 0,
+          "validRtCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "operandMax": 10,
+          "trueRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 6000,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "arithverify v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "operandMax": 10,
+          "trueRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 6000,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "leftOperand": 3,
+              "rightOperand": 4,
+              "displayedResult": 7,
+              "response": true,
+              "rtMs": 400,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "arithverify v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

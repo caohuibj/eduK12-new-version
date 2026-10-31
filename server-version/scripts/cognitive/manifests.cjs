@@ -33,6 +33,7 @@ function discover(root = ROOT, taskRoot = TASK_ROOT) {
     const directory = `${taskRoot}/${dir}`, file = `${directory}/task-package.json`
     const d = JSON.parse(fs.readFileSync(safeFile(root, file), 'utf8'))
     if (d.schemaVersion !== 1 || typeof d.task !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(d.task) || d.task !== dir || !Array.isArray(d.identities) || !d.identities.length || !Array.isArray(d.frontend) || !d.frontend.length) fail('COG_PACKAGE_SCHEMA_INVALID', file, 'invalid package v1')
+    if (d.banks !== undefined && (!Array.isArray(d.banks) || !d.banks.length || !d.banks.every(b => b && typeof b.file === 'string' && symbol(b.export)))) fail('COG_PACKAGE_BANKS_INVALID', file, 'banks must be a non-empty array of {file, export}')
     if (seenTasks.has(d.task)) fail('COG_TASK_DUPLICATE', file, d.task)
     seenTasks.add(d.task)
     for (const i of d.identities) {

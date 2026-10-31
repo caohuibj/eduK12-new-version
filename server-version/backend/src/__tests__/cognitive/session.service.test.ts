@@ -1,3 +1,4 @@
+vi.hoisted(() => { process.env.COGNITIVE_MODULE_ENABLED = 'true' })
 import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest'
 
 // 密钥注入：加密/participantKey 依赖（64-hex 占位）

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "symbolmatch",
+  "order": 105,
+  "identities": [
+    {
+      "testType": "symbolmatch",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 105
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "symbolmatch",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/symbolmatch/symbolmatch.registry.ts",
+      "export": "symbolmatchRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      105
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/symbolmatch/__tests__/SymbolmatchTask.test.tsx",
+      "src/modules/cognitive/tasks/symbolmatch/__tests__/prng.test.ts"
+    ]
+  }
+}

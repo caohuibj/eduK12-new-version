@@ -21,6 +21,9 @@ const main = async () => {
     JSON.parse(readFileSync(args[inputIndex + 1], 'utf8')),
   )
 
+  // The batch planner and publishCognitiveConfig enforce the same bank gate
+  // (fail-closed via collectBankPublishBlockers; no CLI-side override).
+
   if (args.includes('--apply')) {
     const actorIndex = args.indexOf('--actor')
     const actorId = actorIndex >= 0 ? args[actorIndex + 1] : undefined

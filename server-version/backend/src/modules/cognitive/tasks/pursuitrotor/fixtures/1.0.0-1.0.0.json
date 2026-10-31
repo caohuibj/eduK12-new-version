@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "pursuitrotor",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scorePursuitrotorV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "trackMs": 20000,
+          "revolutionMs": 4000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "timeOnTargetMs": 12000,
+              "totalTrackMs": 20000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "timeOnTargetMs": 15000,
+              "totalTrackMs": 20000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 68,
+        "metrics": {
+          "onTargetRate": 0.675,
+          "totalTimeOnTargetMs": 27000,
+          "totalTrackMs": 40000
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "noTracking": false,
+          "lowTracking": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "trackMs": 20000,
+          "revolutionMs": 4000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "pursuitrotor v1 expects exactly 2 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "trackMs": 20000,
+          "revolutionMs": 4000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "timeOnTargetMs": 12000,
+              "totalTrackMs": 20000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "pursuitrotor v1 expects exactly 2 trials, got 1"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "delaydiscount",
+  "order": 103,
+  "identities": [
+    {
+      "testType": "delaydiscount",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 103
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "delaydiscount",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/delaydiscount/delaydiscount.registry.ts",
+      "export": "delaydiscountRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      103
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/delaydiscount/__tests__/DelaydiscountTask.test.tsx",
+      "src/modules/cognitive/tasks/delaydiscount/__tests__/prng.test.ts"
+    ]
+  }
+}

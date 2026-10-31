@@ -2,7 +2,7 @@
  * COG-P1 Commit 3 — Cognitive Library Catalog Registry + authoritative joins.
  *
  * 规则（Pilot-first v2 指令 §10 / §取消4）：
- *  - 为全部 24 个真实 task 建立 catalog identity binding；fake 不进入产品 catalog。
+ *  - 为全部真实 task 建立 catalog identity binding；fake 不进入产品 catalog。
  *  - catalog 通过 testType + engineVersion + scoringVersion 经 cognitive.registry
  *    解析权威任务身份；不维护第二份任务真值。
  *  - Domain/Facet 只能从 cognitive-analysis/evidence-mapping.registry 派生；
@@ -67,7 +67,7 @@ export const listCatalogTestTypes = (): string[] => [...CATALOG_TEST_TYPES]
 export const getCatalogEntry = (testType: string): CognitiveLibraryCatalogEntry | undefined =>
   CATALOG[testType]
 
-/** 全部 24 个真实任务的 catalog 条目（fake 天然不在内）。 */
+/** 全部真实任务的 catalog 条目（fake 天然不在内）。 */
 export const listProductCatalogEntries = (): CognitiveLibraryCatalogEntry[] =>
   CATALOG_TEST_TYPES.map((testType) => CATALOG[testType])
 

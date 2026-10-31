@@ -1,3 +1,4 @@
+vi.hoisted(() => { process.env.COGNITIVE_MODULE_ENABLED = 'true' })
 import { describe, expect, it } from 'vitest'
 import { listCognitiveTestsCatalog } from '../../modules/cognitive/catalog.service'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
@@ -16,6 +17,9 @@ import { scoreEmotionrecognitionV1 } from '../../modules/cognitive/scoring/emoti
 import { emotionrecognitionSequence, lexicaldecisionSequence, wordlistSequence } from '../../modules/cognitive/randomization'
 import { LEXICAL_PSEUDO_BANK, LEXICAL_REAL_BANK } from '../../modules/cognitive/pr13-stimuli'
 import { listAnalysisProtocolDefinitions, listReportPackageDefinitions } from '../../modules/cognitive-analysis'
+
+process.env.DATA_ENCRYPTION_KEY = process.env.DATA_ENCRYPTION_KEY ?? 'a'.repeat(64)
+process.env.DATA_PSEUDONYM_KEY = process.env.DATA_PSEUDONYM_KEY ?? 'b'.repeat(64)
 
 const REPORT = { reportVersion: '1.0.0', referenceMode: 'none' as const }
 

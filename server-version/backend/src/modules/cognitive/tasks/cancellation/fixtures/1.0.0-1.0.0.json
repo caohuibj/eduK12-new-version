@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "cancellation",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreCancellationV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "durationMs": 45000,
+          "stimulusSetVersion": "cancellation-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "scanIndex": 0,
+              "selectedCells": [
+                0,
+                5,
+                6,
+                10,
+                12,
+                15,
+                20,
+                21,
+                33,
+                35,
+                36,
+                39
+              ],
+              "responseDurationMs": 45000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "scanIndex": 1,
+              "selectedCells": [
+                8,
+                10,
+                11,
+                14,
+                16,
+                20,
+                27,
+                41,
+                42,
+                50,
+                59,
+                67,
+                72,
+                73,
+                78,
+                79
+              ],
+              "responseDurationMs": 44000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 88,
+        "metrics": {
+          "hitRate": 0.875,
+          "falseAlarmRate": 0,
+          "hitCount": 28,
+          "missCount": 4,
+          "falseAlarmCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "excessiveFalseAlarms": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "durationMs": 45000,
+          "stimulusSetVersion": "cancellation-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": []
+      },
+      "expectedError": "cancellation v1 expects exactly 2 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "durationMs": 45000,
+          "stimulusSetVersion": "cancellation-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "scanIndex": 0,
+              "selectedCells": [
+                0,
+                5,
+                6,
+                10,
+                12,
+                15,
+                20,
+                21,
+                33,
+                35,
+                36,
+                39
+              ],
+              "responseDurationMs": 45000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "cancellation v1 expects exactly 2 trials, got 1"
+    }
+  ]
+}

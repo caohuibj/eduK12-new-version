@@ -17,10 +17,10 @@ const reactionInput = (valid = 18, interrupted = false) => ({
   trials: Array.from({ length: 20 }, (_, i) => ({ trialIndex: i, payload: { foreperiodMs: 800, rtMs: i < valid ? [280, 305, 310, 295, 330, 315, 300, 290, 340, 325, 310, 300, 320, 355, 305, 295, 310, 335][i] : null, prematureCount: i === 4 ? 1 : 0, interrupted: interrupted && i === 4, inputMode: 'pointer' } })),
 })
 
-function project(testType: string, scoringVersion: string, metrics: Record<string, unknown>, score: CognitiveScoreResult, profile: CognitiveProfile = 'standard', extras: { trials?: unknown[]; config?: Record<string, unknown> } = {}) {
-  const entry = requireCognitiveRegistryEntry(testType, '1.0.0', scoringVersion)
-  const definition = getCognitiveV2TaskDefinition(testType, '1.0.0', scoringVersion)!
-  return projectThreeLayerReport({ testType, engineVersion: '1.0.0', scoringVersion, configVersion: scoringVersion, protocolSignature: 'test', profile,
+function project(testType: string, scoringVersion: string, metrics: Record<string, unknown>, score: CognitiveScoreResult, profile: CognitiveProfile = 'standard', extras: { trials?: unknown[]; config?: Record<string, unknown> } = {}, engineVersion = '1.0.0') {
+  const entry = requireCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
+  const definition = getCognitiveV2TaskDefinition(testType, engineVersion, scoringVersion)!
+  return projectThreeLayerReport({ testType, engineVersion, scoringVersion, configVersion: scoringVersion, protocolSignature: 'test', profile,
     definition: definition.report, metrics, score, metricDefinitions: definition.metrics, qualityDefinitions: definition.quality,
     participantPresentation: resolveParticipantPresentation(entry), reportCaveats: entry.profiles[profile]!.reportCaveats, ...extras })
 }
@@ -142,12 +142,13 @@ describe('versioned participant report interpretation', () => {
       const definition = getCognitiveV2TaskDefinition(entry.testType, entry.engineVersion, entry.scoringVersion)!
       for (const key of [...policy.summary.metricKeys, ...policy.studentMetricKeys, ...policy.processMetricKeys, ...(policy.chart?.metricKeys ?? [])]) expect(definition.metrics[key], `${entry.testType}/${key}`).toBeDefined()
       const metrics = Object.fromEntries(Object.keys(definition.metrics).map(key => [key, 1]))
-      const report = project(entry.testType, entry.scoringVersion, metrics, { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 1, scorerVersion: entry.scoringVersion } }, 'research')
+      const report = project(entry.testType, entry.scoringVersion, metrics, { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 1, scorerVersion: entry.scoringVersion } }, 'research', {}, entry.engineVersion)
       expect([...report.headline, ...report.user, ...report.detail].some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
       expect(report.reading!.professional!.metrics.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      for (const m of report.reading!.professional!.withheld) expect(definition.metrics[m.key], `${entry.testType}/${entry.engineVersion}/${m.key}`).toBeDefined()
       expect(report.reading!.professional!.withheld.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
     }
-    expect(families.size).toBe(24)
+    expect(families.size).toBe(56)
   })
   it('keeps specialist explanations separate from the popular voice and withholds professional numeric estimates too', () => {
     const input = reactionInput(5)

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "trustgame",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreTrustgameV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "offers": [
+            50,
+            20,
+            80,
+            10
+          ],
+          "potTotal": 100,
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "roundIndex": 0,
+              "offerToSelf": 50,
+              "response": "accept",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "roundIndex": 1,
+              "offerToSelf": 20,
+              "response": "reject",
+              "rtMs": 600,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "roundIndex": 2,
+              "offerToSelf": 80,
+              "response": "accept",
+              "rtMs": 400,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "roundIndex": 3,
+              "offerToSelf": 10,
+              "response": "reject",
+              "rtMs": 700,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 50,
+        "showProductIndex": false,
+        "metrics": {
+          "acceptanceRate": 0.5,
+          "unfairAcceptanceRate": 0,
+          "rejectedUnfairCount": 2,
+          "fairOfferCount": 2,
+          "medianDecisionMs": 550
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "noResponses": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "offers": [
+            50,
+            20,
+            80,
+            10
+          ],
+          "potTotal": 100,
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "trustgame v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "offers": [
+            50,
+            20,
+            80,
+            10
+          ],
+          "potTotal": 100,
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "roundIndex": 0,
+              "offerToSelf": 50,
+              "response": "accept",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "trustgame v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}
