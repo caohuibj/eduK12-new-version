@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "calibrationVersion": "cal-matgen-v0.1.0-sim",
+  "status": "SIMULATION_ONLY",
+  "model": "2PL",
+  "estimation": "mirt 1.48 (MMLE), offline",
+  "seed": 20261031,
+  "sample": {
+    "n": 1000,
+    "itemCount": 20,
+    "population": "theta ~ N(0,1) (simulated)"
+  },
+  "items": [
+    {
+      "itemId": "sim-001",
+      "a": 1.1587,
+      "b": 0.6575,
+      "trueA": 1.0553,
+      "trueB": 0.7464
+    },
+    {
+      "itemId": "sim-002",
+      "a": 1.2979,
+      "b": 1.2527,
+      "trueA": 1.2301,
+      "trueB": 1.322
+    },
+    {
+      "itemId": "sim-003",
+      "a": 1.472,
+      "b": -1.6365,
+      "trueA": 1.3186,
+      "trueB": -1.6217
+    },
+    {
+      "itemId": "sim-004",
+      "a": 1.5108,
+      "b": -0.8318,
+      "trueA": 1.4804,
+      "trueB": -0.7178
+    },
+    {
+      "itemId": "sim-005",
+      "a": 1.4101,
+      "b": 0.765,
+      "trueA": 1.3271,
+      "trueB": 0.9456
+    },
+    {
+      "itemId": "sim-006",
+      "a": 1.572,
+      "b": -0.6562,
+      "trueA": 1.6726,
+      "trueB": -0.5575
+    },
+    {
+      "itemId": "sim-007",
+      "a": 1.3009,
+      "b": 1.2118,
+      "trueA": 1.258,
+      "trueB": 1.1717
+    },
+    {
+      "itemId": "sim-008",
+      "a": 1.2645,
+      "b": -1.357,
+      "trueA": 1.1823,
+      "trueB": -1.3379
+    },
+    {
+      "itemId": "sim-009",
+      "a": 1.853,
+      "b": 0.3088,
+      "trueA": 2.0088,
+      "trueB": 0.3497
+    },
+    {
+      "itemId": "sim-010",
+      "a": 0.923,
+      "b": 0.3468,
+      "trueA": 0.9529,
+      "trueB": 0.4074
+    },
+    {
+      "itemId": "sim-011",
+      "a": 0.7341,
+      "b": 0.1808,
+      "trueA": 0.7755,
+      "trueB": 0.1867
+    },
+    {
+      "itemId": "sim-012",
+      "a": 1.4267,
+      "b": -0.6519,
+      "trueA": 1.4041,
+      "trueB": -0.6245
+    },
+    {
+      "itemId": "sim-013",
+      "a": 0.8592,
+      "b": 0.9504,
+      "trueA": 0.842,
+      "trueB": 0.8922
+    },
+    {
+      "itemId": "sim-014",
+      "a": 1.5074,
+      "b": 0.59,
+      "trueA": 1.4732,
+      "trueB": 0.5752
+    },
+    {
+      "itemId": "sim-015",
+      "a": 1.0415,
+      "b": -2.0489,
+      "trueA": 1.1482,
+      "trueB": -1.88
+    },
+    {
+      "itemId": "sim-016",
+      "a": 1.1348,
+      "b": -0.0492,
+      "trueA": 1.1639,
+      "trueB": 0.0386
+    },
+    {
+      "itemId": "sim-017",
+      "a": 1.2485,
+      "b": 0.8955,
+      "trueA": 1.3622,
+      "trueB": 0.9074
+    },
+    {
+      "itemId": "sim-018",
+      "a": 1.2581,
+      "b": 0.2753,
+      "trueA": 1.2634,
+      "trueB": 0.3138
+    },
+    {
+      "itemId": "sim-019",
+      "a": 1.2432,
+      "b": -0.7799,
+      "trueA": 1.1814,
+      "trueB": -0.7292
+    },
+    {
+      "itemId": "sim-020",
+      "a": 1.2385,
+      "b": -1.7995,
+      "trueA": 1.3894,
+      "trueB": -1.6719
+    }
+  ],
+  "diagnostics": {
+    "parameterRecovery": {
+      "rA": 0.9486,
+      "rB": 0.9983,
+      "rmseB": 0.0827,
+      "thresholds": {
+        "rA": 0.8,
+        "rB": 0.9,
+        "rmseB": 0.4
+      }
+    }
+  },
+  "generatedAtUtc": "2026-10-31T06:03:16Z",
+  "provenance": "SIMULATION ONLY: parameters recovered from synthetic responses; this snapshot must never feed participant reports or reference bands. Real calibration awaits the roadmap-B1 pilot sample."
+}
