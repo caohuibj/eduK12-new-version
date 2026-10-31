@@ -49,7 +49,7 @@ export const seriescompleteRegistryMetaV11 = {
     primaryMetrics: ['accuracy', 'medianRtMs'],
     secondaryMetrics: ['errorCount', 'timeoutCount', 'validRtCount'],
     practicalTips: ['先看相邻两个数的差或比，再验证规律。', '不确定时先算差值，再看是不是等差、等比或跳数。'],
-    disclaimer: '结果只描述本次数列完成的表现，不是语言能力、智力或年龄常模判断。',
+    disclaimer: '结果只描述本次数列完成的表现，含英文字母序列，受英语字母知识影响；题目分组非标定难度，不是纯数字能力、智力或年龄常模判断。',
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
 }

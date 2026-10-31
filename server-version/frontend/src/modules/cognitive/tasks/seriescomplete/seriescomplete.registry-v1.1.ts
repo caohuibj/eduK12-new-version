@@ -20,8 +20,8 @@ export const seriescompleteRegistryEntryV11: CognitiveFrontendRegistryEntry = {
     title: '数列完成表现',
     headlineMetric: 'accuracy',
     summaryMetrics: ['medianRtMs', 'errorCount'],
-    indexLabel: '归纳推理指数',
-    practicalTips: ['先确定单位与数量级，再作近似估算。', '结合题内线索检查估计，不作能力或同龄人排名。'],
-    disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
+    indexLabel: '本次数列与字母序列正确率',
+    practicalTips: ['先观察相邻变化，再检查你发现的规律是否适用于各项。', '字母题按A到Z的字母顺序判断；不作能力排名。'],
+    disclaimer: '题目含数字与英文字母序列；题目分组未经难度标定，结果只描述本次作答，不是纯数字能力、诊断或排名。',
   },
 }

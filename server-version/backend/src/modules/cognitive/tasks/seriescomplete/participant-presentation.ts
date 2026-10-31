@@ -194,7 +194,7 @@ participantPresentations.push({
   "experienceHeadline": "accuracy",
   "hiddenMetrics": [],
   "singleHiddenMetrics": [],
-  "disclaimer": "内部原创材料，未标定难度，无常模、诊断或能力排名。重复施测可能受练习影响。",
+  "disclaimer": "内部原创数字与英文字母序列材料，字母题受英语字母知识影响；题目分组未经难度标定，无常模、诊断或能力排名。重复施测可能受练习影响。",
   "suppressTips": false,
   "practicalTips": [
     "依次核查每一步是否符合你发现的简洁规律。"
@@ -227,7 +227,7 @@ participantPresentations.push({
         "insufficientValidRt"
       ]
     },
-    "nextStep": "依次核查每一步是否符合你发现的简洁规律。 内部原创材料，未标定难度，无常模、诊断或能力排名。重复施测可能受练习影响。",
+    "nextStep": "依次核查每一步是否符合你发现的简洁规律。 内部原创数字与英文字母序列材料，字母题受英语字母知识影响；题目分组未经难度标定，无常模、诊断或能力排名。重复施测可能受练习影响。",
     "chart": {
       "kind": "metrics",
       "metricKeys": [
