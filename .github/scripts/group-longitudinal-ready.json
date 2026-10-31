@@ -2178,12 +2178,12 @@
       "schemaVersion": 1,
       "slice": "group",
       "branch": "feat/teacher-group-longitudinal-20261031",
-      "base": "769141d5bc4954919b163a8d8d522530048fbfb6",
-      "reviewedCandidate": "10309fd6a6d016630ed61611636800232fafedc3",
-      "originalSource": "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
+      "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+      "reviewedCandidate": "371ceb7701bdda8d6f5bc4eed18b40f739a9d0f4",
+      "originalSource": "371ceb7701bdda8d6f5bc4eed18b40f739a9d0f4",
       "originalReportPrefix": "docs/evidence/teacher-group-longitudinal-20261031/",
-      "originalCaseCount": 9,
-      "reviewBasis": "Nine new scoped local contracts: four thin adapter mocks, one unit identity, one HTTP route with auth/service fixtures, two jsdom UI cases, and a retained-state real PG two-wave completion/read continuation. Twenty new FINALs once. Prior failures retained. No full application/old 22/37 replay; formal migration/build/SAST missing. Partial metric interface and private composition remain shared-owner dependencies, so initial PR stays Draft.",
+      "originalCaseCount": 10,
+      "reviewBasis": "Ten scoped local cases across original stages, not rerun at the archive commit. Original nine raw cases and failures remain byte-identical; only one new A/B-to-onlyA adapter case executed after consuming merged Group443 second argument. earlierOriginalSource retains the first immutable archive. No new FINAL or upstream producer replay. Complete intended private-composition owner source and formal bounded qualification still pending.",
       "reports": [
         {
           "id": "adapter-run3",
@@ -2317,6 +2317,48 @@
               "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary"
             ]
           }
+        },
+        {
+          "id": "partial-adapter",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-adapter.json",
+          "sha256": "ebcb148cb95a97b6233fd8dad9b7d783751114680455655cef7d0b58a075f155",
+          "review": {
+            "cases": [
+              {
+                "fullName": "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+                "status": "skipped"
+              },
+              {
+                "fullName": "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+                "status": "skipped"
+              },
+              {
+                "fullName": "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+                "status": "skipped"
+              },
+              {
+                "fullName": "checks real organization authority and keeps historical reads subject to current numeric disclosure",
+                "status": "skipped"
+              },
+              {
+                "fullName": "uses the existing Scale points/score raw-unit names only after the same frozen C, and rejects other units",
+                "status": "skipped"
+              },
+              {
+                "fullName": "uses the internal partial-source producer and keeps B null when only A is disclosed in the second planned wave",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 5
+            },
+            "selectedCases": [
+              "uses the internal partial-source producer and keeps B null when only A is disclosed in the second planned wave"
+            ]
+          }
         }
       ],
       "historicalFailures": [
@@ -2424,8 +2466,8 @@
       "repository": "caohuibj/eduK12-new-version",
       "markerBefore": "a34742f916bc9352814ae6dc9eac75824a32a255",
       "components": {
-        "backend": "610004d9d8cc6897a03787d9a3e03a6f7bf80089",
-        "frontend": "5ad55f44e78a414460a9200500c9614edef5a0e9"
+        "backend": "d20c26a9e8561e1b7b5f8b9d3ca60bc5676099bd",
+        "frontend": "6cba910232fdb7cf8f5c54a401407f0c1e929da9"
       },
       "files": {
         ".github/scripts/personal-tracking-ready.mjs": {
@@ -2434,23 +2476,23 @@
         },
         ".github/scripts/personal-tracking-ready.test.mjs": {
           "before": "fd9bdfaeaea3a72aaacda2bca96aaf40b4b34976",
-          "after": "3ce55a9dcf6977997032e921638c4aa8c2303d18"
+          "after": "92442907435a313a5e7829a402d73d465b9e92d2"
         },
         ".github/workflows/ci.yml": {
-          "before": "a4fd8c93e6f61cd866c972aa3ff642e74669e651",
-          "after": "9dfeacf2155d16df4dd81fcd6b1c64e8d8c984e5"
+          "before": "4f58224d30c563d6da1f87e72ff19d0c0f94f241",
+          "after": "1ef32d25a71836eb2e585f8385dbca281b7a90f7"
         },
         "docs/development/teacher-group-longitudinal-20261031.md": {
           "before": null,
-          "after": "aa41e5d246d056a4b7000b9bb31e077d97257a33"
+          "after": "9f8ac7a5faa80b438ecc9047e09409dd50de7231"
         },
         "docs/development/teacher-group-longitudinal-owner-handoff-20261031.md": {
           "before": null,
-          "after": "69310a0123807f30ae498040e0b9f0ef7b58c180"
+          "after": "d381fa4d20b5fdecc71ab285f278a3a0afa4f47a"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/README.md": {
           "before": null,
-          "after": "157b7530942f599213b5f0f4c4355ee29941d581"
+          "after": "6a2967e1cac7befe1bd59cbac689dfb3e4ba0354"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/adapter-first.json": {
           "before": null,
@@ -2528,6 +2570,14 @@
           "before": null,
           "after": "55bba668edc253fcba64254984fc2aee201b0b75"
         },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-adapter.json": {
+          "before": null,
+          "after": "bafa805efecc3c26625821c97a93a09231131c6d"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-adapter.log": {
+          "before": null,
+          "after": "e62413726cf73275e9e24c9e60a439a526e925e5"
+        },
         "docs/evidence/teacher-group-longitudinal-20261031/selected-types-first.log": {
           "before": null,
           "after": "6b3e308f6e7cb60d0e5a8028a38932ed62b3c99b"
@@ -2542,11 +2592,11 @@
         },
         "docs/evidence/teacher-group-longitudinal-20261031/sha256.json": {
           "before": null,
-          "after": "576b185f9b8a47510b9caad8c6189ea0d9a32d26"
+          "after": "18e0d09acd371ad3d5b0ea4efda16afec8f96910"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/static-review.json": {
           "before": null,
-          "after": "6f2886f04818016d0a092c8587773299985b474f"
+          "after": "fb42b22d36f89a252e8525637f4d729ba822ffe7"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/ui-first.json": {
           "before": null,
@@ -2566,7 +2616,7 @@
         },
         "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts": {
           "before": null,
-          "after": "2a41d14ce5f018d234d02ea16b296e4eee9c9b9a"
+          "after": "704bb8cf1507f3e21859272103b7b0cc75dee813"
         },
         "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts": {
           "before": null,
@@ -2582,7 +2632,7 @@
         },
         "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts": {
           "before": null,
-          "after": "a57bcd25ac3d80c4f157afc93b612e6e9430436a"
+          "after": "33698a352a14dbd2a20761f76368a2586efecf32"
         },
         "server-version/backend/src/modules/reporting/task-artifact.ts": {
           "before": "71b7d3ad6f3664d89ced78b92b881e152f552620",
@@ -2616,7 +2666,8 @@
         "jobId": 124055865989,
         "step": "install frontend tools and audit locked inputs",
         "maximumAgeHours": 24
-      }
+      },
+      "earlierOriginalSource": "de230c9464f57dd603ee7fc9b1a8915a03e6b875"
     }
   }
 }
