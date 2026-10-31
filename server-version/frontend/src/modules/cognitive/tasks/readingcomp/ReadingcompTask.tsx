@@ -1,0 +1,115 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
+import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
+import type { CognitiveTaskProps } from '../../core/runner.types'
+import type { ReadingcompConfig, ReadingcompTrialPayload } from './types'
+import { buildReadingcompItems, READINGCOMP_PRACTICE_ITEM } from './prng'
+
+type Phase = 'instruction' | 'practice' | 'formal'
+type SubPhase = 'fixation' | 'stimulus' | 'feedback'
+
+export const ReadingcompTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
+  const config = taskContext.config as unknown as ReadingcompConfig
+  const { totalTrials, fixationMs, timeoutMs } = config
+  const [phase, setPhase] = useState<Phase>('instruction')
+  const [subPhase, setSubPhase] = useState<SubPhase>('fixation')
+  const [practiceChoice, setPracticeChoice] = useState<number | null>(null)
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const [retry, setRetry] = useState(false)
+  const interruptedRef = useRef(false)
+  const onsetRef = useRef<number | null>(null)
+  const submittingRef = useRef(false)
+  const pendingRef = useRef<ReadingcompTrialPayload | null>(null)
+  const items = useMemo(() => {
+    if (config.stimulusSetVersion !== 'readingcomp-zh-v1.1.0') return null
+    try { return buildReadingcompItems(taskContext.randomSeed, totalTrials) } catch { return null }
+  }, [config.stimulusSetVersion, taskContext.randomSeed, totalTrials])
+  const currentTrial = items?.[trialIndex]
+
+  useEffect(() => {
+    if (phase !== 'formal' || !currentTrial) return
+    setFeedback(null); setRetry(false); pendingRef.current = null
+    interruptedRef.current = false; setSubPhase('fixation')
+  }, [phase, trialIndex, currentTrial])
+
+  useEffect(() => {
+    if ((phase !== 'formal' && phase !== 'practice') || subPhase !== 'fixation') return
+    const timer = window.setTimeout(() => { onsetRef.current = performance.now(); setSubPhase('stimulus') }, phase === 'practice' ? 400 : fixationMs + (trialIndex > 0 ? 200 : 0))
+    return () => window.clearTimeout(timer)
+  }, [phase, subPhase, trialIndex, fixationMs])
+
+  const persistPending = useCallback(async () => {
+    if (!pendingRef.current || submittingRef.current) return
+    submittingRef.current = true; setRetry(false)
+    setFeedback('已记录，下一题准备中'); setSubPhase('feedback')
+    let accepted: boolean | void
+    try { accepted = await onTrialComplete(pendingRef.current) }
+    catch { accepted = false }
+    finally { submittingRef.current = false }
+    if (accepted === false) { setFeedback('提交失败，已保留首次答案与用时，请重试提交。'); setRetry(true); return }
+    if (trialIndex + 1 >= totalTrials) {
+      try { await onTaskComplete?.() }
+      catch { setFeedback('作答记录已保存，请返回任务页继续完成提交。') }
+    }
+  }, [onTrialComplete, trialIndex, totalTrials, onTaskComplete])
+
+  const submitFormal = useCallback((responseIndex: number | null) => {
+    if (phase !== 'formal' || subPhase !== 'stimulus' || !currentTrial || pendingRef.current) return
+    const elapsed = onsetRef.current === null ? 0 : Math.max(0, Math.round(performance.now() - onsetRef.current))
+    // A delayed deadline callback must never turn a late click into an on-time answer.
+    const expired = responseIndex === null || elapsed >= timeoutMs
+    pendingRef.current = { itemId: currentTrial.itemId, responseIndex: expired ? null : responseIndex,
+      rtMs: expired ? null : elapsed, interrupted: interruptedRef.current }
+    void persistPending()
+  }, [phase, subPhase, currentTrial, timeoutMs, persistPending])
+
+  useEffect(() => {
+    if (phase !== 'formal' || subPhase !== 'stimulus') return
+    const timer = window.setTimeout(() => submitFormal(null), timeoutMs)
+    return () => window.clearTimeout(timer)
+  }, [phase, subPhase, timeoutMs, submitFormal])
+
+  useEffect(() => {
+    if (phase !== 'formal') return
+    const listener = () => { if (document.hidden) interruptedRef.current = true }
+    document.addEventListener('visibilitychange', listener)
+    return () => document.removeEventListener('visibilitychange', listener)
+  }, [phase])
+
+  const choosePractice = useCallback((choice: number) => {
+    if (phase !== 'practice' || subPhase !== 'stimulus' || practiceChoice !== null) return
+    setPracticeChoice(choice); setSubPhase('feedback')
+  }, [phase, subPhase, practiceChoice])
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || !/^[1-4]$/.test(event.key)) return
+      event.preventDefault()
+      const choice = Number(event.key) - 1
+      if (phase === 'practice') choosePractice(choice)
+      else submitFormal(choice)
+    }
+    window.addEventListener('keydown', listener)
+    return () => window.removeEventListener('keydown', listener)
+  }, [phase, choosePractice, submitFormal])
+
+  const startPractice = () => { setPracticeChoice(null); setSubPhase('fixation'); setPhase('practice') }
+  if (!items) return <div role="alert" className="card p-8">本次题库版本或题量不匹配，请返回任务页联系管理员；正式测验尚未开始。</div>
+  if (phase === 'instruction') return <CognitiveTaskIntro title="阅读理解" description={<><p>每题同时给出一段短文、一个问题和四个选项。先读短文，再根据原文选出唯一最符合问题的答案；不需要用课外知识作答。</p><p className="mt-3">例如，短文说雨伞在门边的篮子里，问雨伞在哪里，就选择“门边的篮子里”。</p></>} hint={<><p>按键 1–4 或点击选项作答。先求准确，再保持稳定节奏；每题最多 {timeoutMs / 1000} 秒，正式共 {totalTrials} 题。练习无时限且不计分，答对后才能开始；正式不显示正确答案。</p></>} onAction={startPractice} />
+  if (phase === 'formal' && !currentTrial) return <div className="card p-8">作答已记录，正在生成结果…</div>
+  const item = phase === 'practice' ? READINGCOMP_PRACTICE_ITEM : currentTrial!
+  const content = <div className="card mx-auto max-w-2xl p-5 text-left sm:p-8">
+    <div className="text-sm text-gray-500">{phase === 'practice' ? '练习 · 不计入成绩' : `第 ${trialIndex + 1} / ${totalTrials} 题`}</div>
+    {subPhase === 'fixation' && <div className="h-28 pt-10 text-center text-4xl text-gray-400">+</div>}
+    {subPhase === 'stimulus' && <><p className="pt-5 text-lg leading-relaxed">{item.passage}</p>{item && <p className="mt-4 text-lg font-semibold">{item.question}</p>}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">{item.options.map((option, index) => <button key={option} type="button" className="btn-secondary min-h-12 px-4 text-left" onClick={() => phase === 'practice' ? choosePractice(index) : submitFormal(index)}><span className="mr-2">{index + 1} ·</span>{option}</button>)}</div>
+      <p className="mt-5 text-xs text-gray-500">按键 1–4 或点击选项作答</p></>}
+    {subPhase === 'feedback' && (phase === 'practice' ? <div role="status" className="mt-5">
+      <p>{practiceChoice === READINGCOMP_PRACTICE_ITEM.answer ? '练习正确。' : '练习还需再试一次。'}{READINGCOMP_PRACTICE_ITEM.explanation}</p>
+      {practiceChoice === READINGCOMP_PRACTICE_ITEM.answer
+        ? <button type="button" className="btn-primary mt-4" onClick={() => { setPhase('formal'); setSubPhase('fixation') }}>开始正式测评</button>
+        : <button type="button" className="btn-primary mt-4" onClick={() => setPhase('instruction')}>重读说明后再练习</button>}
+    </div> : <div role="status" className="mt-5"><p>{feedback}</p>{retry && <button type="button" className="btn-primary mt-4" onClick={() => void persistPending()}>重试提交</button>}</div>)}
+  </div>
+  return phase === 'formal' ? <CognitiveFocusStage ariaLabel="阅读理解正式测验">{content}</CognitiveFocusStage> : content
+}
