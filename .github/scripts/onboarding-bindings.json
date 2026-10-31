@@ -4533,6 +4533,885 @@
         "backend": "4b2481a35fa01fccff933f85676c99883d6fc52d",
         "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
       }
+    },
+    "424": {
+      "schemaVersion": 1,
+      "pr": 424,
+      "enabled": true,
+      "base": "112b944811160e8e2a018563b73e59f5ba542a5c",
+      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
+      "controlCheckpoint": "0f65de649683efde8c69281355dfcb0d4f05e9dc",
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": "b048a3f18702f3eab76083826cf5ed429ff39997",
+          "after": "bcac2e624988b59627963fddb8496210a0b3294e"
+        },
+        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
+          "before": "1b7cc443194acbb917244111d9d6032951f91636",
+          "after": "84afb5bb14724024926de00a4165fdbfaef49e2b"
+        },
+        "docs/development/training-standalone-scale-group-reader-20261030.md": {
+          "before": null,
+          "after": "19d83f2688c362729baeca44a581c2a472b9a26e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/README.md": {
+          "before": null,
+          "after": "3dc68d06733a17945e4c59c11c5b8b910a9f047e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "92bc239292053663109e34d093bb0d2c33190e6b"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.json": {
+          "before": null,
+          "after": "d90fab117d46bfb552948554253621cf249eb198"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types-command.log": {
+          "before": null,
+          "after": "b63c9243d5b047d27ad9e751800e61023cdadcd4"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.json": {
+          "before": null,
+          "after": "0c32fea3d012a2b20d0e568a76a9fd4168b0f72f"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-type-candidate-tree.json": {
+          "before": null,
+          "after": "814f32f63501269a6afdf317aae46a15644c7a22"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/native-proof.json": {
+          "before": null,
+          "after": "1d3989f3c1b78b01c5db55241258f8addf2bd152"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current-proof.json": {
+          "before": null,
+          "after": "bcc03df134e39b9f09dd6233b898e05298f83dbb"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.log": {
+          "before": null,
+          "after": "3fb5ed7357564b3ae342e9eea011274763e07840"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.ts": {
+          "before": null,
+          "after": "493b6f630dc20dc148bbfd10c8f970fec6538521"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json": {
+          "before": null,
+          "after": "33e99faf115496798a324dba05abe8dd06b3695a"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.log": {
+          "before": null,
+          "after": "fdb3c35d1649e36442b04f01ce51b4c10cb7bf45"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "629341af1db45cfbc4486ff72fb4149bf88a76a5"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/reuse.json": {
+          "before": null,
+          "after": "ec3ca1ce3ac4ab33fda3100b4f02f9db871fcc1e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "150872c2690befb93883c0f3a4a7bca697a6e06f"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json": {
+          "before": null,
+          "after": "b5081416da119f779eb88ab5c0b8538b792e4717"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.log": {
+          "before": null,
+          "after": "c44fff22808b7c7f83aa3ab525e0da9188260e58"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "e8be0dde6b2b36f5e27dcdcd85e261279f5f339f"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts": {
+          "before": null,
+          "after": "2897bd80a59374800701edf18af6689f31d786eb"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "e777b59546ad3a41d7888e1c2f91cd5875b03309",
+          "after": "bcc0125d00c180d2f45d354ad047a07d2c7bacbe"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": "3c66d2199b82f8650ba00137c605a126f317a1cf",
+          "after": "96c5f22c9da5fbe472999aab638940ec65230837"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "5c604adeef92dd997944f33f188ba1ca48403b46",
+          "after": "d93481f61741aa48f5b16637784eccfe621d2bce"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "5c32efae2ab0189e8146b503215188bc36027ba0",
+        ".github/scripts/onboarding-checks.mjs": "5e96d8b49c6732772b6d9546713523cbbd8b1275",
+        ".github/scripts/onboarding-controls.test.mjs": "cb606bdefaa175d7307aa3089f7f0ee6677135a4",
+        ".github/scripts/onboarding-evidence.json": "a7deae80cf47a0f000a2ef72c99513ea5708ddfb",
+        ".github/scripts/onboarding-scope.mjs": "ffb98bc26e2c8908960837861b9d62685d545520",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "8b84efc626b9c08f5dba499620310b0112302d84"
+      },
+      "components": {
+        "backend": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
+      }
+    },
+    "426": {
+      "schemaVersion": 1,
+      "pr": 426,
+      "enabled": true,
+      "base": "e4b569c96c0b3d804adb51529b1d4c5ff613efb1",
+      "product": "2ae11d44cb43ac00261394b07e24bc46d54334b9",
+      "controlCheckpoint": "3274e427cdb366d0e4c5218aac7a7a9e8b3e96fc",
+      "source": {
+        ".github/scripts/group-report-draft.mjs": {
+          "before": "6be9a8e42fc295e6bf3ac3a58c9a3856e673f9bf",
+          "after": "30c894d96b7b184148a85afd690cdae5c67e7c9a"
+        },
+        ".github/scripts/group-report-draft.test.mjs": {
+          "before": "a5211b0625eb419e5a6a00eb4c386f7d98257fa6",
+          "after": "65bb3112b91c312ff8d9041dc6779ae12c49bc8b"
+        },
+        "docs/development/education-self-group-v2-handoff-20261030.md": {
+          "before": "ec55129647b82efaaa8399c8ca4cff548c4c9174",
+          "after": "d6b33ec682e33e82f6396bb1533c258adb461f47"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/README.md": {
+          "before": null,
+          "after": "9102f014611102ffdbc412a36f9234db58c5afc7"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/backend-types.json": {
+          "before": null,
+          "after": "2044388eff688fb70404cd2111d601e1a4682090"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend-types.json": {
+          "before": null,
+          "after": "e3ddbb17e826e45fac481bb8fde58168e57c487b"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend.json": {
+          "before": null,
+          "after": "e448964afc3bc770c71f12287d1d399f17eeeb2d"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend.log": {
+          "before": null,
+          "after": "ca480aa963cce21ac0eb5833d631d557df54d39b"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/native.json": {
+          "before": null,
+          "after": "fc610610dbef76a7eb83ffe4f1a7e520fcf9c16d"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/native.log": {
+          "before": null,
+          "after": "7dba03f4796f8f658806b2c1d1b9c72b5d3b0edb"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "d517376295a55f5f72ba0a773186386d4bfcf245"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.json": {
+          "before": null,
+          "after": "4d442a7d7249b45a0c3a138bdfe6dab9471bf02c"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.json": {
+          "before": null,
+          "after": "7f5b2ec0eb2e58c8419ba48f7445e837ef58eccb"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-v2-20261030/README.md": {
+          "before": null,
+          "after": "a7c792eeb0b435731dcd4b012f78a0ee6c71faf5"
+        },
+        "docs/evidence/education-self-group-v2-20261030/backend-types.json": {
+          "before": null,
+          "after": "af3938fc890a438ad2f1f6fbdbd26a6be1f8a557"
+        },
+        "docs/evidence/education-self-group-v2-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-v2-20261030/contract.json": {
+          "before": null,
+          "after": "2b34657ed235f8d4a29b4394e5b713c39d12e5c7"
+        },
+        "docs/evidence/education-self-group-v2-20261030/contract.log": {
+          "before": null,
+          "after": "0e53333dc0d11472fefb5fa8556e28110a6c5958"
+        },
+        "docs/evidence/self-group-bundle-leaf-ceiling-20261030/README.md": {
+          "before": null,
+          "after": "34604573931db2dbfc78d0c17d4168638a0eef1b"
+        },
+        "docs/evidence/self-group-bundle-leaf-ceiling-20261030/contract.json": {
+          "before": null,
+          "after": "b9790f0c1524ea43bc73a6d41711a52d6497837e"
+        },
+        "docs/evidence/self-group-bundle-leaf-ceiling-20261030/contract.log": {
+          "before": null,
+          "after": "d436c794a698f67b2484b74e6f7345f810b93f88"
+        },
+        "docs/evidence/self-group-inbox-disclosure-20261030/README.md": {
+          "before": null,
+          "after": "42e955f5ea3c964c39f117e150b3b43a6921699e"
+        },
+        "docs/evidence/self-group-inbox-disclosure-20261030/contract.json": {
+          "before": null,
+          "after": "96f7bff38963a168c93a6acd7348d5fb6ef45f66"
+        },
+        "docs/evidence/self-group-inbox-disclosure-20261030/contract.log": {
+          "before": null,
+          "after": "380195a1d48bd120ff5e79c9161879311de67dbf"
+        },
+        "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts": {
+          "before": "5cd2b563ec43005eb755b9a6b8d6e8be5d4065f3",
+          "after": "48981895f199004e4d46a9caee6e32955db2c4ab"
+        },
+        "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts": {
+          "before": null,
+          "after": "cfb9fb5d88fb0e261ca26a24775788b763b19d85"
+        },
+        "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts": {
+          "before": null,
+          "after": "3f0bca223a9a07d1764eda5de6dd64764bd4372c"
+        },
+        "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts": {
+          "before": null,
+          "after": "a395dcb6a08761b707abb656f012dee928b521c2"
+        },
+        "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": {
+          "before": "d35c6a4ec22b5231905fc282e4d9588ee3349b05",
+          "after": "959892c5b2892d3b6194c58edb2c0eadcd485766"
+        },
+        "server-version/backend/src/modules/assessment-policy/self-group-contract.ts": {
+          "before": null,
+          "after": "a60b80d6180266ea1131e904884aa8922ec86eaf"
+        },
+        "server-version/backend/src/modules/assessment-relational/product-registry.ts": {
+          "before": "4214484c39ec2881dbf65494bba37617444f1226",
+          "after": "295084487894c3500cc5b2eeaf1e09b0f02919e2"
+        },
+        "server-version/backend/src/modules/bundle-product/education-adapter.ts": {
+          "before": "408a3b4ca7d8bd8e0cdedabe9001e5bba1e77158",
+          "after": "03a13e1877193ddd1aca7ecfa9168d11f5079b87"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts": {
+          "before": "54e2a85e92edbe9f5e83458d19555a0add7e1aee",
+          "after": "076bc5f8ee06f666df9f223f9d7cc5105ecf859f"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": {
+          "before": "eb61e88f84ea455eebc29fb66dd9e721d19a0763",
+          "after": "bb5da7c2bc7f08b8ba4a484cd3b3fe86482012c2"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts": {
+          "before": "2c131002ecfff33e5dbbe853f824430bf9a6bfc4",
+          "after": "4755469de300e15e62c998fd0b7e590ac614b78c"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts": {
+          "before": "3c052a40475e777c3decee2b1a7343bded01d3e9",
+          "after": "6a650e28adf59a21f0767202f06d35111a4569fe"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts": {
+          "before": "65c08968e6bc67a27de0e225019b5cb01e969ecf",
+          "after": "ce622de6bf42e8ce7d8148ff8bc8d86ace16ce98"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": {
+          "before": "ccc4d57523fd6dfe7cb80f7d7158b08f9e56574e",
+          "after": "386e7395a67aebdba9383aecbdfee2680ecdceac"
+        },
+        "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts": {
+          "before": "5cdbb55238a2d7216a0646792896ec67979b2267",
+          "after": "49c8b6a4183f6ce7e8f608f25231d5864bad067c"
+        },
+        "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts": {
+          "before": "ce4b142daa87c53a4774c12b70ec0ce70e9fb933",
+          "after": "af15a7a632c3207c9c81c9ba091be8c6ae129536"
+        },
+        "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": {
+          "before": "e862c25933648a9f72e0e71ca99ea2276a7429fe",
+          "after": "f740348bbfca84bf15566cf6ff8796f7c0be2221"
+        },
+        "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts": {
+          "before": "e42b6ac3720a53041c832ea0e2346da21e8ab99c",
+          "after": "938343ca81c2f5f7ce46955c9b56b32c5050a876"
+        },
+        "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": {
+          "before": "5a52debb678293ddc7fe5c2a1c2a34275771f2a9",
+          "after": "a2d19cce74cfe25c51fbc14e30c8ab414df28675"
+        },
+        "server-version/backend/src/modules/reporting/respondentSummary.ts": {
+          "before": "dbffca79bab712da49e2a6d2a95ffc310396f969",
+          "after": "f59bc3c807c6b67957a63d1fbbf7bdc46e53833b"
+        },
+        "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": {
+          "before": "3a5a87f4c2ba63a96ce68492e098a990f6a95d53",
+          "after": "2290f7d7ec1c25a330187f6bfa248ef079ecebf7"
+        },
+        "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": {
+          "before": "d7a0ffb27930725e0ff251949b5763ee3a2ff788",
+          "after": "764e6e66d1dfac4446f5c6271f78d1b4d895fa94"
+        },
+        "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": {
+          "before": "517ba17a464e69c0ad072b251b9ec92eac151639",
+          "after": "1e06a8247797c37572883be3f81f47e51dc7bd46"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "93895455bb842ceb8e1bc4e7fd81dcddb0675504",
+        ".github/scripts/onboarding-checks.mjs": "27163eaa7801463c867ff0111d95781773f51404",
+        ".github/scripts/onboarding-controls.test.mjs": "8f7bb201c70a81eeef07411f0b8ada6230166c5d",
+        ".github/scripts/onboarding-evidence.json": "da1344c7fd92e9d21f5d4fcf6ae56a428c22e07b",
+        ".github/scripts/onboarding-scope.mjs": "9be979c4f4aa309758910ab95fc4e6cf5261031d",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "e8091e6935e791e2ee86609424919c7274a74207"
+      },
+      "components": {
+        "backend": "770f31e559fb0384eaeb219b3fe1854e5f703799",
+        "frontend": "351d797491ef24a75dffd40678245a6626e3323c"
+      }
+    },
+    "428": {
+      "schemaVersion": 1,
+      "pr": 428,
+      "enabled": true,
+      "base": "6627b41580ae7852ceff9ea33b853985f4390f55",
+      "product": "1338e82efdce0d478d4db1bf98c3f46a5ee74c69",
+      "controlCheckpoint": "9e3cbe991885d98c45a11aea7ce2daa94acffd0c",
+      "source": {
+        "docs/evidence/library-self-group-release-20261031/README.md": {
+          "before": null,
+          "after": "a3df761e168d37b62091d3d04c822b4bbda03de9"
+        },
+        "docs/evidence/library-self-group-release-20261031/backend-types.json": {
+          "before": null,
+          "after": "2a20cdc5c70493d8d9471bd4bf30762c117dec87"
+        },
+        "docs/evidence/library-self-group-release-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/library-self-group-release-20261031/frontend-types.json": {
+          "before": null,
+          "after": "de8aa4905d97d9834b9c1587035b745d49871b14"
+        },
+        "docs/evidence/library-self-group-release-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/library-self-group-release-20261031/frontend.json": {
+          "before": null,
+          "after": "bb9e3e61a1395aa9ada9b1c247f46bb18a8bdc9a"
+        },
+        "docs/evidence/library-self-group-release-20261031/frontend.log": {
+          "before": null,
+          "after": "93ec817761284bafbcc8fddf24623a1f4b184b75"
+        },
+        "docs/evidence/library-self-group-release-20261031/migration.log": {
+          "before": null,
+          "after": "3471166830a41c10ea0732d42adc2e68b32f167d"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-dto-assertion.json": {
+          "before": null,
+          "after": "127291c05c2a397bed4e2d687e64057bfcf899fd"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-dto-assertion.log": {
+          "before": null,
+          "after": "0c0f853f8e9e6a685c76248500e69307eac8d1f1"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-first.json": {
+          "before": null,
+          "after": "0a51f73268b51b11a17cf6049dd808a90a9121cf"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-first.log": {
+          "before": null,
+          "after": "0c0f853f8e9e6a685c76248500e69307eac8d1f1"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-retained-grant.json": {
+          "before": null,
+          "after": "32a6b3b4460025f6adbf4cfa90ff050a3e17574e"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-retained-grant.log": {
+          "before": null,
+          "after": "0c0f853f8e9e6a685c76248500e69307eac8d1f1"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-unchanged-retry.json": {
+          "before": null,
+          "after": "4da0969d7ef1ceb61c73d0e32541229bfef585be"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-unchanged-retry.log": {
+          "before": null,
+          "after": "0c0f853f8e9e6a685c76248500e69307eac8d1f1"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-unique-wrapper.json": {
+          "before": null,
+          "after": "07f21e12079245589ac5a196fa390aea60be2042"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres-unique-wrapper.log": {
+          "before": null,
+          "after": "0c0f853f8e9e6a685c76248500e69307eac8d1f1"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres.json": {
+          "before": null,
+          "after": "0faeb888df719cd2d61dec7a1a605d9d8b6a20e4"
+        },
+        "docs/evidence/library-self-group-release-20261031/postgres.log": {
+          "before": null,
+          "after": "0c0f853f8e9e6a685c76248500e69307eac8d1f1"
+        },
+        "docs/evidence/library-self-group-release-20261031/source.json": {
+          "before": null,
+          "after": "4ec7a6047e7a0b31d64a5350747ff73a1f5ce17e"
+        },
+        "docs/evidence/library-self-group-release-20261031/stage-proof.json": {
+          "before": null,
+          "after": "f52efde4ec03b645098bfcd83bc961f17602f9e0"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/README.md": {
+          "before": null,
+          "after": "6dbb770e06f383711b5b9fb44ded6692db3a67f7"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backend-types.json": {
+          "before": null,
+          "after": "278ec9168f29d79f474b65cf9c95407f67ff243a"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/README.md": {
+          "before": null,
+          "after": "320a3cb2abf0869ffc131a9f2c54c6420f9a0f99"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/backend-types.json": {
+          "before": null,
+          "after": "2317f66ae1c58cb69c53d3fc9d8bdc5bedf52a95"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/frontend-types.json": {
+          "before": null,
+          "after": "6b7888ed5c91178794c2ca265667c7cce8633fff"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/candidate.json": {
+          "before": null,
+          "after": "a2d8c5ef589f009cc629ac1958cdc5f99d68d4d0"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/postgres.json": {
+          "before": null,
+          "after": "1b8210256657ea62bdd99e0a469496399b320e72"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/postgres.log": {
+          "before": null,
+          "after": "b4c7cfad808239ffe808a6a4abd0b74c13a0d0ef"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/production.patch": {
+          "before": null,
+          "after": "6509386377a1520b1ebe095588da04badd6695bd"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/proof.json": {
+          "before": null,
+          "after": "a29400e774a19e30d9e40ed0b94f356b34fd523b"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/raw-sha256.json": {
+          "before": null,
+          "after": "a45f7c6261c9daefd7da7ab03cd0a26aef18ca04"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/README.md": {
+          "before": null,
+          "after": "72927a2e27589a6c2960631e23d7dbf1265b95c4"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/backend-types-first.json": {
+          "before": null,
+          "after": "e26872824b32e344683f27d6a9a35ab9c60786f6"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/backend-types-first.log": {
+          "before": null,
+          "after": "a743a793ba2dc55c55c1fa3b1e38c8cbc4d7e327"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/backend-types.json": {
+          "before": null,
+          "after": "9649db972eaf6ffdaf6202962ecd2ffcacc096d7"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/comparable-C-proof.json": {
+          "before": null,
+          "after": "b856977e257e8bf57e715dfb57793a451ae2b20e"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/frontend-first.json": {
+          "before": null,
+          "after": "e358d585da75ebfe0f6a788769395b9e42567957"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/frontend-first.log": {
+          "before": null,
+          "after": "8bafd27d6bbb4a8026035997924e7eb08d19b70b"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/frontend-types.json": {
+          "before": null,
+          "after": "4f7b219fef05547434805db81be542445991349f"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/frontend.json": {
+          "before": null,
+          "after": "df97a1a3e4db82eec1b2857cad80bda0f9c4ceeb"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/frontend.log": {
+          "before": null,
+          "after": "8bafd27d6bbb4a8026035997924e7eb08d19b70b"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/library-proof.json": {
+          "before": null,
+          "after": "2dbb2074ce2306407d00596c30eb9c617d1a0e72"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/original-proof.json": {
+          "before": null,
+          "after": "939d5c86f9747855d698ebe8e0ff8739570ef752"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-first.json": {
+          "before": null,
+          "after": "d945d0ab20002a1b502c53337386e7bbb535cb74"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-first.log": {
+          "before": null,
+          "after": "68701205f56f719fafdf5ffdfa593142facda014"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-product-context.json": {
+          "before": null,
+          "after": "1364760fb926dd446b1f7374f1c908b1fe9b2473"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-product-context.log": {
+          "before": null,
+          "after": "68701205f56f719fafdf5ffdfa593142facda014"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-sufficient-N.json": {
+          "before": null,
+          "after": "859c387cb18c9f84d96d7cc37e434b5b8a0c50b9"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-sufficient-N.log": {
+          "before": null,
+          "after": "68701205f56f719fafdf5ffdfa593142facda014"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres.json": {
+          "before": null,
+          "after": "a6659c51660170ce24f8a57ce3ee6e9dd8050b00"
+        },
+        "docs/evidence/teacher-numeric-group-consumer-20261031/postgres.log": {
+          "before": null,
+          "after": "68701205f56f719fafdf5ffdfa593142facda014"
+        },
+        "docs/evidence/teacher-numeric-source-boundary-20261031/README.md": {
+          "before": null,
+          "after": "7a45974d7a676912324880e1223a06a8eabffe13"
+        },
+        "docs/evidence/teacher-numeric-source-boundary-20261031/result-first.json": {
+          "before": null,
+          "after": "565c550f1575b7cd3611dc0fd2f4503a1595cf6d"
+        },
+        "docs/evidence/teacher-numeric-source-boundary-20261031/result-first.log": {
+          "before": null,
+          "after": "b4f292c7057fb7b947dd30511d05d251a9114ec8"
+        },
+        "docs/evidence/teacher-numeric-source-boundary-20261031/result.json": {
+          "before": null,
+          "after": "3c0de9571762346a179291b32baedae442d6a385"
+        },
+        "docs/evidence/teacher-numeric-source-boundary-20261031/result.log": {
+          "before": null,
+          "after": "b4f292c7057fb7b947dd30511d05d251a9114ec8"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/README.md": {
+          "before": null,
+          "after": "9d558849095e1c2f56f719c6462cb27a7602f556"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/backend-types.json": {
+          "before": null,
+          "after": "52f690e0a9ec0fb559b65fd42b9447a57d8a5228"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/frontend-types.json": {
+          "before": null,
+          "after": "72aff7ac572510a44f1b3293ad32124691debfcd"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/frontend.json": {
+          "before": null,
+          "after": "a76bec8ec689bd51b9046926898d3689b94103bb"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/frontend.log": {
+          "before": null,
+          "after": "516f7f31d0178db8724826b59c49a1b6f5ecf41b"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/migration.log": {
+          "before": null,
+          "after": "80f3ff61fffa95542ea4c42d9a39fe8a1e705396"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.json": {
+          "before": null,
+          "after": "8c6ec30c63e0caaf97030ef79d16b9766e3e4ea8"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.json.attempt1": {
+          "before": null,
+          "after": "eb66610ba8b4fadac70db136adcb4f61b0b7d0a2"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.json.attempt2": {
+          "before": null,
+          "after": "7814a40fb1f9ee4a02d01782beae114a98caded7"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.json.attempt3": {
+          "before": null,
+          "after": "aa4faaac221077fb1d736011f47a6f7ac8778f2e"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.log": {
+          "before": null,
+          "after": "1c53bd386fbfa6fc54a117868b5201f8c18c0397"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.log.attempt1": {
+          "before": null,
+          "after": "1c53bd386fbfa6fc54a117868b5201f8c18c0397"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.log.attempt2": {
+          "before": null,
+          "after": "1c53bd386fbfa6fc54a117868b5201f8c18c0397"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/postgres.log.attempt3": {
+          "before": null,
+          "after": "1c53bd386fbfa6fc54a117868b5201f8c18c0397"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/standalone-boundary.json": {
+          "before": null,
+          "after": "aeaf7e67c30dba65b3381869ae4866aae3ee1030"
+        },
+        "docs/evidence/teacher-self-group-scale-20261030/standalone-boundary.log": {
+          "before": null,
+          "after": "68bff01d3b49e741505cb8812b6472823aeb946b"
+        },
+        "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql": {
+          "before": null,
+          "after": "7816ddf61ffb59e02638ce60a6a546b99ca9237e"
+        },
+        "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql": {
+          "before": null,
+          "after": "55e74ca43a28c7a6c79c51af1d15a54ab714deb6"
+        },
+        "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts": {
+          "before": null,
+          "after": "bd3367251ecdf4220643dbbf24a14165b796f4ff"
+        },
+        "server-version/backend/src/__tests__/huiteacher/self-group-personal-license.test.ts": {
+          "before": null,
+          "after": "7db143e8deb993a3d98a633e68e4781c85db2f18"
+        },
+        "server-version/backend/src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts": {
+          "before": null,
+          "after": "3288776cefa5ea0728d6323922148b3ca3af6a7c"
+        },
+        "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts": {
+          "before": null,
+          "after": "51a95aa1e05f9c8f8192724680bdf91595493f30"
+        },
+        "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "d1faea7afc4ca87ca9619e8d67af2f792ccd8ee4"
+        },
+        "server-version/backend/src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8b45edd990a23e77c7b0fb7bc69a9505f5395f78"
+        },
+        "server-version/backend/src/modules/assessment-run/registeredResources.ts": {
+          "before": "ff6bb5f3cb8f72f8da6d9ad7229d1625515010ec",
+          "after": "2eba8aa5124d7004997dd23f3216070d8de4ad81"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": {
+          "before": "211fe0646fef1aa1887131a6fa17be4757aece5d",
+          "after": "ad1f4b6d6e9f126ce788aaac4235c18c242fc14b"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts": {
+          "before": null,
+          "after": "441bcf47775d67099c6d1c170dbfe03023f6a766"
+        },
+        "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts": {
+          "before": null,
+          "after": "5cd7d7573e8fec678b5feb89d175a798e78bfc78"
+        },
+        "server-version/backend/src/modules/huiteacher/run.service.ts": {
+          "before": "d2ceb2f0d4de6e6720164d36c9271f1d620daf0f",
+          "after": "92b39c8ccec8509acb219d4168a39027613d25a3"
+        },
+        "server-version/backend/src/modules/huiteacher/scaleLicense.service.ts": {
+          "before": "a05d8c251f509794c4134a8ce3580f69900ba457",
+          "after": "ccfe2a352dbb84b7fa65cb0bded6faa9c6746785"
+        },
+        "server-version/backend/src/modules/huiteacher/scalePersonalReport.service.ts": {
+          "before": "5bc821d993c5bfbc8183666dee6262ade7271b94",
+          "after": "7f7aec0bc4477238f4fcdc30edd92dcb034cbebf"
+        },
+        "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts": {
+          "before": "c3536f21ff37a268c3463be0b8b2fcbdf77bbb8e",
+          "after": "4f6ca3cc76f6013ffeede771bd94b161880a9e9a"
+        },
+        "server-version/backend/src/modules/organization/access.ts": {
+          "before": "89462b846d69c04dfaf0cb9338d396e890896178",
+          "after": "1bb8b2cd990b4bb38b442b3d05004aa7c01dd613"
+        },
+        "server-version/backend/src/modules/organization/organization.routes.ts": {
+          "before": "ba1b1c3ff6de41c8be79fe36b94d8664ae43e9c3",
+          "after": "493eff2c1835e63275c6f74c1e06fa477bab9479"
+        },
+        "server-version/backend/src/modules/reporting/artifact.ts": {
+          "before": "244795010b5a7e94b5882d8a86f40c82e602a122",
+          "after": "4319aefb8152c03de0b133ec8de2c025c81419e6"
+        },
+        "server-version/backend/src/modules/reporting/authorization.ts": {
+          "before": "be0caa933e9bbbf806cbea5ab4d791b2720be532",
+          "after": "b9f8b2466336bcbec934310f5ebad9ad5f496c4e"
+        },
+        "server-version/backend/src/modules/reporting/content.controller.ts": {
+          "before": "d93307d9dd6244155a3e06594b515447d603013f",
+          "after": "e2b81bbe160c329bc0d90d39e3138ae03accc9e9"
+        },
+        "server-version/backend/src/modules/reporting/fixedPopulationPrivacy.ts": {
+          "before": "23b3f62dff52bad1d03b60eb87177fd1ab1423d4",
+          "after": "f52cca5acf61dc609babe08e3cdff45a35ed95b0"
+        },
+        "server-version/backend/src/modules/reporting/governedDisclosure.ts": {
+          "before": "caca09d42ced85f2590e2b31e377455c8c46472f",
+          "after": "4b78a1fa88db00dba6e34b43c8621877aac965c4"
+        },
+        "server-version/backend/src/modules/reporting/resultSource.ts": {
+          "before": "1de430ddf8fa8e5d732346f9c8184ae2f6a087ca",
+          "after": "0ba73cb00eb45eebd8dab8441d17f1df4359d0f1"
+        },
+        "server-version/backend/src/modules/reporting/service.ts": {
+          "before": "5ee9418f96a6c1c094af537a6027cc3f6ef8137c",
+          "after": "6679fae2bfcce38a98c24669fb5e35ea2aa6cb65"
+        },
+        "server-version/backend/src/modules/scale-library-governance/education-catalog.ts": {
+          "before": "0867516d887b4c9cc4244078687d3ac25b6ddbb9",
+          "after": "7a510c6b55dcae2425ca39d10c61ad557f95b2f5"
+        },
+        "server-version/backend/src/modules/scale-library-governance/education-group-resources.ts": {
+          "before": null,
+          "after": "03c617e83d26fd7ac65048f7c8859347e1a6474e"
+        },
+        "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts": {
+          "before": "714c875fd4fdcc841ed1e1df443743906a5a3c76",
+          "after": "3c081d52cd56fd510943e69e0adc894f201cda09"
+        },
+        "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts": {
+          "before": "85517e3bf91bf806d285433ed81cb0fad7fe7721",
+          "after": "941d07ac0e248fe43504a73280e3ff8172041318"
+        },
+        "server-version/frontend/src/api/reportingContent.ts": {
+          "before": "85d911051f5ee37b50a4533e1044c51426685f92",
+          "after": "91334020e3004f23b074229f3ccc3b74c43ba163"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+          "before": "b68c9bd3de329decef4ed8c2f55c9d0b2090aaa1",
+          "after": "af767156f64e878f7e5628f18f680397d79cfb22"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherGroupReportReading.test.tsx": {
+          "before": "41a4f034bc834da5bccf679232fdb18717685c22",
+          "after": "9acbc9d3f167ab30f7255f7470476ffd9875297e"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherLibraryCatalog.test.tsx": {
+          "before": "20bb6d7af021f9c4af6f415f3a30f3142ef391ed",
+          "after": "e32a75ef3c3b4898ad1c4164ac15cda0e9729e1e"
+        },
+        "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx": {
+          "before": null,
+          "after": "047608b8752ccea4c5c1eae27cd5cfa4d8baa9b6"
+        },
+        "server-version/frontend/src/pages/admin/ReportingContent.tsx": {
+          "before": "8fb251862fea85cdf8c5232ea95a367364252d85",
+          "after": "ccc81abecf7b178f1589b96a9bbd560daf6a52a9"
+        },
+        "server-version/frontend/src/pages/admin/__tests__/ReportingContent.test.tsx": {
+          "before": "38c730306a150f1e36e621b9226b3f22c69668e3",
+          "after": "576ff3c953a0915cd62f74e31a992937fcab9c15"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "b7c8c4374b7f04ac7d182ebb6ac9ee1859ead767",
+        ".github/scripts/onboarding-checks.mjs": "6c39e7e2a329fcf03f4d27bdf4406dbaedbf1f97",
+        ".github/scripts/onboarding-controls.test.mjs": "f59ab4ea334d1404d1f100c3f165d4fc3c64186f",
+        ".github/scripts/onboarding-evidence.json": "1da3b796d8f0fb4888886bf2bbdcd710cd960778",
+        ".github/scripts/onboarding-scope.mjs": "66b4dee206aa512c8526d1685fdb258bed78f4d1",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "7e254b9280ee1efe390c1098742edbf964d5a5d6"
+      },
+      "components": {
+        "backend": "f5190a3bba8069a768c53cf7ff69d832280fad99",
+        "frontend": "9bfa314a1fdf9eba874c4e88c5a69b03289a0a52"
+      }
     }
   }
 }
