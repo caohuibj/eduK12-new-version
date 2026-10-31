@@ -326,9 +326,13 @@ GitHub 是唯一正式验证位置：前后端各编译一次，定向真实隔�
 
 ## 下载来源铁律（2026-10-13）
 
-用户确认：**只有生产服务器使用清华或可信大陆镜像；GitHub Actions 一律使用官方源。** 这覆盖 GitHub 托管/自托管 runner、所有工作流和执行脚本、Docker build stage、浏览器、工具及基础镜像；不因构建的是生产产物而使用大陆源。本机开发也使用官方源。生产服务器继续按当次授权优先可信大陆镜像，不可用时记录原因再使用官方源；不改变同一产物只构建一次、生产不复验/不构建的要求。
+默认规则：只有生产服务器使用清华或可信大陆镜像，GitHub Actions 使用官方源。这覆盖 GitHub 托管/自托管 runner、所有工作流和执行脚本、Docker build stage、浏览器、工具及基础镜像；不因构建的是生产产物自动切源。本机开发也使用官方源。生产服务器继续按当次授权优先可信大陆镜像，不可用时记录原因再使用官方源；不改变同一产物只构建一次、生产不复验/不构建的要求。
 
-GitHub Debian 使用签名官方源，npm 固定 `https://registry.npmjs.org` 且 `replace-registry-host=always`，覆盖锁文件保留的历史镜像 URL；Docker npm 安装按显式 `NPM_REGISTRY` 替换历史 host。版本与 integrity 不变，保留 TLS、签名及镜像扫描阈值。前后端 Dockerfile 本次只增加该 npm host 选择设置，其他新增下载策略文件绑定完整前后 blob；未知 Dockerfile/依赖或 CI 编辑不能借此缩减门禁。
+C/平台镜像的可选地域源：现有镜像链 `ci.yml → ci-images.yml → build-ci-images.sh → ci-image-plan.mjs` 可由既有 reusable/manual workflow 的 `debian_mirror`、`npm_registry`、`alpine_mirror` 显式传入源。默认仍为 `deb.debian.org`、`https://registry.npmjs.org`、空 Alpine 前缀；只有被选择的镜像 target 消费对应参数，生成及执行前的 Bake 计划核对相同值，日志记录实际参数。其他检查/工具下载源不变，不扩散到 A/B 或专用候选 producer。
+
+大陆节点可选 `debian_mirror=mirrors.tuna.tsinghua.edu.cn`（只填主机名）、`npm_registry=https://registry.npmmirror.com`、`alpine_mirror=https://mirrors.tuna.tsinghua.edu.cn/alpine`；前端只替换仓库前缀，保留基础镜像的版本路径与 apk 签名/安全更新。继续 `npm ci`、原锁文件/integrity、TLS、APT 签名、实际运行镜像扫描及正式来源记录。参数变化不得冒用旧产物资格；没有新增 producer、权限、自动切源或 CI 激活。先在实际非生产 Linux/amd64 builder 做一次必要的小可达性读取；生产上的可达记录不代表 builder 可达，也不授权构建或部署。
+
+除上述显式 C 镜像参数外，GitHub Debian 使用签名官方源，npm 固定 `https://registry.npmjs.org` 且 `replace-registry-host=always`，覆盖锁文件保留的历史镜像 URL；Docker npm 安装按显式 `NPM_REGISTRY` 替换历史 host。版本与 integrity 不变，保留 TLS、签名及镜像扫描阈值。前后端 Dockerfile 本次只增加该 npm host 选择设置，其他新增下载策略文件绑定完整前后 blob；未知 Dockerfile/依赖或 CI 编辑不能借此缩减门禁。
 
 本 PR 的 access-efficiency 路线同时验证这条新增铁律：所有工作流官方 npm 环境、实际 npm 对历史 host 的替换及 integrity 失败拒绝、CI 镜像计划/发布脚本官方参数、完整冻结 blob 和对应拒绝/汇总契约。该下载策略改变了构建输入，需要生成对应新产物；以后正式同输入阶段继续复用。诊断报告与大型镜像传输分开保存，报告不充当镜像资格或编译成功。
 
