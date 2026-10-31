@@ -570,6 +570,15 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
       )}
     >
       {error ? <p role="alert" className="mb-4 text-sm text-red-700">{error}</p> : null}
+      {meta?.status === 'COMPLETED' ? (
+        <button type="button" disabled={submitting} className="btn-secondary mb-4 min-h-11" onClick={async () => {
+          setSubmitting(true)
+          setError(null)
+          try { await onReload() }
+          catch { setError('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。') }
+          finally { setSubmitting(false) }
+        }}>重新读取进度</button>
+      ) : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <span>本地草稿已保留。当前测评版本已变化，请重启后继续。</span>
@@ -615,7 +624,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     }}
                     options={options}
                     value={value}
-                    answerDisabled={draftLocked}
+                    answerDisabled={draftLocked || requiresRestart}
                     submitDisabled={requiresRestart || meta?.status === 'COMPLETED'}
                     position={sectionIndex + 1}
                     total={currentSection.items.length}

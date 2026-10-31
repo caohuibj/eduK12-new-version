@@ -27,3 +27,11 @@ Actual shared manager→API client→loopback HTTP, same41field fixture hash2571
 ## Handoff boundary
 
 All three slices are local commits only. No new CI/control lane, push/PR, upload, merge, deployment, database service or production operation. No new dependencies/schema or permission changes. No group-report or longitudinal feature implementation. The only reporting files changed are the explicitly delegated spec discovery and existing record-mapper export. Full-platform/types/build/browser/database suites are not rerun; current results cover only the named scopes above. Future release/CI qualification remains a separate DOT decision.
+
+## DOT review correction: conflict lock and actual progress action
+
+The first Form answerDisabled conversion omitted requiresRestart. FINAL_DRAFT_IDENTITY_CONFLICT can occur before meta loads, so draftLocked alone is insufficient. Restored answerDisabled={draftLocked || requiresRestart}; existing submitDisabled already retained requiresRestart. No backend change.
+
+The first accepted-state patch also supplied only a recovery message, with no clickable progress action in this component or either parent. Added “重新读取进度” only for meta.COMPLETED. It calls the existing onReload callback, preserving the parent's existing bounded busy retry, disables itself during the request and retains COMPLETED if reading fails. No new POST, submission identity, polling or state engine.
+
+One new meta-not-loaded identity-conflict assertion and both extended accepted Form/Scale cases: baseline3FAIL, current3PASS/8filtered. The accepted cases assert disabled reread during pending progress, enabled after failure, one click→second onReload, with POST/seal still exactly1. These are1new+2extendedcases, not3additionaluniquechecks on top of the earlier13. Original13 evidence remains at its original source; no other test/type/build/DB/CI was replayed. See questionnaire-review-repair/ for complete reporters and source hashes. Local unpublished scope remains unchanged.
