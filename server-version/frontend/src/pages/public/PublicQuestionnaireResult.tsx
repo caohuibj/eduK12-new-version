@@ -23,6 +23,7 @@ const PublicQuestionnaireResult: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [report, setReport] = useState<CollectionQuestionnaireResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [readRevision, setReadRevision] = useState(0)
   const questionnaireEntry = token ? `/public/questionnaire/${encodeURIComponent(token)}` : '/'
 
   const loadReportImage = useCallback(async (assetId: string) => {
@@ -33,35 +34,39 @@ const PublicQuestionnaireResult: React.FC = () => {
     return response.blob()
   }, [sessionId, token])
 
-  const fetchReport = useCallback(async () => {
-    setError(null)
-    if (!sessionId) {
+  useEffect(() => {
+    let cancelled = false
+    const fetchReport = async () => {
+      setError(null)
       setReport(null)
-      setLoading(false)
-      setError('缺少问卷会话参数，请从问卷入口重新进入结果页。')
-      return
+      if (!sessionId) {
+        setLoading(false)
+        setError('缺少问卷会话参数，请从问卷入口重新进入结果页。')
+        return
+      }
+      const resumeToken = readQuestionnaireResumeToken(token, sessionId)
+      if (!resumeToken) {
+        setLoading(false)
+        setError('缺少本次问卷的恢复凭据，请从问卷入口重新进入或恢复测评。')
+        return
+      }
+      try {
+        setLoading(true)
+        const client = createPublicCapabilityClient(resumeToken)
+        const data = await client.get<CollectionQuestionnaireResponse>(`/assessments/${sessionId}/report`)
+        if (!cancelled) setReport(data.data)
+      } catch (cause) {
+        if (!cancelled) {
+          setReport(null)
+          setError(normalizeApiError(cause).message || '获取报告失败')
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
-    const resumeToken = readQuestionnaireResumeToken(token, sessionId)
-    if (!resumeToken) {
-      setReport(null)
-      setLoading(false)
-      setError('缺少本次问卷的恢复凭据，请从问卷入口重新进入或恢复测评。')
-      return
-    }
-    try {
-      setLoading(true)
-      const client = createPublicCapabilityClient(resumeToken)
-      const data = await client.get<CollectionQuestionnaireResponse>(`/assessments/${sessionId}/report`)
-      setReport(data.data)
-    } catch (cause) {
-      setReport(null)
-      setError(normalizeApiError(cause).message || '获取报告失败')
-    } finally {
-      setLoading(false)
-    }
-  }, [sessionId, token])
-
-  useEffect(() => { void fetchReport() }, [fetchReport])
+    void fetchReport()
+    return () => { cancelled = true }
+  }, [sessionId, token, readRevision])
 
   if (loading) {
     return (
@@ -84,7 +89,7 @@ const PublicQuestionnaireResult: React.FC = () => {
           actions={(
             <div className="hui-public-participation__inline-actions">
               <ProductButton variant="primary" onClick={() => navigate(questionnaireEntry)}>返回问卷入口</ProductButton>
-              {canRetry ? <ProductButton onClick={() => void fetchReport()}>重试读取报告</ProductButton> : null}
+              {canRetry ? <ProductButton onClick={() => setReadRevision(value => value + 1)}>重试读取报告</ProductButton> : null}
             </div>
           )}
         >

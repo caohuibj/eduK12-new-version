@@ -54,11 +54,13 @@ jobs:
           import {execFileSync} from 'node:child_process';
           import {cognitiveIntakeToolingChanged} from './.github/scripts/cognitive-intake-scope.mjs';
           import {scaleIntakeToolingChanged} from './.github/scripts/scale-intake-scope.mjs';
+          import {toolingBackendTests} from './.github/scripts/local-validation.mjs';
           const files=execFileSync('git',['diff','--name-only','-z','--no-renames',process.env.CI_BASE_SHA,process.env.GITHUB_SHA],{encoding:'utf8'}).split('\0').filter(Boolean);
-          process.exitCode=scaleIntakeToolingChanged(files)||cognitiveIntakeToolingChanged(files)?0:1;
+          process.exitCode=scaleIntakeToolingChanged(files)||cognitiveIntakeToolingChanged(files)||toolingBackendTests(files).length?0:1;
           JS
           then
             npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
+            node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
           fi
       - name: consume local success or execute missing tooling checks
         run: node .github/scripts/local-validation.mjs ci release-tools

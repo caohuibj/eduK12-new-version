@@ -38,6 +38,39 @@ function fixture(){
  const read=(cmd,a,...rest)=>{if(cmd==='ls-tree')return a===base?'':`100644 blob ${blob}\t${rest.at(-1)}`;if(cmd==='rev-parse'){if(a.endsWith('^{tree}'))return tree;if(a.endsWith(':server-version/backend'))return h('2');if(a.endsWith(':server-version/frontend'))return h('3');return blob;}throw Error('Unexpected mocked Git command');};
  return {b,entries,env,read};
 }
+test('onboarding accepts unchanged main controls without reading an older candidate checkpoint',()=>{
+ const f=fixture(),checkpointReads=[];
+ const entries=f.entries.filter(e=>!CONTROLS.includes(e.file));
+ const read=(cmd,commit,...rest)=>{
+  if(cmd==='ls-tree'&&CONTROLS.includes(rest.at(-1))){
+   if(commit===f.b.controlCheckpoint)checkpointReads.push(rest.at(-1));
+   return `100644 blob ${commit===f.b.controlCheckpoint?h('4'):h('5')}\t${rest.at(-1)}`;
+  }
+  return f.read(cmd,commit,...rest);
+ };
+ assert.equal(onboardingPlan(entries,base,head,read,f.env,f.b).pr,366);
+ assert.deepEqual(checkpointReads,[],'Unchanged controls belong to the current main baseline');
+});
+test('onboarding still rejects changed control bytes that differ from the reviewed checkpoint',()=>{
+ const f=fixture(),path='.github/scripts/onboarding-checks.mjs';
+ const read=(cmd,commit,...rest)=>cmd==='ls-tree'&&commit===head&&rest.at(-1)===path
+  ?`100644 blob ${h('9')}\t${path}`:f.read(cmd,commit,...rest);
+ assert.throws(()=>onboardingPlan(f.entries,base,head,read,f.env,f.b),/Control checkpoint drift/);
+});
+test('onboarding needs before snapshots only for changed controls, not later additions to the shared list',()=>{
+ const f=fixture(),entries=f.entries.filter(e=>!CONTROLS.includes(e.file));
+ const read=(cmd,commit,...rest)=>cmd==='ls-tree'&&CONTROLS.includes(rest.at(-1))
+  ?`100644 blob ${blob}\t${rest.at(-1)}`:f.read(cmd,commit,...rest);
+ const candidate={...f.b,controlBefore:{}};
+ assert.equal(onboardingPlan(entries,base,head,read,f.env,candidate).pr,366);
+ assert.throws(()=>onboardingPlan(entries,base,head,read,f.env,{...candidate,controlBefore:{'unreviewed-control':null}}),/Unknown control path/);
+ // A modified control still needs its exact before blob; an absent entry must
+ // not let a real M change masquerade as a newly added control.
+ const path='.github/scripts/onboarding-checks.mjs',before=h('6');
+ const modifiedRead=(cmd,commit,...rest)=>cmd==='ls-tree'&&rest.at(-1)===path&&commit===base
+  ?`100644 blob ${before}\t${path}`:read(cmd,commit,...rest);
+ assert.throws(()=>onboardingPlan([...entries,{file:path,status:'M',oldMode:'100644',newMode:'100644'}],base,head,modifiedRead,f.env,candidate));
+});
 test('onboarding scope binds exact source, modes, reviewed controls and the supported PR only',()=>{
  const f=fixture();assert.equal(onboardingPlan(f.entries,base,head,f.read,f.env,f.b).pr,366);
  for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'365'},{CI_FORCE_FULL:'true'},{CI_PR_REPOSITORY:'other/repo'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
@@ -208,7 +241,7 @@ test('PR381 binds the two frontend files, exact evidence and unchanged backend w
  }
  for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:BRANCHES[380]},{CI_PR_NUMBER:'380'},{CI_FORCE_FULL:'true'},{CI_SOURCE_HEAD:h('9')}]){
   const read=(cmd,a,...rest)=>a===h('9')+'^{tree}'?h('9'):f.read(cmd,a,...rest);
-  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b));
+  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b),error=>error instanceof assert.AssertionError&&(!patch.CI_SOURCE_HEAD||/Source\/merge tree drift/.test(error.message)));
  }
  assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...rest),env,b));
  assert.throws(()=>onboardingPlan([...entries,{file:'unknown',newMode:'100644'}],base,head,f.read,env,b));
@@ -678,6 +711,60 @@ test('PR444 exact qualifier preserves required component scope and rejects unkno
  f.b.pr=444;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'444',CI_HEAD_REF:BRANCHES[444]};
  const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
  const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,444);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR448 exact qualifier preserves required component scope and rejects unknown paths',()=>{
+ const f=fixture(),paths=["server-version/backend/scripts/runtime-table-policy.json"];
+ f.b.pr=448;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'448',CI_HEAD_REF:BRANCHES[448]};
+ const read=f.read;
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,448);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+
+test('PR448 integration preserves existing 445 and 449 registry dispatch and frontend-only scope',()=>{
+ for(const [id,path]of [[445,'server-version/frontend/src/pages/student/ScaleResult.tsx'],[449,'server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx']]){
+  const f=fixture(),candidate={...f.b,pr:id,source:{[path]:{before:null,after:blob}}};
+  const entries=[path,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+  const env={...f.env,CI_PR_NUMBER:String(id),CI_HEAD_REF:BRANCHES[id]};
+  const registry={...f.b,candidates:{[String(id)]:candidate}};
+  const read=(cmd,a,...rest)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('8'):f.read(cmd,a,...rest);
+  assert.equal(onboardingPlan(entries,base,head,read,env,registry).pr,id);
+  const changedBackend=(cmd,a,...rest)=>cmd==='rev-parse'&&a.endsWith(':server-version/backend')&&a!==base+':server-version/backend'?h('9'):read(cmd,a,...rest);
+  assert.throws(()=>onboardingPlan(entries,base,head,changedBackend,env,{...registry,candidates:{[String(id)]:{...candidate,components:{...candidate.components,backend:h('9')}}}}),/Frontend loading must not change backend/);
+ }
+});
+
+test('PR447 exact public-result scope and SAST reject identity, activation, unknown paths and backend drift',()=>{
+ const f=fixture(),paths=['server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx','server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx'];
+ f.b.pr=447;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'447',CI_HEAD_REF:BRANCHES[447]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,447);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'445'},{CI_FORCE_FULL:'true'},{CI_EVENT:'workflow_dispatch'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
+ const unknown='server-version/frontend/src/pages/public/PublicQuestionnaire.tsx';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/backend'?h('9'):f.read(cmd,a,...r),f.env,f.b));
+});
+test('PR447 retained evidence admits ten actual passes and fresh aligned types while refusing drift and filtered selections',()=>{
+ const r=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['447'],original=r.reports[0],report=decodeOriginal(original,readFileSync(original.path));
+ assert.equal(verifyOriginalReport(report,original).length,10);assert.equal(report.numPendingTests,2);
+ const filtered=original.cases.find(c=>['pending','skipped'].includes(c.status)).fullName;
+ assert.throws(()=>verifyOriginalReport(report,{...original,selectedCases:[filtered]}));assert.throws(()=>decodeOriginal(original,Buffer.from('{}')));
+ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
+ for(const proof of [r.originalExecutionAssociation.candidate,r.originalExecutionAssociation.lint]){const receipt=decodeOriginal(proof,readFileSync(proof.path));assert.equal(receipt.exitCode,0);for(const[path,digest]of Object.entries(receipt.inputs))assert.equal(hash(readFileSync(path)),digest);}
+ const record=r.types[0],receipt=decodeOriginal(record,readFileSync(record.path));assert.equal(verifyTypeReceipt(receipt,record,readFileSync,record.componentTree).originalExitCode,0);
+ assert.throws(()=>verifyTypeReceipt(receipt,record,readFileSync,h('9')));assert.throws(()=>verifyTypeReceipt({...receipt,exitCode:1},record,readFileSync,record.componentTree));
+ const yaml=readFileSync('.github/workflows/ci.yml','utf8');assert(yaml.includes('437,448,444,447,439'));
+});
+
+test('PR450 exact qualifier preserves required component scope and rejects unknown paths',()=>{
+ const f=fixture(),paths=["server-version/backend/src/modules/composite/composite.service.ts"];
+ f.b.pr=450;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'450',CI_HEAD_REF:BRANCHES[450]};
+ const read=f.read;
+ assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...rest)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):read(cmd,a,...rest),f.env,f.b));
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,450);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
  for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
  const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
 });

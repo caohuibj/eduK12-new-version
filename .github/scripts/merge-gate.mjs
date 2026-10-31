@@ -160,8 +160,9 @@ export function requiredChecks(needs, draft) {
   else if (scope.documentation === 'true') { /* No runtime lane for ordinary docs. */ }
   else if (scope.presentation === 'true') checks.push('visual');
   else if (scope.frontend === 'true') {
-    if (draft) checks.push('pr-light-frontend');
-    if (!draft) checks.push('backend-browser-build', 'frontend', 'browser', 'docker');
+    if (scope.frontend_affected === 'true') checks.push('frontend',...(!draft?['docker']:[]));
+    else if (draft) checks.push('pr-light-frontend');
+    else checks.push('backend-browser-build', 'frontend', 'browser', 'docker');
   } else if (scope.content !== 'true' && scope.scenario !== 'frontend-test') {
     checks.push('maintenance','miniprogram');
     if (draft) checks.push('pr-light-frontend');
@@ -479,6 +480,8 @@ export function failedChecks(needs, draft) {
     failed.push('scope');
   if(scope.personal_tracking_draft!==undefined&&!['true','false'].includes(scope.personal_tracking_draft))failed.push('scope');
   if(scope.personal_tracking_draft==='true'&&(!draft||scope.application_route!=='legacy'||scope.scenario!=='platform'))failed.push('scope');
+  if(scope.frontend_affected!==undefined&&(!['true','false'].includes(scope.frontend_affected)
+    ||scope.frontend_affected==='true'&&(scope.scenario!=='frontend'||scope.frontend!=='true')))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
   const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
