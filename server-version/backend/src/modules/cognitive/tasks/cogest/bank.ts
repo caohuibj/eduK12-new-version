@@ -39,3 +39,13 @@ export const COGEST_BANK: CogestItem[] = [
   { id: 'ce-23', band: 3, stem: '人类第一次登上月球是在哪一年？', options: ['1959 年', '1969 年', '1979 年', '1989 年'], answer: 1 },
   { id: 'ce-24', band: 3, stem: '一瓶 500 毫升的矿泉水大约有多重？', options: ['约 50 克', '约 500 克', '约 1 千克', '约 5 千克'], answer: 1 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'cogest-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

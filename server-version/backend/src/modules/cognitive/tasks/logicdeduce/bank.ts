@@ -39,3 +39,13 @@ export const LOGICDEDUCE_BANK: LogicdeduceItem[] = [
   { id: 'ld-23', band: 3, stem: '小华有红蓝两种笔共 10 支，红笔比蓝笔多 2 支，红笔有几支？', options: ['4 支', '5 支', '6 支', '8 支'], answer: 2 },
   { id: 'ld-24', band: 3, stem: '房间有 4 个角落，每个角落放 1 只猫，每只猫面前都能看到另外 3 只猫，房间里共有几只猫？', options: ['3 只', '4 只', '7 只', '12 只'], answer: 1 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'logicdeduce-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

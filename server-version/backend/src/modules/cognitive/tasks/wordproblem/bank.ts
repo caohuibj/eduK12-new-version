@@ -39,3 +39,13 @@ export const WORDPROBLEM_BANK: WordproblemItem[] = [
   { id: 'wp-23', band: 3, stem: '商店以每件 60 元的价格进了一批衬衫，加价 25% 出售，每件售价多少元？', options: ['75 元', '80 元', '72 元', '85 元'], answer: 0 },
   { id: 'wp-24', band: 1, stem: '小红有 45 元，买书用去 18 元，还剩多少元？', options: ['63 元', '27 元', '37 元', '17 元'], answer: 1 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'wordproblem-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

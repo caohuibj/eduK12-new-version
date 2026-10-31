@@ -22,6 +22,12 @@
       "export": "icarmatrixRegistryEntry"
     }
   ],
+  "banks": [
+    {
+      "file": "generator.ts",
+      "export": "bankMeta"
+    }
+  ],
   "catalog": {
     "file": "governance.ts",
     "export": "catalog"

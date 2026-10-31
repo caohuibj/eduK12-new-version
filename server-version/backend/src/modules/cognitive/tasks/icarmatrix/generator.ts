@@ -178,3 +178,14 @@ export const icarmatrixItem = (seed: string, index: number): IcarmatrixItem => {
   }
   return generatedItem(seed, index)
 }
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：冻结库（前 BANK_SIZE 题）为内部手写题；生成轨见 ICARMATRIX_STIMULUS_SET_VERSION。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'icarmatrix-gen-v1.0.0',
+  source: 'internal-authored frozen bank; generated trials are MatGen-inspired (internal)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+  ruleTags: ['constant', 'progression', 'distribution'],
+})

@@ -29,3 +29,13 @@ export const SEMANTICFLUENCY_BANKS: Record<SemanticfluencyCategory, string[]> = 
     '板栗', '核桃', '腰果', '开心果', '榛子', '松子', '银杏果',
   ],
 }
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'semanticfluency-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

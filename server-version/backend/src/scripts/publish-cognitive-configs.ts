@@ -6,6 +6,7 @@ import {
   planCognitiveConfigBatchPublication,
 } from '../modules/cognitive/release-batch'
 import { publishCognitiveConfig } from '../modules/cognitive/release.service'
+import { collectBankPublishBlockers } from '../modules/cognitive/banks/publish-gate'
 
 const main = async () => {
   const args = process.argv.slice(2)
@@ -20,6 +21,25 @@ const main = async () => {
   const input = cognitiveBatchPublicationInputSchema.parse(
     JSON.parse(readFileSync(args[inputIndex + 1], 'utf8')),
   )
+
+  // Roadmap v2.0 PR1：公开发布闸门——research-restricted 题库默认拦截 --apply；
+  // 内部 pilot 轮次可用 --allow-research-restricted 显式放行。
+  const bankBlockers = await collectBankPublishBlockers(input.configs)
+  if (bankBlockers.length > 0) {
+    const allowFlag = '--allow-research-restricted'
+    if (!args.includes(allowFlag)) {
+      if (args.includes('--apply')) {
+        console.error('Research-restricted banks block public release:')
+        for (const blocker of bankBlockers) {
+          console.error(` - ${blocker.testType}: ${blocker.stimulusSetVersion} license=${blocker.license} (${blocker.source})`)
+        }
+        console.error(`Pass ${allowFlag} only for internal pilot rounds that never reach public deployment.`)
+        process.exitCode = 3
+        return
+      }
+      console.warn('Note: release contains research-restricted banks; --apply would be blocked without' + allowFlag)
+    }
+  }
 
   if (args.includes('--apply')) {
     const actorIndex = args.indexOf('--actor')

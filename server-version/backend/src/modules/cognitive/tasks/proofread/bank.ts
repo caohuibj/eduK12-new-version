@@ -39,3 +39,13 @@ export const PROOFREAD_BANK: ProofreadItem[] = [
   { id: 'pf-23', band: 1, stem: '妈妈说要我放学后直接回家，不要在路上玩流。', options: ['放学', '直接回家', '在路上', '玩流'], answer: 3 },
   { id: 'pf-24', band: 3, stem: '他的态度很坚决，不管别人怎么劝说他都听不进去，真拿他没办法。', options: ['态度', '坚决', '劝说', '没办法'], answer: 3 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'proofread-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

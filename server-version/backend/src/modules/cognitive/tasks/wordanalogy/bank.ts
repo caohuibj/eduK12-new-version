@@ -51,3 +51,13 @@ export const WORDANALOGY_BANK: WordanalogyItem[] = [
   { id: 'wa-35', band: 3, stem: '过滤器 对于 杂质 相当于 筛选 对于 ____', options: ['信息', '简历', '条件', '淘汰'], answer: 0 },
   { id: 'wa-36', band: 3, stem: '自由 对于 约束 相当于 创新 对于 ____', options: ['想法', '常规', '突破', '尝试'], answer: 1 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'wordanalogy-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

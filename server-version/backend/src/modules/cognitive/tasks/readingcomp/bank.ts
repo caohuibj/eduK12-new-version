@@ -32,3 +32,13 @@ export const READINGCOMP_BANK: ReadingcompItem[] = [
   { id: 'rc-15', band: 3, passage: '指纹由遗传决定基本形状，但细节特征在胎儿期随机形成，因此即使同卵双胞胎的指纹也不完全相同。指纹在胎儿发育约 17 周时开始出现。', question: '为什么同卵双胞胎的指纹也不完全相同？', options: ['遗传不同', '细节特征随机形成', '生活环境不同', '饮食影响'], answer: 1 },
   { id: 'rc-16', band: 3, passage: '免疫系统通过产生抗体来对抗病毒。疫苗的原理是让免疫系统提前"认识"病毒的特征，从而在真正感染时快速反应。疫苗通常含有灭活或减毒的病毒。', question: '疫苗让免疫系统提前"认识"病毒的方式是什么？', options: ['直接注射抗体', '注入灭活或减毒病毒', '替换免疫系统', '杀死所有病毒'], answer: 1 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'readingcomp-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

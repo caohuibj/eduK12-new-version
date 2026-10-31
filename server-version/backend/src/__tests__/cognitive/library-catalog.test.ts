@@ -40,7 +40,8 @@ const collectSourceFiles = (dir: string): string[] => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) {
-      if (entry.name === 'node_modules' || entry.name === '__tests__') continue
+      // 隐藏目录（如并发测试的 .cognitive-fixture-* 临时目录）与依赖目录不参与边界扫描。
+      if (entry.name === 'node_modules' || entry.name === '__tests__' || entry.name.startsWith('.')) continue
       out.push(...collectSourceFiles(full))
     } else if (entry.name.endsWith('.ts')) {
       out.push(full)

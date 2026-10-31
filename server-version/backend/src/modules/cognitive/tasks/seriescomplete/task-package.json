@@ -22,6 +22,12 @@
       "export": "seriescompleteRegistryEntry"
     }
   ],
+  "banks": [
+    {
+      "file": "bank.ts",
+      "export": "bankMeta"
+    }
+  ],
   "catalog": {
     "file": "governance.ts",
     "export": "catalog"

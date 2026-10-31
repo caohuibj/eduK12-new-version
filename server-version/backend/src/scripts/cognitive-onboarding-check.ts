@@ -7,6 +7,7 @@ import {
   formatCognitiveOnboardingDecision,
   type CognitiveBlockerV1,
 } from '../modules/cognitive/onboarding/decision'
+import { cognitiveBankMetaSchema } from '../modules/cognitive/banks/bank-meta'
 const manifests = require('../../../scripts/cognitive/manifests.cjs')
 const dependencies = require('../../../scripts/cognitive/dependencies.cjs')
 const { runAcceptance } = require('../../../scripts/cognitive/acceptance.cjs')
@@ -251,6 +252,35 @@ async function main() {
               ),
               gate: 'PILOT_PUBLISH',
             })
+        // Roadmap v2.0 PR1：题库元数据（来源/授权/等值身份）随精确身份校验。
+        const taskPackageFile = `${selected.directory}/task-package.json`
+        for (const bankRef of (selected.banks ?? []) as Array<{ file: string; export: string }>) {
+          try {
+            const bankModule = await import(path.join(manifests.ROOT, selected.directory, bankRef.file))
+            const parsed = cognitiveBankMetaSchema.safeParse(bankModule[bankRef.export])
+            if (!parsed.success) {
+              pilot.push({
+                ...add('COG_BANK_META_INVALID', 'IDENTITY', `Bank meta failed schema validation: ${parsed.error.issues.map((i) => i.path.join('.')).join(', ')}`, taskPackageFile),
+                gate: 'PILOT_PUBLISH',
+              })
+              continue
+            }
+            const seedStimulusVersions = seeds
+              .map((s) => (s.config as { stimulusSetVersion?: unknown }).stimulusSetVersion)
+              .filter((v): v is string => typeof v === 'string')
+            if (seedStimulusVersions.length > 0 && !seedStimulusVersions.includes(parsed.data.stimulusSetVersion)) {
+              pilot.push({
+                ...add('COG_BANK_SEED_MISMATCH', 'IDENTITY', `bank stimulusSetVersion ${parsed.data.stimulusSetVersion} is not referenced by any seed config (${seedStimulusVersions.join(', ')})`, taskPackageFile),
+                gate: 'PILOT_PUBLISH',
+              })
+            }
+          } catch (error) {
+            pilot.push({
+              ...add('COG_BANK_META_INVALID', 'IDENTITY', `Bank module could not be loaded: ${(error as Error).message}`, taskPackageFile),
+              gate: 'PILOT_PUBLISH',
+            })
+          }
+        }
         const presentation = resolveParticipantPresentation(id)
         if (
           !presentation?.title ||

@@ -51,3 +51,13 @@ export const WORDMEANING_BANK: WordmeaningItem[] = [
   { id: 'wm-35', band: 2, word: '一致', options: ['彼此相同没有分歧', '各说各话', '部分相反', '毫无关系'], answer: 0 },
   { id: 'wm-36', band: 2, word: '显著', options: ['非常不明显', '特别明显、容易看出', '慢慢显现', '被完全遮住'], answer: 1 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'wordmeaning-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})

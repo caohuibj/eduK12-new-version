@@ -39,3 +39,13 @@ export const SERIESCOMPLETE_BANK: SeriescompleteItem[] = [
   { id: 'sc-23', band: 2, stem: '5, 7, 11, 13, ?', options: ['14', '15', '16', '17'], answer: 3 },
   { id: 'sc-24', band: 3, stem: '2, 4, 12, 48, ?', options: ['96', '144', '240', '480'], answer: 2 },
 ]
+
+import { cognitiveBankMetaSchema, type CognitiveBankMeta } from '../../banks/bank-meta'
+
+/** PR1 题库元数据：来源/授权/等值身份；对外发布闸门见 publish-cognitive-configs。 */
+export const bankMeta: CognitiveBankMeta = cognitiveBankMetaSchema.parse({
+  stimulusSetVersion: 'seriescomplete-zh-v1.0.0',
+  source: 'internal-authored (pilot bank, not copied from any published test)',
+  license: 'internal-generated',
+  itemSetRole: 'form',
+})
