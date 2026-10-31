@@ -5222,9 +5222,9 @@
       "schemaVersion": 1,
       "pr": 428,
       "enabled": true,
-      "base": "6627b41580ae7852ceff9ea33b853985f4390f55",
-      "product": "1338e82efdce0d478d4db1bf98c3f46a5ee74c69",
-      "controlCheckpoint": "9e3cbe991885d98c45a11aea7ce2daa94acffd0c",
+      "base": "f3c3b7def0ecb663a328c9effb7a7ae90753178b",
+      "product": "2c1ef5d3df1211635b04fac219cc993a5d68bfef",
+      "controlCheckpoint": "18726ca25d0b8ddb28ba105ead6acdf274ae3627",
       "source": {
         "docs/evidence/library-self-group-release-20261031/README.md": {
           "before": null,
@@ -5343,6 +5343,26 @@
           "after": "6b7888ed5c91178794c2ca265667c7cce8633fff"
         },
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/README.md": {
+          "before": null,
+          "after": "49e89654e1ba81a2d8e5afbf6bf9cdd95388ca0e"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/backend-types.json": {
+          "before": null,
+          "after": "67204d2773818e35c95adc098a4d2a54d7a0e2f3"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.json": {
+          "before": null,
+          "after": "acfeab6ffb32e9b2cd376b7d0d5e01b1cb7f0fa1"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.log": {
           "before": null,
           "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
         },
@@ -5698,11 +5718,11 @@
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "b7c8c4374b7f04ac7d182ebb6ac9ee1859ead767",
-        ".github/scripts/onboarding-checks.mjs": "6c39e7e2a329fcf03f4d27bdf4406dbaedbf1f97",
-        ".github/scripts/onboarding-controls.test.mjs": "f59ab4ea334d1404d1f100c3f165d4fc3c64186f",
-        ".github/scripts/onboarding-evidence.json": "1da3b796d8f0fb4888886bf2bbdcd710cd960778",
-        ".github/scripts/onboarding-scope.mjs": "66b4dee206aa512c8526d1685fdb258bed78f4d1",
+        ".github/scripts/onboarding-bindings.json": "02431fa1e8cea88af348adbf2fe2c3f0338b962a",
+        ".github/scripts/onboarding-checks.mjs": "c7d52cb988f1f0f409349c3e35e0ae40e260c3b8",
+        ".github/scripts/onboarding-controls.test.mjs": "a39ff9d41f0984de059cb73ca986f44a8fafb69e",
+        ".github/scripts/onboarding-evidence.json": "bd71e4dce21914f7c51fd20713f370a6d0698b05",
+        ".github/scripts/onboarding-scope.mjs": "be840fc9ee3fbec3f338a6cd5ab0fabdfdfc64a3",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -5712,11 +5732,11 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "7e254b9280ee1efe390c1098742edbf964d5a5d6"
+        ".github/workflows/ci.yml": "1e8bfe293da8513f8c3a0dbd93dc195a533023ae"
       },
       "components": {
-        "backend": "f5190a3bba8069a768c53cf7ff69d832280fad99",
-        "frontend": "9bfa314a1fdf9eba874c4e88c5a69b03289a0a52"
+        "backend": "a904d85585fd635c7521f5f025eaa5a6660843e9",
+        "frontend": "1a014099924357f420821fc7c8aca1344ab472b0"
       }
     }
   }
