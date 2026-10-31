@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "schema": 1,
+    "route": "onboarding-structure",
+    "base": "8bc677156a3548333450363a31e33812ad2a9f0c",
+    "head": "b2c1e012dc409ab08bd786f09b70f3bd00b76685",
+    "sourceHead": "b3e9f35bac2700200c3b099a52ba11a4e74ae34e",
+    "tree": "54319869523c4dd66b85f6358edb68cfdc7f65ed",
+    "product": "486fa3286f264d6321b8140373aaf4dce0593154",
+    "components": {
+      "backend": "d3d7ba830a009c7e28fcedeab6830ba6a1f9c548",
+      "frontend": "84e0aa6ee03428bff0cc0c68de09e39fd5fbd542"
+    },
+    "controlCheckpoint": "6a2ab3879f754d1cedf2c9e28975a66a20a6d566",
+    "pr": 415,
+    "postMerge": false,
+    "draft": false
+  },
+  "runId": "41070437105",
+  "attempt": "1",
+  "admitted": [
+    {
+      "id": "teacher-reading-navigation",
+      "caseNames": [
+        "opens an existing Teacher Form release through the real product navigation and prints only its authorized rounded projection"
+      ],
+      "originalSourceAssociation": "486fa3286f264d6321b8140373aaf4dce0593154",
+      "sourceAssociationBasis": "Actual local navigation invocation on the current main8bc merged source and explicit baselineId:null tracking fixture; unsigned original receipt.",
+      "originalReportSHA256": "7b9298b345053d7b92dd857eb52bdd42b3bdff2a163afb1d211ffb789560d76b",
+      "originalReportSuccess": true,
+      "originalFailedCount": 0,
+      "ciExecuted": false
+    }
+  ],
+  "types": [
+    {
+      "originalExitCode": 0,
+      "originalNode": "v24.21.0",
+      "originalSigned": false,
+      "component": "frontend",
+      "currentComponentTree": "84e0aa6ee03428bff0cc0c68de09e39fd5fbd542",
+      "coverage": "exact-frontend-tree"
+    }
+  ],
+  "observations": [
+    {
+      "kind": "browser",
+      "originalSHA256": "7484e30d26f2c7781d485159ccdd04b64a3035e794db000f27f600dd82880f87",
+      "ciExecuted": false,
+      "sourceAssociationBasis": "Original380b90 actual TeacherApp browser layout/fullscreen/printing observation. Reader component and shared rendering CSS unchanged; current shared Studio tracking-query delta separately covered by the fresh main8bc navigation receipt. Not an identical full browser bundle claim.",
+      "limitations": [
+        "Unsigned original browser observation.",
+        "No real backend or production authority claim; no browser replay."
+      ]
+    }
+  ],
+  "environment": {
+    "node": "v24.21.0",
+    "limitations": [
+      "Unsigned original local evidence; current navigation and frontend types are fresh for the actual main8bc input.",
+      "Original browser/PDF observation belongs to380b90. Reader component/primitives/CSS unchanged; shared Studio gains tracking consumer validated by the fresh single navigation case. No complete bundle equality claim.",
+      "Exact scope refuses any backend drift from main8bc; this unchanged component is not compiled or replayed by this frontend-only slice.",
+      "No real backend authority, production data, subgroup versioning or non-Form permission claim."
+    ]
+  },
+  "testsExecutedInCI": false,
+  "rootReviewAuthentication": "Immutable reviewed Git record, not a signed original execution"
+}

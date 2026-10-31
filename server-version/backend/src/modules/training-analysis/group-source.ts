@@ -1,3 +1,5 @@
+import {readInstance} from '../bundle-product/instance'
+import {compositeConflict} from '../composite/composite.errors'
 import type { FormQuestion } from '../assessment-core/form/definition'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
@@ -43,4 +45,22 @@ export function trainingGroupFormQuestion(item: any): FormQuestion {
   if (item.formDefinition) return typedCompositeFormQuestion(mapCompositeSection({id: item.formSectionId, title: '', position: 0, items: [item]}).items[0])
   return {itemKey: item.id, type: item.formType === 'single_choice' ? 'SINGLE' : item.formType === 'multiple_choice' ? 'MULTIPLE' : 'LONG_TEXT', prompt: item.formLabel, required: item.required,
     options: (item.formOptions ?? []).map((option: {value: string; label: string}) => ({optionKey: option.value, label: option.label})), rows: []}
+}
+
+
+/** Native Bundle measurement bindings only. Context Forms and Profile output
+ * remain part of administration, never become group-report leaf metrics. */
+export function trainingGroupLeafItems<T extends {id:string;type:string}>(task:{productKind?:string;items:T[];bundleInstance?:Parameters<typeof readInstance>[0]|null}):T[]{
+  if(task.productKind!=='ASSESSMENT_BUNDLE')return task.items
+  if(!task.bundleInstance)throw compositeConflict('固定 Bundle 缺少冻结来源')
+  const {frozen,bindings}=readInstance(task.bundleInstance)
+  const ids=new Set<string>()
+  for(const binding of bindings.slots){
+    const slot=frozen.bundleSnapshot.slotBindings.find(slot=>slot.slotKey===binding.slotKey)
+    const item=task.items.find(item=>item.id===binding.itemId)
+    if(!slot||!['SCALE','COGNITIVE','SITUATIONAL'].includes(slot.unitType)||slot.unitType!==binding.unitType||item?.type!==binding.unitType||ids.has(binding.itemId))
+      throw compositeConflict('固定 Bundle 叶工具与冻结来源不一致')
+    ids.add(binding.itemId)
+  }
+  return task.items.filter(item=>ids.has(item.id))
 }

@@ -54,23 +54,26 @@ export async function readReleasedTeacherReport(tx:Tx,input:{
     ||!row.reportProjection
     ||row.reportDigest!==canonicalHash(row.reportProjection))
     reject('TEACHER_REPORT_V2_RELEASE_INTEGRITY')
-  return row.reportProjection
+  const {__population,...projection}=row.reportProjection as Record<string,unknown>
+  return projection
 }
 export async function recordTeacherReportRelease(tx:Tx,input:{
   organizationId:string;runId:string;scopeKey:string;
   policySnapshotId:string;scenario:TeacherReportScenario;
   actorUserId:string;populationDigest:string;projection:Record<string,unknown>;
+  releaseId?:string;privatePopulation?:{cohortSnapshotId:string;contributingExecutionIds:string[]};
 }){
   const existing=await readReleasedTeacherReport(tx,{
     ...input,reportKind:input.scenario})
   if(existing)return existing
-  const projectionJson=input.projection as Prisma.InputJsonValue
+  const storedProjection=input.privatePopulation?{...input.projection,__population:input.privatePopulation}:input.projection
+  const projectionJson=storedProjection as Prisma.InputJsonValue
   await tx.educationReportReleaseRecord.create({data:{
-    id:randomUUID(),organizationId:input.organizationId,
+    id:input.releaseId??randomUUID(),organizationId:input.organizationId,
     reportScopeKey:input.scopeKey,policySnapshotId:input.policySnapshotId,
     sourceRunId:input.runId,reportKind:input.scenario,
     audience:'AUTHORIZED_HUITEACHER_AGGREGATE',
-    reportDigest:canonicalHash(input.projection),
+    reportDigest:canonicalHash(storedProjection),
     effectivePopulationDigest:input.populationDigest,
     releasedByUserId:input.actorUserId,reportProjection:projectionJson,
   }})

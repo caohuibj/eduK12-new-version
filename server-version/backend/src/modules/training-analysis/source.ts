@@ -23,7 +23,7 @@ import { createScaleProjectionContext } from '../scale/projection/context-factor
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { resolveTrainingComparability } from './core'
-import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, type TrainingGroupSource } from './group-source'
+import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, trainingGroupLeafItems, type TrainingGroupSource } from './group-source'
 import type { GroupMetricDefinition, GroupMetricObservation } from '../reporting/group-summary'
 import type { TrainingAnalysisRequestV1, TrainingAnalysisSourceV1, TrainingAnalysisWaveV1, TrainingMetricIdentityV1, TrainingNumericObservationV1, TrainingObservationReason } from './types'
 
@@ -108,8 +108,8 @@ async function authority(tx: Prisma.TransactionClient, actor: TrainingAnalysisAc
   const visibility = actor.role === UserRole.TEACHER ? {OR: [{assignmentRef: null}, {assignmentRef: {in: assignments.map(row => row.id)}}]} : null
   return {principal: {...principal, expiresAt: iso(principal.expiresAt)}, course, assignments, visibility}
 }
-const authorizedTaskWhere = (actor: TrainingAnalysisActor, courseId: string) => ({
-  productKind: productWhere, compositionTemplates: {none: {}}, ...(actor.role === UserRole.ADMIN ? {} : {createdBy: actor.userId}),
+const authorizedTaskWhere = (actor: TrainingAnalysisActor, courseId: string, group=false) => ({
+  productKind: group?{in:[...productWhere.in,'ASSESSMENT_BUNDLE']}:productWhere, compositionTemplates: {none: {}}, ...(actor.role === UserRole.ADMIN ? {} : {createdBy: actor.userId}),
   // Historical delivery identity survives removal of a current course link.
   OR: [{courseId}, {questionnaireCourses: {some: {courseId}}}, {attempts: {some: {deliveryCourseId: courseId}}}],
 })
@@ -237,7 +237,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const auth = await authority(tx, actor, selector.courseId, options.authorityLock, options.expectedTokenVersion)
   if (options.group && selector.waves.length !== 1) throw compositeBadRequest('单次群体报告只选择一个任务来源')
   if (!selector.waves.length || selector.waves.length > 8) throw compositeBadRequest('请选择 1–8 个明确波次')
-  const tasks = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, selector.courseId), id: {in: [...new Set(selector.waves.map(wave => wave.taskId))]}}, include: templateInclude})
+  const tasks = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, selector.courseId, Boolean(options.group)), id: {in: [...new Set(selector.waves.map(wave => wave.taskId))]}}, include: options.group?{...templateInclude,bundleInstance:true}:templateInclude})
   if (tasks.length !== new Set(selector.waves.map(wave => wave.taskId)).size) unavailable()
   const byTask = new Map(tasks.map(task => [task.id, task])), entries: Array<{wave: TrainingAnalysisWaveV1; attempt: any; scope: TrainingAttemptScope; slots: FrozenActiveSlotSetV1 | null}> = []
   const fixed = options.fixedManifest?.attempts
@@ -249,7 +249,8 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     if ((task.trainingVariantDigest ?? null) !== wave.configDigest || Boolean(wave.configDigest) !== Boolean(wave.variantKey)) unavailable()
     const material = materialConfig(task)
     if (material?.schemaVersion === 2 ? !material.experiment.groups.some(group => group.groupKey === wave.materialGroupKey) : wave.materialGroupKey !== undefined) unavailable()
-    if (wave.metrics.some(metric => !task.items.some((item: any) => item.id === metric.itemId))) unavailable()
+    const metricItems=options.group?trainingGroupLeafItems(task):task.items
+    if (wave.metrics.some(metric => !metricItems.some((item: any) => item.id === metric.itemId))) unavailable()
     taskAuthority.push({id: task.id, createdBy: task.createdBy, productKind: task.productKind})
     const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [
       ...(auth.visibility ? [auth.visibility] : []),
@@ -636,7 +637,7 @@ async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: T
  * source and disclosure; Scale selectors come only from frozen runtimes. */
 export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, options: {authorityLock?: 'SHARE' | 'UPDATE'; group?: boolean; taskId?: string; groupKey?: string} = {}) {
   const auth = await authority(tx, actor, courseId, options.authorityLock)
-  const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}, ...(options.taskId ? {id: options.taskId} : {})}, include: templateInclude,
+  const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, Boolean(options.group)), publishedAt: {not: null}, ...(options.taskId ? {id: options.taskId} : {})}, include: options.group?{...templateInclude,bundleInstance:true}:templateInclude,
     orderBy: [{publishedAt: 'desc'}, {id: 'asc'}], take: 101})
   const list: Array<{taskId: string; taskName: string; publication: string; configDigest: string | null; variantKey: string | null; materialGroupKey?: string; metrics: Array<{itemId: string; metricKey: string; label: string}>}> = []
   // Discover SJT metric keys from accepted frozen facts, never from a mutable
@@ -699,8 +700,10 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const scaleTasks = options.groupKey ? available.filter(task => task.items.some((item: any) => item.type === 'SCALE' && item.id === options.groupKey)) : available
   const scaleMetrics = await discoverFrozenScaleMetrics(tx, actor, courseId, scaleTasks, auth.visibility, options.groupKey)
   for (const task of available) {
-    const metrics: Array<{itemId: string; metricKey: string; label: string}> = [...(sjtMetrics.get(task.id) ?? []), ...(scaleMetrics.get(task.id) ?? [])]
-    for (const item of task.items) {
+    const metricItems=options.group?trainingGroupLeafItems(task):task.items
+    const leafIds=new Set(metricItems.map((item:any)=>item.id))
+    const metrics: Array<{itemId: string; metricKey: string; label: string}> = [...(sjtMetrics.get(task.id) ?? []), ...(scaleMetrics.get(task.id) ?? [])].filter(metric=>leafIds.has(metric.itemId))
+    for (const item of metricItems) {
       if (options.groupKey && (item.type === 'FORM' ? `FORM:${item.formSectionId}` : item.id) !== options.groupKey) continue
       if (options.group && item.type === 'FORM') {
         for (const definition of trainingGroupFormDefinitions(item)) metrics.push({itemId: item.id, metricKey: definition.key, label: definition.label})
@@ -736,13 +739,17 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     })
   }) : []
   return {tools, list, total: list.length, hasMore: tasks.length > 100, canQuality: true, canExport: true,
-    unsupportedReason: '独立 Assessment 或缺少冻结课程来源的数据标记为 LEGACY_UNSCOPED，不依据当前班级成员推断。'}
+    unsupportedReason: '只纳入正式完成且已保存本课程来源的结果；旧独立测评或未绑定课程的历史记录不按今天的名单推断。固定 Bundle 仅报告声明的叶工具，不统计 Context 或 Profile。'}
 }
 
 /** Reuse original course/task ownership at the snapshot boundary; no result read. */
 export async function assertTrainingGroupAccess(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, taskId?: string) {
   await authority(tx, actor, courseId, 'SHARE')
-  if (taskId && !await tx.compositeAssessment.findFirst({where: {...authorizedTaskWhere(actor, courseId), id: taskId}, select: {id: true}})) unavailable()
+  if(taskId){
+    const task=await tx.compositeAssessment.findFirst({where:{...authorizedTaskWhere(actor,courseId,true),id:taskId},select:{id:true,productKind:true,bundleInstance:true,items:{select:{id:true,type:true}}}})
+    if(!task)unavailable()
+    if(task.productKind==='ASSESSMENT_BUNDLE')trainingGroupLeafItems(task)
+  }
 }
 /** Immutable accepted slot pointers can be checked without decrypting facts. */
 export function trainingGroupSnapshotHash(row: any) {
@@ -753,5 +760,5 @@ export function trainingGroupSnapshotHash(row: any) {
 
 export async function listTrainingGroupTasks(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
   await assertTrainingGroupAccess(tx, actor, courseId)
-  return tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100})
+  return tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100})
 }

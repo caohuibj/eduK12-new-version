@@ -88,6 +88,8 @@ export const freezeRunTrackCohort = async (input: {
   generatedByUserId: string
   cohortSelector?: ReportingCohortSelectorInputV2
   baselineCohort?: ReportingCohortSnapshotRecord
+  /** Identity-only reuse by the authorized native Teacher Form adapter. */
+  nativeTeacherForm?: true
 }): Promise<ReportingCohortSnapshotRecord> => {
   const filtered = Boolean(input.cohortSelector || input.baselineCohort)
   let normalized: ReportingCohortSelectorInputV2 | undefined
@@ -119,7 +121,7 @@ export const freezeRunTrackCohort = async (input: {
     const source = sourceRows[0]
     if (!source || source.populationN < 1) reportingFail('REPORT_COHORT_EMPTY', 'Run Track has no frozen reporting population', 409)
     if (source.runStatus === 'DRAFT') reportingFail('REPORT_COHORT_SOURCE_STATE', 'draft Run cannot produce a reporting cohort', 409)
-    if (source.resourceFamily === 'FORM') reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
+    if (source.resourceFamily === 'FORM' && !input.nativeTeacherForm) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
     if (!source.selfShape) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'PR3 generic group reporting accepts SELF observations only', 409)
     if (!source.membershipShape) reportingFail('REPORT_COHORT_IDENTITY', 'generic Organization cohort requires frozen Membership provenance', 409)
     if (source.uniqueSubjectMembershipN !== source.populationN) {
@@ -164,7 +166,7 @@ export const freezeRunTrackCohort = async (input: {
     reportingFail('REPORT_COHORT_EMPTY', filtered ? 'selected population has no executions at this measurement' : 'Run Track has no frozen reporting population', 409)
   }
   if (rows.some((row) => row.runStatus === 'DRAFT')) reportingFail('REPORT_COHORT_SOURCE_STATE', 'draft Run cannot produce a reporting cohort', 409)
-  if (rows.some((row) => row.resourceFamily === 'FORM')) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
+  if (rows.some((row) => row.resourceFamily === 'FORM') && !input.nativeTeacherForm) reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'FORM has no independent generic reporting contract in PR3', 409)
   if (rows.some((row) => row.relationshipKind !== 'SELF' || row.subjectUserId !== row.respondentUserId)) {
     reportingFail('REPORT_ANALYSIS_KIND_UNSUPPORTED', 'PR3 generic group reporting accepts SELF observations only', 409)
   }

@@ -4,7 +4,7 @@ import '../modules/reporting/task-group-report.css'
 
 /** The existing Teacher authorized projection; no raw FINAL or scoring adapter. */
 export interface TeacherFormGroupProjection{
-  eventId:string;formId:string;definitionDigest:string;releasedAt?:string
+  eventId:string;formId:string;definitionDigest:string;releasedAt?:string;versionId?:string;populationLabel?:string;sourceLabel?:string
   independentRespondents:number|null;minimumRespondents:number;note?:string
   distributions:Array<{itemKey:string;prompt:string;type?:string;status:'READY'|'WITHHELD';reason?:string
     selectionMode?:'NON_EXCLUSIVE';precision?:'ROUNDED_10_PERCENT'
@@ -36,7 +36,7 @@ export function TeacherFormGroupReport({report,activityTitle,formTitle}:{
   }
   return <article className="task-group-report" ref={root} aria-label="教师群体报告阅读">
     <header className="task-group-report__header"><div><p className="report-eyebrow">教师群体报告 · Form</p>
-      <h2>{formTitle}</h2><p>活动：{activityTitle} · 全部合格参与教师</p>
+      <h2>{formTitle}</h2><p>活动：{report.sourceLabel??activityTitle} · {report.populationLabel??'全部合格参与教师'}</p>
       {released?<p>正式发布 {released}</p>:<p>历史规则汇总 · 原报告未记录发布时间</p>}
     </div><div className="task-group-report__actions">
       <button type="button" onClick={()=>void fullscreen()}>全屏展示</button>
@@ -71,6 +71,6 @@ export function TeacherFormGroupReport({report,activityTitle,formTitle}:{
     </ReportSection>
     <ReportDetails title="报告版本"><p>活动 {report.eventId} · 表单 {report.formId}</p><p>固定定义 {report.definitionDigest}</p>
       <p>{released?'再次打开读取既有正式发布版本。':'历史规则报告沿用原有读取方式。'}</p></ReportDetails>
-    <footer>Form {report.formId} · {report.definitionDigest} · {released??'历史规则汇总'}</footer>
+    <footer>{report.versionId&&<>快照 {report.versionId} · </>}Form {report.formId} · {report.definitionDigest} · {released??'历史规则汇总'}</footer>
   </article>
 }

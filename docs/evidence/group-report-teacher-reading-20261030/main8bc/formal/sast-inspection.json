@@ -1,0 +1,46 @@
+{
+  "artifact": 12982939881,
+  "zipSHA256": "b02e3e37ff6164632508c31e298a3252399dcafaaefefabc57648a3538c4a622",
+  "bytes": 71499,
+  "reports": [
+    {
+      "path": "javascript.sarif",
+      "originalSHA256": "cf736b6f060c1ca152b92675f04e77ba2ee6f97532104de57cb525d3ede6a4d7",
+      "runs": [
+        {
+          "invocations": [
+            {
+              "executionSuccessful": true
+            }
+          ],
+          "results": [
+            {
+              "ruleId": "js/incomplete-url-substring-sanitization",
+              "level": null,
+              "securitySeverity": null,
+              "message": {
+                "text": "'[https://registry.npmjs.org](1)' can be anywhere in the URL, and arbitrary hosts may come before or after it."
+              },
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": ".github/scripts/onboarding-controls.test.mjs",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 0
+                    },
+                    "region": {
+                      "startLine": 279,
+                      "startColumn": 9,
+                      "endColumn": 51
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

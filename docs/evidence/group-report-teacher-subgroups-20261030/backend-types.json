@@ -1,0 +1,12 @@
+{
+  "command": "node node_modules/typescript/bin/tsc --noEmit",
+  "node": "v24.21.0",
+  "component": "backend",
+  "componentTreeBefore": "08e1af56b33962b0f9ec22c9db3973a164a7b7a2",
+  "componentTreeAfter": "08e1af56b33962b0f9ec22c9db3973a164a7b7a2",
+  "startedAt": "2026-10-30T11:07:24.345Z",
+  "finishedAt": "2026-10-30T11:08:02.437Z",
+  "exitCode": 0,
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "ciExecuted": false
+}
