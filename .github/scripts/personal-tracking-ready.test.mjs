@@ -144,3 +144,17 @@ test('School fixed55 source deltas include native quota controls and reject a ch
  const pin=binding.files['server-version/backend/src/modules/campus/report.routes.ts'],old=pin.originalDeltaSHA256;
  try{pin.originalDeltaSHA256='0'.repeat(64);assert.throws(()=>personalTrackingReadyPlan(entries,binding.base,head,options),/Original longitudinal delta changed/);}finally{pin.originalDeltaSHA256=old;}
 });
+
+test('group longitudinal Ready preserves exact inventory, existing gates and original failures without replay',{skip:binding.slice!=='group'},async()=>{
+ const entries=changedEntries(binding.base,head),plan=personalTrackingReadyPlan(entries,binding.base,head,options);
+ assert.deepEqual(plan.required,['scope','personal-tracking','docker','codeql']);
+ assert.equal(plan.branch,binding.branch);assert(plan.frontendLintPaths.length);assert(plan.sastPaths.includes('.github/scripts/personal-tracking-ready.mjs'));
+ const original=await admitOriginalReports();assert.equal(original.caseCount,binding.originalCaseCount);assert.equal(original.ciExecuted,false);
+ for(const patch of [{forceFull:true},{branch:'other'},{event:'workflow_dispatch'}]){
+  if(patch.forceFull)assert.throws(()=>personalTrackingReadyPlan(entries,binding.base,head,{...options,...patch}));
+  else assert.equal(personalTrackingReadyPlan(entries,binding.base,head,{...options,...patch}),null);
+ }
+ assert.throws(()=>personalTrackingReadyPlan(entries,'a'.repeat(40),head,options));
+ assert.throws(()=>personalTrackingReadyPlan([...entries,{file:'server-version/backend/src/unreviewed.ts',newMode:'100644',oldMode:'000000',status:'A'}],binding.base,head,options));
+ assert.throws(()=>personalTrackingReadyPlan(entries.map((e,i)=>i?e:{...e,newMode:'120000'}),binding.base,head,options));
+});

@@ -1,18 +1,24 @@
 import assert from 'node:assert/strict';
 import {createHash,randomUUID} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {createRequire} from 'node:module';
 import {participantAccessOutputs} from './participant-access-scope.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
-export const binding=JSON.parse(readFileSync(new URL('./personal-tracking-ready.json',import.meta.url)));
+const originalBinding=JSON.parse(readFileSync(new URL('./personal-tracking-ready.json',import.meta.url)));
+const groupBindingFile=new URL('./group-longitudinal-ready.json',import.meta.url);
+const executionPlan=JSON.parse(process.env.PERSONAL_TRACKING_PLAN||'null');
+const executionBranch=process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||executionPlan?.branch;
+export const binding=existsSync(groupBindingFile)
+ ? JSON.parse(readFileSync(groupBindingFile)).candidates?.[executionBranch]??originalBinding : originalBinding;
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,forceFull=false}={}){
  if(branch!==binding.branch||event!=='pull_request')return null;
+ if(binding.slice==='group')return groupLongitudinalReadyPlan(entries,base,head,{event,branch,draft,forceFull});
  assert.equal(forceFull,false,'Personal tracking does not authorize whole-platform execution');
  assert.equal(base,binding.base,'Personal tracking main base changed; recheck affected inputs');
  if(binding.slice==='school'){assert.equal(binding.branch,'feat/personal-longitudinal-school-20261030');assert.equal(binding.originalSource,'aecb26636ebec3d7e8fe27201bc01ad7840ca7e2');}
@@ -36,6 +42,33 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
  const sastPaths=['training','teacher','school'].includes(binding.slice)?[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])]:undefined;
  const frontendLintPaths=['training','teacher','school'].includes(binding.slice)?runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)):undefined;
  return {schemaVersion:1,route:'personal-tracking',...(sastPaths?{sastPaths,frontendLintPaths}:{}),base,head,tree:git('rev-parse',head+'^{tree}'),draft:draft===true,reviewedCandidate:binding.reviewedCandidate,...(binding.imageReuse?{imageReuse:binding.imageReuse}:{}),...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.frontendAuditReuse?{frontendAuditReuse:binding.frontendAuditReuse}:{}),...(binding.applicationSastReuse?{applicationSastReuse:binding.applicationSastReuse}:{}),...(binding.qualificationReuse?{qualificationReuse:binding.qualificationReuse}:{}),required:draft?['scope']:['scope','personal-tracking',...(binding.imageReuse?[]:['docker']),'codeql']};
+}
+// Existing longitudinal qualification job, with exact group-slice source pins.
+// This adds no application producer, authorization layer or alternate gate.
+export function groupLongitudinalReadyPlan(entries,base,head,{event,branch,draft,forceFull=false}){
+ assert.equal(binding.slice,'group');assert.equal(event,'pull_request');assert.equal(branch,binding.branch);
+ assert(['feat/group-longitudinal-survey-training-20261030','feat/school-group-longitudinal-complete-20261031'].includes(branch));
+ assert.equal(forceFull,false);assert.equal(base,binding.base);
+ const marker='.github/scripts/group-longitudinal-ready.json';
+ assert.deepEqual(entries.map(e=>e.file).sort(),[...Object.keys(binding.files),marker].sort(),'Complete group candidate inventory changed');
+ for(const entry of entries){
+  assert.equal(entry.newMode,'100644');
+  const pin=entry.file===marker?{before:binding.markerBefore}:binding.files[entry.file];
+  assert.equal(entry.status,pin.before?'M':'A');assert.equal(entry.oldMode,pin.before?'100644':'000000');
+  if(pin.before)assert.equal(git('rev-parse',base+':'+entry.file),pin.before);
+  if(entry.file!==marker)assert.equal(git('rev-parse',head+':'+entry.file),pin.after);
+ }
+ for(const [component,tree]of Object.entries(binding.components)){
+  assert.equal(git('rev-parse',head+':server-version/'+component),tree);
+  assert.equal(git('rev-parse',binding.reviewedCandidate+':server-version/'+component),tree);
+ }
+ for(const [key,component]of [['backendAuditReuse','backend'],['frontendAuditReuse','frontend']])if(binding[key])for(const file of ['package.json','package-lock.json'])assert.equal(git('rev-parse',head+':server-version/'+component+'/'+file),git('rev-parse',binding[key].sourceHead+':server-version/'+component+'/'+file),'Original audit locked input changed');
+ const runtime=entries.filter(e=>/\.(?:[cm]?js|[cm]?ts|jsx|tsx)$/.test(e.file)).map(e=>e.file);
+ return {schemaVersion:1,route:'personal-tracking',slice:'group',...(binding.backendAuditReuse?{backendAuditReuse:binding.backendAuditReuse}:{}),...(binding.frontendAuditReuse?{frontendAuditReuse:binding.frontendAuditReuse}:{}),branch,base,head,tree:git('rev-parse',head+'^{tree}'),
+  draft:draft===true,reviewedCandidate:binding.reviewedCandidate,
+  sastPaths:[...new Set([...runtime,'.github/scripts/personal-tracking-ready.mjs'])],
+  frontendLintPaths:runtime.filter(p=>p.startsWith('server-version/frontend/src/')).map(p=>p.slice('server-version/frontend/'.length)),
+  required:draft?['scope']:['scope','personal-tracking','docker','codeql']};
 }
 export function personalTrackingReadyOutputs(plan){const out=participantAccessOutputs(plan);delete out.participant_access_plan;return {...out,application_route:'personal-tracking',scenario:'personal-tracking',codeql:!plan.draft,personal_tracking_plan:JSON.stringify(plan),personal_tracking_draft:false};}
 export async function admitOriginalReports(read=readFileSync){
@@ -187,6 +220,18 @@ function trackingSchemaSql({parent,attempt,check,index,trigger,snapshotTrigger,p
  'functions',(SELECT jsonb_agg(pg_get_functiondef(oid) ORDER BY proname) FROM pg_proc WHERE proname IN ('${preserve}','preserve_personal_changes_snapshots')))::text;`;}
 function trainingSchemaSql(){return trackingSchemaSql({parent:'composite_assessments',attempt:'composite_assessment_attempts',check:'personal_tracking_complete',index:'composite_personal_tracking_wave',trigger:'composite_personal_tracking_immutable',snapshotTrigger:'personal_changes_snapshots_append',preserve:'preserve_composite_personal_tracking'});}
 function educationSchemaSql(){return trackingSchemaSql({parent:'assessment_runs',attempt:'assessment_run_executions',check:'education_tracking_complete',index:'education_personal_tracking_wave',trigger:'education_personal_tracking_immutable',snapshotTrigger:'education_personal_snapshots_append',preserve:'preserve_education_personal_tracking'});}
+export function nativeTaskArtifactFixtureSql({owner,id,trackingId}){
+ return `INSERT INTO reporting_task_artifacts(id,product,container_id,task_id,generated_by,payload_cipher,payload_hash,generated_at)
+ VALUES('${id}','SURVEY','${trackingId}','${trackingId}','${owner}','synthetic-opaque-old-encrypted-artifact','${'a'.repeat(64)}','2026-10-30 00:00:00.123');`;
+}
+export function nativeTaskArtifactFactsSql(id){return `SELECT jsonb_build_object('id',id,'product',product,'container',container_id,'task',task_id,'owner',generated_by,'cipher',payload_cipher,'hash',payload_hash,'generatedAt',generated_at)::text FROM reporting_task_artifacts WHERE id='${id}';`;}
+const groupArtifactGuards=(sql,database,id,owner,planId)=>{
+ assert.equal(sql(database,`SELECT report_kind||':'||COALESCE(plan_id,'NULL') FROM reporting_task_artifacts WHERE id='${id}';`),'GROUP:NULL');
+ assert.throws(()=>sql(database,`UPDATE reporting_task_artifacts SET payload_hash=payload_hash WHERE id='${id}';`),/reporting snapshot rows are immutable/);
+ const insert=(kind,plan)=>`INSERT INTO reporting_task_artifacts(id,product,container_id,task_id,generated_by,payload_cipher,payload_hash,generated_at,report_kind,plan_id) VALUES('${randomUUID()}','SURVEY','${planId}','${planId}','${owner}','synthetic-only','${'a'.repeat(64)}',clock_timestamp(),'${kind}',${plan});`;
+ assert.throws(()=>sql(database,insert('GROUP',`'${planId}'`)),/reporting_task_artifact_kind/);
+ assert.throws(()=>sql(database,insert('GROUP_LONGITUDINAL','NULL')),/reporting_task_artifact_kind/);
+};
 async function nativeDatabase(){
  const service=process.env.PG_SERVICE;assert(service&&/^[a-zA-Z0-9_.-]+$/.test(service));
  const backend=resolve('server-version/backend'),temporary=mkdtempSync(resolve(tmpdir(),'personal-native-'));
@@ -202,11 +247,17 @@ async function nativeDatabase(){
   try{await db.user.create({data:{id:owner,username:login,passwordHash:'synthetic-schema-fixture-not-a-login',role:'TEACHER',accountDomain:binding.slice==='training'?'TRAINING':binding.slice==='teacher'?'SCHOOL':'SURVEY'}});if(!['training','teacher'].includes(binding.slice))await db.surveyAccount.create({data:{userId:owner,loginName:login,normalizedLogin:login}});}finally{await db.$disconnect()}
   // Nonempty old-schema SQL fixture, not a repeated application journey or a
   // claim of a newly accepted scientific FINAL. Opaque original bytes survive.
-  sql(names[0],binding.slice==='teacher'?nativeTeacherFixtureSql({owner,id,trackingId,attempt,organization:randomUUID(),membership:randomUUID(),track:randomUUID(),actor:randomUUID(),relationship:randomUUID(),digest}):binding.slice==='training'?nativeTrainingFixtureSql({owner,id,trackingId,attempt}):nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));
-  const facts=db=>sql(db,binding.slice==='teacher'?nativeTeacherFactsSql(id,attempt):binding.slice==='training'?nativeTrainingFactsSql(id,attempt):`SELECT jsonb_build_object('publication',(SELECT to_jsonb(p) FROM survey_publications p WHERE id='${publication}'),'final',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id='${final}'),'attempt',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id='${attempt}'))::text;`);
+  sql(names[0],binding.slice==='group'?nativeTaskArtifactFixtureSql({owner,id,trackingId}):binding.slice==='teacher'?nativeTeacherFixtureSql({owner,id,trackingId,attempt,organization:randomUUID(),membership:randomUUID(),track:randomUUID(),actor:randomUUID(),relationship:randomUUID(),digest}):binding.slice==='training'?nativeTrainingFixtureSql({owner,id,trackingId,attempt}):nativeSurveyFixtureSql({owner,id,participant,wave,publication,attempt,final,digest}));
+  const facts=db=>sql(db,binding.slice==='group'?nativeTaskArtifactFactsSql(id):binding.slice==='teacher'?nativeTeacherFactsSql(id,attempt):binding.slice==='training'?nativeTrainingFactsSql(id,attempt):`SELECT jsonb_build_object('publication',(SELECT to_jsonb(p) FROM survey_publications p WHERE id='${publication}'),'final',(SELECT to_jsonb(f) FROM survey_wave_finals f WHERE id='${final}'),'attempt',(SELECT to_jsonb(a) FROM survey_wave_attempts a WHERE id='${attempt}'))::text;`);
   const before=facts(names[0]);
   deploy(resolve(backend,'prisma/schema.prisma'),database(names[0]));assert.equal(facts(names[0]),before,'Old publication/FINAL/attempt changed');
-  if(binding.slice==='teacher'){
+  if(binding.slice==='group'){
+   const beforeMigrations=execFileSync('git',['ls-tree','--name-only',binding.base+':server-version/backend/prisma/migrations'],{encoding:'utf8'}).trim().split('\n').filter(n=>/^\d/.test(n));
+   const applied=sql(names[0],`SELECT migration_name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY migration_name;`).split('\n');
+   assert.deepEqual(applied.filter(n=>!beforeMigrations.includes(n)),binding.addedMigrations);
+   groupArtifactGuards(sql,names[0],id,owner,trackingId);
+   sql(names[0],`INSERT INTO reporting_task_artifacts(id,product,container_id,task_id,generated_by,payload_cipher,payload_hash,generated_at,report_kind,plan_id) VALUES('${trackingId}','SURVEY','${trackingId}','${trackingId}','${owner}','synthetic-opaque-longitudinal','${digest}',clock_timestamp(),'GROUP_LONGITUDINAL','${trackingId}');`);
+  }else if(binding.slice==='teacher'){
    assert.equal(sql(names[0],`SELECT (personal_tracking IS NULL)::text FROM assessment_runs WHERE id='${id}';`),'true');
    assert.equal(sql(names[0],`SELECT personal_changes_snapshots::text FROM assessment_run_executions WHERE id='${attempt}';`),'{}');
    assert.throws(()=>sql(names[0],`UPDATE assessment_runs SET personal_tracking_baseline_id=id,personal_tracking_ordinal=1,personal_tracking='{}' WHERE id='${id}';`),/Published education tracking is immutable/);
@@ -232,9 +283,12 @@ async function nativeDatabase(){
   const dump=execFileSync('docker',['exec',service,'pg_dump','-U','ptool','-Fc',names[0]],{maxBuffer:64*1024*1024});
   execFileSync('docker',['exec','-i',service,'pg_restore','-U','ptool','--no-owner','--no-privileges','-d',names[1]],{input:dump});
   assert.equal(facts(names[1]),before,'Native restored facts changed');
-  const schema=db=>binding.slice==='teacher'?sql(db,educationSchemaSql()):binding.slice==='training'?sql(db,trainingSchemaSql()):execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--table=public.survey_projects','--table=public.survey_waves','--table=public.survey_participants','--no-owner','--no-privileges',db],{encoding:'utf8',maxBuffer:64*1024*1024}).split('\n').filter(line=>!/^\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\n');
+  const schema=db=>binding.slice==='group'?sql(db,`SELECT jsonb_build_object('columns',(SELECT jsonb_agg(jsonb_build_object('column',column_name,'type',data_type,'default',column_default,'nullable',is_nullable,'udt',udt_name) ORDER BY ordinal_position) FROM information_schema.columns c WHERE table_schema='public' AND table_name='reporting_task_artifacts'),'constraints',(SELECT jsonb_agg(pg_get_constraintdef(oid) ORDER BY conname) FROM pg_constraint WHERE conrelid='reporting_task_artifacts'::regclass),'indexes',(SELECT jsonb_agg(indexdef ORDER BY indexname) FROM pg_indexes WHERE tablename='reporting_task_artifacts'),'trigger',(SELECT pg_get_triggerdef(oid) FROM pg_trigger WHERE tgrelid='reporting_task_artifacts'::regclass AND NOT tgisinternal))::text;`):binding.slice==='teacher'?sql(db,educationSchemaSql()):binding.slice==='training'?sql(db,trainingSchemaSql()):execFileSync('docker',['exec',service,'pg_dump','-U','ptool','--schema-only','--table=public.survey_projects','--table=public.survey_waves','--table=public.survey_participants','--no-owner','--no-privileges',db],{encoding:'utf8',maxBuffer:64*1024*1024}).split('\n').filter(line=>!/^\\(?:un)?restrict /.test(line)&&!/^-- Dumped (?:from|by)/.test(line)).join('\n');
   assert.equal(schema(names[0]),schema(names[1]),'Native restored schema changed');
-  if(binding.slice==='teacher'){
+  if(binding.slice==='group'){
+   groupArtifactGuards(sql,names[1],id,owner,trackingId);
+   assert.equal(sql(names[1],`SELECT report_kind||':'||plan_id FROM reporting_task_artifacts WHERE id='${trackingId}';`),'GROUP_LONGITUDINAL:'+trackingId);
+  }else if(binding.slice==='teacher'){
    assert.throws(()=>sql(names[1],`UPDATE assessment_runs SET personal_tracking='{}' WHERE id='${trackingId}';`),/Published education tracking is immutable/);
    assert.equal(sql(names[1],`SELECT personal_changes_snapshots->>'t1' FROM assessment_run_executions WHERE id='${attempt}';`),'synthetic-opaque-snapshot');
    assert.throws(()=>sql(names[1],`UPDATE assessment_run_executions SET personal_changes_snapshots='{}' WHERE id='${attempt}';`),/append-only/);
@@ -243,7 +297,7 @@ async function nativeDatabase(){
    assert.equal(sql(names[1],`SELECT personal_changes_snapshots->>'t1' FROM composite_assessment_attempts WHERE id='${attempt}';`),'synthetic-opaque-snapshot');
    assert.throws(()=>sql(names[1],`UPDATE composite_assessment_attempts SET personal_changes_snapshots='{}' WHERE id='${attempt}';`),/append-only/);
   }else assert.throws(()=>sql(names[1],`UPDATE survey_projects SET longitudinal_plan='{}' WHERE id='${id}';`),/Published personal tracking plan is immutable/);
-  return {status:'PASSED',base:binding.base,postgres:sql(names[0],'SHOW server_version;'),schemaFixture:'nonempty old-schema SQL, no application replay',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,schemaScope:binding.slice==='teacher'?'new education columns, CHECKs, unique index, immutable/append-only triggers and functions on assessment_runs/assessment_run_executions; full database native restore; old Run graph facts retained':binding.slice==='training'?'new columns, CHECKs, unique index, triggers and functions on composite_assessments/composite_assessment_attempts; full database native restore; unrelated legacy DDL text is not requalified':'changed survey_projects, survey_waves, survey_participants tables, constraints, indexes and triggers; full database native restore',immutableGuards:true,dumpPublished:false};
+  return {status:'PASSED',base:binding.base,postgres:sql(names[0],'SHOW server_version;'),schemaFixture:'nonempty old-schema SQL, no application replay',oldFactsSHA256:hash(before),dumpSHA256:hash(dump),dumpBytes:dump.length,restoredFactsEqual:true,restoredSchemaEqual:true,addedMigrations:binding.addedMigrations,schemaScope:binding.slice==='group'?'task artifact kind/plan default, CHECK/index/immutability and nonempty old encrypted bytes; native full dump/restore':binding.slice==='teacher'?'new education columns, CHECKs, unique index, immutable/append-only triggers and functions on assessment_runs/assessment_run_executions; full database native restore; old Run graph facts retained':binding.slice==='training'?'new columns, CHECKs, unique index, triggers and functions on composite_assessments/composite_assessment_attempts; full database native restore; unrelated legacy DDL text is not requalified':'changed survey_projects, survey_waves, survey_participants tables, constraints, indexes and triggers; full database native restore',immutableGuards:true,dumpPublished:false};
  }finally{rmSync(temporary,{recursive:true,force:true});}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
