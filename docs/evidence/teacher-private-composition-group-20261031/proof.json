@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "ownFeedbackBelowGroupN": true,
+  "completedParents": 10,
+  "newFinalsThisContinuation": 9,
+  "groupValidN": 10,
+  "mean": 1,
+  "sdSample": 0,
+  "readCanonicalMaterializations": 0,
+  "historyPointer": true,
+  "sourceRegistryOrResultMock": false,
+  "productionAccessed": false
+}

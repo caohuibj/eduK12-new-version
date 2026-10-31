@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client'
+import {teacherCompositionGroupChoice} from './teacher-composition-group-source'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {RunResourcePolicy} from '../assessment-run/resourceAuthority'
@@ -32,18 +33,18 @@ export function schoolPrivateScaleGroupChoice(version:{id:string;entry:string;ti
 
 /** One bounded metadata query for the already authorized page/reference set;
  * no questions, report prose or participant data are selected. */
-export async function readSchoolPrivateGroupChoices(tx:Prisma.TransactionClient,c:PrivateToolContext,ids:string[]){
+export async function readSchoolPrivateGroupChoices(tx:Prisma.TransactionClient,c:PrivateToolContext,ids:string[],options:{teacherComposition?:boolean}={}){
  const choices=new Map<string,NonNullable<ReturnType<typeof schoolPrivateScaleGroupChoice>>>()
- if(c.entry!=='SCHOOL'||!ids.length)return choices
+ if(c.entry!=='SCHOOL'&&!options.teacherComposition||!ids.length)return choices
  if(ids.length>50)privateToolFail('SCHOOL_PRIVATE_GROUP_SELECTION_INVALID',409)
  const rows=await tx.$queryRaw<Array<{id:string;entry:string;title:string;contentHash:string;metadata:unknown}>>(Prisma.sql`
   SELECT v.id,v.entry,v.title,v.content_hash AS "contentHash",jsonb_build_object('license',v.definition->'license',
    'scoring',jsonb_build_object('scores',(SELECT jsonb_agg(jsonb_build_object('key',score->>'key','label',score->>'label'))
      FROM jsonb_array_elements(v.definition#>'{scoring,scores}') score))) AS metadata
   FROM education_private_tool_versions v WHERE v.id=ANY(${ids}::text[]) AND v.kind='SCALE'
-   AND v.entry='SCHOOL' AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}`)
+   AND v.entry=${c.entry} AND v.organization_id=${c.organizationId} AND v.owner_user_id=${c.principal.userId}`)
  for(const row of rows){const parsed=originalScaleGroupMetadata.safeParse(row.metadata)
-  if(parsed.success){const choice=schoolPrivateScaleGroupChoice(row,parsed.data);if(choice)choices.set(row.id,choice)}}
+  if(parsed.success){const choice=c.entry==='TEACHER'?teacherCompositionGroupChoice(row,{provider:'PRIVATE_VERSION',kind:'SCALE',metricKeys:parsed.data.scoring.scores.map(score=>score.key),license:parsed.data.license}):schoolPrivateScaleGroupChoice(row,parsed.data);if(choice)choices.set(row.id,choice)}}
  return choices
 }
 
@@ -77,7 +78,7 @@ export function schoolPrivateGroupOwnContract(respondent:ResultDisclosureContrac
  * The DB seal still proves original content/children/manifest/owner identity. */
 export function assertSchoolCompositionGroupIdentity(policy:RunResourcePolicy,raw:unknown){
  const binding=policy.educationComposition,contract=policy.resultDisclosure
- if(!binding||binding.origin.entry!=='SCHOOL'||binding.origin.variantKey!=='STUDENT:SELF'||!contract)
+ if(!binding||binding.origin.variantKey!==(binding.origin.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF')||!contract)
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  const selected=schoolPrivateGroupSelectionSchema.parse(raw)
  const cohort=buildSelfGroupCohortAnalysisPolicy(contract)
