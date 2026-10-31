@@ -562,16 +562,21 @@ describe('minimal current grant admission projections', () => {
     expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
     expect(mockPrisma.materialGrant.deleteMany).not.toHaveBeenCalled()
   })
-  it('checks cognitive publication with status only and deletion existence with id only', async () => {
+  it('checks cognitive publication with status only and grant deletion with id and resource type', async () => {
     mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({ status: 'PUBLISHED' })
     await batchCreateGrants({ ...input, resourceType: MaterialResourceType.COGNITIVE_CONFIG, teacherIds: ['teacher-1'] })
     expect(mockPrisma.cognitiveTestConfig.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'scale-1' }, select: { status: true } })
-    mockPrisma.materialGrant.findUnique.mockResolvedValueOnce({ id: 'g' })
+    mockPrisma.materialGrant.findUnique.mockResolvedValueOnce({ id: 'g', resourceType: MaterialResourceType.SCALE })
     expect(await deleteGrant('g')).toEqual({ id: 'g' })
-    expect(mockPrisma.materialGrant.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'g' }, select: { id: true } })
+    expect(mockPrisma.materialGrant.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'g' }, select: { id: true, resourceType: true } })
     mockPrisma.materialGrant.findUnique.mockResolvedValueOnce(null)
     await expect(deleteGrant('gone')).rejects.toMatchObject({ statusCode: 404 })
     expect(mockPrisma.materialGrant.delete).toHaveBeenCalledTimes(1)
+  })
+  it('requires versioned revocation for an exact combination grant before deletion', async () => {
+    mockPrisma.materialGrant.findUnique.mockResolvedValueOnce({ id: 'exact', resourceType: MaterialResourceType.STANDARD_COMBINATION })
+    await expect(deleteGrant('exact')).rejects.toMatchObject({ statusCode: 400, message: '精确组合使用权须通过版本化撤销接口处理' })
+    expect(mockPrisma.materialGrant.delete).not.toHaveBeenCalled()
   })
   it('preserves the full desired set, first occurrence order and existing-only removals at scale', async () => {
     const existing = Array.from({ length: 1000 }, (_, i) => ({ id: `g-${i}`, teacherId: `t-${i}` }))

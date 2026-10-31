@@ -24,6 +24,7 @@ const { mockPrisma, packageMock, protocolMock, grantMock } = vi.hoisted(() => ({
     cognitiveTestConfig: { findUnique: vi.fn() },
     course: { findUnique: vi.fn() },
     scale: { findMany: vi.fn() },
+    user: { findUnique: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
   },
@@ -270,6 +271,7 @@ beforeEach(() => {
     return await last.value
   }))
   mockPrisma.scale.findMany.mockResolvedValue([adexiScale()])
+  mockPrisma.user.findUnique.mockResolvedValue({ accountDomain: 'TRAINING' })
   packageMock.mockReturnValue(packageDefinition)
   protocolMock.mockReturnValue(protocol)
   grantMock.mockResolvedValue(true)
@@ -418,6 +420,7 @@ describe('ReportPackage composite boundary', () => {
     mockPrisma.compositeAssessment.update.mockResolvedValue({ ...draft, status: 'PUBLISHED' })
 
     await publishComposite('teacher-1', UserRole.TEACHER, draft.id)
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 'teacher-1' }, select: { accountDomain: true } })
     const publishedCipher = mockPrisma.compositeAssessment.update.mock.calls[0][0].data.reportPackageSnapshotEncrypted
     const publishedSnapshot = readFrozenReportPackageSnapshot(publishedCipher)
     expect(publishedSnapshot.analysisProtocolSnapshot.scaleMeasurements?.[0]).toMatchObject({

@@ -1,4 +1,5 @@
 import { frozenScalePresentationSchema, freezeLibraryScalePresentation, type FrozenScalePresentation } from '../scale/scale-presentation'
+import { frozenScaleInstructionSchema, type FrozenScaleInstruction } from './frozen-scale-instruction'
 import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { assertAssessmentOperationallyActive } from '../assessment-governance/operational-hold'
@@ -13,8 +14,6 @@ import {
   createFrozenScaleRuntimeSnapshotV2FromV1,
   parseFrozenScaleRuntimeSnapshotV2,
   type FrozenScaleRuntimeSnapshotV2,
-  frozenScaleInstructionSchema,
-  type FrozenScaleInstruction,
 } from './runtime-snapshot-v2'
 import { z } from 'zod'
 

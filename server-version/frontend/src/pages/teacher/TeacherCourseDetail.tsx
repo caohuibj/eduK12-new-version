@@ -31,7 +31,7 @@ interface CheckinWithStats extends Checkin {
   totalStudents?: number
 }
 
-const TeacherCourseDetail: React.FC = () => {
+const TeacherCourseDetailContent: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
   const { feedback, confirm, success, error: showError } = useStaffFeedback()
@@ -329,6 +329,12 @@ const TeacherCourseDetail: React.FC = () => {
       )}
     </ProductPage>
   )
+}
+
+const TeacherCourseDetail: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>()
+  // A new course owns fresh lists, feedback and pending confirmation state.
+  return <TeacherCourseDetailContent key={courseId} />
 }
 
 export default TeacherCourseDetail

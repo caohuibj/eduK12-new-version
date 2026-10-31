@@ -38,7 +38,7 @@ beforeEach(() => {
     respondentUserId: actorUserId, subjectUserId: actorUserId, submissionId: 'submission-1', attemptEpoch: 1,
     runtimeSnapshotEncrypted: 'runtime-cipher', compiledRuntimeHash: 'compiled-hash', frozenAdmissionSnapshotHash: 'admission-hash',
     compositeAttemptId: 'attempt-1', compositeItemId: 'item-1', result: 'result-reference' }])
-  m.final.mockResolvedValue([{ compositeAttemptId: 'attempt-1', sourceSubmissionId: 'submission-1', sourceDefinitionHash: 'source-hash',
+  m.final.mockResolvedValue([{ slotKey: 'scale:item-1', compositeAttemptId: 'attempt-1', sourceSubmissionId: 'submission-1', sourceDefinitionHash: 'source-hash',
     compiledRuntimeHash: 'compiled-hash', canonicalResultEncrypted: 'canonical-reference' }])
   m.runtime.mockResolvedValue({ schemaVersion: 2, instrumentKey: 'test', sourceDefinitionHash: 'source-hash',
     compiledRuntime: { compiledRuntimeHash: 'compiled-hash' }, compiledPolicy: { disclosure: {}, runtimePolicyHash: 'policy-hash' } })
@@ -62,6 +62,7 @@ describe('education personal report reader orchestration (mock storage)', () => 
       persistedFacts: expect.objectContaining({ actorUserId, parent: expect.objectContaining({ frozenActiveSlotSetHash: 'slot-hash' }) }),
       context: expect.objectContaining({ audience: 'respondent' }) }))
     expect(m.project.mock.calls[0][0]).not.toHaveProperty('binding')
+    expect(m.project.mock.calls[0][0].persistedFacts.finalUnit).toMatchObject({ slotKey: 'scale:item-1', sourceSubmissionId: 'submission-1' })
     expect(m.query).toHaveBeenCalledTimes(2)
     expect(m.execute).toHaveBeenCalledTimes(1)
     expect(m.execute.mock.calls[0][0].join('')).toBe('SET LOCAL join_collapse_limit = 1')
@@ -70,6 +71,8 @@ describe('education personal report reader orchestration (mock storage)', () => 
   it('rechecks access after asynchronous result reads', async () => {
     m.query.mockReset().mockResolvedValueOnce([own]).mockResolvedValueOnce([])
     await expect(readEducationRespondentScaleReport({ actorUserId, executionId, product: 'TEACHER' })).rejects.toMatchObject({ statusCode: 404 })
+    expect(m.report).toHaveBeenCalledTimes(1)
+    expect(m.query).toHaveBeenCalledTimes(2)
   })
   it('does not read a canonical result for inaccessible or legacy lanes', async () => {
     m.query.mockResolvedValueOnce([])
@@ -81,7 +84,14 @@ describe('education personal report reader orchestration (mock storage)', () => 
   it('rejects result substitution inconsistent with the canonical FINAL', async () => {
     m.report.mockReturnValue({ result: { scores: [{ key: 'score', value: 99, status: 'calculated' }], quality: { status: 'interpretable' } } })
     await expect(readEducationRespondentScaleReport({ actorUserId, executionId, product: 'TEACHER' })).rejects.toMatchObject({ statusCode: 404 })
+    expect(m.report).toHaveBeenCalledTimes(1)
     expect(m.project).not.toHaveBeenCalled()
+  })
+  it('rejects a FINAL from a different active slot before materializing report contents', async () => {
+    m.final.mockResolvedValue([{ slotKey: 'scale:other-item', compositeAttemptId: 'attempt-1', sourceSubmissionId: 'submission-1',
+      sourceDefinitionHash: 'source-hash', compiledRuntimeHash: 'compiled-hash', canonicalResultEncrypted: 'canonical-reference' }])
+    await expect(readEducationRespondentScaleReport({ actorUserId, executionId, product: 'TEACHER' })).rejects.toMatchObject({ statusCode: 404 })
+    expect(m.runtime).not.toHaveBeenCalled(); expect(m.report).not.toHaveBeenCalled(); expect(m.project).not.toHaveBeenCalled()
   })
   it('rejects a different subject or ambiguous child before loading report contents', async () => {
     m.parent.mockResolvedValueOnce({ ...(await m.parent()), subjectUserId: 'other' })

@@ -80,7 +80,7 @@ describe('School task GET read recovery',()=>{
     const api=vi.fn().mockResolvedValueOnce({list:[run],truncated:false}).mockRejectedValueOnce(Error('refresh failed')).mockResolvedValueOnce({list:[run],truncated:false})
     render(kind==='teacher'?<SchoolTeacherTasks api={api as SchoolApi} organizationId="school-a"/>:<SchoolParentTasks api={api as SchoolApi}/>)
     fireEvent.click(await screen.findByRole('button',{name:/开始／继续/}))
-    const answer=screen.getByRole('textbox',{name:'runner answer'})
+    const answer=await screen.findByRole('textbox',{name:'runner answer'})
     fireEvent.change(answer,{target:{value:'保留观察作答'}})
     fireEvent.click(screen.getByText('查看任务列表'))
     fireEvent.click(screen.getByRole('button',{name:/刷新/}))

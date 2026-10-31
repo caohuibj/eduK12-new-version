@@ -13,6 +13,7 @@ const { mockPrisma } = vi.hoisted(() => {
     compositeAssessmentItem: { create: vi.fn() },
     course: { findUnique: vi.fn() },
     scale: { findUnique: vi.fn(), findMany: vi.fn() },
+    user: { findUnique: vi.fn() },
     materialGrant: { findUnique: vi.fn() },
     $queryRaw: vi.fn(),
   }
@@ -73,6 +74,7 @@ beforeEach(() => {
   mockPrisma.compositeAssessmentItem.create.mockResolvedValue({ id: 'item-1' })
   mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', creatorId: 'teacher-a' })
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
+  mockPrisma.user.findUnique.mockResolvedValue({ accountDomain: 'TRAINING' })
 })
 
 describe('addItem cognitive course match', () => {
@@ -199,6 +201,8 @@ describe('addItem scale grants', () => {
     mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
     mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-other',creatorId:'admin-1',status:'PUBLISHED'}])
     await expect(publishComposite('teacher-a', TEACHER, 'composite-1')).rejects.toMatchObject({statusCode:403})
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 'teacher-a' }, select: { accountDomain: true } })
+    expect(mockPrisma.materialGrant.findUnique).toHaveBeenCalled()
     expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
   })
 })

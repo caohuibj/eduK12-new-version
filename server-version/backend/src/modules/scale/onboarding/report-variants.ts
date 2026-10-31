@@ -6,6 +6,7 @@ import {scaleSourceAxisPayloads} from './source-snapshot'
 import cfq from '../instruments/cfq7_zh_cn_research/1.0.1/report-variants.json'
 import efficacy from '../instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/report-variants.json'
 import procrastination from '../instruments/bps9_zh_cn_research/1.0.0/report-variants.json'
+import chemistryTeacherLiking from '../instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/report-variants.json'
 import reviewed0 from '../instruments/bat23_2020_en/1.0.0/report-variants.json'
 import reviewed1 from '../instruments/cbi_zh_cn/1.0.1/report-variants.json'
 import reviewed2 from '../instruments/ccfq18_zh_cn/1.0.0/report-variants.json'
@@ -68,6 +69,7 @@ const materials=[
   {material:cfq,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/cfq7_zh_cn_research/report-variants.json'}},
   {material:efficacy,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/ipip_neo_c1_self_efficacy10_zh_cn_research/report-variants.json'}},
   {material:procrastination,origin:{commit:'6fa885ec74ca01350db25c44bd61c700648b05d1',path:'docs/scale-intake/materials-three-20261029/bps9_zh_cn_research/report-variants.json'}},
+  {material:chemistryTeacherLiking,origin:{commit:'3b90f60af83180a24743010ed860db6990581c03',path:'server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/source.json'}},
   {material:reviewed0,origin:{commit:'ea5fc03cda7f4d78907a1755041113f725580b23',path:'docs/scale-intake/dual-reports-final-20261029/bat23_2020_en/report-materials.json'}},
   {material:reviewed1,origin:{commit:'ea5fc03cda7f4d78907a1755041113f725580b23',path:'docs/scale-intake/dual-reports-final-20261029/cbi_zh_cn/report-materials.json'}},
   {material:reviewed2,origin:{commit:'ea5fc03cda7f4d78907a1755041113f725580b23',path:'docs/scale-intake/dual-reports-final-20261029/ccfq18_zh_cn/report-materials.json'}},

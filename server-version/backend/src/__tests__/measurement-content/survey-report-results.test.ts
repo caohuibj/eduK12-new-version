@@ -1,5 +1,5 @@
 import {describe,it,expect,vi,beforeEach} from 'vitest'
-const mocks=vi.hoisted(()=>({source:vi.fn(),auth:vi.fn(),get:vi.fn(),transaction:vi.fn(),project:vi.fn(),final:vi.fn(),systemAuth:vi.fn()}))
+const mocks=vi.hoisted(()=>({source:vi.fn(),auth:vi.fn(),get:vi.fn(),transaction:vi.fn(),project:vi.fn(),final:vi.fn(),systemAuth:vi.fn(),nativeAudience:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 vi.mock('../../modules/survey/analytics.source',()=>({loadSurveySource:mocks.source}))
 vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:mocks.auth,SurveyBuilderError:class extends Error{statusCode=403}}))
@@ -20,7 +20,10 @@ const source=()=>({projectId:'project',sourceRevision:5,completeAttempts:1,inter
 const input={projectId:'project',waveId:'wave',finalId:'final',instrumentKey:'scale'}
 beforeEach(()=>{
  vi.clearAllMocks();mocks.systemAuth.mockResolvedValue('owner');mocks.source.mockResolvedValue(source());mocks.auth.mockResolvedValue({id:'project'});mocks.project.mockResolvedValue({revision:5});mocks.final.mockResolvedValue({resultsHash:hash})
- mocks.transaction.mockImplementation(async fn=>fn({surveyProject:{findUnique:mocks.project},surveyWaveFinal:{findFirst:mocks.final}}))
+ // Historical declarative units have an explicit native=false SQL projection.
+ // Keep the real native audience reader in the path instead of bypassing it.
+ mocks.nativeAudience.mockResolvedValue([{native:false,audience:null}])
+ mocks.transaction.mockImplementation(async fn=>fn({$queryRaw:mocks.nativeAudience,surveyProject:{findUnique:mocks.project},surveyWaveFinal:{findFirst:mocks.final}}))
  mocks.get.mockImplementation(async(_tx,id)=>id==='m'?measurement():id==='p'?report():reference())
 })
 describe('researcher reads a report from saved FINAL interpretation',()=>{
@@ -31,6 +34,7 @@ describe('researcher reads a report from saved FINAL interpretation',()=>{
   expect(result.report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',metricKey:'total',value:3}))
   expect(result.report.blocks).toContainEqual(expect.objectContaining({type:'REFERENCE_BAND',text:'Frozen band text'}))
   expect(JSON.stringify(result)).not.toContain('999');expect(mocks.auth).toHaveBeenCalledTimes(1)
+  expect(mocks.nativeAudience).toHaveBeenCalledWith(expect.any(Array),'final','project','scale')
  })
  it('keeps saved reference values with separate current lifecycle notices, without selecting another reference',async()=>{
   mocks.get.mockImplementation(async(_tx,id)=>id==='m'?{...measurement(),status:'RETIRED'}:id==='p'?report():{...reference(),status:'REVOKED'})
@@ -64,6 +68,18 @@ describe('researcher reads a report from saved FINAL interpretation',()=>{
   const result=await readSurveyStoredReport('owner',input)
   expect(result.report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',value:null,status:'INVALID'}))
   expect(result.report.blocks.some((block:any)=>block.type==='REFERENCE_BAND')).toBe(false)
+ })
+ it('requires a researcher audience on a native FINAL before reading any release',async()=>{
+  for(const audience of ['student',null]){
+   mocks.nativeAudience.mockResolvedValue([{native:true,audience}])
+   await expect(readSurveyStoredReport('owner',input)).rejects.toMatchObject({statusCode:403})
+   expect(mocks.get).not.toHaveBeenCalled()
+  }
+  mocks.nativeAudience.mockResolvedValue([])
+  await expect(readSurveyStoredReport('owner',input)).rejects.toMatchObject({statusCode:403})
+  expect(mocks.get).not.toHaveBeenCalled()
+  mocks.nativeAudience.mockResolvedValue([{native:true,audience:'researcher'}])
+  expect(await readSurveyStoredReport('owner',input)).toMatchObject({accessAudience:'researcher',interpretationSemantics:'SAVED_AT_FINAL_NO_RECALCULATION'})
  })
 })
 

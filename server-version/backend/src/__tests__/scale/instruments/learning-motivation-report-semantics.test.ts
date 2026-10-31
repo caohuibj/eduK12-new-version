@@ -6,12 +6,17 @@ import { buildScaleResult } from '../../../modules/scale/scale-result'
 import { allowsScaleAxisRevision } from '../../../modules/scale/onboarding/axis-snapshots'
 import baseline from './fixtures/learning-motivation-v1-facts.json'
 
-const sources = listScaleInstrumentSources().filter(source => source.executable?.definition.versionAxes)
+// Later independent-axis instruments are outside this revision's frozen
+// six-family × six-subject measurement/reference baseline.
+const wave1Keys = new Set(['academic_self_concept', 'academic_self_efficacy', 'domain_fixed_mindset', 'teacher_subject_liking', 'tutoring_necessity', 'value_cost'].flatMap(family =>
+  ['mathematics', 'chemistry', 'physics', 'biology', 'english', 'chinese'].map(subject => `${family}_${subject}_zh_cn`)))
+const sources = listScaleInstrumentSources().filter(source => wave1Keys.has(source.identity.instrumentKey) && source.identity.instrumentVersion === '1.0.0')
 const positions = { very_low: '较低', low: '偏低', middle: '中间', high: '偏高', very_high: '较高' } as const
 
 describe('learning motivation report/reference presentation revision', () => {
   it('preserves all 36 measurements and every reference fact except version and display labels', () => {
     expect(sources).toHaveLength(36)
+    expect(sources.map(source => source.identity.instrumentKey).sort()).toEqual([...wave1Keys].sort())
     for (const source of sources) {
       const previous = baseline.rows.find(row => row.key === source.identity.instrumentKey)!
       const executable = source.executable!
@@ -26,7 +31,7 @@ describe('learning motivation report/reference presentation revision', () => {
       expect(canonicalHash(facts), source.identity.instrumentKey).toBe(previous.referenceFactsHash)
       expect(source.identity.instrumentVersion).toBe('1.0.0')
       expect(executable.definition.scoring.scoringVersion).toBe('1.0.0')
-      expect(executable.definition.report.reportVersion).toBe('1.1.0')
+      expect(executable.definition.report.reportVersion).toBe(source.identity.instrumentKey === 'teacher_subject_liking_chemistry_zh_cn' ? '1.1.1' : '1.1.0')
       expect(executable.references.every(ref => ref.referenceVersion === 'wave1-20261001-v2')).toBe(true)
       expect(executable.definition.referencePolicy.type).toBe('declared')
       if (executable.definition.referencePolicy.type === 'declared') {

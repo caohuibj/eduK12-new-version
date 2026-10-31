@@ -10,7 +10,6 @@ const suite = DB_URL ? describe : describe.skip
 const key = 'synthetic_pr3_eligibility'
 vi.mock('../../modules/scale/onboarding/instrument-registry', async importOriginal => {
   const actual = await importOriginal<typeof import('../../modules/scale/onboarding/instrument-registry')>()
-  const { compileScalePolicy } = await import('../../modules/scale/policy/compile')
   const { DISCLOSURE_PRESETS } = await import('../../modules/scale/policy/disclosure')
   const source = structuredClone(actual.getScaleInstrumentSource('adexi_v1', '2.0.0')!)
   source.identity = { instrumentKey: 'synthetic_pr3_eligibility', instrumentVersion: '1.0.0' }
@@ -19,9 +18,13 @@ vi.mock('../../modules/scale/onboarding/instrument-registry', async importOrigin
   source.applicability = { schemaVersion: 1, policyVersion: '1', respondentTypes: ['SELF'], requiredContextKeys: [], subject: { ageMonths: { minInclusive: 168 } } }
   source.disclosure!.audiences.respondent = DISCLOSURE_PRESETS.EDUCATIONAL_ONLY()
   source.educationalFeedback = { schemaVersion: 1, contentVersion: '1', blocks: [{ id: 'help', body: 'Synthetic educational feedback' }] }
+  // Register the synthetic identity through the current real validation cache;
+  // overriding only source/policy leaves its install validation undefined.
+  const syntheticRegistry = actual.createScaleInstrumentRegistry([source])
   return { ...actual,
-    getScaleInstrumentSource: (k: string, v: string) => k === source.identity.instrumentKey ? source : actual.getScaleInstrumentSource(k, v),
-    getScaleInstrumentRuntimePolicy: (k: string, v: string) => k === source.identity.instrumentKey ? compileScalePolicy(source) : actual.getScaleInstrumentRuntimePolicy(k, v),
+    getScaleInstrumentSource: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getSource(k, v) : actual.getScaleInstrumentSource(k, v),
+    getScaleInstrumentRuntimePolicy: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getRuntimePolicy(k, v) : actual.getScaleInstrumentRuntimePolicy(k, v),
+    getScaleInstrumentValidation: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getValidation(k, v) : actual.getScaleInstrumentValidation(k, v),
   }
 })
 vi.mock('../../modules/scale/scale-package.registry', async importOriginal => {
@@ -43,6 +46,8 @@ let scaleId = ''
 let install: typeof import('../../modules/scale/onboarding/install')
 let source: any
 let input: any
+let initialInstallPlan: Awaited<ReturnType<typeof import('../../modules/scale/onboarding/install')['planScaleInstrumentInstall']>>
+let initialMaterializedRow: { status: string; visibility: string; creatorId: string }
 let admissionModule: typeof import('../../modules/scale/scale-admission.service')
 const request = async (body: unknown = {}) => {
   const response = await fetch(`${base}/scales/${scaleId}/assessments`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
@@ -69,6 +74,17 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
       runtimePolicyHash: registry.getScaleInstrumentRuntimePolicy(key, '1.0.0')!.runtimePolicyHash,
       localizationVersion: source.localization.localizationVersion, inFlightCompletion: 'FROZEN_DEADLINE', completionWindowMs: 86400000,
     } }
+    // Every selected lifecycle case needs the real installed/published fixture;
+    // setup must not depend on the first assertion case being selected by Vitest.
+    initialInstallPlan = await install.planScaleInstrumentInstall(db, input)
+    await install.installScaleInstrument(db, input)
+    const initialRow = await db.scale.findUniqueOrThrow({ where: { code: key } })
+    scaleId = initialRow.id
+    initialMaterializedRow = { status: initialRow.status, visibility: initialRow.visibility, creatorId: initialRow.creatorId }
+    const { planStandardScalePublication, publishStandardScale } = await import('../../modules/scale/onboarding/publish')
+    const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, visibility: 'PUBLIC' as const, allowedProducts: ['TRAINING' as const] }
+    const publicationPreview = await planStandardScalePublication(db, publication)
+    await publishStandardScale(db, { ...publication, expectedProofHash: publicationPreview.proofHash })
     const app = express(); app.use(express.json())
     app.use((req, _res, next) => { req.user = { userId: actor, role: 'STUDENT' } as any; next() })
     app.post('/scales/:scaleId/assessments', (await import('../../modules/scale/scale-start.controller')).startStandaloneScaleAssessment)
@@ -95,14 +111,8 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
   })
 
   it('dry-runs, installs DRAFT/HIDDEN, and reapplies without resetting lifecycle', async () => {
-    expect((await install.planScaleInstrumentInstall(db, input)).createScale).toBe(true)
-    await install.installScaleInstrument(db, input)
-    const row = await db.scale.findUniqueOrThrow({ where: { code: key } }); scaleId = row.id
-    expect(row).toMatchObject({ status: 'DRAFT', visibility: 'HIDDEN', creatorId: publisher })
-    const { planStandardScalePublication, publishStandardScale } = await import('../../modules/scale/onboarding/publish')
-    const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, visibility: 'PUBLIC' as const,allowedProducts:['TRAINING' as const] }
-    const preview = await planStandardScalePublication(db, publication)
-    await publishStandardScale(db, { ...publication, expectedProofHash: preview.proofHash })
+    expect(initialInstallPlan.createScale).toBe(true)
+    expect(initialMaterializedRow).toMatchObject({ status: 'DRAFT', visibility: 'HIDDEN', creatorId: publisher })
     expect((await install.installScaleInstrument(db, input)).deploymentAlreadyActive).toBe(true)
     expect(await db.scale.findUnique({ where: { id: scaleId } })).toMatchObject({ status: 'PUBLISHED', visibility: 'PUBLIC', creatorId: publisher })
   })

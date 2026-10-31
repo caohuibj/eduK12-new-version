@@ -4,7 +4,7 @@ import {
   parseFrozenUnitAdmission,
   type FrozenUnitAdmissionV1,
 } from '../../modules/assessment-runtime/admission-snapshot'
-import { createFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
+import { createFrozenScaleRuntimeSnapshot, hashFrozenScaleRuntimeSnapshot, parseFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { listScalePackages } from '../../modules/scale/scale-package.registry'
@@ -50,7 +50,7 @@ describe(`PR-1 fixed compatibility baseline ${BASE_SHA}`, () => {
     expect(rows).toEqual(BASELINE_PACKAGE_ROWS)
   })
 
-  it('pins the legacy V1 runtime snapshot hash instead of self-validating a new hash', () => {
+  it('reads the pinned legacy V1 shape while new snapshots freeze an explicit empty instruction', () => {
     const adexi = listScalePackages().find((pkg) => pkg.key === 'adexi_v1' && pkg.instrumentVersion === '2.0.0')!
     const runtime = createFrozenScaleRuntimeSnapshot({
       instrumentKey: adexi.key,
@@ -58,7 +58,16 @@ describe(`PR-1 fixed compatibility baseline ${BASE_SHA}`, () => {
       definition: adexi.definition,
       frozenAt: FROZEN_AT,
     })
-    expect(runtime.snapshotHash).toBe(BASELINE_RUNTIME_SNAPSHOT_HASH)
+    // New starts freeze the absence of an instruction. Persisted V1 snapshots
+    // predate that field: keep their original hard-coded hash, not a new hash
+    // calculated from the current writer and substituted as the baseline.
+    expect(runtime.instruction).toBeNull()
+    const { instruction: _instruction, ...legacyShape } = runtime
+    const persisted = { ...legacyShape, snapshotHash: BASELINE_RUNTIME_SNAPSHOT_HASH }
+    expect(hashFrozenScaleRuntimeSnapshot(persisted)).toBe(BASELINE_RUNTIME_SNAPSHOT_HASH)
+    expect(parseFrozenScaleRuntimeSnapshot(persisted)).toEqual(persisted)
+    expect(runtime.snapshotHash).not.toBe(BASELINE_RUNTIME_SNAPSHOT_HASH)
+    expect(parseFrozenScaleRuntimeSnapshot(runtime)).toEqual(runtime)
   })
 
   it('parses a literal persisted V1 admission fixture with its pinned historical hash', () => {

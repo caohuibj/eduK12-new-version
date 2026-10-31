@@ -302,7 +302,7 @@ suite('School bound continuation directory (real PostgreSQL, synthetic persisted
     expect((await parents()).list).toHaveLength(0)
     expect((await teachers()).list).toHaveLength(0)
     expect(await db.compositeAssessmentAttempt.count({ where: { id: { in: [...f.attempts.values()] } } })).toBe(originalCount)
-  })
+  }, 30_000)
 
   it('filters more than 100 ineligible CLOSED candidates before the Parent and Teacher pagination limits', async () => {
     const f = await fixture(true)

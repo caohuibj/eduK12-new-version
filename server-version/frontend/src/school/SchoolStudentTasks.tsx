@@ -72,7 +72,7 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
   },[selected,details])
   const load=useCallback(async(targetPage:number)=>{
     if(currentScope.current!==scope||scope.pending)return
-    scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage)
+    scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage);setFeedback(null)
     try{
       const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'+(activityId?'&activityId='+encodeURIComponent(activityId):''))
       if(currentScope.current===scope){setItems(result);setPage(targetPage)}
@@ -130,8 +130,8 @@ export function SchoolStudentTasks({api,activityId,onNavigate}: {api:SchoolApi;a
     executionRef.current=null;setExecution(null)
     const task=executionTask.current?.scope===scope&&executionTask.current.task.id===active.executionId?executionTask.current.task:undefined
     setNotice('本次测评已完成，正式提交已确认。')
-    if(task&&task.resourceFamily!=='FORM')showFeedback(task)
     void load(page)
+    if(task&&task.resourceFamily!=='FORM')showFeedback(task)
   }
   const submit=async()=>{
     if(!selected||!details||selected.status==='COMPLETED'||scope.submitting||currentScope.current!==scope)return

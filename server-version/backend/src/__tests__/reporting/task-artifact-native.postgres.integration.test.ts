@@ -23,7 +23,10 @@ suite('exact main task artifact migration and native backup', () => {
     expect(restoreUrl.pathname).toMatch(/_restore_test_/); expect(restoreUrl.pathname).not.toBe(sourceUrl.pathname)
     const baseDir = process.env.GROUP_REPORT_MAIN_PRISMA_DIR!
     const expected = readdirSync(resolve(baseDir, 'migrations'), {withFileTypes: true}).filter(row => row.isDirectory()).map(row => row.name).sort()
-    const applied = await prisma.$queryRaw<Array<{name: string}>>`SELECT migration_name AS name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY migration_name`
+    const current = readdirSync(resolve(backendDir, 'prisma/migrations'), {withFileTypes: true}).filter(row => row.isDirectory()).map(row => row.name).sort()
+    const baseNames = new Set(expected), expectedAdded = current.filter(name => !baseNames.has(name))
+    expect(current).toEqual([...expected, ...expectedAdded].sort())
+    const applied = await prisma.$queryRaw<Array<{name: string; ledger: unknown}>>`SELECT migration_name AS name,to_jsonb(m) AS ledger FROM _prisma_migrations m WHERE finished_at IS NOT NULL ORDER BY migration_name`
     const continuation = process.env.GROUP_REPORT_NATIVE_CONTINUE === '1'
     let source: {product: 'SURVEY'; containerId: string; taskId: string}, artifact: Awaited<ReturnType<typeof saveTaskGroupArtifact>>
     if (!continuation) {
@@ -31,15 +34,18 @@ suite('exact main task artifact migration and native backup', () => {
     expect((await prisma.$queryRaw<Array<{name: string | null}>>`SELECT to_regclass('reporting_task_artifacts')::text AS name`)[0].name).toBeNull()
     const migrationLog = execFileSync(process.execPath, ['node_modules/prisma/build/index.js', 'migrate', 'deploy', '--schema', 'prisma/schema.prisma'], {encoding: 'utf8', env: process.env, cwd: backendDir})
     writeFileSync('/tmp/group-report-candidate-migrate.log', migrationLog)
-    const added = await prisma.$queryRaw<Array<{name: string}>>`SELECT migration_name AS name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY migration_name`
-    expect(added.map(row => row.name).filter(name => !expected.includes(name))).toEqual(['20261030160000_reporting_task_artifacts'])
+    const added = await prisma.$queryRaw<Array<{name: string; ledger: unknown}>>`SELECT migration_name AS name,to_jsonb(m) AS ledger FROM _prisma_migrations m WHERE finished_at IS NOT NULL ORDER BY migration_name`
+    expect(added.map(row => row.name)).toEqual(current)
+    expect(added.filter(row => !baseNames.has(row.name)).map(row => row.name)).toEqual(expectedAdded)
+    expect(added).toHaveLength(applied.length + expectedAdded.length)
+    expect(added.filter(row => baseNames.has(row.name))).toEqual(applied)
     const owner = await prisma.user.create({data: {username: 'native-group-synthetic-' + randomUUID(), passwordHash: 'synthetic-only', role: 'STUDENT', accountDomain: 'SURVEY'}})
     source = {product: 'SURVEY' as const, containerId: randomUUID(), taskId: randomUUID()}
     artifact = await saveTaskGroupArtifact(prisma, {source, generatedBy: owner.id, selector: {kind: 'ALL'}, sourceBindings: {parents: []}, projection: {
       schemaVersion: 1, descriptionVersion: 'group-descriptive-v1', title: 'Synthetic native roundtrip', sourceLabel: 'Qualification only', populationLabel: 'No respondent data', cutoff: new Date().toISOString(), completedN: 0, countUnit: 'RESPONSE', assignedN: null,
       tool: {key: 'synthetic', title: 'Synthetic', kind: 'FORM'}, metrics: [], limitations: ['Synthetic artifact, no real answers.']}})
     } else {
-      expect(applied.map(row => row.name)).toEqual([...expected, '20261030160000_reporting_task_artifacts'].sort())
+      expect(applied.map(row => row.name)).toEqual(current)
       const rows = await prisma.$queryRaw<Array<{id: string; containerId: string; taskId: string}>>`SELECT id,container_id AS "containerId",task_id AS "taskId" FROM reporting_task_artifacts WHERE product='SURVEY'`
       expect(rows).toHaveLength(1)
       source = {product: 'SURVEY', containerId: rows[0].containerId, taskId: rows[0].taskId}
@@ -62,6 +68,6 @@ suite('exact main task artifact migration and native backup', () => {
     const copy = await readTaskGroupArtifact(restored, source, artifact.artifactId)
     expect(copy).toMatchObject(artifact); expect(copy!.source).toEqual(source)
     await expect(restored.$executeRaw`UPDATE reporting_task_artifacts SET payload_hash=payload_hash WHERE id=${artifact.artifactId}`).rejects.toThrow(/reporting snapshot rows are immutable/)
-    writeFileSync('/tmp/group-report-native.json', JSON.stringify({passed: true, synthetic: true, productionAccessed: false, base: '8cf07bfd35702222e279cbfeee2f64d73a938b55', baseMigrations: expected.length, addedMigrations: ['20261030160000_reporting_task_artifacts'], pgVersion: version, nativeArchiveSHA256: sha(archive), nativeArchiveBytes: archive.length, sourceSchema, restoreSchema, schemaScope: 'new reporting_task_artifacts table, indexes, foreign key and immutable trigger', nativeRestorePerformedThisInvocation: !continuation, retainedNativeRestoreContinued: continuation, encryptedArtifactRead: true, immutableTriggerVerified: true, dumpUploaded: false}, null, 2) + '\n')
+    writeFileSync('/tmp/group-report-native.json', JSON.stringify({passed: true, synthetic: true, productionAccessed: false, base: '8cf07bfd35702222e279cbfeee2f64d73a938b55', baseMigrations: expected.length, addedMigrations: expectedAdded, candidateMigrations: current.length, pgVersion: version, nativeArchiveSHA256: sha(archive), nativeArchiveBytes: archive.length, sourceSchema, restoreSchema, schemaScope: 'new reporting_task_artifacts table, indexes, foreign key and immutable trigger', nativeRestorePerformedThisInvocation: !continuation, retainedNativeRestoreContinued: continuation, encryptedArtifactRead: true, immutableTriggerVerified: true, dumpUploaded: false}, null, 2) + '\n')
   }, 30000)
 })

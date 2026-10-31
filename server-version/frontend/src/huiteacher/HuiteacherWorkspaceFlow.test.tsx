@@ -68,6 +68,7 @@ describe('Teacher evaluation workspace paging',()=>{
 
   it('separates open activity from unpublished task without automatically publishing',async()=>{
     const api=vi.fn(async(path:string)=>{
+      if(path.endsWith('/tracking'))return {baselineId:null,ordinal:null,choices:[]}
       if(path.endsWith('/evaluation-events'))return {list:[event('e1','OPEN')],nextCursor:null}
       if(path.endsWith('/run'))return {eventId:'e1',runId:'run1',status:'DRAFT',version:1,trackCount:1}
       return {list:[]}

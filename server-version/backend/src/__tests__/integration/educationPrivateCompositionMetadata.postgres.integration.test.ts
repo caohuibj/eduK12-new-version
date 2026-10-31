@@ -21,7 +21,9 @@ suite('ordinary questionnaire editor immutable metadata / real PostgreSQL',()=>{
   expect(root.references).toHaveLength(3)
   for(const version of [f.visible,f.form,f.hidden]){
    const summary=root.references.find(row=>row.id===version.id)
-   expect(summary).toEqual({id:version.id,toolId:version.toolId,kind:version.kind,title:version.title,sourceRevision:version.sourceRevision,contentHash:version.contentHash})
+   expect(summary).toEqual({id:version.id,toolId:version.toolId,kind:version.kind,title:version.title,sourceRevision:version.sourceRevision,contentHash:version.contentHash,
+    sourceProvider:'PRIVATE_VERSION',...(version.kind==='SCALE'?{groupChoice:{versionId:version.id,contentHash:version.contentHash,title:version.title,
+     minimumRespondents:10,metrics:[{key:'total',label:'total'}],audiences:{PROFESSIONAL:[],TEACHER:[],ORGANIZATION:['total']}}}:{})})
   }
   const versions=await listPrivateToolVersions(f.context,f.fixed.toolId),catalog=await listPrivateTools(f.context,undefined,'COMPOSITION')
   expect(versions.list[0]).toMatchObject({id:f.fixed.id,title:f.fixed.title,sourceRevision:f.fixed.sourceRevision,contentHash:f.fixed.contentHash})

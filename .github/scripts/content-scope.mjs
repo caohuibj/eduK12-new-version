@@ -110,6 +110,18 @@ export function frontendFile(file) {
   return !/^server-version\/frontend\/src\/(?:modules\/(?:cognitive|situational|composite|assessment-runtime|assessment-bundle)\/|(?:api|types|services)\/|modules\/assessment-context\/|utils\/(?:scor|assessment|cognitive|situational)|.*(?:scoring|scorer|algorithm|finalizer|trial-timing|reference-data))/i.test(file);
 }
 
+// Measurement pages/components and React orchestration hooks need the full
+// frontend + cognitive onboarding + real API browser lane. Keep this separate
+// from frontendFile: related-tests, test-only and dependency-only shortcuts must
+// not acquire these shared consumers. Engine/protocol sources stay outside.
+function frontendModuleSurfaceFile(file) {
+  if (typeof file !== 'string' || /[\\\x00-\x1f\x7f]/.test(file)
+      || file.split('/').some(part => !part || part === '.' || part === '..')) return false;
+  const path = file.replace(/\/__tests__\//g, '/').replace(/\.(?:test|spec)\.(tsx?)$/, '.$1');
+  if (/\/(?:CognitiveRunner|api|types|registry)(?:[./-])|scoring|scorer|algorithm|finalizer|trial-timing|reference-data/i.test(path)) return false;
+  return /^server-version\/frontend\/src\/modules\/(?:cognitive|composite)\/(?:[^/]+\.(?:tsx|css|scss)|(?:pages|components)\/.+\.(?:tsx|css|scss)|hooks\/use[A-Z][^/]*\.tsx?|core\/use[A-Z][^/]*\.tsx?)$/.test(path);
+}
+
 // Bounded presentation/startup optimization, not a generic authorization/runtime
 // exemption. Complete raw diff admission keeps all other consumers unchanged.
 export const frontendPerformanceFiles = new Set([
@@ -175,6 +187,21 @@ export function frontendTestFile(file) {
 }
 export function frontendTestOnly(files) {
   return files.some(frontendTestFile) && files.every(file=>frontendTestFile(file)||engineeringEvidenceFile(file));
+}
+
+// Compose the existing version-only dependency check with frontend source/test
+// admission. This selects the full frontend lane, never frontend_affected.
+export function frontendDependencyScope(entries,{base,head='HEAD'}) {
+  const manifests=new Set(['server-version/frontend/package.json','server-version/frontend/package-lock.json']);
+  const dependencyEntries=entries.filter(({file})=>manifests.has(file));
+  if(!dependencyEntries.length||!entries.every(({file,status,oldMode,newMode})=>
+    typeof file==='string'&&!/[\\\x00-\x1f\x7f]/.test(file)&&file.split('/').every(p=>p&&p!=='.'&&p!=='..')
+    &&newMode==='100644'&&((status==='A'&&oldMode==='000000')||(status==='M'&&oldMode==='100644'))
+    &&(manifests.has(file)||frontendFile(file)||engineeringEvidenceFile(file)
+      ||file.startsWith(frontendSrc)&&/\.(?:test|spec)\.tsx?$/.test(file))))return false;
+  const production=entries.map(({file})=>file).filter(file=>frontendFile(file)&&!/\.(?:test|spec)\.tsx?$/.test(file));
+  if(Object.entries(acceptanceFor(production)).some(([id,selected])=>id!=='canonical_visual'&&selected))return false;
+  return dependencyScope(dependencyEntries,{base,head});
 }
 
 // Local product pages use dependency-related unit tests. Shared shells, API,
@@ -252,11 +279,12 @@ export function maintenanceChange(files) {
 
 export function classify(files) {
   const domains = [...new Set(files.map(domainFor).filter(Boolean))].sort();
+  const frontend = file => frontendFile(file) || frontendModuleSurfaceFile(file);
   return {
     maintenance: maintenanceChange(files),
     documentation: files.length > 0 && files.every(documentationFile),
-    content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontendFile(file) || engineeringEvidenceFile(file)),
-    frontend: files.length > 0 && files.some(frontendFile) && files.every(file => domainFor(file) || frontendFile(file) || engineeringEvidenceFile(file)) && !files.filter(file=>!engineeringEvidenceFile(file)).every(presentationFile),
+    content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontend(file) || engineeringEvidenceFile(file)),
+    frontend: files.length > 0 && files.some(frontend) && files.every(file => domainFor(file) || frontend(file) || engineeringEvidenceFile(file)) && !files.filter(file=>!engineeringEvidenceFile(file)).every(presentationFile),
     presentation: files.some(presentationFile) && files.every(file=>presentationFile(file)||engineeringEvidenceFile(file)),
     domains,
   };
@@ -325,7 +353,7 @@ export function platformReasons(entries, forceFull = false) {
     if (!(modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
         || (status === 'M' && modes.includes(oldMode)))))
       reasons.push({file,reason:'deletion-or-file-type-or-mode-change'});
-    if (![domainFor(file),frontendFile(file),documentationFile(file),presentationFile(file),
+    if (![domainFor(file),frontendFile(file),frontendModuleSurfaceFile(file),documentationFile(file),presentationFile(file),
         maintenanceFile(file),maintenanceRoutingFiles.has(file)].some(Boolean))
       reasons.push({file,reason:'outside-scoped-allowlists'});
   }
@@ -484,9 +512,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     console.log(JSON.stringify({kind:'cognitive-intake-refusal',base,...refused}));
     throw Error('UNSUPPORTED_COGNITIVE_INTAKE:'+refused.reason+': explicit affected route required; no platform fallback');
   }
-  const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+  const basicDependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
-  const frontendDependencies = dependencies && frontendDependencyFilesOnly(entries);
+  const mixedFrontendDependencies = !basicDependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+    && frontendDependencyScope(entries,{base});
+  const dependencies = basicDependencies || mixedFrontendDependencies;
+  const frontendDependencies = mixedFrontendDependencies || basicDependencies && frontendDependencyFilesOnly(entries);
   const backendModules = result.backend_modules && !result.content && !result.frontend && !result.presentation && !result.documentation;
   const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
   requireSurveyWaveSelectionScope(process.env.CI_SURVEY_SELECTION_REQUIRED === 'true', surveySelection, event, process.env.CI_FORCE_FULL);

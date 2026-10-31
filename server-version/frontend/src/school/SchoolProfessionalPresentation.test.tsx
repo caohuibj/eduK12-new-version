@@ -77,15 +77,20 @@ it('mounts counselor recovery and all five report tabs with compact controls and
   expect(screen.queryByRole('heading',{name:'先选择一个班级'})).not.toBeInTheDocument()
   expect(screen.queryByRole('navigation',{name:'账号与注册操作'})).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('link',{name:'报告与支持'}))
-  for(const [tab,title,help] of [['群体报告','群体分析配置','群体报告使用说明'],['群体纵向分析','纵向分析配置','群体纵向分析使用说明'],['保护性反馈','保护性反馈配置','保护性反馈使用说明'],['个体纵向分析','个体纵向分析配置','个体纵向分析使用说明'],['专业报告','已授权报告','专业报告使用说明']]){
+  for(const [tab,title,help] of [['群体报告','学校群体报告',null],['群体纵向分析','学校群体纵向报告',null],['保护性反馈','保护性反馈配置','保护性反馈使用说明'],['个体纵向分析','个体纵向分析配置','个体纵向分析使用说明'],['专业报告','已授权报告','专业报告使用说明']] as const){
    fireEvent.click(within(screen.getByRole('navigation',{name:'报告与支持功能入口'})).getByRole('link',{name:tab}))
    await screen.findByRole('heading',{name:title})
    expect(view.container.querySelector('.hs-report-panel')).not.toBeNull()
-   expect(screen.getByRole('button',{name:help})).toHaveAttribute('aria-expanded','false')
-   fireEvent.click(screen.getByRole('button',{name:help}))
-   expect(screen.getByRole('note',{name:help})).toBeInTheDocument()
-   fireEvent.scroll(document)
-   expect(screen.queryByRole('note')).not.toBeInTheDocument()
+   if(help){
+    expect(screen.getByRole('button',{name:help})).toHaveAttribute('aria-expanded','false')
+    fireEvent.click(screen.getByRole('button',{name:help}))
+    expect(screen.getByRole('note',{name:help})).toBeInTheDocument()
+    fireEvent.scroll(document)
+    expect(screen.queryByRole('note')).not.toBeInTheDocument()
+   }else{
+    expect(screen.getByText(/选择本任务的正式叶工具和人群/)).toBeVisible()
+    expect(screen.getByText(/仅供当前获授权的心理教师和学校管理者使用/)).toBeVisible()
+   }
    expect(window.location.search).toBe('?organizationId=school')
   }
   expect(fetcher.mock.calls.every(([,options])=>!options?.method||options.method==='GET')).toBe(true)

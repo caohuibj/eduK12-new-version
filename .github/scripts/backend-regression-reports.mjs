@@ -2,9 +2,9 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 
-// Two disjoint executions, not a retry union. Keep both original JSON artifacts.
+// Disjoint executions, not a retry union. Keep every original JSON artifact.
 export function mergeRegressionReports(reports){
-  assert.equal(reports.length,2,'Both regression executions must produce reports');
+  assert.ok(reports.length>=2,'Every selected regression execution must produce a report');
   const files=new Set();
   for(const r of reports){
     assert.equal(typeof r.success,'boolean');assert.ok(Array.isArray(r.testResults)&&r.testResults.length>0);
@@ -24,7 +24,7 @@ export function mergeRegressionReports(reports){
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const [output,...inputs]=process.argv.slice(2);
-  assert.ok(output&&inputs.length===2,'Usage: backend-regression-reports.mjs output base export');
+  assert.ok(output&&inputs.length>=2,'Usage: backend-regression-reports.mjs output base additional-report...');
   const result=mergeRegressionReports(inputs.map(p=>JSON.parse(readFileSync(p,'utf8'))));
   writeFileSync(output,JSON.stringify(result));
   if(!result.success)process.exitCode=1;
