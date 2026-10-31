@@ -417,7 +417,7 @@ jobs:
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
       - name: fetch the actual group report merge base
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'feat/group-report-snapshots-20261030'
+        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/group-report-snapshots-20261030","feat/group-longitudinal-survey-training-20261030"]'), github.event.pull_request.head.ref)
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}

@@ -4,6 +4,7 @@ import {participantAccessOutputs} from './participant-access-scope.mjs';
 
 export const groupReportBranch='feat/group-report-snapshots-20261030';
 export const groupReportLeafBranch='feat/group-report-leaf-sources-20261030';
+export const groupLongitudinalBranch='feat/group-longitudinal-survey-training-20261030';
 export const groupReportBase='dfd506347cfa2c684a75812936f32d48bdce34d4';
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 // GitHub may refresh refs/pull/N/merge after the event's base SHA was captured.
@@ -11,7 +12,7 @@ const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','p
 // exact PR source. This only scopes a Draft; it admits no old application result.
 export function groupReportDiffBase(eventBase,head,env=process.env,read=git){
   const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
-  if(![groupReportBranch,groupReportLeafBranch].includes(ref))return eventBase;
+  if(![groupReportBranch,groupReportLeafBranch,groupLongitudinalBranch].includes(ref))return eventBase;
   assert.match(eventBase||'',/^[a-f0-9]{40}$/);assert.match(head||'',/^[a-f0-9]{40}$/);
   const parents=read('cat-file','-p',head).split('\n').filter(line=>line.startsWith('parent ')).map(line=>line.slice(7));
   assert.equal(parents.length,2,'Actual GitHub merge checkout required');
@@ -36,11 +37,70 @@ export const groupReportAllowedPaths=Object.freeze([...groupReportFiles,...evide
 const allowed=new Set(groupReportAllowedPaths);
 const leafFiles=new Set(['.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs','docs/development/group-report-leaf-sources-20261030.md',...['modules/composite/composite.service.ts','modules/training-analysis/group-source.ts','modules/training-analysis/source.ts','__tests__/training-analysis/group-bundle-leaves.test.ts','__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts'].map(path=>'server-version/backend/src/'+path)]);
 
+// Exact original quota + Survey/Training candidate paths; no evidence directory wildcard.
+export const groupLongitudinalFiles=Object.freeze([
+  ".github/scripts/group-report-draft.mjs",
+  ".github/scripts/group-report-draft.test.mjs",
+  ".github/workflows/ci.yml",
+  "docs/development/group-longitudinal-draft-route-20261031.md",
+  "docs/evidence/group-longitudinal-survey-training-20261030/README.md",
+  "docs/evidence/group-longitudinal-survey-training-20261030/backend-types-candidate.log",
+  "docs/evidence/group-longitudinal-survey-training-20261030/contracts-continuation.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/contracts-first.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/frontend-cognitive-types-candidate.log",
+  "docs/evidence/group-longitudinal-survey-training-20261030/frontend-lint-continuation.log",
+  "docs/evidence/group-longitudinal-survey-training-20261030/frontend-lint.log.gz",
+  "docs/evidence/group-longitudinal-survey-training-20261030/frontend-panel-first.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/frontend-types-candidate.log",
+  "docs/evidence/group-longitudinal-survey-training-20261030/frontend-types-first.log",
+  "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-1280.png",
+  "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-390.png",
+  "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-result.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/manifest.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-1280.png",
+  "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-390.png",
+  "docs/evidence/group-longitudinal-survey-training-20261030/presentation-result.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/survey-contract-continuation.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/survey-current-leaf.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/survey-evidence.json",
+  "docs/evidence/group-longitudinal-survey-training-20261030/survey-published-scope.json",
+  "docs/evidence/training-cognitive-wave-quota-20261030/README.md",
+  "docs/evidence/training-cognitive-wave-quota-20261030/pg-after-fixture.json",
+  "docs/evidence/training-cognitive-wave-quota-20261030/pg-diagnostic.json",
+  "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json",
+  "docs/evidence/training-cognitive-wave-quota-20261030/pg-first.json",
+  "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
+  "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
+  "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
+  "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
+  "server-version/backend/src/__tests__/survey/group-report.test.ts",
+  "server-version/backend/src/controllers/trainingAnalysisController.ts",
+  "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+  "server-version/backend/src/modules/composite/composite.service.ts",
+  "server-version/backend/src/modules/reporting/group-longitudinal.ts",
+  "server-version/backend/src/modules/reporting/task-artifact.ts",
+  "server-version/backend/src/modules/survey/analytics.routes.ts",
+  "server-version/backend/src/modules/survey/analytics.source.ts",
+  "server-version/backend/src/modules/survey/group-longitudinal.service.ts",
+  "server-version/backend/src/modules/survey/group-report.service.ts",
+  "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts",
+  "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+  "server-version/backend/src/routes/courses.ts",
+  "server-version/e2e/group-longitudinal-visual.cjs",
+  "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx",
+  "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx",
+  "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx",
+  "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
+  "server-version/frontend/src/survey/SurveyGroupReports.tsx",
+  "server-version/frontend/src/training/TrainingGroupReports.tsx"
+]);
+const longitudinalFiles=new Set(groupLongitudinalFiles);
+
 /** A Draft review checkpoint only. No local-result admission, application
  * qualification, security waiver or Ready/main route is created here. */
 export function groupReportDraftPlan(entries,base,head,env=process.env){
   const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
-  if(![groupReportBranch,groupReportLeafBranch].includes(ref))return null;
+  if(![groupReportBranch,groupReportLeafBranch,groupLongitudinalBranch].includes(ref))return null;
   assert.equal(env.CI_EVENT,'pull_request','Group report preparation only supports an actual Draft PR');
   assert.equal(env.CI_IS_DRAFT,'true','Ready requires a separately reviewed affected qualification plan');
   assert.notEqual(env.CI_FORCE_FULL,'true');assert.notEqual(env.CI_FULL_ACCEPTANCE,'true');
@@ -48,7 +108,7 @@ export function groupReportDraftPlan(entries,base,head,env=process.env){
   assert.match(head,/^[a-f0-9]{40}$/);assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
   assert.match(String(env.CI_PR_NUMBER),/^[1-9][0-9]*$/);
   assert(entries.length>0);assert.equal(new Set(entries.map(e=>e.file)).size,entries.length);
-  for(const e of entries){assert(ref===groupReportLeafBranch?(leafFiles.has(e.file)||e.file.startsWith('docs/evidence/group-report-leaf-sources-20261030/')):allowed.has(e.file),'Unknown group-report path: '+e.file);assert.equal(e.newMode,'100644');assert(e.status==='A'&&e.oldMode==='000000'||e.status==='M'&&e.oldMode==='100644','Normal added/modified files only');}
+  for(const e of entries){assert(ref===groupLongitudinalBranch?longitudinalFiles.has(e.file):ref===groupReportLeafBranch?(leafFiles.has(e.file)||e.file.startsWith('docs/evidence/group-report-leaf-sources-20261030/')):allowed.has(e.file),'Unknown group-report path: '+e.file);assert.equal(e.newMode,'100644');assert(e.status==='A'&&e.oldMode==='000000'||e.status==='M'&&e.oldMode==='100644','Normal added/modified files only');}
   return {schema:1,route:'group-report-draft',base,eventBase:env.CI_BASE_SHA||base,eventMergeSha:env.GITHUB_SHA||head,head,preflightOnly:true,changes:entries};
 }
 export function groupReportDraftOutputs(plan){
