@@ -67,18 +67,18 @@ export async function listTeacherNumericGroups(input:TeacherNumericScope){
 /** Same existing small-change overlap rule, on frozen actual contributors.
  * This first numeric consumer preserves the strict completed-cohort boundary;
  * no early partial-population report is created while responses arrive. */
-export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number}){
+export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number},db:Prisma.TransactionClient|typeof prisma=prisma){
  const ids=input.cohort.members.map(m=>m.executionId)
- const [complete]=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int AS n FROM assessment_run_executions
+ const [complete]=await db.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int AS n FROM assessment_run_executions
   WHERE organization_id=${input.organizationId} AND run_id=${input.cohort.sourceRunId} AND track_id=${input.cohort.sourceTrackId} AND id=ANY(${ids}::text[]) AND status='COMPLETED'`
  if(input.cohort.eligibleN<input.minimumN||complete?.n!==ids.length)reportingFail('HUITEACHER_GROUP_PENDING_FINALS','所选群体须达到既有人数要求并全部正式完成',409)
  const users=input.cohort.members.map(m=>m.userId)
- const [measurement]=await prisma.$queryRaw<Array<{hash:string}>>`SELECT release.content->>'measurementHash' AS hash
+ const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT release.content->>'measurementHash' AS hash
   FROM assessment_run_tracks t JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
   JOIN scales s ON s.id=r.scale_id JOIN measurement_content_releases release ON release.id=s.measurement_release_id
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${input.cohort.sourceRunId} AND t.id=${input.cohort.sourceTrackId}`
  if(!measurement?.hash)return hidden()
- const prior=await prisma.$queryRaw<Array<{priorN:number;shared:number;minimumN:number}>>(Prisma.sql`
+ const prior=await db.$queryRaw<Array<{priorN:number;shared:number;minimumN:number}>>(Prisma.sql`
   SELECT jsonb_array_length(c.members)::int AS "priorN",
     (SELECT COUNT(*)::int FROM jsonb_array_elements(c.members) m WHERE m->>'userId'=ANY(${users}::text[])) AS shared,
     GREATEST(${input.minimumN},COALESCE((t.frozen_resource_policy->>'minimumRespondents')::int,0),
@@ -128,11 +128,11 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
  if(spec.definition.analysisKind!=='GROUP'||spec.definition.minimumCohortN<run.minimumN!||spec.definition.minimumContributorN<run.minimumN!
    ||spec.definition.metricRules.some(m=>m.minimumMetricN<run.minimumN!))reportingFail('REPORT_SPEC_INVALID','方案低于本任务披露人数要求',409)
  const cohortSelector=await educationGroupSelector(input.organizationId,'TEACHER',input.selection)
- return prisma.$transaction(async tx=>{
+ const generated=await prisma.$transaction(async tx=>{
   await lockTeacherDisclosure(tx,input.organizationId)
-  const generated=await generateOrganizationGroupAnalysis({principal:run.principal,organizationId:input.organizationId,runId:run.runId,trackId:input.trackId,specId:input.specId,
+  return generateOrganizationGroupAnalysis({principal:run.principal,organizationId:input.organizationId,runId:run.runId,trackId:input.trackId,specId:input.specId,tx,
    leaf:input.leaf,cohortSelector,presentation:await educationGroupPresentation({organizationId:input.organizationId,runId:run.runId,selection:input.selection}),
-   beforeCompute:async cohort=>{await assertTeacherNumericDisclosure({organizationId:input.organizationId,cohort,leaf:input.leaf,minimumN:run.minimumN!})}})
-  return readTeacherNumericGroup({...input,artifactId:generated.artifactId})
+   beforeCompute:async cohort=>{await assertTeacherNumericDisclosure({organizationId:input.organizationId,cohort,leaf:input.leaf,minimumN:run.minimumN!},tx)}})
  },{timeout:60000})
+ return readTeacherNumericGroup({...input,artifactId:generated.artifactId})
 }

@@ -1,0 +1,49 @@
+diff --git a/server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts b/server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts
+index 7ba9e64f1..26d6cf32f 100644
+--- a/server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts
++++ b/server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts
+@@ -120 +120 @@ const countsVisible=(payload:ReportingGroupArtifactPayload,minimumN:number)=>{
+-export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>}){
++export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>},db:Prisma.TransactionClient|typeof prisma=prisma){
+@@ -123 +123 @@ export async function assertTeacherNumericDisclosure(input:{organizationId:strin
+- const [measurement]=await prisma.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
++ const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
+@@ -132 +132 @@ export async function assertTeacherNumericDisclosure(input:{organizationId:strin
+- const prior=await prisma.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
++ const prior=await db.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
+@@ -211 +211 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
+- return prisma.$transaction(async tx=>{
++ const generated=await prisma.$transaction(async tx=>{
+@@ -213 +213 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
+-  const generated=await generateOrganizationGroupAnalysis({principal:run.principal,organizationId:input.organizationId,runId:run.runId,trackId:input.trackId,specId:input.specId,
++  return generateOrganizationGroupAnalysis({principal:run.principal,organizationId:input.organizationId,runId:run.runId,trackId:input.trackId,specId:input.specId,tx,
+@@ -215,2 +215 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
+-   beforePersist:async({cohort,payload})=>{await assertTeacherNumericDisclosure({organizationId:input.organizationId,cohort,leaf:input.leaf,minimumN,payload,metricRules})}})
+-  return readTeacherNumericGroup({...input,artifactId:generated.artifactId})
++   beforePersist:async({cohort,payload})=>{await assertTeacherNumericDisclosure({organizationId:input.organizationId,cohort,leaf:input.leaf,minimumN,payload,metricRules},tx)}})
+@@ -217,0 +217 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
++ return readTeacherNumericGroup({...input,artifactId:generated.artifactId})
+diff --git a/server-version/backend/src/modules/reporting/artifact.ts b/server-version/backend/src/modules/reporting/artifact.ts
+index 244795010..4319aefb8 100644
+--- a/server-version/backend/src/modules/reporting/artifact.ts
++++ b/server-version/backend/src/modules/reporting/artifact.ts
+@@ -209 +209,2 @@ export const createOrReuseReportingArtifact = async (input: {
+-}): Promise<ReportingGroupArtifactRecord> => prisma.$transaction(async (tx) => {
++}, tx?: Tx): Promise<ReportingGroupArtifactRecord> => {
++ const persist = async (tx: Tx): Promise<ReportingGroupArtifactRecord> => {
+@@ -234 +235,3 @@ export const createOrReuseReportingArtifact = async (input: {
+-}, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
++ }
++ return tx ? persist(tx) : prisma.$transaction(persist, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
++}
+diff --git a/server-version/backend/src/modules/reporting/service.ts b/server-version/backend/src/modules/reporting/service.ts
+index ee0729018..10e958b45 100644
+--- a/server-version/backend/src/modules/reporting/service.ts
++++ b/server-version/backend/src/modules/reporting/service.ts
+@@ -1,0 +2 @@ import { randomUUID } from 'node:crypto'
++import type { Prisma } from '@prisma/client'
+@@ -39,0 +41 @@ export const generateOrganizationGroupAnalysis = async (input: {
++  tx?: Prisma.TransactionClient
+@@ -99 +101 @@ export const generateOrganizationGroupAnalysis = async (input: {
+-  })
++  }, input.tx)
