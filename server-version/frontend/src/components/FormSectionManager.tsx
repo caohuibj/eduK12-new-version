@@ -56,6 +56,14 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const loadSequence = useRef(0)
+  const resourceSequence = useRef(0)
+
+  useEffect(() => {
+    resourceSequence.current += 1
+    setSaving(false)
+    setNotice(null)
+    return () => { resourceSequence.current += 1 }
+  }, [basePath])
 
   const load = useCallback(async () => {
     const request = ++loadSequence.current
@@ -96,16 +104,20 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
     .map(item => ({ ...item, formSectionId: section.id }))), [sections])
 
   const run = async (operation: () => Promise<{ code: number | string; message: string }>) => {
+    const resource = resourceSequence.current
+    const current = () => resource === resourceSequence.current
     setSaving(true)
     try {
       const response = await operation()
+      if (!current()) return
       if (response.code !== 0) throw new Error(response.message || '保存失败')
       await load()
+      if (!current()) return
       await onChange?.()
     } catch (error) {
-      setNotice(apiErrorMessage(error, '保存失败'))
+      if (current()) setNotice(apiErrorMessage(error, '保存失败'))
     } finally {
-      setSaving(false)
+      if (current()) setSaving(false)
     }
   }
 
