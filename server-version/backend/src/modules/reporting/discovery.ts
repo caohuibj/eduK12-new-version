@@ -5,7 +5,7 @@ import { type ReportingPrincipal } from './authorization'
 import { assertOrganizationReportingWorkspaceAccess, resolveOrganizationReportingWorkspaceContext } from './pr4Authorization'
 import { resolveProtectedFeedbackManagerContext } from './protectedFeedback'
 import { readReportingSeriesBatch, readReportingSeriesWavesBatch } from './series'
-import { getPublishedReportingSpec } from './spec'
+import { getPublishedReportingSpec, reportingSpecRecord, type ReportingSpecRow } from './spec'
 import { reportingAudienceForContext, reportingGroupContract } from './governedDisclosure'
 import { type ReportingAnalysisKindV1, type ReportingAnalysisSpecDefinitionV1 } from './types'
 
@@ -91,8 +91,10 @@ export async function listPublishedReportingSpecs(input: {
     ? Prisma.sql`AND "definition"->>'analysisKind' = ${input.analysisKind}`
     : Prisma.empty
   const [rows, totals] = await Promise.all([
-    prisma.$queryRaw<Array<{ id: string }>>(Prisma.sql`
-      SELECT "id"
+    prisma.$queryRaw<ReportingSpecRow[]>(Prisma.sql`
+      SELECT "id", "spec_key" AS "specKey", "version", "status", "definition", "spec_hash" AS "specHash",
+        "created_by_user_id" AS "createdByUserId", "created_at" AS "createdAt",
+        "reviewed_by_user_id" AS "reviewedByUserId", "reviewed_at" AS "reviewedAt", "published_at" AS "publishedAt"
       FROM "reporting_analysis_specs"
       WHERE "status" = 'PUBLISHED' ${filter}
       ORDER BY "spec_key", "version" DESC, "id"
@@ -104,7 +106,7 @@ export async function listPublishedReportingSpecs(input: {
       WHERE "status" = 'PUBLISHED' ${filter}
     `),
   ])
-  const list = await Promise.all(rows.map(async (row) => specSummary(await getPublishedReportingSpec(row.id))))
+  const list = rows.map((row) => specSummary(reportingSpecRecord(row)))
   await (input.analysisKind === 'INDIVIDUAL_LONGITUDINAL' ? individualSubjectScope(input) : assertOrganizationReportingWorkspaceAccess(input))
   return { list, total: totals[0]?.count ?? 0, page: input.page, pageSize: input.pageSize }
 }
