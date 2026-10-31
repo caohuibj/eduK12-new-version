@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/training/courseAssessments.test.ts",
+    "--testNamePattern=uses enrolled course scopes",
+    "--reporter=json",
+    "--outputFile=/workspace/scratch/5a77e8bdc1ae/dot-course-cognitive-436/docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader.json"
+  ],
+  "exitCode": 0,
+  "startedAt": "2026-10-31T08:56:38.774285+00:00",
+  "endedAt": "2026-10-31T08:56:39.936680+00:00",
+  "elapsedSeconds": 1.1624096960003953,
+  "head": "4292798a0a728099a4f9108beade8a2c78566d4d",
+  "inputs": {
+    "server-version/frontend/src/training/courseAssessments.ts": "9849072c0dd06248eeb5c2deac04d3b84ede756771913f8a3755d4d75f6e1f24",
+    "server-version/frontend/src/training/courseAssessments.test.ts": "27d6dcabccc7b10eb66d8eaa65a4058c627581791b60fc952c8fda3d219f7ac1",
+    "server-version/frontend/src/modules/cognitive/api.ts": "199fbe49dfff025c6e71730dcb0d9a509899bc71b0c88661cf312f094d51ee51",
+    "server-version/frontend/src/modules/composite/api.ts": "fca5b57b26d83d09544fa72dc1ce07a8b7d19d987ee79f312cfb55b3a584b056",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  }
+}

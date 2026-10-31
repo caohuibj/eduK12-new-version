@@ -1,0 +1,29 @@
+{
+  "kind": "SYNTHETIC_CONTROLLER_PRISMA_MOCK_OBSERVATION",
+  "fixtureSHA256": "600e8b90e2386d23992d03df93d1df6bdd5c80209489d50f46c36f5608d3092a",
+  "freeze": {
+    "data": "12 visible scales, 3 excluded scales, 14 standalone attempts plus 3 excluded foreign/child attempts; fixed UTC dates",
+    "runtime": "Node v24.21.0, current locked Vitest; exact argv/input hashes retained",
+    "compression": "JSON.stringify response body, gzip level 1; no HTTP headers/TLS/browser/network/cache measurement",
+    "queries": "3 Prisma method calls per request before/after: membership, catalog, attempts; no actual SQL executed"
+  },
+  "before": {
+    "scaleRows": 12,
+    "attemptRows": 14,
+    "rawBodyBytes": 5936,
+    "gzipBodyBytes": 707
+  },
+  "after": {
+    "scaleRows": 3,
+    "attemptRows": 5,
+    "rawBodyBytes": 1623,
+    "gzipBodyBytes": 496
+  },
+  "defaultBodyIdentical": true,
+  "targetRowsIdenticalToOriginalClientProjection": true,
+  "limits": [
+    "No SQL durations/CPU/RSS/latency/p95/concurrency measured.",
+    "No production traffic, real login, durable submit/report or database suite.",
+    "Visibility, ACTIVE/APPROVED memberships, attempt user/parent exclusion and status selection are existing logic; course filter only reduces eligible catalog rows."
+  ]
+}

@@ -7529,6 +7529,773 @@
         "backend": "458a4d8ccaa6a79f083f0c4205f29fab36c2c931",
         "frontend": "97b0f40bd6787dfed20097ec0519881c9afe42dd"
       }
+    },
+    "435": {
+      "schemaVersion": 1,
+      "pr": 435,
+      "enabled": true,
+      "base": "555f705dd272f0ee9c7ac0d80770010d2d6e9675",
+      "product": "6f70016bd93392990dff07833029c1361538e691",
+      "controlCheckpoint": "cd5f5219615785c70b9c47d82c969e5aa5654d61",
+      "components": {
+        "backend": "5cbbc96236eb7787b0e31da27a2ed06ece2b2bf2",
+        "frontend": "4c7fb5a4a8c25475052fae1b567affb42d09487c"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "48e295822e845d0415740534b5552311c12e618c",
+        ".github/scripts/onboarding-checks.mjs": "5ab5e744ed62c1a7939ffa285ed8335e8f43f263",
+        ".github/scripts/onboarding-controls.test.mjs": "8eeee7b90d75eb34b746f020d1df1819f06a39a2",
+        ".github/scripts/onboarding-evidence.json": "630df9386423f3c4a6482c8c9d9b22c92a7ab12d",
+        ".github/scripts/onboarding-scope.mjs": "558c5618c28f6995607a394afc7e7efaf0d723eb",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "dadc0aa76b32da9e09be922da563ad2f8e9ac597"
+      },
+      "source": {
+        "docs/performance/course-scale-scope-20261031/README.md": {
+          "before": null,
+          "after": "0a83953281048582d3884c01e563ad91fac524e5"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline-execution.json": {
+          "before": null,
+          "after": "8339b37268e10e2ef2c8245458d85794196ed84f"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "831a62c74e4725ce1c1441b307074d0d14ec1a16"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.log.gz": {
+          "before": null,
+          "after": "9066fe6f73ecaa40aeb22786df23e61c8b9ac544"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.ndjson.gz": {
+          "before": null,
+          "after": "2366dfa2e54bd50d2f43fdb268487d0b06178d02"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate-execution.json": {
+          "before": null,
+          "after": "4f60b0b48fa076678d20b69dc25ebb086b0c00af"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz": {
+          "before": null,
+          "after": "de7568cb0447ebd1ba900ba39e1611a850083d33"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.log.gz": {
+          "before": null,
+          "after": "e21737cbd1193f207aefeafdf44b73e4f599726b"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.ndjson.gz": {
+          "before": null,
+          "after": "e2ee11d9e3f6cbf231ceab0c79dc49d5896edfff"
+        },
+        "docs/performance/course-scale-scope-20261031/concurrent-pr-inventory.json": {
+          "before": null,
+          "after": "a1ede9dba48c37b34cb4bd626e1e9d8ffcafcfa8"
+        },
+        "docs/performance/course-scale-scope-20261031/environment.json": {
+          "before": null,
+          "after": "f8f4b56653f7614de1a1bf8afc0aca37a1a8f030"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "85b1a4b8ff05c3f725da15175b5a18976ae4415d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "90c8c27cdccf3167392f4cc4707b06daedd9315d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader-execution.json": {
+          "before": null,
+          "after": "b2a543e9c1179abcae15a741c65b5dfa66914977"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.json": {
+          "before": null,
+          "after": "ff926788b6c99acd8911631df6f277830bc3a6b2"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.log": {
+          "before": null,
+          "after": "ca11fd69b006dab6f37f77cacfc2674ce370b0c4"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/control.log": {
+          "before": null,
+          "after": "fb9c64ca49ca4e7698c6171b66c3670d04edb6b4"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "bd3d0d83bfa9c65d8ad915ee80cd0ed9f57d852d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/backend-types.json": {
+          "before": null,
+          "after": "4c146d8ad1338cf120df46a576ce2dd294597381"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/frontend-types.json": {
+          "before": null,
+          "after": "a1149b2399c41abc44bc9cb9a59fa912c833f133"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/prisma-generate.log": {
+          "before": null,
+          "after": "6aba1933358004ae2ec91061951c59ab364c0047"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/run-types.py": {
+          "before": null,
+          "after": "7447e5110271a4f0e672699a197be5fb3172e83f"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline-execution.json": {
+          "before": null,
+          "after": "e8449eeebfffc3174303f3f22cc78eddff080aa3"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "51af745a8e9a5a2e442e0e264fc0066360fe6d1d"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline.log.gz": {
+          "before": null,
+          "after": "14ad236f39f7933c83ff7ee972d6e16c622bca82"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate-execution.json": {
+          "before": null,
+          "after": "995be24db44bb9f05617a5fcfce11b7247cc55f4"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate.json.gz": {
+          "before": null,
+          "after": "44693a994a4d56a34ab9c191a9598300497c94b6"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate.log.gz": {
+          "before": null,
+          "after": "88400bb356fc67da475363014d45b9055a617917"
+        },
+        "docs/performance/course-scale-scope-20261031/measurements.json": {
+          "before": null,
+          "after": "21b33092a801fbb0a3d834ac313cc8096624c59f"
+        },
+        "docs/performance/course-scale-scope-20261031/original-files.json": {
+          "before": null,
+          "after": "def71a381fcb0f5cfb4c6a428d6a68176adf15b6"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "98b919cd353f812b9a0ebc57493789e448130c1b"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "371cfcdf50519e56d5784f53f07a71b5bbae0079"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "d23ec934b6a2bc09713cf3c454a1f2aeeb4efb0a"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.json": {
+          "before": null,
+          "after": "5160842ad7d91e87566826e1ffe1bb9098af45f5"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "91658ad69ba35c9e397b523177226eb3a17f1055"
+        },
+        "docs/performance/course-scale-scope-20261031/run-recorded-tests.py": {
+          "before": null,
+          "after": "609353e336be4c4e4011a5a776fc69b534c2d175"
+        },
+        "docs/performance/course-scale-scope-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "8cf0ea4e5db46a0acb1c341710f78af5d6c49c26"
+        },
+        "docs/performance/course-scale-scope-20261031/types/backend.json": {
+          "before": null,
+          "after": "361d1d5b99ae53fd81e1b1256ff76a6b9f585b4a"
+        },
+        "docs/performance/course-scale-scope-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/types/frontend.json": {
+          "before": null,
+          "after": "af321f1cc3a60f86e87325e720e74c7b41d08d87"
+        },
+        "docs/performance/course-scale-scope-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "e4c1167b420860df0321b4fed958bd883dc0e80b"
+        },
+        "server-version/backend/src/__tests__/scale/available-course.test.ts": {
+          "before": null,
+          "after": "d01714398f65a6de15b48202be40933cb5b75681"
+        },
+        "server-version/backend/src/controllers/scaleController.ts": {
+          "before": "dd670ed292d383ee99212be449e5c464c38c503e",
+          "after": "3581dda4beb1e896c2202e805b1afcdc0a97b1c2"
+        },
+        "server-version/frontend/src/training/courseAssessments.test.ts": {
+          "before": "bee8e8e441aa7e197ba059af076b88ff990ac05d",
+          "after": "6cfe249badd2f7d18e84c03cd1899564b901f20c"
+        },
+        "server-version/frontend/src/training/courseAssessments.ts": {
+          "before": "f351e2f31c9728f237e5c8a72cb02a33a3e137a7",
+          "after": "4031e1c16be17a4a34b636fcfe8326202ca4a963"
+        }
+      }
+    },
+    "436": {
+      "schemaVersion": 1,
+      "pr": 436,
+      "enabled": true,
+      "base": "093d86e842da12d443301fd4a37d5d046ecb9185",
+      "product": "c7394094623ababb39d88ab779644452b51f5780",
+      "controlCheckpoint": "cca169aadc698d4b15656e9cda258af7f5107e4d",
+      "components": {
+        "backend": "7c990d88802f0bdf924195a30b2b8ebd631ffb47",
+        "frontend": "1bc73a4eaa881fbff76ebbe4fb4f8567c51aa430"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "8747311744f1480a977743b1b74b2e5ae624c652",
+        ".github/scripts/onboarding-checks.mjs": "2695cb606f93afe1758ccaa3f6c8311e37da2a05",
+        ".github/scripts/onboarding-controls.test.mjs": "1f3bd2a13bcfa19b69421eb7bde7da4ec137f2cd",
+        ".github/scripts/onboarding-evidence.json": "da6e78ada84ee3b22a9e2ee1b5e6ced0756d890e",
+        ".github/scripts/onboarding-scope.mjs": "f516e9ccc017b0d550fca3b059676fa32e7e4a07",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "1597a1da3f4d2539ca72e337c12d9fa1a37a88d3"
+      },
+      "source": {
+        "docs/performance/cognitive-course-scope-20261031/README.md": {
+          "before": null,
+          "after": "0655e6a34ff46432b2fc41f3f978ab66146ddc30"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline-execution.json": {
+          "before": null,
+          "after": "a010a3a7e5c94d41172cb3a3ee61a61791cc9f05"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "519b39bfbcb7e1f58eed3b3f77c231c9618a3738"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline.log.gz": {
+          "before": null,
+          "after": "324c3327962ffdc8443e9b83ecc79dbe5db29f89"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-baseline.ndjson.gz": {
+          "before": null,
+          "after": "f468554e57a8b1bceded8142d5e7cfb820fafe15"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate-execution.json": {
+          "before": null,
+          "after": "b4a3858025ebb252d7586182a9c590a23947a5e3"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate.json.gz": {
+          "before": null,
+          "after": "f364abda423393ea5622f43800e4167281ca1e60"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate.log.gz": {
+          "before": null,
+          "after": "f0465be6fe61347a45c79b667c3fc0918a8ef186"
+        },
+        "docs/performance/cognitive-course-scope-20261031/backend-candidate.ndjson.gz": {
+          "before": null,
+          "after": "a7a01da39f92e4a8b87ed402eb9d2f65e87b8ca9"
+        },
+        "docs/performance/cognitive-course-scope-20261031/concurrent-pr-inventory.json": {
+          "before": null,
+          "after": "b74c1b439a6a6d05417163dc2573adf96aabfcf7"
+        },
+        "docs/performance/cognitive-course-scope-20261031/environment.json": {
+          "before": null,
+          "after": "3dffe891f0756249329ea4a96c6c5c326821b4ba"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "dc46bd0ae8fc9fec1ab7a27cc30fba22958b702b"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types-interrupted.json": {
+          "before": null,
+          "after": "c49be47e0ae8700ac81e8950edbea608a89578ce"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types-interrupted.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "71e3b0da145a1154c016eb859d142ae6e6475624"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader-execution.json": {
+          "before": null,
+          "after": "5d439b36bb02df1163f7e79c362735a9b4caced3"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader.json": {
+          "before": null,
+          "after": "499a2927fac97b05bc7b65d08e020c0bbe1a021b"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/combined-loader.log": {
+          "before": null,
+          "after": "cd7c516abe8a14f184857869d3b77285eb408a5d"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/control.log": {
+          "before": null,
+          "after": "d4553dcc8ef87e61f3250ced4769be1bb2a847f0"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "45514a0cc9d8b7a27226b7462afe38b2bbcf52ef"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/run-types.py": {
+          "before": null,
+          "after": "f7a9bf3d2c21d07d0116766011f412e6d4322a85"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader-execution.json": {
+          "before": null,
+          "after": "030ff6e29002f88990162d7b2fb201d918210c5a"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader.json": {
+          "before": null,
+          "after": "6240ef3e869e8cf7fa9877df5588093e7f1cf2a9"
+        },
+        "docs/performance/cognitive-course-scope-20261031/final-qualification/triple-loader.log": {
+          "before": null,
+          "after": "ead9e6b476a7f70fa1798525e008841b44b5870c"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-baseline-execution.json": {
+          "before": null,
+          "after": "3a57917d937dc68e0eb4bcc706bb3313a446f09d"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "a54b5f8195c7819b8495e11ee6495d8ff004ac94"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-baseline.log.gz": {
+          "before": null,
+          "after": "bb984ae4932a9ddb514ae1732da437681744ec44"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-candidate-execution.json": {
+          "before": null,
+          "after": "e8c8195b9aff0b22933d2a1ef5e0bbd58f800fa0"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-candidate.json.gz": {
+          "before": null,
+          "after": "f33afee11f55897f11a2849dd6da9d92aacf84f7"
+        },
+        "docs/performance/cognitive-course-scope-20261031/frontend-candidate.log.gz": {
+          "before": null,
+          "after": "2500681785be1450949d8775b24ecfcaf6cba3d0"
+        },
+        "docs/performance/cognitive-course-scope-20261031/measurements.json": {
+          "before": null,
+          "after": "b395ec742992c74cbfca4d5d9e446d35dc30f23a"
+        },
+        "docs/performance/cognitive-course-scope-20261031/original-files.json": {
+          "before": null,
+          "after": "fa18267287dbac3f4dc3838923c55de1a6749309"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "c23c05859e334161b26df6c316464ba1b80d7cb6"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "90ceb468019f6611a28d9da9eeb07e7d176a890d"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "5ef35b7b3ab16df3d217567c16e7ba1280046987"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/frontend-types.json": {
+          "before": null,
+          "after": "5e2df6ca1f57e82c3c3d9df561bf8fa8590e75b9"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "d70959585eddfd8fa7dda15518bf7d3cf336d8eb"
+        },
+        "docs/performance/cognitive-course-scope-20261031/run-recorded-tests.py": {
+          "before": null,
+          "after": "dbcd6eb396233b27fe73ce84bcb08bf1313b5974"
+        },
+        "docs/performance/cognitive-course-scope-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "bbf9f09aca7d9ba74f9877b2fce88c42dca7091a"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/backend.json": {
+          "before": null,
+          "after": "ed6401aa60ac86bb368ab14b7444f418b403c8de"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/frontend.json": {
+          "before": null,
+          "after": "deb6164444bc2236338d63cae1cd79868a850917"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/cognitive-course-scope-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "2c9b5730a64a3c12b2abe7767758444ed733f107"
+        },
+        "server-version/backend/src/__tests__/cognitive/assignment-course-scope.test.ts": {
+          "before": null,
+          "after": "07676867121e955026c25f85c1dcc3f36da49e10"
+        },
+        "server-version/backend/src/modules/cognitive/assignment.service.ts": {
+          "before": "997b34b1227b541886cfd21114ce7ce550fdf758",
+          "after": "7db7649ce01caa446f45c306ae11ee244c92a913"
+        },
+        "server-version/backend/src/modules/cognitive/cognitive.controller.ts": {
+          "before": "e3ef01da098b1d4786700c2b59f327c08c92f79f",
+          "after": "9286aa46960c2da068895f794c8697df0f29ab37"
+        },
+        "server-version/frontend/src/modules/cognitive/__tests__/api.test.ts": {
+          "before": "978a7915b93b98d13312db95cfec9453661806c7",
+          "after": "c90f782ecf00b56e27382e81efdba6653c783082"
+        },
+        "server-version/frontend/src/modules/cognitive/api.ts": {
+          "before": "da26af7129e7f09bea9f34142a67958d963dcbd1",
+          "after": "3d7d4c64b1769ebcb3951424076cc819d82b5a2d"
+        },
+        "server-version/frontend/src/training/courseAssessments.test.ts": {
+          "before": "6cfe249badd2f7d18e84c03cd1899564b901f20c",
+          "after": "d5abc8e32338e9574a4176dcb8cfd36315a448b5"
+        },
+        "server-version/frontend/src/training/courseAssessments.ts": {
+          "before": "4031e1c16be17a4a34b636fcfe8326202ca4a963",
+          "after": "f03774c77209ee32a37eea8df2971309d03fbe23"
+        }
+      }
+    },
+    "444": {
+      "schemaVersion": 1,
+      "pr": 444,
+      "enabled": true,
+      "base": "63f849c5bb3dfd7c215d719fc9b75e233664dca8",
+      "product": "e2011568f5ca4f217a4b1b7d9c055738f27193cb",
+      "controlCheckpoint": "09fcb1826ba4925bf9ba3e31ad335450640a55d5",
+      "components": {
+        "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+        "frontend": "abac9400eea6d4c9ee7a4ab5024d4c5a35299f57"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "187337f61b252d14562261dc9af15a67492fa2af",
+        ".github/scripts/onboarding-checks.mjs": "e0750ecbd4ed4747a90135f6498f453f5a598c0d",
+        ".github/scripts/onboarding-controls.test.mjs": "9c1d334d3d560613aabf3ebc76c6fcb0db3728a7",
+        ".github/scripts/onboarding-evidence.json": "27c2cd9b1bad74eb00419df976c6b16fdecc30dd",
+        ".github/scripts/onboarding-scope.mjs": "cb3cd65577d72598b98f17266f67d1ce3de769c9",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "008cacc66da4a176280a7eccaea04c70cdfbed85"
+      },
+      "source": {
+        "docs/performance/form-manager-single-read-20261031/README.md": {
+          "before": null,
+          "after": "17ed2e2639edb47be98eced4f7fc79024976ba92"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend.json": {
+          "before": null,
+          "after": "bbc1555850da34d498d651e1c1e2cfe6eec39e0d"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend.log": {
+          "before": null,
+          "after": "61dfab293296a69cb39426f0c10de4bf67925cb3"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional-fixed.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional-fixed.json": {
+          "before": null,
+          "after": "b39534e0a3e2505398604f7cd7f9ce9c01b7502b"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional-fixed.log": {
+          "before": null,
+          "after": "c12f7eae21903353db49d4fa7f617e4904060a2c"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional.json": {
+          "before": null,
+          "after": "11a7815c7cbd619bf2736682c339909c8da7d463"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional.log": {
+          "before": null,
+          "after": "2461d75ad6b4787cbc422af88d0e0859c746cacb"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-mixed-fixed.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-mixed-fixed.json": {
+          "before": null,
+          "after": "120e312739d38f0260fee545df0ffd317f44dbf0"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-mixed-fixed.log": {
+          "before": null,
+          "after": "9b277c651f3b6682b5dc5882353ba74af534fc9b"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types-final.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend.json": {
+          "before": null,
+          "after": "5cf4f4bb62848916410d2dd1da2f32dcd1a4100d"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend.log": {
+          "before": null,
+          "after": "cba6c36a02caaf5ee2bcf65885f54365c9729910"
+        },
+        "docs/performance/form-manager-single-read-20261031/http.jsonl": {
+          "before": null,
+          "after": "84ee70d2d3342f9ea07f45313203afe8ea894ab7"
+        },
+        "docs/performance/form-manager-single-read-20261031/inputs.json": {
+          "before": null,
+          "after": "10e55d90b59de2b8e0e9655abee533501467074a"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/README.md": {
+          "before": null,
+          "after": "4a22b614558ff884a5376d964f587034b49965d1"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline-execution.json": {
+          "before": null,
+          "after": "1fc59f523193cbe1467647ef2d4693f19371e9b1"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline.json": {
+          "before": null,
+          "after": "65f027aa999e63588ff69535cb6e689f44463d85"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline.log": {
+          "before": null,
+          "after": "c647a439a7282a9c6f20b7a5daf8d790e555849c"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate-execution.json": {
+          "before": null,
+          "after": "ab8a638152f2b6fad515be2ca10267c17d5d8029"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate.json": {
+          "before": null,
+          "after": "900942e9ea0784231014bc0d5cc1fd81de70a579"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate.log": {
+          "before": null,
+          "after": "da857c5e89381df8f4bca8bcd07772be9d9b4692"
+        },
+        "docs/performance/form-manager-single-read-20261031/payload.cjs": {
+          "before": null,
+          "after": "bbf186b643fccd599fbce74a1a91189730877b80"
+        },
+        "docs/performance/form-manager-single-read-20261031/payload.json": {
+          "before": null,
+          "after": "a2f8f292687f27fa9f499e164bce3c9813c77f96"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "fb6b9c0a59989f384483776930aa4580d7189205"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "45a9b02d3efa7dea24d02b41a2d4c8db71768b9d"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control-before-upstream-integration.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control-before-upstream-integration.log": {
+          "before": null,
+          "after": "50b539c27dce7dde2663ee8112c1344a4a02509e"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "3b1b4bb0ac8bd7b3a023f0f84f460c56ed56fbf0"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/frontend-types.json": {
+          "before": null,
+          "after": "f3d1129ba3a07419cb7383e7fc8b61b0b6997822"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "c1931a230f3352a74651a7f7188dda7de0d4fd64"
+        },
+        "docs/performance/form-manager-single-read-20261031/transport-inputs.json": {
+          "before": null,
+          "after": "2e8662c9786ed96eadfe3251381981b90d2f0655"
+        },
+        "server-version/backend/src/__tests__/questionnaire/form-sections-units.test.ts": {
+          "before": null,
+          "after": "e6a2a04c24fd93575db8c72a9873ee6497d9f9da"
+        },
+        "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
+          "before": "524d096ef16432954971f00ab1d501070025e33d",
+          "after": "b86d8f910ade9bd7a3e0139efef2907c31ad4002"
+        },
+        "server-version/backend/src/controllers/questionnaireController.ts": {
+          "before": "d39ec92047d3516c6baf5d955288b1df6e22f916",
+          "after": "4d1cb5d82bead6a4a6ee378d69c890e0e48c4e5b"
+        },
+        "server-version/frontend/src/components/FormSectionManager.tsx": {
+          "before": "3b941f29627a53bc374df4a6998a673a8b30f849",
+          "after": "fc0a6369901d29c607c5f1349a08f069e8ad55cc"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": {
+          "before": "189384a86c2e60a87b6db62eda66c25db433ca71",
+          "after": "128103559d595548e948460ee45eb84cbf0d1a5b"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.mutation-race.test.tsx": {
+          "before": null,
+          "after": "6a2591e0d2ef42ac9005dd5850d9772e053784a8"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.race.test.tsx": {
+          "before": null,
+          "after": "db63ff0096b6498d47c0d86ba989beb75a6a13f7"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx": {
+          "before": "541810a1edb87a2642b04897294c73ac6c21e6d1",
+          "after": "5ff5f1ec445a9b9ba8bda640d28bca77ac474fd6"
+        }
+      }
     }
   }
 }

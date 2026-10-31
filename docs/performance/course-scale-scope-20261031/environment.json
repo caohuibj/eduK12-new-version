@@ -1,0 +1,35 @@
+{
+  "kind": "POST_EXECUTION_ENVIRONMENT_INDEX_UNSIGNED",
+  "node": "v24.21.0",
+  "versions": {
+    "backend": {
+      "typescript": {
+        "installed": "5.9.3",
+        "locked": "5.9.3"
+      },
+      "vitest": {
+        "installed": "4.1.11",
+        "locked": "4.1.11"
+      },
+      "vite": {
+        "installed": "7.3.7",
+        "locked": "7.3.7"
+      }
+    },
+    "frontend": {
+      "typescript": {
+        "installed": "5.6.3",
+        "locked": "5.6.3"
+      },
+      "vitest": {
+        "installed": "4.1.11",
+        "locked": "4.1.11"
+      },
+      "vite": {
+        "installed": "6.4.4",
+        "locked": "6.4.4"
+      }
+    }
+  },
+  "note": "Installed versions checked against unchanged locks after execution; this is not a historical complete dependency-byte attestation. Compiler/client selected hashes are in actual type records. Test source inputs before/after in actual command records; vite/vitest config inherited unchanged from the pinned base."
+}
