@@ -14633,6 +14633,66 @@
       "sourceAssociationBasis": "Actual reported executions on local working inputs subsequently committed; no invented contemporaneous head/signature. Remote product is full-tree identical to independently reviewed local head.",
       "reuseRationale": "Final review only removed run recoverSession; ordinary success, initial reads, non-session errors, legacy fallback and MFA branches unchanged. Wrong-password and step-up cases are final correction executions. Backend projection/helper unchanged after recorded checks. Test-only await/navigation improvements do not change retained cases.",
       "failureDisposition": "The wrong operation-401-must-logout assertion is withdrawn, not repaired or admitted. Other selected-report product failures have a selected passing continuation with the same name. Initial fixture-only reports remain archived but are not selected."
+    },
+    "442": {
+      "schemaVersion": 1,
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
+      "environment": {
+        "node": "v24.22.1",
+        "limitations": [
+          "Original Vitest default reporter records only 5 passed summary, not per-case result identities or separately printed numeric exit. No JSON reporter is fabricated.",
+          "Prior logs and tool terminal excerpt are unsigned, retrospectively indexed. Input hashes are post-execution observations, not an atomic execution attestation.",
+          "The baseline 1 failed / 3 passed and missing-dependency types failure remain original; no full-suite, production, build, browser or deployment claim.",
+          "Fulfilled code404 fixture is not actual HTTP404 rejection; actual rejection displays its normalized error and manual retry."
+        ]
+      },
+      "originals": {
+        "baseline": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log",
+          "sha256": "453a5369c4e754409a762453201a86b92b37e0f8d88ec01ff9fd6d9d11432e7a"
+        },
+        "passed": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log",
+          "sha256": "f0e2b416d3359040ab86c75963ec2882a5fb76143be7eefbb4f3167a1b94c953"
+        },
+        "lint": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log",
+          "sha256": "93e413077110bcb7192d384de7453a10c34c3d7e3714158a857d17f195593c39"
+        },
+        "oldTypesTerminal": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt",
+          "sha256": "5e8d634e61aab3651dd053f63ca7fee7d2a159a7b7ff7fd5da36caf3615ae16b"
+        },
+        "oldTypesLog": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "missingDependencyTypes": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log",
+          "sha256": "df58aaa5d57d20e37de01676178a17fb6f49594f95c1110a7c948ba5105e7ef5"
+        }
+      },
+      "sourceHashes": {
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": "8d8de6f5eedf8d50d61b5f6e639d12344bfc45cef4a7ddd68a2fa101a15b9e91",
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": "c429713f54f5a31e3c814e05aa62ee17cf8bbb46be32a4de8bbac7bdcfc7ea08",
+        "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+      },
+      "types": {
+        "path": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json",
+        "sha256": "40eef16d8b868ba2763c17d72559eafbab7205122b3f3d8d0d56042c5a5b69a9",
+        "log": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log"
+      },
+      "sourceAssociationBasis": "Original five-pass execution bound by unchanged questionnaire source, test, lock and tsconfig hashes; summary only, no invented individual result identities.",
+      "reuseRationale": "439 changed School inputs but not questionnaire test loaded modules. Reuse original application tests; fresh recorded frontend app types covers the integrated whole component. Backend equals current main and is not recompiled."
     }
   }
 }
