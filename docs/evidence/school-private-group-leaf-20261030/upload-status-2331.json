@@ -1,0 +1,29 @@
+{
+  "authorization": "2026-10-30 23:31 exact initial-http-group-longitudinal-390.png",
+  "repository": "caohuibj/eduK12-new-version",
+  "targetBranch": "feat/group-longitudinal-survey-training-20261030",
+  "results": [
+    {
+      "path": "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-390.png",
+      "status": "blob-created",
+      "sha": "0f36f7031d989613c3e8019abd2b13f3a9ccd6ba"
+    },
+    {
+      "path": "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-1280.png",
+      "status": "blob-created",
+      "sha": "bd470f8b39a0858a2a5f25fc5be2da52b0c7e11e"
+    },
+    {
+      "path": "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-390.png",
+      "status": "denied-known-not-executed",
+      "sha": "4a72ac143bfd6c6f12ea72905a802774d448d779",
+      "size": 90304,
+      "reason": "Reviewer requires authorization for this distinct binary image; earlier exact PNG authorization not applied to it.",
+      "retried": false
+    }
+  ],
+  "completeRemoteBranchOrPr": false,
+  "pendingApprovalCard": false,
+  "requestIdAvailable": false,
+  "localWorkContinues": true
+}

@@ -1,0 +1,18 @@
+{
+  "advisory": "https://github.com/advisories/GHSA-mrwp-f3q8-3g9p",
+  "release": "https://github.com/follow-redirects/follow-redirects/releases/tag/v1.16.2",
+  "range": ">=1.16.0 <=1.16.1",
+  "patched": "1.16.2",
+  "axiosRange": "^1.16.0",
+  "officialIntegrity": "sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==",
+  "fixtureDownloadedIntegrityEqual": true,
+  "lockedDeltaPackages": [
+    "node_modules/follow-redirects"
+  ],
+  "currentAppSourceCommit": "e5fa21eb058f26601ce12532cc5db5b8b861bdc4",
+  "reuseControlExitCode": 0,
+  "originalQualificationRun": 41167481038,
+  "originalQualificationJob": 124438146565,
+  "migrationOrFrontendTestsReplayed": false,
+  "formalPatchedImageScan": "NOT_RUN_YET"
+}

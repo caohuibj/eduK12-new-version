@@ -1,4 +1,5 @@
 import {readOrdinaryDeclaredFeedback,type OrdinaryStoredContent} from './education-ordinary-declared-feedback'
+import {schoolSelfGroupAssignmentSql} from '../assessment-run/educationCompositionExecution'
 import {readOrdinaryNativeFeedback} from './education-ordinary-native-feedback'
 import {loadFrozenActiveSlotSet} from '../assessment-runtime/slot-set'
 import {Prisma} from '@prisma/client'
@@ -42,7 +43,8 @@ async function readOwn(tx:Prisma.TransactionClient,input:ScopedInput,loadContent
    AND a.subject_user_id=subject.user_id AND a.respondent_user_id=respondent.user_id
    AND a.subject_role=subject.actor_role AND a.respondent_role=respondent.actor_role
    AND (a.analysis_mode='INDIVIDUAL_ONLY' OR (a.analysis_mode='COHORT_AGGREGATE' AND a.subject_role='TEACHER' AND a.respondent_role='STUDENT'
-    AND t.resource_key LIKE 'education-composition:TEACHER:%:TEACHER:STUDENT_REPORT:1.0.0'))
+    AND t.resource_key LIKE 'education-composition:TEACHER:%:TEACHER:STUDENT_REPORT:1.0.0')
+    OR ${schoolSelfGroupAssignmentSql(Prisma.sql`t`,Prisma.sql`a`)})
   LEFT JOIN composite_assessment_attempts p ON p.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
    AND p.assignment_ref=a.id AND p.episode_id=a.episode_id AND p.user_id=${input.actorUserId}
    AND p.subject_user_id=a.subject_user_id AND p.respondent_user_id=a.respondent_user_id

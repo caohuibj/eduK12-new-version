@@ -1,0 +1,21 @@
+{
+  "command": [
+    "./node_modules/.bin/tsc",
+    "--noEmit",
+    "--pretty",
+    "false"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "startedAt": "2026-10-30T19:34:44.505917+00:00",
+  "seconds": 38.417,
+  "exitCode": 0,
+  "sourceHashesAtStart": {
+    "src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts": "78131aa269285f91bdf91910e3d430aa3e2d714ce359b54658aedfed6eb43c20",
+    "src/__tests__/campus/group-longitudinal-plan.routes.test.ts": "069f385e95015a01cce06d65cd7b80209296fff32903dce820bd08300a47af43",
+    "src/__tests__/campus/group-longitudinal-plan.test.ts": "1f18c47f0d561f48dd5111aaf97561e50367e1bff927d1886a4381fb563b6722",
+    "src/modules/campus/group-longitudinal-plan.routes.ts": "d43e70b5bc80f988395b7b8f483c83d36e8264ae2d624e0a6d4abd57d1733fa9",
+    "src/modules/campus/group-longitudinal-plan.service.ts": "af5cb8668252372df34862effb2b4d18a2a7548a8134852f0af04c088430caca"
+  },
+  "unchangedAtCompletion": true,
+  "formalCI": false
+}

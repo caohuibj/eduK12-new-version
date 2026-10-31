@@ -9,11 +9,13 @@ import {privateToolFail,type PrivateToolContext} from './private-tool.contracts'
 import {privateScaleCode,privateScaleResourceKey,privateScaleRuntimeInput,privateScaleRuntimeOriginSchema,privateScaleVariant,type PrivateScaleRuntimeOrigin} from './private-tool.runtime-origin'
 import {readPrivateScaleVersionIdentity,privateScaleMeasurementInput,readPrivateRuntimeScaleSource} from './private-tool.runtime-source'
 import {privateScaleResourceEntry} from './private-tool.runtime-policy'
+import {parseSchoolPrivateGroupSelection} from './school-private-group-selection'
+import {schoolPrivateScaleGroupChoice} from './school-private-group-source'
 type Tx=Prisma.TransactionClient
 type Row={resource_key:string;resource_version:string;scale_id:string;composite_id:string;definition_hash:string;entry:unknown;entry_hash:string;status:string}
 /** Read identity only for an existing execution/history. These modes never
  * authorize a caller: actual task/report access remains the caller's obligation. */
-export async function readPrivateScaleRuntimeResource(tx:Tx,input:{key:string;version:'1.0.0';purpose:'NEW_USE'|'EXISTING_EXECUTION'|'HISTORY';context?:PrivateToolContext}){
+export async function readPrivateScaleRuntimeResource(tx:Tx,input:{key:string;version:'1.0.0'|'2.0.0';purpose:'NEW_USE'|'EXISTING_EXECUTION'|'HISTORY';context?:PrivateToolContext}){
  const [row]=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM registered_assessment_resources
   WHERE resource_key=${input.key} AND resource_version=${input.version} FOR SHARE`)
  if(!row||!row.resource_key.startsWith('private-scale:')||row.status!=='PUBLISHED'||canonicalHash(row.entry)!==row.entry_hash)
@@ -64,6 +66,9 @@ export async function preparePrivateScaleRuntimeResource(tx:Tx,c:PrivateToolCont
  if(!scoped||scoped.contentHash!==input.contentHash)privateToolFail('PRIVATE_TOOL_VERSION_NOT_FOUND',404)
  const {version,definition}=await readPrivateScaleVersionIdentity(tx,scoped.id)
  const variant=privateScaleVariant(c.entry,input.administration)
+ const ceiling=input.groupReporting?schoolPrivateScaleGroupChoice(version,definition):null
+ const groupReporting=input.groupReporting?parseSchoolPrivateGroupSelection(input.groupReporting,{entry:c.entry,
+  administration:input.administration,sources:ceiling?[ceiling]:[]}):null
  await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${'private-scale:'+version.id}))`)
  const code=privateScaleCode(version.id)
  const release=await publishContentRelease(tx,privateScaleMeasurementInput(version,definition),version.ownerUserId)
@@ -75,14 +80,14 @@ export async function preparePrivateScaleRuntimeResource(tx:Tx,c:PrivateToolCont
   definition:definition as unknown as Prisma.InputJsonValue,definitionHash:hashScaleDefinition(definition),
   itemCount:definition.items.length,dimensionCount:definition.scoring.scores.length,measurementReleaseId:release.releaseId}})
  await readPrivateRuntimeScaleSource(tx,scale,version.id)
- const origin:PrivateScaleRuntimeOrigin={schemaVersion:1,adapterVersion:'1.0.0',kind:'AUTHOR_PRIVATE',entry:c.entry,
+ const origin=privateScaleRuntimeOriginSchema.parse({schemaVersion:groupReporting?2:1,adapterVersion:groupReporting?'2.0.0':'1.0.0',kind:'AUTHOR_PRIVATE',entry:c.entry,
   organizationId:version.organizationId,ownerUserId:version.ownerUserId,toolId:version.toolId,versionId:version.id,
   contentHash:version.contentHash,definitionHash:scale.definitionHash!,releaseId:release.releaseId,releaseHash:release.contentHash,
-  variantKey:variant.variantKey as PrivateScaleRuntimeOrigin['variantKey']}
+  variantKey:variant.variantKey as PrivateScaleRuntimeOrigin['variantKey'],...(groupReporting?{groupReporting}:{})})
  const key=privateScaleResourceKey(origin)
  const [prior]=await tx.$queryRaw<Array<{entry:unknown}>>(Prisma.sql`SELECT entry FROM registered_assessment_resources
-  WHERE resource_key=${key} AND resource_version='1.0.0' FOR SHARE`)
- if(prior)return readPrivateScaleRuntimeResource(tx,{key,version:'1.0.0',purpose:'NEW_USE',context:c})
+  WHERE resource_key=${key} AND resource_version=${origin.adapterVersion} FOR SHARE`)
+ if(prior)return readPrivateScaleRuntimeResource(tx,{key,version:origin.adapterVersion,purpose:'NEW_USE',context:c})
  const composite=await tx.compositeAssessment.create({data:{code:'org-private-resource-'+randomUUID(),name:version.title,
   createdBy:version.ownerUserId,productKind:'ORGANIZATION_RESOURCE',publicEnabled:false,copyable:false,
   items:{create:{type:'SCALE',position:0,required:true,scaleId:scale.id}}},include:{items:true}})
@@ -94,7 +99,7 @@ export async function preparePrivateScaleRuntimeResource(tx:Tx,c:PrivateToolCont
  const entry=privateScaleResourceEntry(origin,version.title,definition,composite.id)
  await tx.$executeRaw(Prisma.sql`INSERT INTO registered_assessment_resources
   (id,resource_key,resource_version,scale_id,definition_hash,composite_id,entry,entry_hash,status,created_by_user_id,published_by_user_id,published_at)
-  VALUES(${randomUUID()},${key},'1.0.0',${scale.id},${scale.definitionHash},${composite.id},${JSON.stringify(entry)}::jsonb,
+  VALUES(${randomUUID()},${key},${origin.adapterVersion},${scale.id},${scale.definitionHash},${composite.id},${JSON.stringify(entry)}::jsonb,
    ${canonicalHash(entry)},'PUBLISHED',${version.ownerUserId},${version.ownerUserId},clock_timestamp())`)
- return readPrivateScaleRuntimeResource(tx,{key,version:'1.0.0',purpose:'NEW_USE',context:c})
+ return readPrivateScaleRuntimeResource(tx,{key,version:origin.adapterVersion,purpose:'NEW_USE',context:c})
 }

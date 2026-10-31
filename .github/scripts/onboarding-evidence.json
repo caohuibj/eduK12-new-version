@@ -2712,8 +2712,8 @@
           ],
           "historicalTestDifference": {
             "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
-            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())",
-            "afterAwait": "await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())",
+            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'\u666e\u901a\u95ee\u5377'})).toBeEnabled())",
+            "afterAwait": "await waitFor(()=>expect(screen.queryByText('\u6b63\u5728\u8bfb\u53d6\u6216\u4fdd\u5b58\uff0c\u8bf7\u7a0d\u5019\u2026')).not.toBeInTheDocument())",
             "affectsSelectedCases": false,
             "failedCaseQualifiedBy": "school-recheck"
           }
@@ -3226,7 +3226,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "task group leaf statistics keeps zero, signed values and per-metric missing denominators, using existing statistics",
@@ -3253,11 +3253,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
@@ -3273,11 +3273,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
               "status": "passed"
             },
             {
@@ -3293,11 +3293,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
               "status": "passed"
             },
             {
@@ -4160,7 +4160,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4600,7 +4600,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5001,7 +5001,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5232,7 +5232,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
@@ -5480,7 +5480,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "exact main task artifact migration and native backup upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows",
@@ -10039,7 +10039,7 @@
               "status": "passed"
             },
             {
-              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
               "status": "passed"
             },
             {
@@ -10053,7 +10053,7 @@
           ],
           "selectedCases": [
             "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
-            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source"
           ],
@@ -13347,7 +13347,7 @@
           },
           "cases": [
             {
-              "fullName": "exposes normal resource and spec draft → review → publication with explicit scope",
+              "fullName": "exposes normal resource and spec draft \u2192 review \u2192 publication with explicit scope",
               "status": "skipped"
             },
             {
@@ -14126,6 +14126,1622 @@
           "componentTree": "ace2d78d6cf1ca334ae65d49cfa8701c05df22c6",
           "exitField": "exitCode",
           "log": "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.log"
+        }
+      ]
+    },
+    "421": {
+      "schemaVersion": 1,
+      "product": "078fef00097869d7a4043cf7ce8b50d115f7732e",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "limitations": [
+          "Unsigned original local reporter; not formal CI execution.",
+          "Real quota rows/transaction contract only, not Cognitive trial START/FINAL/browser E2E.",
+          "Current combined backend compiler runs once in existing onboarding admission; historical compiler status is not promoted to current-tree proof.",
+          "Original first/diagnostic/fixture failures remain immutable source files, outside this successful-case admission."
+        ],
+        "unchangedQuotaClosureBlobs": {
+          "server-version/backend/src/modules/cognitive/attempt-quota.ts": "9f836b37730c29847b867cde17e3eb2e288a39ee",
+          "server-version/backend/src/modules/cognitive/product-eligibility.ts": "ad3fc09e42ef89d15b7275142271182dffda424f",
+          "server-version/backend/src/modules/cognitive/cognitive.errors.ts": "c080c93783c3dc8726f3923a05dc3f224d87d42f",
+          "server-version/backend/src/modules/assessment-runtime/canonical.ts": "a115b41386a6a6eb9baba9e158611dfd5d3ed425",
+          "server-version/backend/src/modules/reporting/personal-tracking.ts": "51ea4b1c06836aab6f30e0f59b6101fa0897a928",
+          "server-version/backend/src/modules/composite/training-content-binding.ts": "60c2ed53c328ea6d28a2bfa4bd3abf5a1f77281b",
+          "server-version/backend/src/__tests__/integration/integration-env.ts": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
+          "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts": "8447cbd6d099b676c187b180d6fbed946ecdc22c",
+          "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+          "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+        },
+        "prismaDeltaReview": {
+          "originalTree": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+          "currentTree": "bbb7e492f175e540333c49680418fb99139077f8",
+          "paths": [
+            "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql",
+            "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql"
+          ],
+          "basis": "Only new Teacher license and education-library resource guard functions; no Cognitive quota/assignment/session/composite-parent/plan tables, columns, indexes or guards changed. Original real quota row contract does not create released education resources or Teacher licenses. Retain original unsigned PG outcomes without replay; current merged backend compiler runs once in CI."
+        }
+      },
+      "reports": [
+        {
+          "id": "quota-original-pg",
+          "path": "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json",
+          "sha256": "c45b5df958ad71df98791f91836ebce84f1664e01ebcd751e3c8b2c82464ca87",
+          "originalSourceAssociation": "5a547d0c32ea7908f9708827d335af38ab637b27",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql",
+            "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql",
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/self-group-personal-license.test.ts",
+            "server-version/backend/src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleLicense.service.ts",
+            "server-version/backend/src/modules/huiteacher/scalePersonalReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/organization/access.ts",
+            "server-version/backend/src/modules/organization/organization.routes.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/authorization.ts",
+            "server-version/backend/src/modules/reporting/cohort.ts",
+            "server-version/backend/src/modules/reporting/content.controller.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/fixedPopulationPrivacy.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-catalog.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-group-resources.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Original isolated PostgreSQL reporter at frozen 5a547d0; actual quota runtime/test imports and locked tools remain identical. Later two unrelated Teacher/library trigger migrations were reviewed explicitly, not claimed whole-Prisma equal.",
+          "deltaRationale": "Unchanged quota row contract; current integration compiled once by existing missing-check helper. No FINAL or full journey replay.",
+          "cases": [
+            {
+              "fullName": "Training frozen Cognitive wave quota, real PostgreSQL QUESTIONNAIRE permits T2 without renewing the quota within a wave",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training frozen Cognitive wave quota, real PostgreSQL ASSESSMENT_BUNDLE permits T2 without renewing the quota within a wave",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          }
+        }
+      ],
+      "types": [],
+      "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
+    },
+    "439": {
+      "schemaVersion": 1,
+      "product": "6d2d4dcc52a0d7ed6a6115ed795e2af445f5a21f",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "localReviewedHead": "f071b64c99d2d164627e94c1da5f8692c2b72b55",
+      "identicalFullTree": "525c48f69e4e9bbd8986dfa19c4169092ae81e45",
+      "components": {
+        "frontend": "429f3b43ee47d034c6b0eb65df86fe500ce9fb93",
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3"
+      },
+      "environment": {
+        "kind": "DOT-local unsigned original reports and recorded exits, reviewed retrospective Git association",
+        "limitations": [
+          "Synthetic fetch and mocked router dependencies; not real browser cookie, DB or production latency evidence.",
+          "Selected 14 distinct cases span separate executions; failed and skipped rows remain original. Withdrawn operation-401 logout assertion is not qualification.",
+          "Types were actually executed; records are unsigned and do not contain full contemporaneous dependency-byte attestations. Current main and both component trees remain unchanged from reviewed candidate.",
+          "Backend route tests ran with copied dependencies before follow-redirects update; they do not import it. Backend types followed verified lock-matching 1.16.2 and local Prisma generation."
+        ]
+      },
+      "reports": [
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-final.json.gz",
+          "sha256": "16b17faf212dc31828220dd3c130287ea840910fcb549663faeec433cb913b3e",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "5b21704f55918729ddaf0068773634d0e0a63dc4dc08ec4c371cfd4657f20a43",
+          "id": "frontend-final",
+          "summary": {
+            "success": true,
+            "numPassedTests": 9,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+            "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+            "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+            "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+            "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-non-session-final.json.gz",
+          "sha256": "6875e52abb2b9128f96b1e4fab08d3c4a9346bead44e7c49a430323075ba74f3",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "c3f9b70756f02d3eac2053b2983d71401a1d580dd3d1c9cc3bf605d334042812",
+          "id": "frontend-non-session-final",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 7
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-baseline-corrected.json.gz",
+          "sha256": "0cb86d69b7518fc88d2ef750597daf10ff2ae7fa3eed285639d47b24e9721191",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "15c6c5c54ccfde8dac8afaf5a6970aada3ec0615956e560e50a9c06cf3a34775",
+          "id": "frontend-baseline-corrected",
+          "summary": {
+            "success": false,
+            "numPassedTests": 4,
+            "numFailedTests": 4,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-review-candidate.json.gz",
+          "sha256": "45926e1b214ed87c530f379c9b5e6a432ce938200384a5bd72c0b69ec9989b3e",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "c332b8d8788e7a30ec55e8cfc310b53e92a826d83619d9ab0e361a75519ad83f",
+          "id": "frontend-review-candidate",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 9
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+            "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/backend-baseline.json.gz",
+          "sha256": "2dcda877e05c4de27cec6413ccaaaf73ef441bd722e45b782f567529647725db",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "26fe5a40191dba8eefd35dbf3650e29ed24e4776d65cad4a9669e0a8235a811c",
+          "id": "backend-baseline",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 2,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=false",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=true",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/backend-candidate.json.gz",
+          "sha256": "f86095667e3a57573f2f1ccb8ec284c907fb2f9e7448ffc23e71401a6306cea8",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "8b328c575b436cdb841aec9848251c80e8b8bce8bfa970c3049e08148cc3c85f",
+          "id": "backend-candidate",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=false",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=true",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login projection matches me without private fields returns the same public identity with forced=false",
+            "School login projection matches me without private fields returns the same public identity with forced=true"
+          ]
+        }
+      ],
+      "expectedCases": [
+        "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+        "School login projection matches me without private fields returns the same public identity with forced=false",
+        "School login projection matches me without private fields returns the same public identity with forced=true",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+        "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+        "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+        "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+        "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401",
+        "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+        "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+        "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+        "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag"
+      ],
+      "withdrawnCase": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+      "records": {
+        "initial": {
+          "path": "docs/performance/school-login-projection-20261031/execution-record.json",
+          "sha256": "389b1e48b5926f77a3b5ccdc7c25d4a6bf90227d3f05097fe18c074cab7dcc55"
+        },
+        "review": {
+          "path": "docs/performance/school-login-projection-20261031/review-execution-record.json",
+          "sha256": "b18153e8965c2eea33d859b4bd5b45645c4dc67239174e7a5998b6de1a08d51a"
+        }
+      },
+      "sourceAssociationBasis": "Actual reported executions on local working inputs subsequently committed; no invented contemporaneous head/signature. Remote product is full-tree identical to independently reviewed local head.",
+      "reuseRationale": "Final review only removed run recoverSession; ordinary success, initial reads, non-session errors, legacy fallback and MFA branches unchanged. Wrong-password and step-up cases are final correction executions. Backend projection/helper unchanged after recorded checks. Test-only await/navigation improvements do not change retained cases.",
+      "failureDisposition": "The wrong operation-401-must-logout assertion is withdrawn, not repaired or admitted. Other selected-report product failures have a selected passing continuation with the same name. Initial fixture-only reports remain archived but are not selected."
+    },
+    "442": {
+      "schemaVersion": 1,
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
+      "environment": {
+        "node": "v24.22.1",
+        "limitations": [
+          "Original Vitest default reporter records only 5 passed summary, not per-case result identities or separately printed numeric exit. No JSON reporter is fabricated.",
+          "Prior logs and tool terminal excerpt are unsigned, retrospectively indexed. Input hashes are post-execution observations, not an atomic execution attestation.",
+          "The baseline 1 failed / 3 passed and missing-dependency types failure remain original; no full-suite, production, build, browser or deployment claim.",
+          "Fulfilled code404 fixture is not actual HTTP404 rejection; actual rejection displays its normalized error and manual retry."
+        ]
+      },
+      "originals": {
+        "baseline": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log",
+          "sha256": "453a5369c4e754409a762453201a86b92b37e0f8d88ec01ff9fd6d9d11432e7a"
+        },
+        "passed": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log",
+          "sha256": "f0e2b416d3359040ab86c75963ec2882a5fb76143be7eefbb4f3167a1b94c953"
+        },
+        "lint": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log",
+          "sha256": "93e413077110bcb7192d384de7453a10c34c3d7e3714158a857d17f195593c39"
+        },
+        "oldTypesTerminal": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt",
+          "sha256": "5e8d634e61aab3651dd053f63ca7fee7d2a159a7b7ff7fd5da36caf3615ae16b"
+        },
+        "oldTypesLog": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "missingDependencyTypes": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log",
+          "sha256": "df58aaa5d57d20e37de01676178a17fb6f49594f95c1110a7c948ba5105e7ef5"
+        }
+      },
+      "sourceHashes": {
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": "8d8de6f5eedf8d50d61b5f6e639d12344bfc45cef4a7ddd68a2fa101a15b9e91",
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": "c429713f54f5a31e3c814e05aa62ee17cf8bbb46be32a4de8bbac7bdcfc7ea08",
+        "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+      },
+      "types": {
+        "path": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json",
+        "sha256": "40eef16d8b868ba2763c17d72559eafbab7205122b3f3d8d0d56042c5a5b69a9",
+        "log": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log"
+      },
+      "sourceAssociationBasis": "Original five-pass execution bound by unchanged questionnaire source, test, lock and tsconfig hashes; summary only, no invented individual result identities.",
+      "reuseRationale": "439 changed School inputs but not questionnaire test loaded modules. Reuse original application tests; fresh recorded frontend app types covers the integrated whole component. Backend equals current main and is not recompiled."
+    },
+    "437": {
+      "schemaVersion": 1,
+      "product": "6d4116c9ee8e889a139705d5d88b831d85766041",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "DOT local original reports and retained compiler shell exits",
+        "limitations": [
+          "Synthetic Prisma/controller/task-feed observations, not SQL/browser/concurrency measurements.",
+          "Original failures and filtered cases preserved; eight disjoint selected passes across original invocations.",
+          "Aligned BE and FE direct compiler invocations each exit 0 on final component trees. Unsigned local records; historical preliminary qualification files retained as history, not current admission.",
+          "PR439 changed campus auth routes, SchoolApp and their own fixtures only; no Composite service/controller/studentTasks or Training loader imports those entry modules. Membership, shared Prisma schema, locks, configuration and test setup unchanged. No business case repeated.",
+          "Final main442 changes only QuestionnaireAssessment page and its own fixture, not imported by Composite/Training selected cases; backend tree unchanged. Only affected frontend whole-tree compiler rerun once, actual exit0; earlier compiler records retained."
+        ]
+      },
+      "reports": [
+        {
+          "id": "o09-backend-baseline",
+          "path": "docs/performance/composite-course-scope-20261031/backend-baseline.json",
+          "sha256": "5630fcae62cc243e6f7cf40756fc332fa9ba70390afab250e4e8d06cd9bd73a2",
+          "originalSourceAssociation": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Only the selected unchanged default/history behavior is reused from this baseline. The added course argument changes scoped calls; source and fixture delta explicitly listed. The archived frontend projection and task-feed pagination are unchanged; removing an extra assertion from an unselected test does not change this selected case. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 4,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+              "status": "failed"
+            },
+            {
+              "fullName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+              "status": "failed"
+            },
+            {
+              "fullName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+              "status": "failed"
+            },
+            {
+              "fullName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
+              "status": "failed"
+            }
+          ],
+          "selectedCases": [
+            "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback"
+          ],
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+              "reportId": "o09-backend-candidate"
+            },
+            {
+              "caseName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+              "reportId": "o09-backend-candidate"
+            },
+            {
+              "caseName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+              "reportId": "o09-backend-candidate"
+            },
+            {
+              "caseName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
+              "reportId": "o09-backend-candidate"
+            }
+          ]
+        },
+        {
+          "id": "o09-backend-candidate",
+          "path": "docs/performance/composite-course-scope-20261031/backend-candidate.json",
+          "sha256": "ce2016185f210158ca00d67695745a211de8516899280b0a7a0ede9f5494edab",
+          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+            "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+            "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+            "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read"
+          ]
+        },
+        {
+          "id": "o09-task-default-candidate",
+          "path": "docs/performance/composite-course-scope-20261031/task-default-candidate.json",
+          "sha256": "90ce03f6bc0e4e65b6e0dc7fbd8d4481c3bc1fb270e6c5f8dc1244c756ccd29d",
+          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 11
+          },
+          "cases": [
+            {
+              "fullName": "student task aggregate uses the same actionable rule for the default list, count and pagination",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate filters a course-specific task feed by an actual enrolled relation, not caller-provided authority",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch",
+              "status": "passed"
+            },
+            {
+              "fullName": "student task aggregate keeps exact deadline equality open, distinguishes drafts, and preserves completed tasks after expiry",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate prioritizes a new active attempt over past completion and blocks expired resume links",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate deduplicates questionnaires delivered to several courses and paginates deterministically with global counts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate keeps query count constant with 100 courses and returns no course tasks without membership",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate propagates read failures instead of returning a misleading empty aggregate",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate opens the latest completed questionnaire report without starting a retake",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate includes new questionnaires delivered to a member course and rejects unrelated composite contexts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C06 submitted versus task-satisfied keeps report links without reopening submission; historical satisfaction=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C06 submitted versus task-satisfied keeps report links without reopening submission; historical satisfaction=true",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch"
+          ]
+        },
+        {
+          "id": "o09-frontend-before-edit",
+          "path": "docs/performance/composite-course-scope-20261031/frontend-before-edit.json",
+          "sha256": "15141342087e8a12d7c059b39075ee87dc1c135ccbe29df18e5f7a3998e49721",
+          "originalSourceAssociation": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Only the selected unchanged default/history behavior is reused from this baseline. The added course argument changes scoped calls; source and fixture delta explicitly listed. The archived frontend projection and task-feed pagination are unchanged; removing an extra assertion from an unselected test does not change this selected case. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 12
+          },
+          "cases": [
+            {
+              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+              "status": "passed"
+            },
+            {
+              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "status": "failed"
+            },
+            {
+              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed"
+          ],
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "reportId": "o09-frontend-candidate"
+            }
+          ]
+        },
+        {
+          "id": "o09-frontend-candidate",
+          "path": "docs/performance/composite-course-scope-20261031/frontend-candidate.json",
+          "sha256": "632693886d04963fa9e5a47671aa735799e910216ca3886ce42fa97ec379a26d",
+          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 13
+          },
+          "cases": [
+            {
+              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "status": "passed"
+            },
+            {
+              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/composite-course-scope-20261031/backend-aligned-types-record.json",
+          "sha256": "809ac157c5db8f20863788eb13af40656195edbcee81c15546a29654778d6864",
+          "component": "backend",
+          "componentTree": "6971e3f4076f0a9e1f439e9c4e57d77f706d95c5",
+          "log": "docs/performance/composite-course-scope-20261031/backend-aligned-types.log",
+          "exitField": "exitCode"
+        },
+        {
+          "path": "docs/performance/composite-course-scope-20261031/frontend-main442-types-record.json",
+          "sha256": "817519e77128b267a258faa98f306a47c103b9251b7e0d368464adf0eae21744",
+          "component": "frontend",
+          "componentTree": "605a6561883ade842e2006b174125aab343325ce",
+          "log": "docs/performance/composite-course-scope-20261031/frontend-main442-types.log",
+          "exitField": "exitCode"
+        }
+      ]
+    },
+    "438": {
+      "schemaVersion": 1,
+      "product": "543348730d271605753e00aa1ba301d11d30cbaf",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Three admitted cases: two original unsigned React cases and one fresh isolated PostgreSQL cursor/read case. This is not a cross-entrypoint or real browser acceptance suite.",
+          "The 105 equal-time rows are synthetic metadata pointers to an existing released Form projection, not newly submitted answers or regenerated reports. Prior engine-missing attempt failed before any DB query and remains archived.",
+          "Both current component types passed once; metadata-only qualification will not replay prior app/FINAL journeys. Dependency setup corrected/restored the old shared symlink environment without tracked changes."
+        ]
+      },
+      "reports": [
+        {
+          "id": "teacher-form-history-frontend.json",
+          "path": "docs/evidence/teacher-form-group-history-20261031/frontend.json",
+          "sha256": "b4247d14314644e7ee88c6795bd0011d6c08ca4c618961b67017153c6462434f",
+          "originalSourceAssociation": "c0591a4f3d3efb27ba139323c39f229ea8d84e89",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.group.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/components/education-tools/privateToolClient.ts",
+            "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.history.test.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx",
+            "server-version/frontend/src/modules/reporting/group-history.ts",
+            "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx",
+            "server-version/frontend/src/survey/SurveyGroupReports.tsx",
+            "server-version/frontend/src/training/TrainingGroupReports.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
+          "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "reads a Form version beyond the first hundred using its exact cursor without regenerating or changing the selected report",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-form-history-source-switch.json",
+          "path": "docs/evidence/teacher-form-group-history-20261031/source-switch.json",
+          "sha256": "e2dbd892c6a5b863468bda6743c6150c05abe53095734b449d78592a639e3992",
+          "originalSourceAssociation": "67b4de5ed2382a689f4c18939e39d21389d6e8c6",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.group.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/components/education-tools/privateToolClient.ts",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.test.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx",
+            "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx",
+            "server-version/frontend/src/modules/reporting/group-history.ts",
+            "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.test.tsx",
+            "server-version/frontend/src/school/SchoolGroupReports.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx",
+            "server-version/frontend/src/survey/SurveyGroupReports.tsx",
+            "server-version/frontend/src/training/TrainingGroupReports.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
+          "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "reads a Form version beyond the first hundred using its exact cursor without regenerating or changing the selected report",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps the new Form source after an older-page response from the previous source arrives",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-form-history-integrated/postgres.json",
+          "path": "docs/evidence/teacher-form-group-history-20261031/integrated/postgres.json",
+          "sha256": "2fd1643a4f4953989f1d5543923e61d4c3e9d38de77b2ea8217fae0443c868ee",
+          "originalSourceAssociation": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
+          "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "pages immutable Form pointers with equal microsecond timestamps without rereading FINALs",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.json",
+          "sha256": "9c4e9d303f41905406a02c67edb407626b1aa56f73e9dccbfadad5a4cbf36191",
+          "component": "backend",
+          "componentTree": "9940cf26dec648ef1d7b7c4688ce285c3cc9c2b6",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.json",
+          "sha256": "6b94be1ab72789ae2ae0bdb3409ca8b3d2c5cd240f42ab86b3c7dec755f35cd6",
+          "component": "frontend",
+          "componentTree": "b63667c1ad041a74c903b55e37d03b3a122b6afe",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.log"
+        }
+      ]
+    },
+    "443": {
+      "schemaVersion": 1,
+      "product": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "One focused producer mock boundary and one React initial-read retry case, not a new real PostgreSQL/native/two-wave journey.",
+          "The producer keeps the existing engine/read and same-transaction hook; current exact types include the unchanged Form parent. No whole-suite, FINAL or prior pointer-success replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "partial-metrics.json",
+          "path": "docs/evidence/teacher-group-closeout-20261031/partial-metrics.json",
+          "sha256": "24e5295759d917fca867114c412418c73c5c22c532bf8d7153552ba498b03b3a",
+          "originalSourceAssociation": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned actual focused execution associated with saved5f4ab3 source bytes; neither original receipt is signed. Subsequent Form/main merges change only controls/docs, not either compiled component.",
+          "deltaRationale": "The same two-file producer/UI fix and focused tests are unchanged; both exact component types passed once. Existing common governance, contributor/TX, native FINAL and pointer success originals are reused, not replayed. Long owns the real two-wave planned-contract adapter boundary.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "allows a planned metric superset only internally and returns the existing narrowed projection through the same transaction",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "initial-read-retry.json",
+          "path": "docs/evidence/teacher-group-closeout-20261031/initial-read-retry.json",
+          "sha256": "32d05feb71a155449532c7d112fe3e90834a6543056cd9b68f90abdd5de9b33a",
+          "originalSourceAssociation": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned actual focused execution associated with saved5f4ab3 source bytes; neither original receipt is signed. Subsequent Form/main merges change only controls/docs, not either compiled component.",
+          "deltaRationale": "The same two-file producer/UI fix and focused tests are unchanged; both exact component types passed once. Existing common governance, contributor/TX, native FINAL and pointer success originals are reused, not replayed. Long owns the real two-wave planned-contract adapter boundary.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "retries an initial directory failure in place using GET only",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-group-closeout-20261031/backend-types.json",
+          "sha256": "b1872e7693c125e9bcfc2199e4225f1483c8cda6d3bdba57b790e668093ec26f",
+          "component": "backend",
+          "componentTree": "29b86b19038c196aa5b2728f5e33579a8ba56ee5",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-closeout-20261031/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-group-closeout-20261031/frontend-types.json",
+          "sha256": "daae5862a5704d3cb7b220161d2c6d628cbeb271945ac14babea94eff548c6cd",
+          "component": "frontend",
+          "componentTree": "dfdc072b45a35f04261c807c72a89021f5c9aa1b",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-closeout-20261031/frontend-types.log"
+        }
+      ]
+    },
+    "435": {
+      "schemaVersion": 1,
+      "product": "236a865da0abaf961f7b4bf3d817dfe897eeb9a0",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Retained cloud unsigned originals; fresh local complete-component types after main alignment",
+        "limitations": [
+          "Three selected original backend cases retained (including unchanged failed baseline and successful continuations), plus one fresh affected combined Scale/Composite frontend loader case. Historical frontend original retained but not double-counted.",
+          "Controller Prisma and frontend API mocks only; not SQL latency or production load evidence.",
+          "Fresh local Node v24.22.1 types with recorded hashes, isolated copied dependencies, current generated Prisma and lock-verified follow-redirects 1.16.2. No complete node_modules attestation."
+        ]
+      },
+      "reports": [
+        {
+          "id": "backend-baseline",
+          "path": "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 2,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "preserves the default catalog ordering, status and standalone attempt isolation",
+              "status": "passed"
+            },
+            {
+              "fullName": "returns identical course rows while narrowing the catalog and attempt query",
+              "status": "failed"
+            },
+            {
+              "fullName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+              "status": "failed"
+            }
+          ],
+          "selectedCases": [
+            "preserves the default catalog ordering, status and standalone attempt isolation"
+          ],
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "returns identical course rows while narrowing the catalog and attempt query",
+              "reportId": "backend-candidate"
+            },
+            {
+              "caseName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+              "reportId": "backend-candidate"
+            }
+          ],
+          "sha256": "24226412e9c974f5da1c8706694371bc1679b1b29f2be748899bd7a4ce8a7426",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "cb5e4e6b6470639f39d62959c4cee946fc470e1c2ced25d489f44e0da9a5ffb4",
+          "originalSourceAssociation": "c63382d0eb6629c7bacbd853b8feb92e0257d46b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/package-lock.json",
+            "server-version/backend/package.json",
+            "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
+            "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql",
+            "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts",
+            "server-version/backend/src/__tests__/campus/group-reports.test.ts",
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/campus/report.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-leaf.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-selection.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-source.test.ts",
+            "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
+            "server-version/backend/src/__tests__/scale/available-course.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/controllers/scaleController.ts",
+            "server-version/backend/src/controllers/trainingAnalysisController.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleIdentitySql.ts",
+            "server-version/backend/src/modules/assessment-run/educationScaleExecutionSource.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-resources.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-history.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/group-longitudinal.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/task-artifact.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/survey/analytics.routes.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts",
+            "server-version/backend/src/routes/courses.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types."
+        },
+        {
+          "id": "backend-candidate",
+          "path": "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "preserves the default catalog ordering, status and standalone attempt isolation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "returns identical course rows while narrowing the catalog and attempt query",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "returns identical course rows while narrowing the catalog and attempt query",
+            "keeps inaccessible COURSE entries excluded and returns no rows for unrelated courses"
+          ],
+          "sha256": "1cf87b3792cc111dae38336f7b7df1c3a1ee60d112e4fce2859a3504e36dddde",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "5d7604518e83ac93e36e9bb850d90c2356c7c7ea724afbceb4f5aa05000af7c9",
+          "originalSourceAssociation": "b1fc5493cf8a72dbe8a02f6f939cf42529624c35",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/package-lock.json",
+            "server-version/backend/package.json",
+            "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
+            "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql",
+            "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts",
+            "server-version/backend/src/__tests__/campus/group-reports.test.ts",
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/campus/report.routes.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-leaf.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-selection.test.ts",
+            "server-version/backend/src/__tests__/campus/school-private-group-source.test.ts",
+            "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/__tests__/survey/group-report.test.ts",
+            "server-version/backend/src/controllers/trainingAnalysisController.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
+            "server-version/backend/src/modules/assessment-run/educationPrivateScaleIdentitySql.ts",
+            "server-version/backend/src/modules/assessment-run/educationScaleExecutionSource.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts",
+            "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.run-adapter.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-resources.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-history.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/education-ordinary-feedback.service.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/group-longitudinal.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/task-artifact.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/survey/analytics.routes.ts",
+            "server-version/backend/src/modules/survey/analytics.source.ts",
+            "server-version/backend/src/modules/survey/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/survey/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-longitudinal.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts",
+            "server-version/backend/src/routes/courses.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
+          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types."
+        },
+        {
+          "id": "frontend-current-combined-loader",
+          "path": "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.json",
+          "sha256": "32eaf3ccbae666ee5457837d4938beaaf40b82269108684c094d5aa2b5433e6c",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 13
+          },
+          "cases": [
+            {
+              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "status": "passed"
+            },
+            {
+              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
+          ],
+          "originalSourceAssociation": "528269c2a2f419bc7adb85ef0301340aa8b3b8f0",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Recorded fresh local execution after Scale and Composite loader auto-merge, exact committed source inputs. Equal full product tree at remote 236a865d.",
+          "deltaRationale": "Fresh single affected loader case verifies both courseId parameters; original reporter preserved separately without double-counting."
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.json",
+          "sha256": "a1e19f9f44820a4427a60f431ecd0f65bb1cc7689f790f856c13c58980d11e82",
+          "component": "backend",
+          "componentTree": "94ebc079e565e1c5ce22253c0c52ac07155fff68",
+          "exitField": "exitCode",
+          "log": "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.log"
+        },
+        {
+          "path": "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.json",
+          "sha256": "047924b0cd3d5fee5d620ebb45066a1998fdb05fcc7b3c56dcbc262765639d7f",
+          "component": "frontend",
+          "componentTree": "5daa3daf80ae5bdde2d55f21901ae59cf675fd65",
+          "exitField": "exitCode",
+          "log": "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.log"
         }
       ]
     }

@@ -1,0 +1,18 @@
+{
+  "sourceParentDeliveredCommit": "cf43248e639ae6c4598d60db3513e8d78cbe5be6",
+  "localParent": "eb49e3ab7be4d8fa7b8a6e02effcb8facf99fc73",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/reporting/artifact.ts",
+      "before": "244795010b5a7e94b5882d8a86f40c82e602a122",
+      "after": "4319aefb8152c03de0b133ec8de2c025c81419e6"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/service.ts",
+      "before": "ee07290182fcf657060d7b6c0c17a675ba77a8b0",
+      "after": "10e958b45ffe8f5b8a429651d80a964b1ce19633"
+    }
+  ],
+  "teacherFilesApplied": false,
+  "externalWrite": false
+}

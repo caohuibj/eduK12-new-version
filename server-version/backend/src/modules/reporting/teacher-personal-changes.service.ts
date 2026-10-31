@@ -64,8 +64,9 @@ export async function readEducationPersonalChanges(input:{actorUserId:string;exe
     if(identity.origin.entry!==input.entry||!identity.origin.variantKey.endsWith(':SELF'))denied()
     checkedSources.add(sourceKey);continue
    }
-   if(wave.key.startsWith('private-scale:')&&wave.version!=='1.0.0')denied()
-   const entry=wave.key.startsWith('private-scale:')?(await readPrivateScaleRuntimeResource(tx,{key:wave.key,version:'1.0.0',purpose:'HISTORY'})).resourceEntry:await resolveHistoricalRelationalEntry({resourceKind:wave.family,resourceKey:wave.key,resourceVersion:wave.version},tx)
+   const schoolGroupVersion=wave.key.startsWith('private-scale:SCHOOL:')&&wave.version==='2.0.0'
+   if(wave.key.startsWith('private-scale:')&&wave.version!=='1.0.0'&&!schoolGroupVersion)denied()
+   const entry=wave.key.startsWith('private-scale:')?(await readPrivateScaleRuntimeResource(tx,{key:wave.key,version:schoolGroupVersion?'2.0.0':'1.0.0',purpose:'HISTORY'})).resourceEntry:await resolveHistoricalRelationalEntry({resourceKind:wave.family,resourceKey:wave.key,resourceVersion:wave.version},tx)
    if(!entry||entry.releaseStatus!=='PUBLISHED'||!entry.resultDisclosure||canonicalHash(entry.resultDisclosure)!==canonicalHash(wave.policy.resultDisclosure))denied()
    if(wave.key.startsWith('education-assessment:')){
     const policy=trainingFeedbackPolicySchema.parse((entry as any).educationOrigin?.feedbackPolicy??{schemaVersion:1,mode:'IMMEDIATE'})

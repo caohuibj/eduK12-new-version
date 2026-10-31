@@ -26,7 +26,7 @@ vi.mock('../../modules/reporting/pr4Service',()=>({readOrganizationReportingArti
 import {
   CAMPUS_GROUP_MIN_N,assertReviewedCampusGroupSpec,projectCampusGroupReport,projectCampusLeafGroupReport,assertCampusLeafGroupDifferencing,
   assertCampusNoGroupDifferencing,
-  listCampusGroupReportCatalog,generateCampusGroupReport,readCampusGroupReport,
+  listCampusGroupReportCatalog,listCampusGroupReportSources,generateCampusGroupReport,readCampusGroupReport,
 } from '../../modules/campus/group-reports'
 
 const org='00000000-0000-4000-8000-000000000001'
@@ -49,6 +49,16 @@ const content={artifactId:artifact,generatedAt:'2026-10-10T01:00:00.000Z',projec
 const source={runId:run,trackId:track,runName:'班级学习支持测评',runStatus:'CLOSED',
   resource:{family:'SCALE',key:'reviewed-scale',version:'1.0'}}
 describe('Huischool internal group reporting privacy boundary',()=>{
+  it('continues source discovery without fetching specs or artifacts and keeps manager authorization',async()=>{
+    mock.listSources.mockResolvedValue({list:[source],nextPage:null,truncated:false})
+    const result=await listCampusGroupReportSources(admin as any,org,2)
+    expect(result).toMatchObject({sources:[{runId:run,trackId:track,name:source.runName}],nextSourcePage:null})
+    expect(mock.listSources).toHaveBeenCalledWith(expect.objectContaining({organizationId:org,page:2,pageSize:100,analysisKind:'GROUP'}))
+    expect(mock.listSpecs).not.toHaveBeenCalled()
+    expect(mock.query).not.toHaveBeenCalled()
+    await expect(listCampusGroupReportSources({...admin,role:'STUDENT'} as any,org,2)).rejects.toMatchObject({statusCode:404})
+    expect(mock.listSources).toHaveBeenCalledTimes(1)
+  })
   beforeEach(()=>{
     vi.clearAllMocks()
     mock.lock.mockImplementation((_org:string,fn:()=>Promise<unknown>)=>fn())

@@ -34,8 +34,8 @@ export async function educationTrackingPolicy(db:Prisma.TransactionClient,track:
   return sources.get(track.resourceKey)!.policy
  }
  if(track.resourceKey.startsWith('private-scale:')){
-  if(track.resourceVersion!=='1.0.0')fail('私有追踪来源版本不受支持')
-  const source=await readPrivateScaleRuntimeResource(db,{key:track.resourceKey,version:'1.0.0',purpose:'NEW_USE',context:{entry:context.entry,organizationId:context.organizationId,principal:{userId:context.actorUserId,accountDomain:'SCHOOL'}}})
+  if(track.resourceVersion!=='1.0.0'&&track.resourceVersion!=='2.0.0')fail('私有追踪来源版本不受支持')
+  const source=await readPrivateScaleRuntimeResource(db,{key:track.resourceKey,version:track.resourceVersion,purpose:'NEW_USE',context:{entry:context.entry,organizationId:context.organizationId,principal:{userId:context.actorUserId,accountDomain:'SCHOOL'}}})
   return relationalEntryToRunPolicy(source.resourceEntry)
  }
  const {productionRunResourceAuthorityRegistry}=await import('../assessment-run/resourceAuthority')

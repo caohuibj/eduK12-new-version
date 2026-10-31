@@ -2,13 +2,15 @@ import {useEffect,useState} from 'react'
 import type {ScaleDefinition} from '../../pages/scaleDefinitionEditorModel'
 import type {FormDraft} from '../../survey/builder.types'
 import type {CompositionAdministration} from './educationCompositionAdministration'
+import type {SchoolPrivateGroupChoice,SchoolPrivateGroupSelection} from './SchoolPrivateGroupDisclosure'
 export type PrivateToolApi=<T>(path:string,method?:string,data?:unknown,options?:{responseType?:'blob'})=>Promise<T>
 export type PrivateToolKind='SCALE'|'FORM'
 export type PrivateToolSummary={id:string;kind:PrivateToolKind;title:string;revision:number;contentHash:string;updatedAt?:string}
 export type PrivateTool=PrivateToolSummary & {definition:ScaleDefinition|FormDraft}
 export type PrivateToolIssue={path:string;message:string;severity?:string}
 export type PrivateToolValidation={valid:boolean;issues:PrivateToolIssue[];revision:number;contentHash:string}
-export type PrivateToolVersion={id:string;title:string;sourceRevision:number;contentHash:string;administration?:CompositionAdministration;definition?:ScaleDefinition|FormDraft}
+export type PrivateToolVersion={id:string;title:string;sourceRevision:number;contentHash:string;administration?:CompositionAdministration;definition?:ScaleDefinition|FormDraft;
+ groupChoice?:SchoolPrivateGroupChoice;groupReporting?:SchoolPrivateGroupSelection|null}
 export type PrivateDraftState={dirty:boolean;writing:boolean}
 export const privateToolBase=(organizationId:string)=>`/organizations/${encodeURIComponent(organizationId)}/private-tools`
 export function usePrivateToolCapability(api:PrivateToolApi,organizationId:string,userId?:string){
@@ -25,6 +27,8 @@ export function usePrivateToolCapability(api:PrivateToolApi,organizationId:strin
 export function privateToolError(error:unknown):string{
  const value=(error&&typeof error==='object'?error:typeof error==='string'?{message:error}:{}) as {code?:string;message?:string;status?:number}
  const messages:Record<string,string>={
+  SCHOOL_PRIVATE_GROUP_SELECTION_INVALID:'群体指标、受众或固定来源不符合当前授权。请重新读取并明确选择，原个人报告权限不会自动改变。',
+  SCHOOL_PRIVATE_GROUP_SOURCE_UNSUPPORTED:'此固定来源尚未提供可发布的群体披露合同，请保留原任务配置。',
   PRIVATE_TOOL_REVISION_CONFLICT:'草稿已被其他窗口修改。本页内容仍保留，请先核对最新版本，不会自动覆盖。',
   PRIVATE_TOOL_FREEZE_CONFLICT:'固定版本已变化，请核对最新草稿后再试。',
   PRIVATE_TOOL_AUTHOR_REQUIRED:'当前账号或学校不具备私有工具编制权限。',

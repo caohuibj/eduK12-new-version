@@ -1,0 +1,11 @@
+✔ PR442 exact frontend scope keeps backend unchanged and rejects unrelated sources (6.737817ms)
+✔ PR442 retains original five-pass text summary without inventing per-case rows or exits (5.803648ms)
+✔ PR442 rejects original text, source, component and fresh type-record drift (8.167875ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 196.958867

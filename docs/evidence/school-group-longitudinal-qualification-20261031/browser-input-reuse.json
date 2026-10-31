@@ -1,0 +1,28 @@
+{
+  "originalBrowserProof": "browser-proof.json",
+  "originalFrontendWholeTreeStillEqual": false,
+  "currentFrontendTree": "df92343538f98b3bf6f92476f51c0460fac0b832",
+  "unchangedReadPathBlobs": {
+    "server-version/frontend/src/school/SchoolApp.tsx": "5745a7c2b01b3100409086a69925bf898f9d2897",
+    "server-version/frontend/src/school/SchoolWorkspaceShell.tsx": "958351624897f4805cf8e08dc728e3574da395a2",
+    "server-version/frontend/src/school/SchoolGroupReports.tsx": "2aa4a9636dd6fb953efb896912461ac0849a4b8d",
+    "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx": "5660a45b9f8164a63592c79a5031cd2c6aa5630f",
+    "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx": "4f6de6b6445c14677bd96ae873861c5ffb6081a1",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx": "ae7f8d5cc18e7b63a3173eef8997f651691a541a",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx": "8e533a47b9f26a68fe34504b383264c1620a0921",
+    "server-version/frontend/src/modules/reporting/group-history.ts": "4d8d86b3d6e02df75d8e42b2d4c066fdd4d5fd16",
+    "server-version/frontend/src/modules/reporting/ReportTrendChart.tsx": "b2359912ecd8c1124c4f2b7f7d853c0a679851b0",
+    "server-version/frontend/src/modules/reporting/longitudinalVisualization.ts": "e2942062d43b412ce7c2a7ab9466edc71d70b4da"
+  },
+  "changedOtherFrontendPaths": [
+    "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+    "server-version/frontend/src/components/FormSectionManager.tsx",
+    "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+    "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+    "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+    "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+    "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
+  ],
+  "basis": "Original browser checkpoint remains original. Actual School navigation, scope/source selector, saved-group-history wrapper, shared panel/report/chart and CSS consumer entry are unchanged. New main changes in questionnaire authoring/student pages and personal report consumer are not relabelled as browser-qualified; current full frontend compiler/build is still pending formal CI. No browser or FINAL replay."
+}

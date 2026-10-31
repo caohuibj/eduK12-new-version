@@ -46,7 +46,8 @@ export async function readEducationRunLibraryContext(tx:Prisma.TransactionClient
  */
 export async function assertEducationRunLibraryResources(tx:Prisma.TransactionClient,input:Scope&{resources:Ref[];purpose:'EDIT'|'PREVIEW'|'PUBLISH'}){
  const privateRefs=input.resources.filter(ref=>ref.key.startsWith('private-scale:')||ref.key.startsWith('private-form:')||ref.key.startsWith('education-composition:'))
- if(privateRefs.some(ref=>ref.family!==(ref.key.startsWith('education-composition:')?'BUNDLE':ref.key.startsWith('private-form:')?'FORM':'SCALE')||ref.version!=='1.0.0'))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
+ if(privateRefs.some(ref=>ref.family!==(ref.key.startsWith('education-composition:')?'BUNDLE':ref.key.startsWith('private-form:')?'FORM':'SCALE')
+  ||ref.version!=='1.0.0'&&!(ref.family==='SCALE'&&ref.key.startsWith('private-scale:SCHOOL:')&&ref.version==='2.0.0')))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
  if(!input.resources.some(ref=>ref.family==='SCALE')&&!privateRefs.length)return null
  const initial=await readEducationRunLibraryContext(tx,input)
  if(!initial){
@@ -95,7 +96,9 @@ export async function assertEducationRunLibraryResources(tx:Prisma.TransactionCl
   for(const [key,source] of compositions)privateResourcePolicies.set(key,source.policy)
   for(const ref of privateRefs.filter(ref=>!ref.key.startsWith('education-composition:')).sort((a,b)=>a.key.localeCompare(b.key))){
    const form=ref.key.startsWith('private-form:')
-   const source=await (form?readPrivateFormRuntimeResource:readPrivateScaleRuntimeResource)(tx,{key:ref.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
+   if(ref.version!=='1.0.0'&&(form||ref.version!=='2.0.0'))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
+   const source=form?await readPrivateFormRuntimeResource(tx,{key:ref.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context}):
+    await readPrivateScaleRuntimeResource(tx,{key:ref.key,version:ref.version as '1.0.0'|'2.0.0',purpose:'NEW_USE',context:editor.context})
    privateResourcePolicies.set(ref.key,form?privateFormDraftResourcePolicy(source):relationalEntryToRunPolicy(source.resourceEntry))
   }
  }

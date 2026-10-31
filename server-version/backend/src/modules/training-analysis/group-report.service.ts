@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricSummary, type GroupToolKind, type TaskGroupProjection } from '../reporting/group-summary'
-import { listTaskGroupArtifactsForContainer, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
+import { listTaskGroupArtifactsPage, type TaskArtifactCursor, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
 import { TRAINING_ANALYSIS_MINIMUM_N } from './core'
-import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasks, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, loadTrainingStandaloneCognitiveGroup, readTrainingStandaloneCognitiveGroupArtifact, trainingStandaloneCognitiveGroupTool, trainingStandaloneScaleGroupTools, loadTrainingStandaloneScaleGroup, readTrainingStandaloneScaleGroupArtifact, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
+import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasksPage, assertTrainingGroupTaskHistoryAccess, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, loadTrainingStandaloneCognitiveGroup, readTrainingStandaloneCognitiveGroupArtifact, trainingStandaloneCognitiveGroupTool, trainingStandaloneScaleGroupTools, loadTrainingStandaloneScaleGroup, readTrainingStandaloneScaleGroupArtifact, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
 import { readTrainingAnalysisQuality, trainingResearchReason } from './service'
 import type { TrainingAnalysisRequestV1 } from './types'
 import { trainingCognitiveGroupAssignmentId, trainingScaleGroupId, type TrainingGroupSource } from './group-source'
@@ -30,13 +30,20 @@ export function trainingGroupDisclosure(metrics: GroupMetricSummary[], completed
   return {metrics: projection, completedN: completedN >= floor && projection.every(metric => metric.missingN !== null) ? completedN : null}
 }
 
-export async function listTrainingGroupReports(input: Scope) {
-  return prisma.$transaction(async tx => {
-    const tasks = await listTrainingGroupTasks(tx, input.actor, input.courseId)
-    const allowed = new Set(tasks.map(task => task.id))
-    const artifacts = (await listTaskGroupArtifactsForContainer(tx, 'TRAINING', input.courseId)).filter(row => allowed.has(row.taskId))
-    return {tasks, artifacts}
-  }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
+async function taskHistory(tx:Prisma.TransactionClient,input:Scope&{taskId:string;before?:TaskArtifactCursor}){
+ await assertTrainingGroupTaskHistoryAccess(tx,input.actor,input.courseId,input.taskId)
+ return listTaskGroupArtifactsPage(tx,sourceOf(input.courseId,input.taskId),input.before)
+}
+export async function trainingGroupHistory(input:Scope&{taskId:string;before?:TaskArtifactCursor}){
+ return prisma.$transaction(tx=>taskHistory(tx,input),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
+}
+export async function listTrainingGroupReports(input:Scope&{beforeTaskId?:string}){
+ return prisma.$transaction(async tx=>{
+  const page=await listTrainingGroupTasksPage(tx,input.actor,input.courseId,input.beforeTaskId)
+  const taskId=page.tasks[0]?.id
+  const history=taskId?await taskHistory(tx,{...input,taskId}):{artifacts:[],nextCursor:null}
+  return {...page,taskId:taskId??null,...history,artifacts:history.artifacts.map(pointer=>({...pointer,taskId:taskId!}))}
+ },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 export async function trainingGroupTools(input: Scope & {taskId: string}) {
   return prisma.$transaction(async tx => {
@@ -53,36 +60,9 @@ export async function trainingGroupTools(input: Scope & {taskId: string}) {
   }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 
-export async function generateTrainingGroupReport(input: Scope & {selection: unknown}) {
-  const selection = inputSchema.parse(input.selection)
-  return prisma.$transaction(async tx => {
-    if(trainingScaleGroupId(selection.taskId)!==null){
-      if(selection.toolKey!==selection.taskId||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立量表工具或冻结来源不存在')
-      const native=await loadTrainingStandaloneScaleGroup(tx,input.actor,input.courseId,selection.taskId,selection.configDigest,selection.publication)
-      const disclosed=trainingGroupDisclosure(summarizeGroupMetrics(native.definitions,native.observations,native.parents.map(row=>row.id)),native.parents.length)
-      const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:native.tool.title+' · 群体报告',
-        sourceLabel:`课程独立量表 · 所选投放始于 ${native.tool.source.publication}`,cutoff:new Date().toISOString(),
-        populationLabel:'本课程所选冻结测量版本的合格已完成作答',...disclosed,countUnit:'PERSON',assignedN:null,
-        tool:{key:native.tool.key,title:native.tool.title,kind:'SCALE'},limitations:[
-          '仅纳入已冻结课程 Episode 且原量表允许数值披露的正式结果；不根据当前课程成员名单补历史归属。',
-          '每人先选择最新正式完成结果，再选择测量版本；未完成重做不覆盖已完成，最新缺失不回退旧分数。',
-          '只描述已定义总分和维度；保留真实量尺与每指标有效样本，不重新评分、增设阈值或作诊断。',
-          '沿用 Training 最小有效样本5和小补集披露；新增作答需要主动生成更新版。',
-        ]}
-      return saveTaskGroupArtifact(tx,{source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:native.bindings,projection,generatedBy:input.actor.userId})
-    }
-    if(trainingCognitiveGroupAssignmentId(selection.taskId)!==null){
-      const native=await loadTrainingStandaloneCognitiveGroup(tx,input.actor,input.courseId,selection.taskId)
-      if(!native||selection.toolKey!==native.tool.key||selection.publication!==native.tool.source.publication||selection.configDigest!==native.tool.source.configDigest||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立认知工具或冻结来源不存在')
-      const disclosed=trainingGroupDisclosure(summarizeGroupMetrics(native.definitions,native.observations,native.selected.map(row=>row.id)),native.selected.length)
-      const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:native.tool.title+' · 群体报告',sourceLabel:`独立认知任务 · 发布 ${native.tool.source.publication}`,cutoff:new Date().toISOString(),populationLabel:'本课程所选独立任务的全部合格已完成结果',...disclosed,countUnit:native.selected.every(row=>row.userId)?'PERSON':'RESPONSE',assignedN:null,tool:{key:native.tool.key,title:native.tool.title,kind:'COGNITIVE'},limitations:[
-        '仅汇总已保存的专业报告可见数值；沿用原质量与隐藏结果，不重新评分原始试次。',
-        '每项指标使用各自有效样本；Training最小有效样本为5，过小缺失单元不披露。',
-        '最新正式完成结果先确定，缺失不回退旧值；不同协议、Profile或单位不混合统计。',
-        '匿名结果按来源内绑定处理，不把答卷数推定为人数；未重新查询当前课程名册。',
-      ]}
-      return saveTaskGroupArtifact(tx,{source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:native.bindings,projection,generatedBy:input.actor.userId})
-    }
+export type TrainingPreparedGroup={source:ReturnType<typeof sourceOf>;selector:unknown;sourceBindings:TrainingGroupBindings;projection:TaskGroupProjection;generatedBy:string;definitions:GroupMetricDefinition[];populationKeys:string[]|null}
+async function computeTrainingGroupReport(tx:Prisma.TransactionClient,input:Scope,selection:z.infer<typeof inputSchema>):Promise<TrainingPreparedGroup>{
+
     const catalog = await listTrainingAnalysisSources(tx, input.actor, input.courseId, {authorityLock: 'SHARE', taskId: selection.taskId, group: true, groupKey: selection.toolKey})
     const tool = catalog.tools.find(tool => tool.key === selection.toolKey && tool.source.publication === selection.publication
       && tool.source.configDigest === selection.configDigest && tool.source.variantKey === selection.variantKey && tool.source.materialGroupKey === selection.materialGroupKey)
@@ -122,26 +102,49 @@ export async function generateTrainingGroupReport(input: Scope & {selection: unk
     const {qualityHash} = await readTrainingAnalysisQuality(tx, input.courseId, sources)
     const includedIds = new Set(parents.map(row => row.attemptId))
     const governance = headers.researchGovernance.filter(row => includedIds.has(row.attemptId)).map(({attemptEpoch: _epoch, ...row}) => row)
-    return saveTaskGroupArtifact(tx, {source: sourceOf(input.courseId, selection.taskId), selector: {kind: 'ALL', ...selection}, sourceBindings: {parents: parents.map(({stableIdentity: _identity, ...parent}) => parent), snapshots, sources, qualityHash, governanceHash: canonicalHash(governance)}, projection, generatedBy: input.actor.userId})
-  }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 60000})
+    return {source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:{parents:parents.map(({stableIdentity:_identity,...parent})=>parent),snapshots,sources,qualityHash,governanceHash:canonicalHash(governance)},projection,generatedBy:input.actor.userId,definitions:metricDefinitions,populationKeys:parents.every(p=>p.stableIdentity!==null)?parents.map(p=>p.stableIdentity!):null}
 }
 
-export async function readTrainingGroupReport(input: Scope & {taskId: string; artifactId: string}) {
-  return prisma.$transaction(async tx => {
-    if(trainingScaleGroupId(input.taskId)!==null){
-      const artifact=await readTrainingStandaloneScaleGroupArtifact(tx,input.actor,input.courseId,input.taskId,input.artifactId)
-      if(!artifact)return fail(404,'群体报告不存在')
-      return publicTaskGroupArtifact(artifact)
+
+export async function prepareTrainingGroupReport(input:Scope&{selection:unknown}){
+ const selection=inputSchema.parse(input.selection)
+ return prisma.$transaction(tx=>computeTrainingGroupReport(tx,input,selection),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
+}
+export async function generateTrainingGroupReport(input:Scope&{selection:unknown}){
+ const selection=inputSchema.parse(input.selection)
+ return prisma.$transaction(async tx=>{
+    if(trainingScaleGroupId(selection.taskId)!==null){
+      if(selection.toolKey!==selection.taskId||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立量表工具或冻结来源不存在')
+      const native=await loadTrainingStandaloneScaleGroup(tx,input.actor,input.courseId,selection.taskId,selection.configDigest,selection.publication)
+      const disclosed=trainingGroupDisclosure(summarizeGroupMetrics(native.definitions,native.observations,native.parents.map(row=>row.id)),native.parents.length)
+      const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:native.tool.title+' · 群体报告',
+        sourceLabel:`课程独立量表 · 所选投放始于 ${native.tool.source.publication}`,cutoff:new Date().toISOString(),
+        populationLabel:'本课程所选冻结测量版本的合格已完成作答',...disclosed,countUnit:'PERSON',assignedN:null,
+        tool:{key:native.tool.key,title:native.tool.title,kind:'SCALE'},limitations:[
+          '仅纳入已冻结课程 Episode 且原量表允许数值披露的正式结果；不根据当前课程成员名单补历史归属。',
+          '每人先选择最新正式完成结果，再选择测量版本；未完成重做不覆盖已完成，最新缺失不回退旧分数。',
+          '只描述已定义总分和维度；保留真实量尺与每指标有效样本，不重新评分、增设阈值或作诊断。',
+          '沿用 Training 最小有效样本5和小补集披露；新增作答需要主动生成更新版。',
+        ]}
+      return saveTaskGroupArtifact(tx,{source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:native.bindings,projection,generatedBy:input.actor.userId})
     }
-    if(trainingCognitiveGroupAssignmentId(input.taskId)!==null){
-      const artifact=await readTrainingStandaloneCognitiveGroupArtifact(tx,input.actor,input.courseId,input.taskId,input.artifactId)
-      if(!artifact)return fail(404,'群体报告不存在')
-      return publicTaskGroupArtifact(artifact)
+    if(trainingCognitiveGroupAssignmentId(selection.taskId)!==null){
+      const native=await loadTrainingStandaloneCognitiveGroup(tx,input.actor,input.courseId,selection.taskId)
+      if(!native||selection.toolKey!==native.tool.key||selection.publication!==native.tool.source.publication||selection.configDigest!==native.tool.source.configDigest||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立认知工具或冻结来源不存在')
+      const disclosed=trainingGroupDisclosure(summarizeGroupMetrics(native.definitions,native.observations,native.selected.map(row=>row.id)),native.selected.length)
+      const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:native.tool.title+' · 群体报告',sourceLabel:`独立认知任务 · 发布 ${native.tool.source.publication}`,cutoff:new Date().toISOString(),populationLabel:'本课程所选独立任务的全部合格已完成结果',...disclosed,countUnit:native.selected.every(row=>row.userId)?'PERSON':'RESPONSE',assignedN:null,tool:{key:native.tool.key,title:native.tool.title,kind:'COGNITIVE'},limitations:[
+        '仅汇总已保存的专业报告可见数值；沿用原质量与隐藏结果，不重新评分原始试次。',
+        '每项指标使用各自有效样本；Training最小有效样本为5，过小缺失单元不披露。',
+        '最新正式完成结果先确定，缺失不回退旧值；不同协议、Profile或单位不混合统计。',
+        '匿名结果按来源内绑定处理，不把答卷数推定为人数；未重新查询当前课程名册。',
+      ]}
+      return saveTaskGroupArtifact(tx,{source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:native.bindings,projection,generatedBy:input.actor.userId})
     }
-    await assertTrainingGroupAccess(tx, input.actor, input.courseId, input.taskId)
-    const artifact = await readTaskGroupArtifact(tx, sourceOf(input.courseId, input.taskId), input.artifactId)
-    if (!artifact) return fail(404, '群体报告不存在')
-    const bindings = artifact.sourceBindings as {parents: TrainingGroupSource['parents']; snapshots: TrainingGroupSource['snapshots']; sources: TrainingAnalysisManifestAttemptV1[]; qualityHash: string; governanceHash: string}
+    return saveTaskGroupArtifact(tx,await computeTrainingGroupReport(tx,input,selection))
+  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
+}
+export type TrainingGroupBindings={parents:Array<Pick<TrainingGroupSource['parents'][number],'attemptId'|'attemptEpoch'>>;snapshots:TrainingGroupSource['snapshots'];sources:TrainingAnalysisManifestAttemptV1[];qualityHash:string;governanceHash:string}
+export async function assertTrainingGroupBindingsCurrent(tx:Prisma.TransactionClient,input:Scope&{taskId:string},bindings:TrainingGroupBindings){
     const ids = bindings.parents.map(parent => parent.attemptId)
     // Current source membership plus original immutable slot pointers, never raw
     // result decryption or newest-FINAL discovery when reading an old version.
@@ -161,6 +164,26 @@ export async function readTrainingGroupReport(input: Scope & {taskId: string; ar
     const {researchGovernance} = await trainingParticipantIdentities(tx, input.actor, parents)
     const governanceHash = canonicalHash(researchGovernance.map(({attemptEpoch: _epoch, ...row}) => row))
     if (qualityHash !== bindings.qualityHash || governanceHash !== bindings.governanceHash) return stale()
+}
+
+export async function readTrainingGroupReport(input: Scope & {taskId: string; artifactId: string}) {
+  return prisma.$transaction(async tx => {
+    if(trainingScaleGroupId(input.taskId)!==null){
+      const artifact=await readTrainingStandaloneScaleGroupArtifact(tx,input.actor,input.courseId,input.taskId,input.artifactId)
+      if(!artifact)return fail(404,'群体报告不存在')
+      return publicTaskGroupArtifact(artifact)
+    }
+    if(trainingCognitiveGroupAssignmentId(input.taskId)!==null){
+      const artifact=await readTrainingStandaloneCognitiveGroupArtifact(tx,input.actor,input.courseId,input.taskId,input.artifactId)
+      if(!artifact)return fail(404,'群体报告不存在')
+      return publicTaskGroupArtifact(artifact)
+    }
+
+    await assertTrainingGroupAccess(tx, input.actor, input.courseId, input.taskId)
+    const artifact = await readTaskGroupArtifact(tx, sourceOf(input.courseId, input.taskId), input.artifactId)
+    if (!artifact) return fail(404, '群体报告不存在')
+    const bindings = artifact.sourceBindings as {parents: TrainingGroupSource['parents']; snapshots: TrainingGroupSource['snapshots']; sources: TrainingAnalysisManifestAttemptV1[]; qualityHash: string; governanceHash: string}
+    await assertTrainingGroupBindingsCurrent(tx,input,bindings)
     return publicTaskGroupArtifact(artifact)
   }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
 }

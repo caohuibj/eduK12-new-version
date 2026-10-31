@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react'
 import {privateToolBase,privateToolError,type PrivateToolApi} from './privateToolClient'
-type Candidate={toolId:string;versionId:string;title:string;sourceRevision:number;contentHash:string;createdAt:string;compatibility?:{compatible:boolean;code?:string|null;issues?:{pageKey:string|null;itemKey:string|null;reason:string;message:string}[]}}
+import {SchoolPrivateGroupDisclosure,type SchoolPrivateGroupChoice,type SchoolPrivateGroupSelection} from './SchoolPrivateGroupDisclosure'
+type Candidate={toolId:string;versionId:string;title:string;sourceRevision:number;contentHash:string;createdAt:string;groupChoice?:SchoolPrivateGroupChoice;compatibility?:{compatible:boolean;code?:string|null;issues?:{pageKey:string|null;itemKey:string|null;reason:string;message:string}[]}}
 type Mode='SELF'|'PARENT_REPORT'|'TEACHER_REPORT'
 export function EducationPrivateScalePicker({entry,organizationId,actorKey,scopeKey,api,endpoint,expectedVersion,disabled,homeroomOnly=false,onBusy,onRefresh,kind='SCALE'}:{
  entry:'SCHOOL'|'TEACHER';organizationId:string;actorKey:string;scopeKey:string;api:PrivateToolApi;kind?:'SCALE'|'FORM';
@@ -10,13 +11,14 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
  const [rows,setRows]=useState<Candidate[]>([]),[cursor,setCursor]=useState<string|null>(null)
  const [loading,setLoading]=useState(false),[read,setRead]=useState(false),[writing,setWriting]=useState(false)
  const [choice,setChoice]=useState(''),[mode,setMode]=useState<Mode|''>(''),[target,setTarget]=useState('')
+ const [groupReporting,setGroupReporting]=useState<SchoolPrivateGroupSelection|null>(null)
  const [error,setError]=useState(''),[notice,setNotice]=useState(''),[needsReview,setNeedsReview]=useState(false)
  const epoch=useRef(0),alive=useRef(true),locked=useRef(false)
  const busyCallback=useRef(onBusy);busyCallback.current=onBusy
  const scope=`${entry}:${organizationId}:${actorKey}:${scopeKey}:${endpoint}:${kind}`
  const current=useRef({scope,api});current.current={scope,api}
  useEffect(()=>{alive.current=true;epoch.current++
-  setRows([]);setCursor(null);setWriting(false);setLoading(false);setRead(false);setChoice('');setMode('');setTarget('');setError('');setNotice('');setNeedsReview(false)
+  setRows([]);setCursor(null);setWriting(false);setLoading(false);setRead(false);setChoice('');setMode('');setTarget('');setGroupReporting(null);setError('');setNotice('');setNeedsReview(false)
   return()=>{alive.current=false;epoch.current++;if(locked.current){locked.current=false;busyCallback.current(false)}}
  },[scope,api])
  useEffect(()=>{setTarget('')},[homeroomOnly])
@@ -30,17 +32,21 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
    if(!valid())return
    setRows(old=>Array.from(new Map([...(next?old:[]),...data.list].map(row=>[row.versionId,row])).values()))
    setCursor(data.nextCursor);setRead(true)
-   if(!next){setChoice('');setMode('');setTarget('')}
+   if(!next){setChoice('');setMode('');setTarget('');setGroupReporting(null)}
   }catch(cause){if(valid())setError(privateToolError(cause))}
   finally{if(valid())setLoading(false)}
  }
  const selected=rows.find(row=>row.versionId===choice)
  const compatible=(row:Candidate)=>kind==='SCALE'||row.compatibility?.compatible===true
  const selectedCompatible=Boolean(selected&&compatible(selected))
+ const groupChoice=entry==='SCHOOL'&&kind==='SCALE'&&mode==='SELF'?selected?.groupChoice:undefined
+ const activeGroup=groupChoice?groupReporting:null
+ const groupReady=activeGroup===null||Boolean(groupChoice&&activeGroup.leaves.length===1&&activeGroup.leaves[0].versionId===groupChoice.versionId
+  &&activeGroup.leaves[0].contentHash===groupChoice.contentHash&&Number.isInteger(activeGroup.minimumRespondents)&&activeGroup.minimumRespondents>=Math.max(10,groupChoice.minimumRespondents))
  const label=kind==='FORM'?'表单':'量表'
  const targetValid=mode!=='TEACHER_REPORT'||(homeroomOnly?target==='HOMEROOM_TEACHER':['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS'].includes(target))
  const add=async()=>{
-  if(disabled||locked.current||loading||needsReview||!selected||!selectedCompatible||!mode||!targetValid||!actorKey)return
+  if(disabled||locked.current||loading||needsReview||!selected||!selectedCompatible||!mode||!targetValid||!actorKey||!groupReady)return
   if(!['SELF','PARENT_REPORT','TEACHER_REPORT'].includes(mode)||(entry==='TEACHER'&&mode!=='SELF'))return
   locked.current=true;setWriting(true);onBusy(true);setError('');setNotice('')
   const context=current.current,token=epoch.current
@@ -48,12 +54,12 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
   let saved=false
   try{
    await api(endpoint,'POST',{expectedVersion,[kind==='FORM'?'privateForm':'privateScale']:{versionId:selected.versionId,contentHash:selected.contentHash,
-    administration:{population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:mode}},
+    administration:{population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:mode},...(activeGroup?{groupReporting:activeGroup}:{})},
     subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:mode==='PARENT_REPORT'?'RELATED_PARENT':'ALL_CURRENT'},
     ...(mode==='TEACHER_REPORT'?{targetPolicy:{mode:target}}:{})})
    saved=true
    if(!valid())return
-   setChoice('');setMode('');setTarget('');setNotice(kind==='FORM'?'已将本人固定表单版本加入活动草稿。请核对任务配置，再预览并发布；加入草稿不等于已发布。':'已加入本人固定版本。请核对任务配置，再按现有流程预览和发布；是否可发布以服务器检查为准。')
+   setChoice('');setMode('');setTarget('');setGroupReporting(null);setNotice(kind==='FORM'?'已将本人固定表单版本加入活动草稿。请核对任务配置，再预览并发布；加入草稿不等于已发布。':'已加入本人固定版本。请核对任务配置，再按现有流程预览和发布；是否可发布以服务器检查为准。')
    await onRefresh()
   }catch(cause){if(valid()){
    setError((saved?'已添加，但任务配置刷新失败，请重新读取；不要重复添加。':'添加未确认，请先重新读取任务配置核对；不会自动重复提交。')+' '+privateToolError(cause))
@@ -65,7 +71,7 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
   locked.current=true;setWriting(true);onBusy(true)
   const context=current.current,token=epoch.current
   const valid=()=>alive.current&&token===epoch.current&&current.current.scope===context.scope&&current.current.api===context.api
-  try{await onRefresh();if(valid()){setChoice('');setMode('');setTarget('');setNeedsReview(false);setError('');setNotice('已重新读取配置，请先核对是否已加入；确需添加时重新选择。')}}
+  try{await onRefresh();if(valid()){setChoice('');setMode('');setTarget('');setGroupReporting(null);setNeedsReview(false);setError('');setNotice('已重新读取配置，请先核对是否已加入；确需添加时重新选择。')}}
   catch(cause){if(valid())setError(privateToolError(cause))}
   finally{if(valid()){locked.current=false;setWriting(false);onBusy(false)}}
  }
@@ -82,17 +88,18 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
    {row.compatibility?.issues?.length?<ul>{row.compatibility.issues.map((issue,index)=><li key={index}>{issue.pageKey?`页 ${issue.pageKey} `:''}{issue.itemKey?`题 ${issue.itemKey}：`:''}{issue.message}</li>)}</ul>:<p>尚未取得此版本可用于活动的兼容性确认，请重新读取或修订后固定新版本。</p>}
   </aside>)}
   {rows.length>0&&<>
-   <label className={`${prefix}-field`}><span>我的{label} · 固定版本</span><select disabled={disabled||writing||needsReview} value={choice} onChange={event=>{setChoice(event.target.value);setMode('');setTarget('')}}>
+   <label className={`${prefix}-field`}><span>我的{label} · 固定版本</span><select disabled={disabled||writing||needsReview} value={choice} onChange={event=>{setChoice(event.target.value);setMode('');setTarget('');setGroupReporting(null)}}>
     <option value="">请选择本人固定版本</option>{rows.map(row=><option key={row.versionId} value={row.versionId} disabled={!compatible(row)}>{row.title} · 修订 {row.sourceRevision} · {row.createdAt} · {row.contentHash.slice(0,8)}</option>)}
    </select></label>
-   <label className={`${prefix}-field`}><span>本次作答方式</span><select disabled={disabled||writing||needsReview||!selectedCompatible} value={mode} onChange={event=>{setMode(event.target.value as Mode|'');setTarget('')}}>
+   <label className={`${prefix}-field`}><span>本次作答方式</span><select disabled={disabled||writing||needsReview||!selectedCompatible} value={mode} onChange={event=>{setMode(event.target.value as Mode|'');setTarget('');setGroupReporting(null)}}>
     <option value="">请明确选择</option><option value="SELF">{entry==='SCHOOL'?'学生自评':'教师自评'}</option>
     {entry==='SCHOOL'&&<><option value="PARENT_REPORT">家长评学生</option><option value="TEACHER_REPORT">教师评学生</option></>}
    </select></label>
    {mode==='TEACHER_REPORT'&&<label className={`${prefix}-field`}><span>私有{label}教师作答目标</span><select disabled={disabled||writing||needsReview} value={target} onChange={event=>setTarget(event.target.value)}>
     <option value="">请明确选择</option><option value="HOMEROOM_TEACHER">班主任</option>{!homeroomOnly&&<option value="ALL_CLASS_TEACHERS">全部班级教师</option>}
    </select></label>}
-   <button disabled={disabled||loading||writing||needsReview||!selectedCompatible||!mode||!targetValid} onClick={()=>void add()}>加入我的固定{label}</button>
+   {groupChoice&&<SchoolPrivateGroupDisclosure choices={[groupChoice]} value={groupReporting} disabled={disabled||writing||needsReview} onChange={setGroupReporting}/>}
+   <button disabled={disabled||loading||writing||needsReview||!selectedCompatible||!mode||!targetValid||!groupReady} onClick={()=>void add()}>加入我的固定{label}</button>
   </>}
  </section>
 }

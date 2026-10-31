@@ -1,0 +1,1 @@
+{"check":"two exact shared transaction modules semantic increment only","files":["src/modules/reporting/artifact.ts","src/modules/reporting/service.ts"],"diagnostics":0}
