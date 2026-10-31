@@ -1,0 +1,44 @@
+{
+  "kind": "RETROSPECTIVE_INDEX_OF_ACTUAL_TOOL_COMMAND_RESULTS_UNSIGNED",
+  "commands": [
+    {
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern=^PR432 ",
+        ".github/scripts/onboarding-controls.test.mjs"
+      ],
+      "exitCode": 1,
+      "log": "control-tests-first.log",
+      "result": "2 PASS / 1 FAIL, reader wrongly excluded the already-recorded frontend Prisma input paths; no product failure",
+      "logSHA256": "7b4ee49db7925ed1527e994ea69a16c9f341ab38ce3f9d5294a759f806f82280"
+    },
+    {
+      "argv": [
+        "node",
+        "--test",
+        "--test-name-pattern=^PR432 admits actual final-tree",
+        ".github/scripts/onboarding-controls.test.mjs"
+      ],
+      "exitCode": 0,
+      "log": "control-types-continuation.log",
+      "result": "only failed reader check rerun after exact-path allowance; 1 PASS",
+      "logSHA256": "4a776dedf6d6400e76041f00c8b221712a60ebc9bfd9596635a3659dac0e16b8"
+    },
+    {
+      "argv": [
+        "/tmp/finalize-432/actionlint",
+        "-shellcheck=",
+        "-pyflakes=",
+        ".github/workflows/ci.yml"
+      ],
+      "exitCode": 0,
+      "log": "actionlint.log",
+      "toolArchiveSHA256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "distinctControlCases": 3,
+  "applicationCasesExecuted": 0,
+  "buildsExecuted": 0
+}

@@ -1,0 +1,44 @@
+{
+  "kind": "LOCAL_UNSIGNED_TASK_OBSERVATIONS",
+  "base": "01be5cee34e9f0d38b3372d3f7591afd8b4bc57e",
+  "workingDirectory": "server-version/frontend",
+  "node": "v24.21.0",
+  "command": "node node_modules/vitest/vitest.mjs run src/components/__tests__/FinalQuestionnaireAssessment.test.tsx -t 'recovery: (keeps Form answers disabled|preserves accepted)' --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "baseline": {
+    "exitCode": 1,
+    "passed": 0,
+    "failed": 3,
+    "filtered": 8,
+    "failureReasons": [
+      "Form answer enabled after FINAL_DRAFT_IDENTITY_CONFLICT before meta",
+      "accepted Form missing progress reread button",
+      "accepted Scale missing progress reread button"
+    ]
+  },
+  "candidate": {
+    "exitCode": 0,
+    "passed": 3,
+    "failed": 0,
+    "filtered": 8,
+    "cases": [
+      "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps Form answers disabled when draft identity conflicts before metadata loads",
+      "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+      "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails"
+    ],
+    "originalReporterSHA256": "98ea8de785c0e6a6449b10a1594abb073d23609677703f7be364c3ad25947a74"
+  },
+  "baselineHarnessDelta": "Candidate adds the direct disabled reread-button assertion while the first onReload remains pending; other selected case bodies equal baseline. Original before-review tests remain bound to the preceding commit.",
+  "sourceSHA256": {
+    "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": "acfaaafe205ba36f4a782fbe828e60c50648045c4303698b313d5a1351fa1d7e",
+    "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx": "c0918779af64ab1ae71f8bc2dde0166570b533d2e63213fff4641984f53646e0",
+    "server-version/frontend/src/components/questionnaire/FormPlayer.tsx": "5737183d11f6de76f79e8ef757a61363609a57f7629e69d0105d00c356ff1466",
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": "f359ed8d0c87be804e7b379bf88659313da5d0c43050c9f00489c7a9fc007de4",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+  },
+  "limits": [
+    "These are 1 new conflict case and 2 extended accepted cases, not 3 additional unique cases on top of the original13.",
+    "Other tests remain retained at original source; no full suite, compiler, build, browser, DB or CI execution.",
+    "Synthetic callback/React jsdom tests; no new production, durability or report-availability qualification."
+  ]
+}
