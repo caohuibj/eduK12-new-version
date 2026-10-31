@@ -157,3 +157,18 @@ Draft 仅保留原 pr-light-backend；Ready 仍要求原 backend、backend-regre
 
 只读完整差异：#456 `024ffa4a87540769e9d384238a8d48feffafd010`（13 文件）与 #462 `2b04c98b49375cc684a587412ff234bd02639111`（71 文件）符合 backend；#453 `4c7563cb37cd348cb47396e8a9955e3cca62689e`（31 文件、跨 FE/BE）及 #457 `320e88a15c425d1335383004d0016790a562f4f7`（47 文件、schema/admin）不符合，不硬缩范围。PR 号只出现在观察记录，不参与执行分类。
 Node v24.21.0：三个新增分类/汇总/调度用例 PASS，补一个真实 Git CLI 用例 PASS；六个受影响既有 FE/依赖/拒绝用例 PASS。YAML、diff 检查通过，CodeQL 表达式仍 20,949 字符，未增长。未执行四条业务分支的 audit、业务/PG 测试、应用构建或生产操作。本片独立 Draft，暂不合并，不干扰依赖与问卷修复收口。
+
+## Docker 后端单端小片
+
+观察基线 `28b8cbe4be407cce063e5584b905cadbaecb9498`，源码观察点 `2fd06a06f8ee2ce995866b3773954c0239305014`。
+原 `frontend_only=false` 将 backend、worker、frontend 捆绑；现复用既有 backend 类别选择 backend_only，由同一工作流/构建脚本处理三类：frontend；backend+worker；全部。原调用默认 backend_only=false，完整模式行为保留；不接受两个 only 同时为 true。
+后端单端保留 API/worker 两个目标、官方源参数、runtime 刷新、pull、原 tag/上下文/本地 exporter 限制及真实后端 HIGH/CRITICAL 扫描；仅省去 frontend 构建、Nginx 静态检查和 frontend 扫描。200 用例、固定回归、科学验证和数据库执行器完全未改，不创建工作流、资格或包白名单。
+既有 `.github/scripts/build-ci-images.sh` 原模式为 100755，本片原样保留。工具路线只接纳该既有脚本 M 100755→100755，以及实际控制文件；chmod、新可执行脚本、未知路径继续拒绝。使用现有 release-tools recipe 的 image-plan 控制用例，不以模式伪装取得范围。
+Node24.21.0：6 个 image-plan 控制用例 PASS，覆盖前端/后端/完整三类的真实 shell 选择、workflow 输入及扫描条件；另 2 个既有工具路线/recipe 定向用例 PASS。bash -n、两份 YAML 和 diff 检查通过。没有启动 Docker 构建、业务/audit/PG/压测或生产操作，没有取消或修改任何正在运行的 CI。
+尚未公开的 Mac 部署源参数补丁 `967ecf0f` 未读取、未整合；本片只基于 main，后续由母线协调重放其参数透传。
+
+### 前端整合基线：只读协调结论
+
+公开 #467 `14c73aaeaa853ebebe3fcc99cebac982812b4d8a` 是 11 个前端源码/测试文件，单独可进入 frontend；#464 的 FE lock 加入后，frontendFile 不接 lock，而 dependencyFile 不接 SchoolStudentTasks.tsx，组合会回退 platform。这是路径准入结论，不是组合分支或 CI 资格。
+三个独立提交整合后正常 CI 一次可以解除循环等待，但不会自动获得前端窄路线。A 组完整差异未定，不能预先声称全部可按前端处理。若全部符合已有前端边界，后续可只组合现有前端准入与版本型 manifest/lock 检查，仍走完整前端安装/audit/types/tests/build/scan/SAST；不新建认证、场景例外或绕过 required checks。
+本线未组合提交、未修改/关闭 #464/#467，也未在本 Docker 小片放宽前端分类。
