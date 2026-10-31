@@ -30,7 +30,7 @@
 
 - 纯依赖版本升级及现有测试兼容修复采用 dependencies 范围门禁。只有前端依赖文件及前端测试伴随项变化时，保留前端锁定安装/审计、类型/测试/构建、frontend-only 生产镜像扫描、CI 路由及 CodeQL，不强制未变后端、maintenance、数据库或完整 UI。后端或混合/控制伴随差异当前保留原组合检查，不借前端路线删减实际后端资格；不运行无关浏览器/媒体/UI/Ops 全体验收。依赖声明须与锁文件对应，scripts/engines/业务/数据库/Compose/Dockerfile 或未知路径变动不适用此路线。所有选中项必须成功才能合并。
 
-- 纯后端产品模块、伴随测试及非生产证据可使用 backend 类别；FE、schema、依赖、CI/Compose、共享 API/DTO、身份或测评核心运行时变化不适用。此类别先解除独立 frontend/browser/media/UI/Ops/perf 验收层，Draft 保留 pr-light-backend，Ready 保留原 backend、backend-regression、Docker 和后端 SAST。原 backend 内部固定回归/性能、跨树前端依赖及 Docker 前端构建尚未定向收窄，不声称本片消除了全部无关工作。历史证据脚本不自动成为当次 PG 集成成功；实际共享契约影响仍须按审阅结果扩展范围。
+- 纯后端产品模块、伴随测试及非生产证据可使用 backend 类别；FE、schema、依赖、CI/Compose、共享 API/DTO、身份或测评核心运行时变化不适用。此类别解除独立 frontend/browser/media/UI/Ops/perf 验收层，Draft 保留 pr-light-backend，Ready 保留原 backend、backend-regression、Docker 和后端 SAST；Docker 仅构建 backend/worker 并扫描实际后端镜像。原 backend 内部固定回归/性能和跨树前端依赖尚未定向收窄，不声称本片消除了全部无关工作。历史证据脚本不自动成为当次 PG 集成成功；实际共享契约影响仍须按审阅结果扩展范围。
 
 ## CI 激活与失败回写（2026-10-26 用户追加）
 
