@@ -8433,6 +8433,159 @@
         "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
         "frontend": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8"
       }
+    },
+    "450": {
+      "schemaVersion": 1,
+      "pr": 450,
+      "enabled": false,
+      "base": "194bb91f9af4feb62d9ed384813e7abf0643c2e8",
+      "product": "eeab09a8f23640c56154352c74cd149ac51afd02",
+      "controlCheckpoint": "9f2f89bc2603fb2a035d66e305b687561b73d578",
+      "components": {
+        "backend": "06cea014b3dbc8915a3c7cf1a0e011ca568d9a2b",
+        "frontend": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "2d413c192f69545be782ba0f76445f5b33e9c58d",
+        ".github/scripts/onboarding-checks.mjs": "ac2e7730b3c218f8baa1040374963ad68decec3f",
+        ".github/scripts/onboarding-controls.test.mjs": "89cf2580885db6e6d2b76fbdbb45da1e1f2a2d44",
+        ".github/scripts/onboarding-evidence.json": "6852b95d5241650630531decef2bb7c660e45585",
+        ".github/scripts/onboarding-scope.mjs": "93e8378a9b266427e141ca57ce880276170b2c92",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "ac65636f91e312d266518ce26ec55a148986dba6"
+      },
+      "source": {
+        "docs/performance/variant-report-job-projection-20261031/README.md": {
+          "before": null,
+          "after": "76393aa2b919c6ca97fa833a607139d00acc265f"
+        },
+        "docs/performance/variant-report-job-projection-20261031/binding.json": {
+          "before": null,
+          "after": "eae10147be929ee40c561f076a75d0e4cbaef012"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline-query.json.gz": {
+          "before": null,
+          "after": "1a27a4f2d4c6ba94b03934951152020c699ed59c"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline-r2.json.gz": {
+          "before": null,
+          "after": "84aceaf77d1a40d386356b6d8cb7fe31f4030ac5"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline-r2.log.gz": {
+          "before": null,
+          "after": "bfec14d0efed24969c80a7ab86c8c3a4fb267eb4"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline.json.gz": {
+          "before": null,
+          "after": "cd1a36de4b0c8e44125460a49d5e8a4170b1f762"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/baseline.log.gz": {
+          "before": null,
+          "after": "7b9fd0a9722465218150ed3c9dd1fe3d9f74bf16"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/candidate-query.json.gz": {
+          "before": null,
+          "after": "cbb3ea8997cb9e5db3e9556a3e9c79bb498ddcde"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/candidate.json.gz": {
+          "before": null,
+          "after": "4dba3fc4af5b3f1cd9b5c0da0b4c05051f745d91"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/candidate.log.gz": {
+          "before": null,
+          "after": "6b68c4fab2d3e6601e66713cd12cb116ad3c3068"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-execution.json.gz": {
+          "before": null,
+          "after": "30ac19d9d121b1be488a46c071fda69d3966d30e"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-migrate.log.gz": {
+          "before": null,
+          "after": "6ee02fdafacec0c3d41fcbd196f9b36e42b3b2df"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-probe.log.gz": {
+          "before": null,
+          "after": "d4a3b0fa646ce695928e2071bedebe6858340475"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-result.json.gz": {
+          "before": null,
+          "after": "b9d67f9ba01bbb859e96efd37b98f5a3656aab37"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-start.log.gz": {
+          "before": null,
+          "after": "473af2db167e293f97a216821f8462ccc3b0bb91"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/pg-stop.log.gz": {
+          "before": null,
+          "after": "f883feadb5500be31de326061aa71b8e98b7d1d7"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/types.json.gz": {
+          "before": null,
+          "after": "8f40941085245a77ef08a0980e98525ebf7794f8"
+        },
+        "docs/performance/variant-report-job-projection-20261031/evidence/types.log.gz": {
+          "before": null,
+          "after": "d4b9926df0b7defceb6caf0b474c4a190c5ca8f0"
+        },
+        "docs/performance/variant-report-job-projection-20261031/ownership.json": {
+          "before": null,
+          "after": "9099f83c2caab42c4a9657d70baf7b4a240ffc4c"
+        },
+        "docs/performance/variant-report-job-projection-20261031/probe.mts": {
+          "before": null,
+          "after": "40b5de5bf92caf4242095b3bcfb6540e5e919546"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "756ce56645dd33eae5a8a9905bcb2324bec18dae"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "4762ec8d0d4b9071577aa9a8fd9dcae12a541ce7"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "0d7768ad504218618c587bd24740bdb6845084dc"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/existing-consumer.json": {
+          "before": null,
+          "after": "7523aca3db544bc7d2c9d56a4546159364838e54"
+        },
+        "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "4aac3ced1e9cf5d87ad104c9467f00f9daed77a3"
+        },
+        "docs/performance/variant-report-job-projection-20261031/run-probe.py": {
+          "before": null,
+          "after": "410a5336849765c18f4155da341b4e367e8abe4e"
+        },
+        "server-version/backend/src/__tests__/composite/training-variant-export.test.ts": {
+          "before": "a1af4c0f75fb23192c7aaff5c3294af17c7ceda1",
+          "after": "13b5e300a75d161e509025e9334c3aaaa4c30559"
+        },
+        "server-version/backend/src/modules/composite/composite.service.ts": {
+          "before": "eb7b347ce78457f43ea66f5a0c426f105cf68f75",
+          "after": "9274db0799c0e22a4739e9d13908386fdbd8a8ea"
+        }
+      }
     }
   }
 }
