@@ -1,6 +1,6 @@
 # 过期 CI 门禁清理：onboarding 第一批
 
-基线 `92e398025fb6fbefe1b051520cf5507295173859`。独立 worktree `/workspace/eduk12-ci-gate-cleanup`，分支 `ci-gate-cleanup-20261031`。本文件是审查记录，不是新增门禁、审批层或发布规则。
+最初观察基线 `92e398025fb6fbefe1b051520cf5507295173859`；经母 DOT 独立审阅后，Draft 候选已对齐包含 #448 的实际 main `7e4a5b90c9b9c0a186345a6025f0eb9ef78a3c61`。分支 `ci-gate-cleanup-20261031`。本文件是审查记录，不是新增门禁、审批层或发布规则。
 
 范围 → 对应故障 → 验证位置 → 复用 → 预算：onboarding 控制路径及既有工具路线接纳，消除无关 main 控制更新导致的历史哈希失配和 CI-only 差异进入 platform；云端本地用少量现有 Node 控制用例验证；产品源码、原始业务结果、证据接纳函数与 workflow 未改，不重新构建/运行业务、DB 或浏览器。最初两片使用 Node v24.19.0，各约 0.15–0.17 秒；后续完整受影响路径使用项目支持的 v24.21.0，9 例一次通过，480.6ms。未安装依赖；这些是本地结果，不是正式 Actions 资格。
 
@@ -11,7 +11,7 @@
 
 母 DOT 独立静态审阅后授权补齐工具路线，提交 `e50c04b40a828721ef54df12f4016cd33d8cf75f`：只将两个 onboarding 控制文件及本审查文档加入 `releaseToolFiles`；现有 `release-tools` recipe 在这两文件变化时追加六个定向控制用例。扩充现有路由断言和一个 recipe 选择用例，没有新增 workflow、任务状态、签名身份或候选绑定。原有工具检查保持原样。
 
-没有修改 `onboarding-bindings.json`、`onboarding-evidence.json`、`onboarding-checks.mjs`、`content-scope.mjs`、`merge-gate.mjs` 或任何 workflow。A 的 #448、Long 的 #447、main、branch protection、required checks、凭据及应用/生产配置均未修改。没有 push、开 PR、激活 CI、合并或生产操作。
+没有修改 `onboarding-bindings.json`、`onboarding-evidence.json`、`onboarding-checks.mjs`、`content-scope.mjs`、`merge-gate.mjs` 或任何 workflow。A 的 #448、Long 的 #447、main、branch protection、required checks、凭据及应用/生产配置均未修改。前述审阅阶段没有 push、开 PR 或激活 CI；用户随后授权推送并开 Draft，实际公开状态以 PR 记录为准。没有合并或生产操作。
 
 ## 实际消费者与维护现状
 
@@ -82,4 +82,10 @@ node --test --test-name-pattern='^(onboarding (accepts unchanged main controls|s
 
 ## 交接
 
-先由母 DOT 审查两个代码提交和本记录，再协调 Draft 的既有轻量检查路线、与 A/Long 合并的时间及必要一次证据补缺；不自行更新 main。当前没有任何上传被拒绝、未明结果或绕过行为。没有操作生产或修改身份权限。
+母 DOT 已独立静态审查两个清理提交及工具接纳增量，用户随后明确授权推送 GitHub、开 Draft；正式检查和合并顺序仍由母 DOT 协调，不自行更新 main、转 Ready 或 dispatch。没有操作生产或修改身份权限。
+
+## 对齐 #448 后的 Draft 准备
+
+本地 rebase 到 `7e4a5b90c9b9c0a186345a6025f0eb9ef78a3c61` 无冲突，range-diff 的五个提交全部为 `=`，即已审补丁逐片保持一致；完整保留 #448 新增的路由、445/449 分发及前端范围保护。对齐后控制代码 head `fa5a397c662e9ab54d201845bd346c938a18519c`，Node v24.21.0 仅补 5 个直接相关控制用例，5 PASS、0 FAIL、exit 0，167.5ms：前三个新增清理用例及 main 已有的 `PR448 exact qualifier preserves required component scope and rejects unknown paths`、`PR448 integration preserves existing 445 and 449 registry dispatch and frontend-only scope`。没有重复业务验证；原 Node24.21 9 PASS 与 Node24.19 初验按各自来源保留，不能冒称对齐后重跑了原九例。
+
+公开内容仅源码、测试及本合成审查说明，不包含原环境材料、日志、凭据或生产配置。只读获取 Hui 的“CI 常见错误清单”返回 `NOT_FOUND`；这是工具访问缺项，不是代码 CI 失败或上传审批拒绝，未换账号/工具绕过。Draft 可能由仓库自动运行分类；本线不手动激活正式 Ready/dispatch。
