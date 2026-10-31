@@ -165,6 +165,9 @@ suite('Survey personal tracking real publication/FINAL/HTTP loop',()=>{
   })
 
   it('inherits frozen tracked C after the same source draft is revised, while untracked Form edits remain current',async()=>{
+    // Each independent T1 has its own project-level frozen tracking plan.
+    const projectId=uuid()
+    await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'固定来源继承合成研究',collectionMode:'LINKED_WAVES'}})
     const scaleId=uuid(),formId=uuid(),scaleKey=key(),formKey=key()
     const definition={schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
       responseOptions:[{optionKey:'zero',label:'0',score:0},{optionKey:'one',label:'1',score:1}],dimensions:[{dimensionKey:'total',label:'总分',direction:'descriptive'}],
@@ -202,6 +205,8 @@ suite('Survey personal tracking real publication/FINAL/HTTP loop',()=>{
     const general=await readGeneralForOwnAttempt({publicId:opened.publicId,attemptId:attempt.attemptId,...proof})
     expect(general).toMatchObject({kind:'DESCRIPTIVE',measurements:[{metrics:[{key:'total',value:1}]}]})
     expect((await db.surveyInstrumentDraft.findUniqueOrThrow({where:{id:scaleId}})).definition).toMatchObject({items:[{itemKey:'changed'}]})
+    const unlinked=await createWave(owner,projectId,{requestId:uuid(),title:'不能另起基线',consentText:consent,instrumentIds:[formId],linkageNoticeConfirmed:true})
+    await expect(prepareWave(owner,projectId,unlinked.id,0)).rejects.toThrow('请通过已发布纵向波次创建下一轮')
   },30000)
 
 })

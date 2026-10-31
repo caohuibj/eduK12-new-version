@@ -1,5 +1,12 @@
 import { PrismaClient } from '@prisma/client'
-import { describe,it,expect,afterAll } from 'vitest'
+import { describe,it,expect,afterAll,vi } from 'vitest'
+// Fixed registry identities and revision 1 must not reuse another suite's
+// immutable deployment policy. Reuse the existing disposable-DB fixture.
+const isolated=await vi.hoisted(async()=>{
+ vi.resetModules()
+ const {isolatedTestDatabase}=await import('../../fixtures/isolated-test-database')
+ return isolatedTestDatabase(['RELEASE_INTEGRATION_DATABASE_URL'],'scale_wave_one')
+})
 import { integrationDatabaseUrl } from '../../integration/integration-env'
 import { listScaleInstrumentSources,getScaleInstrumentRuntimePolicy } from '../../../modules/scale/onboarding/instrument-registry'
 import { installScaleInstrument,planScaleInstrumentInstall } from '../../../modules/scale/onboarding/install'
@@ -9,7 +16,7 @@ const wave1Keys=new Set(['academic_self_concept','academic_self_efficacy','domai
  ['mathematics','chemistry','physics','biology','english','chinese'].map(subject=>`${family}_${subject}_zh_cn`)))
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 suite('Wave1 registered content install and publication (isolated PostgreSQL)',{timeout:60_000},()=>{
- const db=new PrismaClient({datasources:{db:{url}}});afterAll(()=>db.$disconnect())
+ const db=new PrismaClient({datasources:{db:{url}}});afterAll(async()=>{await db.$disconnect();await isolated.restore()})
  it('installs all 36, publishes with real gates, and reapplies idempotently',async()=>{
   const actor=await db.user.upsert({where:{username:'wave1-test-system-admin'},create:{username:'wave1-test-system-admin',passwordHash:'test-only',role:'ADMIN',platformRole:'SYSTEM_ADMIN'},update:{}})
   // Other independent-axis packages have their own versions and report variants.

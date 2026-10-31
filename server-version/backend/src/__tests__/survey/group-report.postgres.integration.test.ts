@@ -17,6 +17,15 @@ import * as security from '../../modules/assessment-runtime/security'
 import type { FormDraft } from '../../modules/survey/builder.definition'
 import { runtimeMetricLines } from '../../services/runtimeObservability'
 
+// Configure the existing count-only observer before the shared client is loaded.
+const sqlEventFlags = vi.hoisted(() => {
+  const previous = { PERF_ISOLATED_TEST_MODE: process.env.PERF_ISOLATED_TEST_MODE, PERF_SQL_EVENT_COUNT: process.env.PERF_SQL_EVENT_COUNT }
+  if (process.env.GROUP_REPORT_DATABASE_URL?.trim()) {
+    process.env.PERF_ISOLATED_TEST_MODE = '1'; process.env.PERF_SQL_EVENT_COUNT = '1'
+  }
+  return previous
+})
+
 const url = integrationDatabaseUrl('GROUP_REPORT_DATABASE_URL')
 const suite = url ? describe : describe.skip
 let server: Server | undefined
@@ -69,6 +78,9 @@ suite('Survey generated group snapshot / real HTTP and PostgreSQL', () => {
     if (server) await new Promise<void>(resolve => server!.close(() => resolve()))
     process.env.SURVEY_PUBLICATION_ENABLED = flags.publication; process.env.SURVEY_ANALYTICS_ENABLED = flags.analytics; process.env.SURVEY_WORKSPACE_ENABLED = flags.workspace
     await prisma.$disconnect()
+    for (const [key, value] of Object.entries(sqlEventFlags)) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value
+    }
     console.log('GROUP_REPORT_COMPARISON', JSON.stringify(evidence))
   })
   it('generates the real Form report, then reopens without FINAL decryption or regeneration', async () => {
