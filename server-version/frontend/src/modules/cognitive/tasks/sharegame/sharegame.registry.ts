@@ -26,4 +26,19 @@ export const sharegameRegistryEntry: CognitiveFrontendRegistryEntry = {
   },
 }
 
-export const sharegameRegistryEntryV2:CognitiveFrontendRegistryEntry={...sharegameRegistryEntry,engineVersion:'2.0.0',scoringVersion:'2.0.0',reportDefinition:{...sharegameRegistryEntry.reportDefinition,showProductIndex:false,indexLabel:undefined,practicalTips:['只统计有效选择，未答不补零；明确选择零仍是真实选择。'],disclaimer:'描述本次有效选择，不作人格或品德判断。'}}
+export const sharegameRegistryEntryV2:CognitiveFrontendRegistryEntry={
+  ...sharegameRegistryEntry,engineVersion:'2.0.0',scoringVersion:'2.0.0',
+  metricDefinitions:[...sharegameRegistryEntry.metricDefinitions,
+    {key:'plannedRounds',label:'计划轮数',displayType:'number'},
+    {key:'answeredRounds',label:'有效选择轮数',displayType:'number'},
+    {key:'timeoutRounds',label:'超时未答轮数',displayType:'number'},
+    {key:'omittedRounds',label:'未响应轮数',displayType:'number'},
+    {key:'zeroChoiceCount',label:'明确选择零轮数',displayType:'number'},
+    {key:'responseRate',label:'有效选择覆盖率',displayType:'percentage'},
+    {key:'answeredEndowment',label:'有效轮次点数总额',displayType:'number'},
+  ],
+  reportDefinition:{...sharegameRegistryEntry.reportDefinition,showProductIndex:false,indexLabel:undefined,
+    summaryMetrics:['answeredRounds','timeoutRounds','omittedRounds','zeroChoiceCount'],
+    practicalTips:['只统计有效选择，未答不补零；明确选择零仍是真实选择。'],
+    disclaimer:'描述本次有效选择，不作人格或品德判断。'},
+}
