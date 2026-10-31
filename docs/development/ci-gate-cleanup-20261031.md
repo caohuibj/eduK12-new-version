@@ -180,3 +180,17 @@ Node24.21.0：6 个 image-plan 控制用例 PASS，覆盖前端/后端/完整三
 同目录、模块内测试仅在此完整前端组合路线接纳，不扩展 frontend_affected 或测试专用轻量路线。Ready/Draft 均选择 scope、frontend-build、frontend、docker、codeql；原完整前端安装/audit/types/tests/build/image scan/SAST 保留，未变后台/数据库/media 不选。生产共享 API/测评运行时代码沿用 frontendFile 排除；命中特殊 media/app-shell 等既有验收的生产改动仍回原范围，不能混锁后省掉相关检查。
 Node24.21.0 四个定向分类/命令选择用例 PASS；随后只对增补的相关验收反例补验原组合一例，1 PASS。真实 Git fixture 覆盖 School 产品源、同目录测试及认知模块测试，结果 dependencies_frontend_only=true、frontend_affected=false；混入 BE、根依赖、CI、共享前端 API、测评 runtime、媒体生产文件及脚本变更均拒绝该组合范围。未运行 D 的 audit 或任何前端业务基线。
 母线提供的本地整合 head `2f70bdf630385fdc92ecba24d8ce5a8d1367162b` 尚未公开，本线没有读取该 Git 对象、组合提交或关闭原 PR；规则覆盖所述“1 lock＋1 School 产品源＋25 现有测试”形态，公开后仍按实际完整差异进行正常 CI。Docker backend-only 已独立公开 #469，不与本片捆绑，也不取消现有运行。
+
+## 测评前端入口与共享 React hook：使用完整 frontend，停止目录级 platform 回落
+
+观察基线 `8aa346942570f4aa92c0a2720b7b75ae24a43851`。只读核查公开 #454 `ec2efa5af653ebb0aaca0230830eb447880c7ba2`、#455 `018813ccb4f518b2ebe1ba46104009e9da96f432`、#460 `fbe32e62fdb9b6a348617441d2d647ea6b2e58cc`，各自 merge-base 完整 raw diff 为 3/3/9 文件，并集 15 文件（6 产品、6 测试、3 说明）。没有读取或组合 D 尚未公开的 `dceda4452059df5fa0fbbe1f242d82517ff95670`；它的精确合成仍由原实施线负责。
+
+实际差异与消费者：`training/courseAssessments.ts` 在未核实课程关系集合为空后停止后续页请求，仍保留原筛选/失败/动态 total/50 页上限；`PublicQuestionnaire.tsx` 只加单次 START 的 in-flight/入口 epoch 保护，原 POW、POST 和恢复凭据协议不变。`useCognitiveSession.ts` 将现有 abort lease 检查移到 GET 错误分支之前，并给 catch 同样的保护；trial envelope、checkpoint/final payload、API/类型和评分引擎无差异。`CognitiveAssignmentEntry.tsx` 在组件失效后停止账本和跳转回写；`CompositeReportPage.tsx` 按 pathname 重挂载，原报告加载/恢复协议不变；`SchoolCompositeRunner.tsx` 在 consent 返回后、START 发送前检查原入口身份。共享 hook 的其余试次/完成逻辑仍受完整前端检查，不能仅凭路径断言它的未来任意修改都无协议影响。
+
+原 `frontendFile` 整目录排除 cognitive/composite，故 #460 及组合落 platform；platform 随后强制全部 acceptance=true。#454 已走完整 frontend/browser，#455 加 canonical_visual→accept-ui，二者不需要进一步减项。本片只在既有完整分类中识别这两个模块的页面/组件 TSX、样式和 React use* hook（含对应测试），按架构角色判断，不列当前六文件、不加 scenario。原 `frontendFile`、`frontendAffected`、test-only 和依赖组合的准入不扩大，新增模块界面也不能取得这些窄路径资格。任务目录、CognitiveRunner、generated/registry、API/types、核心非 hook 的 ledger/envelope/timing、评分/算法/运行时/持久化协议来源，以及混入后台/schema/依赖/CI、异常模式、force-full，继续原范围。
+
+保留的必要检查及唯一位置：现有 frontend job 的锁定安装、audit、完整单测/类型，frontend-build 的正式构建，Docker 镜像扫描和 CodeQL/SAST；现有 backend-browser-build 为真实浏览器产出后台，并执行 `cognitive-ci-diagnostics.sh` 的全部 cognitive onboarding（含已声明 DOM/runner/stimulus suites）；原 browser 三组的真实 API/交互不缩矩阵。组合的实际 acceptance 仅 canonical_visual=true，因此保留 accept-ui。没有调用本片之外的后端单元/全量回归、全部媒体、性能或 Ops；没有改这些验收的阈值或失败结果。未改 A 的 `ci-backend-regression.yml` 或环境供应。
+
+本地 Node v24.21.0 六个受影响控制用例 PASS（约 0.18 秒，非 CI/业务时间承诺）：新模块页面/hooks、完整 consumer/失败汇总、engine/protocol/混合反例，以及既有 UI-only、measurement runtime、API/persistence 边界。真实三个 PR 及 15 文件并集只读分类均 frontend=true、frontend_affected=false、frontend_test=false；#454 无额外 acceptance，#455/#460/组合仅 canonical_visual，platformReasons 均空。汇总仍拒绝所选 job 的 failure/skipped/cancelled；没有将本地业务历史结果伪称新运行，也未复跑业务、浏览器、镜像、压测或部署。
+
+消除的维护工作：无需为每个新测评界面名称更新白名单或让整个后台/媒体/性能队列陪跑。保留共享 runtime 的全前端和真实消费者验证；若实际新差异改变 engine/scoring/协议，应按其真实文件及影响复核，不能用本次已审异步保护结论代替审阅。没有新门禁、哈希接纳、手工 enabled 或 GitHub 设置变化。

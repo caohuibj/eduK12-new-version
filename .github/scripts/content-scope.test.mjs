@@ -356,6 +356,63 @@ test('UI-only route saves backend regression but retains real API browser, Docke
     for (const result of ['skipped','cancelled','failure',undefined])
       assert.ok(failedChecks({...needs,[job]:{result}},false).includes(job));
 });
+test('measurement pages and React hooks use full frontend without widening narrow shortcuts',()=>{
+  const src='server-version/frontend/src/';
+  const files=[
+    'training/courseAssessments.ts','training/courseAssessments.pagination.test.ts',
+    'pages/public/PublicQuestionnaire.tsx','pages/public/__tests__/PublicQuestionnaire.start.test.tsx',
+    'modules/cognitive/core/useCognitiveSession.ts','modules/cognitive/core/__tests__/useCognitiveSession.error-race.test.tsx',
+    'modules/cognitive/pages/CognitiveAssignmentEntry.tsx','modules/cognitive/__tests__/CognitiveAssignmentEntry.navigation.test.tsx',
+    'modules/composite/CompositeReportPage.tsx','modules/composite/__tests__/CompositeReportPage.navigation.test.tsx',
+    'school/SchoolCompositeRunner.tsx','school/SchoolCompositeRunner.test.tsx',
+  ].map(file=>src+file).concat('docs/performance/frontend-entry-scope/README.md');
+  const entries=files.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+  const result=classifyChanges(entries);
+  assert.equal(result.frontend,true);assert.equal(result.frontend_affected,false);assert.equal(result.frontend_test,false);
+  // Architectural roles, not a list of the current six product files.
+  for(const file of ['modules/cognitive/pages/FutureEntry.tsx','modules/cognitive/components/Status.tsx',
+    'modules/composite/hooks/useReportNavigation.ts','modules/cognitive/core/useSessionNotice.ts']){
+    assert.equal(classify([src+file]).frontend,true,file);
+    assert.equal(frontendFile(src+file),false,file);
+  }
+  const tests=files.filter(file=>file.includes('/modules/')&&file.endsWith('.test.tsx'));
+  assert.equal(classify(tests).frontend,true);assert.equal(frontendTestOnly(tests),false);
+  const selected=acceptanceFor(files);
+  assert.equal(selected.canonical_visual,true);
+  for(const key of ['perf_smoke','media2','media7','situational_video','situational_branching'])assert.equal(selected[key],false,key);
+});
+test('measurement frontend retains cognitive and browser consumers and selected failures',()=>{
+  const src='server-version/frontend/src/';
+  const selected=acceptanceFor([src+'pages/public/PublicQuestionnaire.tsx',src+'modules/composite/CompositeReportPage.tsx']);
+  const outputs=scopeOutputs('false','false','true',Object.fromEntries(Object.entries(selected).map(([key,value])=>[key,String(value)])));
+  const needs={scope:{result:'success',outputs}};
+  const expected=['scope','backend-browser-build','frontend','browser','docker','frontend-build','codeql','accept-ui'];
+  assert.deepEqual(requiredChecks(needs,false),expected);
+  for(const name of expected)needs[name]={...needs[name],result:'success'};
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for(const name of expected)for(const result of ['failure','skipped','cancelled'])
+    assert.ok(failedChecks({...needs,[name]:{...needs[name],result}},false).includes(name),name+':'+result);
+  const build=readFileSync(new URL('../workflows/ci-backend-browser-build.yml',import.meta.url),'utf8');
+  assert.match(build,/bash "\$GITHUB_WORKSPACE\/\.github\/scripts\/cognitive-ci-diagnostics.sh"/);
+  const cognitive=readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
+  assert.match(cognitive,/cognitive:onboarding-check -- --all --json/);
+});
+test('measurement engines protocols and mixed components retain their original scope',()=>{
+  const ui='server-version/frontend/src/modules/composite/CompositeReportPage.tsx';
+  for(const file of ['modules/cognitive/pages/CognitiveRunner.tsx','modules/cognitive/tasks/cpt/runner.tsx',
+    'modules/cognitive/generated/runners.ts','modules/cognitive/registry.ts','modules/cognitive/api.ts','modules/cognitive/types.ts',
+    'modules/cognitive/core/session-ledger.ts','modules/cognitive/core/trial-envelope.ts','modules/cognitive/core/response-timing.ts',
+    'modules/composite/api.ts','modules/composite/types.ts','modules/composite/scoring.ts',
+    'modules/composite/components/scorer.tsx','modules/assessment-runtime/Runner.tsx','services/persistence/finalDraftStore.ts'])
+    assert.equal(classify([ui,'server-version/frontend/src/'+file]).frontend,false,file);
+  for(const file of ['server-version/backend/src/routes/cognitive.ts','server-version/backend/prisma/schema.prisma',
+    'server-version/frontend/package-lock.json','package-lock.json','.github/workflows/ci.yml'])
+    assert.equal(classify([ui,file]).frontend,false,file);
+  const entry={file:ui,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([entry],true).frontend,false);
+  for(const newMode of ['100755','120000','000000'])assert.equal(classifyChanges([{...entry,newMode}]).frontend,false);
+  for(const file of [ui.replace('/modules/','//modules/'),ui.replace('composite','..'),ui+'\n'])assert.equal(classify([file]).frontend,false);
+});
 test('measurement runtimes, timing/scoring, dependencies, schema and CI cannot use frontend route', () => {
   const ui = 'server-version/frontend/src/pages/Portal.tsx';
   for (const file of ['server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx',

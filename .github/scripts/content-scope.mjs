@@ -110,6 +110,18 @@ export function frontendFile(file) {
   return !/^server-version\/frontend\/src\/(?:modules\/(?:cognitive|situational|composite|assessment-runtime|assessment-bundle)\/|(?:api|types|services)\/|modules\/assessment-context\/|utils\/(?:scor|assessment|cognitive|situational)|.*(?:scoring|scorer|algorithm|finalizer|trial-timing|reference-data))/i.test(file);
 }
 
+// Measurement pages/components and React orchestration hooks need the full
+// frontend + cognitive onboarding + real API browser lane. Keep this separate
+// from frontendFile: related-tests, test-only and dependency-only shortcuts must
+// not acquire these shared consumers. Engine/protocol sources stay outside.
+function frontendModuleSurfaceFile(file) {
+  if (typeof file !== 'string' || /[\\\x00-\x1f\x7f]/.test(file)
+      || file.split('/').some(part => !part || part === '.' || part === '..')) return false;
+  const path = file.replace(/\/__tests__\//g, '/').replace(/\.(?:test|spec)\.(tsx?)$/, '.$1');
+  if (/\/(?:CognitiveRunner|api|types|registry)(?:[./-])|scoring|scorer|algorithm|finalizer|trial-timing|reference-data/i.test(path)) return false;
+  return /^server-version\/frontend\/src\/modules\/(?:cognitive|composite)\/(?:[^/]+\.(?:tsx|css|scss)|(?:pages|components)\/.+\.(?:tsx|css|scss)|hooks\/use[A-Z][^/]*\.tsx?|core\/use[A-Z][^/]*\.tsx?)$/.test(path);
+}
+
 // Bounded presentation/startup optimization, not a generic authorization/runtime
 // exemption. Complete raw diff admission keeps all other consumers unchanged.
 export const frontendPerformanceFiles = new Set([
@@ -267,11 +279,12 @@ export function maintenanceChange(files) {
 
 export function classify(files) {
   const domains = [...new Set(files.map(domainFor).filter(Boolean))].sort();
+  const frontend = file => frontendFile(file) || frontendModuleSurfaceFile(file);
   return {
     maintenance: maintenanceChange(files),
     documentation: files.length > 0 && files.every(documentationFile),
-    content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontendFile(file) || engineeringEvidenceFile(file)),
-    frontend: files.length > 0 && files.some(frontendFile) && files.every(file => domainFor(file) || frontendFile(file) || engineeringEvidenceFile(file)) && !files.filter(file=>!engineeringEvidenceFile(file)).every(presentationFile),
+    content: files.length > 0 && domains.length > 0 && files.every(file => domainFor(file) || frontend(file) || engineeringEvidenceFile(file)),
+    frontend: files.length > 0 && files.some(frontend) && files.every(file => domainFor(file) || frontend(file) || engineeringEvidenceFile(file)) && !files.filter(file=>!engineeringEvidenceFile(file)).every(presentationFile),
     presentation: files.some(presentationFile) && files.every(file=>presentationFile(file)||engineeringEvidenceFile(file)),
     domains,
   };
@@ -340,7 +353,7 @@ export function platformReasons(entries, forceFull = false) {
     if (!(modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
         || (status === 'M' && modes.includes(oldMode)))))
       reasons.push({file,reason:'deletion-or-file-type-or-mode-change'});
-    if (![domainFor(file),frontendFile(file),documentationFile(file),presentationFile(file),
+    if (![domainFor(file),frontendFile(file),frontendModuleSurfaceFile(file),documentationFile(file),presentationFile(file),
         maintenanceFile(file),maintenanceRoutingFiles.has(file)].some(Boolean))
       reasons.push({file,reason:'outside-scoped-allowlists'});
   }
