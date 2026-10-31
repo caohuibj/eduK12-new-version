@@ -1,0 +1,9 @@
+# 八项题库的最小集成接线
+
+唯一基础为PR477@605a3a5f5a03e23da442f0e17a6fb9486870e8dd。每组只交付自己的任务、schema/scorer、局部测试和说明；G1统一生成与汇总，不纳入PR441其余四项、IRT/CAT、native或其他技术储备。
+
+沿当前task-package机制发现任务，再调用既有manifest generator生成execution、catalog、seeds、presentation、scientific、identities及前端runners七个投影。每个新修订精确身份与其config/profile/report/fixture一致。旧身份保留为非推荐，新增DRAFT配置才进入推荐安装候选；不直接安装或公开发布。
+
+原题库的bank-meta依赖不在PR477，且主线安装链并不消费该PR441题库平台。本轮不接入其额外体系：题库保留只读来源附注，复用现有catalog的rightsProvenance与既有审核/发布链。若其他组仍引用该模块，由G1只做相同的局部类型/附注适配，不导入IRT或新发布门禁。
+
+管理员候选源在PR478直接来自generated seeds与registry推荐标记，不另加八项硬编码资格名单。新任务本身满足核心readiness才可安装DRAFT；安装不等同授权、发布或生产可用。其12项旧缺口说明会按已注册task ID过滤，不修改冻结PR478。本批尚未收齐前不将整批计为8项已完成。

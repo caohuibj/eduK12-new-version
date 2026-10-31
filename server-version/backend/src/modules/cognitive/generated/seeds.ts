@@ -35,15 +35,17 @@ import { seeds as task32 } from '../tasks/sentencecheck/seeds'
 import { seeds as task33 } from '../tasks/seqlearn/seeds'
 import { seeds as task34 } from '../tasks/timecopy/seeds'
 import { seeds as task35 } from '../tasks/letternumseries/seeds'
-import { seeds as task36 } from '../tasks/semanticfluency/seeds'
-import { seeds as task37 } from '../tasks/cancellation/seeds'
-import { seeds as task38 } from '../tasks/trustgame/seeds'
-import { seeds as task39 } from '../tasks/ufov/seeds'
-import { seeds as task40 } from '../tasks/pursuitrotor/seeds'
-import { seeds as task41 } from '../tasks/visualwm/seeds'
-import { seeds as task42 } from '../tasks/maze/seeds'
-import { seeds as task43 } from '../tasks/auditoryrt/seeds'
-import { seeds as task44 } from '../tasks/auditorynback/seeds'
+import { seeds as task36 } from '../tasks/wordanalogy/seeds'
+import { seeds as task37 } from '../tasks/wordmeaning/seeds'
+import { seeds as task38 } from '../tasks/semanticfluency/seeds'
+import { seeds as task39 } from '../tasks/cancellation/seeds'
+import { seeds as task40 } from '../tasks/trustgame/seeds'
+import { seeds as task41 } from '../tasks/ufov/seeds'
+import { seeds as task42 } from '../tasks/pursuitrotor/seeds'
+import { seeds as task43 } from '../tasks/visualwm/seeds'
+import { seeds as task44 } from '../tasks/maze/seeds'
+import { seeds as task45 } from '../tasks/auditoryrt/seeds'
+import { seeds as task46 } from '../tasks/auditorynback/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -85,7 +87,9 @@ export const cognitiveSeeds = [
   task34[0],
   task35[0],
   task36[0],
+  task36[1],
   task37[0],
+  task37[1],
   task38[0],
   task39[0],
   task40[0],
@@ -93,5 +97,7 @@ export const cognitiveSeeds = [
   task42[0],
   task43[0],
   task44[0],
+  task45[0],
+  task46[0],
   task21[1],
 ]

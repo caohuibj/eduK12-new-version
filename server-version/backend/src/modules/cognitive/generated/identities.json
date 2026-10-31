@@ -198,6 +198,26 @@
       "scoringVersion": "1.0.0"
     },
     {
+      "testType": "wordanalogy",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "wordanalogy",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "wordmeaning",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "wordmeaning",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
       "testType": "semanticfluency",
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0"
@@ -392,6 +412,22 @@
     {
       "testType": "letternumseries",
       "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "wordanalogy",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "wordanalogy",
+      "engineVersion": "1.1.0"
+    },
+    {
+      "testType": "wordmeaning",
+      "engineVersion": "1.0.0"
+    },
+    {
+      "testType": "wordmeaning",
+      "engineVersion": "1.1.0"
     },
     {
       "testType": "semanticfluency",

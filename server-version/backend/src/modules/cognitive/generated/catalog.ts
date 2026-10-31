@@ -34,15 +34,17 @@ import { catalog as task31 } from '../tasks/sentencecheck/governance'
 import { catalog as task32 } from '../tasks/seqlearn/governance'
 import { catalog as task33 } from '../tasks/timecopy/governance'
 import { catalog as task34 } from '../tasks/letternumseries/governance'
-import { catalog as task35 } from '../tasks/semanticfluency/governance'
-import { catalog as task36 } from '../tasks/cancellation/governance'
-import { catalog as task37 } from '../tasks/trustgame/governance'
-import { catalog as task38 } from '../tasks/ufov/governance'
-import { catalog as task39 } from '../tasks/pursuitrotor/governance'
-import { catalog as task40 } from '../tasks/visualwm/governance'
-import { catalog as task41 } from '../tasks/maze/governance'
-import { catalog as task42 } from '../tasks/auditoryrt/governance'
-import { catalog as task43 } from '../tasks/auditorynback/governance'
+import { catalog as task35 } from '../tasks/wordanalogy/governance'
+import { catalog as task36 } from '../tasks/wordmeaning/governance'
+import { catalog as task37 } from '../tasks/semanticfluency/governance'
+import { catalog as task38 } from '../tasks/cancellation/governance'
+import { catalog as task39 } from '../tasks/trustgame/governance'
+import { catalog as task40 } from '../tasks/ufov/governance'
+import { catalog as task41 } from '../tasks/pursuitrotor/governance'
+import { catalog as task42 } from '../tasks/visualwm/governance'
+import { catalog as task43 } from '../tasks/maze/governance'
+import { catalog as task44 } from '../tasks/auditoryrt/governance'
+import { catalog as task45 } from '../tasks/auditorynback/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -79,13 +81,15 @@ export const cognitiveCatalog = {
   'seqlearn': task32,
   'timecopy': task33,
   'letternumseries': task34,
-  'semanticfluency': task35,
-  'cancellation': task36,
-  'trustgame': task37,
-  'ufov': task38,
-  'pursuitrotor': task39,
-  'visualwm': task40,
-  'maze': task41,
-  'auditoryrt': task42,
-  'auditorynback': task43,
+  'wordanalogy': task35,
+  'wordmeaning': task36,
+  'semanticfluency': task37,
+  'cancellation': task38,
+  'trustgame': task39,
+  'ufov': task40,
+  'pursuitrotor': task41,
+  'visualwm': task42,
+  'maze': task43,
+  'auditoryrt': task44,
+  'auditorynback': task45,
 }
