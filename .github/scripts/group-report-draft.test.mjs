@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {groupReportLeafBranch,groupReportBranch,groupReportBase,groupReportFiles,groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
+import {groupReportStandaloneBranch,groupReportLeafBranch,groupReportBranch,groupReportBase,groupReportFiles,groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const env={CI_EVENT:'pull_request',CI_IS_DRAFT:'true',CI_HEAD_REF:groupReportBranch,CI_PR_NUMBER:'402',GITHUB_REPOSITORY:'caohuibj/eduK12-new-version'};
 const entries=groupReportFiles.map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
@@ -44,4 +44,14 @@ test('fixed Training Bundle leaf Draft uses the existing scope-only checkpoint w
  assert.throws(()=>groupReportDraftPlan(leaf,groupReportBase,head,{...leafEnv,CI_IS_DRAFT:'false'}));
  assert.throws(()=>groupReportDraftPlan([{...leaf[0],file:'server-version/backend/src/modules/reporting/personal-tracking.ts'}],groupReportBase,head,leafEnv));
  const parent='c'.repeat(40),source='d'.repeat(40);assert.equal(groupReportDiffBase(groupReportBase,head,{...leafEnv,CI_SOURCE_HEAD:source},()=>`tree ${'e'.repeat(40)}\nparent ${parent}\nparent ${source}\n`),parent);
+});
+
+test('standalone Cognitive Draft stays within the existing source checkpoint and cannot qualify Ready',()=>{
+ const nativeEnv={...env,CI_HEAD_REF:groupReportStandaloneBranch},native=[{file:'server-version/backend/src/modules/training-analysis/group-report.service.ts',status:'M',oldMode:'100644',newMode:'100644'},{file:'docs/development/group-report-source-matrix-20261030.md',status:'A',oldMode:'000000',newMode:'100644'}];
+ const p=groupReportDraftPlan(native,groupReportBase,head,nativeEnv),o=Object.fromEntries(Object.entries(groupReportDraftOutputs(p)).map(([k,v])=>[k,String(v)]));
+ assert.deepEqual(requiredChecks({scope:{result:'success',outputs:o}},true),['scope']);
+ assert(failedChecks({scope:{result:'success',outputs:o}},false).includes('group-report-ready-qualification-required'));
+ assert.equal(o.codeql,'false');assert.equal(o.frontend,'false');assert.equal(o.application_route,'group-report-draft');
+ for(const file of ['server-version/backend/src/modules/composite/composite.service.ts','server-version/backend/prisma/schema.prisma','server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts'])assert.throws(()=>groupReportDraftPlan([{...native[0],file}],groupReportBase,head,nativeEnv));
+ assert.throws(()=>groupReportDraftPlan(native,groupReportBase,head,{...nativeEnv,CI_IS_DRAFT:'false'}));
 });

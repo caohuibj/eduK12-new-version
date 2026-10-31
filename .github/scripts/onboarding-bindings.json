@@ -4212,6 +4212,138 @@
         "frontend": "43e5e363e2b8ac8f40da27af293d02a73a89eb8c"
       },
       "activationNote": "Ready synchronize after initial Draft/Ready event competition; exact source/control unchanged, original cancelled/Draft runs retained. Qualify existing admission, scoped SAST and stable gate only."
+    },
+    "422": {
+      "schemaVersion": 1,
+      "pr": 422,
+      "enabled": true,
+      "base": "0a9c565ce9a46793363fd1b40a3e7a0b1d124019",
+      "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
+      "controlCheckpoint": "3cc544510241948e161f85cf4bc1e30978c45df5",
+      "components": {
+        "backend": "3981ae7a7afa5716834f69315b708075b93c6c76",
+        "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/group-report-draft.mjs": "4d4f3723852831f5658cedca7581c8db6f5d903b",
+        ".github/scripts/group-report-draft.test.mjs": "74fd84665dfb994ec7474fdaebf24ca38b806ced",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "7e9a0c3f0253d2488a492e52300063a91a6aa014",
+        ".github/scripts/onboarding-checks.mjs": "5a66ec97be97383964746ef00b604e4a369d11c0",
+        ".github/scripts/onboarding-controls.test.mjs": "b208f5ff03f0a4ab9f0b23debc22112489608159",
+        ".github/scripts/onboarding-evidence.json": "1e7596adb0f37da1dbc29937e27abe9aee451ecf",
+        ".github/scripts/onboarding-scope.mjs": "ec582fcd083c1411f528e973e11c1aed394f582e",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "7af093473eb685e3c449f2eab3e0c9f85e57eea5"
+      },
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": null,
+          "after": "b048a3f18702f3eab76083826cf5ed429ff39997"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/README.md": {
+          "before": null,
+          "after": "5ec2800e7dcfdfce6b825d7542f6a54ddc5f93dd"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/backend-types-original.json.gz": {
+          "before": null,
+          "after": "7f1e24031f1854737cf9dc4c55d8e0f28c8e4d6c"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/backend-types.json": {
+          "before": null,
+          "after": "0848f98bd71197889ee9b71f3847650f54ba855f"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/draft-control-first.log": {
+          "before": null,
+          "after": "4492ddf0e265d7d3b83954c193b008d5d70bda9c"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/draft-control-repair.log": {
+          "before": null,
+          "after": "06c6f8c9db06b4fc29c2c4b4da5cbad313567b4d"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-archive.json": {
+          "before": null,
+          "after": "2baebcf937275780f3148d8916efd674cf0ea473"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-archive.log": {
+          "before": null,
+          "after": "165685e19c661b73b38884acd7a5b849fe163df0"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-first.json": {
+          "before": null,
+          "after": "52f8e24e3796d394b9f3e574c8156997f324a575"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-first.log": {
+          "before": null,
+          "after": "eed77b77951ab88971c0fc71dcc6ec7f7c008b16"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-archived-proof.json": {
+          "before": null,
+          "after": "85e7f30a229a681f3612bab22b8b1f45c09d66df"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-proof.json": {
+          "before": null,
+          "after": "864df1b3e47e5e2cfaef4b758c07d42643f1f9ff"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-current.json": {
+          "before": null,
+          "after": "14e34f6ef3fbfe92af555d3999e3925b00c83245"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-current.log": {
+          "before": null,
+          "after": "35ac2af689e92252ba9a06719ee2631f7c7fd9ed"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-first.json": {
+          "before": null,
+          "after": "4cc7fdd6468de667de5aacfd3dcdaf6107041885"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-first.log": {
+          "before": null,
+          "after": "fe38531435b6adea1f431d87dd934d4bf486898a"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-repair.json": {
+          "before": null,
+          "after": "f4d8717a18d4ed95c20fdc49230da6b265e1622d"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-repair.log": {
+          "before": null,
+          "after": "79370440473220bb62140edc1eb2f539a24bc97e"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "97e56112e547ad350daa3500b1b8f96a53fd53d9"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts": {
+          "before": null,
+          "after": "3a580a3fedb833d49f1aebd2ef71e4bcf4bfba0d"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "542307abd805eaca6559dac518688060acbca5db",
+          "after": "e777b59546ad3a41d7888e1c2f91cd5875b03309"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": "968ad284663fcbcd785ed725c42c1aae8e2c388b",
+          "after": "3c66d2199b82f8650ba00137c605a126f317a1cf"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "785694ca8c7f769cca173036d2f2517c9d25e5a7",
+          "after": "5c604adeef92dd997944f33f188ba1ca48403b46"
+        }
+      },
+      "activationNote": "Existing backend-only onboarding route422. Original4 distinct app cases,2 native observations and exact final backend type receipt admitted unsigned with source-capture limits disclosed. No app/PG/browser/frontend/participant replay,no schema change,no new workflow. Scope/admission/CodeQL/gate only;not a merge or deployment."
     }
   }
 }
