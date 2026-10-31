@@ -1,0 +1,33 @@
+{
+  "sourceBase": "aa840084f97af4259275e4ba1192d4b42556a2f2",
+  "status": "local School-owned leaf adapter; shared two-consumer hook prepared, not applied",
+  "observations": {
+    "pureCanonicalContract": 1,
+    "actualPublishedMetadataContinuation": 1,
+    "boundedSqlEvents": 11,
+    "finalFactQueries": 0,
+    "newPublishOrFinal": 0,
+    "backendTypesExit": 0
+  },
+  "notExecuted": [
+    "two-wave FINAL and own/single/group-longitudinal report journey",
+    "formal CI",
+    "migration/restore qualification"
+  ],
+  "noReplay": [
+    "previous source publication case",
+    "15 School plan observations",
+    "22 Survey/Training observations",
+    "37 previous native observations",
+    "Group shared-reader cases"
+  ],
+  "files": {
+    "school-shared-resolver-hooks.json": "caf5e431f2d6f5e5c522475ee2e52845344b1eab489e159622e500525576463b",
+    "leaf-contract.log": "7a5ff031435c865bfc896ef2e049f2ede4be6ab84060beca9e780bebc9608b26",
+    "verify-school-leaf-metadata.ts": "fddf1633fabbba8dd5f2be29213d00a35a2e05a3cb19014f50446c3923981763",
+    "leaf-contract.json": "4fbbf851a358a240f4d5e5b589803272e586e375dcbd457392b2dc11265f46ae",
+    "leaf-backend-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "leaf-published-metadata.log": "695af4886db822364b155f6e50afd02b67266ceda7e6d0d511e5488b531a40a6",
+    "leaf-backend-types-final.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  }
+}

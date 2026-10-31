@@ -1,3 +1,4 @@
+import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {readEducationNativeBundleFeedback} from '../bundle-product/education-adapter'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -150,7 +151,7 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     }
     if(formOnly){await recheck();return response('COMPLETED','本次表单已正式完成，当前只提供完成确认。')}
     if(rule.mode==='COMPLETION_ONLY'){await recheck();return response('COMPLETED','本次作答已完成，当前仅提供完成确认。')}
-    if(rule.mode!=='INDIVIDUAL_SUMMARY'||own.policy.analysisMode!=='INDIVIDUAL_ONLY')hidden()
+    if(rule.mode!=='INDIVIDUAL_SUMMARY'||own.policy.analysisMode!=='INDIVIDUAL_ONLY'&&!isSelfGroupV2Entry(source.entry))hidden()
     // Existing current respondent disclosure remains an independent ceiling.
     const summary=await readRespondentRunSummary(input.actorUserId,input.executionId,{disclosureOnly:true,db:tx})
     if(summary.state!=='READY'||summary.mode!=='INDIVIDUAL_SUMMARY'){
@@ -182,9 +183,14 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       facts.set(unit.itemId,envelope)
     }
     const available=new Set(Array.isArray(summary.metricKeys)?summary.metricKeys:[])
+    const metricKeysByItem=isSelfGroupV2Entry(source.entry)?new Map(origin.units.map(unit=>{
+      const leaf=validateResultDisclosureContract(unit.groupDisclosure).audiences.RESPONDENT
+      return [unit.itemId,new Set(leaf.mode==='INDIVIDUAL_SUMMARY'?leaf.metricKeys.filter(key=>available.has(key)&&rule.metricKeys.includes(key)):[])]
+    })):undefined
     const reports=projectEducationAssessmentReports({product:input.product,origin,binding,receipt,references,releases:source.releases,facts,
-      metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key)))})
-    const nativeBundle=origin.nativeBundle&&source.runtime.bundleInstance?await readEducationNativeBundleFeedback({db:tx,attemptId:parent.id,instance:source.runtime.bundleInstance,identity:origin.nativeBundle,availableItemIds:new Set(reports.filter(r=>r.status==='READY').map(r=>r.itemId)),metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key)))}):undefined
+      metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key))),
+      ...(metricKeysByItem?{metricKeysByItem}:{})})
+    const nativeBundle=origin.nativeBundle&&source.runtime.bundleInstance?await readEducationNativeBundleFeedback({db:tx,attemptId:parent.id,instance:source.runtime.bundleInstance,identity:origin.nativeBundle,availableItemIds:new Set(reports.filter(r=>r.status==='READY').map(r=>r.itemId)),metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key))),...(metricKeysByItem?{metricKeysByItem}:{})}):undefined
     await recheck()
     return {schemaVersion:1 as const,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT' as const,state:'READY' as const,mode:'INDIVIDUAL_SUMMARY' as const,
       message:'以下反馈依据本次作答冻结、且当前获准开放的工具与报告版本展示。',reports,...(nativeBundle?{nativeBundle}:{})}

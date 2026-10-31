@@ -3,9 +3,9 @@ import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricSummary, type GroupToolKind, type TaskGroupProjection } from '../reporting/group-summary'
-import { listTaskGroupArtifactsForContainer, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
+import { listTaskGroupArtifactsPage, type TaskArtifactCursor, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
 import { TRAINING_ANALYSIS_MINIMUM_N } from './core'
-import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasks, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
+import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasksPage, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
 import { readTrainingAnalysisQuality, trainingResearchReason } from './service'
 import type { TrainingAnalysisRequestV1 } from './types'
 import type { TrainingGroupSource } from './group-source'
@@ -30,13 +30,20 @@ export function trainingGroupDisclosure(metrics: GroupMetricSummary[], completed
   return {metrics: projection, completedN: completedN >= floor && projection.every(metric => metric.missingN !== null) ? completedN : null}
 }
 
-export async function listTrainingGroupReports(input: Scope) {
-  return prisma.$transaction(async tx => {
-    const tasks = await listTrainingGroupTasks(tx, input.actor, input.courseId)
-    const allowed = new Set(tasks.map(task => task.id))
-    const artifacts = (await listTaskGroupArtifactsForContainer(tx, 'TRAINING', input.courseId)).filter(row => allowed.has(row.taskId))
-    return {tasks, artifacts}
-  }, {isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead})
+async function taskHistory(tx:Prisma.TransactionClient,input:Scope&{taskId:string;before?:TaskArtifactCursor}){
+ await assertTrainingGroupAccess(tx,input.actor,input.courseId,input.taskId)
+ return listTaskGroupArtifactsPage(tx,sourceOf(input.courseId,input.taskId),input.before)
+}
+export async function trainingGroupHistory(input:Scope&{taskId:string;before?:TaskArtifactCursor}){
+ return prisma.$transaction(tx=>taskHistory(tx,input),{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
+}
+export async function listTrainingGroupReports(input:Scope&{beforeTaskId?:string}){
+ return prisma.$transaction(async tx=>{
+  const page=await listTrainingGroupTasksPage(tx,input.actor,input.courseId,input.beforeTaskId)
+  const taskId=page.tasks[0]?.id
+  const history=taskId?await taskHistory(tx,{...input,taskId}):{artifacts:[],nextCursor:null}
+  return {...page,taskId:taskId??null,...history,artifacts:history.artifacts.map(pointer=>({...pointer,taskId:taskId!}))}
+ },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 export async function trainingGroupTools(input: Scope & {taskId: string}) {
   return prisma.$transaction(async tx => {

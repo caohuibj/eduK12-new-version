@@ -18,6 +18,8 @@ import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
+import {assertSelfGroupOwnSummaryCeiling,SELF_GROUP_POLICY_VERSION} from '../assessment-policy/self-group-contract'
 import {buildTrainingFlowUnits} from '../composite/training-flow-definition'
 import {trainingContentSnapshotSchema,type TrainingContentSnapshot} from '../composite/training-content-binding'
 import {trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
@@ -35,7 +37,8 @@ import {educationCompositeInclude,lockEducationAssessmentSourceIdentities,readEd
 type Tx=Prisma.TransactionClient
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const prepareEducationAssessmentSchema=z.object({resourceId:uuid,sourceCompositeId:uuid,title:z.string().trim().min(1).max(200),family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),licenses:educationDistributionSelectionSchema,publicPackage:educationPackageReferenceSchema.optional()}).strict()
-export const registerEducationAssessmentSchema=z.object({expectedPreparationHash:hash,disclosure:z.unknown(),feedbackPolicy:trainingFeedbackPolicySchema.transform(parseTrainingFeedbackPolicy),references:trainingReferenceSelectionSchema,
+export const registerEducationAssessmentSchema=z.object({analysisMode:z.enum(['INDIVIDUAL_ONLY','COHORT_AGGREGATE']).optional(),
+ groupUnits:z.array(z.object({itemId:uuid,disclosure:z.unknown()}).strict()).min(1).max(1000).optional(),expectedPreparationHash:hash,disclosure:z.unknown(),feedbackPolicy:trainingFeedbackPolicySchema.transform(parseTrainingFeedbackPolicy),references:trainingReferenceSelectionSchema,
  reports:z.array(z.object({itemId:uuid,releaseId:uuid}).strict()).max(1000),licenses:educationDistributionSelectionSchema}).strict()
 export const transitionEducationAssessmentSchema=z.object({expectedEntryHash:hash,reason:z.string().trim().min(1).max(500)}).strict()
 const preparationSchema=z.object({schemaVersion:z.literal(1),resourceId:uuid,product:z.enum(['SCHOOL','TEACHER']),organizationId:uuid,
@@ -253,7 +256,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
    if((prior?.metadata as {inputHash?:string}|undefined)?.inputHash!==canonicalHash(input))fail('EDUCATION_ASSESSMENT_ALREADY_FROZEN')
    const row=await header(tx,c,id),origin=educationAssessmentOriginSchema.parse(row.entry.educationOrigin)
    const entry=draftEducationAssessmentEntry({origin,title:p.title,disclosure:row.entry.resultDisclosure})
-   return {resourceId:id,resourceKey:key(c,id),version:'1.0.0',status:row.status,entryHash:row.entry_hash,entry:{...entry,releaseStatus:row.entry.releaseStatus as 'DRAFT'|'PUBLISHED'}}
+   return {resourceId:id,resourceKey:key(c,id),version:origin.adapterVersion,status:row.status,entryHash:row.entry_hash,entry:{...entry,releaseStatus:row.entry.releaseStatus as 'DRAFT'|'PUBLISHED'}}
   }
   const {source,content}=await readEducationAssessmentSource(tx,p.sourceCompositeId,identities,c.product)
   if(canonicalHash(source.trainingContentSnapshot)!==p.sourceSnapshotHash||canonicalHash(buildTrainingFlowUnits(source))!==p.sourceDefinitionHash)fail('EDUCATION_ASSESSMENT_SOURCE_CHANGED')
@@ -265,20 +268,42 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
    if(!preservesEducationPackageSelection(p.snapshot,{references:input.references,reports:input.reports}))fail('EDUCATION_PACKAGE_SELECTION_IMMUTABLE',400)
   }
   const selected=await selectedContent(tx,c,p,p.snapshot,input)
+  const group=input.analysisMode==='COHORT_AGGREGATE'
+  const adapterVersion=group?SELF_GROUP_POLICY_VERSION:'1.0.0'
+  if(group){
+   if(!input.groupUnits||input.groupUnits.length!==selected.snapshot.units.length
+    ||new Set(input.groupUnits.map(unit=>unit.itemId)).size!==input.groupUnits.length
+    ||input.groupUnits.some(unit=>!selected.snapshot.units.some(value=>value.itemId===unit.itemId)))fail('EDUCATION_GROUP_EXPLICIT_LEAVES_REQUIRED',400)
+   selected.snapshot=trainingContentSnapshotSchema.parse({...selected.snapshot,units:selected.snapshot.units.map(unit=>({...unit,source:{...unit.source,
+    ...(unit.source.educationBinding?{educationBinding:{...unit.source.educationBinding,resourceVersion:adapterVersion}}:{})}}))})
+  }else if(input.groupUnits)fail('EDUCATION_GROUP_EXPLICIT_MODE_REQUIRED',400)
   const assets=educationAssessmentAssets(runtime,selected.releases.values())
   await assertEducationAssessmentAssets(tx,assets)
   const distribution=await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,selection:input.licenses,
    resourceIds:[source.id,...selected.releases.keys(),...assets.map(asset=>asset.assetId)]})
   for(const original of p.distribution.grants)if(!distribution.grants.some(grant=>grant.resourceId===original.resourceId&&grant.grantId===original.grantId&&grant.version===original.version))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_CHANGED',403)
-  const origin=educationAssessmentOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',resourceId:id,product:c.product,organizationId:c.organizationId,family:p.family,
+  const origin=educationAssessmentOriginSchema.parse({schemaVersion:1,adapterVersion,resourceId:id,product:c.product,organizationId:c.organizationId,family:p.family,
    sourceCompositeId:source.id,runtimeCompositeId:runtime.id,sourceSnapshotHash:p.sourceSnapshotHash,runtimeSnapshotHash:canonicalHash(selected.snapshot),runtimeDefinitionHash:p.runtimeDefinitionHash,
    distribution,...(p.nativeBundle?{nativeBundle:p.nativeBundle}:{}),...(p.publicPackage?{publicPackage:p.publicPackage}:{}),feedbackPolicy:input.feedbackPolicy,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
-    references:[...new Map((unit.referencePolicy?.choices??[]).map(choice=>[choice.releaseId,{releaseId:choice.releaseId,contentHash:choice.contentHash}])).values()],report:unit.report??null}))})
+    references:[...new Map((unit.referencePolicy?.choices??[]).map(choice=>[choice.releaseId,{releaseId:choice.releaseId,contentHash:choice.contentHash}])).values()],report:unit.report??null,
+    ...(group?{groupDisclosure:input.groupUnits!.find(value=>value.itemId===unit.itemId)!.disclosure}:{})}))})
   const entry=(()=>{try{return draftEducationAssessmentEntry({origin,title:p.title,disclosure:input.disclosure})}
    catch(error){if(error instanceof z.ZodError)throw error;fail('EDUCATION_ASSESSMENT_DISCLOSURE_INVALID',400)}})()
   if(!origin.units.length&&entry.resultDisclosure?.audiences.RESPONDENT.mode==='INDIVIDUAL_SUMMARY')fail('EDUCATION_ASSESSMENT_FORM_COMPLETION_ONLY')
   const approvedMetrics=new Set([...selected.releases.values()].flatMap(release=>release.layer==='REPORT'?release.content.metricKeys:[]))
   if(entry.resultDisclosure?.audiences.RESPONDENT.metricKeys.some(metric=>!approvedMetrics.has(metric)))fail('EDUCATION_ASSESSMENT_DISCLOSURE_REPORT_REQUIRED',403)
+  if(group)for(const unit of origin.units){
+   const contract=validateResultDisclosureContract(unit.groupDisclosure),measurement=selected.releases.get(unit.measurement.releaseId)
+   const report=unit.report?selected.releases.get(unit.report.releaseId):null
+   const ownMetrics=report?.layer==='REPORT'?report.content.metricKeys:[]
+   const allowed=measurement?.layer==='MEASUREMENT'?measurement.content.metrics.map(value=>value.metricKey):[]
+   if(Object.values(contract.audiences).some(rule=>rule.metricKeys.some(metric=>!allowed.includes(metric))))fail('EDUCATION_GROUP_METRIC_NOT_DEFINED',403)
+   const approved=validateResultDisclosureContract({...contract,minimumRespondents:null,audiences:{...contract.audiences,
+    RESPONDENT:{mode:ownMetrics.length?'INDIVIDUAL_SUMMARY':'NONE',metricKeys:ownMetrics,longitudinalMetricKeys:ownMetrics},
+    SUBJECT:{mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]},TEACHER:{mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]},
+    PROFESSIONAL:{mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]},ORGANIZATION:{mode:'NONE',metricKeys:[],longitudinalMetricKeys:[]}}})
+   assertSelfGroupOwnSummaryCeiling({approved,proposed:contract})
+  }
   await content.recheckSourceLicenses();await retainEducationAssessmentIssuers(tx,c,[p.createdAuthority,actor]);await captureEducationAssessmentIssuer(tx,c)
   await assertEducationAssessmentDistributionCurrent(tx,origin)
   await tx.compositeAssessment.update({where:{id:runtime.id},data:{trainingContentSnapshot:selected.snapshot,trainingContentSnapshotHash:origin.runtimeSnapshotHash}})
@@ -286,7 +311,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
    (id,product,organization_id,family,source_composite_id,runtime_composite_id,entry,entry_hash,created_by_user_id,created_authority)
    VALUES(${id},${c.product},${c.organizationId},${p.family},${source.id},${runtime.id},${JSON.stringify(entry)}::jsonb,${canonicalHash(entry)},${c.principal.userId},${JSON.stringify(actor)}::jsonb)`)
   await event(tx,c,id,'EDUCATION_ASSESSMENT_REGISTERED',{entryHash:canonicalHash(entry),inputHash:canonicalHash(input)})
-  return {resourceId:id,resourceKey:key(c,id),version:'1.0.0',status:'DRAFT',entryHash:canonicalHash(entry),entry}
+  return {resourceId:id,resourceKey:key(c,id),version:origin.adapterVersion,status:'DRAFT',entryHash:canonicalHash(entry),entry}
  })
 }
 async function header(tx:Tx,c:EducationAssessmentContext,id:string,lock=false){
@@ -307,7 +332,7 @@ export async function transitionEducationAssessment(c:EducationAssessmentContext
   if(row.status===targetStatus){
    const prior=await tx.assessmentManagementEvent.findFirst({where:{resourceId:id,actorId:c.principal.userId,action:'EDUCATION_ASSESSMENT_'+action}})
    if((prior?.metadata as {inputHash?:string}|undefined)?.inputHash===canonicalHash(input))
-    return {resourceId:id,resourceKey:key(c,id),version:'1.0.0',status:row.status,entryHash:row.entry_hash}
+    return {resourceId:id,resourceKey:key(c,id),version:origin.adapterVersion,status:row.status,entryHash:row.entry_hash}
   }
   if(row.entry_hash!==input.expectedEntryHash||row.status!==({REVIEW:'DRAFT',PUBLISH:'REVIEWED',RETIRE:'PUBLISHED'} as const)[action])fail('EDUCATION_ASSESSMENT_STATE_CONFLICT')
   if(action==='REVIEW'&&row.created_by_user_id===c.principal.userId)fail('EDUCATION_ASSESSMENT_INDEPENDENT_REVIEW_REQUIRED',403)
@@ -338,9 +363,9 @@ export async function transitionEducationAssessment(c:EducationAssessmentContext
    ${action==='REVIEW'?Prisma.sql`reviewed_by_user_id=${c.principal.userId},reviewed_at=clock_timestamp(),reviewed_authority=${JSON.stringify(actor)}::jsonb`:
     action==='PUBLISH'?Prisma.sql`published_by_user_id=${c.principal.userId},published_at=clock_timestamp(),published_authority=${JSON.stringify(actor)}::jsonb`:
     Prisma.sql`retired_by_user_id=${c.principal.userId},retired_at=clock_timestamp()`} WHERE id=${id}`)
-  if(action==='PUBLISH')await readEducationAssessmentDeliveryIdentity(tx,{resourceKey:key(c,id),version:'1.0.0',purpose:'NEW_USE'})
+  if(action==='PUBLISH')await readEducationAssessmentDeliveryIdentity(tx,{resourceKey:key(c,id),version:origin.adapterVersion,purpose:'NEW_USE'})
   await event(tx,c,id,'EDUCATION_ASSESSMENT_'+action,{reason:input.reason,fromStatus:row.status,toStatus:status,entryHash:canonicalHash(entry),authority:actor,inputHash:canonicalHash(input)})
-  return {resourceId:id,resourceKey:key(c,id),version:'1.0.0',status,entryHash:canonicalHash(entry)}
+  return {resourceId:id,resourceKey:key(c,id),version:origin.adapterVersion,status,entryHash:canonicalHash(entry)}
  })
 }
 export async function listEducationAssessmentRegistrations(c:EducationAssessmentContext,cursor?:string){
@@ -436,7 +461,7 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
     AND grant_row.revoked_at IS NULL AND grant_row.valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND grant_row.expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
    ${cursor?Prisma.sql`AND release.id>${cursor}`:Prisma.empty} ORDER BY release.id LIMIT 51`)
   const page=rows.slice(0,50),nextCursor=rows.length>50?page[49].id:null
-  const releases=await getContentReleaseBatch(tx,page.map(row=>row.id),true),units=[]
+  const releases=await getContentReleaseBatch(tx,[...new Set([...page.map(row=>row.id),...measurementIds])],true),units=[]
   for(const unit of p.snapshot.units){
    const references=[],reports=[]
    for(const row of page){
@@ -460,7 +485,9 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
      choices:availability.selectable?release.content.entries.map(entry=>({entryKey:referenceEntryKey(entry.definition as unknown as AssessmentReferenceEntry),metricKey:entry.metricKey,referenceKind:entry.referenceKind})):[]})
     if(release.layer==='REPORT')reports.push({releaseId:release.releaseId,contentHash:release.contentHash,...availability,audience:release.content.audience,title:release.content.template.title??null,metricKeys:availability.selectable?release.content.metricKeys:[]})
    }
-   units.push({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,references,reports})
+   const measurement=releases.get(unit.measurement.releaseId)
+   const groupMetricKeys=measurement?.layer==='MEASUREMENT'?measurement.content.metrics.map(metric=>metric.metricKey):[]
+   units.push({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,groupMetricKeys,references,reports})
   }
   return {units,emptySelectionAllowed:true,nextCursor}
  })

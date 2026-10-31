@@ -758,7 +758,19 @@ export function trainingGroupSnapshotHash(row: any) {
     canonicalDigest: row.canonicalDigest ?? (row.canonicalResultEncrypted ? createHash('md5').update(row.canonicalResultEncrypted).digest('hex') : null), collectionDigest: row.collectionDigest ?? (row.collectionFactsEncrypted ? createHash('md5').update(row.collectionFactsEncrypted).digest('hex') : null), completedAt: iso(row.completedAt)})
 }
 
-export async function listTrainingGroupTasks(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
-  await assertTrainingGroupAccess(tx, actor, courseId)
-  return tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100})
+/** Task history authorizes the actual fixed task, independently of this menu. */
+export async function listTrainingGroupTasksPage(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,beforeTaskId?:string){
+ await assertTrainingGroupAccess(tx,actor,courseId,beforeTaskId)
+ const rows=await tx.compositeAssessment.findMany({where:{...authorizedTaskWhere(actor,courseId,true),publishedAt:{not:null}},
+  select:{id:true,name:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:101,
+  ...(beforeTaskId?{cursor:{id:beforeTaskId},skip:1}:{})})
+ const tasks=rows.slice(0,100)
+ return {tasks,nextTaskId:rows.length>100?tasks[99].id:null}
+}
+export async function listTrainingGroupTasks(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string){return (await listTrainingGroupTasksPage(tx,actor,courseId)).tasks}
+/** Scope every wave by the original course/task authority, without a recent menu cutoff. */
+export async function listTrainingGroupPlanTasks(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,baselineId:string){
+ await assertTrainingGroupAccess(tx,actor,courseId,baselineId)
+ return tx.compositeAssessment.findMany({where:{...authorizedTaskWhere(actor,courseId,true),personalTrackingBaselineId:baselineId,status:{in:['PUBLISHED','ARCHIVED']}},
+  orderBy:[{personalTrackingOrdinal:'asc'},{id:'asc'}],take:101,select:{id:true,name:true,personalTrackingOrdinal:true,personalTracking:true}})
 }

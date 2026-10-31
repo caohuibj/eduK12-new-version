@@ -6,13 +6,21 @@ import {Prisma} from '@prisma/client'
 export function privateScaleRegistryIdentitySql(input:{registered:Prisma.Sql;organizationId:Prisma.Sql;product:'SCHOOL'|'TEACHER'}){
  const r=input.registered
  return Prisma.sql`(
-  ${r}.resource_version='1.0.0' AND ${r}.status='PUBLISHED'
-  AND ${r}.entry->'privateOrigin'->>'schemaVersion'='1'
-  AND ${r}.entry->'privateOrigin'->>'adapterVersion'='1.0.0'
+  ${r}.status='PUBLISHED'
+  AND ((${r}.resource_version='1.0.0' AND ${r}.entry->'privateOrigin'->>'schemaVersion'='1'
+        AND ${r}.entry->'privateOrigin'->>'adapterVersion'='1.0.0')
+    OR (${input.product}='SCHOOL' AND ${r}.resource_version='2.0.0'
+        AND ${r}.entry->'privateOrigin'->>'schemaVersion'='2' AND ${r}.entry->'privateOrigin'->>'adapterVersion'='2.0.0'
+        AND ${r}.entry->'privateOrigin'->>'variantKey'='STUDENT:SELF'
+        AND ${r}.entry#>>'{applicability,analysisMode}'='COHORT_AGGREGATE'
+        AND ${r}.entry#>>'{resultDisclosure,policyKey}'='EDUCATION_SELF_GROUP_V2'
+        AND ${r}.entry#>>'{cohortAnalysisPolicy,policyKey}'='EDUCATION_SELF_GROUP_V2'
+        AND ${r}.entry#>>'{cohortAnalysisPolicy,policyVersion}'='2.0.0'))
   AND ${r}.entry->'privateOrigin'->>'kind'='AUTHOR_PRIVATE'
   AND ${r}.entry->'privateOrigin'->>'entry'=${input.product}
   AND ${r}.entry->'privateOrigin'->>'organizationId'=${input.organizationId}
   AND ${r}.resource_key='private-scale:'||${input.product}||':'||(${r}.entry->'privateOrigin'->>'versionId')||':'||(${r}.entry->'privateOrigin'->>'variantKey')
+   ||CASE WHEN ${r}.resource_version='2.0.0' THEN ':GROUP:'||education_composition_binding_hash(${r}.entry#>'{privateOrigin,groupReporting}') ELSE '' END
   AND ${r}.entry->'privateOrigin'->>'variantKey' IN (${Prisma.join(input.product==='SCHOOL'?['STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT']:['TEACHER:SELF'])})
   AND EXISTS(SELECT 1 FROM education_private_tool_versions private_version
    JOIN scales private_scale ON private_scale.id=${r}.scale_id

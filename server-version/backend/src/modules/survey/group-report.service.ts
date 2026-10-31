@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { groupFormMetricType, summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricObservation, type TaskGroupProjection } from '../reporting/group-summary'
-import { listTaskGroupArtifacts, readTaskGroupArtifact, publicTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
+import { listTaskGroupArtifactsPage, type TaskArtifactCursor, readTaskGroupArtifact, publicTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
 import { authorizedProject } from './builder.service'
 import { SurveyAnalyticsError } from './analytics.errors'
 import { loadSurveySource, loadSurveyItemDictionary, type SurveySourceProjection } from './analytics.source'
@@ -25,8 +25,13 @@ export async function surveyGroupCatalog(input: Scope) {
   const tools = dictionary.tools ?? []
   return { tools, ...(await prisma.$transaction(async db => {
     await authorize(db, input)
-    return { artifacts: await listTaskGroupArtifacts(db, sourceOf(input.projectId, input.waveId)) }
+    return listTaskGroupArtifactsPage(db,sourceOf(input.projectId,input.waveId))
   })) }
+}
+
+/** Page stored pointers only; dictionary, facts and FINAL are not loaded. */
+export async function surveyGroupHistory(input:Scope&{before?:TaskArtifactCursor}){
+ return prisma.$transaction(async db=>{await authorize(db,input);return listTaskGroupArtifactsPage(db,sourceOf(input.projectId,input.waveId),input.before)})
 }
 
 /** Pure adapter: select one frozen slot before looking at metric keys. */

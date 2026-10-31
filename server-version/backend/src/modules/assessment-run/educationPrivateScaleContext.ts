@@ -32,8 +32,8 @@ export async function assertPrivateScaleRunWorkflow(tx:Prisma.TransactionClient,
 }
 export async function assertPrivateScaleRunResource(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;resource:{key:string;version:string}}){
  const editor=await assertPrivateScaleRunEditor(tx,input)
- if(input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
- const source=await readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
+ if(input.resource.version!=='1.0.0'&&input.resource.version!=='2.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ const source=await readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:input.resource.version,purpose:'NEW_USE',context:editor.context})
  return {...editor,source}
 }
 
@@ -47,10 +47,10 @@ export async function assertPrivateFormRunResource(tx:Prisma.TransactionClient,i
 /** Advisory source preparation only. Publication repeats current author and
  * workflow checks in its locked transaction; this does not confer use rights. */
 export async function readPrivateScaleRunSourceForPreparation(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;resource:{family:string;key:string;version:string}}){
- if(input.resource.family!=='SCALE'||input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ if(input.resource.family!=='SCALE'||input.resource.version!=='1.0.0'&&input.resource.version!=='2.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
  const workflow=await readEducationRunLibraryContext(tx,input)
  if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
- return readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:{
+ return readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:input.resource.version,purpose:'NEW_USE',context:{
   entry:workflow.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}}})
 }
 

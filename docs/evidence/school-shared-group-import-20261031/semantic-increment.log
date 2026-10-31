@@ -1,0 +1,1 @@
+{"check":"four imported modules semantic integration only","files":["src/modules/reporting/engine.ts","src/modules/reporting/service.ts","src/modules/reporting/types.ts","src/modules/education-tools/assessment-resource.service.ts"],"diagnostics":0}

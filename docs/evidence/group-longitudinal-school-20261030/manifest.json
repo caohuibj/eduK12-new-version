@@ -1,0 +1,197 @@
+{
+  "parentCandidate": "863ae60a19eb4021c754d7d786695d7ce62479ea",
+  "dotPaginationOriginal": "24f78d1034703530b81834dce3f0e85a404a74de",
+  "dotPaginationCherryPick": "c94b83185",
+  "branch": "feat/group-longitudinal-school-20261030",
+  "distinctPassedCases": 15,
+  "originalPassedReportByCase": {
+    "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access": "adapter-contract.json",
+    "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores": "selected-slot.json",
+    "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back": "selected-slot.json",
+    "School plan thin adapter delegates disclosure and reuses group snapshots uses the actual Cognitive protocol when compiled publication identities differ": "cognitive-protocol.json",
+    "School plan thin adapter delegates disclosure and reuses group snapshots preserves the saved report through wording-only changes while retaining numeric permission checks": "disclosure-final.json",
+    "School plan thin adapter delegates disclosure and reuses group snapshots keeps allowed outputs when another planned score is not disclosed, and retains per-wave suppression": "group-metric-subset.json",
+    "School plan entry integrates existing paged source selection selects a page-two task and sends only its frozen plan, reusing the published GROUP spec and showing original population labels": "frontend-lazy-entry.json",
+    "School plan entry integrates existing paged source selection keeps a task without a published plan unavailable and never posts or auto-opens a single report": "frontend-lazy-entry.json",
+    "adds the existing School GROUP spec and frozen subgroup choice to the shared command": "frontend-wrapper.json",
+    "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan": "no-group-permission.json",
+    "School compound snapshot / metadata PG contract (not authentication or end-to-end) keeps School plan history isolated and accepts only the current latest completed bound parent": "pg-final.json",
+    "Huischool governed report HTTP surface rejects the legacy arbitrary-Run longitudinal POST after the current manager check": "root-routes-final.json",
+    "Huischool governed report HTTP surface mounts the published-plan command under the existing School auth, MFA and CSRF surface": "root-routes-final.json",
+    "child handlers require the School auth context, catch synchronous validation and retain MFA/write budget": "routes.json",
+    "School compound snapshot / metadata PG contract (not authentication or end-to-end) limits planned discovery to the selected slot while the stored Track contains another same-named metric": "selected-slot-pg-final.json"
+  },
+  "invocations": [
+    {
+      "file": "adapter-contract.json",
+      "success": false,
+      "passed": 1,
+      "failed": 2,
+      "skipped": 0,
+      "failedSuites": 2
+    },
+    {
+      "file": "adapter-first.json",
+      "success": false,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "failedSuites": 0
+    },
+    {
+      "file": "adapter-pg-continuation.json",
+      "success": false,
+      "passed": 2,
+      "failed": 1,
+      "skipped": 1,
+      "failedSuites": 2
+    },
+    {
+      "file": "cognitive-protocol.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 4,
+      "failedSuites": 0
+    },
+    {
+      "file": "disclosure-final.json",
+      "success": true,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 4,
+      "failedSuites": 0
+    },
+    {
+      "file": "frontend-entry.json",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "failedSuites": 0
+    },
+    {
+      "file": "frontend-lazy-entry.json",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "failedSuites": 0
+    },
+    {
+      "file": "frontend-wrapper.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "failedSuites": 0
+    },
+    {
+      "file": "group-metric-subset.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 5,
+      "failedSuites": 0
+    },
+    {
+      "file": "integration-contracts.json",
+      "success": false,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 2,
+      "failedSuites": 1
+    },
+    {
+      "file": "no-group-permission.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 3,
+      "failedSuites": 0
+    },
+    {
+      "file": "pg-final.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "failedSuites": 0
+    },
+    {
+      "file": "root-routes-final.json",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 34,
+      "failedSuites": 0
+    },
+    {
+      "file": "routes.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "failedSuites": 0
+    },
+    {
+      "file": "selected-slot-pg-final.json",
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 1,
+      "failedSuites": 0
+    },
+    {
+      "file": "selected-slot.json",
+      "success": false,
+      "passed": 2,
+      "failed": 1,
+      "skipped": 2,
+      "failedSuites": 2
+    }
+  ],
+  "developerInputHashes": {
+    "server-version/backend/src/__tests__/campus/report.routes.test.ts": "34282bbffe65f92fe3a9f4f93ecf213299e28bdeb41a57aa73030402b3bac4ea",
+    "server-version/backend/src/modules/campus/report.routes.ts": "a9fd6a1ec732dc80897db0ff681bc3101fe23ef972f6e537a060ab42943118ec",
+    "server-version/backend/src/modules/reporting/group-longitudinal.ts": "e150271874fbbdc768bd72b09ad400fbc41be20eac0ef3740962edafa785945f",
+    "server-version/backend/src/modules/reporting/resultSource.ts": "32bc569edb180dafb7c6bf2cab6f1f6c21f549e9ac493c81655437d997c1079b",
+    "server-version/backend/src/modules/reporting/task-artifact.ts": "e3af5a5964906e5aead96f1d48f991d41e3946e60756054108a245e2933c072a",
+    "server-version/frontend/src/modules/reporting/GroupLongitudinalReport.tsx": "423c45cd5787c382456d2c43e2cd3fb5e04d4aeaecfdfedb7051408e5742107b",
+    "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx": "aac1d43b5b26bca3fb32d075766a9f05e465f3d54b6d1a7f57465927261c0df1",
+    "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx": "2518939be375fe3a1bb66a77b53272bdea0295e071e155a79c7a711843c07a12",
+    "server-version/frontend/src/school/SchoolGroupReports.tsx": "ea1957cae91ac003192a34b4e0e23f1553074ed5c51892de95398b2eeafb1f74",
+    "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql": "71abad87f7f5d2463f2aff099a6a498c10c450e9f6f57e36354b8d9d84c4a093",
+    "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts": "78131aa269285f91bdf91910e3d430aa3e2d714ce359b54658aedfed6eb43c20",
+    "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts": "069f385e95015a01cce06d65cd7b80209296fff32903dce820bd08300a47af43",
+    "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts": "1f18c47f0d561f48dd5111aaf97561e50367e1bff927d1886a4381fb563b6722",
+    "server-version/backend/src/modules/campus/group-longitudinal-plan.routes.ts": "d43e70b5bc80f988395b7b8f483c83d36e8264ae2d624e0a6d4abd57d1733fa9",
+    "server-version/backend/src/modules/campus/group-longitudinal-plan.service.ts": "af5cb8668252372df34862effb2b4d18a2a7548a8134852f0af04c088430caca",
+    "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx": "4f42300e43983d72378978dd8eba9455775acc35f38ec31461eaa326f362e733",
+    "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx": "cd928577c2c922853302c605b49394661f75ad94810f27729196802b1607ed2b"
+  },
+  "sourcePermissionBlocker": "Supported private/library/assessment/composition School SELF sources currently use INDIVIDUAL_ONLY and group audiences NONE. No positive real-source School E2E claim.",
+  "checks": {
+    "frontendAppTypes": 0,
+    "frontendChangedFilesLint": {
+      "exit": 0,
+      "warnings": 1,
+      "scope": "existing cancellation ref cleanup warning"
+    },
+    "backendTypes": {
+      "exit": 0,
+      "receipt": "backend-types-receipt.json",
+      "previousCandidateProcessExit": "unavailable; empty original log retained, not claimed as a pass",
+      "repeatedBusinessOrPgCasesForMissingExit": false
+    }
+  },
+  "databaseScope": "isolated loopback eduk12_test; School namespace and exact bound/latest parent metadata plus selected-slot pushdown only",
+  "formalCI": false,
+  "newUploadsAttempted": false,
+  "productionAccessed": false,
+  "sourceLimits": [
+    "numeric source GROUP authorization pending; real positive School E2E not performed",
+    "empty selected-leaf canonical discovery remains unavailable",
+    "no numeric Form or Teacher non-Form permissions added"
+  ]
+}

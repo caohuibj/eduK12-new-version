@@ -5,7 +5,7 @@ import {SurveyAnalyticsError} from './analytics.errors'
 import {personalTrackingPlanSchema} from '../reporting/personal-tracking'
 import {groupTrackingMetrics,projectGroupLongitudinal,type GroupLongitudinalWave} from '../reporting/group-longitudinal'
 import {prepareSurveyGroupReport,assertSurveyGroupBindingsCurrent,type SurveyGroupBindings} from './group-report.service'
-import {listTaskGroupLongitudinalArtifacts,saveTaskGroupLongitudinalArtifact,readTaskGroupLongitudinalArtifact} from '../reporting/task-artifact'
+import {listTaskGroupLongitudinalArtifactsPage,type TaskArtifactCursor,saveTaskGroupLongitudinalArtifact,readTaskGroupLongitudinalArtifact} from '../reporting/task-artifact'
 
 type Scope={actorUserId:string;projectId:string;waveId:string}
 const fail=(message:string,status=409):never=>{throw new SurveyAnalyticsError(status,message)}
@@ -21,13 +21,13 @@ async function resolvePlan(db:Prisma.TransactionClient,input:Scope){
  if(waves.length>100||waves[0]?.id!==plan.baselineWaveId)fail('纵向计划波次无效或超过当前范围')
  return {plan,waves,source:{product:'SURVEY' as const,containerId:input.projectId,taskId:plan.baselineWaveId}}
 }
-export async function surveyGroupLongitudinalCatalog(input:Scope){
+export async function surveyGroupLongitudinalCatalog(input:Scope&{before?:TaskArtifactCursor}){
  return prisma.$transaction(async db=>{
   const state=await resolvePlan(db,input)
   if(!state)return {status:'NOT_CONFIGURED' as const,tools:[],waves:[],artifacts:[]}
   const tools=[...new Map(state.plan.metrics.map(m=>[m.sourceKey,{key:m.sourceKey,label:m.label,kind:m.kind}])).values()]
   return {status:'CONFIGURED' as const,planId:state.plan.id,tools,waves:state.waves,
-   artifacts:await listTaskGroupLongitudinalArtifacts(db,state.source,state.plan.id)}
+   ...await listTaskGroupLongitudinalArtifactsPage(db,state.source,state.plan.id,input.before)}
  })
 }
 type Bindings={waves:Array<{waveId:string;bindings:SurveyGroupBindings}>}

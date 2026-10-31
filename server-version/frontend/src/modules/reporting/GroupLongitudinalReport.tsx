@@ -3,7 +3,7 @@ import {ReportTrendChart} from './ReportTrendChart'
 import type {LongitudinalTrendModel} from './longitudinalVisualization'
 
 export type GroupLongitudinalArtifact={artifactId:string;generatedAt:string;projection:{
- planId:string;sourceKey:string;title:string;limitations:string[];metrics:Array<{id:string;label:string;unit:string;points:Array<{
+ planId:string;sourceKey:string;title:string;wavePopulationLabels?:Record<string,string>;limitations:string[];metrics:Array<{id:string;label:string;unit:string;points:Array<{
   waveId:string;ordinal:number;label:string;observedFrom:string|null;observedUntil:string|null
   completedN:number|null;countUnit:'PERSON'|'RESPONSE';validN:number|null;missingN:number|null
   state:'present'|'missing'|'suppressed';mean:number|null;sdSample:number|null
@@ -25,7 +25,7 @@ export function GroupLongitudinalReport({artifact}:{artifact:GroupLongitudinalAr
     <div className="group-longitudinal-report__scroll"><table className="w-full text-sm"><thead><tr>
      <th>波次/测量时间</th><th>完成样本</th><th>有效/缺失</th><th>均值</th><th>样本标准差</th><th>与前轮均值差</th><th>与基线均值差</th>
     </tr></thead><tbody>{metric.points.map(point=><tr key={point.waveId}>
-     <td>T{point.ordinal} · {point.label}<br/>{point.observedFrom?new Date(point.observedFrom).toLocaleString('zh-CN'):'暂无测量时间'}
+     <td>T{point.ordinal} · {point.label}{artifact.projection.wavePopulationLabels?.[point.waveId]&&<p>人群：{artifact.projection.wavePopulationLabels[point.waveId]}</p>}<br/>{point.observedFrom?new Date(point.observedFrom).toLocaleString('zh-CN'):'暂无测量时间'}
       {point.observedUntil&&point.observedUntil!==point.observedFrom&&<> 至 {new Date(point.observedUntil).toLocaleString('zh-CN')}</>}
       {point.populationChanged===true&&<p>完成样本人群组成有变化</p>}</td>
      <td>{number(point.completedN)}{point.completedN!==null&&(point.countUnit==='PERSON'?'人':'份答卷')}</td>

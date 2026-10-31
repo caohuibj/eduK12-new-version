@@ -3,35 +3,33 @@ import {prisma} from '../../config/database'
 import {compositeBadRequest,compositeNotFound} from '../composite/composite.errors'
 import {readTrainingTracking} from '../composite/personal-tracking'
 import {groupTrackingMetrics,projectGroupLongitudinal,type GroupLongitudinalWave} from '../reporting/group-longitudinal'
-import {listTaskGroupLongitudinalArtifacts,saveTaskGroupLongitudinalArtifact,readTaskGroupLongitudinalArtifact} from '../reporting/task-artifact'
-import {listTrainingGroupTasks,listTrainingAnalysisSources,type TrainingAnalysisActor} from './source'
+import {listTaskGroupLongitudinalArtifactsPage,type TaskArtifactCursor,saveTaskGroupLongitudinalArtifact,readTaskGroupLongitudinalArtifact} from '../reporting/task-artifact'
+import {assertTrainingGroupAccess,listTrainingGroupPlanTasks,listTrainingAnalysisSources,type TrainingAnalysisActor} from './source'
 import {prepareTrainingGroupReport,assertTrainingGroupBindingsCurrent,type TrainingGroupBindings} from './group-report.service'
 
 type Scope={actor:TrainingAnalysisActor;courseId:string;taskId:string}
 const missing=():never=>{throw compositeNotFound('纵向群体来源不可访问')}
 async function resolvePlan(tx:Prisma.TransactionClient,input:Scope){
- const tasks=await listTrainingGroupTasks(tx,input.actor,input.courseId),allowed=tasks.map(t=>t.id)
- if(!allowed.includes(input.taskId))missing()
+ await assertTrainingGroupAccess(tx,input.actor,input.courseId,input.taskId)
  const task=await tx.compositeAssessment.findUnique({where:{id:input.taskId},select:{personalTrackingBaselineId:true}})
  if(!task?.personalTrackingBaselineId)return null
- if(!allowed.includes(task.personalTrackingBaselineId))missing()
+ await assertTrainingGroupAccess(tx,input.actor,input.courseId,task.personalTrackingBaselineId)
  const baseline=await tx.compositeAssessment.findUnique({where:{id:task.personalTrackingBaselineId},select:{personalTracking:true,createdBy:true}})
  const plan=readTrainingTracking(baseline?.personalTracking)?.plan
  if(!plan||plan.baselineWaveId!==task.personalTrackingBaselineId)missing()
- const rows=await tx.compositeAssessment.findMany({where:{id:{in:allowed},personalTrackingBaselineId:task.personalTrackingBaselineId,createdBy:baseline!.createdBy,status:{in:['PUBLISHED','ARCHIVED']}},
-  orderBy:{personalTrackingOrdinal:'asc'},take:101,select:{id:true,name:true,personalTrackingOrdinal:true,personalTracking:true}})
+ const rows=await listTrainingGroupPlanTasks(tx,input.actor,input.courseId,task.personalTrackingBaselineId)
  if(rows.length>100||rows[0]?.id!==plan!.baselineWaveId)missing()
  return {plan:plan!,waves:rows.map(r=>({id:r.id,ordinal:r.personalTrackingOrdinal!,title:r.name,tracking:readTrainingTracking(r.personalTracking)})),
   source:{product:'TRAINING' as const,containerId:input.courseId,taskId:plan!.baselineWaveId}}
 }
-export async function trainingGroupLongitudinalCatalog(input:Scope){
+export async function trainingGroupLongitudinalCatalog(input:Scope&{before?:TaskArtifactCursor}){
  return prisma.$transaction(async tx=>{
   const state=await resolvePlan(tx,input)
   if(!state)return {status:'NOT_CONFIGURED' as const,tools:[],waves:[],artifacts:[]}
   return {status:'CONFIGURED' as const,planId:state.plan.id,
    tools:[...new Map(state.plan.metrics.map(m=>[m.sourceKey,{key:m.sourceKey,label:m.label,kind:m.kind}])).values()],
    waves:state.waves.map(({tracking:_tracking,...wave})=>wave),
-   artifacts:await listTaskGroupLongitudinalArtifacts(tx,state.source,state.plan.id)}
+   ...await listTaskGroupLongitudinalArtifactsPage(tx,state.source,state.plan.id,input.before)}
  })
 }
 type Bindings={waves:Array<{taskId:string;bindings:TrainingGroupBindings}>}

@@ -1,0 +1,27 @@
+[
+  {
+    "path": "docs/evidence/group-longitudinal-survey-training-20261030/frontend-lint.log.gz",
+    "bytes": 360,
+    "gitBlob": "ae20c635e2f2064e0b466a5339638d8162601c62"
+  },
+  {
+    "path": "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-1280.png",
+    "bytes": 132493,
+    "gitBlob": "737b02a8d026cf4250c1c1d8148129586b097036"
+  },
+  {
+    "path": "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-390.png",
+    "bytes": 151088,
+    "gitBlob": "0f36f7031d989613c3e8019abd2b13f3a9ccd6ba"
+  },
+  {
+    "path": "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-1280.png",
+    "bytes": 110798,
+    "gitBlob": "bd470f8b39a0858a2a5f25fc5be2da52b0c7e11e"
+  },
+  {
+    "path": "docs/evidence/group-longitudinal-survey-training-20261030/presentation-report-390.png",
+    "bytes": 90304,
+    "gitBlob": "4a72ac143bfd6c6f12ea72905a802774d448d779"
+  }
+]

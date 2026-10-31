@@ -1,12 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
+import {z} from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { TaskGroupProjection } from './group-summary'
 import type {GroupLongitudinalProjection} from './group-longitudinal'
 
 type Db = Prisma.TransactionClient
-export type TaskArtifactSource = { product: 'SURVEY' | 'TRAINING'; containerId: string; taskId: string }
+export type TaskArtifactSource = { product: 'SURVEY' | 'TRAINING' | 'SCHOOL'; containerId: string; taskId: string }
 export interface TaskGroupArtifact {
   artifactId: string
   generatedAt: string
@@ -48,15 +49,31 @@ export async function readTaskGroupArtifact(db: Db, source: TaskArtifactSource, 
   return artifact
 }
 
-export async function listTaskGroupArtifacts(db: Db, source: TaskArtifactSource) {
-  const rows = await db.$queryRaw<Array<{ artifactId: string; generatedAt: Date }>>`
-    SELECT id AS "artifactId",generated_at AS "generatedAt" FROM reporting_task_artifacts
-    WHERE report_kind='GROUP' AND product=${source.product} AND container_id=${source.containerId} AND task_id=${source.taskId}
-    ORDER BY generated_at DESC,id DESC LIMIT 25
-  `
-  return rows.map(row => ({ ...row, generatedAt: row.generatedAt.toISOString() }))
+export const taskArtifactCursorSchema=z.object({generatedAt:z.string().datetime({precision:6}),artifactId:z.string().guid()}).strict()
+export type TaskArtifactCursor=z.infer<typeof taskArtifactCursorSchema>
+export type TaskArtifactPointer={artifactId:string;generatedAt:string}
+export function taskArtifactBefore(query:Record<string,unknown>):TaskArtifactCursor|undefined{
+ if(query.beforeGeneratedAt===undefined&&query.beforeArtifactId===undefined)return undefined
+ return taskArtifactCursorSchema.parse({generatedAt:query.beforeGeneratedAt,artifactId:query.beforeArtifactId})
 }
+async function listTaskArtifactPage(db:Db,source:TaskArtifactSource,kind:'GROUP'|'GROUP_LONGITUDINAL',planId:string|null,before?:TaskArtifactCursor){
+ const cursor=before?taskArtifactCursorSchema.parse(before):undefined
+ const rows=await db.$queryRaw<TaskArtifactPointer[]>(Prisma.sql`
+  SELECT id AS "artifactId",to_char(generated_at,'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "generatedAt"
+  FROM reporting_task_artifacts
+  WHERE product=${source.product} AND container_id=${source.containerId} AND task_id=${source.taskId} AND report_kind=${kind}
+   ${kind==='GROUP_LONGITUDINAL'?Prisma.sql`AND plan_id=${planId}`:Prisma.empty}
+   ${cursor?Prisma.sql`AND (generated_at,id)<(${cursor.generatedAt}::timestamp,${cursor.artifactId})`:Prisma.empty}
+  ORDER BY generated_at DESC,id DESC LIMIT 26`)
+ const artifacts=rows.slice(0,25)
+ return {artifacts,nextCursor:rows.length>25?artifacts[24]:null}
+}
+/** Only pointer metadata; keep PostgreSQL microseconds in the seek cursor. */
+export const listTaskGroupArtifactsPage=(db:Db,source:TaskArtifactSource,before?:TaskArtifactCursor)=>listTaskArtifactPage(db,source,'GROUP',null,before)
+/** Legacy array consumers keep their first page; HTTP history uses the page API. */
+export async function listTaskGroupArtifacts(db:Db,source:TaskArtifactSource){return (await listTaskGroupArtifactsPage(db,source)).artifacts}
 
+/** Legacy first-page convenience, not a task authorization catalog. */
 export async function listTaskGroupArtifactsForContainer(db: Db, product: TaskArtifactSource['product'], containerId: string) {
   const rows = await db.$queryRaw<Array<{artifactId: string; generatedAt: Date; taskId: string}>>`
     SELECT id AS "artifactId", generated_at AS "generatedAt", task_id AS "taskId" FROM reporting_task_artifacts
@@ -84,9 +101,5 @@ export async function readTaskGroupLongitudinalArtifact(db:Db,source:TaskArtifac
  if(artifact.artifactId!==artifactId||artifact.selector.planId!==planId||canonicalHash(artifact.source)!==canonicalHash(source)||canonicalHash(artifact)!==rows[0].hash)throw new Error('纵向快照来源不一致')
  return artifact
 }
-export async function listTaskGroupLongitudinalArtifacts(db:Db,source:TaskArtifactSource,planId:string){
- const rows=await db.$queryRaw<Array<{artifactId:string;generatedAt:Date}>>`SELECT id AS "artifactId",generated_at AS "generatedAt" FROM reporting_task_artifacts
- WHERE product=${source.product} AND container_id=${source.containerId} AND task_id=${source.taskId} AND report_kind='GROUP_LONGITUDINAL' AND plan_id=${planId}
- ORDER BY generated_at DESC,id DESC LIMIT 25`
- return rows.map(row=>({...row,generatedAt:row.generatedAt.toISOString()}))
-}
+export const listTaskGroupLongitudinalArtifactsPage=(db:Db,source:TaskArtifactSource,planId:string,before?:TaskArtifactCursor)=>listTaskArtifactPage(db,source,'GROUP_LONGITUDINAL',planId,before)
+export async function listTaskGroupLongitudinalArtifacts(db:Db,source:TaskArtifactSource,planId:string){return (await listTaskGroupLongitudinalArtifactsPage(db,source,planId)).artifacts}

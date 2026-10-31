@@ -1,0 +1,28 @@
+{
+  "status": "prepared; exact hashes checked before application",
+  "historyParent": "e527d13370c531021edc5dc47cf3f3be9bce19f0",
+  "source": "parent-delivered original Group 9dedd85 and native followup21f15b916",
+  "remoteFetchOrUpload": false,
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/reporting/engine.ts",
+      "before": "6aabd0db80380e607994ca81802b4db3c2eaa139",
+      "after": "b24ff6d7d8ead1f49a66e1f2b32c8ce195ef53cc"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/service.ts",
+      "before": "5ee9418f96a6c1c094af537a6027cc3f6ef8137c",
+      "after": "ee07290182fcf657060d7b6c0c17a675ba77a8b0"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/types.ts",
+      "before": "22a008a4cb09b5807ee3e35bdfd0609eaa1eb73b",
+      "after": "7d003d6ac7cfaeaf71d8ed6365e20100acfef9d8"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "before": "386e7395a67aebdba9383aecbdfee2680ecdceac",
+      "after": "cf2893b4bf626313639d4a5a1ebfe95db19c7468"
+    }
+  ]
+}
