@@ -2179,11 +2179,11 @@
       "slice": "group",
       "branch": "feat/teacher-group-longitudinal-20261031",
       "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
-      "reviewedCandidate": "371ceb7701bdda8d6f5bc4eed18b40f739a9d0f4",
-      "originalSource": "371ceb7701bdda8d6f5bc4eed18b40f739a9d0f4",
+      "reviewedCandidate": "673ef062adbd20a2f0da0a308be8d6d476547f93",
+      "originalSource": "673ef062adbd20a2f0da0a308be8d6d476547f93",
       "originalReportPrefix": "docs/evidence/teacher-group-longitudinal-20261031/",
-      "originalCaseCount": 10,
-      "reviewBasis": "Ten scoped local cases across original stages, not rerun at the archive commit. Original nine raw cases and failures remain byte-identical; only one new A/B-to-onlyA adapter case executed after consuming merged Group443 second argument. earlierOriginalSource retains the first immutable archive. No new FINAL or upstream producer replay. Complete intended private-composition owner source and formal bounded qualification still pending.",
+      "originalCaseCount": 11,
+      "reviewBasis": "Eleven scoped local cases across retained original stages, not rerun at this immutable evidence archive. One new two-metric adapter mock and one new real PG wider-spec producer boundary consume Group443. Real persisted plan still has one metric; unpublished B was not fabricated. Existing twenty FINALs and frozen Run plans/parent references remained unchanged. Two new first-query PG fixture column failures retained. Private-composition owner source and full official Ready qualification still pending.",
       "reports": [
         {
           "id": "adapter-run3",
@@ -2359,6 +2359,36 @@
               "uses the internal partial-source producer and keeps B null when only A is disclosed in the second planned wave"
             ]
           }
+        },
+        {
+          "id": "partial-native-final",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-native-final.json",
+          "sha256": "b26f0db64c01500ab4b34edb727c6ffb15347f273effaf85fb828654d7880cea",
+          "review": {
+            "cases": [
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 2
+            },
+            "selectedCases": [
+              "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric"
+            ]
+          }
         }
       ],
       "historicalFailures": [
@@ -2457,6 +2487,66 @@
             }
           ],
           "continuation": "native-read-continuation"
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-native.json",
+          "sha256": "bf39c06d1c8713ff567d2c5123418448533d69331c9de5b394d7c1f84d824ad3",
+          "cases": [
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "status": "failed"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 1,
+            "numPendingTests": 2
+          },
+          "continuations": [
+            {
+              "failedCaseName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "successfulReportId": "partial-native-final"
+            }
+          ]
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-native-repair.json",
+          "sha256": "fd09c25ca9b0197620075a7083672a9ffe4c663dcb3e0f370ed33dabb48fa2ec",
+          "cases": [
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "status": "failed"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 1,
+            "numPendingTests": 2
+          },
+          "continuations": [
+            {
+              "failedCaseName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "successfulReportId": "partial-native-final"
+            }
+          ]
         }
       ],
       "addedMigrations": [
@@ -2466,7 +2556,7 @@
       "repository": "caohuibj/eduK12-new-version",
       "markerBefore": "a34742f916bc9352814ae6dc9eac75824a32a255",
       "components": {
-        "backend": "d20c26a9e8561e1b7b5f8b9d3ca60bc5676099bd",
+        "backend": "2620f2de01daaf3e812e0f43f1a313476a1eb86f",
         "frontend": "6cba910232fdb7cf8f5c54a401407f0c1e929da9"
       },
       "files": {
@@ -2476,7 +2566,7 @@
         },
         ".github/scripts/personal-tracking-ready.test.mjs": {
           "before": "fd9bdfaeaea3a72aaacda2bca96aaf40b4b34976",
-          "after": "92442907435a313a5e7829a402d73d465b9e92d2"
+          "after": "be6c440012987cfa23d13476dd4e0b6fce07f462"
         },
         ".github/workflows/ci.yml": {
           "before": "4f58224d30c563d6da1f87e72ff19d0c0f94f241",
@@ -2492,7 +2582,7 @@
         },
         "docs/evidence/teacher-group-longitudinal-20261031/README.md": {
           "before": null,
-          "after": "6a2967e1cac7befe1bd59cbac689dfb3e4ba0354"
+          "after": "e5bcb77784bc146744496d17d88b3c55d779dbba"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/adapter-first.json": {
           "before": null,
@@ -2578,6 +2668,34 @@
           "before": null,
           "after": "e62413726cf73275e9e24c9e60a439a526e925e5"
         },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-final.json": {
+          "before": null,
+          "after": "936e12a52cef91a39646b370822304cd8d382610"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-final.log": {
+          "before": null,
+          "after": "97b2d754a80bccb3d5a27dd4271e06dcdf5bceea"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-proof.json": {
+          "before": null,
+          "after": "b814bb8e62576d594e4454dbe7e09147a4868d80"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-repair.json": {
+          "before": null,
+          "after": "310217bc0aa42dd10b6b4789ff6ea752a2e9decb"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-repair.log": {
+          "before": null,
+          "after": "991cba7120723818416e7570dfbe3e39c4569d01"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native.json": {
+          "before": null,
+          "after": "104d9af0b4286a24b745d636e39f38f9c2f1456c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native.log": {
+          "before": null,
+          "after": "539d216475fd683c8cc49b8c28dd27c5727b861c"
+        },
         "docs/evidence/teacher-group-longitudinal-20261031/selected-types-first.log": {
           "before": null,
           "after": "6b3e308f6e7cb60d0e5a8028a38932ed62b3c99b"
@@ -2592,11 +2710,11 @@
         },
         "docs/evidence/teacher-group-longitudinal-20261031/sha256.json": {
           "before": null,
-          "after": "18e0d09acd371ad3d5b0ea4efda16afec8f96910"
+          "after": "655f6683c8eeaacfbe343759ca0ca8124c053dd6"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/static-review.json": {
           "before": null,
-          "after": "fb42b22d36f89a252e8525637f4d729ba822ffe7"
+          "after": "64aedf7564fa3482d0f147f882dcfee466eb7306"
         },
         "docs/evidence/teacher-group-longitudinal-20261031/ui-first.json": {
           "before": null,
@@ -2620,7 +2738,7 @@
         },
         "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts": {
           "before": null,
-          "after": "8e1e26aa3016686b104fbcd3c512125c2aaea3b3"
+          "after": "8ae518963af57d1efc255b42018560f9ee719082"
         },
         "server-version/backend/src/index.ts": {
           "before": "76cb77d52377a590e5ce757075e5729e97099a96",
@@ -2667,7 +2785,11 @@
         "step": "install frontend tools and audit locked inputs",
         "maximumAgeHours": 24
       },
-      "earlierOriginalSource": "de230c9464f57dd603ee7fc9b1a8915a03e6b875"
+      "earlierOriginalSource": "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
+      "evidenceArchiveHistory": [
+        "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
+        "371ceb7701bdda8d6f5bc4eed18b40f739a9d0f4"
+      ]
     }
   }
 }
