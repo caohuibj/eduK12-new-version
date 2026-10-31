@@ -6,7 +6,8 @@ import {
   resolveBankReleaseState,
 } from '../../modules/cognitive/banks/bank-meta'
 import { collectBankPublishBlockers } from '../../modules/cognitive/banks/publish-gate'
-import { readFileSync } from 'node:fs'
+import { COGNITIVE_BANK_REGISTRY } from '../../modules/cognitive/banks/registry'
+import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 
 describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
@@ -35,6 +36,22 @@ describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
     }
     expect(resolveBankReleaseState(meta('research-restricted'))).toBe('research-restricted')
     expect(isBankPublicReleaseAllowed(meta('research-restricted'))).toBe(false)
+  })
+
+  it('keeps the production compiled registry aligned with every bank-declaring package', () => {
+    const root = path.resolve('src/modules/cognitive/tasks')
+    const declared = readdirSync(root).filter((task) => {
+      const file = path.join(root, task, 'task-package.json')
+      try {
+        const pkg = JSON.parse(readFileSync(file, 'utf8'))
+        return Array.isArray(pkg.banks) && pkg.banks.length > 0
+      } catch { return false }
+    }).sort()
+    expect(Object.keys(COGNITIVE_BANK_REGISTRY).sort()).toEqual(declared)
+    for (const task of declared) {
+      const pkg = JSON.parse(readFileSync(path.join(root, task, 'task-package.json'), 'utf8'))
+      expect(COGNITIVE_BANK_REGISTRY[task].length).toBe(pkg.banks.length)
+    }
   })
 
   it('parses every declared bank in the product catalog and flags none as research-restricted today', async () => {
