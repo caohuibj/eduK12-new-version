@@ -1,0 +1,34 @@
+{
+  "reviewedHead": "e041610d7d7b40c1cbeb1bf8d24481a08dc1997d",
+  "scope": "Remove operation-runner session recovery; preserve initial-read recovery.",
+  "frontend-review-baseline": {
+    "sha256Uncompressed": "4712cf78a0abdcc0ef7bb994ce795dfcca2914292ddd1294267638a63e8c5e83",
+    "exit": 1,
+    "passed": 0,
+    "failed": 2,
+    "skipped": 9
+  },
+  "frontend-review-baseline-corrected": {
+    "sha256Uncompressed": "b6f2242cc6161bec5afd2d9340a46b12fe3f3db1dcd1a7ec1baa3535af0b5b97",
+    "exit": 1,
+    "passed": 0,
+    "failed": 2,
+    "skipped": 9
+  },
+  "frontend-review-candidate": {
+    "sha256Uncompressed": "c332b8d8788e7a30ec55e8cfc310b53e92a826d83619d9ab0e361a75519ad83f",
+    "exit": 0,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 9
+  },
+  "currentFiles": {
+    "server-version/frontend/src/school/SchoolApp.tsx": "1117ef885cb764521d335625908b5df345397e33b78fc302083954a84539416e",
+    "server-version/frontend/src/school/SchoolLoginProjection.test.tsx": "843703008fc80b988bb1c4c075bc992af677cbdd2fdb0caf1fa35211d8ad30d5"
+  },
+  "frontend-review-types": {
+    "exit": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit"
+  }
+}
