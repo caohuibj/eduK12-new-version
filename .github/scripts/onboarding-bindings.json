@@ -7192,6 +7192,224 @@
         "backend": "29b86b19038c196aa5b2728f5e33579a8ba56ee5",
         "frontend": "dfdc072b45a35f04261c807c72a89021f5c9aa1b"
       }
+    },
+    "435": {
+      "schemaVersion": 1,
+      "pr": 435,
+      "enabled": false,
+      "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+      "product": "236a865da0abaf961f7b4bf3d817dfe897eeb9a0",
+      "controlCheckpoint": "902aab16efb1e19183367820f2e8da4e11c86c2a",
+      "components": {
+        "backend": "94ebc079e565e1c5ce22253c0c52ac07155fff68",
+        "frontend": "5daa3daf80ae5bdde2d55f21901ae59cf675fd65"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "3ce7405872c806f5a610d14bda018cf1bb58b713",
+        ".github/scripts/onboarding-checks.mjs": "cc7166462dd9628ff5371cae3aaade12c9bdac9d",
+        ".github/scripts/onboarding-controls.test.mjs": "8eeee7b90d75eb34b746f020d1df1819f06a39a2",
+        ".github/scripts/onboarding-evidence.json": "c5c64355f72aba38ba893796e18d053e196191ef",
+        ".github/scripts/onboarding-scope.mjs": "fcbfcf1b0a9afbe091e0a506a081b953a47be2b2",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "4f58224d30c563d6da1f87e72ff19d0c0f94f241"
+      },
+      "source": {
+        "docs/performance/course-scale-scope-20261031/README.md": {
+          "before": null,
+          "after": "0a83953281048582d3884c01e563ad91fac524e5"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline-execution.json": {
+          "before": null,
+          "after": "8339b37268e10e2ef2c8245458d85794196ed84f"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "831a62c74e4725ce1c1441b307074d0d14ec1a16"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.log.gz": {
+          "before": null,
+          "after": "9066fe6f73ecaa40aeb22786df23e61c8b9ac544"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-baseline.ndjson.gz": {
+          "before": null,
+          "after": "2366dfa2e54bd50d2f43fdb268487d0b06178d02"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate-execution.json": {
+          "before": null,
+          "after": "4f60b0b48fa076678d20b69dc25ebb086b0c00af"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.json.gz": {
+          "before": null,
+          "after": "de7568cb0447ebd1ba900ba39e1611a850083d33"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.log.gz": {
+          "before": null,
+          "after": "e21737cbd1193f207aefeafdf44b73e4f599726b"
+        },
+        "docs/performance/course-scale-scope-20261031/backend-candidate.ndjson.gz": {
+          "before": null,
+          "after": "e2ee11d9e3f6cbf231ceab0c79dc49d5896edfff"
+        },
+        "docs/performance/course-scale-scope-20261031/concurrent-pr-inventory.json": {
+          "before": null,
+          "after": "a1ede9dba48c37b34cb4bd626e1e9d8ffcafcfa8"
+        },
+        "docs/performance/course-scale-scope-20261031/environment.json": {
+          "before": null,
+          "after": "f8f4b56653f7614de1a1bf8afc0aca37a1a8f030"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "85b1a4b8ff05c3f725da15175b5a18976ae4415d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "90c8c27cdccf3167392f4cc4707b06daedd9315d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader-execution.json": {
+          "before": null,
+          "after": "b2a543e9c1179abcae15a741c65b5dfa66914977"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.json": {
+          "before": null,
+          "after": "ff926788b6c99acd8911631df6f277830bc3a6b2"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/combined-loader.log": {
+          "before": null,
+          "after": "ca11fd69b006dab6f37f77cacfc2674ce370b0c4"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/control.log": {
+          "before": null,
+          "after": "fb9c64ca49ca4e7698c6171b66c3670d04edb6b4"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "bd3d0d83bfa9c65d8ad915ee80cd0ed9f57d852d"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/backend-types.json": {
+          "before": null,
+          "after": "4c146d8ad1338cf120df46a576ce2dd294597381"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/frontend-types.json": {
+          "before": null,
+          "after": "a1149b2399c41abc44bc9cb9a59fa912c833f133"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/previous-f5fa/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/prisma-generate.log": {
+          "before": null,
+          "after": "6aba1933358004ae2ec91061951c59ab364c0047"
+        },
+        "docs/performance/course-scale-scope-20261031/final-qualification/run-types.py": {
+          "before": null,
+          "after": "7447e5110271a4f0e672699a197be5fb3172e83f"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline-execution.json": {
+          "before": null,
+          "after": "e8449eeebfffc3174303f3f22cc78eddff080aa3"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "51af745a8e9a5a2e442e0e264fc0066360fe6d1d"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-baseline.log.gz": {
+          "before": null,
+          "after": "14ad236f39f7933c83ff7ee972d6e16c622bca82"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate-execution.json": {
+          "before": null,
+          "after": "995be24db44bb9f05617a5fcfce11b7247cc55f4"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate.json.gz": {
+          "before": null,
+          "after": "44693a994a4d56a34ab9c191a9598300497c94b6"
+        },
+        "docs/performance/course-scale-scope-20261031/frontend-candidate.log.gz": {
+          "before": null,
+          "after": "88400bb356fc67da475363014d45b9055a617917"
+        },
+        "docs/performance/course-scale-scope-20261031/measurements.json": {
+          "before": null,
+          "after": "21b33092a801fbb0a3d834ac313cc8096624c59f"
+        },
+        "docs/performance/course-scale-scope-20261031/original-files.json": {
+          "before": null,
+          "after": "def71a381fcb0f5cfb4c6a428d6a68176adf15b6"
+        },
+        "docs/performance/course-scale-scope-20261031/run-recorded-tests.py": {
+          "before": null,
+          "after": "609353e336be4c4e4011a5a776fc69b534c2d175"
+        },
+        "docs/performance/course-scale-scope-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "8cf0ea4e5db46a0acb1c341710f78af5d6c49c26"
+        },
+        "docs/performance/course-scale-scope-20261031/types/backend.json": {
+          "before": null,
+          "after": "361d1d5b99ae53fd81e1b1256ff76a6b9f585b4a"
+        },
+        "docs/performance/course-scale-scope-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/types/frontend.json": {
+          "before": null,
+          "after": "af321f1cc3a60f86e87325e720e74c7b41d08d87"
+        },
+        "docs/performance/course-scale-scope-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/course-scale-scope-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "e4c1167b420860df0321b4fed958bd883dc0e80b"
+        },
+        "server-version/backend/src/__tests__/scale/available-course.test.ts": {
+          "before": null,
+          "after": "d01714398f65a6de15b48202be40933cb5b75681"
+        },
+        "server-version/backend/src/controllers/scaleController.ts": {
+          "before": "dd670ed292d383ee99212be449e5c464c38c503e",
+          "after": "3581dda4beb1e896c2202e805b1afcdc0a97b1c2"
+        },
+        "server-version/frontend/src/training/courseAssessments.test.ts": {
+          "before": "bee8e8e441aa7e197ba059af076b88ff990ac05d",
+          "after": "6cfe249badd2f7d18e84c03cd1899564b901f20c"
+        },
+        "server-version/frontend/src/training/courseAssessments.ts": {
+          "before": "f351e2f31c9728f237e5c8a72cb02a33a3e137a7",
+          "after": "4031e1c16be17a4a34b636fcfe8326202ca4a963"
+        }
+      },
+      "activationReview": {
+        "reviewer": "delegated Codex scoped self-review; parent independent review before activation",
+        "scope": "Exact local evidence reviewed; intentionally disabled waiting Draft. User Sentinel_0974382e93c881918bb9d85f50df7f0e prioritizes two Codex report conversations. No Ready, CI activation, auto-merge or merge until those close; recheck actual base/input changes then.",
+        "userAuthorization": "User Sentinel_810dd9ed18088191811ed14f28c1250b permits DOT local sequential performance PR commits and normal merge; no deployment"
+      }
     }
   }
 }
