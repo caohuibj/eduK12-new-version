@@ -77,3 +77,7 @@ Don't start expensive qualification on the knowingly incomplete producer interfa
 ## Scope correction after the development confirmations
 
 The user's later clarification explicitly excludes native Teacher numeric Form longitudinal from this development round. The preceding Form discussion is a retained plan only; it is not an authorization to implement or a blocker for #440. A local branch was prepared and existing code read, but no new Form production code, tests, schema, release or PR was added. Continue #440's existing numeric-source scope and its Group-owned partial-source/private-composition dependency. The user confirmed the earlier development/upload requests, not this separate Form expansion.
+
+## Current-main preparation after DOT #439/#442
+
+Actual main `769141d5bc4954919b163a8d8d522530048fbfb6` was merged without conflicts into the independent preparation branch. All six #440 runtime source blobs and its TEACHER CHECK migration remain exact. Main changed School login and the student questionnaire retry, not Teacher/group report implementations. `static-review.json` records those identities. Do not rerun the nine local feature cases or twenty FINALs. The initial Draft scope success remains bound to b467/f5fa; it is not relabelled as current Ready qualification. Final base/source pins must include the Group owner delta once, then use the same original qualification route. No new feature PR is opened for preparation/docs.

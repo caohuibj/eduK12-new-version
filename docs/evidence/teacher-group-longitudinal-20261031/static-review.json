@@ -82,5 +82,49 @@
   },
   "formalReadyCIExecuted": false,
   "productionAccessed": false,
-  "scopeCorrection": "User explicitly excludes native Teacher numeric Form longitudinal from this round; retained plan only, not a #440 delivery blocker. No new Form implementation."
+  "scopeCorrection": "User explicitly excludes native Teacher numeric Form longitudinal from this round; retained plan only, not a #440 delivery blocker. No new Form implementation.",
+  "mainAlignment": {
+    "actualMain": "769141d5bc4954919b163a8d8d522530048fbfb6",
+    "preBindingCheckpoint": "c34db48f5e3178769e7c1d0397ceb31f4f4c48fd",
+    "mergeConflicts": false,
+    "featureBlobs": {
+      "server-version/backend/src/index.ts": {
+        "before": "ce182833fc063c276a3e29abcc751bcfbbd21929",
+        "after": "ce182833fc063c276a3e29abcc751bcfbbd21929"
+      },
+      "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts": {
+        "before": "8f5a34cb477c551512de30c679300eb3a9f1d5bc",
+        "after": "8f5a34cb477c551512de30c679300eb3a9f1d5bc"
+      },
+      "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts": {
+        "before": "a57bcd25ac3d80c4f157afc93b612e6e9430436a",
+        "after": "a57bcd25ac3d80c4f157afc93b612e6e9430436a"
+      },
+      "server-version/backend/src/modules/reporting/task-artifact.ts": {
+        "before": "8d04ca03829a694615d13c4dc461a91530092f16",
+        "after": "8d04ca03829a694615d13c4dc461a91530092f16"
+      },
+      "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+        "before": "e06a3109e204f4ec2989341e48e6a28a64ee7f12",
+        "after": "e06a3109e204f4ec2989341e48e6a28a64ee7f12"
+      },
+      "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx": {
+        "before": "14f11268071b31c3172be2001f4a72bebef5715c",
+        "after": "14f11268071b31c3172be2001f4a72bebef5715c"
+      },
+      "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql": {
+        "before": "c92cd9e47f14519e9d63e51a709c29a910bce9c5",
+        "after": "c92cd9e47f14519e9d63e51a709c29a910bce9c5"
+      }
+    },
+    "featureRuntimeChanged": false,
+    "businessCasesReexecuted": false,
+    "exactMainRuntimeChanges": [
+      "server-version/backend/src/modules/campus/auth.routes.ts",
+      "server-version/frontend/src/school/SchoolApp.tsx",
+      "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx"
+    ],
+    "formalCIActive": false,
+    "reason": "Prepare current real base without changing frozen PR440 or replaying unaffected feature observations. Group owner delta still missing."
+  }
 }
