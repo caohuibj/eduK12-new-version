@@ -8,7 +8,25 @@ vi.mock('../../modules/education-tools/assessment-resource.repository',()=>({rea
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { readRespondentRunSummary } from '../../modules/reporting/respondentSummary'
 import { testDisclosure } from './result-disclosure.fixture'
+import {buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_KEY} from '../../modules/assessment-policy/self-group-contract'
 beforeEach(()=>{vi.resetAllMocks()})
+it('refuses public SELF GROUP summaries while allowing only the internal whitelist without materializing scores',async()=>{
+ const contract=testDisclosure(20);contract.policyKey=SELF_GROUP_POLICY_KEY
+ contract.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:['score'],longitudinalMetricKeys:[]}
+ contract.audiences.ORGANIZATION={mode:'AGGREGATE_ONLY',metricKeys:['score'],longitudinalMetricKeys:[]}
+ const policy={analysisMode:'COHORT_AGGREGATE',resultDisclosure:contract}
+ const row={organizationId:'org',runId:'run',trackId:'track',subjectUserId:'self',relationship:'SELF',perspective:'SELF_REPORT',family:'BUNDLE',key:'key',version:'2.0.0',policy,hash:canonicalHash(policy)}
+ mocks.query.mockResolvedValue([row])
+ mocks.find.mockReturnValue({releaseStatus:'PUBLISHED',resultDisclosure:contract,
+  applicability:{analysisMode:'COHORT_AGGREGATE',relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],minimumRespondents:20},
+  cohortAnalysisPolicy:buildSelfGroupCohortAnalysisPolicy(contract)})
+ // The public inbox must never flatten scores, even if a parent permits the
+ // metric. Only the education reader can apply timing and per-leaf ceilings.
+ mocks.resolve.mockRejectedValue(Error('public GROUP must not read canonical metrics'))
+ await expect(readRespondentRunSummary('self','e')).rejects.toMatchObject({statusCode:404})
+ expect(await readRespondentRunSummary('self','e',{disclosureOnly:true})).toEqual({schemaVersion:1,mode:'INDIVIDUAL_SUMMARY',state:'READY',metricKeys:['score']})
+ expect(mocks.resolve).not.toHaveBeenCalled()
+})
 describe('own Run feedback summary',()=>{
   it('projects only content-approved canonical metrics for the exact respondent',async()=>{
     const contract=testDisclosure();contract.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:['score'],longitudinalMetricKeys:[]}

@@ -505,3 +505,12 @@ test('Training standalone Scale reader qualifier uses retained cases and stays w
  const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,424);assert(task1SastConfig(p,f.b).paths.includes(file));
  assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...r)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):f.read(cmd,a,...r),f.env,f.b));
 });
+
+
+test('Shared SELF GROUP qualifier binds both current components and its two disclosure fixes without a second application engine',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/reporting/respondentSummary.ts',frontend='server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx';
+ f.b.pr=426;f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'426',CI_HEAD_REF:BRANCHES[426]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,426);assert(task1SastConfig(p,f.b).paths.includes(backend));assert(task1SastConfig(p,f.b).paths.includes(frontend));
+ const unknown='server-version/backend/src/modules/reporting/unrelated-new-engine.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});

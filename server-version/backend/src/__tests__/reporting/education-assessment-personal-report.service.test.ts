@@ -9,8 +9,25 @@ import { readEducationRespondentAssessmentReport } from '../../modules/reporting
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { educationReportFixture } from './education-assessment-report.fixture'
 import { createEducationAssessmentReportReader } from '../../modules/reporting/education-assessment-personal-report.service'
+import {draftEducationAssessmentEntry} from '../../modules/education-tools/assessment-resource.contract'
+import {SELF_GROUP_POLICY_KEY} from '../../modules/assessment-policy/self-group-contract'
 
 const input={actorUserId:'self',executionId:'execution',product:'SCHOOL' as const}
+it('preserves own saved FINAL summaries under an explicit new GROUP contract and keeps per-leaf NONE private',async()=>{
+ const f=await setup('score')
+ const contract={...f.contract,policyKey:SELF_GROUP_POLICY_KEY,minimumRespondents:20,
+  audiences:{...f.contract.audiences,ORGANIZATION:{mode:'AGGREGATE_ONLY' as const,metricKeys:['score'],longitudinalMetricKeys:[]}}}
+ const units=f.origin.units.map((unit,index)=>({...unit,groupDisclosure:{...contract,audiences:{...contract.audiences,
+  ...(index===1?{RESPONDENT:{mode:'NONE' as const,metricKeys:[],longitudinalMetricKeys:[]}}:{})}}}))
+ Object.assign(f.origin,{adapterVersion:'2.0.0',units})
+ f.source.entry={...draftEducationAssessmentEntry({origin:f.origin,title:'Explicit group',disclosure:contract}),releaseStatus:'PUBLISHED'}
+ Object.assign(f.own.policy,{analysisMode:'COHORT_AGGREGATE',resultDisclosure:contract})
+ f.own.resourceVersion='2.0.0';f.own.policyHash=canonicalHash(f.own.policy)
+ const data=await f.read(input)
+ expect(data).toMatchObject({state:'READY',mode:'INDIVIDUAL_SUMMARY',reports:[{status:'READY'},{status:'WITHHELD'}]})
+ expect(m.units).toHaveBeenCalledTimes(1);expect(f.assertSourceAuthority).toHaveBeenCalledTimes(2)
+ expect(f.parent.attemptEpoch).toBe(1)
+})
 async function setup(sharedMetricKey?:string){
   const f=await educationReportFixture('SCHOOL',['COGNITIVE','SJT'],{sharedMetricKey})
   m.query.mockResolvedValue([f.own]);m.scope.mockResolvedValue({membershipId:'own-member'})

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {groupReportStandaloneBranch,groupReportLeafBranch,groupReportBranch,groupReportBase,groupReportFiles,groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
+import {selfGroupBranch,selfGroupDraftPaths,groupReportStandaloneBranch,groupReportLeafBranch,groupReportBranch,groupReportBase,groupReportFiles,groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const env={CI_EVENT:'pull_request',CI_IS_DRAFT:'true',CI_HEAD_REF:groupReportBranch,CI_PR_NUMBER:'402',GITHUB_REPOSITORY:'caohuibj/eduK12-new-version'};
 const entries=groupReportFiles.map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
@@ -54,4 +54,13 @@ test('standalone Cognitive Draft stays within the existing source checkpoint and
  assert.equal(o.codeql,'false');assert.equal(o.frontend,'false');assert.equal(o.application_route,'group-report-draft');
  for(const file of ['server-version/backend/src/modules/composite/composite.service.ts','server-version/backend/prisma/schema.prisma','server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts'])assert.throws(()=>groupReportDraftPlan([{...native[0],file}],groupReportBase,head,nativeEnv));
  assert.throws(()=>groupReportDraftPlan(native,groupReportBase,head,{...nativeEnv,CI_IS_DRAFT:'false'}));
+});
+
+test('SELF GROUP shared Draft stays scope-only for its exact frozen files and refuses Ready or unrelated changes',()=>{
+ const input=selfGroupDraftPaths.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'})),environment={...env,CI_HEAD_REF:selfGroupBranch,CI_PR_NUMBER:'999'};
+ const p=groupReportDraftPlan(input,groupReportBase,head,environment),o=Object.fromEntries(Object.entries(groupReportDraftOutputs(p)).map(([k,v])=>[k,String(v)]));
+ assert.deepEqual(requiredChecks({scope:{result:'success',outputs:o}},true),['scope']);
+ for(const key of ['frontend','content','codeql','run_performance_tests'])assert.equal(o[key],'false');
+ assert.throws(()=>groupReportDraftPlan(input,groupReportBase,head,{...environment,CI_IS_DRAFT:'false'}));
+ assert.throws(()=>groupReportDraftPlan([...input,{file:'server-version/backend/prisma/schema.prisma',status:'M',oldMode:'100644',newMode:'100644'}],groupReportBase,head,environment));
 });
