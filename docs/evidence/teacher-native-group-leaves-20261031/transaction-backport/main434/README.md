@@ -1,0 +1,5 @@
+# Current native Teacher consumer on main434
+
+Current backend treeace2d78d6cf1ca334ae65d49cfa8701c05df22c6 includes original native consumption, the reviewed caller-owned transaction correction and actual main432/434 inputs; it compiled once at source1f6276b554ac76765de678e274dc5d19131c134e. Subsequent CI-only parent integration leaves this complete component identical. The frontend is identical to the current partial-population parent and requires no further compiler invocation.
+
+Original V1-refusal success remains in the partially failed first unit report; its separate failed leaf-binding case is linked to the later successful correction. The actual ten-assignment/twenty-leaf HTTP/PG continuation and final binding unit stay original unsigned results. No new FINAL, registration, scoring, protocol matrix, browser or PG replay is claimed. Main432/434 questionnaire/spec-discovery changes are outside the unchanged Teacher native leaf/runtime flow; current types cover interfaces. Formal source binding awaits the actual accepted parent.

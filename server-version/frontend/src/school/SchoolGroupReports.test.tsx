@@ -8,6 +8,18 @@ const catalog={specs:[{specId:spec,title:'正式方案',version:1,metricIds:['sc
 const report={artifactId:'artifact',generatedAt:'2026-10-30T00:00:00Z',projection:{title:'学校群体报告',sourceLabel:'工具甲',cutoff:'2026-10-30T00:00:00Z',populationLabel:'冻结子群',completedN:10,countUnit:'PERSON',assignedN:10,tool:{key:'a',title:'甲',kind:'SCALE'},metrics:[{key:'score',label:'score',type:'NUMBER',unit:'score',validN:10,missingN:0,mean:0,sdSample:1,range:null,observedRange:null,qualityCounts:{},measurement:leaf,frequencies:[]}],limitations:['不作因果结论']}}
 const tools={tools:[{leaf,metrics:[{key:'score',unit:'score'}]}],groups:{options:[{kind:'CLASSES',id:'class-a',name:'一班',dimensionId:null,dimensionName:null}],limitations:['按任务发布时分组']}}
 describe('School group workbench',()=>{
+ it('continues an empty filtered source page without reloading the catalog or reports',async()=>{
+  const api=vi.fn(async(path:string)=>{
+   if(path.includes('/catalog?'))return {...catalog,sources:[],nextSourcePage:2,truncated:true}
+   if(path==='/reports/groups/sources?organizationId=org&page=2')return {sources:catalog.sources,nextSourcePage:null}
+   throw new Error('Unexpected request: '+path)
+  })
+  render(<SchoolGroupReports api={api as SchoolApi} organizationId={org}/>)
+  fireEvent.click(await screen.findByRole('button',{name:'加载更多测评来源'}))
+  expect(await screen.findByRole('option',{name:'任务甲 · bundle'})).toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'加载更多测评来源'})).not.toBeInTheDocument()
+  expect(api.mock.calls.map(([path])=>path)).toEqual(['/reports/groups/catalog?organizationId=org','/reports/groups/sources?organizationId=org&page=2'])
+ })
  it('generates a selected leaf subgroup and prints the same authorized snapshot',async()=>{
   const api=vi.fn(async(path:string,method='GET')=>path.includes('/catalog')?catalog:path.includes('/tools?')?tools:method==='POST'?report:report)
   const print=vi.spyOn(window,'print').mockImplementation(()=>{})

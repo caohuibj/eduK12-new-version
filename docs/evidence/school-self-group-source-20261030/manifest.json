@@ -1,0 +1,165 @@
+{
+  "parentSchoolCandidate": "424667b022853f01887bed91841cba7c89257c73",
+  "selectionPreparation": "3f520ad2a4e5c3dc0cbfb45032b080cbd860754f",
+  "sharedInternalImport": "c4ad8ba2965ea4c0c1fc5156be6ef333bb8817ad",
+  "branch": "feat/school-self-group-source-v2-20261030",
+  "newDistinctPassedCases": 3,
+  "layers": {
+    "sourceContractPure": 1,
+    "pickerJsdomMockAPI": 1,
+    "realPGPublication": 1,
+    "realFINAL": 0,
+    "realGroupGeneration": 0,
+    "T2Journey": 0,
+    "browser": 0
+  },
+  "reports": {
+    "source-v2-contract.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0,
+      "failedSuites": 0,
+      "cases": [
+        {
+          "name": "School private Scale publication contract integration creates a distinct explicit source identity, preserves the own ceiling and keeps every aggregate audience independent",
+          "status": "passed"
+        }
+      ]
+    },
+    "source-v2-picker.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0,
+      "failedSuites": 0,
+      "cases": [
+        {
+          "name": "posts only explicit School SELF group selections and clears them when the administration changes",
+          "status": "passed"
+        }
+      ]
+    },
+    "source-v2-publication-pg.json": {
+      "success": false,
+      "passed": 0,
+      "failed": 0,
+      "pending": 1,
+      "failedSuites": 2,
+      "cases": [
+        {
+          "name": "School explicit group source / real publication only, not FINAL or group generation keeps legacy private rights, publishes a new configured questionnaire and verifies actual frozen execution identity",
+          "status": "skipped"
+        }
+      ]
+    },
+    "source-v2-publication-pg-isolated.json": {
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "failedSuites": 2,
+      "cases": [
+        {
+          "name": "School explicit group source / real publication only, not FINAL or group generation keeps legacy private rights, publishes a new configured questionnaire and verifies actual frozen execution identity",
+          "status": "failed"
+        }
+      ]
+    },
+    "source-v2-publication-pg-key-continuation.json": {
+      "success": false,
+      "passed": 0,
+      "failed": 1,
+      "pending": 0,
+      "failedSuites": 2,
+      "cases": [
+        {
+          "name": "School explicit group source / real publication only, not FINAL or group generation keeps legacy private rights, publishes a new configured questionnaire and verifies actual frozen execution identity",
+          "status": "failed"
+        }
+      ]
+    },
+    "source-v2-publication-pg-guard-continuation.json": {
+      "success": true,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0,
+      "failedSuites": 0,
+      "cases": [
+        {
+          "name": "School explicit group source / real publication only, not FINAL or group generation keeps legacy private rights, publishes a new configured questionnaire and verifies actual frozen execution identity",
+          "status": "passed"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "backendTypesFirst": 0,
+    "backendTypesFinal": 0,
+    "frontendAppTypes": 0,
+    "frontendLintObservedExit": 0,
+    "frontendLintWarnings": 3
+  },
+  "old15_22_37AndGroupChecksReplayed": false,
+  "pgBoundary": {
+    "database": "explicit isolated loopback eduk12_test",
+    "defaultDevURLRejectedBeforeFixtures": true,
+    "syntheticCampusKeyAddedOnlyAfterIsolationGuard": true,
+    "newMigrationSQLAppliedDirectly": true,
+    "prismaMigrateDeployExecuted": false,
+    "nativeRestoreQualification": false,
+    "canonicalFINALInserted": false,
+    "fullJourneyClaimed": false
+  },
+  "failureDiagnoses": {
+    "source-v2-publication-pg.json": "Isolation guard: default loader points to eduk12_dev; suite did not run.",
+    "source-v2-publication-pg-isolated.json": "Actual campus fixture missing its existing synthetic HMAC configuration.",
+    "source-v2-publication-pg-key-continuation.json": "Actual source insert refused by V1-only database namespace guard; fixed with new narrowly scoped migration.",
+    "source-v2-publication-pg-guard-continuation.json": "Real new source and questionnaire publication passed; not FINAL/group report."
+  },
+  "sharedResolverConnectionPending": "Connect resolveSchoolPrivateGroupHistory and the exact per-leaf frozen contract/slot mapping under existing shared parent/leaf checks. No ungoverned mock fallback.",
+  "formalCI": false,
+  "merged": false,
+  "deployed": false,
+  "externalDelivery": {
+    "original863SourceBlob": "d3c3655e9c328f9b78f648ab916e6294b3560927",
+    "fullBranchOrPRCreated": false,
+    "imageStatus": "denied; not pending; no request ID provided; not retried",
+    "deniedPath": "docs/evidence/group-longitudinal-survey-training-20261030/initial-http-group-longitudinal-390.png",
+    "deniedBlob": "0f36f7031d989613c3e8019abd2b13f3a9ccd6ba",
+    "Hui424Append": "succeeded and read back; existing history retained"
+  },
+  "rawSHA256": {
+    "source-v2-contract.json": "4c16e7c74825d33ae1d5551661b8fe6dc26c8af3ea7e17f1b5280c681dcbd1d7",
+    "source-v2-contract.log": "3d289180873954b7afa6b665d8467d6d4e2059ea95cc71e3bcb3e43264fa26f2",
+    "source-v2-picker.json": "d549f39208b83009465338ec25cf7d1be4c772e508d0212552c6fab32ebe043b",
+    "source-v2-picker.log": "f8aeb8d1c8d6a751d2abe74e35477aef6830c0690b0e497474a45d34a4af198b",
+    "source-v2-backend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source-v2-backend-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "source-v2-backend-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source-v2-backend-types-final.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "source-v2-frontend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source-v2-frontend-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "source-v2-publication-pg.json": "b42bd4ee822c90e984fdc2598a54e14a706aa00722935a255bc0ac8fd331d43f",
+    "source-v2-publication-pg.log": "c2b959b035b0648efd83714459ffcac07c86a1796dc3916de28619e9c2b909ef",
+    "source-v2-publication-pg-isolated.json": "6c8e2a594c0827d849f4a56c3142123100310122d3a6dd6cb36b780a7bacce45",
+    "source-v2-publication-pg-isolated.log": "a9660b96ff1f9c9a751ad9b5bed6d607f7d401193306a3f2f5e7a8a6760fadb6",
+    "source-v2-publication-pg-key-continuation.json": "ac08a2b39b61286b0ba56704f12b70e1a3ae390b9f7b97e2bfd6d44dd1781472",
+    "source-v2-publication-pg-guard-continuation.json": "1f8d18c3b5dc74e0f9b8babf3a40f22f96c5fd640028356dc7aaf259205452d6",
+    "source-v2-publication-pg-guard-continuation.log": "b498366e3f3b08b3b73509c23603420ffaa9d01bc5771842a6e43e0ef749d7a2",
+    "source-v2-frontend-lint.log.gz": "ddac4807400b0f0ce45950c7eceb9906739923fbddadbb87fed3ea4e5224e972",
+    "source-v2-publication-pg-key-continuation.log.gz": "6f069d10f09e2826cf83a93c4e14e4c187875f313c5df207229642aa6d0f21e9"
+  },
+  "rawLogTransport": {
+    "source-v2-frontend-lint.log.gz": {
+      "format": "lossless gzip",
+      "originalName": "source-v2-frontend-lint.log",
+      "originalSHA256": "43193ed814dc6582f2ab8427fc8197e39a8efb29a7e69178e8f289cfbae17934"
+    },
+    "source-v2-publication-pg-key-continuation.log.gz": {
+      "format": "lossless gzip",
+      "originalName": "source-v2-publication-pg-key-continuation.log",
+      "originalSHA256": "89f1f6060afb03918537e4de0854d18c1b36f01d72caba9d5bb91beadededc35"
+    }
+  }
+}

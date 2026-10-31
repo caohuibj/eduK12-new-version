@@ -2508,7 +2508,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if(userId){
     const native=attempt.trainingContentBinding?.units?.some((unit:any)=>unit.itemId===item.id&&unit.source.educationNative?.provider==='COGNITIVE_CONFIG')
     if(native||readVerifiedLongitudinalEducationAttempt(educationAttempt,db,attempt,userId))await admitEducationNativeCognitive(db as Prisma.TransactionClient,{proof:educationAttempt,parent:attempt,actorUserId:userId,itemId:item.id,assignmentId:assignment.id,configId:config.id})
-    else await admitCognitiveAttempt(db,userId,assignment.id)
+    else await admitCognitiveAttempt(db,userId,assignment.id,{compositeAttemptId:attempt.id,compositeItemId:item.id})
   }
   return db.cognitiveSession.create({
     data: {
@@ -3012,7 +3012,13 @@ const createAttempt = async (
       const sourceIds=[...new Set<string>(sources.map(source=>source.id))].sort()
       for (const id of sourceIds) await lockCognitiveQuota(db as any,userId,id)
       const quotas=new Map<string,number>()
-      for(const id of sourceIds)quotas.set(id,(await readCognitiveQuota(db as any,userId,id)).remainingAttempts)
+      for(const id of sourceIds){
+        // Read-only preflight uses the published leaf; START still verifies its
+        // actual parent binding. An untracked copy retains the global quota.
+        const items=cognitiveItems.filter((item:any)=>byItem.get(item.id)===id)
+        const remaining=await Promise.all(items.map((item:any)=>readCognitiveQuota(db as any,userId,item.cognitiveAssignmentId,{compositeAssessmentId:composite.id,compositeItemId:item.id})))
+        quotas.set(id,Math.min(...remaining.map(quota=>quota.remainingAttempts)))
+      }
       for(const group of parseCompiledWeightedVariants(composite.trainingVariantFrozen).groups){
         const needed=new Map<string,number>()
         for(const id of group.selectedItemIds){const source=byItem.get(id);if(source)needed.set(source,(needed.get(source)??0)+1)}

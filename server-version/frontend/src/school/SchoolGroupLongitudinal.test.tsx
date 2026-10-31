@@ -1,100 +1,36 @@
-import { describe,expect,it,vi } from 'vitest'
-import { act,fireEvent,render,screen,waitFor } from '@testing-library/react'
-import { SchoolGroupLongitudinal } from './SchoolGroupLongitudinal'
-import type { SchoolApi } from './SchoolRecovery'
-
-const org='00000000-0000-4000-8000-000000000001'
-const spec='00000000-0000-4000-8000-000000000002'
-const r1='00000000-0000-4000-8000-000000000003'
-const r2='00000000-0000-4000-8000-000000000004'
-const t1='00000000-0000-4000-8000-000000000005'
-const t2='00000000-0000-4000-8000-000000000006'
-const catalog={sources:[
-  {runId:r1,trackId:t1,runName:'前测',resource:{family:'SCALE',key:'pilot',version:'1.0'}},
-  {runId:r2,trackId:t2,runName:'后测',resource:{family:'SCALE',key:'pilot',version:'1.0'}},
-],specs:[{specId:spec,title:'已发布方案',version:1,analysisKind:'REPEATED_COHORT'}],
-truncated:false}
-describe('Huischool internal fixed-population group trends',()=>{
-  it('does not expose cohort/member selectors; posts only exact whole Run identifiers',async()=>{
-    const api=vi.fn(async(path:string,method='GET')=>{
-      if(path.startsWith('/reports/groups/longitudinal/catalog'))return catalog
-      if(path==='/reports/groups/longitudinal'&&method==='POST')return {
-        artifactId:'result-1',kind:'SCHOOL_LONGITUDINAL',state:'READY',
-        metrics:{class_climate:[{wave:1,mean:3.4},{wave:2,mean:3.7}]},
-        limitations:['仅用于支持性研究'],
-      }
-      throw Error('unrecognized '+path)
-    })
-    const original=window.confirm;window.confirm=vi.fn(()=>true)
-    try{
-      render(<SchoolGroupLongitudinal compact api={api as unknown as SchoolApi}
-        organizationId={org}/>)
-      const checkboxes=await screen.findAllByRole('checkbox')
-      checkboxes.forEach(x=>fireEvent.click(x))
-      fireEvent.change(screen.getByLabelText('纵向分析科学方案'),{target:{value:spec}})
-      fireEvent.click(screen.getByRole('button',{name:'经近期动态验证码核对后生成固定群体分析'}))
-      const panel=await screen.findByRole('region',{name:'固定群体纵向投影'})
-      expect(panel).toHaveTextContent('3.4')
-      expect(panel).toHaveTextContent('3.7')
-      expect(panel).not.toHaveTextContent('学生人数')
-      await waitFor(()=>expect(api).toHaveBeenCalledWith('/reports/groups/longitudinal','POST',{
-        organizationId:org,specId:spec,analysisKind:'REPEATED_COHORT',
-        sources:[{runId:r1,trackId:t1},{runId:r2,trackId:t2}],
-      }))
-      expect(JSON.stringify(api.mock.calls)).not.toMatch(/memberIds|cohortSelector|username|rawAnswers/)
-    }finally{window.confirm=original}
+import {render,screen,fireEvent,waitFor} from '@testing-library/react'
+import {describe,it,expect,vi} from 'vitest'
+import {SchoolGroupLongitudinal} from './SchoolGroupLongitudinal'
+vi.mock('../modules/reporting/ReportTrendChart',()=>({ReportTrendChart:()=> <div>trend</div>}))
+const org='school',spec='published-spec',source=(runId:string,name:string)=>({runId,trackId:'track-'+runId,name,resource:{family:'SCALE',key:'scale-A',version:'1'}})
+const index={sources:[source('r1','第一页任务')],specs:[{specId:spec,title:'既有群体方案',version:1,metricIds:['score']}],artifacts:[{artifactId:'old-single',generatedAt:'2026-10-01T00:00:00Z'}],nextSourcePage:2,truncated:true}
+const projection={planId:'plan',sourceKey:'A',title:'群体纵向报告',wavePopulationLabels:{r1:'冻结乙班'},limitations:[],metrics:[{id:'A-score',label:'A',unit:'score',points:[{waveId:'r1',ordinal:1,label:'T1',observedFrom:null,observedUntil:null,completedN:10,countUnit:'PERSON',validN:10,missingN:0,state:'present',mean:1,sdSample:0,adjacentDelta:null,baselineDelta:null,intermediateMissing:false,populationChanged:null}]}]}
+describe('School plan entry integrates existing paged source selection',()=>{
+ it('selects a page-two task and sends only its frozen plan, reusing the published GROUP spec and showing original population labels',async()=>{
+  const api=vi.fn(async(path:string,method='GET')=>{
+   if(path.startsWith('/reports/groups/catalog'))return index
+   if(path.startsWith('/reports/groups/sources'))return {sources:[source('r2','第二页任务')],nextSourcePage:null}
+   if(path==='/reports/groups/plans/school/r2'&&method==='GET')return {status:'CONFIGURED',planId:'plan',tools:[{key:'A',label:'A',kind:'SCALE'}],waves:[{id:'r1',ordinal:1,title:'T1'},{id:'r2',ordinal:2,title:'T2'}],artifacts:[]}
+   if(path==='/reports/groups/plans/school/r2'&&method==='POST')return {artifactId:'combined',generatedAt:'2026-10-30T00:00:00Z',projection}
+   throw Error('Unexpected '+path)
   })
-  it('does not make one or mixed-tool measurement appear comparable',async()=>{
-    const api=vi.fn(async()=>({
-      ...catalog,sources:[
-        catalog.sources[0],
-        {...catalog.sources[1],resource:{family:'SCALE',key:'different',version:'1.0'}},
-      ],
-    }))
-    render(<SchoolGroupLongitudinal api={api as unknown as SchoolApi}
-      organizationId={org}/>)
-    const checkboxes=await screen.findAllByRole('checkbox')
-    checkboxes.forEach(x=>fireEvent.click(x))
-    fireEvent.change(screen.getByLabelText('纵向分析科学方案'),{target:{value:spec}})
-    expect(screen.getByRole('button',{
-      name:'经近期动态验证码核对后生成固定群体分析',
-    })).toBeDisabled()
-    expect(screen.getByRole('alert')).toHaveTextContent('所选测量工具不一致')
-  })
-})
-
-
-describe('SchoolGroupLongitudinal catalogue request recovery',()=>{
-  it('replaces pending state with an error and retries only the catalogue GET',async()=>{
-    let reject!:(reason:Error)=>void
-    const pending=new Promise<never>((_resolve,no)=>{reject=no})
-    let requests=0
-    const api=vi.fn(async(_path:string,_method?:string)=>++requests===1?pending:catalog)
-    render(<SchoolGroupLongitudinal api={api as SchoolApi} organizationId={org}/>)
-    expect(screen.getByText('正在核对当前学校的正式波次与科学方案…')).toBeInTheDocument()
-    expect(screen.queryByRole('button',{name:'重新读取报告目录'})).not.toBeInTheDocument()
-    await act(async()=>reject(Error('目录读取失败，请重试')))
-    expect(await screen.findByRole('alert')).toHaveTextContent('目录读取失败，请重试')
-    expect(screen.queryByText('正在核对当前学校的正式波次与科学方案…')).not.toBeInTheDocument()
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'重新读取报告目录'}))
-    await screen.findByRole('option',{name:new RegExp(catalog.specs[0].title)})
-    expect(screen.queryByText('目录读取失败，请重试')).not.toBeInTheDocument()
-    expect(api.mock.calls).toEqual([
-      ['/reports/groups/longitudinal/catalog?organizationId='+org],['/reports/groups/longitudinal/catalog?organizationId='+org],
-    ])
-  })
-  it('does not restore a previous school catalogue from a late response',async()=>{
-    let resolve!:(value:typeof catalog)=>void
-    const pending=new Promise<typeof catalog>(yes=>{resolve=yes})
-    const api=vi.fn(async(path:string)=>path.endsWith('organizationId='+org)?pending:{sources:[],specs:[],truncated:false})
-    const view=render(<SchoolGroupLongitudinal api={api as SchoolApi} organizationId={org}/>)
-    expect(screen.getByText('正在核对当前学校的正式波次与科学方案…')).toBeInTheDocument()
-    view.rerender(<SchoolGroupLongitudinal api={api as SchoolApi} organizationId="new-school"/>)
-    await waitFor(()=>expect(screen.queryByText('正在核对当前学校的正式波次与科学方案…')).not.toBeInTheDocument())
-    await act(async()=>resolve(catalog))
-    expect(screen.queryByRole('option',{name:new RegExp(catalog.specs[0].title)})).not.toBeInTheDocument()
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    expect(api).toHaveBeenLastCalledWith('/reports/groups/longitudinal/catalog?organizationId=new-school')
-  })
+  render(<SchoolGroupLongitudinal api={api as any} organizationId={org}/>)
+  fireEvent.click(await screen.findByRole('button',{name:'加载更多测评来源'}));await screen.findByRole('option',{name:/第二页任务/})
+  fireEvent.change(screen.getByLabelText('测评来源'),{target:{value:'r2:track-r2'}})
+  fireEvent.change(screen.getByLabelText('已发布统计方案'),{target:{value:spec}})
+  fireEvent.click(await screen.findByRole('button',{name:'打开纵向群体报告'}));await screen.findByLabelText('纵向群体子工具')
+  fireEvent.click(screen.getByRole('button',{name:'生成更新版纵向报告'}))
+  await screen.findByText('人群：冻结乙班')
+  expect(api).toHaveBeenCalledWith('/reports/groups/plans/school/r2','POST',{planId:'plan',sourceKey:'A',throughWaveId:'r2',specId:spec,selection:{kind:'ALL'}})
+  expect(api.mock.calls.some(([p])=>p.includes('old-single')||p.includes('/groups/longitudinal'))).toBe(false)
+ })
+ it('keeps a task without a published plan unavailable and never posts or auto-opens a single report',async()=>{
+  const api=vi.fn(async(path:string)=>path.startsWith('/reports/groups/catalog')?index:{status:'NOT_CONFIGURED',tools:[],waves:[],artifacts:[]})
+  render(<SchoolGroupLongitudinal api={api as any} organizationId={org}/>)
+  await screen.findByRole('option',{name:/第一页任务/});fireEvent.change(screen.getByLabelText('测评来源'),{target:{value:'r1:track-r1'}})
+  fireEvent.click(await screen.findByRole('button',{name:'打开纵向群体报告'}))
+  await screen.findByText(/此来源没有已正式发布的 longitudinal 计划/)
+  await waitFor(()=>expect(api).toHaveBeenCalledTimes(2))
+  expect(api.mock.calls.some(([p])=>p.includes('old-single')||p.includes('/groups/longitudinal'))).toBe(false)
+ })
 })

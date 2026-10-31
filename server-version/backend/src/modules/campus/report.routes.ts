@@ -1,3 +1,4 @@
+import {schoolPlanGroupRouter} from './group-longitudinal-plan.routes'
 import {readSchoolPersonalChanges} from '../reporting/teacher-personal-changes.service'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z, ZodError } from 'zod'
@@ -13,13 +14,13 @@ import { readCampusStudentStatus } from './admission.service'
 import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readCampusStudentFeedback } from './student-feedback'
-import { listCampusGroupReportCatalog, listCampusGroupReportTools, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import { listCampusGroupReportCatalog, listCampusGroupReportSources, listCampusGroupReportTools, generateCampusGroupReport, readCampusGroupReport, requireCampusGroupManager } from './group-reports'
 import {educationGroupSelectionSchema,reportingLeafSourceSchema} from '../reporting/education-group-selection'
 import {listCampusGeneralGroupV2Catalog,publishCampusGeneralGroupV2,
   readCampusGeneralGroupV2} from './generalGroupV2.service'
 import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
 import { listCampusIndividualLongitudinalCatalog, listCampusIndividualLongitudinalSources, generateCampusIndividualLongitudinal } from './individual-longitudinal-studio'
-import { listCampusGroupLongitudinalCatalog,generateCampusFixedGroupLongitudinal } from './group-longitudinal-studio'
+import { listCampusGroupLongitudinalCatalog } from './group-longitudinal-studio'
 
 /**
  * SCHOOL has its own authenticated reporting surface. The legacy parent/reporting
@@ -86,12 +87,18 @@ router.get('/reports/groups/general-v2/:organizationId/:runId/:trackId/:specId',
     return readCampusGeneralGroupV2({actor:req.user!,...v})
   }))
 
+router.use('/reports/groups/plans',schoolPlanGroupRouter)
+
 // Internal school GROUP workbench: never teacher-rating release, raw rows or
 // arbitrary subgroup selectors. School governance or current psychology staff
 // only. Generation requires recent SCHOOL TOTP and the existing abuse budget.
 router.get('/reports/groups/catalog', guarded(req => {
   const q=z.object({organizationId:id}).strict().parse(req.query)
   return listCampusGroupReportCatalog(req.user!,q.organizationId)
+}))
+router.get('/reports/groups/sources',guarded(req=>{
+  const q=z.object({organizationId:id,page:z.coerce.number().int().min(1).max(10000)}).strict().parse(req.query)
+  return listCampusGroupReportSources(req.user!,q.organizationId,q.page)
 }))
 router.get('/reports/groups/tools',guarded(req=>{
   const input=z.object({organizationId:id,runId:id,trackId:id}).strict().parse(req.query)
@@ -110,13 +117,14 @@ router.get('/reports/groups/longitudinal/catalog',guarded(req=>{
   const values=z.object({organizationId:id}).strict().parse(req.query)
   return listCampusGroupLongitudinalCatalog(req.user!,values.organizationId)
 }))
-router.post('/reports/groups/longitudinal',requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+router.post('/reports/groups/longitudinal',requireRecentSchoolMfa,mutationBudget,guarded(async req=>{
   const values=z.object({
     organizationId:id,specId:id,
     analysisKind:z.enum(['REPEATED_COHORT','MATCHED_LONGITUDINAL']),
     sources:z.array(z.object({runId:id,trackId:id}).strict()).min(2).max(4),
   }).strict().parse(req.body)
-  return generateCampusFixedGroupLongitudinal({actor:req.user!,...values})
+  await requireCampusGroupManager(req.user!,values.organizationId)
+  throw new ReportingError('CAMPUS_LONGITUDINAL_PLAN_REQUIRED','请从已发布的追踪计划生成校园群体纵向报告',409)
 }))
 router.get('/reports/groups/:organizationId/:artifactId', guarded(req=>
   readCampusGroupReport({actor:req.user!,

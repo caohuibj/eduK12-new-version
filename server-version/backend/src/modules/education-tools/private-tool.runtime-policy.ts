@@ -1,6 +1,9 @@
 import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../assessment-relational/product-registry'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
 import {privateScaleResourceKey,privateScaleVariant,type PrivateScaleRuntimeOrigin} from './private-tool.runtime-origin'
+import {assertSelfGroupV2Entry,buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_KEY} from '../assessment-policy/self-group-contract'
+import {schoolPrivateGroupDisclosure,schoolPrivateScaleGroupChoice} from './school-private-group-source'
+import {parseSchoolPrivateGroupSelection} from './school-private-group-selection'
 export function privateScaleResourceEntry(origin:PrivateScaleRuntimeOrigin,title:string,definition:ScaleDefinitionV2,compositeId:string){
  const [population,responseMode]=origin.variantKey.split(':')
  const v=privateScaleVariant(origin.entry,{population,responseMode})
@@ -18,6 +21,14 @@ export function privateScaleResourceEntry(origin:PrivateScaleRuntimeOrigin,title
   cohortAnalysisPolicy:null,launchTarget:{runtime:'COMPOSITE',compositeAssessmentId:compositeId},
   resultDisclosure:{schemaVersion:1,policyKey,minimumRespondents:null,audiences:{RESPONDENT:personal?{mode:'INDIVIDUAL_SUMMARY',metricKeys,longitudinalMetricKeys:definition.report.audienceContract?.longitudinalMetricKeys??[]}:none,
    SUBJECT:none,TEACHER:none,PARENT:none,PROFESSIONAL:none,ORGANIZATION:none,RESEARCH:none}},
+ }
+ if(origin.schemaVersion===2){
+  const ceiling=schoolPrivateScaleGroupChoice({id:origin.versionId,contentHash:origin.contentHash,title,entry:origin.entry},definition)
+  const selection=parseSchoolPrivateGroupSelection(origin.groupReporting,{entry:origin.entry,administration:{population,responseMode},sources:ceiling?[ceiling]:[]})
+  entry.resultDisclosure=schoolPrivateGroupDisclosure({approved:entry.resultDisclosure!,minimumRespondents:selection.minimumRespondents,audiences:selection.leaves[0].audiences})
+  entry.applicability={...entry.applicability,analysisMode:'COHORT_AGGREGATE',visibilityPolicyKey:SELF_GROUP_POLICY_KEY,minimumRespondents:selection.minimumRespondents}
+  entry.cohortAnalysisPolicy=buildSelfGroupCohortAnalysisPolicy(entry.resultDisclosure)
+  assertSelfGroupV2Entry(entry)
  }
  createRelationalProductRegistry([entry]);return entry
 }

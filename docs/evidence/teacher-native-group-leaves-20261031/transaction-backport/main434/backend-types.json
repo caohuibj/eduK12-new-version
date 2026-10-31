@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "sourceTree": "87608f67cd86b84c37689989e1723d1e5b4a9f56",
+  "component": "backend",
+  "componentTree": "ace2d78d6cf1ca334ae65d49cfa8701c05df22c6",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "node": "v24.21.0",
+  "startedAt": "2026-10-31T03:20:12.315740+00:00",
+  "finishedAt": "2026-10-31T03:20:45.335961+00:00",
+  "exitCode": 0,
+  "inputsStable": true,
+  "inputFiles": 3995,
+  "inputManifestSHA256": "c7a5a86d791f52cba26642c4f092fb745afbc7f8107f561338e68203f59a27f5",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "originalSigned": false
+}

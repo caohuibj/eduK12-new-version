@@ -22,8 +22,17 @@ import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/c
 import {issueVerifiedEducationStart} from './education-start-context'
 import type {RunResourcePolicy} from './resourceAuthority'
 import {readSelectedSourceBindings,type SelectedSourceBindings} from '../education-tools/selected-source-binding'
+import {assertSchoolCompositionGroupIdentity} from '../education-tools/school-private-group-source'
 
 type Tx=Prisma.TransactionClient
+export const schoolSelfGroupAssignmentSql=(track:Prisma.Sql,assignment:Prisma.Sql)=>Prisma.sql`(
+ ${assignment}.analysis_mode='COHORT_AGGREGATE' AND ${assignment}.subject_role='STUDENT' AND ${assignment}.respondent_role='STUDENT'
+ AND ${assignment}.subject_user_id=${assignment}.respondent_user_id AND ${assignment}.relationship_kind='SELF' AND ${assignment}.perspective='SELF_REPORT'
+ AND ${track}.resource_key LIKE 'education-composition:SCHOOL:%:STUDENT:SELF:1.0.0'
+ AND ${track}.frozen_resource_policy->>'analysisMode'='COHORT_AGGREGATE'
+ AND ${track}.frozen_resource_policy#>>'{resultDisclosure,policyKey}'='EDUCATION_SELF_GROUP_V2'
+ AND ${assignment}.minimum_respondents=(${track}.frozen_resource_policy->>'minimumRespondents')::integer
+)`
 const manifestSchema=z.array(z.object({blockId:z.string().guid(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']),versionId:z.string().guid(),
  sourceProvider:z.enum(['PRIVATE_VERSION','PUBLIC_FORM','STANDARD_SCALE','LIBRARY_SCALE','COGNITIVE_CONFIG','SJT_RELEASE']),profileArtifactHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),contentHash:z.string(),itemIds:z.array(z.string().guid()),sectionIds:z.array(z.string().guid()),title:z.string()}).strict()).min(1).max(50)
 const unitsSchema=z.array(z.object({itemId:z.string(),family:z.enum(['SCALE','COGNITIVE','SJT']).default('SCALE'),scaleId:z.string().nullable(),versionId:z.string().guid(),contentHash:z.string(),
@@ -37,14 +46,16 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
  const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
  if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
  const variant=educationCompositionVariant(origin)
+ const group=origin.entry==='SCHOOL'&&origin.variantKey==='STUDENT:SELF'&&policy.analysisMode==='COHORT_AGGREGATE'
+  &&policy.resultDisclosure?.policyKey==='EDUCATION_SELF_GROUP_V2'
  if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
   ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
   ||policy.runtimeLaunchTarget?.kind!=='COMPOSITE'||policy.scientificMaturity!=='PILOT'
-  ||(isStudentComposition(origin)?!validStudentCompositionPolicy(policy):policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null)
+  ||(isStudentComposition(origin)?!validStudentCompositionPolicy(policy):!group&&(policy.analysisMode!=='INDIVIDUAL_ONLY'||policy.minimumRespondents!==null))
   ||canonicalHash([policy.subjectRoles,policy.respondentRoles,policy.relationshipKinds,policy.perspectives])
    !==canonicalHash([[variant.subjectRole],[variant.respondentRole],variant.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),[variant.perspective]]))
   privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
- const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown;publicBindings?:unknown}>>(Prisma.sql`SELECT c.name AS title,
+ const [row]=await tx.$queryRaw<Array<{title:string;manifest:unknown;units:unknown;groupReporting?:unknown;publicBindings?:unknown}>>(Prisma.sql`SELECT c.name AS title,original.definition->'groupReporting' AS "groupReporting",
   (SELECT COALESCE(jsonb_agg((b->'source')-ARRAY['kind','profile']),'[]'::jsonb) FROM jsonb_array_elements(original.definition->'blocks') b
    WHERE b#>>'{source,provider}' IN ('STANDARD_SCALE','COGNITIVE_CONFIG') AND b->'source'?'selectedBinding') AS "publicBindings",
   (SELECT jsonb_agg(jsonb_build_object('blockId',b->>'blockId','kind',b->>'kind','versionId',b->>'versionId','contentHash',b->>'contentHash','sourceProvider',b->>'sourceProvider',
@@ -70,6 +81,8 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
    AND c.created_by=${origin.ownerUserId} AND c.status='PUBLISHED' AND c.published_at IS NOT NULL
    AND c.product_kind='ORGANIZATION_RESOURCE' AND NOT c.public_enabled AND NOT c.copyable`)
  if(!row)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
+ if(group)assertSchoolCompositionGroupIdentity(policy,row.groupReporting)
+ else if(row.groupReporting!=null)privateToolFail('PRIVATE_COMPOSITION_EXECUTION_INVALID')
  return {kind:'COMPOSITION' as const,origin,compositeId:policy.runtimeLaunchTarget.ref,title:row.title,policy,binding,
   manifest:manifestSchema.parse(row.manifest),units:unitsSchema.parse(row.units),selectedBindings:readSelectedSourceBindings(row.publicBindings??[]),identityOnly:true as const}
 }
@@ -127,7 +140,8 @@ export async function readCompositionExecutionSource(tx:Tx,input:{executionId?:s
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id AND a.policy_domain='ORGANIZATION_RUN'
    AND a.resource_kind=t.resource_family AND a.resource_key=t.resource_key AND a.resource_version=t.resource_version
-   AND (a.analysis_mode='INDIVIDUAL_ONLY' OR (a.analysis_mode='COHORT_AGGREGATE' AND a.subject_role='TEACHER' AND a.respondent_role='STUDENT'))
+   AND (a.analysis_mode='INDIVIDUAL_ONLY' OR (a.analysis_mode='COHORT_AGGREGATE' AND a.subject_role='TEACHER' AND a.respondent_role='STUDENT')
+    OR ${schoolSelfGroupAssignmentSql(Prisma.sql`t`,Prisma.sql`a`)})
   JOIN assessment_run_actor_snapshots subject ON subject.id=e.subject_actor_snapshot_id AND subject.organization_id=e.organization_id
    AND subject.run_id=e.run_id AND subject.user_id=a.subject_user_id AND subject.actor_role=a.subject_role
   JOIN assessment_run_actor_snapshots respondent ON respondent.id=e.respondent_actor_snapshot_id AND respondent.organization_id=e.organization_id

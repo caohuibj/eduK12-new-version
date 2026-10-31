@@ -1,0 +1,1 @@
+src/modules/reporting/GroupLongitudinalPanel.tsx(23,89): error TS2550: Property 'at' does not exist on type '{ id: string; ordinal: number; title: string; }[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.

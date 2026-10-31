@@ -1,0 +1,16 @@
+{
+  "sourceHead": "dcc1dffe5d4feebc5c0f8da9c4d3ebf025c13be7",
+  "actualInlineStep": "select dependency-free documentation or tooling classification",
+  "fixture": "local two-parent merge-shaped checkout, not GitHub execution",
+  "exitCode": 0,
+  "outputs": {
+    "documentation": false,
+    "lightweight": true
+  },
+  "workflowBlob": "84d95686d025d1a6073472f00742e741a8cf1ad7",
+  "actionlintExit": 0,
+  "applicationTestsRun": false,
+  "migrationRun": false,
+  "sastRun": false,
+  "metadataOnlyFinalBindingContinuation": true
+}

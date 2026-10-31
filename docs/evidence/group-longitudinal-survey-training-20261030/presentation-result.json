@@ -1,0 +1,8 @@
+{
+  "synthetic": true,
+  "scope": "retained aggregate presentation only; no repeated backend/FINAL checks",
+  "viewport": 390,
+  "documentWidth": 390,
+  "tableScrollable": true,
+  "tableScrollLeft": 100
+}

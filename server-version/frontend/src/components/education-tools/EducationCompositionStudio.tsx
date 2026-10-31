@@ -1,6 +1,7 @@
 import {contextOptionsForKey,assessmentContextLabels,type AssessmentContextKey} from '../../modules/assessment-context/options'
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
 import {EducationPrivateVersionChooser} from './EducationPrivateVersionChooser'
+import {SchoolPrivateGroupDisclosure} from './SchoolPrivateGroupDisclosure'
 import {CompositionOutline} from '../../modules/assessment-core/composition/CompositionOutline'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
 import {PrivateToolPreview,type PrivateToolPreviewValue} from './PrivateToolPreview'
@@ -85,6 +86,7 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
   if((tool.definition.blocks.length||['STUDENT_REPORT','EXPERT_REPORT'].includes(responseMode)&&tool.definition.contextFields?.length)
    &&!window.confirm('更改作答方式需要重新选择适用的固定工具。确定清空当前工具列表及不适用的个人背景字段吗？'))return
   const {contextFields,...definition}=tool.definition
+  delete definition.groupReporting
   setReferences([]);setAnswers({});setSourceView('PRIVATE');change({definition:{...definition,schemaVersion:responseMode==='EXPERT_REPORT'?2:1,adapterVersion:responseMode==='EXPERT_REPORT'?'2.0.0':'1.0.0',
    ...(!['STUDENT_REPORT','EXPERT_REPORT'].includes(responseMode)&&contextFields?{contextFields}:{}),administration,blocks:[]}})
  }
@@ -106,6 +108,10 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
  }
  const block=preview?tool?.definition.blocks[previewIndex]:undefined
  const responseMode=tool?.definition.administration.responseMode??'SELF'
+ const groupChoices=entry==='SCHOOL'&&responseMode==='SELF'?tool?.definition.blocks.flatMap(block=>{
+  const reference=references.find(reference=>reference.sourceProvider===block.source.provider&&reference.id===block.source.versionId&&reference.contentHash===block.source.contentHash)
+  return reference?.sourceProvider==='PRIVATE_VERSION'&&reference.kind==='SCALE'&&reference.groupChoice?[{...reference.groupChoice,blockId:block.blockId}]:[]
+ })??[]:[]
  const sourceViewActual=sourceView
  const targetKind=tool?.definition.administration.responseMode==='EXPERT_REPORT'?tool.definition.administration.targetKind:undefined
  const reference=block?references.find(row=>row.sourceProvider===block.source.provider&&row.id===block.source.versionId&&row.contentHash===block.source.contentHash):undefined
@@ -195,6 +201,10 @@ function CompositionSession({api,organizationId,actorId,entry,onDraftStateChange
       onChange={event=>change({definition:{...tool.definition,blocks:tool.definition.blocks.map((block,i)=>i===index?{...block,instruction:event.target.value}:block)}})}/></label>{responseMode==='SELF'&&tool.definition.blocks[index].source.kind!=='FORM'&&<label><input type="checkbox" disabled={busy} checked={tool.definition.blocks[index].longitudinal===true} onChange={event=>change({definition:{...tool.definition,blocks:tool.definition.blocks.map((block,i)=>i===index?{...block,longitudinal:event.target.checked}:block)}})}/>允许本工具已获准的本人数字指标用于纵向查看；具体追踪指标在任务发布时选择。</label>}</>}
      footer="量表反馈由固定版本和受众权限独立决定，表单仅采集信息。正式整包不能拆分或加入这里。"/>
    </div>
+   {entry==='SCHOOL'&&responseMode==='SELF'&&<SchoolPrivateGroupDisclosure choices={groupChoices} value={tool.definition.groupReporting??null} disabled={busy} onChange={groupReporting=>{
+    const definition={...tool.definition};delete definition.groupReporting
+    change({definition:{...definition,...(groupReporting?{groupReporting}:{})}})
+   }}/>}
    {preview&&<section aria-label="问卷内容预览"><h3>问卷内容预览</h3><p>试填仅保留在本页，不计分或保存为正式作答。</p><p>{tool.definition.instruction}</p>{!!tool.definition.contextFields?.length&&<aside aria-label="背景信息预览"><h4>背景信息（问卷第一屏）</h4>{tool.definition.contextFields.map(field=><p key={field.contextKey}>{field.formLabel}（必答）{field.formOptions.length?'：'+field.formOptions.map(option=>option.label).join('、'):'：YYYY-MM'}</p>)}</aside>}
     <div><button disabled={previewIndex===0} onClick={()=>setPreviewIndex(index=>index-1)}>上一工具</button><span>{previewIndex+1} / {tool.definition.blocks.length}</span>
      <button disabled={previewIndex===tool.definition.blocks.length-1} onClick={()=>setPreviewIndex(index=>index+1)}>下一工具</button></div>

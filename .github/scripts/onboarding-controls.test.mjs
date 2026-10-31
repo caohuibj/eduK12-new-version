@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,decodeOriginal,verifyCloudComponentTypeReceipt,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -494,4 +494,74 @@ test('Training course delivery qualifier binds its backend/frontend and reviewed
  const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,423);assert(task1SastConfig(p,f.b).paths.includes(frontend));
  const unknown='server-version/backend/src/modules/scale/unrelated-new-runtime.ts';
  assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+
+test('Training standalone Scale reader qualifier uses retained cases and stays within its exact backend source',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/training-analysis/source.ts';
+ f.b.pr=424;f.b.source={[file]:{before:null,after:blob}};
+ f.entries=[file,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'424',CI_HEAD_REF:BRANCHES[424]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,424);assert(task1SastConfig(p,f.b).paths.includes(file));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...r)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):f.read(cmd,a,...r),f.env,f.b));
+});
+
+
+test('Shared SELF GROUP qualifier binds both current components and its two disclosure fixes without a second application engine',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/reporting/respondentSummary.ts',frontend='server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx';
+ f.b.pr=426;f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'426',CI_HEAD_REF:BRANCHES[426]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,426);assert(task1SastConfig(p,f.b).paths.includes(backend));assert(task1SastConfig(p,f.b).paths.includes(frontend));
+ const unknown='server-version/backend/src/modules/reporting/unrelated-new-engine.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+// PR432 checks only the new routing/receipt glue; retained business cases are not executed.
+test('PR432 exact mixed scope and changed-input SAST keep unrelated paths outside the lane',()=>{
+ const f=fixture(),paths=['server-version/backend/src/modules/reporting/discovery.ts','server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx'];
+ f.b.pr=432;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));
+ f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'432',CI_HEAD_REF:BRANCHES[432]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,432);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');
+ assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'433'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+test('PR432 admits exactly the retained 14-case union and rejects either original-byte hash drift',()=>{
+ const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['432'];
+ const names=review.reports.flatMap(proof=>verifyOriginalReport(decodeOriginal(proof,readFileSync(proof.path)),proof));assert.equal(names.length,14);assert.equal(new Set(names).size,14);
+ const proof=review.reports[0],bytes=readFileSync(proof.path);
+ assert.throws(()=>decodeOriginal({...proof,sha256:'0'.repeat(64)},bytes));assert.throws(()=>decodeOriginal({...proof,originalJSONSHA256:'0'.repeat(64)},bytes));
+});
+test('PR432 admits actual final-tree cloud compiler argv and exit records without inferring success from logs',()=>{
+ const review=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['432'];
+ for(const proof of review.types){const receipt=decodeOriginal(proof,readFileSync(proof.path)),call=value=>verifyCloudComponentTypeReceipt(value,proof,path=>readFileSync(path),proof.componentTree);
+  assert.equal(call(receipt).originalExitCode,0);assert.throws(()=>call({...receipt,exitCode:1}));assert.throws(()=>call({...receipt,componentTree:h('9')}));assert.throws(()=>call({...receipt,argv:['node','--version']}));
+ }
+});
+
+// Existing receipt readers are unchanged; only the new exact candidate routing is checked here.
+test('PR434 target questionnaire qualifier binds both consumers and rejects unknown scope',()=>{
+ const f=fixture(),paths=['server-version/backend/src/controllers/questionnaireController.ts','server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx'];
+ f.b.pr=434;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'434',CI_HEAD_REF:BRANCHES[434]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,434);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('quota candidate reuses the existing missing compiler route without frontend, migration or duplicate image work',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/cognitive/attempt-quota.ts';
+ f.b={...f.b,pr:421,source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries(CONTROLS.map(path=>[path,null]))};
+ f.entries=[file,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'421',CI_HEAD_REF:BRANCHES['421']};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b),outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]));
+ const needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);
+ assert.deepEqual(failedChecks(needs,false),[]);
+ assert.equal(outputs.frontend,'false');assert(task1SastConfig(p,f.b).paths.includes(file));
+ assert(failedChecks({...needs,scope:{result:'success',outputs:{...outputs,onboarding_plan:'invalid'}}},false).includes('scope'));
+ for(const extra of [{file:'server-version/frontend/src/new.ts',status:'A',oldMode:'000000',newMode:'100644'},{...f.entries[0],newMode:'120000'}])
+  assert.throws(()=>onboardingPlan([...f.entries,extra],base,head,f.read,f.env,f.b));
+ for(const change of [{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'},{CI_PR_NUMBER:'422'},{CI_PR_REPOSITORY:'outside/repo'}])
+  assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...change},f.b));
 });

@@ -1,0 +1,1 @@
+{"check":"changed-two-module semantic increment only","files":["src/modules/reporting/task-artifact.ts","src/modules/training-analysis/group-report.service.ts"],"diagnostics":0}

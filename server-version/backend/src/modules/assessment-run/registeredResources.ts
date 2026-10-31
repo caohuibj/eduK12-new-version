@@ -238,6 +238,12 @@ export async function resolveHistoricalRelationalEntry(ref: { resourceKind: stri
     if(source.origin.family!==ref.resourceKind)return null
     return source.entry
   }
+  if(ref.resourceKey.startsWith('private-scale:SCHOOL:')&&ref.resourceVersion==='2.0.0'
+    ||ref.resourceKey.startsWith('education-composition:SCHOOL:')){
+    const {resolveSchoolPrivateGroupHistory}=await import('../education-tools/school-private-group-history')
+    const school=await resolveSchoolPrivateGroupHistory(db,ref)
+    if(school)return school
+  }
   if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry

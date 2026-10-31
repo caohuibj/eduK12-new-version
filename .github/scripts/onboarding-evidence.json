@@ -336,6 +336,181 @@
     ]
   },
   "candidates": {
+    "434": {
+      "schemaVersion": 1,
+      "product": "f44a207d1e20bbfdf502e7e7a7c1e44df3479708",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Retained unsigned cloud local originals; final component types on integrated PR432 dependency",
+        "limitations": [
+          "Nine named selected cases from original reporters, not a new application execution. Original failures and filters are preserved.",
+          "Controller/Prisma mocks and parent React component with child stub; no real database/auth/session durability or live-browser/network latency evidence.",
+          "Backend compiler excludes tests; frontend covers app tsconfig. Selected compiler and generated input hashes retained, not complete node_modules byte attestation."
+        ]
+      },
+      "reports": [
+        {
+          "id": "target-retained-1",
+          "path": "docs/performance/questionnaire-target-20261031/backend-fixed.json.gz",
+          "sha256": "abc9a24c4d364b8b9bbd8f21ef05ae752203fcfcc02315f922b73869dfd1f7f7",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "59fc728d5b3665b1866be1f3843c0519a8faa78b3d3f9500ac7a7102be1efdfa",
+          "originalSourceAssociation": "2685b3dbc78d59ec790138966af4935191d8a70d",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/reporting/spec.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local cases ran on uncommitted source later preserved in the product commit; no invented contemporaneous execution Git identity.",
+          "deltaRationale": "Target availability/filter and parent state branches plus their direct test inputs are unchanged. Integrated PR432 edits other controller listContent and separate Form/Final children; the target tests mock those dependencies and do not call those branches. Main group/Scale/report additions are outside the selected invocation closures. Full component delta retained; final assembled types are separate actual executions.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 6,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps not-joined outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps draft outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps general outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps private outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps missing outside target availability",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+            "keeps not-joined outside target availability",
+            "keeps draft outside target availability",
+            "keeps general outside target availability",
+            "keeps private outside target availability",
+            "keeps missing outside target availability"
+          ]
+        },
+        {
+          "id": "target-retained-2",
+          "path": "docs/performance/questionnaire-target-20261031/frontend-fixed.json.gz",
+          "sha256": "18189e9b10a1b76a790cfbc4858e11aef4a31aa2cda93ccb6307bb139ca5e0d1",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "e2584822b82ddb43e173acfafbf0dd774d6de2d5849ead133f14df13b9e0551f",
+          "originalSourceAssociation": "2685b3dbc78d59ec790138966af4935191d8a70d",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned local cases ran on uncommitted source later preserved in the product commit; no invented contemporaneous execution Git identity.",
+          "deltaRationale": "Target availability/filter and parent state branches plus their direct test inputs are unchanged. Integrated PR432 edits other controller listContent and separate Form/Final children; the target tests mock those dependencies and do not call those branches. Main group/Scale/report additions are outside the selected invocation closures. Full component delta retained; final assembled types are separate actual executions.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "opens only the target questionnaire with unchanged active-with-completed dispatch",
+              "status": "passed"
+            },
+            {
+              "fullName": "opens only the target questionnaire with unchanged completed dispatch",
+              "status": "passed"
+            },
+            {
+              "fullName": "opens only the target questionnaire with unchanged unstarted dispatch",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "opens only the target questionnaire with unchanged active-with-completed dispatch",
+            "opens only the target questionnaire with unchanged completed dispatch",
+            "opens only the target questionnaire with unchanged unstarted dispatch"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/questionnaire-target-20261031/final-qualification/backend-types.json",
+          "sha256": "fb19448838a7caa870f14d5f003980946381224fc906c36199494debc3323b1b",
+          "component": "backend",
+          "componentTree": "f1add827fbed7ba266f9978428688ae4ec4629ad",
+          "log": "docs/performance/questionnaire-target-20261031/final-qualification/backend-types.log"
+        },
+        {
+          "path": "docs/performance/questionnaire-target-20261031/final-qualification/frontend-types.json",
+          "sha256": "6068bf3c4d4e795880cbcb59b1af2f44d034afdd0320eaea053dc1804ac7f8bc",
+          "component": "frontend",
+          "componentTree": "a6fba422c422bb589c5793d4b75d67d03ee8330c",
+          "log": "docs/performance/questionnaire-target-20261031/final-qualification/frontend-types.log"
+        }
+      ]
+    },
     "415": {
       "schemaVersion": 1,
       "product": "0367785f19fadc20b9e9368d8e435377f298bcca",
@@ -12083,6 +12258,2030 @@
           "log": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log"
         }
       ]
+    },
+    "424": {
+      "schemaVersion": 1,
+      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Two passed application cases remain original unsigned observations, not fresh CI execution.",
+          "Complete backend equals original reviewed Legacy type receipt; frontend unchanged from aligned423 and not compiled again.",
+          "Picker read-only continuation is retained documentation, not a third application test; no broad browser/PG/migration/FINAL replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "scale-adapter",
+          "path": "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json",
+          "sha256": "c8f65584fcfc0738d72dd82f9b6fb0bbb6096140b480e23454c94f6ad43bac8e",
+          "originalSourceAssociation": "298e1dc960b898327f437f24368d219f5edfb933",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "deltaRationale": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "adapts official Scale zero, missing and signed values with their true ranges; changes to R do not change C",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "scale-native",
+          "path": "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json",
+          "sha256": "8248695a17d724242d358fc16f8b20061e9bc4972358e0da76e0260f98959cfa",
+          "originalSourceAssociation": "298e1dc960b898327f437f24368d219f5edfb933",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "deltaRationale": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "generates and reads a disclosed five-person standalone Scale report from frozen course Episodes without roster inference",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-legacy-course-20261030/backend-types.json",
+          "sha256": "bb78e3cf229e05c6b3d1232bb6ba81fe25ad6cd684386e7f06115cfe75f9e661",
+          "component": "backend",
+          "componentTree": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-legacy-course-20261030/backend-types.log"
+        }
+      ]
+    },
+    "426": {
+      "schemaVersion": 1,
+      "product": "2ae11d44cb43ac00261394b07e24bc46d54334b9",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Seven distinct successful staged contract/registration cases retained, not seven new CI executions; original skipped cases remain skipped.",
+          "F1/F2 have specific passed counterexamples and independent static closure; no all-forms/all-protocol journey or production permission claim.",
+          "Both actual current component receipts cover F1/F2 and aligned chart loading; no application, FINAL, DB or compiler replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "self-group-contract",
+          "path": "docs/evidence/education-self-group-v2-20261030/contract.json",
+          "sha256": "50d6728b46ff4efd2d88d8be6811f3e1edd34d498e96861dc102b1188c798f23",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "new explicit SELF GROUP contract requires a v2 SELF contract, preserves own ceilings and checks each aggregate audience independently",
+              "status": "passed"
+            },
+            {
+              "fullName": "new explicit SELF GROUP contract binds the chosen frozen leaf, keeps container swaps in one disclosure identity and separates real measurement changes",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "native-publisher-own-feedback",
+          "path": "docs/evidence/education-self-group-publishing-20261030/native.json",
+          "sha256": "18103e34b19b0b4e86951dd15df8c79d39591ef2b82b60fe4394d247688cbc8c",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 37
+          },
+          "cases": [
+            {
+              "fullName": "freezes explicit per-leaf GROUP ceilings without upgrading old sources or mixing same-named scores",
+              "status": "passed"
+            },
+            {
+              "fullName": "preserves own saved FINAL summaries under an explicit new GROUP contract and keeps per-leaf NONE private",
+              "status": "passed"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) reads exact saved mixed reports and independently rechecks current source and respondent rights",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses not-own before facts and never treats identity as authorization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses membership before facts and never treats identity as authorization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses source-authority before facts and never treats identity as authorization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong product binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong organization binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong version binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong subject binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong assignment binding",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) honors current respondent disclosure without materializing raw canonical facts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) shows only completion when the frozen tool permits that mode",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) returns PENDING only for a real matching accepted asynchronous job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for absent report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-epoch report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-slots report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for failed report job",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects respondent withdrawal during asynchronous materialization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects authority withdrawal during asynchronous materialization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects release withdrawal during asynchronous materialization",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses a changed canonical FINAL source rather than displaying a stored template",
+              "status": "skipped"
+            },
+            {
+              "fullName": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) repeated reads do not write FINAL, reinterpretation or queue state",
+              "status": "skipped"
+            },
+            {
+              "fullName": "honors an exact configured education report opening and becomes readable after that time",
+              "status": "skipped"
+            },
+            {
+              "fullName": "refuses a different frozen publication even if unit IDs are the same",
+              "status": "skipped"
+            },
+            {
+              "fullName": "does not replace original source authority proofs with another later administrator during a read",
+              "status": "skipped"
+            },
+            {
+              "fullName": "refuses replacement of the frozen distribution proof while materializing a saved report",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps identically named metrics in distinct approved unit reports instead of flattening a mixed bundle",
+              "status": "skipped"
+            },
+            {
+              "fullName": "production composition consumes HISTORY and original proofs without new-use or current-issuer admission",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form NONE never exposes completion feedback from the measurement-free exception",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form completion obeys the same frozen opening and opens without creating report facts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "pure Form uses its frozen education schedule without borrowing a Training course snapshot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "production composition enforces frozen education timing with no injected opening reader",
+              "status": "skipped"
+            },
+            {
+              "fullName": "an optional earlier workflow opening cannot widen the frozen schedule",
+              "status": "skipped"
+            },
+            {
+              "fullName": "rejects malformed present frozen policy instead of silently enabling legacy immediate: null",
+              "status": "skipped"
+            },
+            {
+              "fullName": "rejects malformed present frozen policy instead of silently enabling legacy immediate: {\"schemaVersion\":1,\"mode\":\"SCHEDULED\",\"releaseAt\":\"bad-date\"}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "rejects malformed present frozen policy instead of silently enabling legacy immediate: {\"schemaVersion\":1,\"mode\":\"OTHER\"}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "an elapsed frozen schedule does not open NONE, incomplete or unauthorized Form reads",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "registration-ui",
+          "path": "docs/evidence/education-self-group-publishing-20261030/frontend.json",
+          "sha256": "43b366da3bd71d13850bc397fa2a8c61d90be86b3fddcdd8ad4c42297ed0ee19",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 17
+          },
+          "cases": [
+            {
+              "fullName": "registers explicit per-tool GROUP audiences while preserving the selected own report and scheduled opening",
+              "status": "passed"
+            },
+            {
+              "fullName": "shared education registration management real client contracts presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts does not expose operations before actual issuer read succeeds and keeps denial closed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts freezes exact P/R, real grant ids, explicit scheduled UTC and respondent-only disclosure without publication flags",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts freezes only an explicitly selected own longitudinal subset in the new registration",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts requires an explicit immediate choice and supports pure Form with explicit empty P/R and completion only",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts recovers a lost registration response by original id without repeating the mutation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts discards a pending read after organization switches",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts recovers an existing preparation by id and reloads actual source and grant choices without creating another preparation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts refuses multiple grant conflicts before POST rather than replacing a pinned source asset",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts disables unavailable sources and P/R without guessing missing authority",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts submits NONE disclosure with stable readonly policy id and only original licenses when P/R are not selected",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts clears an old source selection when the current source list refreshes",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts cancels a pending permission read without late resurrection",
+              "status": "skipped"
+            },
+            {
+              "fullName": "shared education registration management real client contracts reviews an independent frozen registration with its hash and reads the result back",
+              "status": "skipped"
+            },
+            {
+              "fullName": "bounded resource pagination continues an empty eligible source page and preserves the selected source grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "bounded resource pagination appends P/R choices without clearing selections or replacing the original grant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "bounded resource pagination refuses a changed measurement on later pages and preserves the prior selection",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "public-inbox-ceiling",
+          "path": "docs/evidence/self-group-inbox-disclosure-20261030/contract.json",
+          "sha256": "bcaa7ae0c2d1ffa82903e460cc5d8189e600d2b3f5d75fc807df527d340ecd8c",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 5
+          },
+          "cases": [
+            {
+              "fullName": "refuses public SELF GROUP summaries while allowing only the internal whitelist without materializing scores",
+              "status": "passed"
+            },
+            {
+              "fullName": "own Run feedback summary projects only content-approved canonical metrics for the exact respondent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "checks current respondent disclosure without flattening same-named canonical unit metrics",
+              "status": "skipped"
+            },
+            {
+              "fullName": "retains the default metric summary refusal for an ambiguous observation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "does not treat disclosure-only as permission after current access is withdrawn",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps internal disclosure and exact historical source rechecks on the supplied report transaction",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "bundle-leaf-ceiling",
+          "path": "docs/evidence/self-group-bundle-leaf-ceiling-20261030/contract.json",
+          "sha256": "fcbe37887503cc4ba7a301c806d9c7934623548858f3fb446221acc4a8c69103",
+          "originalSourceAssociation": "203aae6ecc93407bc01edaa753ab4def9e97e293",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "deltaRationale": "Unsigned staged original retained, retrospectively associated with the saved203aae shared snapshot, not an execution-time commit signature. Earlier publishing originals predate F1/F2; those fixes strengthen public Inbox refusal and per-item Bundle selector ceilings and have their two separate passed counterexamples below. The pure helper and registration/own-feedback case bytes are retained; filtered old cases remain filtered. Final backend bytes equal203aae; the only later frontend production delta is unrelated PersonalChangesReport chart loading, outside this registration case; current combined types cover interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "withholds Bundle inference when a READY item forbids its selector despite a global grant from another item",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.json",
+          "sha256": "9608eba36d87981255808e67823ee22fabe08c664083135b311f1db68c667c5a",
+          "component": "backend",
+          "componentTree": "770f31e559fb0384eaeb219b3fe1854e5f703799",
+          "exitField": "exitCode",
+          "log": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.json",
+          "sha256": "652e2b3b28fdb84835a2a2a06f92707f34db386cd4204acde400d700a49ca488",
+          "component": "frontend",
+          "componentTree": "351d797491ef24a75dffd40678245a6626e3323c",
+          "exitField": "exitCode",
+          "log": "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.log"
+        }
+      ]
+    },
+    "432": {
+      "schemaVersion": 1,
+      "product": "16c5f66860ff92fd91aa529d43de50d1d714bceb",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "unsigned cloud local originals, retrospectively indexed; final types executed once on integrated component trees",
+        "limitations": [
+          "14 distinct selected cases are a disjoint union of retained original reporters, not a new full execution. All failures and filtered rows remain in repository originals.",
+          "Controller/Prisma mocks and synthetic loopback/jsdom fixtures; no real database, browser build, live authentication, production timing, p95 or concurrency claim.",
+          "Backend compiler excludes tests; frontend covers app tsconfig. Dependency/tool selected hashes recorded; no complete node_modules attestation."
+        ]
+      },
+      "reports": [
+        {
+          "id": "retained-1",
+          "path": "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-fixed.json.gz",
+          "sha256": "fc1728655c3997562c47bd837cc6524ef3424e0efd1fba98f81249eb73d7c90a",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "4d4118bbff0ea9ce339c9448280df822a04e7b3600587f93d35ffb03110eea72",
+          "originalSourceAssociation": "61440918cdada213e7da08e16bfb753a9fca3e2c",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
+          ],
+          "sourceAssociationBasis": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+          "deltaRationale": "Original directly exercised consumer bytes remain, except the explicitly recorded same-slice accepted-state repair covered by the later three-case continuation. Other component delta comprises separate slice code and main group/report/Scale additions, outside these mocked handler/render interactions. Exact complete delta retained; current assembled component types are separately checked. The two original accepted cases are retained in this reporter but superseded by the extended repair reporter.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 7
+          },
+          "cases": [
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement keeps Scale provenance out of form-section submit payloads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement flushes the last text edit before sealing the FORM_SECTION payload",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement sends one top-level provenance object on authenticated Scale final submit",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement uses the same top-level provenance contract on public Scale final submit",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement captures once when the current Scale has no server provenance",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement restores draft provenance without fresh capture and preserves capturedAt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement replays the identical sealed Scale body after an ambiguous submit failure",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps sealed Form answers locked while allowing navigation and identical retry",
+              "status": "passed"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+              "status": "passed"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps sealed Form answers locked while allowing navigation and identical retry"
+          ]
+        },
+        {
+          "id": "retained-2",
+          "path": "docs/performance/access-followup-20261031/questionnaire-review-repair/fixed.json.gz",
+          "sha256": "7ae3052dffd2b6c039d80fe6045f46b848df7ddc401e100be14c9a6d122eb9b8",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "98ea8de785c0e6a6449b10a1594abb073d23609677703f7be364c3ad25947a74",
+          "originalSourceAssociation": "926b6b8ede703762ae174fee876ae0a8c59fe8f9",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
+          ],
+          "sourceAssociationBasis": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+          "deltaRationale": "Original directly exercised consumer bytes remain, except the explicitly recorded same-slice accepted-state repair covered by the later three-case continuation. Other component delta comprises separate slice code and main group/report/Scale additions, outside these mocked handler/render interactions. Exact complete delta retained; current assembled component types are separately checked. Original statuses and filters retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 8
+          },
+          "cases": [
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement keeps Scale provenance out of form-section submit payloads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement flushes the last text edit before sealing the FORM_SECTION payload",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement sends one top-level provenance object on authenticated Scale final submit",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement uses the same top-level provenance contract on public Scale final submit",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement captures once when the current Scale has no server provenance",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement restores draft provenance without fresh capture and preserves capturedAt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement replays the identical sealed Scale body after an ambiguous submit failure",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps sealed Form answers locked while allowing navigation and identical retry",
+              "status": "skipped"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps Form answers disabled when draft identity conflicts before metadata loads",
+              "status": "passed"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+              "status": "passed"
+            },
+            {
+              "fullName": "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "FinalQuestionnaireAssessment Scale provenance placement recovery: keeps Form answers disabled when draft identity conflicts before metadata loads",
+            "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Form when progress reload fails",
+            "FinalQuestionnaireAssessment Scale provenance placement recovery: preserves accepted Scale when progress reload fails"
+          ]
+        },
+        {
+          "id": "retained-3",
+          "path": "docs/performance/access-followup-20261031/spec-discovery/discovery-fixed.json.gz",
+          "sha256": "cae0bbbefda5f1d92b1e7e8677a50f41ba1f4f186a1e577795b65bcbce8ef57f",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "dad25cd4a284285f45efab5beca26a907046c668b40dc14644e71d16094e4566",
+          "originalSourceAssociation": "7cdc9fbce8f21c835ff93f75fa209cb65dd4c681",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+          "deltaRationale": "Original directly exercised consumer bytes remain, except the explicitly recorded same-slice accepted-state repair covered by the later three-case continuation. Other component delta comprises separate slice code and main group/report/Scale additions, outside these mocked handler/render interactions. Exact complete delta retained; current assembled component types are separately checked. Original statuses and filters retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "returns the same published spec page with two reads for 1 records",
+              "status": "passed"
+            },
+            {
+              "fullName": "returns the same published spec page with two reads for 4 records",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "returns the same published spec page with two reads for 1 records",
+            "returns the same published spec page with two reads for 4 records"
+          ]
+        },
+        {
+          "id": "retained-4",
+          "path": "docs/performance/access-followup-20261031/content-units/content-controller-fixed.json.gz",
+          "sha256": "2be1aa4258751ea20c4fab68b8b3fa5a21b3187439de7d078cfbb9d74a91ec0c",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "f2802b2be616a73c10e75d9d2e68f1f29803f37371c9c1bbd993c3247ca76d20",
+          "originalSourceAssociation": "01be5cee34e9f0d38b3372d3f7591afd8b4bc57e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+          "deltaRationale": "Original directly exercised consumer bytes remain, except the explicitly recorded same-slice accepted-state repair covered by the later three-case continuation. Other component delta comprises separate slice code and main group/report/Scale additions, outside these mocked handler/render interactions. Exact complete delta retained; current assembled component types are separately checked. Original statuses and filters retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 6,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "GENERAL units-only content skips both discarded payload reads after authorization",
+              "status": "passed"
+            },
+            {
+              "fullName": "COURSE units-only content skips both discarded payload reads after authorization",
+              "status": "passed"
+            },
+            {
+              "fullName": "GENERAL default content preserves full sorted list, definitions and total",
+              "status": "passed"
+            },
+            {
+              "fullName": "COURSE default content preserves full sorted list, definitions and total",
+              "status": "passed"
+            },
+            {
+              "fullName": "GENERAL units-only content still refuses a non-manager before reading content",
+              "status": "passed"
+            },
+            {
+              "fullName": "COURSE units-only content still refuses a non-manager before reading content",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "GENERAL units-only content skips both discarded payload reads after authorization",
+            "COURSE units-only content skips both discarded payload reads after authorization",
+            "GENERAL default content preserves full sorted list, definitions and total",
+            "COURSE default content preserves full sorted list, definitions and total",
+            "GENERAL units-only content still refuses a non-manager before reading content",
+            "COURSE units-only content still refuses a non-manager before reading content"
+          ]
+        },
+        {
+          "id": "retained-5",
+          "path": "docs/performance/access-followup-20261031/content-units/manager-fixed.json.gz",
+          "sha256": "0bc576c2f61b2a733d151820ebe1bf35693161804598e1d1961dd8491f10ca0a",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "ff989a4c37645d6a0720135b8196d3a186fc429d0885d6c2c1d67b8af85eaae6",
+          "originalSourceAssociation": "01be5cee34e9f0d38b3372d3f7591afd8b4bc57e",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
+          ],
+          "sourceAssociationBasis": "Original task tested uncommitted bytes later committed as named source; unsigned local execution, not contemporaneous Git authentication.",
+          "deltaRationale": "Original directly exercised consumer bytes remain, except the explicitly recorded same-slice accepted-state repair covered by the later three-case continuation. Other component delta comprises separate slice code and main group/report/Scale additions, outside these mocked handler/render interactions. Exact complete delta retained; current assembled component types are separately checked. Original statuses and filters retained.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 10
+          },
+          "cases": [
+            {
+              "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+              "status": "passed"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q",
+              "status": "passed"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP measures initial shared manager at /composite-assessments/q",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP measures the real ordinary editor basic, content and cached tab revisit",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /general-questionnaires/q",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /questionnaires/q",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP uses only sections and order and refreshes canonical membership after a move at /composite-assessments/q",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP uses the refreshed section list for newly available fields",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP derives membership when nested field DTOs omit their enclosing section IDs",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP keeps a failed /form-sections distinguishable from an empty section list",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP keeps a failed /content distinguishable from an empty section list",
+              "status": "skipped"
+            },
+            {
+              "fullName": "canonical section field source over synthetic HTTP keeps published/read-only section management non-mutating",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "canonical section field source over synthetic HTTP measures initial shared manager at /general-questionnaires/q",
+            "canonical section field source over synthetic HTTP measures initial shared manager at /questionnaires/q"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/access-followup-20261031/final-qualification/main6627/backend-types.json",
+          "sha256": "f883ad01fa964dd72648ad026a53519157b79dd88f8cd5c1734cec55f1867d22",
+          "component": "backend",
+          "componentTree": "ba7101d00c071160007d5b016f591e297c5c2f1c",
+          "log": "docs/performance/access-followup-20261031/final-qualification/main6627/backend-types.log"
+        },
+        {
+          "path": "docs/performance/access-followup-20261031/final-qualification/main6627/frontend-types.json",
+          "sha256": "0e818c72bfecec6b7e9372cad67ecdcafc7462146f2376ce52698c0f21fa268d",
+          "component": "frontend",
+          "componentTree": "5ce2c28959f26d7ddeaba7aac8a63c15bb205415",
+          "log": "docs/performance/access-followup-20261031/final-qualification/main6627/frontend-types.log"
+        }
+      ]
+    },
+    "428": {
+      "schemaVersion": 1,
+      "product": "10d8bfffbb4144628bfc34bba8c2988cbf0e55bb",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Eleven passed staged cases retained; old failed setup/fixture/raw reporters and filtered cases are not erased or represented as fresh full successes.",
+          "Original/library N10, mean3/SD0, saved-read canonical0 are the sufficient-N cases; the older one-person read is not presented as sufficient-N aggregation.",
+          "Two existing trigger migrations were applied only in the retained isolated test DB for original publisher/Run/FINAL cases; no production migration or new schema framework. Current full backend/frontend types include the reviewed transaction fix.",
+          "Only existing scope/admission/CodeQL/gate execute; no new auth layer or platform/build/browser/FINAL replay.",
+          "Original successful formal41162868653 is tied to main6627; current main432 changes both components, so each integrated component compiled once. No original application or FINAL replay.",
+          "Main434 superseded the unpublished main432 alignment. Questionnaire-only input changes retain original Teacher cases; current whole component receipts bind this actual integration, not earlier trees."
+        ]
+      },
+      "reports": [
+        {
+          "id": "original-publisher",
+          "path": "docs/evidence/teacher-self-group-scale-20261030/postgres.json",
+          "sha256": "87a86f6d4573d56f54f01a8c05d3d3bf38ef1ed30071622c83bf6a16eda36b14",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "original Teacher Scale explicitly reviewed SELF GROUP version publishes a separate GROUP resource and preserves same-FINAL own feedback without reopening the public inbox",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "original-register-ui",
+          "path": "docs/evidence/teacher-self-group-scale-20261030/frontend.json",
+          "sha256": "ed3f5254c9e3479d74e6f6657a70ab16adc28c01e7c7172c5f7ffa8563c49a74",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 6
+          },
+          "cases": [
+            {
+              "fullName": "attaches an explicitly released Teacher GROUP version with its frozen floor and own-feedback ceiling",
+              "status": "passed"
+            },
+            {
+              "fullName": "Teacher common-library catalogue consumer continues empty pages and preserves selection on failed pagination, then retries without duplicates",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher common-library catalogue consumer rejects library policy undefined without attaching a track",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher common-library catalogue consumer rejects library policy HUITEACHER_ADULT_SELF_PILOT_V1 without attaching a track",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher common-library catalogue consumer saves the exact library policy without converting report availability into permission",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher common-library catalogue consumer saves the exact legacy policy without converting report availability into permission",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher common-library catalogue consumer isolates event lists and discards a pending old organization/API response",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "own-entitlement-boundary",
+          "path": "docs/evidence/teacher-self-group-scale-20261030/standalone-boundary.json",
+          "sha256": "d15e1fcf84d0a503c9a6116b31e9000d8333582d78cf0d70f9f539b65973c6cc",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "does not reinterpret an organization GROUP resource as a standalone personal Scale entitlement",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "library-register-ui",
+          "path": "docs/evidence/library-self-group-release-20261031/frontend.json",
+          "sha256": "9def9c5816029bed38c0b4b00685154937ece4db1ac7e77379c9bdfcd5600303",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 4
+          },
+          "cases": [
+            {
+              "fullName": "exposes normal resource and spec draft → review → publication with explicit scope",
+              "status": "skipped"
+            },
+            {
+              "fullName": "offers retry for a plain-object 502 and does not claim a permissions problem",
+              "status": "skipped"
+            },
+            {
+              "fullName": "loads older resources without losing selection or duplicating overlapping page rows",
+              "status": "skipped"
+            },
+            {
+              "fullName": "disables self-review of registered resources and reporting specs",
+              "status": "skipped"
+            },
+            {
+              "fullName": "registers a library GROUP draft only for explicitly selected aggregate audiences",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "library-retained-read",
+          "path": "docs/evidence/library-self-group-release-20261031/postgres.json",
+          "sha256": "dd3d64b9c943cdfe21f7258b15efe3a40853b8050a3d4e6c8de4aecf9bd52711",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "library Scale explicit SELF GROUP / retained Teacher population reviews a separate GROUP policy on the approved C and consumes its same-FINAL own ceiling",
+              "status": "skipped"
+            },
+            {
+              "fullName": "library Scale explicit SELF GROUP / retained Teacher population continues only the retained library GROUP FINAL reading without republishing or scoring",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-sufficient-N",
+          "path": "docs/evidence/teacher-numeric-group-consumer-20261031/postgres-sufficient-N.json",
+          "sha256": "f76940200b19ddf306a0985077cc23a02212851fe1477e6d7df9eb0b2b8a1377",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N original GROUP without resubmitting its completed participant",
+              "status": "passed"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N library GROUP without resubmitting its completed participant",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "same-C-cross-wrapper",
+          "path": "docs/evidence/teacher-numeric-group-consumer-20261031/postgres.json",
+          "sha256": "7894bf4247130fe149a3e46990c07f11e6238866efb437678b4cabddc28b229c",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N original GROUP without resubmitting its completed participant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N library GROUP without resubmitting its completed participant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population matches existing original and library disclosures by immutable C rather than their different parent keys",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "actual-event-ui",
+          "path": "docs/evidence/teacher-numeric-group-consumer-20261031/frontend.json",
+          "sha256": "665119fefc763aad29135ce48f2c786030c3e96629984041f9d9c8dc3bf8b5b0",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Current frontend production change sinceec2 is only unrelated PersonalChangesReport chart loading; current exact component types passed, no shared TaskGroupReport rebuild/browser replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "keeps a successfully generated Teacher report when the directory refresh fails and retries only GET",
+              "status": "skipped"
+            },
+            {
+              "fullName": "opens existing Teacher Form versions, explicitly generates one class report, and prints only its authorized rounded projection",
+              "status": "skipped"
+            },
+            {
+              "fullName": "opens numeric GROUP from the actual Teacher event and generates, switches and prints the saved projection",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "native-family-boundary",
+          "path": "docs/evidence/teacher-numeric-source-boundary-20261031/result.json",
+          "sha256": "aa4e41bdb0e9019d35b76fad296160410e7d203ebee9e862266b7ce78ce20206",
+          "originalSourceAssociation": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice.",
+          "deltaRationale": "Unsigned stage original, retrospectively associated with its saved reviewed slice; original failures, filtered cases and retained-stage continuation remain in the same evidence directory. It is not an execution-time commit signature or a complete fresh journey. Current delta only brings forward the reviewed lock-owning transaction correction and its exact counterexample/test; old closed/full-population behavior is unchanged here. The new callback passes the existing tx through comparison and Artifact persistence and reads after commit. Native-family refusal is retained until the separate native slice. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "transaction-expiry",
+          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/postgres.json",
+          "sha256": "62815d33d1b2bd0c04fff816de5ef808406890a0fd847dffbcb7541fca5a2180",
+          "originalSourceAssociation": "cf43248e639ae6c4598d60db3513e8d78cbe5be6",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts",
+            "server-version/backend/src/modules/reporting/types.ts"
+          ],
+          "sourceAssociationBasis": "Original real PG/Prisma expiry counterexample fromcf43248e. Current artifact persist helper, lock helper, canonical hash and test bytes exactly match; it reads retained stored Artifact metadata directly and never invokes native source/partial-population functions absent from this parent. Missing429/430 modules remain explicit in the full backend source delta. New outer wiring uses the same tx and compiles; no PG/FINAL replay.",
+          "deltaRationale": "Original real PG/Prisma expiry counterexample fromcf43248e. Current artifact persist helper, lock helper, canonical hash and test bytes exactly match; it reads retained stored Artifact metadata directly and never invokes native source/partial-population functions absent from this parent. Missing429/430 modules remain explicit in the full backend source delta. New outer wiring uses the same tx and compiles; no PG/FINAL replay. Main432 contributes reviewed spec discovery and questionnaire-only changes; actual Teacher frozen numeric inputs and existing getPublishedReportingSpec contract remain unchanged, and final combined types are fresh. Main434 adds questionnaire available-target selection and its student page, outside the unchanged Teacher event/group path; current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher group artifact transaction boundary cannot persist an artifact or audit after its disclosure-lock transaction expires",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.json",
+          "sha256": "993576c712db92efe6403131e06051a1706a6d6c2c45ad6c83f4329a72022c0a",
+          "component": "backend",
+          "componentTree": "aa12ceb3d8ac490c5f470c92fab76e6cbb5ef1a2",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.json",
+          "sha256": "3837c8c284bd07376dc326a739f5e8023f4d85ec227aca2d9af3028b07180ee7",
+          "component": "frontend",
+          "componentTree": "f5ba5d4c1c50634071a9f130fe96e2628f860320",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main434/frontend-types.log"
+        }
+      ]
+    },
+    "429": {
+      "schemaVersion": 1,
+      "product": "80f40cf78ba7f1fff8b80658cbd0fd80214918bb",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Seven distinct admitted cases; the earlier unit metric case is retained in its raw report but only its unchanged delay case is selected, using the later strengthened alias case once.",
+          "N11 missing-complement suppression and N20/valid10/missing10 are retained continuations from10 genuine FINALs plus deliberately seeded incomplete boundary members; not a new20-person publication flow.",
+          "Pointer mock and component cases are not full browser/DB journeys; actual directory/snapshot PG read has canonical0. Current exact types cover the transaction correction; oldFINALs, whole browser, scoring and migration not replayed."
+        ]
+      },
+      "reports": [
+        {
+          "id": "actual-delay",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/unit.json",
+          "sha256": "1b793a73168bd664ab351258a7a0f0fa9fe77afe88be51e87665ae255fce1f60",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "passed"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "only honors the actual aggregate contract delay rather than inventing a universal close requirement"
+          ]
+        },
+        {
+          "id": "contributor-alias",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/alias-unit.json",
+          "sha256": "e6ac252ad82104227c1bb9b41d89391eea8d4a30af8606bb3f08ac3863a0a9bf",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "passed"
+            },
+            {
+              "fullName": "seeks26 same-time version pointers with the full timestamp and id, without selecting saved report payloads",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "pointer-seek",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/paging-unit.json",
+          "sha256": "80486c21bf74d1ddb92bdcaf67447d9e845aafd2b43a326802b080964f0bd362",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "rejects an unimplemented native family before generic leaf resolution, despite an explicit GROUP parent",
+              "status": "skipped"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "skipped"
+            },
+            {
+              "fullName": "seeks26 same-time version pointers with the full timestamp and id, without selecting saved report payloads",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "partial-native",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/postgres-partial-success.json",
+          "sha256": "382f8965130a2178d091e6c7b6ea07f35be1bb6b743591a22bb6013b62738cd5",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher partial numeric population / existing real FINAL continuation preserves N10 real FINALs, withholds a small missing complement and discloses N10 of20 without requiring complete participation",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "pointer-native",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/postgres.json",
+          "sha256": "42b17236c01bb777f9cb39f6cfb0693a3cff0b97340da013a25605c167647838",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Teacher partial numeric population / existing real FINAL continuation preserves N10 real FINALs, withholds a small missing complement and discloses N10 of20 without requiring complete participation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher partial numeric population / existing real FINAL continuation reads only authorized version pointers and the saved partial Artifact when reopening the report",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "alias-native",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/comparable-alias-postgres.json",
+          "sha256": "fe9fd4ab7a985315e2bb1c0566c0377a4fbc52b71ab509051e01ccb1d176375f",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N original GROUP without resubmitting its completed participant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population generates and reads sufficient-N library GROUP without resubmitting its completed participant",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher fixed Scale leaves / retained real population matches existing original and library disclosures by immutable C rather than their different parent keys",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "pointer-ui",
+          "path": "docs/evidence/teacher-group-partial-population-20261031/pointer-ui.json",
+          "sha256": "879827609a53d40052a5983e16349a610143815582bdab08c7c9c41cae9d646f",
+          "originalSourceAssociation": "9dedd85fd2cff4e0510a1bff72fe58a4b9b3375c",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx",
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx"
+          ],
+          "sourceAssociationBasis": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained.",
+          "deltaRationale": "Original unsigned stage retained at saved9dedd85 association, not a signed execution-time commit. All partial-population, metric-alias and pointer logic stays byte-identical except the separately reviewed caller-owned transaction correction: compare and Artifact persist use the lock tx, read after commit. No FINAL/PG replay. Original bigint failure and intermediate type diagnostics remain archived. Frontend only adds main chart loading outside this pointer component; exact current types retained. Main432/434 add unrelated questionnaire source changes and reviewed spec discovery; Teacher frozen metric/source/pointer behavior is unchanged. Current integrated types are fresh.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "opens saved pointers first, seeks older versions and loads calculation configuration only on explicit request",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/backend-types.json",
+          "sha256": "ed305f10982ffc3544b486145fb4ce91c0f8e5b80a2cbd9812fcfc9ca63d52b2",
+          "component": "backend",
+          "componentTree": "dca39d39720e4317600fd4e9cc34d2de18a05272",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.json",
+          "sha256": "eb2220065b7d79264946e37e8f30a123cc5face85721362cf4bbcc70db94a033",
+          "component": "frontend",
+          "componentTree": "5b108c22d6006abddcfcabd71ce2de67ed886828",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.log"
+        }
+      ]
+    },
+    "430": {
+      "schemaVersion": 1,
+      "product": "c4a23801d1943333a7dad356ed6fabc1fd7b9365",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Three distinct admitted cases: original successfulV1 refusal from a partially failed report, its exact failed leaf case linked to the successful continuation, and actual native HTTP/PG retained completion. First report stays failed; filtered rows stay filtered.",
+          "Actual mixed native source is one existing Cognitive/SJT composite with10 new assignments/20 leaves, not all native protocols or Bundle Profile acceptance. Snapshot readcanonical0 and old Scale unchanged remain original observations.",
+          "Current backend receipt includes the same transaction correction and main432/434 inputs. Frontend unchanged from base is proven by source scope; no frontend compiler, FINAL, PG, browser or original app replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "native-v1-original",
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/unit-first.json",
+          "sha256": "d066fa257550af33e34491f9568ef262aa52ef152d5052e363387826de50f0a8",
+          "originalSourceAssociation": "21f15b91627a3d3a500957f9d1af837324389675",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "deltaRationale": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "binds native leaves to their frozen C and separate GROUP ceilings without decoding participant results",
+              "status": "failed"
+            },
+            {
+              "fullName": "rejects a historical native v1 before generic leaf resolution, despite a claimed GROUP parent",
+              "status": "passed"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "skipped"
+            },
+            {
+              "fullName": "seeks26 same-time version pointers with the full timestamp and id, without selecting saved report payloads",
+              "status": "skipped"
+            }
+          ],
+          "allowPartialFailure": true,
+          "selectedCases": [
+            "rejects a historical native v1 before generic leaf resolution, despite a claimed GROUP parent"
+          ],
+          "failureContinuations": [
+            {
+              "caseName": "binds native leaves to their frozen C and separate GROUP ceilings without decoding participant results",
+              "reportId": "native-leaf-final"
+            }
+          ]
+        },
+        {
+          "id": "native-leaf-final",
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/unit.json",
+          "sha256": "fcd77f0cc2d1a729ebff1aa2e4d08ea705545aaf9b4b489f778a691532137a6c",
+          "originalSourceAssociation": "21f15b91627a3d3a500957f9d1af837324389675",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "deltaRationale": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "binds native leaves to their frozen C and separate GROUP ceilings without decoding participant results",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "native-real-final",
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/postgres.json",
+          "sha256": "a695ebba7d8ae68cb0086bf74c2d80105eeed2da390bdc42e2b692daf6db3a7c",
+          "originalSourceAssociation": "21f15b91627a3d3a500957f9d1af837324389675",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "deltaRationale": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher native GROUP actual frozen leaves publishes ten new native assignments once and reads Cognitive and SJT aggregates through the existing Teacher consumer",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.json",
+          "sha256": "11ac96c6a0b90a230bbc992ff17c8a6d75437f436309ba7d4aba24bf449345ff",
+          "component": "backend",
+          "componentTree": "ace2d78d6cf1ca334ae65d49cfa8701c05df22c6",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.log"
+        }
+      ]
+    },
+    "421": {
+      "schemaVersion": 1,
+      "product": "078fef00097869d7a4043cf7ce8b50d115f7732e",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "limitations": [
+          "Unsigned original local reporter; not formal CI execution.",
+          "Real quota rows/transaction contract only, not Cognitive trial START/FINAL/browser E2E.",
+          "Current combined backend compiler runs once in existing onboarding admission; historical compiler status is not promoted to current-tree proof.",
+          "Original first/diagnostic/fixture failures remain immutable source files, outside this successful-case admission."
+        ],
+        "unchangedQuotaClosureBlobs": {
+          "server-version/backend/src/modules/cognitive/attempt-quota.ts": "9f836b37730c29847b867cde17e3eb2e288a39ee",
+          "server-version/backend/src/modules/cognitive/product-eligibility.ts": "ad3fc09e42ef89d15b7275142271182dffda424f",
+          "server-version/backend/src/modules/cognitive/cognitive.errors.ts": "c080c93783c3dc8726f3923a05dc3f224d87d42f",
+          "server-version/backend/src/modules/assessment-runtime/canonical.ts": "a115b41386a6a6eb9baba9e158611dfd5d3ed425",
+          "server-version/backend/src/modules/reporting/personal-tracking.ts": "51ea4b1c06836aab6f30e0f59b6101fa0897a928",
+          "server-version/backend/src/modules/composite/training-content-binding.ts": "60c2ed53c328ea6d28a2bfa4bd3abf5a1f77281b",
+          "server-version/backend/src/__tests__/integration/integration-env.ts": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
+          "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts": "8447cbd6d099b676c187b180d6fbed946ecdc22c",
+          "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+          "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+        },
+        "prismaDeltaReview": {
+          "originalTree": "eeeafc08104fd303620a5a8fbf069b6599c4c87f",
+          "currentTree": "bbb7e492f175e540333c49680418fb99139077f8",
+          "paths": [
+            "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql",
+            "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql"
+          ],
+          "basis": "Only new Teacher license and education-library resource guard functions; no Cognitive quota/assignment/session/composite-parent/plan tables, columns, indexes or guards changed. Original real quota row contract does not create released education resources or Teacher licenses. Retain original unsigned PG outcomes without replay; current merged backend compiler runs once in CI."
+        }
+      },
+      "reports": [
+        {
+          "id": "quota-original-pg",
+          "path": "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json",
+          "sha256": "c45b5df958ad71df98791f91836ebce84f1664e01ebcd751e3c8b2c82464ca87",
+          "originalSourceAssociation": "5a547d0c32ea7908f9708827d335af38ab637b27",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030233000_teacher_self_group_scale_license/migration.sql",
+            "server-version/backend/prisma/migrations/20261030234500_education_library_self_group_identity/migration.sql",
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/self-group-personal-license.test.ts",
+            "server-version/backend/src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherFormGroupSubgroups.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/huiteacher/disclosureOverlap.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
+            "server-version/backend/src/modules/huiteacher/nativeGroupSource.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/privacyReleaseV2.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleLicense.service.ts",
+            "server-version/backend/src/modules/huiteacher/scalePersonalReport.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/organization/access.ts",
+            "server-version/backend/src/modules/organization/organization.routes.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/authorization.ts",
+            "server-version/backend/src/modules/reporting/cohort.ts",
+            "server-version/backend/src/modules/reporting/content.controller.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/engine.ts",
+            "server-version/backend/src/modules/reporting/fixedPopulationPrivacy.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts",
+            "server-version/backend/src/modules/reporting/types.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-catalog.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-group-resources.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Original isolated PostgreSQL reporter at frozen 5a547d0; actual quota runtime/test imports and locked tools remain identical. Later two unrelated Teacher/library trigger migrations were reviewed explicitly, not claimed whole-Prisma equal.",
+          "deltaRationale": "Unchanged quota row contract; current integration compiled once by existing missing-check helper. No FINAL or full journey replay.",
+          "cases": [
+            {
+              "fullName": "Training frozen Cognitive wave quota, real PostgreSQL QUESTIONNAIRE permits T2 without renewing the quota within a wave",
+              "status": "passed"
+            },
+            {
+              "fullName": "Training frozen Cognitive wave quota, real PostgreSQL ASSESSMENT_BUNDLE permits T2 without renewing the quota within a wave",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          }
+        }
+      ],
+      "types": [],
+      "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
     }
   }
 }
