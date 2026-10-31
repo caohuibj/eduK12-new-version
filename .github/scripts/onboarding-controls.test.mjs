@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -471,4 +471,37 @@ test('PR420 official reuse accepts only the fixed successful steps and preserves
  }
  for(const patch of [{id:1},{expired:true},{size_in_bytes:o.size+1},{digest:'sha256:'+h('9')},{name:'frontend-ui-lab-dist-'+o.merge},{workflow_run:{id:o.run,head_sha:h('9')}}])assert.throws(()=>verify(run,build,lint,{...artifact,...patch}));
  assert.throws(()=>verify(run,build,lint,artifact,h('9')));assert.throws(()=>verify(run,build,lint,artifact,o.frontend,now+86400000));
+});
+
+test('Training standalone Cognitive formal route accepts its four original cases without frontend or fixture replay',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/training-analysis/group-source.ts',b={...f.b,pr:422,source:{[file]:{before:null,after:blob}},controlBefore:{...f.b.controlBefore,...Object.fromEntries(GROUP_REPORT_CONTROLS.map(path=>[path,null]))}};
+ const entries=[...f.entries.map(e=>Object.hasOwn(f.b.source,e.file)?{...e,file}:e),...GROUP_REPORT_CONTROLS.map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}))],env={...f.env,CI_PR_NUMBER:'422',CI_HEAD_REF:BRANCHES[422]};
+ const p=onboardingPlan(entries,base,head,f.read,env,b);assert.equal(p.pr,422);assert(task1SastConfig(p,b).paths.includes(file));assert(task1SastConfig(p,b).paths.includes(GROUP_REPORT_CONTROLS[0]));
+ assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):f.read(cmd,a,...rest),env,b));
+ const root='docs/evidence/group-report-training-standalone-20261030/',native=JSON.parse(readFileSync(root+'training-standalone-cognitive-group-proof.json')),archived=JSON.parse(readFileSync(root+'training-standalone-cognitive-group-archived-proof.json'));
+ assert.equal(verifyTrainingStandaloneCognitiveObservation(native,'standalone-cognitive').testsExecutedInCI,false);
+ assert.equal(verifyTrainingStandaloneCognitiveObservation(archived,'standalone-archived').testsExecutedInCI,false);
+ assert.throws(()=>verifyTrainingStandaloneCognitiveObservation({...native,participantN:1},'standalone-cognitive'));
+ assert.throws(()=>verifyTrainingStandaloneCognitiveObservation({...archived,oldSnapshotUnchanged:false},'standalone-archived'));
+});
+
+test('Training course delivery qualifier binds its backend/frontend and reviewed Legacy compatibility without widening source scope',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/scale/scale-access.ts',frontend='server-version/frontend/src/pages/student/ScaleAssessment.tsx';
+ f.b.pr=423;f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));
+ f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'423',CI_HEAD_REF:BRANCHES[423]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,423);assert(task1SastConfig(p,f.b).paths.includes(frontend));
+ const unknown='server-version/backend/src/modules/scale/unrelated-new-runtime.ts';
+ assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+
+test('Training standalone Scale reader qualifier uses retained cases and stays within its exact backend source',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/training-analysis/source.ts';
+ f.b.pr=424;f.b.source={[file]:{before:null,after:blob}};
+ f.entries=[file,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'424',CI_HEAD_REF:BRANCHES[424]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,424);assert(task1SastConfig(p,f.b).paths.includes(file));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...r)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):f.read(cmd,a,...r),f.env,f.b));
 });
