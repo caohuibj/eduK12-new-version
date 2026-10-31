@@ -51,7 +51,11 @@ beforeAll(async () => {
       else if (suffix === '') body = envelope(metadata)
       else if (suffix === '/form-sections') body = envelope({ list: sections })
       else if (suffix === '/form-items') body = envelope({ list: sections.flatMap(section => section.items) })
-      else if (suffix === '/content') body = envelope({ units: sections.map(section => ({ type: 'form-section', id: section.id, label: section.title, position: section.position, itemCount: section.items.length, contextSection: section.contextSection })) })
+      else if (suffix === '/content') {
+        const units = sections.map(section => ({ type: 'form-section', id: section.id, label: section.title, position: section.position, itemCount: section.items.length, contextSection: section.contextSection }))
+        const list = sections.flatMap(section => section.items.map(item => ({ type: 'form', id: item.id, position: item.position, data: item })))
+        body = envelope(basePath.startsWith('/composite') || url.searchParams.get('projection') === 'units' ? { units } : { units, list, total: list.length })
+      }
       else if (suffix === '/scales') body = envelope({ list: [] })
     } else if (req.method === 'GET' && url.pathname === '/api/scales' && url.search === '?status=PUBLISHED&page=1&pageSize=100') {
       body = envelope({ list: [] })
@@ -117,6 +121,7 @@ describe('canonical section field source over synthetic HTTP', () => {
     expect(within(target()).getByRole('option', { name: field1 })).toBeInTheDocument()
     expect(within(target()).queryByRole('option', { name: field2 })).toBeNull()
     expect(within(target()).queryByRole('option', { name: '背景字段' })).toBeNull()
+    expect(requests.map(r => r.path)).toEqual([`/api${path}/form-sections`, `/api${path}/content${path.startsWith('/composite') ? '' : '?projection=units'}`])
     record(path, started, cpu)
   })
 
@@ -144,7 +149,7 @@ describe('canonical section field source over synthetic HTTP', () => {
     basePath = path; sections = fixture(path.startsWith('/composite'))
     render(<FormSectionManager basePath={path} />)
     await ready()
-    expect(requests.map(r => r.path)).toEqual([`/api${path}/form-sections`, `/api${path}/content`])
+    expect(requests.map(r => r.path)).toEqual([`/api${path}/form-sections`, `/api${path}/content${path.startsWith('/composite') ? '' : '?projection=units'}`])
     await userEvent.selectOptions(target(), 'field-1-0')
     await waitFor(() => expect(within(target()).queryByRole('option', { name: field1 })).toBeNull())
     expect(within(screen.getByRole('combobox', { name: '向分区1添加字段' })).getByRole('option', { name: field1 })).toBeInTheDocument()

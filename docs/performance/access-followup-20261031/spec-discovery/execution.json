@@ -1,0 +1,49 @@
+{
+  "kind": "LOCAL_UNSIGNED_TASK_OBSERVATIONS",
+  "base": "61440918c",
+  "workingDirectory": "server-version/backend",
+  "node": "v24.21.0",
+  "command": "node node_modules/vitest/vitest.mjs run src/__tests__/reporting/spec-discovery-reads.test.ts --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "baseline": {
+    "exitCode": 1,
+    "records": [
+      1,
+      4
+    ],
+    "prismaReadCalls": [
+      3,
+      6
+    ],
+    "failedOnlyAt": "expected query calls=2 after unchanged-output and auth assertions"
+  },
+  "candidate": {
+    "exitCode": 0,
+    "uniquePassed": 2,
+    "records": [
+      1,
+      4
+    ],
+    "prismaReadCalls": [
+      2,
+      2
+    ],
+    "outputs": "exact equality against the same sorted summary fixture"
+  },
+  "scope": "Actual service and original definition/hash mapper with a synthetic Prisma adapter. Counts are calls issued by service, not measured PostgreSQL executions, wall time or pool waits. Authorization adapter returns synthetic allow, called before and after reads.",
+  "sourceSHA256": {
+    "server-version/backend/src/modules/reporting/discovery.ts": "05ca9256d17393eb1aff1fc4c7f15f831d61a905b96bca25b0975441283a194b",
+    "server-version/backend/src/modules/reporting/spec.ts": "a91e70e603b2f1e5b631bd629380b8f7f169258334dd980a5d58e8ccbe0190d9",
+    "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts": "1e250f11b5260e2c20acfd085f1b1ce7fb85de7259bf39881c2a3b711a22def4",
+    "server-version/backend/src/modules/assessment-runtime/canonical.ts": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066",
+    "server-version/backend/src/modules/reporting/types.ts": "7192b2d7634bf34d263c6d2a5df279a30863e4f7f1b0f468a06e40ae4657be7c",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+  },
+  "notExecuted": [
+    "real PostgreSQL auth/revocation suite",
+    "existing full reporting journey",
+    "build",
+    "CI"
+  ]
+}

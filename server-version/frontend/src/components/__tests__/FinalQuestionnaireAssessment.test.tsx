@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   createFinalDraftMeta,
@@ -266,5 +266,77 @@ describe('FinalQuestionnaireAssessment Scale provenance placement', () => {
     await user.click(screen.getByRole('button', { name: '提交整份量表' }))
     await waitFor(() => expect(post).toHaveBeenCalledTimes(2))
     expect(post.mock.calls[1][1]).toEqual(firstBody)
+  })
+
+  it('recovery: keeps sealed Form answers locked while allowing navigation and identical retry', async () => {
+    const data = makeFormData()
+    data.currentFormSection!.items.push({ ...data.currentFormSection!.items[0], id: 'form-item-2', label: '班级' })
+    const user = userEvent.setup()
+    const { post } = renderAssessment(data)
+    post.mockRejectedValueOnce(new Error('response lost')).mockResolvedValueOnce(response)
+    await user.type(await screen.findByRole('textbox', { name: /年级/ }), '六年级')
+    await user.click(screen.getByRole('button', { name: '下一题' }))
+    await user.type(screen.getByRole('textbox', { name: /班级/ }), '一班')
+    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('response lost'))
+    const original = structuredClone(post.mock.calls[0][1])
+    const stored = await finalDraftStore.get('questionnaire-form-section:questionnaire-assessment-1:form-section-1')
+    expect(stored?.status).toBe('RETRY_PENDING')
+    expect(stored?.sealedSubmission?.payload).toEqual(original)
+    expect(screen.getByRole('textbox', { name: /班级/ })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '上一题' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: '上一题' }))
+    expect(screen.getByRole('textbox', { name: /年级/ })).toBeDisabled()
+    expect(screen.getByRole('textbox', { name: /年级/ })).toHaveValue('六年级')
+    await user.click(screen.getByRole('button', { name: '下一题' }))
+    expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(post).toHaveBeenCalledTimes(2))
+    expect(post.mock.calls[1][1]).toEqual(original)
+  })
+
+  it('recovery: keeps Form answers disabled when draft identity conflicts before metadata loads', async () => {
+    const ensure = vi.spyOn(finalDraftStore, 'ensure').mockRejectedValueOnce(
+      Object.assign(new Error('identity conflict'), { code: 'FINAL_DRAFT_IDENTITY_CONFLICT' }),
+    )
+    try {
+      const { post } = renderAssessment(makeFormData())
+      const answer = await screen.findByRole('textbox', { name: /年级/ })
+      expect(answer).toBeDisabled()
+      expect(screen.getByRole('button', { name: '提交整个区段' })).toBeDisabled()
+      expect(post).not.toHaveBeenCalled()
+    } finally { ensure.mockRestore() }
+  })
+
+  it.each(['Form', 'Scale'] as const)('recovery: preserves accepted %s when progress reload fails', async (kind) => {
+    const user = userEvent.setup()
+    const { post, onReload } = renderAssessment(kind === 'Form' ? makeFormData() : makeScaleData())
+    let rejectReload!: (error: Error) => void
+    onReload.mockImplementation(() => new Promise<void>((_, reject) => { rejectReload = reject }))
+    const seal = vi.spyOn(finalDraftStore, 'sealForSubmission')
+    const submitLabel = kind === 'Form' ? '提交整个区段' : '提交整份量表'
+    if (kind === 'Scale') await user.click(await screen.findByRole('button', { name: '经常' }))
+    await user.click(await screen.findByRole('button', { name: submitLabel }))
+    await waitFor(() => expect(onReload).toHaveBeenCalledTimes(1))
+    const key = kind === 'Form' ? 'questionnaire-form-section:questionnaire-assessment-1:form-section-1' : 'questionnaire-scale:scale-assessment-1'
+    expect(await finalDraftStore.get(key)).toBeNull()
+    // The server acceptance must remain visible even while progress is pending.
+    expect(screen.getByText('服务器已确认当前单元的权威结果。')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '重新读取进度' })).toBeDisabled()
+    await act(async () => { rejectReload(new Error('progress unavailable')) })
+    expect(await screen.findByRole('alert')).toHaveTextContent('无需再次交卷')
+    expect(screen.getByRole('button', { name: submitLabel })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: submitLabel }))
+    expect(post).toHaveBeenCalledTimes(1)
+    expect(seal).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText(/本地.*草稿不存在/)).not.toBeInTheDocument()
+    onReload.mockResolvedValue(undefined)
+    const reread = screen.getByRole('button', { name: '重新读取进度' })
+    expect(reread).toBeEnabled()
+    await user.click(reread)
+    await waitFor(() => expect(onReload).toHaveBeenCalledTimes(2))
+    expect(post).toHaveBeenCalledTimes(1)
+    expect(seal).toHaveBeenCalledTimes(1)
+    seal.mockRestore()
   })
 })
