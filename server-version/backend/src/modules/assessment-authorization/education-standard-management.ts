@@ -1,3 +1,4 @@
+import {standardNativeScaleJoin} from '../scale/component-import/native-source'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -45,7 +46,7 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
      FROM (${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)} ORDER BY g.id LIMIT 129) r),'[]'::jsonb) AS authorities
    FROM survey_standard_releases s LEFT JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key='standard-release:'||s.id AND p.fingerprint=s.combination_hash
    LEFT JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
-   LEFT JOIN scales native ON native.code=s.tool_key AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+   LEFT JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
    WHERE (EXISTS(${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)}) OR EXISTS(
     SELECT 1 FROM content_capability_grants own JOIN assessment_management_events e ON e.id=own.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
     WHERE own.issuer_id=${actorId} AND own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId} AND e.resource_id=s.id))

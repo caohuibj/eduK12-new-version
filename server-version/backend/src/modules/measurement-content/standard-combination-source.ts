@@ -3,9 +3,10 @@ import {canonicalHash,retainImmutableCanonicalValue} from '../assessment-runtime
 import {isAssessmentOperationallyPaused} from '../assessment-governance/operational-hold'
 import {getContentRelease} from './repository'
 import {ContentReleaseError} from './release'
-import {compileStandardCombinationReport,describeStandardCombination,type StandardCombinationRecord} from './standard-combination'
+import {compileStandardCombinationReport,describeStandardCombination,selectedStandardReport,type StandardCombinationRecord} from './standard-combination'
 import type {Triplet} from '../survey/standard-triplet.model'
 import type {StoredRelease} from './repository'
+import {importedMeasurementPayload,importedNativeDefinition,databaseContentSource} from '../scale/component-import/native-source'
 
 export class StandardCombinationSourceError extends ContentReleaseError {readonly statusCode=409}
 function fail(code:string):never{throw new StandardCombinationSourceError('STANDARD_COMBINATION_'+code)}
@@ -78,13 +79,15 @@ export function assertExactStandardCombinationFacts(row:ExactStandardCombination
   if(mapping.axisIdentity.status!=='VALID'||!readable(mapping.measurement.status,purpose))fail('IDENTITY_MISMATCH')
   if(!measurement||measurement.layer!=='MEASUREMENT')return fail('MEASUREMENT_REQUIRED')
   const {report,referencePolicy,source:_,license:__,...content}=row.snapshot.definition
-  if(canonicalHash(content)!==row.snapshot.parts.CONTENT.hash)fail('CONTENT_SNAPSHOT_MISMATCH')
+  if(canonicalHash(content)!==canonicalHash(importedMeasurementPayload(row.snapshot.parts.CONTENT)))fail('CONTENT_SNAPSHOT_MISMATCH')
+  if(databaseContentSource(row.snapshot.parts.CONTENT))importedNativeDefinition(row.snapshot.parts.CONTENT)
   const p=row.snapshot.parts.PARAMETERS.payload as {referencePolicy:unknown;references:unknown[]}|null
   if(canonicalHash(referencePolicy)!==canonicalHash(p?.referencePolicy??{type:'none'})
     ||canonicalHash(row.snapshot.references)!==canonicalHash(p?.references??[]))fail('PARAMETERS_SNAPSHOT_MISMATCH')
   if(row.snapshot.parts.REPORT.payload===null){if(row.snapshot.template!==null)fail('REPORT_SNAPSHOT_MISMATCH')}
-  else if(canonicalHash(report)!==row.snapshot.parts.REPORT.hash)fail('REPORT_SNAPSHOT_MISMATCH')
+  else if(canonicalHash(report)!==canonicalHash(selectedStandardReport(row.snapshot.parts.REPORT.payload).definition))fail('REPORT_SNAPSHOT_MISMATCH')
   const compiled=compileStandardCombinationReport(row.snapshot.title,row.snapshot.definition,row.snapshot.parts.REPORT.payload!==null)
-  if(compiled.blockers.length||canonicalHash(compiled.template)!==canonicalHash(row.snapshot.template))fail('REPORT_TEMPLATE_MISMATCH')
+  const template=selectedStandardReport(row.snapshot.parts.REPORT.payload).template??compiled.template
+  if(compiled.blockers.length||canonicalHash(template)!==canonicalHash(row.snapshot.template))fail('REPORT_TEMPLATE_MISMATCH')
   return mapping
 }

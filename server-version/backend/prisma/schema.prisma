@@ -819,6 +819,8 @@ model Scale {
   visibility        ScaleVisibility      @default(HIDDEN) // 可见性
   instrumentClass   ScaleInstrumentClass @default(CUSTOM_DESCRIPTIVE) @map("instrument_class")
   instrumentVersion String               @default("2.0.0") @map("instrument_version")
+  standardSourceKind String              @default("CODE_PACKAGE") @map("standard_source_kind")
+  standardToolKey    String?             @map("standard_tool_key")
   definition        Json? // ScaleDefinitionV2；运行时唯一计分来源
   definitionHash    String?              @map("definition_hash")
   // Immutable, server-authored provenance for a copied draft; never part of scoring/hash.

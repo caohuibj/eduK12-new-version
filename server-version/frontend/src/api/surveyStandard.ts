@@ -5,7 +5,8 @@ export type Selection={toolKey:string;CONTENT:string;PARAMETERS:string;REPORT:st
 export type VersionPart={axis:Axis;version:string;hash:string;sourceVersion:string;payload:unknown;reference:unknown}
 export type StandardState={id:string;state:'APPROVED'|'TRIAL_RUNNING'|'TRIAL_FAILED'|'ONLINE'|'WITHDRAWN';version:number;approvedBy:string;approvedAt:string;latestTrial:string|null;blockers:string[];combinationHash:string;versions:Record<Axis,{version:string;hash:string}>;reference?:unknown}
 export type StandardItem={toolKey:string;instrumentVersion:string;title:string;versions:Array<Pick<VersionPart,'axis'|'version'|'hash'>>;combinationHash:string|null;blockers:string[];releases:StandardState[];tags:string[];classificationTags?:CatalogClassificationTag[]}
-export type StandardDetail={available:VersionPart[];selection:Selection;history:StandardState[];trials:Array<{releaseId:string;runId:string;caseIndex:number;recordHash:string;createdAt:string;scores?:unknown;report?:unknown}>;reference:unknown}
+export type StandardDetail={available:VersionPart[];selection:Selection;history:StandardState[];versionMappings?:Array<{identity:{releaseId:string};measurement:{pointer:{releaseId:string;contentHash:string}|null;status:string}}>;
+ trials:Array<{releaseId:string;runId:string;caseIndex:number;recordHash:string;createdAt:string;scores?:unknown;report?:unknown}>;reference:unknown}
 export type StandardPreview={combinationHash:string;blockers:string[];title:string;parts:Record<Axis,VersionPart>;template:unknown;reference:unknown}
 export type StandardOnboardingEntry={
  scaleId:string|null;instrumentKey:string;instrumentVersion:string;name:string;
