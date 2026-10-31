@@ -165,6 +165,7 @@ Node v24.21.0：三个新增分类/汇总/调度用例 PASS，补一个真实 Gi
 后端单端保留 API/worker 两个目标、官方源参数、runtime 刷新、pull、原 tag/上下文/本地 exporter 限制及真实后端 HIGH/CRITICAL 扫描；仅省去 frontend 构建、Nginx 静态检查和 frontend 扫描。200 用例、固定回归、科学验证和数据库执行器完全未改，不创建工作流、资格或包白名单。
 既有 `.github/scripts/build-ci-images.sh` 原模式为 100755，本片原样保留。工具路线只接纳该既有脚本 M 100755→100755，以及实际控制文件；chmod、新可执行脚本、未知路径继续拒绝。使用现有 release-tools recipe 的 image-plan 控制用例，不以模式伪装取得范围。
 Node24.21.0：6 个 image-plan 控制用例 PASS，覆盖前端/后端/完整三类的真实 shell 选择、workflow 输入及扫描条件；另 2 个既有工具路线/recipe 定向用例 PASS。bash -n、两份 YAML 和 diff 检查通过。没有启动 Docker 构建、业务/audit/PG/压测或生产操作，没有取消或修改任何正在运行的 CI。
+既有 frontend workflow 控制例中两条 `true)/false)` 字面语法绑定删除，三类目标行为由上述实际 shell 选择覆盖；原 Compose/exporter、镜像扫描、CSP/API 断言保留，该既有例单独验证并纳入原工具 recipe。未把业务失败改绿。
 尚未公开的 Mac 部署源参数补丁 `967ecf0f` 未读取、未整合；本片只基于 main，后续由母线协调重放其参数透传。
 
 ### 前端整合基线：只读协调结论

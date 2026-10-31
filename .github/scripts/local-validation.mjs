@@ -44,7 +44,10 @@ export function recipe(check,base,head) {
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
   if(files.some(file=>file==='.github/scripts/dependency-scope.mjs'||file==='.github/scripts/dependency-routing.test.mjs'))commands.push(['node','--test','.github/scripts/dependency-routing.test.mjs']);
-  if(files.some(file=>['.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].includes(file)))commands.push(['node','--test','.github/scripts/ci-image-plan.test.mjs']);
+  if(files.some(file=>['.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].includes(file))){
+   commands.push(['node','--test','.github/scripts/ci-image-plan.test.mjs']);
+   commands.push(['node','--test','--test-name-pattern=^frontend route builds only the frontend image','.github/scripts/content-workflows.test.mjs']);
+  }
   if(files.some(f=>f==='.github/scripts/onboarding-scope.mjs'||f==='.github/scripts/onboarding-controls.test.mjs')) {
    commands.push(['node','--test','--test-name-pattern=^(onboarding (accepts unchanged main controls|still rejects changed control bytes|needs before snapshots|scope binds exact source)|stable gate still requires admission|Task1 scope refuses incomplete inventories)',
     '.github/scripts/onboarding-controls.test.mjs','.github/scripts/task1-onboarding-controls.test.mjs']);
