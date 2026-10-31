@@ -26,6 +26,7 @@ router.post('/reporting-specs/descriptive', authenticate, asyncHandler(reporting
 router.get('/measurement-resources', authenticate, asyncHandler(reportingContentController.listResources))
 router.get('/measurement-resources/candidates', authenticate, asyncHandler(reportingContentController.listCandidates))
 router.post('/measurement-resources', authenticate, asyncHandler(reportingContentController.registerResource))
+router.post('/measurement-resources/:resourceId/group-versions', authenticate, asyncHandler(reportingContentController.registerLibraryGroup))
 router.post('/measurement-resources/:resourceId/:action', authenticate, asyncHandler(reportingContentController.transitionResource))
 router.post('/reporting-specs/:specId/review', authenticate, reportingController.reviewSpec)
 router.post('/reporting-specs/:specId/publish', authenticate, reportingController.publishSpec)

@@ -2,7 +2,7 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-const api = vi.hoisted(() => ({resources:vi.fn(),specs:vi.fn(),register:vi.fn(),transitionResource:vi.fn(),createSpec:vi.fn(),transitionSpec:vi.fn()}))
+const api = vi.hoisted(() => ({resources:vi.fn(),specs:vi.fn(),register:vi.fn(),registerLibraryGroup:vi.fn(),transitionResource:vi.fn(),createSpec:vi.fn(),transitionSpec:vi.fn()}))
 const client = vi.hoisted(() => ({get:vi.fn()}))
 vi.mock('../../../api/reportingContent',()=>({reportingContentApi:api}))
 vi.mock('../../../api/client',()=>({default:client}))
@@ -72,4 +72,19 @@ it('disables self-review of registered resources and reporting specs',async()=>{
  expect(screen.getByRole('button',{name:'审核'})).toBeDisabled()
  expect(screen.getByText(/注册者、量表作者与方案创建者不能自审/)).toBeInTheDocument()
  expect(api.transitionResource).not.toHaveBeenCalled();expect(api.transitionSpec).not.toHaveBeenCalled()
+})
+
+it('registers a library GROUP draft only for explicitly selected aggregate audiences',async()=>{
+ const source={...resource,id:'library-source',status:'PUBLISHED',resource_version:'1.0.0',entry:{...resource.entry,libraryOrigin:{adapterVersion:'1.0.0',variantKey:'TEACHER:SELF',product:'TEACHER'}}}
+ api.resources.mockResolvedValue({list:[source],nextPage:null});api.registerLibraryGroup.mockResolvedValue({id:'group-draft'})
+ const user=userEvent.setup();render(<MemoryRouter><ReportingContent/></MemoryRouter>)
+ fireEvent.click((await screen.findByText('原创偏好',{selector:'strong'})).closest('summary')!)
+ await user.click(screen.getByRole('button',{name:'登记此库版本的群体用途'}))
+ const submit=screen.getByRole('button',{name:'登记库群体版本草稿'})
+ expect(submit).toBeDisabled()
+ expect(screen.getByRole('checkbox',{name:'心理专业人员群体汇总'})).not.toBeChecked()
+ expect(screen.getByRole('checkbox',{name:'教师群体汇总'})).not.toBeChecked()
+ await user.click(screen.getByRole('checkbox',{name:'组织管理者群体汇总'}));await user.click(submit)
+ await waitFor(()=>expect(api.registerLibraryGroup).toHaveBeenCalledWith('library-source',{minimumRespondents:10,aggregateAudiences:['ORGANIZATION']}))
+ expect(api.transitionResource).not.toHaveBeenCalled()
 })

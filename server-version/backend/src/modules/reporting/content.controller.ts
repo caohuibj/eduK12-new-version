@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
+import {registerEducationLibraryGroupResource} from '../scale-library-governance/education-group-resources'
 import { prisma } from '../../config/database'
 import { instrumentError, unauthorized } from '../../utils/response'
 import { listRegistrationCandidates,listRegisteredResources, readPublishedRegisteredResource, registerDescriptiveResource, transitionDescriptiveResource } from '../assessment-run/registeredResources'
@@ -17,9 +18,11 @@ const handle = (work: (req: Request) => Promise<unknown>) => async (req: Request
   }
 }
 
-export function descriptiveReportingDefinition(entry: { applicability: { resourceKey: string; resourceVersion: string }; definitionHash: string; resultDisclosure?: { audiences: { SUBJECT: { metricKeys: string[] } } } }, kind: 'INDIVIDUAL_LONGITUDINAL' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL', minimumN: number): ReportingAnalysisSpecDefinitionV1 {
-  const keys = entry.resultDisclosure?.audiences.SUBJECT.metricKeys ?? []
+export function descriptiveReportingDefinition(entry: { applicability: { resourceKey: string; resourceVersion: string;minimumRespondents?:number|null };cohortAnalysisPolicy?:{metricKeys:string[]}|null; definitionHash: string; resultDisclosure?: { audiences: { SUBJECT: { metricKeys: string[] } } } }, kind: 'GROUP' | 'INDIVIDUAL_LONGITUDINAL' | 'REPEATED_COHORT' | 'MATCHED_LONGITUDINAL', minimumN: number): ReportingAnalysisSpecDefinitionV1 {
+  const keys = kind==='GROUP'?entry.cohortAnalysisPolicy?.metricKeys??[]:entry.resultDisclosure?.audiences.SUBJECT.metricKeys??[]
+  if(kind==='GROUP')minimumN=Math.max(minimumN,entry.applicability.minimumRespondents??0)
   if (!keys.length || !Number.isInteger(minimumN) || minimumN < 3) reportingFail('REPORT_SPEC_INVALID', '资源没有计分指标或群体保护人数不足', 400)
+  if(kind==='GROUP')return {schemaVersion:1,analysisKind:'GROUP',engineKey:'ORG_GROUP_V1',engineVersion:'1.0.0',privacyUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT',minimumCohortN:minimumN,minimumContributorN:minimumN,reportEvidenceCeiling:'PILOT',metricRules:keys.map(key=>({metricId:key,sourceMetricKey:key,acceptedResultQuality:['interpretable'],acceptedMetricQuality:'IGNORE_METRIC_QUALITY',aggregations:['MEAN','SD_SAMPLE','MIN_MAX'],missingnessRule:'EXCLUDE',minimumMetricN:minimumN,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}))}
   const metricRules = keys.map(key => ({
     metricId: key, sourceMetricKey: key, acceptedResultQuality: ['interpretable'], acceptedMetricQuality: 'IGNORE_METRIC_QUALITY',
     missingnessRule: 'EXCLUDE', observationUnit: 'SUBJECT', selectionPolicy: 'UNIQUE_OR_REJECT',
@@ -39,12 +42,13 @@ export function descriptiveReportingDefinition(entry: { applicability: { resourc
 export const reportingContentController = {
   listCandidates:handle(req=>listRegistrationCandidates(actor(req),z.coerce.number().int().min(1).default(1).parse(req.query.page))),
   listResources: handle(req => listRegisteredResources(actor(req), z.coerce.number().int().min(1).max(100000).default(1).parse(req.query.page))),
-  registerResource: handle(req => { const input = z.object({ scaleId: z.string().guid(), mode: z.enum(['INDIVIDUAL','GROUP','TEACHER_INDIVIDUAL']).default('INDIVIDUAL') }).strict().parse(req.body); return registerDescriptiveResource(actor(req), input.scaleId, input.mode) }),
+  registerResource: handle(req => { const input = z.object({ scaleId: z.string().guid(), mode: z.enum(['INDIVIDUAL','GROUP','TEACHER_INDIVIDUAL','TEACHER_GROUP']).default('INDIVIDUAL') }).strict().parse(req.body); return registerDescriptiveResource(actor(req), input.scaleId, input.mode) }),
+  registerLibraryGroup:handle(req=>registerEducationLibraryGroupResource(actor(req),req.params.resourceId,req.body)),
   transitionResource: handle(req => transitionDescriptiveResource(actor(req), req.params.resourceId, z.enum(['review', 'publish', 'retire']).parse(req.params.action))),
   listSpecs: handle(req => listPlatformReportingSpecs(actor(req), z.coerce.number().int().min(1).default(1).parse(req.query.page))),
   createDescriptiveSpec: handle(async req => {
     const input = z.object({ resourceId: z.string().guid(), specKey: z.string().trim().min(1).max(160), version: z.number().int().min(1),
-      analysisKind: z.enum(['INDIVIDUAL_LONGITUDINAL', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL']), minimumN: z.number().int().min(3).max(1000) }).strict().parse(req.body)
+      analysisKind: z.enum(['GROUP','INDIVIDUAL_LONGITUDINAL', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL']), minimumN: z.number().int().min(3).max(1000) }).strict().parse(req.body)
     const resource = await readPublishedRegisteredResource(actor(req), input.resourceId)
     if ((input.analysisKind === 'INDIVIDUAL_LONGITUDINAL') !== (resource.entry.applicability.analysisMode === 'INDIVIDUAL_ONLY')) reportingFail('REPORT_SPEC_SCOPE', '个人方案须选择个人自评资源，群体方案须选择群体资源', 400)
     const scale = await prisma.scale.findUnique({ where: { id: resource.scale_id } })

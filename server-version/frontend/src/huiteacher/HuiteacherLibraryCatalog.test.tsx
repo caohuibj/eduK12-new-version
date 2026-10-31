@@ -15,6 +15,15 @@ function common(path:string,events=[event]){
 }
 async function open(){fireEvent.click(await screen.findByRole('button',{name:'查看任务配置'}));fireEvent.click(await screen.findByRole('button',{name:'查询本校授权的教师自评 Scale'}))}
 afterEach(cleanup)
+it('attaches an explicitly released Teacher GROUP version with its frozen floor and own-feedback ceiling',async()=>{
+ const item={...scale,key:'teacher-scale:scale:GROUP',analysisMode:'COHORT_AGGREGATE',visibilityPolicyKey:'EDUCATION_SELF_GROUP_V2',minimumRespondents:10,personalReportAvailable:true}
+ const api=vi.fn(async(path:string,method='GET')=>path===endpoint?{list:[item],nextCursor:null}:path.endsWith('/tracks')&&method==='POST'?{}:common(path))
+ render(<HuiteacherEvaluationStudio organizationId="org" api={api as Api}/>);await open()
+ fireEvent.change(await screen.findByLabelText('正式教师自评量表 · 固定版本'),{target:{value:'scale'}})
+ fireEvent.click(screen.getByRole('button',{name:'加入教师自评量表'}))
+ await waitFor(()=>expect(api).toHaveBeenCalledWith('/organizations/org/evaluation-events/event/run/tracks','POST',expect.objectContaining({resource:{family:'SCALE',key:item.key,version:'v1'},requestedPolicy:expect.objectContaining({analysisMode:'COHORT_AGGREGATE',visibilityPolicyKey:'EDUCATION_SELF_GROUP_V2',minimumRespondents:10})})))
+ expect(api.mock.calls.some(([path])=>path.includes('/personal-summary'))).toBe(false)
+})
 describe('Teacher common-library catalogue consumer',()=>{
  it('continues empty pages and preserves selection on failed pagination, then retries without duplicates',async()=>{
   let tries=0

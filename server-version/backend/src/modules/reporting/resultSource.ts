@@ -439,7 +439,7 @@ export const resolveAuthoritativeRunResults = async (
   cohort: ReportingCohortSnapshotRecord,
   leaf?: ReportingLeafSourceV2,
 ): Promise<ReportingResultBatchV1> => {
-  const leafContract=leaf?await reportingLeafDisclosureContract(leaf):null
+  const leafContract=leaf?await reportingLeafDisclosureContract(leaf,{organizationId:cohort.organizationId,runId:cohort.sourceRunId,trackId:cohort.sourceTrackId}):null
   const selectedExecutionIds = new Set(cohort.members.map((member) => member.executionId))
   const prepared = await prisma.$transaction(
     (tx) => prepareTrackInTransaction(tx, {
@@ -543,7 +543,7 @@ export const listAuthoritativeRunLeafSources = async (input: {
   const allowed:typeof tools=[]
   for(const tool of tools){
     try{
-      const contract=await reportingLeafDisclosureContract(tool.leaf),rule=contract.audiences[input.groupAudience]
+      const contract=await reportingLeafDisclosureContract(tool.leaf,input),rule=contract.audiences[input.groupAudience]
       const metrics=tool.metrics.filter(metric=>rule.metricKeys.includes(metric.key))
       if(rule.mode.includes('AGGREGATE')&&metrics.length)allowed.push({...tool,metrics})
     }catch(error){if(!(error instanceof ReportingError&&error.code==='REPORT_NOT_FOUND'))throw error}

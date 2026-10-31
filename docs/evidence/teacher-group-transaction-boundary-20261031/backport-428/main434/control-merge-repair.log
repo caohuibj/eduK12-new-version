@@ -1,0 +1,10 @@
+✔ PR432 exact mixed scope and changed-input SAST keep unrelated paths outside the lane (4.835233ms)
+✔ PR434 target questionnaire qualifier binds both consumers and rejects unknown scope (1.096403ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 122.291288

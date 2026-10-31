@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import type { Prisma } from '@prisma/client'
 import {
   assertOrganizationGroupArtifactReadAccess,
   assertOrganizationGroupReportGenerateAccess,
@@ -36,6 +37,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
   leaf?: ReportingLeafSourceV2
   presentation?: { sourceLabel: string; populationLabel: string }
   beforeCompute?: (cohort: ReportingCohortSnapshotRecord) => Promise<void>
+  tx?: Prisma.TransactionClient
 }): Promise<Awaited<ReturnType<typeof publicArtifact>>> => {
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
@@ -94,7 +96,7 @@ export const generateOrganizationGroupAnalysis = async (input: {
     snapshotHash: built.snapshotHash,
     generatedByUserId: input.principal.userId,
     generatedAt,
-  })
+  }, input.tx)
   await assertOrganizationGroupReportGenerateAccess({
     principal: input.principal,
     organizationId: input.organizationId,

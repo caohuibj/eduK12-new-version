@@ -1,0 +1,5 @@
+# Actual main432 integration
+
+PR428 first qualified successfully at eade7c9e on main6627: formal41162868653. Before merge main advanced through PR432 to f3c3b7def0ecb663a328c9effb7a7ae90753178b. The earlier success stays historical for its original baseline. Integrated source2c1ef5d3df1211635b04fac219cc993a5d68bfef includes both the reviewed Teacher transaction fix and PR432 application/control changes. Both current full component trees compiled once; no TeacherN10/FINAL/PG/browser/application case was replayed.
+
+PR432 changes reporting spec discovery and questionnaire controllers/components. Published spec validation remains in its existing reader, while bulk discovery removes duplicated reads; the Teacher numeric catalog/generation and frozen measured leaf inputs are unchanged. Questionnaire section/progress changes are outside the Teacher numeric/native consumer cases; original saved-FINAL reading remains separate. Current combined types cover interfaces. Both PR432 record values in the merged binding/evidence retain their exact pre-merge bytes; both scoped CodeQL selectors and current-cloud receipt reader are preserved.
