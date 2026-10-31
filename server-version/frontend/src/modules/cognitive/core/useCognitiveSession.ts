@@ -187,11 +187,11 @@ export function useCognitiveSession(
     dispatch({ type: 'LOADING' })
     try {
       const response = await api.getSession(sessionId)
+      if (lease.controller.signal.aborted) return
       if (response.code !== 0 || !response.data) {
         dispatch({ type: 'SESSION_ERROR', error: { code: 'NOT_FOUND', message: '测评不存在或不可访问' } })
         return
       }
-      if (lease.controller.signal.aborted) return
       const session: CognitiveSession = response.data
 
       if (session.deliveryMode === 'FINAL_ONLY') {
@@ -352,6 +352,7 @@ export function useCognitiveSession(
         dispatch({ type: 'TRIAL_SUBMIT_FAILED', error: friendlyError(err) })
       })
     } catch (err) {
+      if (lease.controller.signal.aborted) return
       dispatch({ type: 'SESSION_ERROR', error: friendlyError(err) })
     }
   }, [api, cognitiveCheckpointTransport, handleCheckpointError, sessionId])
