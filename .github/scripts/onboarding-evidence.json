@@ -15104,7 +15104,7 @@
     },
     "438": {
       "schemaVersion": 1,
-      "product": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
+      "product": "543348730d271605753e00aa1ba301d11d30cbaf",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
@@ -15147,14 +15147,18 @@
             "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
             "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
             "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
             "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx",
             "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx",
             "server-version/frontend/src/school/SchoolGroupReports.test.tsx",
             "server-version/frontend/src/school/SchoolGroupReports.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
             "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx",
             "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx",
             "server-version/frontend/src/survey/SurveyGroupReports.tsx",
-            "server-version/frontend/src/training/TrainingGroupReports.tsx"
+            "server-version/frontend/src/training/TrainingGroupReports.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
           ],
           "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
           "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
@@ -15199,14 +15203,18 @@
             "server-version/frontend/src/modules/reporting/group-longitudinal-ui.css",
             "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
             "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
             "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx",
             "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx",
             "server-version/frontend/src/school/SchoolGroupReports.test.tsx",
             "server-version/frontend/src/school/SchoolGroupReports.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
             "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.test.tsx",
             "server-version/frontend/src/school/SchoolPlanGroupLongitudinal.tsx",
             "server-version/frontend/src/survey/SurveyGroupReports.tsx",
-            "server-version/frontend/src/training/TrainingGroupReports.tsx"
+            "server-version/frontend/src/training/TrainingGroupReports.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
           ],
           "sourceAssociationBasis": "Unsigned original stage, retained with its saved source association. The two React cases are reused because this pointer component and runtime imports are unchanged. The PostgreSQL case executed the identical test/source bytes saved in 6ae85828c; the preceding engine-missing failure remains archived, not relabeled as successful.",
           "deltaRationale": "Intervening main changes concern separate report/School/longitudinal and dependency inputs. The Form directory service and UI only add the reviewed seek/append path. Current integrated backend/frontend types each passed once. No original React case, native FINAL or application suite was replayed.",
@@ -15231,7 +15239,7 @@
           "id": "teacher-form-history-integrated/postgres.json",
           "path": "docs/evidence/teacher-form-group-history-20261031/integrated/postgres.json",
           "sha256": "2fd1643a4f4953989f1d5543923e61d4c3e9d38de77b2ea8217fae0443c868ee",
-          "originalSourceAssociation": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
+          "originalSourceAssociation": "543348730d271605753e00aa1ba301d11d30cbaf",
           "sourceRoots": [
             "server-version/backend"
           ],
@@ -15254,20 +15262,20 @@
       ],
       "types": [
         {
-          "path": "docs/evidence/teacher-form-group-history-20261031/integrated/backend-types.json",
-          "sha256": "40cdfaf018455dd906db0e4e3bb2661236c5dc525faf45625b4bf59ba5fa718a",
+          "path": "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.json",
+          "sha256": "9c4e9d303f41905406a02c67edb407626b1aa56f73e9dccbfadad5a4cbf36191",
           "component": "backend",
-          "componentTree": "e9dd4a0a1f5f218f5880df5069f0841b61140075",
+          "componentTree": "9940cf26dec648ef1d7b7c4688ce285c3cc9c2b6",
           "exitField": "exitCode",
-          "log": "docs/evidence/teacher-form-group-history-20261031/integrated/backend-types.log"
+          "log": "docs/evidence/teacher-form-group-history-20261031/main437/backend-types.log"
         },
         {
-          "path": "docs/evidence/teacher-form-group-history-20261031/integrated/frontend-types.json",
-          "sha256": "0067c1222ab3816ad13a4d4adc8ed670660ea4fff512d5acd1d8d9e268d972ee",
+          "path": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.json",
+          "sha256": "6b94be1ab72789ae2ae0bdb3409ca8b3d2c5cd240f42ab86b3c7dec755f35cd6",
           "component": "frontend",
-          "componentTree": "716ffa297676cad39f74fdc7afa5eb5dfdc90c96",
+          "componentTree": "b63667c1ad041a74c903b55e37d03b3a122b6afe",
           "exitField": "exitCode",
-          "log": "docs/evidence/teacher-form-group-history-20261031/integrated/frontend-types.log"
+          "log": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.log"
         }
       ]
     }
