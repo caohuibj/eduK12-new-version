@@ -81,5 +81,6 @@
     "businessReplay": false
   },
   "formalReadyCIExecuted": false,
-  "productionAccessed": false
+  "productionAccessed": false,
+  "scopeCorrection": "User explicitly excludes native Teacher numeric Form longitudinal from this round; retained plan only, not a #440 delivery blocker. No new Form implementation."
 }
