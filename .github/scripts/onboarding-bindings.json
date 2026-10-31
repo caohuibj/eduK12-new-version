@@ -8303,7 +8303,7 @@
       "enabled": false,
       "base": "25cad994ec20b32b53ed8735c732143376536da0",
       "product": "de3b0204a525ebd929282cd78624d23977ed0266",
-      "controlCheckpoint": "e1c629c46af764e08ce8c0e41df0a5f402e8aed8",
+      "controlCheckpoint": "1253164cd0dafc21ed8f96873671b1d85b182066",
       "source": {
         "docs/performance/teacher-group-ui-recovery-20261031/README.md": {
           "before": null,
