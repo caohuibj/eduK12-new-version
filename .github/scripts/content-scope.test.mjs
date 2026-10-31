@@ -776,7 +776,7 @@ test('Cognitive mixed with image inputs selects full route and gate recomputes i
     for(const file of mixedFiles){mkdirSync(dirname(join(dir,file)),{recursive:true});writeFileSync(join(dir,file),'export {}');}
     const manifest='server-version/backend/src/modules/cognitive/tasks/example/task-package.json';writeFileSync(join(dir,manifest),mixedManifest());
     const dockerfile='server-version/frontend/Dockerfile';mkdirSync(dirname(join(dir,dockerfile)),{recursive:true});writeFileSync(join(dir,dockerfile),'FROM node:24\n');commit();const head=git('rev-parse','HEAD');
-    const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_FORCE_FULL:'false',GITHUB_OUTPUT:''}}));
+    const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_FORCE_FULL:'false',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',GITHUB_OUTPUT:''}}));
     assert.equal(output.scenario,'platform');assert.equal(output.cognitive_intake_light,false);assert.equal(output.cognitive,true);assert.equal(output.image_build,false);
     const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(output).map(([k,v])=>[k,String(v)]))}};
     for(const name of requiredChecks(needs,false))needs[name]={...needs[name],result:'success'};
