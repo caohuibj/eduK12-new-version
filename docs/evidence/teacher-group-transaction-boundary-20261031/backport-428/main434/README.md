@@ -1,0 +1,3 @@
+# Actual main434 integration
+
+Before publishing the already prepared main432 alignment, main advanced through PR434 to3bb4c9ad2385d5c3d043663cc303336817763f08. That earlier alignment was not uploaded or activated. PR434 adds only questionnaire available-target projection/controller and student page/test changes; no Teacher source, cohort, metric or disclosure branch changed. Final integrated source10d8bfffbb4144628bfc34bba8c2988cbf0e55bb keeps both CI candidates and the existing transaction correction. Each current combined component compiled once. The original Teacher11 staged cases, N10 FINALs and PG expiry counterexample were not replayed. All earlier receipts remain associated with their original component trees.
