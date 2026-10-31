@@ -31,17 +31,23 @@ function database(installed = false) {
 const input = { instrumentKey: key, instrumentVersion: version, actorUserId: 'system', deploymentPolicy: policy }
 
 describe('self-authored formal install, publication and consumption', () => {
-  it('rejects the known scientific territory mismatch in the install plan before creating a deployment', async () => {
+  it('keeps the reviewed scientific territory visible without treating it as a technical install gate', async () => {
     const reviewedKey = 'academic_self_concept_mathematics_zh_cn'
     const reviewedRuntime = getScaleInstrumentRuntimePolicy(reviewedKey, version)!
     const db = database()
     const reviewedInput = { ...input, instrumentKey: reviewedKey, deploymentPolicy: { ...policy,
       runtimePolicyHash: reviewedRuntime.runtimePolicyHash } }
-    const wrong = await planScaleInstrumentInstall(db as any, reviewedInput)
-    expect(wrong.allowActivation).toBe(false)
-    expect(wrong.blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+    const outsideReview = await planScaleInstrumentInstall(db as any, reviewedInput)
+    expect(outsideReview).toMatchObject({ createScale: true, allowActivation: true, blockers: [],
+      manualReview: { scientificReview: { territory: 'CN' } } })
     const correct = await planScaleInstrumentInstall(db as any, { ...reviewedInput, deploymentPolicy: { ...reviewedInput.deploymentPolicy, territory: 'CN' } })
     expect(correct).toMatchObject({ createScale: true, allowActivation: true, blockers: [] })
+    expect(correct.manualReview.scientificReview).toEqual(outsideReview.manualReview.scientificReview)
+    expect(correct.deploymentPolicyHash).not.toBe(outsideReview.deploymentPolicyHash)
+    const wrongLocale = await planScaleInstrumentInstall(db as any, { ...reviewedInput,
+      deploymentPolicy: { ...reviewedInput.deploymentPolicy, locale: 'en' } })
+    expect(wrongLocale.allowActivation).toBe(false)
+    expect(wrongLocale.blockers).toContain('DEPLOYMENT_CONTENT_LOCALE_MISMATCH')
   })
   it('plans fresh installation without a fabricated authorization row, and checks the real system actor', async () => {
     const db = database()
@@ -63,7 +69,7 @@ describe('self-authored formal install, publication and consumption', () => {
     const stale = await planStandardScalePublication(db as any, { instrumentKey: key, instrumentVersion: version, actorUserId: 'system', visibility: 'HIDDEN', expectedProofHash: '0'.repeat(64) })
     expect(stale.blockers).toContain('PUBLICATION_PREVIEW_STALE')
   })
-  it('retains scientific scope rejection and accepts a new reviewed CN deployment revision without external licenses', async () => {
+  it('binds publication proof to the deployment revision without rewriting the reviewed scientific scope', async () => {
     const reviewedKey = 'academic_self_concept_mathematics_zh_cn'
     const reviewed = getScaleInstrumentSource(reviewedKey, version)!, reviewedRuntime = getScaleInstrumentRuntimePolicy(reviewedKey, version)!
     const oldPolicy = { ...policy, runtimePolicyHash: reviewedRuntime.runtimePolicyHash }
@@ -73,10 +79,19 @@ describe('self-authored formal install, publication and consumption', () => {
     db.assessmentReferenceSet.findUnique.mockImplementation(async (arg: any) => ({ definition: reviewed.executable!.references.find(r => r.referenceVersion === arg.where.instrumentType_instrumentKey_referenceVersion.referenceVersion), status: 'ACTIVE' }))
     db.$queryRaw.mockResolvedValue([{ ...deployment, policyJson: oldPolicy, policyHash: hashScaleDeploymentPolicy(oldPolicy) }])
     const publication = { instrumentKey: reviewedKey, instrumentVersion: version, actorUserId: 'system', visibility: 'HIDDEN' as const }
-    expect((await planStandardScalePublication(db as any, publication)).blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+    const original = await planStandardScalePublication(db as any, publication)
+    expect(original).toMatchObject({ allowPublish: true, blockers: [] })
     const revised = { ...oldPolicy, revision: 2, territory: registeredSelfAuthoredDeploymentTerritory(reviewedKey, version)! }
     db.$queryRaw.mockResolvedValue([{ ...deployment, revision: 2, policyJson: revised, policyHash: hashScaleDeploymentPolicy(revised) }])
-    expect(await planStandardScalePublication(db as any, publication)).toMatchObject({ allowPublish: true, blockers: [] })
+    const next = await planStandardScalePublication(db as any, publication)
+    expect(next).toMatchObject({ allowPublish: true, blockers: [] })
+    expect(next.proofHash).not.toBe(original.proofHash)
+    expect(next.proof.sourceHash).toBe(original.proof.sourceHash)
+    expect(next.proof.definitionHash).toBe(original.proof.definitionHash)
+    expect(next.proof.qualification).toEqual(original.proof.qualification)
+    expect(reviewed.scientificReview?.territory).toBe('CN')
+    expect((await planStandardScalePublication(db as any, { ...publication,
+      expectedProofHash: original.proofHash })).blockers).toContain('PUBLICATION_PREVIEW_STALE')
     expect(revised).not.toHaveProperty('authorizationRefs')
     expect(reviewed.catalog.scientificMaturity).toBe('RESEARCH_READY')
   })

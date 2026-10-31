@@ -178,7 +178,15 @@ describe('Wave 1 P1 scale-library integration', () => {
       'mpfi24_zh_cn',
       'pss10_zh_cn',
     ]))
-    expect(keys(filterExpandedScaleLibraryEntries(model.entries, { primaryDomain: 'SELF_EFFICACY' }))).toEqual(['gse_zh_cn'])
+    const efficacy = filterExpandedScaleLibraryEntries(model.entries, { primaryDomain: 'SELF_EFFICACY' })
+    // GSE remains the sole P1 efficacy entry; later reviewed families are also discoverable.
+    expect(keys(efficacy.filter(entry => WAVE1_P1_CATALOG_KEYS.has(entry.identity.instrumentKey)))).toEqual(['gse_zh_cn'])
+    const expectedEfficacy = listScaleInstrumentSources()
+      .filter(source => source.catalog.construct.primaryDomain === 'SELF_EFFICACY')
+      .map(source => `${source.identity.instrumentKey}:${source.identity.instrumentVersion}`).sort()
+    const efficacyIdentities = efficacy.map(entry => `${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`)
+    expect(efficacyIdentities.slice().sort()).toEqual(expectedEfficacy)
+    expect(new Set(efficacyIdentities).size).toBe(expectedEfficacy.length)
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { availability: 'NOT_AVAILABLE', respondent: 'SELF' }))).toContain('dass21_zh_cn')
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { minAge: 8, maxAge: 13 }))).not.toContain('dass21_zh_cn')
     expect(keys(filterExpandedScaleLibraryEntries(model.entries, { minAge: 14, maxAge: 17 }))).toContain('dass21_zh_cn')

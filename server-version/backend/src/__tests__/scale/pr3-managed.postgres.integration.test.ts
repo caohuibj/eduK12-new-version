@@ -10,7 +10,6 @@ const suite = DB_URL ? describe : describe.skip
 const key = 'synthetic_pr3_eligibility'
 vi.mock('../../modules/scale/onboarding/instrument-registry', async importOriginal => {
   const actual = await importOriginal<typeof import('../../modules/scale/onboarding/instrument-registry')>()
-  const { compileScalePolicy } = await import('../../modules/scale/policy/compile')
   const { DISCLOSURE_PRESETS } = await import('../../modules/scale/policy/disclosure')
   const source = structuredClone(actual.getScaleInstrumentSource('adexi_v1', '2.0.0')!)
   source.identity = { instrumentKey: 'synthetic_pr3_eligibility', instrumentVersion: '1.0.0' }
@@ -19,9 +18,13 @@ vi.mock('../../modules/scale/onboarding/instrument-registry', async importOrigin
   source.applicability = { schemaVersion: 1, policyVersion: '1', respondentTypes: ['SELF'], requiredContextKeys: [], subject: { ageMonths: { minInclusive: 168 } } }
   source.disclosure!.audiences.respondent = DISCLOSURE_PRESETS.EDUCATIONAL_ONLY()
   source.educationalFeedback = { schemaVersion: 1, contentVersion: '1', blocks: [{ id: 'help', body: 'Synthetic educational feedback' }] }
+  // Register the synthetic identity through the current real validation cache;
+  // overriding only source/policy leaves its install validation undefined.
+  const syntheticRegistry = actual.createScaleInstrumentRegistry([source])
   return { ...actual,
-    getScaleInstrumentSource: (k: string, v: string) => k === source.identity.instrumentKey ? source : actual.getScaleInstrumentSource(k, v),
-    getScaleInstrumentRuntimePolicy: (k: string, v: string) => k === source.identity.instrumentKey ? compileScalePolicy(source) : actual.getScaleInstrumentRuntimePolicy(k, v),
+    getScaleInstrumentSource: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getSource(k, v) : actual.getScaleInstrumentSource(k, v),
+    getScaleInstrumentRuntimePolicy: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getRuntimePolicy(k, v) : actual.getScaleInstrumentRuntimePolicy(k, v),
+    getScaleInstrumentValidation: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getValidation(k, v) : actual.getScaleInstrumentValidation(k, v),
   }
 })
 vi.mock('../../modules/scale/scale-package.registry', async importOriginal => {

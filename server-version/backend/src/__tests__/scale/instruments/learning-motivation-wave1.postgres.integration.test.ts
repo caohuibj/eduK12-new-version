@@ -4,12 +4,17 @@ import { integrationDatabaseUrl } from '../../integration/integration-env'
 import { listScaleInstrumentSources,getScaleInstrumentRuntimePolicy } from '../../../modules/scale/onboarding/instrument-registry'
 import { installScaleInstrument,planScaleInstrumentInstall } from '../../../modules/scale/onboarding/install'
 import { planStandardScalePublication,publishStandardScale } from '../../../modules/scale/onboarding/publish'
+const wave1Keys=new Set(['academic_self_concept','academic_self_efficacy','domain_fixed_mindset','teacher_subject_liking','tutoring_necessity','value_cost'].flatMap(family=>
+ ['mathematics','chemistry','physics','biology','english','chinese'].map(subject=>`${family}_${subject}_zh_cn`)))
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 suite('Wave1 registered content install and publication (isolated PostgreSQL)',{timeout:60_000},()=>{
  const db=new PrismaClient({datasources:{db:{url}}});afterAll(()=>db.$disconnect())
  it('installs all 36, publishes with real gates, and reapplies idempotently',async()=>{
   const actor=await db.user.upsert({where:{username:'wave1-test-system-admin'},create:{username:'wave1-test-system-admin',passwordHash:'test-only',role:'ADMIN',platformRole:'SYSTEM_ADMIN'},update:{}})
-  const sources=listScaleInstrumentSources().filter(s=>s.executable?.definition.versionAxes)
+  // Other independent-axis packages have their own versions and report variants.
+  const sources=listScaleInstrumentSources().filter(s=>wave1Keys.has(s.identity.instrumentKey)&&s.identity.instrumentVersion==='1.0.0')
+  expect(sources).toHaveLength(36)
+  expect(sources.map(source=>source.identity.instrumentKey).sort()).toEqual([...wave1Keys].sort())
   for(const source of sources){
    const key=source.identity.instrumentKey
    const input={instrumentKey:key,instrumentVersion:'1.0.0',actorUserId:actor.id,deploymentPolicy:{schemaVersion:2 as const,revision:1,locale:'zh-CN',territory:'CN',deploymentModes:['STANDALONE','COMPOSITE'] as ('STANDALONE'|'COMPOSITE')[],runtimePolicyHash:getScaleInstrumentRuntimePolicy(key,'1.0.0')!.runtimePolicyHash,localizationVersion:'1.0.0',inFlightCompletion:'FROZEN_DEADLINE' as const,completionWindowMs:86400000}}
