@@ -13966,6 +13966,168 @@
           "log": "docs/evidence/teacher-group-partial-population-20261031/transaction-backport/main434/frontend-types.log"
         }
       ]
+    },
+    "430": {
+      "schemaVersion": 1,
+      "product": "7d5b81cb81a5c3e8b966305ac3301d04c57e3005",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Three distinct admitted cases: original successfulV1 refusal from a partially failed report, its exact failed leaf case linked to the successful continuation, and actual native HTTP/PG retained completion. First report stays failed; filtered rows stay filtered.",
+          "Actual mixed native source is one existing Cognitive/SJT composite with10 new assignments/20 leaves, not all native protocols or Bundle Profile acceptance. Snapshot readcanonical0 and old Scale unchanged remain original observations.",
+          "Current backend receipt includes the same transaction correction and main432/434 inputs. Frontend unchanged from base is proven by source scope; no frontend compiler, FINAL, PG, browser or original app replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "native-v1-original",
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/unit-first.json",
+          "sha256": "d066fa257550af33e34491f9568ef262aa52ef152d5052e363387826de50f0a8",
+          "originalSourceAssociation": "21f15b91627a3d3a500957f9d1af837324389675",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "deltaRationale": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "binds native leaves to their frozen C and separate GROUP ceilings without decoding participant results",
+              "status": "failed"
+            },
+            {
+              "fullName": "rejects a historical native v1 before generic leaf resolution, despite a claimed GROUP parent",
+              "status": "passed"
+            },
+            {
+              "fullName": "only honors the actual aggregate contract delay rather than inventing a universal close requirement",
+              "status": "skipped"
+            },
+            {
+              "fullName": "freezes only per-metric contributor subsets and rejects a one-person swap despite unchanged overall N",
+              "status": "skipped"
+            },
+            {
+              "fullName": "seeks26 same-time version pointers with the full timestamp and id, without selecting saved report payloads",
+              "status": "skipped"
+            }
+          ],
+          "allowPartialFailure": true,
+          "selectedCases": [
+            "rejects a historical native v1 before generic leaf resolution, despite a claimed GROUP parent"
+          ],
+          "failureContinuations": [
+            {
+              "caseName": "binds native leaves to their frozen C and separate GROUP ceilings without decoding participant results",
+              "reportId": "native-leaf-final"
+            }
+          ]
+        },
+        {
+          "id": "native-leaf-final",
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/unit.json",
+          "sha256": "fcd77f0cc2d1a729ebff1aa2e4d08ea705545aaf9b4b489f778a691532137a6c",
+          "originalSourceAssociation": "21f15b91627a3d3a500957f9d1af837324389675",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "deltaRationale": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "binds native leaves to their frozen C and separate GROUP ceilings without decoding participant results",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "native-real-final",
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/postgres.json",
+          "sha256": "a695ebba7d8ae68cb0086bf74c2d80105eeed2da390bdc42e2b692daf6db3a7c",
+          "originalSourceAssociation": "21f15b91627a3d3a500957f9d1af837324389675",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/teacherGroupTransaction.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/available-target.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts",
+            "server-version/backend/src/modules/reporting/artifact.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/service.ts",
+            "server-version/backend/src/modules/reporting/spec.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "deltaRationale": "Unsigned stage original retained with retrospective saved21f15b source association, not an execution-time signature. Actual native leaf/source code is unchanged except the separately reviewed transaction correction, while main432/434 only add questionnaire/spec-discovery inputs. Current backend compiled once; frontend exactly equals the qualified partial-population parent. Original native10 assignments/20 canonical leaves were not replayed; failed registration/fixture/session/header stages stay archived and the final continuation reuses retained FINALs.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher native GROUP actual frozen leaves publishes ten new native assignments once and reads Cognitive and SJT aggregates through the existing Teacher consumer",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.json",
+          "sha256": "11ac96c6a0b90a230bbc992ff17c8a6d75437f436309ba7d4aba24bf449345ff",
+          "component": "backend",
+          "componentTree": "ace2d78d6cf1ca334ae65d49cfa8701c05df22c6",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-native-group-leaves-20261031/transaction-backport/main434/backend-types.log"
+        }
+      ]
     }
   }
 }
