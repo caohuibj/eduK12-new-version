@@ -11,9 +11,21 @@ test('combines disjoint files and preserves counts, failures, interruption and o
   assert.deepEqual(result.testResults,[base.testResults[0],extra.testResults[0]]);
   assert.equal(base.numTotalTests,1);
 });
-test('only both successful, uninterrupted disjoint executions qualify',()=>{
+test('only all successful, uninterrupted disjoint executions qualify',()=>{
   assert.equal(mergeRegressionReports([report('base'),report('export')]).success,true);
   assert.equal(mergeRegressionReports([report('base'),{...report('export'),wasInterrupted:true}]).success,false);
+});
+test('preserves all five phase reports, including a failure between successful phases',()=>{
+  const reports=['bundle','course','base','roster','export'].map(name=>report(name));
+  const success=mergeRegressionReports(reports);
+  assert.equal(success.success,true);assert.equal(success.numTotalTests,5);
+  assert.deepEqual(success.testResults,reports.flatMap(r=>r.testResults));
+  reports[1]=report('course',false);
+  const failed=mergeRegressionReports(reports);
+  assert.equal(failed.success,false);assert.equal(failed.numFailedTests,1);
+  assert.equal(failed.numPassedTests,4);assert.equal(failed.testResults[1].status,'failed');
+  assert.equal(reports[1].success,false);
+  assert.throws(()=>mergeRegressionReports([...reports,report('course')]));
 });
 test('missing, overlapping, empty and malformed reports are refused',()=>{
   for(const reports of [[report('a')],[report('a'),report('a')],[report('a'),{...report('b'),testResults:[]}],

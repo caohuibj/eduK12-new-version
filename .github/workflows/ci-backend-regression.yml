@@ -69,6 +69,7 @@ jobs:
       SCHOOL_GROUP_SOURCE_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       TASK_GROUP_HISTORY_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR363_FEEDBACK_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      LIBRARY_DISCOVERY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       UPLOAD_DIR: /tmp/eduk12-ci-uploads
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
@@ -127,7 +128,7 @@ jobs:
         run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
       - name: clear reports from previous regression jobs
         # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
-        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt
+        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -219,14 +220,36 @@ jobs:
           node scripts/assert-release-test-report.mjs /tmp/eduk12-parent-vitest.json src/__tests__/integration/parentPortal.postgres.integration.test.ts
           npm test -- src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/integration/reportingHttp.postgres.integration.test.ts src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
+      - name: Training Bundle checkpoint producer
+        if: inputs.focus == 'full'
+        run: |
+          # This hosted job owns these fixed synthetic checkpoint paths.
+          rm -f /tmp/training-native-bundle-group-bootstrap.json /tmp/training-native-bundle-group-fixture.json /tmp/training-native-bundle-group-disclosed-fixture.json /tmp/training-scale-course-delivery-fixture.json /tmp/training-scale-course-delivery-started.json /tmp/training-standalone-scale-group-fixture.json /tmp/training-standalone-cognitive-group-fixture.json
+          env -u TRAINING_BUNDLE_GROUP_FIXTURE -u TRAINING_BUNDLE_GROUP_BOOTSTRAP -u TRAINING_BUNDLE_GROUP_DISCLOSED_FIXTURE npm test -- src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-training-bundle-producer.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-training-bundle-producer.json src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts
+      - name: Training Scale course checkpoint producer
+        if: inputs.focus == 'full'
+        # A failed producer blocks its consumers even when it left partial JSON.
+        run: |
+          npm test -- src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-training-course-producer.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-training-course-producer.json src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts
       - name: full functional regression
         if: inputs.focus == 'full'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         # Real-PG suites remain serial. The single hardware-sensitive burst is
-        # covered by the isolated backend job. The export consumer runs separately
-        # on Redis DB 15; every functional file remains covered by the report union.
-        run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --exclude=src/__tests__/integration/training-mac-export.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest-base.json
+        # covered by the isolated backend job. Producers precede their consumers;
+        # roster and export use Redis DB14/15. Reports cover the disjoint executions.
+        run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --exclude=src/__tests__/integration/training-mac-export.postgres.integration.test.ts --exclude=src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts --exclude=src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts --exclude=src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest-base.json
+      - name: isolated roster consumer on this job Redis DB 14
+        if: (success() || failure()) && inputs.focus == 'full'
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          REDIS_URL: redis://localhost:6379/14
+          ROSTER_INTEGRATION_REDIS_URL: redis://localhost:6379/14
+        run: |
+          npm test -- src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest-roster.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest-roster.json src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts
       - name: isolated export consumer on this job Redis DB 15
         if: (success() || failure()) && inputs.focus == 'full'
         env:
@@ -258,9 +281,9 @@ jobs:
           if(result.error)throw result.error;
           process.exitCode=result.status??1;
           NODE
-      - name: preserve both disjoint functional reports and require their complete union
+      - name: preserve all disjoint functional reports and require their complete union
         if: (success() || failure()) && inputs.focus == 'full'
-        run: node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json
+        run: node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-backend-vitest-export.json
       - name: capture hosted runner resources
         if: always()
         run: |-
@@ -276,6 +299,9 @@ jobs:
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
           src/__tests__/integration/training-mac-export.postgres.integration.test.ts
+          src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts
+          src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts
+          src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts
           src/__tests__/survey/governed-native.postgres.integration.test.ts
           src/__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts
           src/__tests__/cognitive/concurrency.integration.test.ts
@@ -369,6 +395,9 @@ jobs:
             /tmp/eduk12-backend-vitest.json
             /tmp/eduk12-backend-vitest-base.json
             /tmp/eduk12-backend-vitest-export.json
+            /tmp/eduk12-backend-vitest-roster.json
+            /tmp/eduk12-training-bundle-producer.json
+            /tmp/eduk12-training-course-producer.json
             /tmp/eduk12-parent-vitest.json
             /tmp/eduk12-r5-vitest.json
             /tmp/eduk12-hosted-ci-env.txt
