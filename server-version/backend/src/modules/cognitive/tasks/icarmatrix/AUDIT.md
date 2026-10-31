@@ -94,3 +94,26 @@ or Prisma client regeneration was done. This is not a claim of full build/CI
 qualification. Only directly affected local checks were rerun after repairs.
 Manifest/dependency checks are local source checks, not formal Actions approval.
 No database install, production access, publication, merge or deployment occurs.
+
+
+## Independent review follow-up
+
+The new 2.1.0 report now states 3×3 only in both plain-language concept and
+configuration labels. Quality labels are neutral: low-RT observations and
+unanswered items, based on operational rates .3/.4; these are uncalibrated
+thresholds and do not imply guessing or a psychological state. The default RT
+floor is 500ms, frozen in config. Stable internal flag keys are unchanged.
+
+Only three simple rule families are represented. Item 009 is mandatory in every
+profile; forms overlap and are not parallel/equated. Rule-label results cannot
+be interpreted as reliable sub-ability scores. Independent review found the
+80/64px figures clear in its available rendering; neither that review nor this
+work claims native-device or formal acceptance.
+
+The existing source-to-bank records and two fixed script snapshots are now
+provided in provenance/README.md. Exact historical R/DescTools/svglite/jsonlite
+versions and generation stdout are absent; this is explicitly unverified, not
+reconstructed. matRiks MIT software and DescTools GPL>=2 are distinguished from
+specific SVG output rights, for which independent evidence remains missing.
+This remaining source/rights qualification must be disclosed for this task and
+does not turn into a new software gate for the other three tasks.

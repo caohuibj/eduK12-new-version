@@ -14,5 +14,5 @@ export const catalog: CognitiveLibraryCatalogEntry = {
     'ICAR、Sandia MatGen仅为原候选的范式背景，未导入其标准题目；MaRs-IB原材料非商业条件，不纳入本次公开题库。',
     '逐题保留/排除理由、精确原素材来源与许可边界见 tasks/icarmatrix/AUDIT.md。',
   ],
-  rightsProvenance: 'Procedurally generated matRiks-derived assets, MIT generator attribution retained; not original ICAR/Raven/MaRs-IB items. See tasks/icarmatrix/THIRD_PARTY_NOTICES.md.',
+  rightsProvenance: 'Existing bank declares matRiks generation; MIT applies to matRiks software, DescTools declares GPL>=2, and these SVG output rights are not independently verified. No original ICAR/Raven/MaRs-IB items imported. See tasks/icarmatrix/provenance/README.md and THIRD_PARTY_NOTICES.md.',
 }

@@ -1,7 +1,7 @@
 # Matrix stimulus provenance
 
-The committed SVG bank is the existing procedural output from the matRiks 0.1.5
-pipeline in candidate source commit `16d9bbaa5fffb424ce463220d6f9f7d3a7280db5`.
+The committed SVG bank declares procedural generation using matRiks 0.1.5
+and is present in candidate source commit `16d9bbaa5fffb424ce463220d6f9f7d3a7280db5`.
 Its Git blob is `449f11201500c132d8f68f17fd2151547d9221ec`; the frontend and backend
 copies are identical. No external standard-test images were added by this audit.
 
@@ -34,12 +34,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-The package notes that its graphics are based on DescTools. The original R
-pipeline is provenance for these generated figures; no R package/source is
-vendored or run in the application. These are procedural derivatives; the
-historic `internal-generated` label is not a claim that EduK12 authored matRiks.
-Neither the MIT software license nor this notice supplies psychometric norms,
-an ICAR/Raven license, or permission for unrelated test materials.
+The package notes that its graphics are based on DescTools, whose program
+license is **GPL (>= 2)**. See its [fixed official DESCRIPTION](https://github.com/AndriSignorell/DescTools/blob/820c97ccc00447b2ef17c938ab1a12adbe4b13b3/DESCRIPTION).
+The DescTools version used to generate this bank is not recorded; this current
+source inspection does not identify the installed historical version.
+
+The matRiks MIT grant above concerns software. It is **not a declaration that all
+bank SVGs are MIT-licensed images**. Similarly, DescTools' program license alone
+does not establish the license or copyright status of every generated output.
+No independent output-rights grant/provenance record was found for these specific
+SVGs; that part remains unverified. The script uses parameterized figures (such
+as `pacman()`), not an embedded original standard-test image, but that observation
+does not resolve all rights by itself. The historical `internal-generated` label
+is not proof of output rights or a claim that EduK12 authored matRiks.
+
+Fixed generation scripts and existing bank history are archived under
+[provenance](provenance/README.md). They are source records only and are not
+executed by the application. The exact historical R/DescTools/svglite/jsonlite
+environment and retained generation stdout are missing; no reproducible rebuild
+is claimed. No package source beyond those archived project scripts is vendored.
+Neither these software licenses nor this notice supplies psychometric norms,
+an ICAR/Raven material license, or permission for unrelated test materials.
 
 MaRs-IB is an alternative discussed in the literature. Its paper is open access,
 but the paper describes its test forms as non-commercial-use materials. Those

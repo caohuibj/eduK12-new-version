@@ -319,6 +319,8 @@ participantPresentations.push({
   disclaimer: '只描述本次七题试测范围内的表现。不是原版 ICAR 全套；无年龄常模、IQ、百分位或能力等级。',
   reportReading: {
     ...previous.reportReading!, version: '1.1.0',
+    qualityLabels: { ...previous.reportReading!.qualityLabels, rapidGuessing: '低于用时下限的作答较多', excessiveTimeouts: '未作答较多' },
+    popular: { ...previous.reportReading!.popular!, concept: '本版每题仅使用3×3图形表格，右下角缺一块。观察形状、方向或填充深浅在行列中的变化，从六个选项中选出缺失图形。它只是一组项目试测题。' },
     introduction: '一起看看这次已作答、答对和未作答的情况；这些数字不代表固定能力。',
     summary: { template: '这一次，你作答了 {answeredCount} 题，答对 {correctCount} 题，另有 {timeoutCount} 题未作答。', metricKeys: ['answeredCount', 'correctCount', 'timeoutCount'] },
     summaryByProfile: {
@@ -329,8 +331,9 @@ participantPresentations.push({
     withholdFlags: ['legacyUninterpretable', 'interrupted', 'excessiveTimeouts', 'rapidGuessing'],
     professional: {
       ...previous.reportReading!.professional!,
+      configFields: previous.reportReading!.professional!.configFields.map(field => field.key === 'matrixType' ? { ...field, label: '矩阵规格（本版仅3×3）' } : field),
       procedure: '七道冻结3×3试测题；按seed确定性分层选择4/6/7题，每版均含形状、旋转与填充变化。六个呈现选项的顺序也按seed固定。独立练习通过后才开始正式试次。',
-      interpretation: '准确率分母为实际完整呈现的计划题数，含未作答。未作答与错误选择分别保存；有效用时排除过快及中断题。少量题的规则标签正确率仅作科研观察，不能据此推断稳定能力。',
+      interpretation: '准确率分母为实际完整呈现的计划题数，含未作答。未作答与错误选择分别保存；有效用时排除低于本次用时下限及有中断的题目。仅涉及形状、旋转、填充三类简单规则，009必出，不是平行等值形式，不能据规则标签正确率推断稳定子能力。',
       metricNotes: {
         ...Object.fromEntries(Object.entries(previous.reportReading!.professional!.metricNotes).filter(([key]) => key !== 'accuracyByRuleTag')),
         medianRtMs: { definition: '所有未中断、validRtFloorMs≤rtMs≤timeoutMs的已作答题用时中位数（含错答）；无有效用时为null。', readingHint: '结合有效用时题数阅读；不判断能力高低。' },

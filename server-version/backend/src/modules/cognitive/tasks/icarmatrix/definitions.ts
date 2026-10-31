@@ -120,10 +120,17 @@ export const icarmatrixV21RegistryMeta = {
   metricDefinitionVersion: '1.1.0',
   metricDefinitions: {
     ...icarmatrixV2RegistryMeta.metricDefinitions,
+    accuracyByRuleTag: { ...icarmatrixV2RegistryMeta.metricDefinitions.accuracyByRuleTag, description: '只描述本次有限题目；规则标签重叠且009必出，不是独立或稳定子能力分数。' },
     medianRtMs: metric('medianRtMs', '有效作答中位用时', 'fluid_reasoning', 'ms', 'descriptive', 'secondary'),
     timeoutCount: metric('timeoutCount', '未作答题数', 'fluid_reasoning', 'count', 'descriptive', 'secondary'),
     answeredCount: metric('answeredCount', '已作答题数', 'fluid_reasoning', 'count', 'descriptive', 'secondary'),
     validRtCount: metric('validRtCount', '有效用时题数', 'fluid_reasoning', 'count', 'descriptive', 'secondary'),
+  },
+  qualityDefinitionVersion: '1.1.0',
+  qualityDefinitions: {
+    ...icarmatrixV2RegistryMeta.qualityDefinitions,
+    rapidGuessing: { key: 'rapidGuessing', label: '低于用时下限的作答较多', description: '低于本次冻结用时下限的作答占计划题数至少0.3；这是未经校准的操作标记，不推断心理状态。' },
+    excessiveTimeouts: { key: 'excessiveTimeouts', label: '未作答较多', description: '未作答占计划题数至少0.4；这是未经校准的操作标记。' },
   },
   reportDefinitionVersion: '1.1.0',
   reportDefinition: {
