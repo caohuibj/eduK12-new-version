@@ -59,9 +59,11 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
   const load = useCallback(async () => {
     setLoading(true)
     try {
+      const projection = basePath.startsWith('/general-questionnaires/') || basePath.startsWith('/questionnaires/')
+        ? '?projection=units' : ''
       const [sectionResponse, contentResponse] = await Promise.all([
         apiClient.get<{ list: FormSection[] }>(`${basePath}/form-sections`),
-        apiClient.get<{ units?: ContentUnit[] }>(`${basePath}/content`),
+        apiClient.get<{ units?: ContentUnit[] }>(`${basePath}/content${projection}`),
       ])
       if (sectionResponse.code !== 0) throw new Error(sectionResponse.message || '区段加载失败')
       if (contentResponse.code !== 0) throw new Error(contentResponse.message || '内容顺序加载失败')
