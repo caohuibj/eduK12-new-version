@@ -41,6 +41,8 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
     AND EXISTS(SELECT 1 FROM scale_library_use_grants g WHERE g.entry_id=e.id
       AND g.product=${input.product} AND g.organization_id=${input.organizationId} AND g.status='ACTIVE'
       AND ((g.scope_kind='USER' AND g.user_id=${input.actorId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL)))
+    AND NOT EXISTS(SELECT 1 FROM registered_assessment_resources newer WHERE newer.resource_key=r.resource_key
+      AND newer.status='PUBLISHED' AND (newer.created_at,newer.id)>(r.created_at,r.id))
     AND r.resource_key>${cursor}
   ORDER BY r.resource_key LIMIT ${batchSize}`)
  if(rows.length===0){exhausted=true;break}

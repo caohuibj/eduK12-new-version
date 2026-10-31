@@ -86,3 +86,38 @@ it('opens existing Teacher Form versions, explicitly generates one class report,
  expect(screen.queryByRole('button',{name:'创建下一轮教师自评'})).not.toBeInTheDocument()
  expect(report.textContent).not.toContain('NaN')
 })
+
+it('opens numeric GROUP from the actual Teacher event and generates, switches and prints the saved projection',async()=>{
+ const leaf={slotKey:'scale:item',unitType:'SCALE',instrumentKey:'support-scale',instrumentVersion:'1.0.0',compiledRuntimeHash:'a'.repeat(64)}
+ const make=(id:string)=>({artifactId:id,generatedAt:'2026-10-31T00:00:00Z',projection:{title:'教师群体报告',sourceLabel:'教师支持',cutoff:'2026-10-31T00:00:00Z',populationLabel:'全部合格参与教师',completedN:10,assignedN:10,countUnit:'PERSON',tool:{key:'support-scale',title:'教师支持',kind:'SCALE'},metrics:[{key:'support',label:'支持体验',type:'NUMBER',unit:null,state:'present',validN:10,missingN:0,mean:3,sdSample:0,range:null,observedRange:{min:3,max:3},qualityCounts:{},measurement:leaf,frequencies:[]}],limitations:['数值来自正式固定结果。']}})
+ const old=make('old'),fresh=make('fresh');let posted=false
+ const print=vi.spyOn(window,'print').mockImplementation(()=>{})
+ const fetch=vi.fn(async(url:string,options?:RequestInit)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'admin',username:'Teacher admin',role:'TEACHER',mustChangePassword:false,organizations:[{organizationId:'school',organizationName:'合成学校',productAdmin:true}]})
+  if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic'})
+  if(url.endsWith('/evaluation-targets'))return reply({list:[{id:'target',name:'学校',kind:'ORGANIZATION'}]})
+  if(url.endsWith('/evaluation-events'))return reply({list:[{id:'event',targetId:'target',title:'教师支持测量',kind:'ASSESSMENT',status:'CLOSED',version:3}]})
+  if(url.endsWith('/evaluation-events/event/run'))return reply({eventId:'event',runId:'run',status:'CLOSED',version:4,trackCount:1})
+  if(url.endsWith('/run/tracking'))return reply({baselineId:null})
+  if(url.endsWith('/numeric-group-reports')&&options?.method==='POST'){posted=true;expect(JSON.parse(options.body as string)).toEqual({trackId:'track',leaf,specId:'spec',selection:{kind:'ALL'}});return reply(fresh)}
+  if(url.endsWith('/numeric-group-reports')||url.endsWith('/numeric-group-reports?configure=true'))return reply({sources:[{trackId:'track',title:'教师支持',minimumN:10,tools:[{leaf,metrics:[{key:'support'}]}],groups:{options:[],limitations:[]}}],specs:[{specId:'spec',title:'支持描述'}],versions:(posted?[fresh,old]:[old]).map(({artifactId,generatedAt})=>({artifactId,generatedAt})),canGenerate:true})
+  if(url.endsWith('/numeric-group-reports/old'))return reply(old)
+  if(url.endsWith('/numeric-group-reports/fresh'))return reply(fresh)
+  return reply({list:[],nextCursor:null})
+ })
+ vi.stubGlobal('fetch',fetch);render(<HuiteacherApp/>)
+ const school=within(await screen.findByRole('navigation',{name:'Teacher 工作台'})).getByRole('button',{name:'学校改进'})
+ fireEvent.click(school);await waitFor(()=>expect(school).toHaveAttribute('aria-pressed','true'))
+ fireEvent.click(await screen.findByRole('link',{name:'评价活动'}));fireEvent.click(await screen.findByRole('button',{name:'查看任务配置'}))
+ fireEvent.click(await screen.findByRole('button',{name:'查看数值群体报告'}))
+ await screen.findByRole('article',{name:'群体报告阅读'});expect(posted).toBe(false)
+ fireEvent.click(screen.getByRole('button',{name:'配置数值群报更新版'}));await screen.findByLabelText('已批准群体用途的工具')
+ fireEvent.change(screen.getByLabelText('已批准群体用途的工具'),{target:{value:'track:scale:item:'+leaf.compiledRuntimeHash}})
+ fireEvent.change(screen.getByLabelText('已发布单次群体方案'),{target:{value:'spec'}})
+ fireEvent.click(screen.getByRole('button',{name:'生成数值群报更新版'}))
+ await waitFor(()=>expect(screen.getByLabelText('已生成数值报告')).toHaveValue('fresh'))
+ fireEvent.change(screen.getByLabelText('已生成数值报告'),{target:{value:'old'}})
+ await waitFor(()=>expect(screen.getByLabelText('已生成数值报告')).toHaveValue('old'))
+ fireEvent.click(within(screen.getByRole('article',{name:'群体报告阅读'})).getByRole('button',{name:'打印 / 保存 PDF'}));expect(print).toHaveBeenCalledOnce()
+ expect(fetch.mock.calls.filter(([,o])=>o?.method==='POST')).toHaveLength(1)
+})

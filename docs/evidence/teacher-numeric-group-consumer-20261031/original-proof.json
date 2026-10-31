@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "kind": "original",
+  "productionAccessed": false,
+  "scope": {
+    "organizationId": "6540be55-5879-4b34-8e2a-c1035939f791",
+    "eventId": "b183745a-0dac-41ab-88ba-db3799a3e8a7",
+    "actorUserId": "fbd22c11-0282-411c-a299-e9d314693f4d"
+  },
+  "artifactId": "d768caef-ea89-4a57-bec3-67cdd4247d5c",
+  "retainedFinal": "735d3433-307a-46d2-af63-c0db40854b96",
+  "newCompletedFinals": 0,
+  "completedN": 10,
+  "mean": 3,
+  "sdSample": 0,
+  "readPayloadMaterializations": 0,
+  "ordinaryTeacherDenied": true,
+  "genericRouteCannotBypassTeacherDisclosure": true
+}

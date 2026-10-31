@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "kind": "library",
+  "productionAccessed": false,
+  "scope": {
+    "organizationId": "6540be55-5879-4b34-8e2a-c1035939f791",
+    "eventId": "e9c5aa2a-2371-4094-b600-d85f4b7b0f7b",
+    "actorUserId": "fbd22c11-0282-411c-a299-e9d314693f4d"
+  },
+  "artifactId": "06462cfd-d90b-447d-88eb-5cd706a681d9",
+  "retainedFinal": "f4de63b8-6ab1-47e4-ac1d-443c3200f50a",
+  "newCompletedFinals": 0,
+  "completedN": 10,
+  "mean": 3,
+  "sdSample": 0,
+  "readPayloadMaterializations": 0,
+  "ordinaryTeacherDenied": true,
+  "genericRouteCannotBypassTeacherDisclosure": true
+}

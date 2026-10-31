@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED_BY_RETAINED_STAGE_CONTINUATION",
+  "productionAccessed": false,
+  "sourcePopulation": "Retained original Teacher fixture, current members unchanged",
+  "newCDefinition": false,
+  "sameCScaleIdAcrossPolicies": true,
+  "separateFrozenCompositeRequiredByExistingUniqueKey": true,
+  "newDatabaseTablesOrColumns": false,
+  "schemaChange": "Existing library identity trigger permits independently reviewed new GROUP lifecycle; exact SQL applied only in isolated PostgreSQL",
+  "explicitAggregateAudience": [
+    "ORGANIZATION"
+  ],
+  "otherAudiencesNotInferred": true,
+  "originalV1Unmodified": true,
+  "approvedOwnCeilingPreserved": true,
+  "actualPublishedRunExecutions": 10,
+  "completedFinals": 1,
+  "sameFinalOwnFeedback": "READY via existing unitReports DTO",
+  "publicInboxDenied": true,
+  "managerIndividualReadDenied": true,
+  "fullInitialJourneyCase": "Failed only at incorrect metrics DTO assertion after publish, allocation and FINAL; retained failed original, no replay",
+  "continuationCasesPassed": 1,
+  "wholeJourneyCaseReexecuted": false,
+  "frontendNewCasePassed": 1,
+  "frontendOldCasesFiltered": 4,
+  "aggregateGenerationProven": false,
+  "limitations": [
+    "Does not yet prove sufficient-N group aggregation/read or native Cognitive/SJT group consumer",
+    "Existing completed FINAL and nine pending executions retained for subsequent aggregate continuation",
+    "One unchanged fixture retry accidentally executed; retained as failure, never promoted to success"
+  ]
+}
