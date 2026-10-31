@@ -1,5 +1,6 @@
 import {cognitiveIntakeToolingChanged} from './cognitive-intake-scope.mjs';
 import {scaleIntakeToolingChanged} from './scale-intake-scope.mjs';
+import {backendTestFile} from '../../server-version/scripts/release/policy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -31,6 +32,12 @@ const recipes={
  documentation:[['node','.github/scripts/documentation-check.mjs']],
  'release-tools':[['node','--test','server-version/scripts/release/policy.test.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/local-validation.test.mjs']],
 };
+export function toolingBackendTests(files) {
+ const tests=files.filter(backendTestFile);
+ // Keep the subprocess contract even when only the development CLI entry changes.
+ if(files.includes('server-version/backend/src/scripts/cognitive-onboarding-check.ts'))tests.push('server-version/backend/src/__tests__/cognitive/onboarding-cli.test.ts');
+ return [...new Set(tests)].sort().map(file=>file.slice('server-version/backend/'.length));
+}
 export function recipe(check,base,head) {
  if(!recipes[check])throw Error('Unsupported receipt check: '+check);
  const commands=check==='release-tools'&&adapterOnly(base,head)?[['node','--test','.github/scripts/local-validation.integration.test.mjs']]:structuredClone(recipes[check]);
@@ -43,6 +50,9 @@ export function recipe(check,base,head) {
   if(cognitiveIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/cognitive-intake-scope.test.mjs','.github/scripts/cognitive-intake-check.test.mjs','server-version/scripts/cognitive/onboarding-selection.test.cjs']);
   }
+  const backendTests=toolingBackendTests(files);
+  if(backendTests.length)commands.push(['npm','--prefix','server-version/backend','test','--',...backendTests,'--maxWorkers=1']);
+  if(files.includes('server-version/backend/src/scripts/cognitive-onboarding-check.ts'))commands.push(['node','server-version/backend/node_modules/typescript/bin/tsc','--project','server-version/backend/tsconfig.json','--noEmit']);
   if(scaleIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/scale-intake-scope.test.mjs','.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs','.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs']);
    commands.push(['node','--import','./server-version/backend/node_modules/tsx/dist/loader.mjs','--test','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
