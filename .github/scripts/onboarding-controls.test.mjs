@@ -103,6 +103,8 @@ test('PR449 retains its eight original cases, unchanged input hashes and real co
  assert.equal(verifyTypeReceipt(receipt,types,readFileSync,cfg.components.frontend).component,'frontend');
  assert.throws(()=>verifyTypeReceipt({...receipt,argv:['node','node_modules/.bin/tsc','--emitDeclarationOnly','-p','tsconfig.app.json']},types,readFileSync,cfg.components.frontend));
  assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'onboarding-structure'}}},false),['scope','onboarding-structure','codeql']);
+ const workflow=readFileSync('.github/workflows/ci.yml','utf8').split('- name: select exact Task1 changed application and control SAST inputs')[1].split('- name: authenticate original PR395')[0];
+ assert(JSON.parse(workflow.match(/fromJSON\('([^']+)'\)/)[1]).includes(449));
 });
 test('first-feedback scope permits only reviewed mixed components and scans both source families',()=>{
  const f=fixture(),path='server-version/frontend/src/survey/SurveyPublicApp.tsx',b={...f.b,pr:372,source:{[path]:{before:null,after:blob}}};
