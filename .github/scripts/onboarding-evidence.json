@@ -336,6 +336,181 @@
     ]
   },
   "candidates": {
+    "434": {
+      "schemaVersion": 1,
+      "product": "f44a207d1e20bbfdf502e7e7a7c1e44df3479708",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Retained unsigned cloud local originals; final component types on integrated PR432 dependency",
+        "limitations": [
+          "Nine named selected cases from original reporters, not a new application execution. Original failures and filters are preserved.",
+          "Controller/Prisma mocks and parent React component with child stub; no real database/auth/session durability or live-browser/network latency evidence.",
+          "Backend compiler excludes tests; frontend covers app tsconfig. Selected compiler and generated input hashes retained, not complete node_modules byte attestation."
+        ]
+      },
+      "reports": [
+        {
+          "id": "target-retained-1",
+          "path": "docs/performance/questionnaire-target-20261031/backend-fixed.json.gz",
+          "sha256": "abc9a24c4d364b8b9bbd8f21ef05ae752203fcfcc02315f922b73869dfd1f7f7",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "59fc728d5b3665b1866be1f3843c0519a8faa78b3d3f9500ac7a7102be1efdfa",
+          "originalSourceAssociation": "2685b3dbc78d59ec790138966af4935191d8a70d",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts",
+            "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts",
+            "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts",
+            "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts",
+            "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/modules/assessment-policy/self-group-contract.ts",
+            "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+            "server-version/backend/src/modules/bundle-product/education-adapter.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts",
+            "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+            "server-version/backend/src/modules/reporting/respondentSummary.ts",
+            "server-version/backend/src/modules/reporting/spec.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts",
+            "server-version/backend/src/modules/scale/scale-restart.service.ts",
+            "server-version/backend/src/modules/scale/scale-start.controller.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned local cases ran on uncommitted source later preserved in the product commit; no invented contemporaneous execution Git identity.",
+          "deltaRationale": "Target availability/filter and parent state branches plus their direct test inputs are unchanged. Integrated PR432 edits other controller listContent and separate Form/Final children; the target tests mock those dependencies and do not call those branches. Main group/Scale/report additions are outside the selected invocation closures. Full component delta retained; final assembled types are separate actual executions.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 6,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps not-joined outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps draft outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps general outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps private outside target availability",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps missing outside target availability",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+            "keeps not-joined outside target availability",
+            "keeps draft outside target availability",
+            "keeps general outside target availability",
+            "keeps private outside target availability",
+            "keeps missing outside target availability"
+          ]
+        },
+        {
+          "id": "target-retained-2",
+          "path": "docs/performance/questionnaire-target-20261031/frontend-fixed.json.gz",
+          "sha256": "18189e9b10a1b76a790cfbc4858e11aef4a31aa2cda93ccb6307bb139ca5e0d1",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "e2584822b82ddb43e173acfafbf0dd774d6de2d5849ead133f14df13b9e0551f",
+          "originalSourceAssociation": "2685b3dbc78d59ec790138966af4935191d8a70d",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx",
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/pages/student/ScaleAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx"
+          ],
+          "sourceAssociationBasis": "Unsigned local cases ran on uncommitted source later preserved in the product commit; no invented contemporaneous execution Git identity.",
+          "deltaRationale": "Target availability/filter and parent state branches plus their direct test inputs are unchanged. Integrated PR432 edits other controller listContent and separate Form/Final children; the target tests mock those dependencies and do not call those branches. Main group/Scale/report additions are outside the selected invocation closures. Full component delta retained; final assembled types are separate actual executions.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "opens only the target questionnaire with unchanged active-with-completed dispatch",
+              "status": "passed"
+            },
+            {
+              "fullName": "opens only the target questionnaire with unchanged completed dispatch",
+              "status": "passed"
+            },
+            {
+              "fullName": "opens only the target questionnaire with unchanged unstarted dispatch",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "opens only the target questionnaire with unchanged active-with-completed dispatch",
+            "opens only the target questionnaire with unchanged completed dispatch",
+            "opens only the target questionnaire with unchanged unstarted dispatch"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/questionnaire-target-20261031/final-qualification/backend-types.json",
+          "sha256": "fb19448838a7caa870f14d5f003980946381224fc906c36199494debc3323b1b",
+          "component": "backend",
+          "componentTree": "f1add827fbed7ba266f9978428688ae4ec4629ad",
+          "log": "docs/performance/questionnaire-target-20261031/final-qualification/backend-types.log"
+        },
+        {
+          "path": "docs/performance/questionnaire-target-20261031/final-qualification/frontend-types.json",
+          "sha256": "6068bf3c4d4e795880cbcb59b1af2f44d034afdd0320eaea053dc1804ac7f8bc",
+          "component": "frontend",
+          "componentTree": "a6fba422c422bb589c5793d4b75d67d03ee8330c",
+          "log": "docs/performance/questionnaire-target-20261031/final-qualification/frontend-types.log"
+        }
+      ]
+    },
     "415": {
       "schemaVersion": 1,
       "product": "0367785f19fadc20b9e9368d8e435377f298bcca",
