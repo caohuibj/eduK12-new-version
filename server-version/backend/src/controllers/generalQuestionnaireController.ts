@@ -1054,6 +1054,7 @@ export const generalQuestionnaireController = {
       if (!questionnaire) return notFound(res, '问卷不存在')
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
       const units = await formSectionService.listQuestionnaireContentUnits(id)
+      if (req.query?.projection === 'units') return success(res, { units })
       const [formItems, scales] = await Promise.all([
         prisma.questionnaireFormItem.findMany({ where: { questionnaireId: id }, orderBy: { position: 'asc' } }),
         prisma.questionnaireScale.findMany({
