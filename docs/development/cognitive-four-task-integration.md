@@ -68,15 +68,21 @@ sub-ability scores are claimed. Low-RT/missing flags use neutral operational
 labels, not psychological explanations. See the task AUDIT.md and provenance
 records for missing historical R/dependency versions and output-rights evidence.
 matRiks' MIT software license and DescTools' GPL>=2 program license do not by
-themselves establish that every SVG is a MIT-licensed image. Output rights remain
-independently unverified and must stay disclosed; no new permission framework
-or gate has been introduced for the other tasks.
+themselves establish that every SVG is a MIT-licensed image. Source review is
+ongoing to distinguish any actual restricted inputs from the separate inability
+to reproduce an exact old dependency environment. No independent per-SVG rights
+record was found, but its absence or a missing historical dependency hash does
+not by itself establish restricted material or justify a permanent HOLD. No new
+permission framework or gate has been introduced.
 
 Embeddedfigures recovery fixes from 373c2907 are integrated: completion uses
 the accepted final itemIndex rather than a fresh local count, and failed final
 confirmation has a visible retry action without resubmitting the saved response.
-The parent independent incremental review remains pending at this checkpoint;
-this Draft must not be described as full acceptance.
+The parent independent incremental review of 373c2907 is GO: both recovery
+issues are closed, accepted RT remains below the existing deadline without
+extending the response window, the boundary cases are concrete, and only the new
+report interruption explanation changed. Old behavior is retained. This is not
+formal installed-flow or production acceptance.
 No task is installed/published by this PR. HTTP-persisted FINAL, installed four
 entry flows, native devices and formal CI qualification are NOT_RUN. Viewport
 screenshots are not native-device certification. No CI activation, production
@@ -85,5 +91,6 @@ local results. The existing isolated Cognitive-intake scope planner returns NOT_
 shared-or-mixed-input for the full base-to-head diff, which includes old schema/
 scorer paths, direct bank dependencies and shared type additions. This is not a
 content-only or supported selected-browser qualification. No CI route was changed
-to bypass that decision, and no run was activated. Independent review/qualification
-and the missing matrix output-rights record remain explicit review limitations.
+to bypass that decision, and no run was activated. Formal qualification and
+matrix source clarification remain pending; no automatic or permanent HOLD is
+inferred from missing per-image licenses or historical dependency hashes.

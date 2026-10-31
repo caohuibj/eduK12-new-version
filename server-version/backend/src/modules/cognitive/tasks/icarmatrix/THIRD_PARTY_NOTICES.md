@@ -43,7 +43,11 @@ The matRiks MIT grant above concerns software. It is **not a declaration that al
 bank SVGs are MIT-licensed images**. Similarly, DescTools' program license alone
 does not establish the license or copyright status of every generated output.
 No independent output-rights grant/provenance record was found for these specific
-SVGs; that part remains unverified. The script uses parameterized figures (such
+SVGs; source review remains open. A separate per-SVG license or old dependency
+hash is not automatically required to establish that the inputs were procedural;
+its absence alone does not show a restricted input or justify a permanent HOLD.
+Exact old-environment replay and actual input rights are separate questions.
+The script uses parameterized figures (such
 as `pacman()`), not an embedded original standard-test image, but that observation
 does not resolve all rights by itself. The historical `internal-generated` label
 is not proof of output rights or a claim that EduK12 authored matRiks.

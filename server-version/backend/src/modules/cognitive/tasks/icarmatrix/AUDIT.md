@@ -115,5 +115,7 @@ provided in provenance/README.md. Exact historical R/DescTools/svglite/jsonlite
 versions and generation stdout are absent; this is explicitly unverified, not
 reconstructed. matRiks MIT software and DescTools GPL>=2 are distinguished from
 specific SVG output rights, for which independent evidence remains missing.
-This remaining source/rights qualification must be disclosed for this task and
-does not turn into a new software gate for the other three tasks.
+Source review remains open to distinguish actual restricted inputs, if any,
+from missing exact historical-environment reproducibility. Missing per-SVG
+licenses or dependency hashes alone are not evidence of restricted inputs and
+do not create an automatic or permanent HOLD or a new gate for other tasks.
