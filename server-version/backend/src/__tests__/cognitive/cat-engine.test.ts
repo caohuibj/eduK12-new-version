@@ -87,7 +87,12 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     const ruleTags = new Map(snapshot.items.map((item, index) => [item.itemId, ['shape', 'rotate', 'shade', 'size', 'identity'][index % 5]]))
     expect(() => buildCatPool(snapshot, ruleTags)).toThrow(/SIMULATION_ONLY/)
     expect(() => buildCatPool(snapshot, ruleTags, { allowSimulationPool: true })).not.toThrow()
-    expect(() => buildCatPool({ ...snapshot, status: 'PILOT_CALIBRATED', provenance: 'real sample' }, ruleTags)).not.toThrow()
+    const pilot = {
+      ...snapshot, status: 'PILOT_CALIBRATED' as const, provenance: 'real sample',
+      items: snapshot.items.map(({ trueA: _a, trueB: _b, ...rest }) => rest),
+    }
+    expect(() => buildCatPool(pilot, ruleTags)).not.toThrow()
+    expect(() => buildCatPool({ ...pilot, status: 'VALIDATED' }, ruleTags)).toThrow(/evidenceReviewRef/)
   })
 
   it('estimates theta with shrinking SE as history accumulates', () => {
@@ -99,6 +104,19 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     const longer = [...history, ...pool.slice(3, 10).map((item) => ({ itemId: item.itemId, correct: true }))]
     const second = estimateCatTheta(itemsById, longer)!
     expect(second.se).toBeLessThan(first.se)
+  })
+
+  it('rejects stale, repeated and under-sized CAT histories and invalid configuration', () => {
+    const pool = buildSyntheticPool(12, 4)
+    expect(() => selectNextCatItem(pool, [], { ...config, minItems: 13 })).toThrow(/Invalid CAT pool/)
+    expect(() => selectNextCatItem(pool, [], { ...config, randomesqueK: 0 })).toThrow(/Invalid CAT pool/)
+    expect(() => selectNextCatItem(pool, [
+      { itemId: pool[0].itemId, correct: true },
+      { itemId: pool[0].itemId, correct: false },
+    ], config)).toThrow(/duplicate/)
+    expect(() => estimateCatTheta(new Map(pool.map((i) => [i.itemId, i])), [
+      { itemId: 'unknown', correct: true },
+    ])).toThrow(/unknown/)
   })
 
   it('honors min/max item bounds and stop rules', () => {
@@ -129,9 +147,12 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     const totalExposure = new Map<string, number>()
     let sessions = 0
     let lengths: number[] = []
+    const simulationCases: Array<{ thetaTrue: number; examineeSeed: number; length: number }> = []
     for (const thetaTrue of thetas) {
       for (let examinee = 0; examinee < 100; examinee += 1) {
-        const session = runAdaptiveSession(pool, thetaTrue, 1000 * examinee + thetaTrue * 7 + 3, config.maxItems, `-e${examinee}-t${thetaTrue}`)
+        const examineeSeed = 1000 * examinee + thetaTrue * 7 + 3
+        const session = runAdaptiveSession(pool, thetaTrue, examineeSeed, config.maxItems, `-e${examinee}-t${thetaTrue}`)
+        simulationCases.push({ thetaTrue, examineeSeed, length: session.length })
         errors.push(session.theta - thetaTrue)
         byTheta.set(thetaTrue, [...(byTheta.get(thetaTrue) ?? []), session.theta - thetaTrue])
         for (const [itemId, count] of session.exposure) totalExposure.set(itemId, (totalExposure.get(itemId) ?? 0) + count)
@@ -147,26 +168,21 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     const maxBias = Math.max(...biases.map(Math.abs))
     const maxExposureRate = Math.max(...totalExposure.values()) / sessions
     const rmseFixed = (() => {
-      // 固定版本对照：所有人做同一前 10 题（无自适应）。
-      const fixed = pool.slice(0, 10)
+      // The same 500 examinees, with exactly the SAME NUMBER of scored items as
+      // each adaptive session. Avoid a misleading 20-item CAT vs 10-item fixed comparison.
+      const itemsById = new Map(pool.map((item) => [item.itemId, item]))
       const errs: number[] = []
-      for (const thetaTrue of thetas) {
-        for (let examinee = 0; examinee < 100; examinee += 1) {
-          let state = (1000 * examinee + thetaTrue * 7 + 3) | 0
-          const rand = (): number => {
-            state = (state + 0x6d2b79f5) | 0
-            let t = Math.imul(state ^ (state >>> 15), 1 | state)
-            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-            return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-          }
-          let logLik = 0
-          for (const item of fixed) logLik += Math.log(rand() < icc(item, thetaTrue) ? Math.max(icc(item, thetaTrue), 1e-12) : Math.max(1 - icc(item, thetaTrue), 1e-12))
-          // 固定版本的 theta 估计用同一 EAP
-          const itemsById = new Map(pool.map((item) => [item.itemId, item]))
-          const history = fixed.map((item) => ({ itemId: item.itemId, correct: rand() < icc(item, thetaTrue) }))
-          void logLik
-          errs.push(estimateCatTheta(itemsById, history)!.theta - thetaTrue)
+      for (const { thetaTrue, examineeSeed, length } of simulationCases) {
+        let state = examineeSeed | 0
+        const rand = (): number => {
+          state = (state + 0x6d2b79f5) | 0
+          let t = Math.imul(state ^ (state >>> 15), 1 | state)
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296
         }
+        const fixed = pool.slice(0, length)
+        const history = fixed.map((item) => ({ itemId: item.itemId, correct: rand() < icc(item, thetaTrue) }))
+        errs.push(estimateCatTheta(itemsById, history)!.theta - thetaTrue)
       }
       return Math.sqrt(errs.reduce((sum, e) => sum + e * e, 0) / errs.length)
     })()
@@ -180,6 +196,7 @@ describe('CAT engine (roadmap v2.0 PR7)', () => {
     expect(rmse).toBeLessThanOrEqual(0.6)
     expect(maxBias).toBeLessThanOrEqual(0.5)
     expect(centralBias).toBeLessThanOrEqual(0.3)
+    expect(Number.isFinite(rmseFixed)).toBe(true)
     expect(rmse).toBeLessThanOrEqual(rmseFixed)
     expect(maxExposureRate).toBeLessThanOrEqual(0.7)
     expect(Math.min(...lengths)).toBeGreaterThanOrEqual(config.minItems)

@@ -13,7 +13,7 @@
  *    （fixedCountFinalSubmission 通路）。
  */
 
-import type { CalibrationSnapshot } from '../banks/calibration-snapshot-schema'
+import { calibrationSnapshotSchema, type CalibrationSnapshot } from '../banks/calibration-snapshot-schema'
 
 export interface CatItem {
   itemId: string
@@ -62,6 +62,13 @@ export const estimateCatTheta = (
   history: CatHistoryEntry[],
 ): { theta: number; se: number } | null => {
   if (history.length === 0) return null
+  const seen = new Set<string>()
+  for (const response of history) {
+    if (!itemsById.has(response.itemId) || seen.has(response.itemId)) {
+      throw new Error('CAT history contains unknown or duplicate item IDs')
+    }
+    seen.add(response.itemId)
+  }
   let posteriorSum = 0
   let posteriorThetaSum = 0
   let posteriorTheta2Sum = 0
@@ -132,11 +139,22 @@ export const selectNextCatItem = (
   history: CatHistoryEntry[],
   config: CatSelectionConfig,
 ): { itemId: string } | null => {
-  if (history.length >= config.maxItems) return null
+  if (!Number.isInteger(config.minItems) || !Number.isInteger(config.maxItems) ||
+      config.minItems < 1 || config.maxItems < config.minItems ||
+      !Number.isInteger(config.randomesqueK) || config.randomesqueK < 1 ||
+      !Number.isFinite(config.seStopThreshold) || config.seStopThreshold <= 0 ||
+      !config.seed || pool.length < config.minItems ||
+      new Set(pool.map((item) => item.itemId)).size !== pool.length) {
+    throw new Error('Invalid CAT pool or selection configuration')
+  }
+  if (pool.some((item) => !Number.isFinite(item.a) || item.a <= 0 || !Number.isFinite(item.b))) {
+    throw new Error('Invalid IRT item parameters')
+  }
   const administeredIds = new Set(history.map((entry) => entry.itemId))
   const remaining = pool.filter((item) => !administeredIds.has(item.itemId))
   if (remaining.length === 0) return null
   const estimate = estimateCatTheta(new Map(pool.map((item) => [item.itemId, item])), history)
+  if (shouldStopCatSession(history, pool.length, estimate?.se ?? null, config)) return null
   const theta = estimate?.theta ?? 0
 
   // 内容平衡：规则族配额 = ceil(已施测+1 / 规则族数)，超额族先排除；若全部超额则放松。
@@ -162,6 +180,7 @@ export const buildCatPool = (
   ruleTagByItemId: Map<string, string>,
   options: { allowSimulationPool?: boolean } = {},
 ): CatItem[] => {
+  calibrationSnapshotSchema.parse(snapshot)
   if (snapshot.status === 'SIMULATION_ONLY' && !options.allowSimulationPool) {
     throw new Error('CAT pool from a SIMULATION_ONLY calibration snapshot may only be used by the simulation harness')
   }
