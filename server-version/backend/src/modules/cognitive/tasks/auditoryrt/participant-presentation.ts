@@ -61,7 +61,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       processMetricKeys: ["anticipationCount", "lapseCount"],
       withholdFlags: ["legacyUninterpretable", "insufficientValidTrials", "excessiveAnticipations", "highVariability"],
       metricGates: {},
-      nextStep: "反应速度很大程度由神经传导决定，但充足的睡眠和清醒状态能让它处在最佳状态。",
+      nextStep: "反应速度会受到注意状态、音量、播放设备和按键方式的共同影响；单次结果仅供观察。",
       chart: {
         "kind": "metrics",
         "metricKeys": ["medianRtMs", "rtCv"]
@@ -85,7 +85,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       illustration: "signal",
       popular: {
         conceptTitle: "先弄懂，这个任务在看什么",
-        concept: "房间里很安静。突然——「嘀」的一声，你立刻按键。声音从耳朵传到大脑、再从大脑传到手指，这条通路越顺畅，你按得越快。这个任务测的就是这条「听觉反应通路」的速度。",
+        concept: "房间里很安静。突然——「嘀」的一声，你立刻按键。听到声音再按键，需要听觉觉察、注意和动作配合，记录的总时间还受到设备播放延迟影响。这个任务观察的是一次特定条件下的反应时。",
         takeaway: "听到再按，不抢拍；反应快不等于聪明，它只是大脑的一条快车道。",
         exampleTitle: "走出任务：生活里的一个例子",
         example: "听到身后自行车铃声马上让开、起跑线上听发令枪冲出去，都靠这条听觉反应通路。它受睡眠和状态影响很大，一次结果只是这一刻的快照。",
@@ -101,7 +101,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           },
           {
             "title": "看速度",
-            "text": "按键越快、越稳，说明这条通路越顺畅。"
+            "text": "记录本次反应快慢和稳定性，同时留意设备差异。"
           }
         ],
         boundary: "这是理解概念的场景示例，不是职业资格、考试排名或同龄人比较。",

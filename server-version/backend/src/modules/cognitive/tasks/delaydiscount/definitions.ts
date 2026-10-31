@@ -29,9 +29,9 @@ export const delaydiscountRegistryMeta = {
   } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
   metricDefinitionVersion: '1.0.0',
   metricDefinitions: {
-    aucDelayDiscounting: metric('aucDelayDiscounting', '折扣曲线下面积', 'decision_making', 'ratio', 'higher_is_better', 'primary'),
-    meanIndifferenceRate: metric('meanIndifferenceRate', '平均无差异点', 'decision_making', 'ratio', 'higher_is_better', 'secondary'),
-    laterChoiceRate: metric('laterChoiceRate', '选延后奖赏比例', 'decision_making', 'ratio', 'higher_is_better', 'secondary'),
+    aucDelayDiscounting: metric('aucDelayDiscounting', '折扣曲线下面积', 'decision_making', 'ratio', 'descriptive', 'primary'),
+    meanIndifferenceRate: metric('meanIndifferenceRate', '平均无差异点', 'decision_making', 'ratio', 'descriptive', 'secondary'),
+    laterChoiceRate: metric('laterChoiceRate', '选延后奖赏比例', 'decision_making', 'ratio', 'descriptive', 'secondary'),
     timeoutCount: metric('timeoutCount', '超时次数', 'decision_making', 'count', 'lower_is_better', 'secondary'),
     validTrialCount: metric('validTrialCount', '有效选择数', 'decision_making', 'count', 'descriptive', 'secondary'),
   } as Record<string, MetricDefinition>,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CognitiveScoringInputError } from '../../modules/cognitive/cognitive.types'
 import { scoreDelaydiscountV1 } from '../../modules/cognitive/scoring/delaydiscount.v1'
+import { delaydiscountRegistryMeta } from '../../modules/cognitive/tasks/delaydiscount/definitions'
 import type { DelaydiscountConfig } from '../../modules/cognitive/schemas/delaydiscount.config'
 import type { DelaydiscountTrial } from '../../modules/cognitive/schemas/delaydiscount.trial'
 
@@ -40,6 +41,12 @@ const buildTrials = (bands: Array<{ delayDays: number; choices: Array<'later' | 
 }
 
 describe('delaydiscount scorer', () => {
+  it('treats discount preference as descriptive rather than ability direction', () => {
+    for (const key of ['aucDelayDiscounting', 'meanIndifferenceRate', 'laterChoiceRate']) {
+      expect(delaydiscountRegistryMeta.metricDefinitions[key].direction).toBe('descriptive')
+    }
+  })
+
   it('recomputes indifference points from the bisection trajectory and derives AUC', () => {
     const result = scoreDelaydiscountV1({
       config,

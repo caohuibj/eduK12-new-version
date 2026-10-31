@@ -101,7 +101,7 @@ run_simulation <- function() {
 # ---- 模式二：真实/试测数据标定 ----
 run_calibration <- function() {
   payload <- fromJSON(input_path, simplifyVector = FALSE)
-  if (!identical(payload$schemaVersion, 1L) || !identical(payload$dataOrigin, "real") ||
+  if (!isTRUE(as.integer(payload$schemaVersion) == 1L) || !identical(payload$dataOrigin, "real") ||
       !identical(payload$testType, "icarmatrix") || !identical(payload$engineVersion, "2.0.0") ||
       !identical(payload$scoringVersion, "1.0.0") ||
       !identical(payload$stimulusSetVersion, "matgen-bank-v1.0.0") ||
