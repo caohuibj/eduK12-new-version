@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, frontendFile, frontendTestFile, frontendTestOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
+import { classify, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
@@ -15,6 +15,55 @@ const root = 'server-version/backend/src/modules/';
 const scale = `${root}scale/instruments/new_scale/1.0.0/instrument.ts`;
 const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
+test('engineering records follow the affected component without admitting executable or scientific inputs',()=>{
+  const records=['docs/performance/navigation/README.md','docs/evidence/cli/metadata.json','docs/evidence/cli/checks.json.gz'];
+  const page='server-version/frontend/src/pages/student/CourseDetail.tsx';
+  assert.equal(classify(records).documentation,true);
+  assert.equal(classify([page,...records]).frontend,true);
+  assert.equal(classify([scale,...records]).content,true);
+  assert.equal(classify([page,'docs/scale-instruments/scientific.md']).content,true);
+  assert.equal(frontendAffected([page,'docs/scale-instruments/scientific.md']),false);
+  for(const file of ['docs/evidence/cli/check.ts','docs/evidence/../secret.md','server-version/backend/src/index.ts'])assert.equal(classify([page,file]).frontend,false,file);
+});
+test('local page selection keeps shared runtime, explicit media and mixed changes on existing paths',()=>{
+  const page='server-version/frontend/src/pages/student/CourseDetail.tsx';
+  assert.equal(frontendAffected([page,'server-version/frontend/src/pages/teacher/TeacherCourseDetail.tsx','docs/performance/navigation/README.md']),true);
+  for(const file of ['server-version/frontend/src/pages/student/ScaleAssessment.tsx','server-version/frontend/src/components/app-shell/Shell.tsx','server-version/frontend/src/api/course.ts',`${root}cognitive/service.ts`])assert.equal(frontendAffected([page,file]),false,file);
+  const entry={file:page,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([entry]).frontend_affected,true);
+  assert.equal(classifyChanges([entry],true).frontend_affected,false);
+  assert.equal(classifyChanges([{...entry,newMode:'120000'}]).frontend_affected,false);
+});
+test('affected frontend uses existing jobs and every selected failure remains blocking',()=>{
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true'})}};
+    const expected=draft?['scope','frontend']:['scope','frontend','docker','frontend-build','codeql'];
+    assert.deepEqual(requiredChecks(needs,draft),expected);
+    for(const job of expected)needs[job]={...needs[job],result:'success'};
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const job of expected)for(const result of ['skipped','failure','cancelled',undefined])assert.ok(failedChecks({...needs,[job]:{...needs[job],result}},draft).includes(job));
+  }
+});
+test('affected frontend workflow conditions agree with the existing merge jobs',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  for(const draft of [true,false]){
+    const outputs=scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true',application_route:'legacy'});
+    const needs={scope:{outputs,result:'success'},'frontend-build':{result:'success'},'backend-browser-build':{result:'success'}};
+    const github={event_name:'pull_request',ref_name:'feature/local-page',event:{pull_request:{draft,number:1,head:{ref:'feature/local-page'}}}};
+    for(const name of ['frontend','frontend-build','pr-light-frontend','backend-browser-build','browser','docker','post-merge-smoke']){
+      const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
+      const selected=new Function('needs','github','vars','cancelled',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false);
+      assert.equal(Boolean(selected),name==='frontend'||['frontend-build','docker'].includes(name)&&!draft,name+' draft='+draft);
+    }
+  }
+  const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
+  assert.match(block('frontend'),/affected_only:.*frontend_affected/);
+  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src\]'/);
+  assert.match(frontend,/npm test -- --changed "\$CI_BASE_SHA"/);
+  assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
+  assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true\n        run: npm test/);
+});
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
   assert.deepEqual(classify([scale, cognitive, sjt]), { maintenance:false, documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });

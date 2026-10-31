@@ -89,3 +89,41 @@ node --test --test-name-pattern='^(onboarding (accepts unchanged main controls|s
 本地 rebase 到 `7e4a5b90c9b9c0a186345a6025f0eb9ef78a3c61` 无冲突，range-diff 的五个提交全部为 `=`，即已审补丁逐片保持一致；完整保留 #448 新增的路由、445/449 分发及前端范围保护。对齐后控制代码 head `fa5a397c662e9ab54d201845bd346c938a18519c`，Node v24.21.0 仅补 5 个直接相关控制用例，5 PASS、0 FAIL、exit 0，167.5ms：前三个新增清理用例及 main 已有的 `PR448 exact qualifier preserves required component scope and rejects unknown paths`、`PR448 integration preserves existing 445 and 449 registry dispatch and frontend-only scope`。没有重复业务验证；原 Node24.21 9 PASS 与 Node24.19 初验按各自来源保留，不能冒称对齐后重跑了原九例。
 
 公开内容仅源码、测试及本合成审查说明，不包含原环境材料、日志、凭据或生产配置。只读获取 Hui 的“CI 常见错误清单”返回 `NOT_FOUND`；这是工具访问缺项，不是代码 CI 失败或上传审批拒绝，未换账号/工具绕过。Draft 可能由仓库自动运行分类；本线不手动激活正式 Ready/dispatch。
+
+## 后续片：工程说明、局部页面和开发 CLI 的实际路由
+
+基线为含 #450 的 main `ac3fe1f000a5b736f39eab886c023b33b5e175aa`。
+首轮源码合成观察点 `0cb593d55cec67014012278a2213544e3085ac1c`；公开后再限定局部页面 CodeQL 为 frontend/src，避免扫描未变后台，并仅补验 workflow 一例。
+不增加 workflow、candidate 清单、手工 enabled、签名用途或哈希链。
+
+原问题及本片删减：
+
+- `docs/performance`、`docs/evidence` 中的被动说明/结果文件使混合差异掉入 platform。
+  现按通用工程材料规则随受影响组件；脚本、科学/发布输入、未知路径和非普通文件不借此放行。
+- 局部学生/教师页面继承了后台浏览器构建、整套平台浏览器及宽泛 `student/**` 视觉清单。
+  它们检查的后台/共享外壳本次未变。此类页面改用已有 frontend job 的依赖相关 Vitest、变化文件 lint、应用类型；
+  Ready 保留 frontend-build、已有 frontend-only Docker 镜像构建/扫描和 CodeQL。
+  应用 tsconfig 已包括 cognitive 子集，省去重复子集编译；独立媒体/Ops 命中、共享组件/API/引擎及混合后台变更仍保留原路线。
+- 开发 CLI 已在既有工具登记中，但同批 API/catalog/CLI 测试没有被接纳。
+  工具路线现执行实际变化的后端测试，并在 CLI 变化时保留 subprocess 用例和 backend 类型编译。
+  `src/__tests__` 已被 backend tsconfig 排除且运行时源码无其导入，不作为生产 dist 变化触发全后台镜像；
+  未登记开发工具、运行时模块、schema、依赖和未知控制文件不能进入工具路线。
+
+只读分类实际公开差异（产品用例未重跑）：
+
+| 来源 head | 文件数 | 结果 |
+| --- | ---: | --- |
+| #451 `e5c114121a9fe8ce8ba60dbb76d28b6cbf2e224d` | 3 | frontend / affected；仅 frontend 运行时组件变化 |
+| #452 `63aba325ce1c7e9763b80a6a6d2194926af298c4` | 7 | frontend / affected；仅 frontend 运行时组件变化 |
+| #459 `f570285a2160652bb93aeacd651d7e3f88fc6a6f` | 7 | release-tooling；无运行时组件变化；保留 assignment-api、onboarding-cli、product-eligibility 三份测试 |
+
+支持 Node v24.21.0 的最终定向检查为 6 PASS、0 FAIL：工程记录分类、局部页面/反例、必要 job 的真实失败阻断、workflow 条件与汇总一致、CLI 命令选择、工具/运行时边界。
+另在合成前运行 10 个既有分类/拒绝用例，10 PASS；相关实现未在合成中改变。
+初验 4/6：一个测试误把既有 content+frontend 并集当作纯前端拒绝；一个真实 Docker OR 条件绕过范围。
+前者修正为保留 content 并集，后者在最终产物核查中恢复既有 frontend-only Docker 路线及必需检查，最终六例通过。
+三份变动 workflow 的 YAML 解析、diff 空白检查及本候选真实 scope CLI 均通过；本候选自身为 release-tooling，Draft 只选现有工具 job。
+
+复用边界：本片不把已审阅的 #451/#452/#459 历史本地结果补签为 Actions 成功，也不扩张既有文档/工具签名接纳。
+frontend-build 和 Docker 仍各自生成既有产物，未借本片重写为统一打包系统；重复前端编译是已知后续可独立收敛项。
+本线未执行上述业务测试、应用构建、镜像、数据库、浏览器、生产操作；本地结果不能称正式 CI 资格。
+Hui 错误清单读取仍为 `NOT_FOUND`（404），未改用其他账号或通道；正式激活和合并顺序交母 DOT。
