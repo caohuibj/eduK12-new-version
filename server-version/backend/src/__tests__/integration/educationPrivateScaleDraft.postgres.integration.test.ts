@@ -5,6 +5,7 @@ import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integr
 import { setupEducationLibraryRuntimeFixture } from './educationLibraryRuntimeFixture'
 import { compileResearchScale } from '../../modules/survey/builder.compiler'
 import * as tools from '../../modules/education-tools/private-tool.service'
+import { resolveEducationToolAuthoringContext } from '../../modules/education-tools/access'
 import type { PrivateToolContext } from '../../modules/education-tools/private-tool.contracts'
 import { addPrivateScaleRunTrack } from '../../modules/education-tools/private-tool.run-adapter'
 import { addTeacherPrivateRunTrack } from '../../modules/huiteacher/run.service'
@@ -24,13 +25,12 @@ async function fixture(product: 'SCHOOL' | 'TEACHER') {
   const f = await setupEducationLibraryRuntimeFixture({ db, product, trackCount: 0, publish: false })
   const context: PrivateToolContext = { entry: product, organizationId: f.organizationId, principal: { userId: f.managerUserId, accountDomain: 'SCHOOL' } }
   if (product === 'TEACHER') {
-    // Event management and private authorship are independent qualifications.
-    await expect(tools.createPrivateTool(context, { kind: 'SCALE', title: 'Not yet an author' })).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
-    const member = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: f.organizationId, userId: f.managerUserId, validUntil: null } })
-    await db.organizationPersonaGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
-      membershipId: member.id, persona: 'COUNSELOR', grantedByUserId: f.managerUserId } })
-    await db.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
-      membershipId: member.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: f.managerUserId } })
+    // Current Teacher authorship comes from product administration.
+    expect(await resolveEducationToolAuthoringContext(context, db)).toMatchObject({
+      entry: 'TEACHER', ownerUserId: f.managerUserId, organizationId: f.organizationId,
+    })
+    expect(await db.organizationCapabilityGrant.count({ where: { organizationId: f.organizationId,
+      membership: { userId: f.managerUserId }, capability: 'PSYCHOLOGY_STAFF', revokedAt: null } })).toBe(0)
   }
   const source = await frozen(context)
   const target = { organizationId: f.organizationId, runId: f.runId, actorUserId: f.managerUserId,

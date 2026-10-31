@@ -26,7 +26,8 @@ async function actor(organizationId?:string){
  const member=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:org,userId:user.id,validFrom:new Date(Date.now()-60000)}})
  await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:member.id,persona:'COUNSELOR',grantedByUserId:user.id}})
  const capability=await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:member.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:user.id}})
- return {user,org,capability}
+ const teacherAdmin=await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId:org,membershipId:member.id,product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:user.id}})
+ return {user,org,capability,teacherAdmin}
 }
 type Actor=Awaited<ReturnType<typeof actor>>
 function headers(a:Actor,entry:Entry){
@@ -102,7 +103,8 @@ suite('Education CSV real authenticated routes / isolated PostgreSQL',()=>{
   const a=await actor(),d=await draft(a,entry)
   const pre=await request(a,entry,`/${d.id}/import/preview`,d.input);expect(pre.status).toBe(200)
   const before=await state(d.id)
-  await db.$executeRaw(Prisma.sql`UPDATE organization_capability_grants SET revoked_at=clock_timestamp() WHERE id=${a.capability.id}`)
+  if(entry==='SCHOOL')await db.$executeRaw(Prisma.sql`UPDATE organization_capability_grants SET revoked_at=clock_timestamp() WHERE id=${a.capability.id}`)
+  else await db.$executeRaw(Prisma.sql`UPDATE education_product_role_grants SET revoked_at=clock_timestamp(),revoked_by_user_id=${a.user.id} WHERE id=${a.teacherAdmin.id}`)
   const denied=await request(a,entry,`/${d.id}/import/apply`,command(d.input,pre.body.data))
   expect(denied.status).toBe(403);expect(denied.body.code).toBe('PRIVATE_TOOL_AUTHOR_REQUIRED')
   expect((await request(a,entry,`/${d.id}/import/preview`,d.input)).status).toBe(403)

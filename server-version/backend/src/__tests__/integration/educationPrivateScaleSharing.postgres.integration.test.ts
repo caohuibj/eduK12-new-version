@@ -25,6 +25,7 @@ async function fixture(entry:'SCHOOL'|'TEACHER'='SCHOOL',withImage=false,mimeTyp
  const member=await db.organizationMembership.create({data:{id:randomUUID(),organizationId,userId:user.id,validFrom:new Date(Date.now()-60000)}})
  await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId,membershipId:member.id,persona:'COUNSELOR',grantedByUserId:admin}})
  const capability=await db.organizationCapabilityGrant.create({data:{id:randomUUID(),organizationId,membershipId:member.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:admin}})
+ if(entry==='TEACHER')await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId,membershipId:member.id,product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:admin}})
  const c:PrivateToolContext={principal:{userId:user.id,accountDomain:'SCHOOL'},entry,organizationId}
  const draft=await tools.createPrivateTool(c,{kind:'SCALE',title:metadata.title})
  let assetId:string|undefined

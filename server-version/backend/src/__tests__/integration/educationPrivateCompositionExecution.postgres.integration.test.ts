@@ -140,7 +140,7 @@ suite('Teacher ordinary questionnaire / actual SELF participation and block feed
   const snapshot=root.trainingContentSnapshot as unknown as {units:Array<{measurement:{releaseId:string}}>}
   await db.scaleLibraryEmergencyStop.create({data:{targetKind:'RELEASE',targetId:snapshot.units[0].measurement.releaseId,
    actorId:f.libraryAdminUserId,reason:'Synthetic entered questionnaire emergency stop'}})
-  await expect(submitCompositeScaleFinal(id,current.id,input,{userId:f.participantUserId},{receiptOnly:true})).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_COLLECTION_UNAVAILABLE'})
+  await expect(submitCompositeScaleFinal(id,current.id,input,{userId:f.participantUserId},{receiptOnly:true})).rejects.toMatchObject({name:'ScaleLibraryError',statusCode:409,message:'该量表版本已紧急停用，停止新增进入和采集；历史结果保留'})
   expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:id}})).toBe(0)
   // Separate event/source for a real not-yet-entered author withdrawal.
   const waiting=await setupTeacherCompositionExecution(db),waitingAuth=await headers(waiting.participantUserId)

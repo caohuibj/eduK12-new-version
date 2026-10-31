@@ -133,7 +133,7 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     // The outline projection returns only the exact configured resource metadata,
     // never definitions, selectors, policies or respondent/execution records.
     const outline=[{id:configuredTrack.id,resourceFamily:ref.family,
-      resourceKey:ref.key,resourceVersion:ref.version}]
+      resourceKey:ref.key,resourceVersion:ref.version,title:null,sourceRevision:null}]
     expect(run.tracks).toStrictEqual(outline)
     expect(run.trackCount).toBe(outline.length)
     await expect(readHuiteacherEventRun({...key,actorUserId:participants[0].id}))
