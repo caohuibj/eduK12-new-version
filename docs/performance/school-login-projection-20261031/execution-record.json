@@ -1,0 +1,52 @@
+{
+  "frontend-baseline": {
+    "sha256Uncompressed": "dc6eaac3a1a6d89e1b0b7b2bb43e0afaa91c6c0ebc9bbcc34f5ea0f089aa0a0d",
+    "exit": 1,
+    "reporter": "vitest json"
+  },
+  "frontend-baseline-corrected": {
+    "sha256Uncompressed": "15c6c5c54ccfde8dac8afaf5a6970aada3ec0615956e560e50a9c06cf3a34775",
+    "exit": 1,
+    "reporter": "vitest json"
+  },
+  "frontend-candidate": {
+    "sha256Uncompressed": "84592ff22161b0642e4b968322261aa81624ea06d559547100bda51f46b82dbf",
+    "exit": 0,
+    "reporter": "vitest json"
+  },
+  "frontend-final": {
+    "sha256Uncompressed": "5b21704f55918729ddaf0068773634d0e0a63dc4dc08ec4c371cfd4657f20a43",
+    "exit": 0,
+    "reporter": "vitest json"
+  },
+  "frontend-non-session-final": {
+    "sha256Uncompressed": "c3f9b70756f02d3eac2053b2983d71401a1d580dd3d1c9cc3bf605d334042812",
+    "exit": 0,
+    "reporter": "vitest json"
+  },
+  "backend-baseline": {
+    "sha256Uncompressed": "26fe5a40191dba8eefd35dbf3650e29ed24e4776d65cad4a9669e0a8235a811c",
+    "exit": 1,
+    "reporter": "vitest json"
+  },
+  "backend-candidate": {
+    "sha256Uncompressed": "8b328c575b436cdb841aec9848251c80e8b8bce8bfa970c3049e08148cc3c85f",
+    "exit": 0,
+    "reporter": "vitest json"
+  },
+  "frontend-types": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit": 0
+  },
+  "backend-types": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit": 0
+  },
+  "base": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+  "currentFiles": {
+    "server-version/backend/src/modules/campus/auth.routes.ts": "6f0b8b5a1808f61cf5940b3ad36dce27c8abfde6961d555b444f5453e183bb1e",
+    "server-version/frontend/src/school/SchoolApp.tsx": "34f93edec95f318cee7b48061dd8aeb2d7197e3ab8089cea842f38048b9b8c0e",
+    "server-version/backend/src/__tests__/campus/login-projection.test.ts": "a71f21e7952b6278906ce19ec7d4aaa25456175e7cc8953d61bedd45bf637dfd",
+    "server-version/frontend/src/school/SchoolLoginProjection.test.tsx": "6041cd26970bb8d7784bdd25a7f172f2512ef48a07fbe9d05e672c82847ff786"
+  }
+}
