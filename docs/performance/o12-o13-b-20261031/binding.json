@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 1,
+  "baseHead": "555f705dd272f0ee9c7ac0d80770010d2d6e9675",
+  "association": "retrospective unsigned binding, not formal CI admission",
+  "productPatch": "one added reporting_task_artifacts:RUNTIME_RW entry",
+  "node": "v24.21.0",
+  "dependencyOrigin": "copied saved local backend node_modules, no fresh install/audit",
+  "inputs": {
+    "server-version/backend/scripts/runtime-table-policy.json": "2d56d8105b09976f1affebff78f58a43fa8fadc825107021808bb1e67c5f0a4f",
+    "server-version/backend/scripts/runtime-role-defaults.sql": "074b528ae8077fd2df073143ba4bb55c981f409e4a12eb35ba3abdf1d955c30b",
+    "server-version/backend/scripts/runtime-role-contract.mjs": "f252be0d53b63a22495e5b0894cfd394fac79ab9c1bacfd23f16d890db2cfd81",
+    "server-version/backend/scripts/release-schema-contract.mjs": "18c60c7ab72d96550ab092c6db5b577d3dd87d2b65ea5dd51acaa0392c04a8be",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc",
+    "server-version/backend/package.json": "eb9818ccb8e7797f201d86d20752aa23bb3c13685d4660ec395f4f905a28f87a",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "docs/performance/o12-o13-b-20261031/probe-runtime-artifact.mts": "d11ef45db244e9edf1c217787bb492c1e637d9aa7153159dcc5038e19f635cf5",
+    "docs/performance/o12-o13-b-20261031/observe-authority.mts": "6a993fb055401a5961bea32057e33f1e9da22cbf023a888e9d56a4749f6077b6",
+    "docs/performance/o12-o13-b-20261031/inspect-resource-defaults.py": "8437754867693d9a927959d65267d9118393a8c2e69a9b7bfdb84b8163181f5e",
+    "docs/performance/o12-o13-b-20261031/derive-ledger.py": "e49ec83548f7e673586ac01bcf3e38423f67f0f7d12e70212217b3ef0b143b50",
+    "docs/performance/o12-o13-b-20261031/run-observer.py": "3e478e0a02c9edc76f2551f82709f0cabbe4ac4094387b82b17116178a72ef1b"
+  },
+  "generatedPrisma": {
+    "node_modules/.prisma/client/default.js": "61419abcd0ff0f9127dd52fee7bd236d49917050317e1cc87067c1f18f86e412",
+    "node_modules/.prisma/client/edge.js": "4c287bedf81cccb44a741b336f58f894a54439adbca29d9ab13aead03be590c2",
+    "node_modules/.prisma/client/package.json": "4e384fed2b2d9462759b9734d0271ca31c7ffe13224da152f03bb8291a6c1dcf",
+    "node_modules/.prisma/client/wasm.d.ts": "d5eb5865d4cbaa9985cc3cfb920b230cdcf3363f1e70903a08dc4baab80b0ce1",
+    "node_modules/.prisma/client/schema.prisma": "6b32c4d0cd4127ec7c0df8f9b002d11bafa15381abbb57ae683a6191edc69498",
+    "node_modules/.prisma/client/index-browser.js": "baf05bcf374e2b15e14afd6d4c2622ea4af5baf47a960ae78a5323db3e67571a",
+    "node_modules/.prisma/client/edge.d.ts": "7378dd41401ba1acff435b9c317a5b919a3d38479ed3dbd4a25c8b4fd623a224",
+    "node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node": "35860a5c0fb2f79e7b38c40747c4d212318d97e1910ca528b133c802716de0b8",
+    "node_modules/.prisma/client/index.js": "24cffb10fe40d5ae704233f73be7c1a47446fbb8c32c00c4e67946880f7ef54d",
+    "node_modules/.prisma/client/wasm.js": "baf05bcf374e2b15e14afd6d4c2622ea4af5baf47a960ae78a5323db3e67571a",
+    "node_modules/.prisma/client/default.d.ts": "d5eb5865d4cbaa9985cc3cfb920b230cdcf3363f1e70903a08dc4baab80b0ce1",
+    "node_modules/.prisma/client/index.d.ts": "5d080b94f4556a0d93de84f1992172371ceda80949547ecc4308106f45bac73d"
+  },
+  "notExecuted": [
+    "full types or application suites",
+    "HTTP/browser",
+    "START/FINAL",
+    "official CI/build/security qualification",
+    "production/COS access",
+    "4C4G capacity"
+  ],
+  "installedPackageVersionMismatches": [
+    {
+      "path": "node_modules/follow-redirects",
+      "expected": "1.16.2",
+      "actual": "1.16.1"
+    }
+  ],
+  "missingOptionalLockPackages": [
+    {
+      "path": "node_modules/@emnapi/core",
+      "expected": "1.9.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@emnapi/wasi-threads",
+      "expected": "1.2.0",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/aix-ppc64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/android-arm",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/android-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/android-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/darwin-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/darwin-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/freebsd-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/freebsd-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-arm",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-ia32",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-loong64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-mips64el",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-ppc64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-riscv64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/linux-s390x",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/netbsd-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/netbsd-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/openbsd-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/openbsd-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/openharmony-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/sunos-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/win32-arm64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/win32-ia32",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@esbuild/win32-x64",
+      "expected": "0.28.2",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-darwin-arm64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-darwin-x64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-freebsd-wasm32",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-darwin-arm64",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-darwin-x64",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-arm",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-arm64",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-ppc64",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-riscv64",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linux-s390x",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-libvips-linuxmusl-arm64",
+      "expected": "1.3.4",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-arm",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-arm64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-ppc64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-riscv64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-linux-s390x",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-linuxmusl-arm64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-webcontainers-wasm32",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-win32-arm64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-win32-ia32",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@img/sharp-win32-x64",
+      "expected": "0.35.5",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@msgpackr-extract/msgpackr-extract-darwin-arm64",
+      "expected": "3.0.3",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@msgpackr-extract/msgpackr-extract-darwin-x64",
+      "expected": "3.0.3",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@msgpackr-extract/msgpackr-extract-linux-arm",
+      "expected": "3.0.3",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@msgpackr-extract/msgpackr-extract-linux-arm64",
+      "expected": "3.0.3",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@msgpackr-extract/msgpackr-extract-win32-x64",
+      "expected": "3.0.3",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@napi-rs/wasm-runtime",
+      "expected": "0.2.12",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-android-arm-eabi",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-android-arm64",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-darwin-arm64",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-darwin-x64",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-freebsd-x64",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-linux-arm-gnueabihf",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-linux-arm64-gnu",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-linux-arm64-musl",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-wasm32-wasi",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-win32-arm64-msvc",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-win32-ia32-msvc",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@node-rs/jieba-win32-x64-msvc",
+      "expected": "2.0.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-android-arm-eabi",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-android-arm64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-darwin-arm64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-darwin-x64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-freebsd-arm64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-freebsd-x64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-arm-gnueabihf",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-arm-musleabihf",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-arm64-gnu",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-arm64-musl",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-loong64-gnu",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-loong64-musl",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-ppc64-gnu",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-ppc64-musl",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-riscv64-gnu",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-riscv64-musl",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-linux-s390x-gnu",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-openbsd-x64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-openharmony-arm64",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-win32-arm64-msvc",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-win32-ia32-msvc",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-win32-x64-gnu",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@rollup/rollup-win32-x64-msvc",
+      "expected": "4.63.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/@tybys/wasm-util",
+      "expected": "0.10.1",
+      "actual": "missing"
+    },
+    {
+      "path": "node_modules/fsevents",
+      "expected": "2.3.3",
+      "actual": "missing"
+    }
+  ],
+  "missingRequiredLockPackages": []
+}
