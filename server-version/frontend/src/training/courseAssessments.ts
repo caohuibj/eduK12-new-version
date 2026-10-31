@@ -188,7 +188,7 @@ export async function loadCourseAssessments(courseId: string, cognitiveEnabled: 
     return response.data?.list ?? []
   }, [] as Question[])
   const scaleTask = attempt('课程量表', async () => {
-    const response = await apiClient.get<{ list: Scale[] }>('/scales/available')
+    const response = await apiClient.get<{ list: Scale[] }>('/scales/available', { params: { courseId } })
     if (response.code !== 0) throw new Error(response.message || '请重试')
     return response.data?.list ?? []
   }, [] as Scale[])
