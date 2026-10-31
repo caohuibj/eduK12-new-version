@@ -73,4 +73,3 @@ hash recovery or new author contacts. No generic rights HOLD or new gate is
 created. The prior source's test/QC claims are not counted as a fresh
 byte-for-byte rebuild. See ../THIRD_PARTY_NOTICES.md for license attribution;
 psychometric validity, norms and age adaptation remain unverified.
-
