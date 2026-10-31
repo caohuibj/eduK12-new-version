@@ -193,7 +193,7 @@ export function backendModuleFile(file) {
   if(!file.startsWith(modules)||!/\.(?:ts|json)$/.test(file))return false;
   if(/^server-version\/backend\/src\/modules\/(?:assessment-[^/]+|reporting|cognitive|situational|auth|authorization|identity|session)\//.test(file))return false;
   if(/\/(?:runtime|scorers|algorithms|reference-data)\//.test(file))return false;
-  return !/(?:^|[./-])(?:routes?|controllers?|middleware|schemas?|contracts?|types|dto|api|scoring|scorer|compiler|finalizer|runtime)(?:[./-]|$)/i.test(file.slice(modules.length));
+  return !/(?:^|[./-])(?:auth|authorization|identity|session|routes?|controllers?|middleware|schemas?|contracts?|types|dto|api|scoring|scorer|compiler|finalizer|runtime)(?:[./-]|$)/i.test(file.slice(modules.length));
 }
 export function backendModuleFilesOnly(files) {
   const evidence=file=>engineeringEvidenceFile(file)
