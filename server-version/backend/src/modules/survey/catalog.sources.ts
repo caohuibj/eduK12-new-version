@@ -1,6 +1,6 @@
 import {isSurveyCognitiveProfileRef,readSurveyCognitiveProfileSource,SURVEY_PROFILE_ADAPTER} from './cognitive-profile.source'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
-import {catalogDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
+import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
 import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
@@ -353,7 +353,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   let offset=(page-1)*limit
   const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
-  const records=catalogDiscoveryRecords(),filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
+  const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(db)],filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
   const profileHeaders=new Map<string,{available:boolean;reason:string|null}>()
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
@@ -367,7 +367,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
     const online=input.includeGoverned===false?[]:await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string};classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,combination_hash,snapshot,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_standard_releases t ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`t.tool_key`,version:Prisma.sql`t.snapshot->>'instrumentVersion'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE state='ONLINE' AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.tool_key`,Prisma.sql`t.snapshot->>'title'`,Prisma.sql`t.combination_hash`],filters)} ORDER BY tool_key,created_at,id`)
     for(const row of online)sourceTags.set('survey-standard:'+row.id,row.classification_tags??[])
     for(const r of online.slice(offset,offset+take))refs.push({ref:{kind:'SCALE',sourceId:'survey-standard:'+r.id,sourceVersion:r.combination_hash},title:r.snapshot.title})
-    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',...scaleDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
+    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',standardSourceKind:'CODE_PACKAGE',...scaleDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
     for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='SCALE'&&record.key===row.code&&record.version===row.instrumentVersion)?.tags??[])
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))

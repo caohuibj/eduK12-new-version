@@ -4,7 +4,7 @@ import { listCognitiveRegistryEntries } from '../cognitive/cognitive.registry'
 import { deriveCatalogDomainSummary } from '../cognitive/library/catalog'
 import { getCognitiveDomainDefinition } from '../cognitive-analysis/domain.registry'
 import {
-  catalogKeywordTerms, catalogTagFacets, matchesCatalogDiscovery, scaleSourceClassificationTags,
+  catalogKeywordTerms, catalogTagFacets, matchesCatalogDiscovery, scaleSourceClassificationTags,catalogClassificationTags,
   type CatalogClassificationTag, type CatalogDiscoveryFilters,
 } from '../scale/library/catalog-discovery'
 
@@ -43,6 +43,18 @@ export function catalogDiscoveryRecords(): DiscoveryRecord[] {
       ids: tags.map(tag => tag.id), terms: [entry.testType, ...tags.flatMap(tag => [tag.id, tag.label])].join(' ').toLowerCase() }
   })
   return [...scales, ...cognitive]
+}
+/** Header-only metadata from frozen imported C, using the same discovery
+ * projection. This never adds an executable registry or a persisted catalog. */
+export async function importedStandardDiscoveryRecords(db:Pick<Prisma.TransactionClient,'$queryRaw'>):Promise<DiscoveryRecord[]>{
+ const rows=await db.$queryRaw<Array<{key:string;version:string;title:string;catalog:{construct?:Parameters<typeof catalogClassificationTags>[0];population?:NonNullable<Parameters<typeof catalogClassificationTags>[1]>['population']};language:string|null}>>`SELECT DISTINCT ON(tool_key,snapshot->>'instrumentVersion') tool_key AS key,snapshot->>'instrumentVersion' AS version,snapshot->>'title' AS title,
+  snapshot#>'{parts,CONTENT,reference,metadata,catalog}' AS catalog,COALESCE(snapshot#>>'{definition,versionAxes,locale}',snapshot#>>'{parts,CONTENT,reference,metadata,instruction,language}') AS language
+  FROM survey_standard_releases WHERE snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,kind}'='DB_IMPORTED'
+  ORDER BY tool_key,snapshot->>'instrumentVersion',created_at DESC,id DESC`
+ return rows.filter(row=>typeof row.key==='string'&&typeof row.version==='string').map(row=>{
+  const tags=catalogClassificationTags(row.catalog?.construct??{}, {population:row.catalog?.population,targetLocale:row.language??undefined})
+  return {kind:'SCALE',key:row.key,version:row.version,engine:'',scoring:'',tags,ids:tags.map(t=>t.id),terms:[row.title,...tags.flatMap(t=>[t.id,t.label])].join(' ').toLowerCase()}
+ })
 }
 
 export const discoveryFacets = (records: readonly DiscoveryRecord[], family?: string) => catalogTagFacets(records.filter(record => !family || record.kind === family).map(record => record.tags))
