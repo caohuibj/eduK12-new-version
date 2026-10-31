@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/dot-questionnaire-open-retry-20261031/server-version/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  15:39:08
+   Duration  877ms (transform 155ms, setup 111ms, import 241ms, tests 112ms, environment 277ms)
+

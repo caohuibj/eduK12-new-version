@@ -1,0 +1,126 @@
+../backend/src/config/database.ts(1,30): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../backend/src/config/database.ts(40,22): error TS7006: Parameter 'params' implicitly has an 'any' type.
+../backend/src/config/database.ts(40,30): error TS7006: Parameter 'next' implicitly has an 'any' type.
+../backend/src/modules/admin-permissions/service.ts(2,24): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../backend/src/modules/admin-permissions/service.ts(34,36): error TS7006: Parameter 'tx' implicitly has an 'any' type.
+../backend/src/modules/admin-permissions/service.ts(42,31): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/admin-permissions/service.ts(47,32): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/definition-primitives.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/assessment-core/form/definition.ts(2,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/assessment-core/form/definition.ts(17,72): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(17,76): error TS7006: Parameter 'page' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(18,30): error TS7006: Parameter 'n' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(18,32): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(40,47): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(42,42): error TS7006: Parameter 'n' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(42,44): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(47,61): error TS7006: Parameter 'n' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(47,63): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(109,47): error TS7006: Parameter 'issue' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(118,87): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(119,39): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(124,99): error TS7006: Parameter 'key' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(152,61): error TS7006: Parameter 'x' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(158,31): error TS7006: Parameter 'p' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(166,22): error TS7006: Parameter 'p' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(167,20): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(170,20): error TS7006: Parameter 'page' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(170,25): error TS7006: Parameter 'pi' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(172,29): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(172,31): error TS7006: Parameter 'qi' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(175,40): error TS7006: Parameter 'item' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(178,31): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ readonly SINGLE: { readonly version: 1; readonly shape: "choice"; }; readonly MULTIPLE: { readonly version: 1; readonly shape: "choices"; }; readonly SHORT_TEXT: { readonly version: 1; readonly shape: "text"; }; ... 9 more ...; readonly MATRIX_MULTIPLE: { ...; }; }'.
+../backend/src/modules/assessment-core/form/definition.ts(184,28): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(185,25): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(189,28): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(198,30): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(205,42): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(205,44): error TS7006: Parameter 'oi' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(209,39): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(209,41): error TS7006: Parameter 'oi' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/definition.ts(255,37): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(8,39): error TS7006: Parameter 'p' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(8,58): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(9,47): error TS7006: Parameter 'p' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(10,13): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(11,14): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(11,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(12,46): error TS7006: Parameter 'p' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(13,13): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(13,50): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(30,21): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(50,47): error TS7006: Parameter 'x' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(59,77): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(74,35): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(89,35): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(93,32): error TS7006: Parameter 'k' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(94,24): error TS7006: Parameter 'v' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(100,9): error TS2322: Type '{ [k: string]: string | number | true | string[]; }' is not assignable to type 'AnswerPrimitive'.
+  Type '{ [k: string]: string | number | true | string[]; }' is missing the following properties from type 'string[]': length, pop, push, concat, and 28 more.
+../backend/src/modules/assessment-core/form/runtime.ts(100,60): error TS7006: Parameter 'k' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(118,39): error TS7006: Parameter 'o' implicitly has an 'any' type.
+../backend/src/modules/assessment-core/form/runtime.ts(129,61): error TS7006: Parameter 'x' implicitly has an 'any' type.
+../backend/src/modules/assessment-media/assessment-asset-identity.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/assessment-media/assessment-asset-identity.ts(3,75): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../backend/src/modules/assessment-media/assessment-image.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/assessment-media/material.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/assessment-media/material.ts(13,78): error TS7006: Parameter 'items' implicitly has an 'any' type.
+../backend/src/modules/assessment-media/material.ts(13,84): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+../backend/src/modules/assessment-media/material.ts(14,24): error TS7006: Parameter 'item' implicitly has an 'any' type.
+../backend/src/modules/assessment-runtime/form-policy.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/assessment-runtime/typed-form.ts(35,46): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/assessment-runtime/typed-form.ts(35,87): error TS7006: Parameter 'option' implicitly has an 'any' type.
+../backend/src/modules/assessment-runtime/typed-form.ts(39,151): error TS7006: Parameter 'option' implicitly has an 'any' type.
+../backend/src/modules/assessment-runtime/typed-form.ts(116,69): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/assessment-runtime/typed-form.ts(123,72): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/education-tools/access.ts(1,29): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../backend/src/modules/education-tools/expert-observation.contract.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/education-tools/expert-observation.contract.ts(15,26): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../backend/src/modules/education-tools/expert-observation.contract.ts(15,32): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+../backend/src/modules/education-tools/expert-observation.contract.ts(16,39): error TS7006: Parameter 'a' implicitly has an 'any' type.
+../backend/src/modules/education-tools/expert-observation.contract.ts(21,58): error TS7006: Parameter 'a' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.contracts.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/education-tools/private-tool.form-runtime-adapter.ts(19,29): error TS7006: Parameter 'option' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.form-runtime-adapter.ts(31,38): error TS7006: Parameter 'page' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.form-runtime-adapter.ts(34,35): error TS7006: Parameter 'q' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.form-runtime-adapter.ts(34,37): error TS7006: Parameter 'index' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.form-runtime-adapter.ts(37,34): error TS7006: Parameter 'm' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.form-runtime-contracts.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/education-tools/private-tool.runtime-origin.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/education-tools/private-tool.runtime-origin.ts(15,26): error TS7006: Parameter 'origin' implicitly has an 'any' type.
+../backend/src/modules/education-tools/private-tool.runtime-origin.ts(15,33): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/education-tools/school-private-group-selection.ts(14,26): error TS7006: Parameter 'selection' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(14,36): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(15,34): error TS7006: Parameter 'leaf' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(19,48): error TS18046: 'keys' is of type 'unknown'.
+../backend/src/modules/education-tools/school-private-group-selection.ts(21,74): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(iterable?: Iterable<unknown> | null | undefined): Set<unknown>', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'Iterable<unknown> | null | undefined'.
+  Overload 2 of 2, '(values?: readonly any[] | null | undefined): Set<any>', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'readonly any[] | null | undefined'.
+../backend/src/modules/education-tools/school-private-group-selection.ts(21,87): error TS18046: 'keys' is of type 'unknown'.
+../backend/src/modules/education-tools/school-private-group-selection.ts(52,37): error TS7006: Parameter 'key' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(56,49): error TS7006: Parameter 'leaf' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(59,13): error TS7006: Parameter 'a' implicitly has an 'any' type.
+../backend/src/modules/education-tools/school-private-group-selection.ts(59,15): error TS7006: Parameter 'b' implicitly has an 'any' type.
+../backend/src/modules/organization/educationProductAccess.ts(1,24): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../backend/src/modules/organization/educationProductAccess.ts(109,19): error TS7006: Parameter 'row' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/contracts.ts(3,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/scale-library-governance/contracts.ts(22,66): error TS7006: Parameter 'v' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/contracts.ts(25,155): error TS7006: Parameter 'v' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(1,17): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+../backend/src/modules/scale-library-governance/education-applicability.ts(17,26): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(17,32): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(19,34): error TS7006: Parameter 'administration' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(19,49): error TS7006: Parameter 'index' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(29,14): error TS7006: Parameter 'value' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(50,84): error TS7031: Binding element 'population' implicitly has an 'any' type.
+../backend/src/modules/scale-library-governance/education-applicability.ts(50,95): error TS7031: Binding element 'responseMode' implicitly has an 'any' type.
+../backend/src/services/runtimeObservability.ts(4,70): error TS2307: Cannot find module 'express' or its corresponding type declarations.
+../backend/src/services/runtimeObservability.ts(440,102): error TS7006: Parameter 'req' implicitly has an 'any' type.
+../backend/src/services/runtimeObservability.ts(440,107): error TS7006: Parameter 'res' implicitly has an 'any' type.
+../backend/src/services/runtimeObservability.ts(440,112): error TS7006: Parameter 'next' implicitly has an 'any' type.
+../backend/src/services/runtimeObservability.ts(445,37): error TS7006: Parameter 'error' implicitly has an 'any' type.
+../backend/src/types/index.ts(1,97): error TS2307: Cannot find module '@prisma/client' or its corresponding type declarations.
+../backend/src/types/index.ts(42,47): error TS2503: Cannot find namespace 'Express'.
