@@ -10,7 +10,7 @@ import {compileResearchScale} from '../../modules/survey/builder.compiler'
 import {createHuiteacherTarget,createHuiteacherEvent,createHuiteacherEventRunDraft,transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
 import {addTeacherPrivateCompositionRunTrack,publishTeacherRun} from '../../modules/huiteacher/run.service'
 import {startAssessmentRunExecution} from '../../modules/assessment-run/startExecution'
-import {getAttemptState} from '../../modules/composite/composite.service'
+import {getAttemptState,finalizeCompositeAttemptIfReady} from '../../modules/composite/composite.service'
 import {submitCompositeScaleFinal} from '../../modules/scale/scale-final-submit.service'
 import {readTeacherOrdinaryFeedback} from '../../modules/reporting/education-ordinary-feedback.service'
 import {listTeacherNumericGroups,generateTeacherNumericGroup,readTeacherNumericGroup} from '../../modules/huiteacher/numericGroupReport.service'
@@ -54,19 +54,30 @@ it.skipIf(!url)('publishes a new Teacher private GROUP composition, retains own 
   const result={scope:{...scope,eventId:event.id},runId:run.runId,sourceVersionId:fixed.id}
   writeFileSync(file,JSON.stringify(result));return result
  })()
+ const checkOwn=async(row:{id:string;userId:string})=>{
+  const own=await readTeacherOrdinaryFeedback({actorUserId:row.userId,executionId:row.id})
+  writeFileSync(file+'.own.json',JSON.stringify(own,null,2))
+  expect(own).toMatchObject({state:'READY',units:[{kind:'SCALE',state:'READY'}]})
+ }
+ const [completed]=await db.$queryRaw<Array<{id:string;userId:string}>>`SELECT e.id,r.user_id AS "userId" FROM assessment_run_executions e
+  JOIN assessment_run_actor_snapshots r ON r.id=e.respondent_actor_snapshot_id AND r.run_id=e.run_id AND r.organization_id=e.organization_id
+  WHERE e.run_id=${checkpoint.runId} AND e.status='COMPLETED' ORDER BY e.id LIMIT 1`
+ if(completed)await checkOwn(completed)
  const pending=await db.$queryRaw<Array<{id:string;userId:string}>>`SELECT e.id,r.user_id AS "userId" FROM assessment_run_executions e
   JOIN assessment_run_actor_snapshots r ON r.id=e.respondent_actor_snapshot_id AND r.run_id=e.run_id AND r.organization_id=e.organization_id
   WHERE e.run_id=${checkpoint.runId} AND e.status<>'COMPLETED' ORDER BY e.id`
+ let submittedFinals=0
  for(const [i,row] of pending.entries()){
   const started=await startAssessmentRunExecution({executionId:row.id,actorUserId:row.userId})
   if(started.state!=='STARTED')throw Error('Actual private composition start required')
   const state=await getAttemptState(started.runtimeBindingRef,{userId:row.userId},undefined,'current-unit'),item=state.currentItem
-  await submitCompositeScaleFinal(started.runtimeBindingRef,item.id,{submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:state.contextSnapshotHash,
-   answers:item.scale.definition.items.map((q:{itemCode:string})=>({itemCode:q.itemCode,responseValue:'a'}))},{userId:row.userId},{receiptOnly:true})
-  if(i===0){
-   const own=await readTeacherOrdinaryFeedback({actorUserId:row.userId,executionId:row.id})
-   expect(own).toMatchObject({state:'READY',units:[{kind:'SCALE',state:'READY'}]})
+  if(state.status!=='COMPLETED'){
+   await submitCompositeScaleFinal(started.runtimeBindingRef,item.id,{submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:state.contextSnapshotHash,
+    answers:item.scale.definition.items.map((q:{itemCode:string})=>({itemCode:q.itemCode,responseValue:'a'}))},{userId:row.userId},{receiptOnly:true})
+   submittedFinals++
   }
+  await finalizeCompositeAttemptIfReady(started.runtimeBindingRef)
+  if(i===0&&!completed)await checkOwn(row)
  }
  const index=await listTeacherNumericGroups(checkpoint.scope,{configure:true}),choice=index.sources[0]
  expect(index.sources).toHaveLength(1);expect(choice.tools).toHaveLength(1)
@@ -81,5 +92,5 @@ it.skipIf(!url)('publishes a new Teacher private GROUP composition, retains own 
  setReportingPayloadMaterializationObserverForTests(null);expect(materializations).toBe(0)
  expect((await listTeacherNumericGroups(checkpoint.scope)).versions.some(v=>v.artifactId===result.artifactId)).toBe(true)
  writeFileSync(file,JSON.stringify({...checkpoint,artifactId:result.artifactId}))
- if(process.env.TEACHER_PRIVATE_GROUP_PROOF)writeFileSync(process.env.TEACHER_PRIVATE_GROUP_PROOF,JSON.stringify({passed:true,ownFeedbackBelowGroupN:true,completedParents:10,newFinals:pending.length,groupValidN:10,mean:1,sdSample:0,readCanonicalMaterializations:materializations,historyPointer:true,sourceRegistryOrResultMock:false,productionAccessed:false},null,2))
+ if(process.env.TEACHER_PRIVATE_GROUP_PROOF)writeFileSync(process.env.TEACHER_PRIVATE_GROUP_PROOF,JSON.stringify({passed:true,ownFeedbackBelowGroupN:true,completedParents:10,newFinalsThisContinuation:submittedFinals,groupValidN:10,mean:1,sdSample:0,readCanonicalMaterializations:materializations,historyPointer:true,sourceRegistryOrResultMock:false,productionAccessed:false},null,2))
 },90_000)

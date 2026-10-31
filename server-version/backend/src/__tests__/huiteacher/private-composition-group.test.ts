@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {expect,it} from 'vitest'
-import {teacherCompositionGroupChoice} from '../../modules/education-tools/teacher-composition-group-source'
+import {teacherCompositionGroupChoice,readTeacherCompositionNativeGroupChoices} from '../../modules/education-tools/teacher-composition-group-source'
 import {parseSchoolPrivateGroupSelection} from '../../modules/education-tools/school-private-group-selection'
 import {privateCompositionDefinitionSchema} from '../../modules/education-tools/private-tool.composition-contracts'
 import {schoolPrivateGroupDisclosure,schoolPrivateGroupOwnContract} from '../../modules/education-tools/school-private-group-source'
@@ -24,11 +24,24 @@ it('freezes an explicit Teacher SELF choice with organization-only native/origin
   expect(()=>parseSchoolPrivateGroupSelection({...selected,leaves:[{...selected.leaves[0],audiences:{...bound.audiences,TEACHER:choice.metricKeys}}]},context)).toThrow()
   expect(()=>parseSchoolPrivateGroupSelection(selected,{...context,administration:{population:'TEACHER',responseMode:'STUDENT_REPORT'}})).toThrow()
   const definition={schemaVersion:1,adapterVersion:'1.0.0',administration:context.administration,instruction:'',groupReporting:parsed,
-   blocks:[{blockId,instruction:'',source:{provider:'PRIVATE_VERSION',kind:'SCALE',versionId:version.id,contentHash:version.contentHash}}]}
+   blocks:[{blockId,instruction:'',source:{provider:choice.provider,kind:choice.kind,versionId:version.id,contentHash:version.contentHash,...(choice.kind==='COGNITIVE'?{profile:'research'}:{})}}]}
   expect(privateCompositionDefinitionSchema.parse(definition).groupReporting).toEqual(parsed)
  }
  expect(teacherCompositionGroupChoice(version,{provider:'LIBRARY_SCALE',kind:'SCALE',metricKeys:['total']})).toBeNull()
  expect(teacherCompositionGroupChoice(version,{provider:'PRIVATE_VERSION',kind:'SCALE',metricKeys:['total'],license:{status:'restricted',redistribution:'not_allowed'}})).toBeNull()
+})
+
+it('offers native choices from already authorized exact profile headers without substituting their base measurement identity',async()=>{
+ const profile={key:'approved-profile',kind:'COGNITIVE_PROFILE',id:randomUUID(),hash:'a'.repeat(64),title:'Research reaction',
+  versions:{content:'1.0.0',parameters:null,report:'1.0.0',measurementHash:'b'.repeat(64)},nativeAvailable:true}
+ const sjt={...profile,key:'approved-sjt',kind:'SJT_RELEASE',id:randomUUID(),hash:'c'.repeat(64),title:'SJT',versions:{content:'3.0.0',parameters:null,report:null}}
+ let query:any
+ const db={$queryRaw:async(sql:unknown)=>{query=sql;return [{hash:'b'.repeat(64),family:'COGNITIVE',metricKeys:['rt']},{hash:sjt.hash,family:'SJT',metricKeys:['dimension']}]}} as any
+ const choices=await readTeacherCompositionNativeGroupChoices(db,[profile,sjt] as any)
+ expect(choices.get(profile.key)).toMatchObject({versionId:profile.id,contentHash:profile.hash,audiences:{ORGANIZATION:['rt']}})
+ expect(choices.get(sjt.key)?.audiences.ORGANIZATION).toEqual(['dimension'])
+ expect(query.sql).not.toMatch(/executable|canonical|answers/)
+ expect(query.values).toContainEqual(['b'.repeat(64),sjt.hash])
 })
 
 it('keeps private Cognitive/SJT slot, runner version and physical units separate even with equal score names',()=>{
