@@ -1,0 +1,18 @@
+{
+  "kind": "RETAINED_LOCAL_COMPILER_EXIT",
+  "component": "frontend",
+  "componentTree": "605a6561883ade842e2006b174125aab343325ce",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "originalExitFile": "docs/performance/composite-course-scope-20261031/frontend-main442-types.exit",
+  "originalExitSHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "sourceAssociationBasis": "Actual direct compiler after final main442 alignment; tracked frontend tree unchanged throughout invocation. Backend tree unchanged from aligned BE receipt. Unsigned local execution."
+}

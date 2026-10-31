@@ -606,3 +606,12 @@ test('PR442 rejects original text, source, component and fresh type-record drift
  assert.throws(()=>verifyQuestionnaire442Evidence(r,{...p,components:{...p.components,frontend:h('9')}}));
  for(const target of [...Object.values(r.originals).map(x=>x.path),...Object.keys(r.sourceHashes),r.types.path,r.types.log])assert.throws(()=>verifyQuestionnaire442Evidence(r,p,path=>path===target?Buffer.from('drift'):readFileSync(path)));
 });
+
+test('PR437 exact mixed scope and SAST reject unknown source and incorrect activation identity',()=>{
+ const f=fixture(),paths=['server-version/backend/src/modules/composite/composite.service.ts','server-version/frontend/src/training/courseAssessments.ts'];
+ f.b.pr=437;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'437',CI_HEAD_REF:BRANCHES[437]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,437);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'440'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
