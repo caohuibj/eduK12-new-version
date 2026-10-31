@@ -65,7 +65,7 @@ describe('original source catalog grants',()=>{
     await waitFor(()=>expect(api).toHaveBeenCalledWith('/researchers/r1/tool-grants','POST',{currentPassword:'test-password',source}))
     await waitFor(()=>expect(screen.getByRole('button',{name:revokeName})).toBeEnabled())
     fireEvent.click(screen.getByRole('button',{name:revokeName}))
-    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('既有已发布和进行中的研究不受影响'))
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('将阻止新的导入、后续冻结发布和未入场的新启动；已开始作答及历史定义保留。'))
     await waitFor(()=>expect(api).toHaveBeenCalledWith('/tool-grants/grant-1/revoke','POST',{currentPassword:'test-password'}))
   })
   it('renders imported native snapshots without editable adapted scoring or bulk controls',async()=>{

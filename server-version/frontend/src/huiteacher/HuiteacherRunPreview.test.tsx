@@ -13,6 +13,7 @@ function setup(override?:(path:string,method?:string)=>Promise<unknown>|undefine
   if(path.endsWith('/evaluation-events'))return {list:[event]}
   if(path.endsWith('/forms'))return {list:[{id:'form',title:'正式表单',definitionDigest:'hash',status:'PUBLISHED'}]}
   if(path===base)return run
+  if(path===base+'/tracking')return {baselineId:null,ordinal:null,choices:[]}
   if(path===base+'/preview')return preview
   if(path===base+'/tracks')return {}
   if(path===base+'/publish')return {executionCount:8,version:4}
@@ -30,7 +31,7 @@ it('shows per-tool unique counts and total executions, with a neutral publicatio
  expect(screen.getByText('工具 1：被测者 4 人 · 作答者 4 人 · 作答任务 4 个')).toBeInTheDocument()
  expect(screen.getByText('工具 2：被测者 4 人 · 作答者 4 人 · 作答任务 4 个')).toBeInTheDocument()
  expect(screen.getByText(/不将各工具人数相加视为独立人数/)).toBeInTheDocument()
- fireEvent.click(screen.getByRole('button',{name:'发布教师评价任务'}))
+ fireEvent.click(await screen.findByRole('button',{name:'发布教师评价任务'}))
  await waitFor(()=>expect(confirm).toHaveBeenCalledWith('确认按当前固定版本配置，向本校符合资格的教师分配测评任务吗？发布时将重新校验参与资格。'))
  expect(api.mock.calls.some(([path])=>path.endsWith('/publish'))).toBe(false)
 })
@@ -59,6 +60,6 @@ it('rejects a mismatched preview version without adding a mandatory-preview publ
  render(<HuiteacherEvaluationStudio organizationId="org" api={api as never}/>);await open()
  fireEvent.click(screen.getByRole('button',{name:'预览任务配置'}));await screen.findByText('预览版本或人数响应无效，请重新预览任务配置。')
  expect(screen.queryByRole('region',{name:'任务配置预览'})).not.toBeInTheDocument()
- fireEvent.click(screen.getByRole('button',{name:'发布教师评价任务'}))
- await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/publish','POST',{expectedVersion:3}))
+ fireEvent.click(await screen.findByRole('button',{name:'发布教师评价任务'}))
+ await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/publish','POST',{expectedVersion:3,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]}}))
 })

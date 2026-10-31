@@ -95,7 +95,7 @@ describe('Teacher list request feedback',()=>{
 })
 const baseTask={executionId:'execution',eventId:'event',eventTitle:'活动',runId:'run',organizationId:'org',status:'STARTED',runtimeBindingRef:'attempt',runtimeBindingKind:'COMPOSITE',resourceKey:'resource',title:'已分配任务',formTitle:'已分配任务',runStatus:'PUBLISHED',eventStatus:'OPEN'}
 describe('List-only retry preserves current answering',()=>{
- it.each(['form','scale','personal','private'] as const)('%s retains rows and answers without replaying POST',async key=>{
+ it.each(['form','scale','personal','private'] as const)('%s retains answers without replaying POST or rereading a hidden list',async key=>{
   const view=views[key];let listReads=0
   const api=vi.fn(async(path:string,method?:string)=>{
    if(path===view.path){
@@ -110,6 +110,22 @@ describe('List-only retry preserves current answering',()=>{
   render(view.render(api as Api))
   const open={form:'继续评价',scale:'进入本人自评',personal:'发起个人测评',private:'打开本人表单'}[key]
   fireEvent.click(await screen.findByRole('button',{name:open}))
+  if(key==='scale'){
+   // Opening a bound scale no longer rereads the hidden list. There is no
+   // list-refresh control during answering, so it cannot produce a retry alert.
+   const answer=await screen.findByRole('textbox',{name:'当前答案'})
+   fireEvent.change(answer,{target:{value:'未提交的答案'}})
+   expect(screen.getByText('已分配任务',{selector:'strong'})).toBeInTheDocument()
+   expect(answer).toHaveValue('未提交的答案')
+   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+   expect(listReads).toBe(1)
+   expect(api.mock.calls.filter(([,method])=>method==='POST')).toHaveLength(0)
+   return
+  }
+  if(key==='private'){
+   await screen.findByRole('textbox',{name:'当前答案'})
+   fireEvent.click(screen.getByRole('button',{name:'刷新自编表单任务'}))
+  }
   await screen.findByRole('alert')
   expect(screen.getByText('已分配任务',{selector:'strong'})).toBeInTheDocument()
   if(key==='personal')fireEvent.click(screen.getByRole('button',{name:'我的选择'}))
