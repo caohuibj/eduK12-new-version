@@ -30,6 +30,8 @@ async function source(input:TeacherNumericScope,trackId?:string){
   SELECT resource_family AS family,resource_key AS key,resource_version AS version,frozen_resource_policy AS policy,resource_policy_hash AS hash
   FROM assessment_run_tracks WHERE organization_id=${input.organizationId} AND run_id=${run.runId} AND id=${trackId}`
  if(!track||canonicalHash(track.policy)!==track.hash)hidden()
+ if(track.family!=='SCALE'||!track.key.endsWith(':GROUP')
+   ||!['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix)))hidden()
  const entry=await resolveHistoricalRelationalEntry({resourceKind:track.family,resourceKey:track.key,resourceVersion:track.version} as any)
  if(!entry||!isSelfGroupV2Entry(entry)||entry.resultDisclosure?.audiences.ORGANIZATION.mode!=='AGGREGATE_ONLY'
   ||!track.policy.subjectRoles?.every((r:string)=>r==='TEACHER')||!track.policy.respondentRoles?.every((r:string)=>r==='TEACHER')
