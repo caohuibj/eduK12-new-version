@@ -8,7 +8,7 @@ afterEach(()=>{cleanup();captured.transport=undefined})
 it('rejects other attempts, other units, traversal and noncanonical segments before either transport API call',async()=>{
  const api=vi.fn(async(path:string)=>{
   if(path==='/my-scale-tasks')return {list:[{executionId:'exec',eventId:'event',eventTitle:'活动',runId:'run',organizationId:'school',status:'STARTED',runtimeBindingRef:'current',resourceKey:'library-scale:one',title:'当前任务',runStatus:'PUBLISHED'}]}
-  if(path==='/composite-attempts/current')return {id:'current',status:'IN_PROGRESS',currentItem:{id:'unit',type:'SCALE',definitionHash:'hash'}}
+  if(path==='/composite-attempts/current?view=current-unit')return {id:'current',status:'IN_PROGRESS',currentItem:{id:'unit',type:'SCALE',definitionHash:'hash'}}
   throw Error('Unexpected transport '+path)
  })
  render(<HuiteacherMyScaleTasks api={api as EducationReportApi}/>)

@@ -31,7 +31,7 @@ describe('private studio scoped static image integration',()=>{
   const state=vi.fn()
   await open(api,state)
   fireEvent.click(screen.getByRole('button',{name:'题目'}))
-  fireEvent.change(screen.getByLabelText('上传题目图片'),{target:{files:[new File(['png'],'question.png',{type:'image/png'})]}})
+  fireEvent.change(await screen.findByLabelText('上传题目图片'),{target:{files:[new File(['png'],'question.png',{type:'image/png'})]}})
   expect(screen.getByRole('button',{name:'保存草稿'})).toBeDisabled()
   expect(screen.getByRole('button',{name:'固定私有版本'})).toBeDisabled()
   expect(screen.getByRole('button',{name:'返回我的工具'})).toBeDisabled()
@@ -51,7 +51,7 @@ describe('private studio scoped static image integration',()=>{
   const draft:PrivateTool={id:'draft',kind:'FORM',title:'工具',revision:1,contentHash:'draft-hash',definition:{schemaVersion:2,pages:[{pageKey:'page',title:'第一页',questions:[{itemKey:'q',type:'SHORT_TEXT',prompt:'问题',required:true,allowRefusal:false,options:[],rows:[]}]}]}}
   const api=apiFor(draft,pending.promise)
   await open(api)
-  fireEvent.change(screen.getByLabelText('上传题目图片'),{target:{files:[new File(['png'],'question.png',{type:'image/png'})]}})
+  fireEvent.change(await screen.findByLabelText('上传题目图片'),{target:{files:[new File(['png'],'question.png',{type:'image/png'})]}})
   await act(async()=>pending.resolve(asset))
   fireEvent.change(await screen.findByLabelText('图片版权状态'),{target:{value:'authorized'}})
   fireEvent.change(screen.getByLabelText('版权或授权说明（必填）'),{target:{value:'作者已许可本工具使用'}})

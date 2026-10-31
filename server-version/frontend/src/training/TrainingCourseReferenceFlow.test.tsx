@@ -12,10 +12,10 @@ vi.mock('./FormalReferenceStudio',()=>({
  FormalReferenceSubmission:(props:ComponentProps<typeof import('./FormalReferenceStudio').FormalReferenceSubmission>)=>{mocks.submissionProps(props);return <button disabled={props.disabled} onClick={()=>props.onRiskChange?.(true)}>submit formal</button>},
  default:(props:ComponentProps<typeof import('./FormalReferenceStudio').default>)=>{mocks.governanceProps(props);return <button disabled={props.disabled} onClick={()=>props.onRiskChange?.(true)}>governance action</button>},
 }))
-import TrainingCourseAnalysis from './TrainingCourseAnalysis'
+import {TrainingLongitudinalAnalysis as TrainingCourseAnalysis} from './TrainingCourseAnalysis'
 const source={taskId:'task-1',taskName:'actual source',publication:'2026-10-20T00:00:00.000Z',configDigest:null,variantKey:null,metrics:[{itemId:'item-1',metricKey:'total'}]}
 beforeEach(()=>{vi.clearAllMocks();mocks.sources.mockResolvedValue({list:[source],canQuality:false,canExport:false})})
-describe('Training analysis reference entry integration',()=>{
+describe('Training longitudinal analysis reference entry integration',()=>{
  it('passes the actual actor/source and exact current candidate to explicit formal submission',async()=>{
   render(<TrainingCourseAnalysis actorId="owner-1" courseId="course-1"/>);fireEvent.click(await screen.findByText('source ready'))
   expect(mocks.sourceProps.mock.lastCall?.[0]).toMatchObject({actorId:'owner-1',courseId:'course-1',sources:[source]})
