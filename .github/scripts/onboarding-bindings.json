@@ -6346,6 +6346,96 @@
         "backend": "ace2d78d6cf1ca334ae65d49cfa8701c05df22c6",
         "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
       }
+    },
+    "421": {
+      "schemaVersion": 1,
+      "pr": 421,
+      "enabled": true,
+      "base": "15e58e0e2d186d041293b3f2e139bc243946d3f3",
+      "product": "078fef00097869d7a4043cf7ce8b50d115f7732e",
+      "controlCheckpoint": "755e2295555044bb450ddbdb854b532d6ba85311",
+      "components": {
+        "backend": "32a16236c7b66f4b4efe2d5f6a15cccacdb97398",
+        "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "bad52a06610aca89d02881bb3e9846103fd1570a",
+        ".github/scripts/onboarding-checks.mjs": "a96b7ce2d1aa46b2c7b80e9c3be47a6705e2b8cb",
+        ".github/scripts/onboarding-controls.test.mjs": "99bffd299fe472a47597b91e9cccf2197fa2a0f8",
+        ".github/scripts/onboarding-evidence.json": "5256efeb0f14ad85101e6d0a7f73f1e7e1b49397",
+        ".github/scripts/onboarding-scope.mjs": "02d4fbb783a223f30e349768b11cfce4f5d6c5ce",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "bca5b6b3df304cb4b3b0c5d2710d1cabbc83c56c"
+      },
+      "source": {
+        "docs/evidence/training-cognitive-wave-quota-20261030/README.md": {
+          "before": null,
+          "after": "dbbefa3833fe1056319ae99f2c46ae271ae23f46"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-after-fixture.json": {
+          "before": null,
+          "after": "716ade2681c2259f617de522cd78789a467f1093"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-diagnostic.json": {
+          "before": null,
+          "after": "98612abffb59b0f4f486dc0c1fab343b14692f33"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json": {
+          "before": null,
+          "after": "e8294186179c09d7f936f633a3769215d73c48a4"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-first.json": {
+          "before": null,
+          "after": "f935f96048d504ca1f397f560bef46ba1ce0f8a9"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-final.log": {
+          "before": null,
+          "after": "b70a682621c2a63253e3300c0c12143fc1e31a4c"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-first.log": {
+          "before": null,
+          "after": "9ee1cad68583cdc62aab47ad1bfaac5138e3aec9"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-proof.json": {
+          "before": null,
+          "after": "08235b524145a468b01a0be1a20cca046f2563a3"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/final-minimal-plan.txt": {
+          "before": null,
+          "after": "3e56b51eba729382f1724867d02c3fc27d8af687"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/plan.txt": {
+          "before": null,
+          "after": "b0e851483e18459dee1338ebb9c5423255813f58"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/quota-delta-final.log": {
+          "before": null,
+          "after": "6625a143fb223fc6cfb234e3f25ee858f99dddfd"
+        },
+        "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8447cbd6d099b676c187b180d6fbed946ecdc22c"
+        },
+        "server-version/backend/src/modules/cognitive/attempt-quota.ts": {
+          "before": "e4a5211bccaeba384633eab9980df2495ac262e4",
+          "after": "9f836b37730c29847b867cde17e3eb2e288a39ee"
+        },
+        "server-version/backend/src/modules/composite/composite.service.ts": {
+          "before": "9ca250db58d9dea364c082d55876655ea40d64d6",
+          "after": "d3c3655e9c328f9b78f648ab916e6294b3560927"
+        }
+      },
+      "activationNote": "Reuse original two quota PostgreSQL cases; execute only missing current backend compiler in existing onboarding route and bounded CodeQL. No new image workflow or frontend/migration work."
     }
   }
 }

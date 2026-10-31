@@ -548,3 +548,20 @@ test('PR434 target questionnaire qualifier binds both consumers and rejects unkn
  for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
  const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
 });
+
+test('quota candidate reuses the existing missing compiler route without frontend, migration or duplicate image work',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/cognitive/attempt-quota.ts';
+ f.b={...f.b,pr:421,source:{[file]:{before:null,after:blob}},controlBefore:Object.fromEntries(CONTROLS.map(path=>[path,null]))};
+ f.entries=[file,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'421',CI_HEAD_REF:BRANCHES['421']};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b),outputs=Object.fromEntries(Object.entries(onboardingOutputs(p)).map(([k,v])=>[k,String(v)]));
+ const needs={scope:{result:'success',outputs},'onboarding-structure':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','onboarding-structure','codeql']);
+ assert.deepEqual(failedChecks(needs,false),[]);
+ assert.equal(outputs.frontend,'false');assert(task1SastConfig(p,f.b).paths.includes(file));
+ assert(failedChecks({...needs,scope:{result:'success',outputs:{...outputs,onboarding_plan:'invalid'}}},false).includes('scope'));
+ for(const extra of [{file:'server-version/frontend/src/new.ts',status:'A',oldMode:'000000',newMode:'100644'},{...f.entries[0],newMode:'120000'}])
+  assert.throws(()=>onboardingPlan([...f.entries,extra],base,head,f.read,f.env,f.b));
+ for(const change of [{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'},{CI_PR_NUMBER:'422'},{CI_PR_REPOSITORY:'outside/repo'}])
+  assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...change},f.b));
+});
