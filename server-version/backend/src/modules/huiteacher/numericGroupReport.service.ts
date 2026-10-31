@@ -117,10 +117,10 @@ const countsVisible=(payload:ReportingGroupArtifactPayload,minimumN:number)=>{
 }
 /** Existing small-change rule, now over immutable actual contributor sets,
  * including per-metric quality/missingness subsets instead of invitee lists. */
-export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>}){
+export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>},db:Prisma.TransactionClient|typeof prisma=prisma){
  const metrics=disclosedMetrics(input.payload)
  if(!countsVisible(input.payload,input.minimumN)&&!metrics.length)return {comparedArtifacts:0,measurementHash:null}
- const [measurement]=await prisma.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
+ const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
   FROM assessment_run_tracks t LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
   LEFT JOIN scales s ON s.id=r.scale_id LEFT JOIN measurement_content_releases release ON release.id=s.measurement_release_id
   LEFT JOIN education_assessment_deliveries native ON t.resource_key='education-assessment:TEACHER:'||native.organization_id||':'||native.id
@@ -129,7 +129,7 @@ export async function assertTeacherNumericDisclosure(input:{organizationId:strin
    ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=${input.leaf.slotKey}
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${input.cohort.sourceRunId} AND t.id=${input.cohort.sourceTrackId}`
  if(!measurement?.hash)return hidden()
- const prior=await prisma.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
+ const prior=await db.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
   SELECT a.artifact_payload AS payload,spec.definition->'metricRules' AS "metricRules",
     GREATEST(${input.minimumN},COALESCE((t.frozen_resource_policy->>'minimumRespondents')::int,0),
       COALESCE((spec.definition->>'minimumCohortN')::int,0),COALESCE((spec.definition->>'minimumContributorN')::int,0),
@@ -208,11 +208,11 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
  const minimumN=Math.max(run.minimumN,spec.definition.minimumCohortN,spec.definition.minimumContributorN)
  const metricRules=spec.definition.metricRules
  const cohortSelector=await educationGroupSelector(input.organizationId,'TEACHER',input.selection)
- return prisma.$transaction(async tx=>{
+ const generated=await prisma.$transaction(async tx=>{
   await lockTeacherDisclosure(tx,input.organizationId)
-  const generated=await generateOrganizationGroupAnalysis({principal:run.principal,organizationId:input.organizationId,runId:run.runId,trackId:input.trackId,specId:input.specId,
+  return generateOrganizationGroupAnalysis({principal:run.principal,organizationId:input.organizationId,runId:run.runId,trackId:input.trackId,specId:input.specId,tx,
    leaf:input.leaf,cohortSelector,presentation:await educationGroupPresentation({organizationId:input.organizationId,runId:run.runId,selection:input.selection}),
-   beforePersist:async({cohort,payload})=>{await assertTeacherNumericDisclosure({organizationId:input.organizationId,cohort,leaf:input.leaf,minimumN,payload,metricRules})}})
-  return readTeacherNumericGroup({...input,artifactId:generated.artifactId})
+   beforePersist:async({cohort,payload})=>{await assertTeacherNumericDisclosure({organizationId:input.organizationId,cohort,leaf:input.leaf,minimumN,payload,metricRules},tx)}})
  },{timeout:60000})
+ return readTeacherNumericGroup({...input,artifactId:generated.artifactId})
 }
