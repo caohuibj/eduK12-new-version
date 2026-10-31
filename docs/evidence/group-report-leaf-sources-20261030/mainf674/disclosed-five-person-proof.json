@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "minimumRespondents": 5,
+  "actualCompletedParticipants": 5,
+  "newSyntheticParticipants": 4,
+  "retainedOriginalParticipant": true,
+  "scaleValues": [
+    0,
+    1,
+    0,
+    1,
+    0
+  ],
+  "validN": 5,
+  "mean": 0.4,
+  "sdSample": 0.5477225575051662,
+  "publicMetricState": "present",
+  "storedReadEqualsGeneration": true,
+  "readCanonicalMaterializations": 0,
+  "originalPublicationReplayed": false,
+  "browserReplayed": false,
+  "productionAccessed": false,
+  "coverage": "Scale leaf disclosed generation/read;original Cognitive and SJT metric projections retain their own single-parent/continuation evidence,not separate disclosed multi-person claims"
+}

@@ -1,0 +1,184 @@
+{
+  "status": "DRAFT_NOT_MERGE_READY",
+  "sourceCheckpoint": "f51d2275e065333ede10636605171404cca5e17d",
+  "scope": "Training native fixed Bundle declared measurement leaves through existing course group source, canonical results, statistics and artifact readers; persist actual course on new native Bundle parent",
+  "noNewTablesOrEngines": true,
+  "historicalUnscopedParents": "No backfill or present-day roster inference. Old parents without deliveryCourseId are not consumed. Standalone legacy Assessment remains unsupported.",
+  "sourceFilesAtRecordTime": {
+    "server-version/backend/src/modules/composite/composite.service.ts": "856346ac3b3476f55e79440160367974e9a4e4524574d0f8aaacceb6a470b198",
+    "server-version/backend/src/modules/training-analysis/group-source.ts": "ac64b577a459e82bf6145d01568f691357368f44cc6575ed3f355c234e43e194",
+    "server-version/backend/src/modules/training-analysis/source.ts": "339d1bad0129b942c764415007660d85a87981414972f7f4ba288d65be94600d",
+    "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts": "2ed871c4969fb4475264ad3d5106ec86e07bb4ededa6c00ad8f7b5c285d7884b",
+    "server-version/backend/src/__tests__/training-analysis/group-bundle-leaves.test.ts": "737f80f3c03753fd13f83c66de006ff9611dea482cc4dae9b15ca17acc720184"
+  },
+  "evidenceAttribution": "Unsigned local original reports. These source fingerprints were recorded after execution, not execution-time attestation or formal CI admission. Final fixture differs by additive split into separate Cognitive/SJT cases; original reports retain their actual names and failures. Composite course binding expression was only reformatted after successful PG execution.",
+  "checks": {
+    "unit": "bundle-leaves.json: one leaf-binding case passed, no replay",
+    "nativePostgres": "bundle-postgres-key-continuation.json: actual publication/start/all required Context+Scale+Cognitive+SJT FINAL, then Scale canonical zero, old multiwave exclusion, Context rejection, existing floor and snapshot read passed",
+    "initialNativeFailure": "bundle-postgres-first.json: synthetic bundleKey contained hyphens. Resources had already been published. Reused those resources; corrected fixture key only, no publication setup replay.",
+    "otherLeavesInitial": "bundle-other-leaves.json: Cognitive definitions/numeric canonical observations and own parent assertions completed before SJT lookup failed. Fixture used internal SITUATIONAL instead of public SJT kind. This failed case is not counted as a fresh passed case.",
+    "sjtContinuation": "bundle-sjt-continuation.json: only SJT executed after fixing fixture kind. One passed; original Bundle journey and Cognitive case filtered, no administration replay.",
+    "frontend": "Unchanged frontend tree 6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103; PR418 browser/types evidence retained without replay. Training PR408 175 assertions not rerun.",
+    "backendTypes": "backend-types.json/log: node TypeScript tsc --noEmit exit0 on final backend tree 60e3a0336b424f0ca3f665ff427251a4ca0c75d6; frontend tree unchanged, no repeat."
+  },
+  "remaining": [
+    "Standalone Assessment source adapters need actual frozen product scope; no inference from mutable ownership or rosters.",
+    "School Form and other Teacher tool sources retain their existing contract limits.",
+    "Group longitudinal waits stable personal longitudinal contract.",
+    "Formal qualification remains separate from local unsigned evidence."
+  ],
+  "ciExecuted": false,
+  "merged": false,
+  "deployed": false,
+  "productionAccessed": false,
+  "mainAligned": "55fab18e9933e58dcb800b20156f5b7e48858536",
+  "componentTrees": {
+    "backend": "60e3a0336b424f0ca3f665ff427251a4ca0c75d6",
+    "frontend": "6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103"
+  },
+  "reports": {
+    "backend-types.json": {
+      "bytes": 384,
+      "sha256": "f16c8d370ee27046990152d6e3c0caf2c8cb57a7a6958664179759ee188f800b"
+    },
+    "backend-types.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bundle-leaves.json": {
+      "bytes": 1043,
+      "sha256": "25a89c0a671d4e8d3bda5054db6f501e53bd30dd50f99eb9432c36d73c63b0b9"
+    },
+    "bundle-leaves.log": {
+      "bytes": 121,
+      "sha256": "712515ee056cb96062b2ff4e144fe7468d98fa6e818175a76aa3842b7783747d"
+    },
+    "bundle-other-leaves.json": {
+      "bytes": 1747,
+      "sha256": "40ef5c00b24d1ec36afa9270fd542b48d1a87b356e6af80cd637de6c0072745b"
+    },
+    "bundle-other-leaves.log": {
+      "bytes": 127,
+      "sha256": "a1979c6a3a4d21c7bcd35f79f8a4a2fe68f52e48baa009378e4066331b768822"
+    },
+    "bundle-postgres-first.json": {
+      "bytes": 2455,
+      "sha256": "1f9aa8c3ffad4992ae9ba2dd00164e1591eaf2c828fd5dbaa0666eb7c0ccfda6"
+    },
+    "bundle-postgres-first.log": {
+      "bytes": 129,
+      "sha256": "5aaa911dcc09389dd3f844ca1330c853f7752e54cfbe0621671becee7c1b29e4"
+    },
+    "bundle-postgres-key-continuation.json": {
+      "bytes": 1116,
+      "sha256": "21a99bddca5b696bc4081903f65830abae2f2d251c6a99cb030dd7220f93ac01"
+    },
+    "bundle-postgres-key-continuation.log": {
+      "bytes": 140,
+      "sha256": "13bdbe349afece6bf30a42f9b95a5aba9253f0af023de824472aabeb46a54a33"
+    },
+    "bundle-postgres-proof.json": {
+      "bytes": 434,
+      "sha256": "728037416703c1a079e6ddd3d898ec38e0de6a3d3f01485b407457db2e7f1194"
+    },
+    "bundle-sjt-continuation.json": {
+      "bytes": 1627,
+      "sha256": "57b5fa741bb5d9beadc1ee0a4cbd0d23e9f4698ca897351fbe719aed861b9c88"
+    },
+    "bundle-sjt-continuation.log": {
+      "bytes": 131,
+      "sha256": "bf677ed1b1264306a3bf3aa3b0491fa5d22767276425be00e03db5e33b447bfa"
+    },
+    "bundle-sjt-proof.json": {
+      "bytes": 185,
+      "sha256": "f441343e884d9d4da7f189a333937344acc1e0b536f111f1549bdd0ec4392c1d"
+    }
+  },
+  "mainfaIntegration": {
+    "main": "fa038041c47b275d30ccb8b8b01ab019615906e0",
+    "checkpoint": "9628a654f64e01c07095a77ab5bc408be8c8ddc4",
+    "teacherSubgroupBase": "ef2554926777363e5389fd281d17b15d832b0dd7",
+    "componentTrees": {
+      "backend": "4743d62a2e8de078e53e3b4a4b7acf7e571515e0",
+      "frontend": "7b00ad00d1f02666df497b268f9b27a28d3ff7aa"
+    },
+    "inheritedReviewFixes": [
+      "Teacher POST-success/GET-failure retained report with read-only retry, one new case passed on PR418.",
+      "School GROUP catalog/leaf selection respects existing parent/leaf contract; unsupported private composition GROUP not advertised, two new cases passed on PR414."
+    ],
+    "oldBundleChecksReexecuted": false,
+    "currentWholeComponentTypes": "NOTRUN for these new combined leaf trees; earlier60e3/6fbb receipts retain original-tree attribution. School base current component compilers are separate.",
+    "formalCiActivated": false,
+    "draftCreation": "Specific branch/base authorization received from user; retry only once at this natural checkpoint.",
+    "notion": "Progress kept in Git/local during Hui migration; no Qiang writes."
+  },
+  "mainf674DisclosedContract": {
+    "main": "f6740969b31f1154e3ffc1a23dd2406bd06a3634",
+    "sourceCheckpoint": "54d4344f0",
+    "retainedOriginalCompleted": 1,
+    "newSyntheticCompleted": 4,
+    "oneContract": "mainf674/disclosed-five-person-continuation.json:1PASS,3filtered",
+    "proof": "mainf674/disclosed-five-person-proof.json",
+    "disclosedScale": {
+      "N": 5,
+      "mean": 0.4,
+      "sdSample": 0.5477225575051662,
+      "snapshotReadCanonicalMaterializations": 0
+    },
+    "actualCoverage": "Scale disclosed multi-person generation/read now proved;Cognitive/SJT retain original single-parent metric/continuation evidence,not separately disclosed multi-person cases. Context still mandatory/no aggregation;Profile not aggregated. Independent legacy Assessment not connected.",
+    "firstFailure": "mainf674/disclosed-five-person.json:missing already-merged Training personal tracking column before new parent creation;original completed response not replayed",
+    "databaseRepair": "Existing isolated test DB applied four pending main migrations (Survey100000/100500,Training110000,Education120000);no new migration file,no reset,no production access. One unused synthetic enrollment from first fixture failure remains excluded from completed population;assignedN not invented.",
+    "types": {
+      "backendReceipt": "mainf674/backend-types.json",
+      "backendTree": "b1c57bf9195379ba0e45e59f9320a7411eb8b068",
+      "frontend": "unchanged c444887 main418 tree;no recompile"
+    },
+    "draftRoute": "Reuse existing group-report-draft scope-only route for exact leaf branch;one targeted control PASS;no Ready qualification,new workflow,PG/browser/shared-statistics replay.",
+    "newDraftAuthorization": "User specifically allowed existing leaf branch update and Draft to main;verify no duplicate before single authorized retry",
+    "mergeDeploy": false,
+    "rawMigrationLog": {
+      "transport": "lossless gzip",
+      "path": "mainf674/existing-main-migrations.log.gz",
+      "originalSHA256": "89f59aaadb1e80203c9fb7594b22301faa1178380b1837730974c2b95a393ab0",
+      "why": "Preserve original migration output including trailing whitespace without trimming"
+    },
+    "rawEvidence": {
+      "disclosed-five-person.log": {
+        "sha256": "6eec488fdd53ed2d1359cfa9d4414257cacfe4621fe12fbfd53f7d051cab63ce",
+        "bytes": 138
+      },
+      "disclosed-five-person-proof.json": {
+        "sha256": "be3ab77d220676fd9a083d252b44de923fa979bd63262c6dea005521562f32d8",
+        "bytes": 682
+      },
+      "backend-types.json": {
+        "sha256": "1eea91688198f706f8766e5778c98822de9e0556616411187af69578e2490530",
+        "bytes": 508
+      },
+      "disclosed-five-person.json": {
+        "sha256": "99d06a8ef153b8b655236e27a6fa58af79a97a28a140e6c9addd0b3f7f4ea8fa",
+        "bytes": 3581
+      },
+      "existing-main-migrations.log.gz": {
+        "sha256": "e3124be6d0125d24fb4de075d92da272b85cefd05c5310d7459423ced23421a0",
+        "bytes": 332
+      },
+      "disclosed-five-person-continuation.log": {
+        "sha256": "bdf8e8c4dc3410cf787810abf12febd3fefd74deec9da68b0ef79fd87d89e132",
+        "bytes": 151
+      },
+      "backend-types.log": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "disclosed-five-person-continuation.json": {
+        "sha256": "880303a1d33b7f2fb8400d7b3f98d41602d0339f39438f31e618d6f7e3eb69fe",
+        "bytes": 1936
+      },
+      "draft-scope-control.log": {
+        "sha256": "3b7e3494f90e30258136fe1d6f1860eddee16f46306d287d0a7e9a04121da0e2",
+        "bytes": 242
+      }
+    }
+  }
+}

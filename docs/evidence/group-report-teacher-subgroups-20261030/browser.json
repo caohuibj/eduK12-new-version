@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "actualTeacherAppAndEvaluationNavigation": true,
+  "syntheticAuthAndBackend": true,
+  "snapshotReadsAndOneExplicitGeneration": true,
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/auth/me"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/tool-authoring-capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/my-form-tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/my-private-form-tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/my-scale-tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/my-assessment-tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/units"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/members"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/roster-files/capabilities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-targets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/forms"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/run"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/forms/form/group-report/versions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/forms/form/group-report/versions/old"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/auth/csrf"
+    },
+    {
+      "method": "POST",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/forms/form/group-report/versions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/forms/form/group-report/versions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/forms/form/group-report/versions/old"
+    },
+    {
+      "method": "GET",
+      "path": "/api/huiteacher/organizations/school/evaluation-events/event/forms/form/group-report/versions/new"
+    }
+  ],
+  "checks": [
+    "real product admin navigation",
+    "initial saved version without generation",
+    "single staff-class selection and explicit POST",
+    "retained version GET",
+    "hidden counts retained",
+    "rounded zero percentage retained",
+    "multi-select denominator explanation",
+    "item switch",
+    "fullscreen",
+    "1440/390 report layout",
+    "print all items including withholding reasons; hide surrounding management UI"
+  ],
+  "noBackendOrProductionAuthorityClaim": true
+}

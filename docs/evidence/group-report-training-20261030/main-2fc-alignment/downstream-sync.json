@@ -1,0 +1,16 @@
+{
+  "headsAtSync": {
+    "408": "55ceb9c3d0c306e3632e0d9b20e604893b0dddf2",
+    "414": "2461d7b440fe184923589c8b0b6881bd823d6565",
+    "415": "a93c0cb55d57f858eabb00b63b142c60bf8b5b77",
+    "418": "fd488939c74972b6846eae67ce42f6939308125d"
+  },
+  "main": "2fccefaf838fe24c3d2ec3a63b32d016dbe18866",
+  "conflicts": false,
+  "Teacher418ComponentTreesUnchanged": {
+    "backend": "08e1af56b33962b0f9ec22c9db3973a164a7b7a2",
+    "frontend": "6fbb37e3f7e15a4b185a2a9b5b69a6bf69f0e103"
+  },
+  "replayedChecks": false,
+  "School414AndReader415CompleteTreeTypes": "Earlier product checkpoints retained. After upstream-only main alignment complete trees changed; no new exact-tree type claim, defer necessary compile to next final product freeze; changed behavior inputs remain separately reviewed."
+}

@@ -1,0 +1,34 @@
+{
+  "newResultCount": 0,
+  "retainedResultCount": 1,
+  "sameRuleMessageLocationAsSchool414": true,
+  "unchangedMainAssertion": " assert(job.includes('https://registry.npmjs.org'));assert(!job.includes('npm run build'));",
+  "findings": [
+    {
+      "ruleId": "js/incomplete-url-substring-sanitization",
+      "message": {
+        "text": "'[https://registry.npmjs.org](1)' can be anywhere in the URL, and arbitrary hosts may come before or after it."
+      },
+      "locations": [
+        {
+          "physicalLocation": {
+            "artifactLocation": {
+              "uri": ".github/scripts/onboarding-controls.test.mjs",
+              "uriBaseId": "%SRCROOT%",
+              "index": 0
+            },
+            "region": {
+              "startLine": 279,
+              "startColumn": 9,
+              "endColumn": 51
+            }
+          }
+        }
+      ],
+      "defaultLevel": "warning",
+      "securitySeverity": "7.8"
+    }
+  ],
+  "disposition": "Retain original unsuppressed finding. Assertion inspects workflow YAML text;not a runtime URL hostname decision. No changes to finding thresholds or source line.",
+  "notZeroFindingsClaim": true
+}

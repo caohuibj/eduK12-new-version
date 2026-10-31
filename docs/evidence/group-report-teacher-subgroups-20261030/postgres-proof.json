@@ -1,0 +1,18 @@
+{
+  "status": "PASSED_BY_RETAINED_STAGE_CONTINUATION",
+  "precedingCompletedAssertions": "postgres-scope-continuation.json; failure only at final revocation fixture update",
+  "actualNativeFormPublishedAndCompleted": 12,
+  "selectedClassN": 6,
+  "multiClassOrDedupN": 12,
+  "smallClassWithheld": true,
+  "sameRunOverlapBlocked": true,
+  "correctedReadInstrumentation": {
+    "rawReadQueries": 3,
+    "finalQueries": 0
+  },
+  "oldCaptionAndDigestFrozen": true,
+  "newVersionRetained": true,
+  "currentProductGrantRevocation": true,
+  "privateManifestNotReturned": true,
+  "productionAccessed": false
+}

@@ -11085,6 +11085,833 @@
           7
         ]
       }
+    },
+    "418": {
+      "schemaVersion": 1,
+      "product": "b4dd0f7be5d9e064534ad02d7a73b942d68efe23",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Unsigned original local evidence,not backfilled execution signatures.",
+          "Native stage continuation preserves all original fixture failures and preceding completed assertions;not a fresh full native lifecycle execution. No current migration/restore or production qualification claim.",
+          "Original browser uses actual TeacherApp with synthetic identity/API;directory-refresh repair separately covered by main8bc2-case original. No identical complete historical browser bundle claim.",
+          "Current component types executed once;no PG/browser/shared stats replay. Prior POST/GET generic mock repair and failed type/navigation originals retained."
+        ]
+      },
+      "reports": [
+        {
+          "id": "teacher-native-retained-final-stage",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/postgres-revocation-continuation.json",
+          "sha256": "2fcef78762a8825ad38345d0ef40b1a9e4864e38bd4487489bd93547f199d6d6",
+          "originalSourceAssociation": "9b3e29ed413865fd232cb01f59d2f9bfc2dd5c44",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+            "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+            "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+            "server-version/backend/src/modules/assessment-run/publish.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/assessment-run/repository.ts",
+            "server-version/backend/src/modules/assessment-run/run.controller.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/campus/activity.allocation.ts",
+            "server-version/backend/src/modules/campus/activity.run.routes.ts",
+            "server-version/backend/src/modules/campus/activity.runs.ts",
+            "server-version/backend/src/modules/campus/activity.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/personal-tracking.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+            "server-version/backend/src/modules/huiteacher/evaluation.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.routes.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale/scale-definition.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original last-stage continuation on retained real12 FINAL scene;earlier publication,subgroup,overlap and version assertions remain in failed scope report solely due final fixture revoke metadata. This last invocation validates corrected read instrumentation and revoked current grant,not a whole lifecycle replay.",
+          "deltaRationale": "All own native group/subgroup/privacy/cohort and versions implementation inputs retain reviewed original behavior. Upstream School/personal longitudinal changes are independently qualified;current shared Studio changes are draft-only removal and Next implementation re-export with same CLOSED Form GET/null contract. No original PG/browser/shared calculation replay. Exact changed whole component compiler inputs qualified once here.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "freezes real staff/tag subgroups, enforces the existing same-Form disclosure guard, and reopens native versions without FINAL work",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "teacher-versions-navigation-directory",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/main8bc/navigation-continuation.json",
+          "sha256": "3d1428175975192561f7eee155347235c999fb53a809b687e95317d6bc2cdd40",
+          "originalSourceAssociation": "478670cef348ce0c686bb889708fa4ddfbe12c14",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx",
+            "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/HuiteacherMyAssessmentTasks.tsx",
+            "server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx",
+            "server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx",
+            "server-version/frontend/src/modules/reporting/EducationPersonalTracking.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/EducationPersonalTracking.test.tsx",
+            "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx",
+            "server-version/frontend/src/pages/ScaleLongitudinalMetricChoice.tsx",
+            "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts",
+            "server-version/frontend/src/school/SchoolActivityManager.tsx",
+            "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx",
+            "server-version/frontend/src/school/SchoolStudentTasks.tsx"
+          ],
+          "sourceAssociationBasis": "Actual unsigned main8bc local2-case continuation after generic API fixture repair and diagnostic async wait;covers real product navigation/class generation/version reads and POST-success/directory-GET-failure behavior.",
+          "deltaRationale": "All own native group/subgroup/privacy/cohort and versions implementation inputs retain reviewed original behavior. Upstream School/personal longitudinal changes are independently qualified;current shared Studio changes are draft-only removal and Next implementation re-export with same CLOSED Form GET/null contract. No original PG/browser/shared calculation replay. Exact changed whole component compiler inputs qualified once here.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "keeps a successfully generated Teacher report when the directory refresh fails and retries only GET",
+              "status": "passed"
+            },
+            {
+              "fullName": "opens existing Teacher Form versions, explicitly generates one class report, and prints only its authorized rounded projection",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/backend-types.json",
+          "sha256": "75480f4577fde8ec45ff9a3f12f2142aff7cc1ecc874f371c691b3704b905187",
+          "component": "backend",
+          "componentTree": "2ea6fd8d6e44388995a9d8ca9d0ba6b51a68ea05",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/frontend-types.json",
+          "sha256": "d1828a3b3eb6fd7f5760371a498593ed7ef0f58c325eb56cdccdb64646d6bc55",
+          "component": "frontend",
+          "componentTree": "c444887f09c20c27d7ffbdd9a115786b65554a68",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-teacher-subgroups-20261030/mainc643/frontend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "browser",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/browser.json",
+          "sha256": "60ddefe79860b919d9be220f269ef363e49630f43cba6509e28e092477b83e0c",
+          "sourceAssociationBasis": "Original actual TeacherApp version selection,explicit class generation and print observation;current reader/versions behavior retained,shared upstream closed Form contract reviewed.",
+          "limitations": [
+            "Synthetic auth/backend;not native permission proof.",
+            "No browser replay;POST-success/directory-failure extension covered by the retained2-case unit/navigation original."
+          ]
+        },
+        {
+          "kind": "teacher-native",
+          "path": "docs/evidence/group-report-teacher-subgroups-20261030/postgres-proof.json",
+          "sha256": "5cc1e6b26ec75a91cad36bc2d6aa69bcd2e68f5029c26704677aa7ffca2c1b87",
+          "sourceAssociationBasis": "Actual retained native scene:12 published/start/FINAL participants,6-person staff class,12 dedup OR,existing overlap guard,old versions,corrected3 read queries/0 FINAL and revoked current product grant. Original staged failures preserved.",
+          "limitations": [
+            "Retained stage continuation,not a green rewrite of failed full original reports.",
+            "No PG replay,no migration/restore claim,no production data."
+          ]
+        }
+      ]
+    },
+    "419": {
+      "schemaVersion": 1,
+      "product": "bcfadfaa5fb9ecdbeb93f8a8e12cefc60dbbcd63",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Original local records are unsigned;old08ccad association is retrospective,not a backfilled execution signature.",
+          "Failed native key fixture,partial Cognitive/SJT naming fixture and current isolated-DB missing-column error remain in raw committed originals. Only real passed/filtered rows are admitted unchanged.",
+          "Disclosed multi-person native generation/read proof covers Scale N5. Cognitive has partial assertions in failed original and SJT its own single-parent continuation;neither is a new disclosed multi-person qualification.",
+          "No original application/PG/browser/shared calculation replay or physical cognitive timing claim. Frontend tree equals base;only the already current backend compiler receipt is consumed. No new migration/schema/dependency inputs introduced."
+        ]
+      },
+      "reports": [
+        {
+          "id": "bundle-frozen-bindings",
+          "path": "docs/evidence/group-report-leaf-sources-20261030/bundle-leaves.json",
+          "sha256": "25a89c0a671d4e8d3bda5054db6f501e53bd30dd50f99eb9432c36d73c63b0b9",
+          "originalSourceAssociation": "08ccad0645ac40da57d6dbf9b7bb78d0d472304e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+            "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+            "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+            "server-version/backend/src/modules/assessment-run/publish.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/assessment-run/repository.ts",
+            "server-version/backend/src/modules/assessment-run/run.controller.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/campus/activity.allocation.ts",
+            "server-version/backend/src/modules/campus/activity.run.routes.ts",
+            "server-version/backend/src/modules/campus/activity.runs.ts",
+            "server-version/backend/src/modules/campus/activity.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/personal-tracking.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+            "server-version/backend/src/modules/huiteacher/evaluation.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.routes.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale/scale-definition.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original binding unit case,associated retrospectively with retained08ccad source;not an execution signature.",
+          "deltaRationale": "Original binding/source/SJT adapter behavior remains exact;upstream personal/education/runtime source changes retain main qualification. Current disclosed N5 case exercises the current Training Bundle source chain. Later additions affect only the extra targeted test or controls/docs,not old fixture outcomes. Exact current backend tree receipt is reused;frontend equals main and is untouched. No old app/PG/browser replay.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "uses native frozen leaf bindings while keeping mandatory Context and Profile outside group metrics",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "bundle-native-small-n",
+          "path": "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-key-continuation.json",
+          "sha256": "21a99bddca5b696bc4081903f65830abae2f2d251c6a99cb030dd7220f93ac01",
+          "originalSourceAssociation": "08ccad0645ac40da57d6dbf9b7bb78d0d472304e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+            "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+            "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+            "server-version/backend/src/modules/assessment-run/publish.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/assessment-run/repository.ts",
+            "server-version/backend/src/modules/assessment-run/run.controller.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/campus/activity.allocation.ts",
+            "server-version/backend/src/modules/campus/activity.run.routes.ts",
+            "server-version/backend/src/modules/campus/activity.runs.ts",
+            "server-version/backend/src/modules/campus/activity.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/personal-tracking.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+            "server-version/backend/src/modules/huiteacher/evaluation.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.routes.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale/scale-definition.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned original native publication and mandatory Context+Scale+Cognitive+SJT completion;fixed malformed test bundleKey and continued retained publication. One respondent proves suppression and raw zero,not disclosed aggregation.",
+          "deltaRationale": "Original binding/source/SJT adapter behavior remains exact;upstream personal/education/runtime source changes retain main qualification. Current disclosed N5 case exercises the current Training Bundle source chain. Later additions affect only the extra targeted test or controls/docs,not old fixture outcomes. Exact current backend tree receipt is reused;frontend equals main and is untouched. No old app/PG/browser replay.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "consumes a real course Bundle leaf through existing source/statistics/artifact readers without Context or Profile aggregation",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "bundle-sjt-retained",
+          "path": "docs/evidence/group-report-leaf-sources-20261030/bundle-sjt-continuation.json",
+          "sha256": "57b5fa741bb5d9beadc1ee0a4cbd0d23e9f4698ca897351fbe719aed861b9c88",
+          "originalSourceAssociation": "08ccad0645ac40da57d6dbf9b7bb78d0d472304e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/prisma/migrations/20261030100000_survey_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030100500_survey_personal_tracking_guards/migration.sql",
+            "server-version/backend/prisma/migrations/20261030110000_training_personal_tracking/migration.sql",
+            "server-version/backend/prisma/migrations/20261030120000_education_personal_tracking/migration.sql",
+            "server-version/backend/prisma/schema.prisma",
+            "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+            "server-version/backend/src/__tests__/education-tools/native-cognitive-run-quota.test.ts",
+            "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+            "server-version/backend/src/__tests__/integration/educationLongitudinalLeafs.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationNativeLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/educationPrivateScaleExecutionFixture.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.browser.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPersonalLongitudinal.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingBundleLeafGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/trainingPersonalTracking.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/survey-content-selection.test.ts",
+            "server-version/backend/src/__tests__/measurement-content/training-metric-disclosure.test.ts",
+            "server-version/backend/src/__tests__/reporting/campus-protected-discovery.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-longitudinal-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-personal-changes-timing.test.ts",
+            "server-version/backend/src/__tests__/reporting/education-tracking-leafs.test.ts",
+            "server-version/backend/src/__tests__/reporting/personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/reporting/reporting-leaf-source.test.ts",
+            "server-version/backend/src/__tests__/reporting/training-personal-tracking.test.ts",
+            "server-version/backend/src/__tests__/survey/personal-tracking.postgres.integration.test.ts",
+            "server-version/backend/src/modules/anonymous-study/routes.ts",
+            "server-version/backend/src/modules/anonymous-study/service.ts",
+            "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+            "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+            "server-version/backend/src/modules/assessment-run/publish.ts",
+            "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+            "server-version/backend/src/modules/assessment-run/repository.ts",
+            "server-version/backend/src/modules/assessment-run/run.controller.ts",
+            "server-version/backend/src/modules/bundle-product/routes.ts",
+            "server-version/backend/src/modules/bundle-product/service.ts",
+            "server-version/backend/src/modules/campus/activity.allocation.ts",
+            "server-version/backend/src/modules/campus/activity.run.routes.ts",
+            "server-version/backend/src/modules/campus/activity.runs.ts",
+            "server-version/backend/src/modules/campus/activity.service.ts",
+            "server-version/backend/src/modules/campus/group-reports.ts",
+            "server-version/backend/src/modules/campus/personal-tracking.ts",
+            "server-version/backend/src/modules/campus/report.routes.ts",
+            "server-version/backend/src/modules/composite/composite.routes.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking-results.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.service.ts",
+            "server-version/backend/src/modules/composite/personal-tracking.ts",
+            "server-version/backend/src/modules/composite/training-content-binding.ts",
+            "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+            "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+            "server-version/backend/src/modules/education-tools/native-source.cognitive.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-contracts.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+            "server-version/backend/src/modules/huiteacher/assessmentRuntime.routes.ts",
+            "server-version/backend/src/modules/huiteacher/evaluation.service.ts",
+            "server-version/backend/src/modules/huiteacher/run.routes.ts",
+            "server-version/backend/src/modules/huiteacher/run.service.ts",
+            "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/routes.ts",
+            "server-version/backend/src/modules/questionnaire-product/service.ts",
+            "server-version/backend/src/modules/reporting/discovery.ts",
+            "server-version/backend/src/modules/reporting/education-personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/governedDisclosure.ts",
+            "server-version/backend/src/modules/reporting/personal-tracking.ts",
+            "server-version/backend/src/modules/reporting/resultSource.ts",
+            "server-version/backend/src/modules/reporting/teacher-personal-changes.service.ts",
+            "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+            "server-version/backend/src/modules/scale/scale-definition.ts",
+            "server-version/backend/src/modules/survey/measurement.result.ts",
+            "server-version/backend/src/modules/survey/participant-feedback.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.service.ts",
+            "server-version/backend/src/modules/survey/personal-tracking.ts",
+            "server-version/backend/src/modules/survey/public.routes.ts",
+            "server-version/backend/src/modules/survey/publication.service.ts",
+            "server-version/backend/src/modules/survey/tracking-source.ts",
+            "server-version/backend/src/modules/survey/waves.publish.ts",
+            "server-version/backend/src/modules/survey/waves.routes.ts",
+            "server-version/backend/src/modules/survey/waves.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned retained SJT-only continuation after public SJT vs internal SITUATIONAL fixture-name repair. Cognitive earlier partial assertions remain in a failed original;filtered Cognitive row is not promoted to passed.",
+          "deltaRationale": "Original binding/source/SJT adapter behavior remains exact;upstream personal/education/runtime source changes retain main qualification. Current disclosed N5 case exercises the current Training Bundle source chain. Later additions affect only the extra targeted test or controls/docs,not old fixture outcomes. Exact current backend tree receipt is reused;frontend equals main and is untouched. No old app/PG/browser replay.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "consumes a real course Bundle leaf through existing source/statistics/artifact readers without Context or Profile aggregation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "projects the retained native COGNITIVE leaf with its frozen metric identities",
+              "status": "skipped"
+            },
+            {
+              "fullName": "projects the retained native SJT leaf with its frozen metric identities",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "bundle-disclosed-five",
+          "path": "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-continuation.json",
+          "sha256": "880303a1d33b7f2fb8400d7b3f98d41602d0339f39438f31e618d6f7e3eb69fe",
+          "originalSourceAssociation": "54d4344f076e0c0dc2fdc000ee06ba64b66a6b47",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Actual selected one-case native generation/read on existing publication plus four new synthetic completions,after applying missing already-merged main migrations in isolated DB. Old first schema error retained;no existing response/browser replay.",
+          "deltaRationale": "Original binding/source/SJT adapter behavior remains exact;upstream personal/education/runtime source changes retain main qualification. Current disclosed N5 case exercises the current Training Bundle source chain. Later additions affect only the extra targeted test or controls/docs,not old fixture outcomes. Exact current backend tree receipt is reused;frontend equals main and is untouched. No old app/PG/browser replay.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 3
+          },
+          "cases": [
+            {
+              "fullName": "consumes a real course Bundle leaf through existing source/statistics/artifact readers without Context or Profile aggregation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "projects the retained native COGNITIVE leaf with its frozen metric identities",
+              "status": "skipped"
+            },
+            {
+              "fullName": "projects the retained native SJT leaf with its frozen metric identities",
+              "status": "skipped"
+            },
+            {
+              "fullName": "generates and reopens a disclosed five-person native Bundle Scale aggregate from retained publication",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-leaf-sources-20261030/mainf674/backend-types.json",
+          "sha256": "1eea91688198f706f8766e5778c98822de9e0556616411187af69578e2490530",
+          "component": "backend",
+          "componentTree": "b1c57bf9195379ba0e45e59f9320a7411eb8b068",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-leaf-sources-20261030/mainf674/backend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "bundle-native",
+          "path": "docs/evidence/group-report-leaf-sources-20261030/bundle-postgres-proof.json",
+          "sha256": "728037416703c1a079e6ddd3d898ec38e0de6a3d3f01485b407457db2e7f1194",
+          "sourceAssociationBasis": "Actual original native mandatory-input and exact leaf/source integration;N1 suppression only. Source key fixture failure preserved,not a fabricated single green first run.",
+          "limitations": [
+            "Synthetic isolated native fixture;not a current migration/restore result.",
+            "No new full native lifecycle replay or Profile/Context aggregation."
+          ]
+        },
+        {
+          "kind": "bundle-disclosed",
+          "path": "docs/evidence/group-report-leaf-sources-20261030/mainf674/disclosed-five-person-proof.json",
+          "sha256": "be3ab77d220676fd9a083d252b44de923fa979bd63262c6dea005521562f32d8",
+          "sourceAssociationBasis": "Actual current source disclosed Scale N5,mean.4,sample SD sqrt(.3),saved snapshot read equality and zero canonical rematerialization.",
+          "limitations": [
+            "Original publication/participant reused;only four necessary new synthetic completions.",
+            "Cognitive/SJT not independently proved as multi-person disclosed aggregates;no browser or production claim."
+          ]
+        }
+      ]
+    },
+    "420": {
+      "schemaVersion": 1,
+      "product": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "limitations": [
+          "Fresh local unsigned recovered-candidate evidence; old original local logs unavailable.",
+          "Official build/lint accepted only as successful steps in cancelled run41082809728 attempt1; whole-run qualification not claimed.",
+          "Local runtime clock is retained as emitted, not backdated; GitHub original timestamps unchanged.",
+          "No browser, PG, platform, baseline rebuild, deployment or merge verification."
+        ]
+      },
+      "reports": [
+        {
+          "id": "personal-chart-four-cases",
+          "path": "docs/evidence/personal-chart-loading-20261030/report-tests-results.json",
+          "sha256": "af4976cb6553c54a70ac6820fce54fd5eda863e6272c04c625335c1539e8cd6d",
+          "originalSourceAssociation": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Complete frontend tree unchanged since exact fresh execution.",
+          "sourceAssociationBasis": "Actual execution remained local f4fa39bdb98d3d6984538b45de5797a46b52bda5. Remote comparison anchor dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1 has identical full git tree cfc70c7f34d96cb40fcd50e715e9c9d3e7762480 (fetched and verified). originalSourceAssociation is only this retrievable comparison anchor; original report/command receipt bytes and timestamps are unchanged, not a remote execution.",
+          "cases": [
+            {
+              "fullName": "personal changes chart loading loads no chart for waiting feedback and preserves numeric content during chart loading",
+              "status": "passed"
+            },
+            {
+              "fullName": "Personal changes report shows a disclosed wholly missing metric and its release/validity notes",
+              "status": "passed"
+            },
+            {
+              "fullName": "Personal changes report keeps zero, actual dates, signed baseline differences and a missing-wave note",
+              "status": "passed"
+            },
+            {
+              "fullName": "Personal changes report shows eligibility in the report response without a separate request",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "actualLocalExecutionSource": "f4fa39bdb98d3d6984538b45de5797a46b52bda5"
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/personal-chart-loading-20261030/frontend-types-qualified.json",
+          "sha256": "ba0591d839148b402803798736fa6c51d1c216e8c1a0a2bba4d09e67d0df28b5",
+          "component": "frontend",
+          "componentTree": "8d7f9214106aa965d1379b75464136d7cc5b90e5",
+          "exitField": "exitCode",
+          "log": "docs/evidence/personal-chart-loading-20261030/frontend-types-qualified.log"
+        }
+      ],
+      "executionSourceMapping": {
+        "actualLocalExecutionSource": "f4fa39bdb98d3d6984538b45de5797a46b52bda5",
+        "remoteComparisonAnchor": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+        "identicalFullTree": "cfc70c7f34d96cb40fcd50e715e9c9d3e7762480",
+        "basis": "Fetched remote commit and compared full git tree to actual local execution commit. Remote anchor is a comparison identity, NOT the original execution SHA; original receipts/report bytes and times unchanged."
+      }
+    },
+    "422": {
+      "schemaVersion": 1,
+      "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Original reports are unsigned;source49538293f association is retrospective,not a reconstructed execution signature.",
+          "Before the first native run no complete source receipt was captured. The sole subsequent application delta is archived-task catalog/read-only support;the dedicated archive case passed afterward. Complete final backend type inputs were captured before/after compilation.",
+          "Original unit fixture startup and control assertion failures remain in raw evidence;zero-case startup failure is not promoted to passed. Exactly4 distinct passed application cases;duplicate earlier unit successes and filtered five-person row are not counted again.",
+          "Backend types are exact tree3981ae7a7afa5716834f69315b708075b93c6c76. Frontend/schema/migrations/locks equal main;no old81/175/41 application,PG,browser or Cognitive timing replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "standalone-unit",
+          "path": "docs/evidence/group-report-training-standalone-20261030/unit-current.json",
+          "sha256": "aeebfb57caaefdbc9841df9ddac0a97fed032f0dcb5ae9f15757ed224a5e22a0",
+          "originalSourceAssociation": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Two actual current adapter cases; exact final backend type manifest retained. Unsigned output,retrospective association with product49538293f,not an execution signature.",
+          "deltaRationale": "Product49538293f is the explicit retrospective reference point for these raw outputs;formal follow-up changes controls only. Original native source-capture limitation and the exact post-first-run archive delta are disclosed in the committed README. No claim that unsigned originals were signed or executed at a Git commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "selects the completed session first, preserves zero and missing, and respects persisted report visibility",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps protocol, Profile and published units separate instead of pooling incompatible values",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "standalone-native-five",
+          "path": "docs/evidence/group-report-training-standalone-20261030/postgres-first.json",
+          "sha256": "537247cf7ba156fb5bc321522b0cc51863f26b1b7b616ec15b620cc92243c107",
+          "originalSourceAssociation": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Actual standalone publication,5 legitimate synthetic final submissions,generation and stored read. Execution preceded only archived-catalog/read-only support and a second test addition;the PUBLISHED generation and frozen reader behavior did not change. Original pre-execution full source inventory was not captured;association with49538293f is retrospective,not an exact execution signature.",
+          "deltaRationale": "Product49538293f is the explicit retrospective reference point for these raw outputs;formal follow-up changes controls only. Original native source-capture limitation and the exact post-first-run archive delta are disclosed in the committed README. No claim that unsigned originals were signed or executed at a Git commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "generates a disclosed standalone Cognitive course report and reopens its frozen version without reading result payloads",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "standalone-archived",
+          "path": "docs/evidence/group-report-training-standalone-20261030/postgres-archive.json",
+          "sha256": "804ee3c5f64e50385c85ed12fd1cc94065e6f1756db34088bf5f93275d545eaa",
+          "originalSourceAssociation": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Actual one-case continuation on the retained generated artifact after adding archived state support;the original five-person test remained filtered and was not replayed. Current backend tree manifest later captured unchanged complete inputs.",
+          "deltaRationale": "Product49538293f is the explicit retrospective reference point for these raw outputs;formal follow-up changes controls only. Original native source-capture limitation and the exact post-first-run archive delta are disclosed in the committed README. No claim that unsigned originals were signed or executed at a Git commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "generates a disclosed standalone Cognitive course report and reopens its frozen version without reading result payloads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps an archived standalone task and its original version reachable while disabling generation",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-training-standalone-20261030/backend-types.json",
+          "sha256": "620fac6ab8286bec16ea1f3e45348708aa2a530ba26330bb050d0ed4957b10f9",
+          "component": "backend",
+          "componentTree": "3981ae7a7afa5716834f69315b708075b93c6c76",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-training-standalone-20261030/backend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "standalone-cognitive",
+          "path": "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-proof.json",
+          "sha256": "ecf8d2f9625906adb8647252fde1116c2f250631adf381d7cf38672f1df7366b",
+          "sourceAssociationBasis": "Actual isolated native observation corroborated by the corresponding unchanged raw reporter;no result/answer replay in CI.",
+          "limitations": [
+            "Synthetic local database,not production or performance evidence.",
+            "Original receipts unsigned;first native full source inventory was not captured at execution time."
+          ]
+        },
+        {
+          "kind": "standalone-archived",
+          "path": "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-archived-proof.json",
+          "sha256": "f0df726f176762ef32707c731b3f949246105bdf1444c7db4ab6a4d47f50a99c",
+          "sourceAssociationBasis": "Actual isolated native observation corroborated by the corresponding unchanged raw reporter;no result/answer replay in CI.",
+          "limitations": [
+            "Synthetic local database,not production or performance evidence.",
+            "Original receipts unsigned;first native full source inventory was not captured at execution time."
+          ]
+        }
+      ]
     }
   }
 }

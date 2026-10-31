@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "kind": "SJT",
+  "metricKeys": [
+    "bfi2.assertiveness.behavior"
+  ],
+  "numericObservations": 1,
+  "reusedCompletedParent": true,
+  "newAdministration": false
+}

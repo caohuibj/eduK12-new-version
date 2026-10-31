@@ -1,0 +1,14 @@
+{
+  "artifact": 12984902346,
+  "downloadedBytes": 1541,
+  "officialSHA256": "d8e10f9a567eefd467f3ff8e3522a050072f5d9a91c68849d3e05b8467c7d3a8",
+  "actualSHA256": "d8e10f9a567eefd467f3ff8e3522a050072f5d9a91c68849d3e05b8467c7d3a8",
+  "sourceHead": "b3e9f35bac2700200c3b099a52ba11a4e74ae34e",
+  "preview": "b2c1e012dc409ab08bd786f09b70f3bd00b76685",
+  "tree": "54319869523c4dd66b85f6358edb68cfdc7f65ed",
+  "distinctNavigationCases": 1,
+  "frontendTypeReceipts": 1,
+  "browserObservations": 1,
+  "testsExecutedInCI": false,
+  "backendTypeOrPgReplay": false
+}
