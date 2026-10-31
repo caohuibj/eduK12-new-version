@@ -1,0 +1,727 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "cogest",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Project-original G3; computed locally from committed 36-item form, cross-checked accuracy=1/0, median=500/null, timeout=0/36; not live administration",
+  "cases": [
+    {
+      "name": "all-correct",
+      "input": {
+        "config": {
+          "totalTrials": 36,
+          "stimulusSetVersion": "cogest-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "ce11-01",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "ce11-02",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "ce11-03",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "ce11-04",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "itemId": "ce11-05",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "itemId": "ce11-06",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "itemId": "ce11-07",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "itemId": "ce11-08",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "itemId": "ce11-09",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "itemId": "ce11-10",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "itemId": "ce11-11",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "itemId": "ce11-12",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "itemId": "ce11-13",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "itemId": "ce11-14",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "itemId": "ce11-15",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "itemId": "ce11-16",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "itemId": "ce11-17",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "itemId": "ce11-18",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "itemId": "ce11-19",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "itemId": "ce11-20",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "itemId": "ce11-21",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "itemId": "ce11-22",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "itemId": "ce11-23",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "itemId": "ce11-24",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "itemId": "ce11-25",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "itemId": "ce11-26",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "itemId": "ce11-27",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "itemId": "ce11-28",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "itemId": "ce11-29",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "itemId": "ce11-30",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "itemId": "ce11-31",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "itemId": "ce11-32",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "itemId": "ce11-33",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "itemId": "ce11-34",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "itemId": "ce11-35",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "itemId": "ce11-36",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianRtMs": 500,
+          "errorCount": 0,
+          "timeoutCount": 0,
+          "validRtCount": 36
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "all-timeout",
+      "input": {
+        "config": {
+          "totalTrials": 36,
+          "stimulusSetVersion": "cogest-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "ce11-01",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "ce11-02",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "ce11-03",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "ce11-04",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "itemId": "ce11-05",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "itemId": "ce11-06",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "itemId": "ce11-07",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "itemId": "ce11-08",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "itemId": "ce11-09",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "itemId": "ce11-10",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "itemId": "ce11-11",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "itemId": "ce11-12",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "itemId": "ce11-13",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "itemId": "ce11-14",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "itemId": "ce11-15",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "itemId": "ce11-16",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "itemId": "ce11-17",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "itemId": "ce11-18",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "itemId": "ce11-19",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "itemId": "ce11-20",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "itemId": "ce11-21",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "itemId": "ce11-22",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "itemId": "ce11-23",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "itemId": "ce11-24",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "itemId": "ce11-25",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "itemId": "ce11-26",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "itemId": "ce11-27",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "itemId": "ce11-28",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "itemId": "ce11-29",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "itemId": "ce11-30",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "itemId": "ce11-31",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "itemId": "ce11-32",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "itemId": "ce11-33",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "itemId": "ce11-34",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "itemId": "ce11-35",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "itemId": "ce11-36",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "accuracy": 0,
+          "medianRtMs": null,
+          "errorCount": 0,
+          "timeoutCount": 36,
+          "validRtCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": true,
+          "lowAccuracy": true,
+          "interrupted": false
+        }
+      }
+    }
+  ]
+}
