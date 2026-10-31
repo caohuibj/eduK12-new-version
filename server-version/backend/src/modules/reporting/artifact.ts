@@ -206,7 +206,8 @@ export const createOrReuseReportingArtifact = async (input: {
   snapshotHash: string
   generatedByUserId: string
   generatedAt: Date
-}): Promise<ReportingGroupArtifactRecord> => prisma.$transaction(async (tx) => {
+}, tx?: Tx): Promise<ReportingGroupArtifactRecord> => {
+ const persist = async (tx: Tx): Promise<ReportingGroupArtifactRecord> => {
   const rows = await tx.$queryRaw<ArtifactRow[]>`
     INSERT INTO "reporting_analysis_artifacts"
       ("id","organization_id","analysis_kind","policy_domain","cohort_snapshot_id","spec_id","analysis_identity_hash","artifact_payload","snapshot_hash","generated_by_user_id","generated_at")
@@ -231,7 +232,9 @@ export const createOrReuseReportingArtifact = async (input: {
   const existing = await verifyStored(tx, await readByIdentity(tx, input.analysisIdentityHash))
   if (existing.analysisKind !== 'GROUP') reportingFail('REPORT_ANALYSIS_REUSE', 'analysis identity collides with a different artifact kind', 500)
   return existing as ReportingGroupArtifactRecord
-}, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+ }
+ return tx ? persist(tx) : prisma.$transaction(persist, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted })
+}
 
 export const createOrReuseLongitudinalReportingArtifact = async (input: {
   organizationId: string
