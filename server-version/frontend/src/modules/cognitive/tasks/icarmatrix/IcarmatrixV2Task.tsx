@@ -1,5 +1,5 @@
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { IcarmatrixV2Config, IcarmatrixV2TrialPayload } from '../../types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
@@ -31,6 +31,9 @@ export const IcarmatrixV2Task: React.FC<CognitiveTaskProps> = ({ taskContext, tr
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
   const submittingRef = useRef(false)
+  // An older async acknowledgement must not reset a newer trial.
+  const committedTrialIndexRef = useRef(trialIndex)
+  useLayoutEffect(() => { committedTrialIndexRef.current = trialIndex }, [trialIndex])
   const pendingTrialRef = useRef<IcarmatrixV2TrialPayload | null>(null)
   const submittedTrialRef = useRef(false)
   const [retryPending, setRetryPending] = useState(false)
@@ -81,6 +84,7 @@ export const IcarmatrixV2Task: React.FC<CognitiveTaskProps> = ({ taskContext, tr
     try {
       if (!submittedTrialRef.current) {
         const accepted = await onTrialComplete(pendingTrialRef.current)
+        if (committedTrialIndexRef.current !== trialIndex) return
         if (accepted === false) {
           setFormalFeedback('提交失败，请重试保存本题')
           setRetryPending(true)
@@ -89,12 +93,15 @@ export const IcarmatrixV2Task: React.FC<CognitiveTaskProps> = ({ taskContext, tr
         submittedTrialRef.current = true
       }
       if (trialIndex + 1 >= totalTrials) await onTaskComplete?.()
+      if (committedTrialIndexRef.current !== trialIndex) return
       pendingTrialRef.current = null
       submittedTrialRef.current = false
       setFormalFeedback('已记录，下一题准备中')
     } catch {
-      setFormalFeedback('网络或保存异常，请重试保存本题')
-      setRetryPending(true)
+      if (committedTrialIndexRef.current === trialIndex) {
+        setFormalFeedback('网络或保存异常，请重试保存本题')
+        setRetryPending(true)
+      }
     } finally {
       submittingRef.current = false
     }

@@ -45,7 +45,7 @@ const practiceCorrectDisplay = (): number => {
 }
 
 const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
-  render(<IcarmatrixV2Task taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} onTaskComplete={vi.fn().mockResolvedValue(undefined)} />)
+  const view = render(<IcarmatrixV2Task taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} onTaskComplete={vi.fn().mockResolvedValue(undefined)} />)
   fireEvent.click(screen.getByText('开始练习'))
   await act(async () => { vi.advanceTimersByTime(300) })
   fireEvent.click(screen.getAllByRole('button', { name: /练习选项/ })[practiceCorrectDisplay()])
@@ -53,6 +53,7 @@ const enterFormal = async (onTrialComplete: ReturnType<typeof vi.fn>) => {
   fireEvent.click(screen.getByText('开始正式测评'))
   await act(async () => {})
   await act(async () => { vi.advanceTimersByTime(400) })
+  return view
 }
 
 describe('IcarmatrixV2Task', () => {
@@ -78,6 +79,25 @@ describe('IcarmatrixV2Task', () => {
         expect(realSvgs.has(svg)).toBe(false)
       }
     }
+  })
+
+  it('ignores a late acknowledgement after the parent advances to the next trial', async () => {
+    let acknowledge!: (accepted: boolean) => void
+    const pending = new Promise<boolean>((resolve) => { acknowledge = resolve })
+    const onTrialComplete = vi.fn().mockReturnValueOnce(pending).mockResolvedValueOnce(true)
+    const view = await enterFormal(onTrialComplete)
+    fireEvent.click(screen.getByLabelText('选项 1'))
+    await act(async () => { view.rerender(
+      <IcarmatrixV2Task taskContext={context} trialIndex={1}
+        onTrialComplete={onTrialComplete} onTaskComplete={vi.fn().mockResolvedValue(undefined)} />
+    ) })
+    await act(async () => { acknowledge(true); await Promise.resolve() })
+    await act(async () => { vi.advanceTimersByTime(400) })
+    expect(screen.getByText('第 2 / 2 题')).toBeTruthy()
+    fireEvent.click(screen.getByLabelText('选项 1'))
+    await act(async () => { vi.advanceTimersByTime(0) })
+    expect(onTrialComplete).toHaveBeenCalledTimes(2)
+    expect(onTrialComplete.mock.calls[1][0].trialIndex).toBe(1)
   })
 
   it('preserves the original trial payload on a failed-save retry', async () => {
