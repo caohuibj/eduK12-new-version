@@ -8297,6 +8297,203 @@
         }
       }
     },
+    "448": {
+      "schemaVersion": 1,
+      "pr": 448,
+      "enabled": true,
+      "base": "92e398025fb6fbefe1b051520cf5507295173859",
+      "product": "742630c5a53955a83784c0e4635868ffbeafa0ea",
+      "controlCheckpoint": "f129b673d0e05becbfa0765d4db4b09fad438a2e",
+      "components": {
+        "backend": "4dfcd69abc6d086f68463e71488ad88dad61e1e7",
+        "frontend": "aaacedc9b62bb21e801b3a0d66507636646f3a88"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "e111fd0471510343a1d5f09b6eff0da85e26c444",
+        ".github/scripts/onboarding-checks.mjs": "aaecb88d852a978b6c44f6426a591e658b188509",
+        ".github/scripts/onboarding-controls.test.mjs": "f8df0ddbf98c47469d50c517205ff13e9b008b4a",
+        ".github/scripts/onboarding-evidence.json": "025cca3e478b8ecf2d6d051a85f5bc9f06596fd3",
+        ".github/scripts/onboarding-scope.mjs": "d8a60b4033491e744b9570c5f95785fa419c8cc8",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "85e8a951a0d94cb159b832824815a9894f8a7a99"
+      },
+      "source": {
+        "docs/performance/o12-o13-b-20261031/README.md": {
+          "before": null,
+          "after": "4899a1f9e7cef9e11f7cf4dc07e27dd331ef2e99"
+        },
+        "docs/performance/o12-o13-b-20261031/a-file-ownership.json": {
+          "before": null,
+          "after": "a711e31e677605035c99ea42c158d04acfe7aadb"
+        },
+        "docs/performance/o12-o13-b-20261031/binding.json": {
+          "before": null,
+          "after": "42e629b6a11fb4a28c0fd101a09f390b0e34cbb9"
+        },
+        "docs/performance/o12-o13-b-20261031/derive-ledger.py": {
+          "before": null,
+          "after": "e88bd79ad1d81fb15f196330e1ea8a33c41f7243"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/execution.json.gz": {
+          "before": null,
+          "after": "96845cfa701709a515344844b6da91b60ed78001"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/migrate.log.gz": {
+          "before": null,
+          "after": "1a8a820696b36fb0498d11a316d9dbbbf9e8a809"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/postgres-start.log.gz": {
+          "before": null,
+          "after": "51a1f6c4e5063073022add6c7900a2b2eeb113b4"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/postgres-stop.log.gz": {
+          "before": null,
+          "after": "1c3dbf4a78bb772a36a0e78c5cc1376658267b5e"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/prisma-generate.log.gz": {
+          "before": null,
+          "after": "2191eba645b94a4235148ba950af6d1c9bb864dc"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/runtime-acl.log.gz": {
+          "before": null,
+          "after": "6e3adeafcfcd49c26fb28c02c83f4c7b8cbffe11"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r1/runtime-role.log.gz": {
+          "before": null,
+          "after": "bb8899f18cfe4d6044cd36f43281c198d32777d9"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/artifact-policy.json.gz": {
+          "before": null,
+          "after": "ac02735a528ea01c33f1df3aecb94f6af5139299"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/artifact-policy.log.gz": {
+          "before": null,
+          "after": "a07f324f1fa34f883db37813bc65f0e373d9f911"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/catalog.log.gz": {
+          "before": null,
+          "after": "490eb569d2012b62625d8f2a515dd7a93282a8e0"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/execution.json.gz": {
+          "before": null,
+          "after": "962e21209da52c4352838a1c1852c92f51fbafe6"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/migrate.log.gz": {
+          "before": null,
+          "after": "1a8a820696b36fb0498d11a316d9dbbbf9e8a809"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/postgres-start.log.gz": {
+          "before": null,
+          "after": "0c6f2d17655b542518326db14279f5f85cc6f001"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/postgres-stop.log.gz": {
+          "before": null,
+          "after": "1c3dbf4a78bb772a36a0e78c5cc1376658267b5e"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/read.json.gz": {
+          "before": null,
+          "after": "82dff0eb6b766ac28bb63e851649bbee2bc96ea0"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/read.log.gz": {
+          "before": null,
+          "after": "049de29bcb89ab80cab0be9e1048d9f3a6146f02"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/runtime-acl.log.gz": {
+          "before": null,
+          "after": "e076a2cdd93ff5d5c14a9a6a78c5d0c8d50a7a3b"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/runtime-role.log.gz": {
+          "before": null,
+          "after": "bb8899f18cfe4d6044cd36f43281c198d32777d9"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/seed.json.gz": {
+          "before": null,
+          "after": "77c741705fcba9cb6e80456710dd3715a78bbd23"
+        },
+        "docs/performance/o12-o13-b-20261031/evidence/authority-r2/seed.log.gz": {
+          "before": null,
+          "after": "1b9f27127fe57f68b134923171f38e1c654db153"
+        },
+        "docs/performance/o12-o13-b-20261031/inspect-resource-defaults.py": {
+          "before": null,
+          "after": "36cbc0c2c713cc9c368876e681e8d38eae209672"
+        },
+        "docs/performance/o12-o13-b-20261031/ledger-derived.json": {
+          "before": null,
+          "after": "d678ded88c707aa89c9702bca69365ab92298a56"
+        },
+        "docs/performance/o12-o13-b-20261031/observe-authority.mts": {
+          "before": null,
+          "after": "4651a3e8b3832e728b1752ece0c55fd8846aaeb2"
+        },
+        "docs/performance/o12-o13-b-20261031/probe-runtime-artifact.mts": {
+          "before": null,
+          "after": "f2badd0df5ca2038d5444c805dbd102cc2b13d42"
+        },
+        "docs/performance/o12-o13-b-20261031/production-readonly-snapshot.sql": {
+          "before": null,
+          "after": "494c7b027b87ee42204daf1dabe25b7de4c07e19"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "01a5aaab7ea589256b6d2104c7db484d379b8042"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "0c87dcac40f78124ded3264be23078503e160516"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "a1d53935ec806ecfba7e711f4011caa4da050e2b"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/policy-contract-execution.json": {
+          "before": null,
+          "after": "6a9e7e84bab73ab306e63469f281ed7d29d8c8a4"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/policy-contract.json": {
+          "before": null,
+          "after": "0a556c7efbef8b36318dba65ddc8e463f97a4b6f"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/policy-contract.log": {
+          "before": null,
+          "after": "c5a84326809283a8c369f207f5afb612670311ae"
+        },
+        "docs/performance/o12-o13-b-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "3ea1513a1f3e578b333916d3986d2dc1c26f3672"
+        },
+        "docs/performance/o12-o13-b-20261031/resource-defaults.json": {
+          "before": null,
+          "after": "8a58df8169a36ef821dac58daea20dc8c1562461"
+        },
+        "docs/performance/o12-o13-b-20261031/run-observer.py": {
+          "before": null,
+          "after": "75e6526bbaadf45d58c51c5109c70b06089234f9"
+        },
+        "server-version/backend/scripts/runtime-table-policy.json": {
+          "before": "bb703b167ab21ed990031021d6e8d0bca1124d58",
+          "after": "a407d68f8154cf0072dc8355ab6ed6d971ea7a1f"
+        }
+      }
+    },
     "449": {
       "schemaVersion": 1,
       "pr": 449,

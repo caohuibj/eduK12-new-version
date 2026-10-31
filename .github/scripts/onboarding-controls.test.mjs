@@ -208,7 +208,7 @@ test('PR381 binds the two frontend files, exact evidence and unchanged backend w
  }
  for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:BRANCHES[380]},{CI_PR_NUMBER:'380'},{CI_FORCE_FULL:'true'},{CI_SOURCE_HEAD:h('9')}]){
   const read=(cmd,a,...rest)=>a===h('9')+'^{tree}'?h('9'):f.read(cmd,a,...rest);
-  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b));
+  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b),error=>error instanceof assert.AssertionError&&(!patch.CI_SOURCE_HEAD||/Source\/merge tree drift/.test(error.message)));
  }
  assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...rest),env,b));
  assert.throws(()=>onboardingPlan([...entries,{file:'unknown',newMode:'100644'}],base,head,f.read,env,b));
@@ -680,4 +680,27 @@ test('PR444 exact qualifier preserves required component scope and rejects unkno
  const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,444);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
  for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
  const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+test('PR448 exact qualifier preserves required component scope and rejects unknown paths',()=>{
+ const f=fixture(),paths=["server-version/backend/scripts/runtime-table-policy.json"];
+ f.b.pr=448;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'448',CI_HEAD_REF:BRANCHES[448]};
+ const read=f.read;
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,448);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.filter(path=>/\.(?:[cm]?js|tsx?)$/.test(path)).sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'435'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,read,{...f.env,...patch},f.b));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+
+
+test('PR448 integration preserves existing 445 and 449 registry dispatch and frontend-only scope',()=>{
+ for(const [id,path]of [[445,'server-version/frontend/src/pages/student/ScaleResult.tsx'],[449,'server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx']]){
+  const f=fixture(),candidate={...f.b,pr:id,source:{[path]:{before:null,after:blob}}};
+  const entries=[path,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+  const env={...f.env,CI_PR_NUMBER:String(id),CI_HEAD_REF:BRANCHES[id]};
+  const registry={...f.b,candidates:{[String(id)]:candidate}};
+  const read=(cmd,a,...rest)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('8'):f.read(cmd,a,...rest);
+  assert.equal(onboardingPlan(entries,base,head,read,env,registry).pr,id);
+  const changedBackend=(cmd,a,...rest)=>cmd==='rev-parse'&&a.endsWith(':server-version/backend')&&a!==base+':server-version/backend'?h('9'):read(cmd,a,...rest);
+  assert.throws(()=>onboardingPlan(entries,base,head,changedBackend,env,{...registry,candidates:{[String(id)]:{...candidate,components:{...candidate.components,backend:h('9')}}}}),/Frontend loading must not change backend/);
+ }
 });
