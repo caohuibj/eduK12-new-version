@@ -1,0 +1,29 @@
+{
+  "base": "194bb91f9af4feb62d9ed384813e7abf0643c2e8",
+  "product": "eeab09a8f23640c56154352c74cd149ac51afd02",
+  "productTree": "19fe094d0a1511fff1019e0687039452b9802fa8",
+  "backend": "06cea014b3dbc8915a3c7cf1a0e011ca568d9a2b",
+  "frontend": "109c8f913f4458247495cb8e9a77d1d63b3cf9b8",
+  "frontendUnchanged": true,
+  "original23ObjectsUnchanged": true,
+  "original16CompressedHashesVerified": true,
+  "distinctCases": [
+    "teacher variant batch report job projection reads saved reports with only the frozen job binding and report ciphertext",
+    "teacher variant batch report job projection keeps owner and exact frozen-version refusals before publishing saved reports",
+    "variant report page canonical batches loads selected typed snapshots once for a multi-person teacher report page"
+  ],
+  "originalInputSHA256Matches": {
+    "server-version/backend/src/modules/composite/composite.service.ts": "01818702bf4039ce89a27115f195b875d974bedd6483fb4bcb8e163f52be88d3",
+    "server-version/backend/src/__tests__/composite/training-variant-export.test.ts": "647d46ed2c0dd12d8c5e1a3ba1660839b84062aaee3368e5d1045e0c8d18e24d",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/package.json": "eb9818ccb8e7797f201d86d20752aa23bb3c13685d4660ec395f4f905a28f87a",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc"
+  },
+  "currentBETypeExit": 0,
+  "newControlContractExit": 0,
+  "old31AndRootRetained": true,
+  "formalCI": "NOTRUN",
+  "remoteChanges": "NONE",
+  "originalLocalProduct": "8ac79da2950df85784b738195fcfb3eb129b2909"
+}

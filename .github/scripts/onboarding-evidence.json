@@ -17192,6 +17192,318 @@
         "originalEightCasesRerun": false,
         "originalLintRerun": false
       }
+    },
+    "450": {
+      "schemaVersion": 1,
+      "product": "eeab09a8f23640c56154352c74cd149ac51afd02",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Retained actual Vitest originals plus fresh exact current-backend compiler receipt",
+        "limitations": [
+          "3different original successful assertions:2newdirect+1existingconsumer; no PG/lifecycle/FINAL or application case replay.",
+          "Original R1fixtureFAIL and corrected R2projectionFAIL retained; only successful candidate and consumer original reporters admitted.",
+          "Original B copied dependency follow-redirects1.16.1 differs from lock1.16.2; this historical constraint remains. Fresh exact compiler used isolated lock-patched1.16.2 copy/current generated client, without full installed-byte attestation.",
+          "PG diagnostic query replay is separately reviewed synthetic evidence, not Jest or a live authority/production throughput test."
+        ]
+      },
+      "reports": [
+        {
+          "id": "candidate-original-two",
+          "path": "docs/performance/variant-report-job-projection-20261031/evidence/candidate.json.gz",
+          "sha256": "9a11cfaf6855cbc341328db34366cb8d745239a106eedab93864887e27858766",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 25
+          },
+          "cases": [
+            {
+              "fullName": "teacher variant batch report job projection reads saved reports with only the frozen job binding and report ciphertext",
+              "status": "passed"
+            },
+            {
+              "fullName": "teacher variant batch report job projection keeps owner and exact frozen-version refusals before publishing saved reports",
+              "status": "passed"
+            },
+            {
+              "fullName": "weighted variant export scope exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope retains variant provenance and strata in the same CSV/ZIP artifact dictionary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope previews count the full exact scope while sampling rows",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for allocation drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for slot drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for publication drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for definition drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope provides usable stratified administration counts without reading answers or excluding uncompleted attempts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope rejects cached report provenance or union leakage before compact source reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope invalidates artifact identity when either frozen configuration or publication changes",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers counts and exports only selected current-epoch unified cognitive raw trials without zero filling another group",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers full preview loads bounded selected raw and preserves fractional values without a missing-raw fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers preflights combined scoped legacy and unified trial bounds before raw source reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on missing unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on duplicate unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on epoch unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on encoding unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on count unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers resolves shared FSP2 plans in one batch for all selected attempts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers history filters unselected and old-epoch child rows before counts and result parsing",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches loads selected typed snapshots once for a multi-person teacher report page",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches rejects parent drift in a batched typed source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches rejects epoch drift in a batched typed source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches rejects section drift in a batched typed source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "history rejects draft-only variant metadata instead of treating it as ordinary history",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "teacher variant batch report job projection reads saved reports with only the frozen job binding and report ciphertext",
+            "teacher variant batch report job projection keeps owner and exact frozen-version refusals before publishing saved reports"
+          ],
+          "originalSourceAssociation": "64fa9e53aa2da3b4077ff22a5edec5f16252e467",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/cognitive/assignment-course-scope.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/form-sections-units.test.ts",
+            "server-version/backend/src/__tests__/scale/available-course.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/controllers/scaleController.ts",
+            "server-version/backend/src/modules/cognitive/assignment.service.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.controller.ts"
+          ],
+          "sourceAssociationBasis": "Actual original unsigned Vitest reporters are retained byte-for-byte: gzip original and lossless extraction of rawReporterUTF8 embedded in original binding.json with its original SHA256. Original source/test/config/lock/schema hashes match delivered64fa9e53 and this integrated product. No process signature or complete contemporaneous module-load/install-byte attestation is claimed.",
+          "deltaRationale": "Original2direct product/test files and all6original recorded input hashes remain unchanged. Earlier course-target/controller and manager endpoint changes do not enter these direct service mock fixtures; no query selection, job report binding/decryption/owner/frozen-version/projector input changed. Backend aggregate source delta is explicit; original dependency mismatch is retained. Current full backend compilation is a separate new exact-component execution.",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "f30d495c9f457614c05ba8b8944f8b48cef051eec9eb60a8dd2bc047fbcc9d74"
+        },
+        {
+          "id": "original-synchronous-consumer-one",
+          "path": "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/existing-consumer.json",
+          "sha256": "1e72e44c700eae9829ec9eff8278e84e530ef2a332f844135b43fffa6e4d86cc",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 26
+          },
+          "cases": [
+            {
+              "fullName": "teacher variant batch report job projection reads saved reports with only the frozen job binding and report ciphertext",
+              "status": "skipped"
+            },
+            {
+              "fullName": "teacher variant batch report job projection keeps owner and exact frozen-version refusals before publishing saved reports",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope retains variant provenance and strata in the same CSV/ZIP artifact dictionary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope previews count the full exact scope while sampling rows",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for allocation drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for slot drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for publication drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope fails closed for definition drift before child payload reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope provides usable stratified administration counts without reading answers or excluding uncompleted attempts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope rejects cached report provenance or union leakage before compact source reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant export scope invalidates artifact identity when either frozen configuration or publication changes",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers counts and exports only selected current-epoch unified cognitive raw trials without zero filling another group",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers full preview loads bounded selected raw and preserves fractional values without a missing-raw fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers preflights combined scoped legacy and unified trial bounds before raw source reads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on missing unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on duplicate unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on epoch unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on encoding unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers fails closed on count unified raw without legacy fallback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers resolves shared FSP2 plans in one batch for all selected attempts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "weighted variant raw, batch and history consumers history filters unselected and old-epoch child rows before counts and result parsing",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches loads selected typed snapshots once for a multi-person teacher report page",
+              "status": "passed"
+            },
+            {
+              "fullName": "variant report page canonical batches rejects parent drift in a batched typed source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches rejects epoch drift in a batched typed source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "variant report page canonical batches rejects section drift in a batched typed source",
+              "status": "skipped"
+            },
+            {
+              "fullName": "history rejects draft-only variant metadata instead of treating it as ordinary history",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "variant report page canonical batches loads selected typed snapshots once for a multi-person teacher report page"
+          ],
+          "originalSourceAssociation": "64fa9e53aa2da3b4077ff22a5edec5f16252e467",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/cognitive/assignment-course-scope.test.ts",
+            "server-version/backend/src/__tests__/questionnaire/form-sections-units.test.ts",
+            "server-version/backend/src/__tests__/scale/available-course.test.ts",
+            "server-version/backend/src/controllers/generalQuestionnaireController.ts",
+            "server-version/backend/src/controllers/questionnaireController.ts",
+            "server-version/backend/src/controllers/scaleController.ts",
+            "server-version/backend/src/modules/cognitive/assignment.service.ts",
+            "server-version/backend/src/modules/cognitive/cognitive.controller.ts"
+          ],
+          "sourceAssociationBasis": "Actual original unsigned Vitest reporters are retained byte-for-byte: gzip original and lossless extraction of rawReporterUTF8 embedded in original binding.json with its original SHA256. Original source/test/config/lock/schema hashes match delivered64fa9e53 and this integrated product. No process signature or complete contemporaneous module-load/install-byte attestation is claimed.",
+          "deltaRationale": "Original2direct product/test files and all6original recorded input hashes remain unchanged. Earlier course-target/controller and manager endpoint changes do not enter these direct service mock fixtures; no query selection, job report binding/decryption/owner/frozen-version/projector input changed. Backend aggregate source delta is explicit; original dependency mismatch is retained. Current full backend compilation is a separate new exact-component execution."
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/backend-types.json",
+          "sha256": "76985ac1e7ac63673164222f39dcd7045c12e3f80b0f1b0ec9db7ccbf64c602c",
+          "component": "backend",
+          "componentTree": "06cea014b3dbc8915a3c7cf1a0e011ca568d9a2b",
+          "exitField": "exitCode",
+          "log": "docs/performance/variant-report-job-projection-20261031/report-baseline-closeout/backend-types.log"
+        }
+      ]
     }
   }
 }
