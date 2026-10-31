@@ -256,9 +256,13 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   // writer behavior. A real DB resolution error never falls back open.
   const scaleModel = (db as any).scale
   if (!scaleModel || typeof scaleModel.findUnique !== 'function') return v1
-  const scale = await scaleModel.findUnique({
+  let scale = await scaleModel.findUnique({
     where: { code: input.instrumentKey },
     select: { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true, libraryEntryId: true, measurementReleaseId: true },
+  })
+  if(!scale&&typeof scaleModel.findFirst==='function')scale=await scaleModel.findFirst({
+    where:{standardSourceKind:'DB_IMPORTED',standardToolKey:input.instrumentKey,instrumentVersion:input.instrumentVersion},
+    select:{id:true,code:true,instrumentVersion:true,instrumentClass:true,status:true,libraryEntryId:true,measurementReleaseId:true},
   })
   if (!scale) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
   if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')

@@ -4,6 +4,7 @@ import {scaleDefinitionSchema,scaleReportDefinitionSchema,scaleReferencePolicySc
 import {getScaleCustomScorerKeys} from '../scale-scoring'
 import {scaleInstrumentSourceV1Schema} from '../onboarding/schema'
 import {reportTemplateSchema} from '../../measurement-content/report-template'
+import {assetReference} from '../../measurement-content/release'
 import {validateReferenceSetDefinition} from '../../assessment-reference/reference'
 
 const version=z.string().trim().min(1).max(120),hash=z.string().regex(/^[a-f0-9]{64}$/)
@@ -20,7 +21,7 @@ export const parameterPayloadSchema=z.object({referencePolicy:scaleReferencePoli
 })
 // The wrapper preserves all installed report-engine blocks without modifying
 // the legacy R payload/hash contract. Existing unwrapped R remains supported.
-export const reportPayloadSchema=z.union([scaleReportDefinitionSchema,z.object({definition:scaleReportDefinitionSchema,template:reportTemplateSchema}).strict()])
+export const reportPayloadSchema=z.union([scaleReportDefinitionSchema,z.object({definition:scaleReportDefinitionSchema,template:reportTemplateSchema,assetRefs:z.array(assetReference).optional()}).strict()])
 export const componentDraftSchema=z.object({
   toolKey:z.string().regex(/^[a-z][a-z0-9_]*$/).max(120),
   configurationName:z.string().trim().min(1).max(300),
@@ -36,7 +37,7 @@ export type ImportIssue={sheet:string;row:number;path:string;message:string}
 export type ImportEntry={index:number;toolKey:string|null;draft:ComponentDraft|null;issues:ImportIssue[]}
 export function unsupportedFields(raw:unknown,parsed:unknown,path=''):Array<{path:string;message:string}>{
   if(!raw||typeof raw!=='object'||!parsed||typeof parsed!=='object')return []
-  return Object.entries(raw).flatMap(([key,value])=>Object.hasOwn(parsed,key)?unsupportedFields(value,(parsed as Record<string,unknown>)[key],path?path+'.'+key:key):[{path:path?path+'.'+key:key,message:'不支持此字段，未保存或执行'}])
+  return Object.entries(raw).flatMap(([key,value])=>Object.prototype.hasOwnProperty.call(parsed,key)?unsupportedFields(value,(parsed as Record<string,unknown>)[key],path?path+'.'+key:key):[{path:path?path+'.'+key:key,message:'不支持此字段，未保存或执行'}])
 }
 export function parseComponentDraft(value:unknown){
   const draft=componentDraftSchema.parse(value),extra=unsupportedFields(value,draft)

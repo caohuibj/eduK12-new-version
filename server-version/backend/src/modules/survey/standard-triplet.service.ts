@@ -9,6 +9,8 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
 import {resolveScaleReference} from '../assessment-reference/reference'
 import {hashScaleDefinition} from '../scale/scale-definition'
+import {scoreScale} from '../scale/scale-scoring'
+import {databaseContentSource,materializeImportedContent,activateImportedContent} from '../scale/component-import/native-source'
 import {getContentReleaseBatch,publishContentRelease} from '../measurement-content/repository'
 import {describeStandardCombination,standardCombinationMeasurementInput} from '../measurement-content/standard-combination'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
@@ -94,13 +96,12 @@ export async function readStandardApprovalIntent(tx:Db,row:StandardRelease){
  try{return {products:exactStandardCombinationEntryProducts(evidence!.allowedProducts),reason:evidence!.reason}}
  catch{ return fail(409,'原批准入口范围缺少可核验证据；请核对历史审批并使用正式入口范围调整流程') }
 }
-export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
- const products=exactStandardCombinationEntryProducts(input.allowedProducts)
- const triplet=await previewStandardTriplet(prisma,actor,input)
- if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'审核预览已变化，请重新核对三份版本')
+export type StandardApprovalInput=Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown}
+/** Shared approval transaction for registry selections and imported drafts. */
+export async function persistStandardTripletApproval(tx:Prisma.TransactionClient,actor:string,input:StandardApprovalInput,triplet:Triplet,products:ReturnType<typeof exactStandardCombinationEntryProducts>){
+ if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'组合预览已变化')
  if(triplet.blockers.length)fail(409,triplet.blockers.join('；'))
- const id=await prisma.$transaction(async tx=>{
-  await assertStandardSystem(tx,actor,proof)
+ if(products.includes('SURVEY')&&(triplet.definition.items.length>500||triplet.definition.display.randomizeItems||triplet.definition.items.some(i=>i.type!=='single'||i.randomizeOptions)))fail(409,'所选内容超出Survey播放器的题型或题量能力')
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard:'+triplet.combinationHash}))`
   const prior=await tx.$queryRaw<StandardRelease[]>`SELECT * FROM survey_standard_releases WHERE id=${input.requestId} OR combination_hash=${triplet.combinationHash} FOR UPDATE`
   if(prior.length){
@@ -109,6 +110,12 @@ export async function approveStandardTriplet(actor:string,input:Selection&{reque
    if(canonicalHash(intent.products)!==canonicalHash(products))fail(409,'该组合已按其他入口范围批准；请使用正式入口范围调整流程，不可通过审批重试扩展范围')
    if(existing.id===input.requestId&&(existing.approved_by!==actor||intent.reason!==input.reason))fail(409,'请求编号已用于另一项审批意图')
    return existing.id
+  }
+  await materializeImportedContent(tx,triplet,actor)
+  if(databaseContentSource(triplet.parts.CONTENT)||triplet.parts.PARAMETERS.reference.metadata.importedComponent)for(const set of triplet.references){
+   const existing=await tx.assessmentReferenceSet.findUnique({where:{instrumentType_instrumentKey_referenceVersion:{instrumentType:'SCALE',instrumentKey:triplet.toolKey,referenceVersion:set.referenceVersion}}})
+   if(existing&&canonicalHash(existing.definition)!==canonicalHash(set))fail(409,'参数正式版本已有不同内容：'+set.referenceVersion)
+   if(!existing)await tx.assessmentReferenceSet.create({data:{instrumentType:'SCALE',instrumentKey:triplet.toolKey,referenceVersion:set.referenceVersion,status:set.status,definition:set as unknown as Prisma.InputJsonValue}})
   }
   for(const p of Object.values(triplet.parts).sort((a,b)=>a.axis.localeCompare(b.axis))){
    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-axis:'+triplet.toolKey+':'+p.axis+':'+p.version}))`
@@ -121,12 +128,22 @@ export async function approveStandardTriplet(actor:string,input:Selection&{reque
   await approveStandardCombinationEntryPolicies(tx,{resourceKey:'standard-release:'+input.requestId,fingerprint:triplet.combinationHash},products,actor,input.reason)
   await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
   return input.requestId
+}
+export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
+ const products=exactStandardCombinationEntryProducts(input.allowedProducts)
+ const triplet=await previewStandardTriplet(prisma,actor,input)
+ if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'审核预览已变化，请重新核对三份版本')
+ if(triplet.blockers.length)fail(409,triplet.blockers.join('；'))
+ const id=await prisma.$transaction(async tx=>{
+  await assertStandardSystem(tx,actor,proof)
+  return persistStandardTripletApproval(tx,actor,input,triplet,products)
  },{timeout:15000})
  const row=await standardReleaseRow(prisma,id)
  if(row.state==='APPROVED')return runStandardTrial(actor,id,row.version,proof)
  return stateView(row)
 }
 export function computeStandardTrial(triplet:Triplet,releaseId:string){
+ if(databaseContentSource(triplet.parts.CONTENT))return computeImportedStandardTrial(triplet)
  const snapshot=tripletSnapshot(triplet,releaseId),display=snapshot.displayDefinition as ReturnType<typeof import('./catalog-scale.presentation')['canonicalScalePresentation']>['display']
  const unit={draftId:releaseId,instrumentKey:'trial-scale',kind:'SCALE' as const,title:triplet.title,draftRevision:1,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,sourceAnswerMapping:snapshot.answerMapping}
  const publication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'isolated-trial',waveId:'isolated-trial',collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,consentDigest:canonicalHash('SYNTHETIC_TRIAL'),runtimeStatus:'SURVEY_FINAL_V1',units:[unit]} as ResearchFrozenPublication
@@ -140,6 +157,17 @@ export function computeStandardTrial(triplet:Triplet,releaseId:string){
   if(triplet.template&&(!report?.blocks.length||!report.blocks.some(b=>(b as {type:string}).type==='METRIC')))throw new Error('试运行未产生有效报告')
   const value={caseIndex,answers,scores:calculated,report}
   return {...value,recordHash:canonicalHash(value)}
+ })
+}
+function computeImportedStandardTrial(t:Triplet){
+ return [0,.5,1].map((fraction,caseIndex)=>{
+  const answers=t.definition.items.map(item=>{const set=t.definition.responseSets.find(s=>s.key===item.responseSetKey)!;return {itemCode:item.itemCode,responseValue:set.options[Math.floor((set.options.length-1)*fraction)].value}})
+  const scores=scoreScale(t.definition,answers)
+  if(!scores.scores.length||scores.scores.some(s=>s.status!=='calculated'||typeof s.value!=='number'||!Number.isFinite(s.value)))throw new Error('试运行未产生完整有效分数')
+  const references:ReportReferenceFact[]=scores.scores.flatMap(s=>resolveScaleReference({policy:t.definition.referencePolicy,references:t.references,instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,scoringVersion:t.definition.scoring.scoringVersion,score:s,measurementHash:hashScaleDefinition(t.definition)}).map(r=>({metricKey:s.key,referenceKind:r.referenceKind,status:r.status==='available'?'AVAILABLE' as const:'UNAVAILABLE' as const,bandKey:r.criterionBand?.key??null})))
+  const report=t.template?renderDeclaredReport(t.template,scores.scores.map(s=>({metricKey:s.key,value:s.value,unit:'points',status:'INTERPRETABLE' as const})),references):null
+  if(t.template&&(!report||t.template.blocks.length>0&&!report.blocks.length))throw new Error('试运行未产生有效报告')
+  const value={caseIndex,answers,scores,report};return {...value,recordHash:canonicalHash(value)}
  })
 }
 export async function runStandardTrial(actor:string,id:string,expectedVersion:number,proof?:AdminSessionProof){
@@ -170,6 +198,7 @@ export async function runStandardTrial(actor:string,id:string,expectedVersion:nu
    const measurement=await publishContentRelease(tx,standardCombinationMeasurementInput(row),actor)
    if(measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED')throw new Error('内容发布版本当前不能用于新增使用')
    await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,lease_until=NULL,measurement_release=${JSON.stringify({releaseId:measurement.releaseId,contentHash:measurement.contentHash})}::jsonb,blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
+   await activateImportedContent(tx,row.snapshot,actor)
    const intent=await readStandardApprovalIntent(tx,current)
    await audit(tx,actor,'STANDARD_TRIAL_PASSED_ONLINE',{releaseId:id,runId,caseCount:results.length,databaseReadback:true,allowedProducts:intent.products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
   },{timeout:15000})

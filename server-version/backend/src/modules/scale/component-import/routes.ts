@@ -5,6 +5,8 @@ import {success,error} from '../../../utils/response'
 import {AdminPermissionError} from '../../admin-permissions/service'
 import {componentTemplateWorkbook} from './excel'
 import * as service from './service'
+import {previewComponentPublication,publishComponentDraft} from './publication'
+import {requireRecentAdminKey} from '../../admin-permissions/guards'
 
 /** Inherits existing platform origin, CSRF, authentication and system-admin guards. */
 export const scaleComponentImportRouter=Router()
@@ -19,3 +21,5 @@ scaleComponentImportRouter.post('/component-import/save',upload,handle(req=>{con
 scaleComponentImportRouter.get('/component-drafts',handle(req=>service.listComponentDrafts(req.user!.userId,z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page))))
 scaleComponentImportRouter.get('/component-drafts/:id',handle(req=>service.readComponentDraft(req.user!.userId,z.string().uuid().parse(req.params.id))))
 scaleComponentImportRouter.post('/component-drafts/:id',handle(req=>service.editComponentDraft(req.user!.userId,z.string().uuid().parse(req.params.id),z.object({expectedRevision:z.number().int().positive(),draft:z.unknown()}).strict().parse(req.body))))
+scaleComponentImportRouter.get('/component-drafts/:id/preview',handle(req=>previewComponentPublication(req.user!.userId,z.string().uuid().parse(req.params.id))))
+scaleComponentImportRouter.post('/component-drafts/:id/publish',requireRecentAdminKey,handle(req=>publishComponentDraft(req.user!.userId,z.string().uuid().parse(req.params.id),z.object({requestId:z.string().uuid(),expectedRevision:z.number().int().positive(),expectedPreviewHash:z.string().regex(/^[a-f0-9]{64}$/),expectedBase:z.object({releaseId:z.string().uuid(),combinationHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().nullable(),reason:z.string().trim().min(1).max(1000),allowedProducts:z.array(z.enum(['TRAINING','SURVEY','SCHOOL','TEACHER'])).min(1).max(4)}).strict().parse(req.body),req.user!)))
