@@ -73,3 +73,15 @@ test('CI image script forces only local Docker export for printed and executed b
   resolved.target.frontend.output = [{type:'docker'}];
   verifyResolvedPlan(resolved,true);
 });
+
+test('quota backend-only images retain API/worker runtime scanning without a frontend target',()=>{
+ const input=fixture(false);delete input.target.frontend;
+ const plan=runtimeRefreshPlan(input,false,true);verifyResolvedPlan(resolved(plan),false,true);
+ assert.deepEqual(Object.keys(plan.target).sort(),['backend','worker']);
+ assert.throws(()=>runtimeRefreshPlan(fixture(false),false,true));
+ assert.throws(()=>runtimeRefreshPlan(fixture(true),true,true));
+ const workflow=readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8');
+ for(const name of ['verify production Nginx static asset MIME and security headers','scan frontend image (high and critical)'])
+  assert(workflow.includes('- name: '+name+'\n        if: inputs.backend_only != true'));
+ assert(workflow.includes('if: inputs.frontend_only != true'));
+});

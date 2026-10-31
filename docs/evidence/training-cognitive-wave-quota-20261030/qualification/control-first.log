@@ -1,0 +1,15 @@
+✔ runtime refresh preserves source, tags and build arguments without mutating Compose input (3.393155ms)
+✔ missing refresh, whole-image cache bypass, wrong tags or publishing cannot pass resolved validation (7.297708ms)
+✔ UI route cannot secretly build backend; full route cannot omit a production target (0.507151ms)
+✔ Debian mirror applies to both API and worker and cannot disappear from the resolved build (0.766141ms)
+✔ CI image script forces only local Docker export for printed and executed builds (0.961895ms)
+✔ quota backend-only images retain API/worker runtime scanning without a frontend target (1.094563ms)
+✔ quota candidate requires exact source and backend image success without selecting frontend or a native migration (12.140519ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 150.289614
