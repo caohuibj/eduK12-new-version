@@ -169,7 +169,30 @@ function plan(){
   assert.equal(value.draft,false);assert.equal(value.postMerge,false);
   return value;
 }
-function readOriginal(proof){const bytes=readFileSync(safePath(proof.path));assert.equal(hash(bytes),proof.sha256,'Original evidence bytes drift');return JSON.parse(bytes);}
+export function decodeOriginal(proof,bytes){
+ assert.equal(hash(bytes),proof.sha256,'Original evidence bytes drift');
+ if(proof.encoding==='gzip-json'){const original=gunzipSync(bytes);assert.equal(hash(original),proof.originalJSONSHA256,'Decompressed original evidence drift');return JSON.parse(original);}
+ assert(proof.encoding===undefined);return JSON.parse(bytes);
+}
+function readOriginal(proof){return decodeOriginal(proof,readFileSync(safePath(proof.path)));}
+// Read the actual cloud argv/exit records without rewriting their original format.
+export function verifyCloudComponentTypeReceipt(receipt,review,readBytes,currentTree){
+ const component=review.component;assert(['backend','frontend'].includes(component));
+ assert.equal(receipt.kind,'RECORDED_LOCAL_EXECUTION_UNSIGNED');assert.equal(receipt.component,component);
+ assert.equal(receipt.exitCode,0);assert.equal(receipt.node,'v24.21.0');
+ assert.deepEqual(receipt.argv,['/workspace/eduk12-cloud/tools/node_modules/.bin/node','node_modules/typescript/bin/tsc','-p',component==='backend'?'tsconfig.json':'tsconfig.app.json','--noEmit']);
+ assert.equal(receipt.workingDirectory,'/workspace/eduK12-new-version/server-version/'+component);
+ assert.equal(receipt.componentTree,review.componentTree);assert.equal(currentTree,review.componentTree);
+ assert.deepEqual(receipt.before,receipt.after);assert(Object.keys(receipt.before).length);
+ for(const [path,digest] of Object.entries(receipt.after)){
+  safePath(path);assert(path.startsWith('server-version/'+component+'/')||(component==='frontend'&&['server-version/backend/package-lock.json','server-version/backend/prisma/schema.prisma','server-version/backend/node_modules/.prisma/client/schema.prisma','server-version/backend/node_modules/.prisma/client/index.d.ts'].includes(path)));assert.match(digest,/^[a-f0-9]{64}$/);
+  // Installed compiler/client bytes are recorded observations, not reinstalled in admission.
+  if(!path.includes('/node_modules/'))assert.equal(hash(readBytes(path)),digest,'Recorded tracked compiler input drift');
+ }
+ for(const suffix of ['package.json','package-lock.json',component==='backend'?'tsconfig.json':'tsconfig.app.json',...(component==='backend'?['prisma/schema.prisma']:[])])assert(receipt.after['server-version/'+component+'/'+suffix]);
+ assert.equal(hash(readBytes(safePath(review.log))),receipt.logSHA256);
+ return {component,currentComponentTree:currentTree,originalExitCode:0,originalNode:receipt.node,originalSigned:false,coverage:'exact-'+component+'-tree',originalHead:receipt.head};
+}
 
 // Task1's preserved reports are embedded in immutable review records. Some
 // records retain a reporter projection rather than a second copied attachment.
@@ -219,7 +242,7 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
- assert(['task1','choice-page',404,408,414,415,418,419,420,422].includes(p.pr));assert.equal(p.product,b.product);
+ assert(['task1','choice-page',404,408,414,415,418,419,420,422,423,424,426,432].includes(p.pr));assert.equal(p.product,b.product);
  const paths=[...Object.keys(b.source),...([404,419,422].includes(p.pr)?['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']:[]),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
@@ -514,9 +537,9 @@ export function verifyPr420ExecutionMapping(receipt,mapping,product,productTree)
 
 async function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,404,408,414,415,418,419,420,422,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,404,408,414,415,418,419,420,422,423,424,426,432,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,422].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,422,423,424,426,432].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   if(p.pr==='choice-page'){
@@ -536,7 +559,7 @@ async function admit(){
     assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
     for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
     const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
-    assert.deepEqual(delta,[404,408,414,415,418,419,422].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
+    assert.deepEqual(delta,[404,408,414,415,418,419,422,423,424,426,432].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
     admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
@@ -550,15 +573,15 @@ async function admit(){
     assert.deepEqual(review.types,[],'PR381 does not fabricate an argv-style original receipt');
     originalTaskChecks=verifyPr381CommandRecords(readOriginal(record.commands),readOriginal(record.inputs),readOriginal(record.firstInputs),p.components.frontend,path=>readFileSync(path));
   }else assert(!review.pr381LocalChecks);
-  const types=p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
+  const types=p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>(p.pr===432?verifyCloudComponentTypeReceipt:verifyTypeReceipt)(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if([372,374,404,408,414,418].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374,404,408,414,418,423,426,432].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   // The fixed415 source plan proves its backend tree equals the exact base.
   // Do not rerun or invent a compiler receipt for this unchanged component.
   if([415,420].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['frontend']);
   let official420=null;
   if(p.pr===420){assert.equal(admitted.flatMap(r=>r.caseNames).length,4);verifyPr420ExecutionMapping(readOriginal(review.types[0]),review.executionSourceMapping,p.product,git('rev-parse',p.product+'^{tree}'));official420=await reusePr420Official(p);}
-  if([419,422].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['backend']);
+  if([419,422,424].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['backend']);
   const observations=[];
   if([404,408,414,415,418,419,422].includes(p.pr)){
     assert.equal(review.groupReportObservations.length,p.pr===415?1:2);

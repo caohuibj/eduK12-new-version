@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, forbidden, instrumentError, notFound, success } from '../../utils/response'
 import { logger } from '../../utils/logger'
-import { canStudentAccessScale, canStartLibraryCourseScale } from './scale-access'
+import { canStudentAccessScale, canStartLibraryCourseScale, assertTrainingCourseScaleStart, assertStandaloneScaleCourseMatch, trainingScaleCourseCampaignKey } from './scale-access'
 import {
   ageMonthsAt,
   hashAssessmentContext,
@@ -104,6 +104,9 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     if (!userId) return forbidden(res, '请先登录')
     const contextInput = standaloneContextSchema.safeParse(req.body?.context)
     if (!contextInput.success) return error(res, contextInput.error.issues[0].message)
+    const courseInput = z.string().trim().min(1).max(200).optional().safeParse(req.body?.courseId)
+    if (!courseInput.success) return error(res, courseInput.error.issues[0].message)
+    const courseId = courseInput.data
 
     const { scaleId } = req.params
     const scale = await prisma.scale.findUnique({ where: { id: scaleId }, select: scaleSelect })
@@ -117,8 +120,10 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         questionnaireAssessmentId: null,
         compositeAttemptId: null,
       },
+      include: {episode: {select: {courseId: true}}},
     })
     if (existing) {
+      assertStandaloneScaleCourseMatch(existing, courseId)
       // Resume is governed by the already-frozen admission. Current product
       // access, deployment and grant state are new-start controls and must not
       // retroactively invalidate an in-flight attempt.
@@ -138,7 +143,8 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         if (!currentScale || !(await canStudentAccessScale(currentScale, userId, tx))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表不存在', 404)
         }
-        if (!(await canStartLibraryCourseScale(currentScale, userId, tx))) {
+        if (courseId) await assertTrainingCourseScaleStart(tx, courseId, scaleId, userId)
+        if (!(await canStartLibraryCourseScale(currentScale, userId, tx, courseId))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '课程量表使用授权已失效', 403)
         }
         await assertScaleNewEntryAllowed(tx, [currentScale.id], userId)
@@ -180,6 +186,10 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
           contextValues: context.context?.values ?? null,
           contextFrozenAt: context.context?.frozenAt ?? null,
         })
+        const episode = courseId ? await tx.assessmentEpisode.create({data: {
+          subjectUserId: userId, initiatedByUserId: userId, initiationMode: 'STUDENT_SELF', courseId,
+          campaignKey: trainingScaleCourseCampaignKey(scaleId), label: 'Training 课程独立量表',
+        }, select: {id: true}}) : null
         const created = await tx.assessment.create({
           data: {
             scaleId,
@@ -197,6 +207,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
             subjectUserId: userId,
             respondentUserId: userId,
             respondentType: 'SELF',
+            ...(episode ? {episodeId: episode.id} : {}),
           },
         })
         await retainFrozenScaleAssessmentImages({ assessmentId: created.id, snapshot: runtimeSnapshot, db: tx as never })
@@ -215,8 +226,10 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
           questionnaireAssessmentId: null,
           compositeAttemptId: null,
         },
+        include: {episode: {select: {courseId: true}}},
       })
       if (!assessment) throw err
+      assertStandaloneScaleCourseMatch(assessment, courseId)
     }
     if ('preflight' in assessment) return success(res, assessment, '请先补充测评所需资料')
     if (assessment.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...assessment, scale } as any)

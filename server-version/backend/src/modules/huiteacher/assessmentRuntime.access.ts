@@ -1,3 +1,4 @@
+import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {Prisma} from '@prisma/client'
@@ -91,14 +92,16 @@ export async function queryTeacherAssessmentRows(db:TeacherRuntimeDb,actorUserId
   AND ${student?Prisma.sql`a.respondent_role='STUDENT' AND a.subject_role='TEACHER' AND a.relationship_kind='CLASS_TEACHER_STUDENT'
    AND a.perspective='OBSERVER_REPORT' AND a.analysis_mode='COHORT_AGGREGATE' AND a.minimum_respondents>=5`:
    Prisma.sql`a.respondent_role='TEACHER' AND a.subject_role='TEACHER' AND a.relationship_kind='SELF' AND a.perspective='SELF_REPORT'
-    AND a.analysis_mode='INDIVIDUAL_ONLY' AND a.minimum_respondents IS NULL`}
+    AND ((a.analysis_mode='INDIVIDUAL_ONLY' AND a.minimum_respondents IS NULL)
+     OR (t.resource_key LIKE 'education-assessment:TEACHER:%' AND t.resource_version='2.0.0'
+      AND a.analysis_mode='COHORT_AGGREGATE' AND a.minimum_respondents>=3))`}
  LEFT JOIN assessment_attempt_consents consent ON consent.id=a.consent_id
  LEFT JOIN composite_assessment_attempts parent ON parent.id=e.runtime_binding_ref AND e.runtime_binding_kind='COMPOSITE'
   AND parent.assignment_ref=a.id AND parent.episode_id=a.episode_id
   AND parent.user_id=${actorUserId} AND parent.subject_user_id=subject.user_id AND parent.respondent_user_id=${actorUserId}
   AND parent.composite_assessment_id=t.frozen_resource_policy->'runtimeLaunchTarget'->>'ref'
   AND parent.delivery_mode='FINAL_ONLY' AND parent.runtime_generation='UNIFIED_V1'
- WHERE t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND t.resource_version='1.0.0'
+ WHERE t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND t.resource_version IN ('1.0.0','2.0.0')
   AND (t.resource_key LIKE 'education-assessment:TEACHER:%' OR t.resource_key LIKE 'education-composition:TEACHER:%')
   AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
   AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}
@@ -133,14 +136,14 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
   const identity=await source.readIdentity(db,{resourceKey:row.resourceKey,version:row.resourceVersion,purpose:row.status==='ASSIGNED'?'NEW_USE':'HISTORY'})
   const origin=educationAssessmentOriginSchema.parse(identity.origin),entry=identity.entry
   if(identity.identityOnly!==true||origin.product!=='TEACHER'||origin.organizationId!==row.organizationId
-   ||origin.family!==row.family||row.resourceVersion!=='1.0.0'||educationAssessmentResourceKey(origin)!==row.resourceKey
+   ||origin.family!==row.family||row.resourceVersion!==origin.adapterVersion||educationAssessmentResourceKey(origin)!==row.resourceKey
    ||canonicalHash(row.policy)!==row.policyHash||canonicalHash(relationalEntryToRunPolicy(entry))!==row.policyHash
    ||entry.launchTarget?.runtime!=='COMPOSITE'||entry.launchTarget.compositeAssessmentId!==origin.runtimeCompositeId)fail()
   const a=entry.applicability
   if(a.resourceKey!==row.resourceKey||a.resourceVersion!==row.resourceVersion||a.resourceKind!==row.family
    ||a.subjectRoles.length!==1||a.subjectRoles[0]!=='TEACHER'||a.respondentRoles.length!==1||a.respondentRoles[0]!=='TEACHER'
    ||a.relationshipKinds.length!==1||a.relationshipKinds[0]!=='SELF'||a.perspectives.length!==1||a.perspectives[0]!=='SELF_REPORT'
-   ||a.analysisMode!=='INDIVIDUAL_ONLY'||a.minimumRespondents!==null)fail()
+   ||(a.analysisMode!=='INDIVIDUAL_ONLY'||a.minimumRespondents!==null)&&!isSelfGroupV2Entry(entry))fail()
   const purpose:TeacherRuntimePurpose=row.status==='ASSIGNED'?'START':row.status==='COMPLETED'?'HISTORY_READ':'BOUND_COLLECTION'
   await source.assertUse(db,{identity,executionId:row.executionId,actorUserId,purpose})
   return {task:taskDto(row,entry.title),identity,row,runtimeCompositeId:origin.runtimeCompositeId,units:origin.units}

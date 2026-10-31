@@ -5,6 +5,7 @@ import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../assessment-relational/product-registry'
 import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
+import {assertSelfGroupV2Entry,buildSelfGroupCohortAnalysisPolicy,SELF_GROUP_POLICY_VERSION} from '../assessment-policy/self-group-contract'
 
 const id=z.string().guid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
 // Captured from server-side authority reads at each lifecycle transition.
@@ -27,12 +28,13 @@ const unit=z.object({
   measurement:pointer.extend({measurementHash:digest}).strict(),
   // Explicit empty means no approved reference/report selection; never "latest".
   references:z.array(pointer).max(100),report:pointer.nullable(),
+  groupDisclosure:z.unknown().optional(),
 }).strict()
 /** A server-frozen delivery identity, not an HTTP approval or a use grant.
  * Content/parameter/report releases remain independent existing C/P/R objects.
  */
 export const educationAssessmentOriginSchema=z.object({
-  schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),resourceId:id,
+  schemaVersion:z.literal(1),adapterVersion:z.enum(['1.0.0','2.0.0']),resourceId:id,
   product:z.enum(['SCHOOL','TEACHER']),organizationId:id,
   family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),
   sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,runtimeDefinitionHash:digest,
@@ -73,15 +75,16 @@ export function draftEducationAssessmentEntry(input:{origin:unknown;title:string
   const origin=educationAssessmentOriginSchema.parse(input.origin)
   const title=z.string().trim().min(1).max(200).parse(input.title)
   const disclosure=validateResultDisclosureContract(input.disclosure)
+  const group=origin.adapterVersion===SELF_GROUP_POLICY_VERSION
   if(origin.units.length===0&&!['NONE','COMPLETION_ONLY'].includes(disclosure.audiences.RESPONDENT.mode))throw new Error('Form-only delivery cannot invent measurement feedback')
-  if(disclosure.minimumRespondents!==null)throw new Error('Personal delivery cannot imply group report authority')
+  if(!group&&disclosure.minimumRespondents!==null)throw new Error('Personal delivery cannot imply group report authority')
   // New fixed source versions may explicitly allow a subset of existing own
   // numeric metrics. The shared contract validator enforces that subset and
   // rejects metrics in NONE/completion-only; historical entries stay unchanged.
   const role=origin.product==='TEACHER'?'TEACHER':'STUDENT'
   // Other audiences require their own separately reviewed workflows, not
   // a side effect of assigning a personal cognitive/SJT/composite task.
-  if(Object.entries(disclosure.audiences).some(([audience,rule])=>
+  if(!group&&Object.entries(disclosure.audiences).some(([audience,rule])=>
     audience!=='RESPONDENT'&&rule.mode!=='NONE'
     ||audience==='RESPONDENT'&&!['NONE','COMPLETION_ONLY','INDIVIDUAL_SUMMARY'].includes(rule.mode)))
     throw new Error('Personal delivery disclosure cannot widen other audiences')
@@ -90,7 +93,25 @@ export function draftEducationAssessmentEntry(input:{origin:unknown;title:string
       resourceVersion:origin.adapterVersion,subjectRoles:[role],respondentRoles:[role],relationshipKinds:['SELF'],
       perspectives:['SELF_REPORT'],analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:disclosure.policyKey,minimumRespondents:null},
     initiationModes:['ORG_ASSIGN','CLASS_ASSIGN'],subjectReportMode:'NONE',resultDisclosure:disclosure,
-    cohortAnalysisPolicy:null,launchTarget:{runtime:'COMPOSITE',compositeAssessmentId:origin.runtimeCompositeId}}
+    cohortAnalysisPolicy:group?buildSelfGroupCohortAnalysisPolicy(disclosure):null,launchTarget:{runtime:'COMPOSITE',compositeAssessmentId:origin.runtimeCompositeId}}
+  if(group){
+    entry.applicability={...entry.applicability,analysisMode:'COHORT_AGGREGATE',minimumRespondents:disclosure.minimumRespondents}
+    assertSelfGroupV2Entry(entry)
+    if(!origin.units.length||disclosure.audiences.SUBJECT.mode!=='NONE')throw new Error('Native group requires real leaves and the original respondent-only ceiling')
+    for(const value of origin.units){
+      const leaf=validateResultDisclosureContract(value.groupDisclosure)
+      assertSelfGroupV2Entry({...entry,applicability:{...entry.applicability,minimumRespondents:leaf.minimumRespondents},
+        resultDisclosure:leaf,cohortAnalysisPolicy:buildSelfGroupCohortAnalysisPolicy(leaf)})
+      if(leaf.audiences.SUBJECT.mode!=='NONE')throw new Error('Native leaf cannot add subject result rights')
+      for(const [audience,rule] of Object.entries(leaf.audiences)){
+        const parent=disclosure.audiences[audience as keyof typeof disclosure.audiences]
+        if(rule.metricKeys.some(key=>!parent.metricKeys.includes(key))
+          ||rule.longitudinalMetricKeys.some(key=>!parent.longitudinalMetricKeys.includes(key))
+          ||rule.mode==='INDIVIDUAL_SUMMARY'&&parent.mode!=='INDIVIDUAL_SUMMARY'
+          ||rule.mode.includes('AGGREGATE')&&!parent.mode.includes('AGGREGATE'))throw new Error('Leaf metrics require the explicit parent ceiling')
+      }
+    }
+  }else if(origin.units.some(value=>value.groupDisclosure!==undefined))throw new Error('Legacy personal origin cannot carry GROUP contracts')
   createRelationalProductRegistry([entry])
   return {...entry,educationOrigin:origin,educationOriginHash:canonicalHash(origin)}
 }

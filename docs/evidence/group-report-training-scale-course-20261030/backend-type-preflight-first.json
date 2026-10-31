@@ -1,0 +1,7 @@
+{
+  "phase": "candidate metadata before compiler",
+  "gitWriteTreeExitCode": 128,
+  "compilerExecuted": false,
+  "reason": "Two independent compiler wrappers both invoked git write-tree concurrently;temporary index lock conflict. Git index was not removed or reset.",
+  "repair": "Capture one candidate tree sequentially,then reuse that immutable value for compiler wrappers. Frontend compiler already started successfully;do not restart it."
+}

@@ -5,10 +5,10 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { summarizeGroupMetrics, type GroupMetricDefinition, type GroupMetricSummary, type GroupToolKind, type TaskGroupProjection } from '../reporting/group-summary'
 import { listTaskGroupArtifactsForContainer, publicTaskGroupArtifact, readTaskGroupArtifact, saveTaskGroupArtifact } from '../reporting/task-artifact'
 import { TRAINING_ANALYSIS_MINIMUM_N } from './core'
-import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasks, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, loadTrainingStandaloneCognitiveGroup, readTrainingStandaloneCognitiveGroupArtifact, trainingStandaloneCognitiveGroupTool, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
+import { assertTrainingGroupAccess, listTrainingAnalysisSources, listTrainingGroupTasks, loadTrainingAnalysisSources, trainingGroupSnapshotHash, trainingParticipantIdentities, loadTrainingStandaloneCognitiveGroup, readTrainingStandaloneCognitiveGroupArtifact, trainingStandaloneCognitiveGroupTool, trainingStandaloneScaleGroupTools, loadTrainingStandaloneScaleGroup, readTrainingStandaloneScaleGroupArtifact, type TrainingAnalysisActor, type TrainingAnalysisManifestAttemptV1 } from './source'
 import { readTrainingAnalysisQuality, trainingResearchReason } from './service'
 import type { TrainingAnalysisRequestV1 } from './types'
-import { trainingCognitiveGroupAssignmentId, type TrainingGroupSource } from './group-source'
+import { trainingCognitiveGroupAssignmentId, trainingScaleGroupId, type TrainingGroupSource } from './group-source'
 
 type Scope = {actor: TrainingAnalysisActor; courseId: string}
 const sourceOf = (courseId: string, taskId: string) => ({product: 'TRAINING' as const, containerId: courseId, taskId})
@@ -40,6 +40,10 @@ export async function listTrainingGroupReports(input: Scope) {
 }
 export async function trainingGroupTools(input: Scope & {taskId: string}) {
   return prisma.$transaction(async tx => {
+    if(trainingScaleGroupId(input.taskId)!==null){
+      return {tools:await trainingStandaloneScaleGroupTools(tx,input.actor,input.courseId,input.taskId),
+        limitations:['仅使用新施测已保存的真实课程 Episode 和允许披露数值的冻结量表；旧无归属记录不按今天的名单补填。']}
+    }
     if(trainingCognitiveGroupAssignmentId(input.taskId)!==null){
       const tool=await trainingStandaloneCognitiveGroupTool(tx,input.actor,input.courseId,input.taskId)
       return {tools:tool?[tool]:[],limitations:['独立认知只使用同一冻结协议、Profile和专业报告已可见的正式数值；无冻结来源的历史结果不补算。']}
@@ -52,6 +56,21 @@ export async function trainingGroupTools(input: Scope & {taskId: string}) {
 export async function generateTrainingGroupReport(input: Scope & {selection: unknown}) {
   const selection = inputSchema.parse(input.selection)
   return prisma.$transaction(async tx => {
+    if(trainingScaleGroupId(selection.taskId)!==null){
+      if(selection.toolKey!==selection.taskId||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立量表工具或冻结来源不存在')
+      const native=await loadTrainingStandaloneScaleGroup(tx,input.actor,input.courseId,selection.taskId,selection.configDigest,selection.publication)
+      const disclosed=trainingGroupDisclosure(summarizeGroupMetrics(native.definitions,native.observations,native.parents.map(row=>row.id)),native.parents.length)
+      const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:native.tool.title+' · 群体报告',
+        sourceLabel:`课程独立量表 · 所选投放始于 ${native.tool.source.publication}`,cutoff:new Date().toISOString(),
+        populationLabel:'本课程所选冻结测量版本的合格已完成作答',...disclosed,countUnit:'PERSON',assignedN:null,
+        tool:{key:native.tool.key,title:native.tool.title,kind:'SCALE'},limitations:[
+          '仅纳入已冻结课程 Episode 且原量表允许数值披露的正式结果；不根据当前课程成员名单补历史归属。',
+          '每人先选择最新正式完成结果，再选择测量版本；未完成重做不覆盖已完成，最新缺失不回退旧分数。',
+          '只描述已定义总分和维度；保留真实量尺与每指标有效样本，不重新评分、增设阈值或作诊断。',
+          '沿用 Training 最小有效样本5和小补集披露；新增作答需要主动生成更新版。',
+        ]}
+      return saveTaskGroupArtifact(tx,{source:sourceOf(input.courseId,selection.taskId),selector:{kind:'ALL',...selection},sourceBindings:native.bindings,projection,generatedBy:input.actor.userId})
+    }
     if(trainingCognitiveGroupAssignmentId(selection.taskId)!==null){
       const native=await loadTrainingStandaloneCognitiveGroup(tx,input.actor,input.courseId,selection.taskId)
       if(!native||selection.toolKey!==native.tool.key||selection.publication!==native.tool.source.publication||selection.configDigest!==native.tool.source.configDigest||selection.variantKey!==null||selection.materialGroupKey!==undefined)return fail(404,'独立认知工具或冻结来源不存在')
@@ -109,6 +128,11 @@ export async function generateTrainingGroupReport(input: Scope & {selection: unk
 
 export async function readTrainingGroupReport(input: Scope & {taskId: string; artifactId: string}) {
   return prisma.$transaction(async tx => {
+    if(trainingScaleGroupId(input.taskId)!==null){
+      const artifact=await readTrainingStandaloneScaleGroupArtifact(tx,input.actor,input.courseId,input.taskId,input.artifactId)
+      if(!artifact)return fail(404,'群体报告不存在')
+      return publicTaskGroupArtifact(artifact)
+    }
     if(trainingCognitiveGroupAssignmentId(input.taskId)!==null){
       const artifact=await readTrainingStandaloneCognitiveGroupArtifact(tx,input.actor,input.courseId,input.taskId,input.artifactId)
       if(!artifact)return fail(404,'群体报告不存在')

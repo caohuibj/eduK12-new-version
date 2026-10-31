@@ -8,12 +8,12 @@ export type EducationAssessmentPreparation={resourceId:string;product:'SCHOOL'|'
  sourceCompositeId:string;runtimeCompositeId:string;preparationHash:string;title:string;canPublish:false;licenses:EducationAssessmentLicense[];
  units:Array<{itemId:string;family:'SCALE'|'COGNITIVE'|'SJT';measurement:EducationAssessmentPointer&{measurementHash:string}}>;
  publicPackage?:EducationPackageRef;fixedSelection?:Pick<EducationAssessmentRegisterInput,'references'|'reports'>}
-export type EducationAssessmentDisclosure={schemaVersion:1;policyKey:string;minimumRespondents:null;
+export type EducationAssessmentDisclosure={schemaVersion:1;policyKey:string;minimumRespondents:number|null;
  audiences:Record<'RESPONDENT'|'SUBJECT'|'TEACHER'|'PARENT'|'PROFESSIONAL'|'ORGANIZATION'|'RESEARCH',{
- mode:'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY';metricKeys:string[];longitudinalMetricKeys:string[]}>}
+ mode:'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY'|'AGGREGATE_ONLY'|'CLASS_AGGREGATE'|'ORGANIZATION_AGGREGATE';metricKeys:string[];longitudinalMetricKeys:string[]}>}
 export type EducationFeedbackPolicy={schemaVersion:1;mode:'IMMEDIATE'}|{schemaVersion:1;mode:'SCHEDULED';releaseAt:string}
-export type EducationAssessmentRegistration={resourceId:string;resourceKey?:string;version?:'1.0.0';status:EducationAssessmentStatus;entryHash:string;entry?:unknown;createdBy?:string;reviewedBy?:string|null}
-export type EducationAssessmentRegisterInput={expectedPreparationHash:string;disclosure:EducationAssessmentDisclosure;feedbackPolicy:EducationFeedbackPolicy;
+export type EducationAssessmentRegistration={resourceId:string;resourceKey?:string;version?:'1.0.0'|'2.0.0';status:EducationAssessmentStatus;entryHash:string;entry?:unknown;createdBy?:string;reviewedBy?:string|null}
+export type EducationAssessmentRegisterInput={analysisMode?:'INDIVIDUAL_ONLY'|'COHORT_AGGREGATE';groupUnits?:Array<{itemId:string;disclosure:EducationAssessmentDisclosure}>;expectedPreparationHash:string;disclosure:EducationAssessmentDisclosure;feedbackPolicy:EducationFeedbackPolicy;
  references:{schemaVersion:1;units:Array<{itemId:string;choices:Array<{releaseId:string;entryKey:string;priority:number}>}>};
  reports:Array<{itemId:string;releaseId:string}>;licenses:EducationAssessmentLicense[]}
 /** Inject School/Teacher's existing authenticated product transport. The client
@@ -26,7 +26,7 @@ export function educationAssessmentResourceClient(api:PrivateToolApi,organizatio
   sources:(cursor?:string,publicPackage?:EducationPackageRef)=>api<{nextCursor:string|null;list:Array<{sourceCompositeId:string;title:string;canPrepare:boolean;unavailableReason:null|'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|'ORIGINAL_CONTENT_SCOPE_UNSUPPORTED';licenses:EducationAssessmentLicense[];canPublish:false}>}>(base+'/source-candidates'+(cursor||publicPackage?'?'+new URLSearchParams({...cursor?{cursor}:{},...publicPackage?{publicPackage:JSON.stringify(publicPackage)}:{}}):'')),
   prepare:(input:{resourceId:string;sourceCompositeId:string;title:string;family:EducationAssessmentFamily;licenses:EducationAssessmentLicense[];publicPackage?:EducationPackageRef})=>api<EducationAssessmentPreparation&{created:boolean}>(base+'/preparations','POST',input),
   preparation:(id:string)=>api<EducationAssessmentPreparation>(base+'/preparations/'+encodeURIComponent(id)),
-  choices:(id:string,cursor?:string)=>api<{nextCursor:string|null;emptySelectionAllowed:true;units:Array<{itemId:string;family:'SCALE'|'COGNITIVE'|'SJT';measurement:EducationAssessmentPointer;
+  choices:(id:string,cursor?:string)=>api<{nextCursor:string|null;emptySelectionAllowed:true;units:Array<{itemId:string;family:'SCALE'|'COGNITIVE'|'SJT';measurement:EducationAssessmentPointer;groupMetricKeys?:string[];
    references:Array<EducationAssessmentPointer&{selectable:boolean;unavailableReason:null|'CONTENT_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY';licenses:EducationAssessmentLicense[];choices:Array<{entryKey:string;metricKey:string;referenceKind:string}>}>;
    reports:Array<EducationAssessmentPointer&{selectable:boolean;unavailableReason:null|'CONTENT_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY';licenses:EducationAssessmentLicense[];audience:string;title:string|null;metricKeys:string[]}>}>}>(base+'/preparations/'+encodeURIComponent(id)+'/content-choices'+(cursor?'?cursor='+encodeURIComponent(cursor):'')),
   register:(id:string,input:EducationAssessmentRegisterInput)=>api<EducationAssessmentRegistration>(base+'/preparations/'+encodeURIComponent(id)+'/register','POST',input),
