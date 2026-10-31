@@ -1,5 +1,6 @@
 import {SELF_GROUP_POLICY_KEY,buildSelfGroupCohortAnalysisPolicy,assertSelfGroupOwnSummaryCeiling} from '../assessment-policy/self-group-contract'
 import {teacherResourceMinimum} from '../huiteacher/privacyV2'
+import {validateEducationLibraryGroupCandidate} from '../scale-library-governance/education-group-resources'
 import {readEducationRunLibraryContext,assertEducationRunLibraryResources} from './educationLibraryContext'
 import {readEducationLibraryRegisteredSource} from '../scale-library-governance/education-runtime-resources'
 import {educationLibraryResourceProduct} from '../scale-library-governance/education-runtime-entry'
@@ -147,7 +148,8 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
     const row = (await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE id=${id} FOR UPDATE`)[0]
     if (!row) return reportingFail('RESOURCE_NOT_FOUND', '资源不存在', 404)
     rejectPrivateResource(row)
-    if (row.resource_key.startsWith('library-scale:') || 'libraryOrigin' in row.entry)
+    const libraryGroup=row.resource_key.startsWith('library-scale:')&&row.resource_key.endsWith(':GROUP')
+    if (!libraryGroup&&(row.resource_key.startsWith('library-scale:') || 'libraryOrigin' in row.entry))
       return reportingFail('RESOURCE_LIBRARY_LANE_REQUIRED', '共用库资源随公库精确版本管理，不使用旧独立审核流程', 409)
     const expected = { review: 'DRAFT', publish: 'REVIEWED', retire: 'PUBLISHED' }[action]
     if (row.status !== expected) return reportingFail('RESOURCE_STATE_CONFLICT', '资源状态已变化，请刷新后再试', 409)
@@ -155,10 +157,12 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
     if (action !== 'retire') {
       await tx.$queryRaw`SELECT id FROM scales WHERE id=${row.scale_id} FOR UPDATE`
       const scale = await tx.scale.findUniqueOrThrow({ where: { id: row.scale_id } })
-      validateDescriptiveResourceScale(scale, row.resource_key.startsWith('teacher-scale:') ? 'teacher_self_report' : 'participant_self_report')
+      if(libraryGroup)await validateEducationLibraryGroupCandidate(tx,row)
+      else validateDescriptiveResourceScale(scale, row.resource_key.startsWith('teacher-scale:') ? 'teacher_self_report' : 'participant_self_report')
       if (scale.definitionHash !== row.definition_hash) reportingFail('RESOURCE_INTEGRITY', '量表已变化，请重新注册当前版本', 409)
       if (action === 'review' && [row.created_by_user_id, scale.creatorId].includes(actor.userId)) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '资源注册者和量表作者不能自审，请交由另一位平台管理员审核', 403)
       if (action === 'publish' && (!row.reviewed_by_user_id || [row.created_by_user_id, scale.creatorId].includes(row.reviewed_by_user_id))) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '发布需要独立审核记录，请重新登记新版本并独立审核', 409)
+      if(!libraryGroup){
       await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${row.composite_id} FOR UPDATE`
       const content = await prepareRegisteredResourceContentSnapshot(tx, { compositeId: row.composite_id, scale, purpose: 'PUBLISH' })
       if (action === 'publish') {
@@ -167,6 +171,7 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
           trainingContentSnapshot: content.snapshot as Prisma.InputJsonValue,
           trainingContentSnapshotHash: content.snapshotHash,
         } })
+      }
       }
     }
     const status = { review: 'REVIEWED', publish: 'PUBLISHED', retire: 'RETIRED' }[action]

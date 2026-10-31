@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
+import {registerEducationLibraryGroupResource} from '../scale-library-governance/education-group-resources'
 import { prisma } from '../../config/database'
 import { instrumentError, unauthorized } from '../../utils/response'
 import { listRegistrationCandidates,listRegisteredResources, readPublishedRegisteredResource, registerDescriptiveResource, transitionDescriptiveResource } from '../assessment-run/registeredResources'
@@ -40,6 +41,7 @@ export const reportingContentController = {
   listCandidates:handle(req=>listRegistrationCandidates(actor(req),z.coerce.number().int().min(1).default(1).parse(req.query.page))),
   listResources: handle(req => listRegisteredResources(actor(req), z.coerce.number().int().min(1).max(100000).default(1).parse(req.query.page))),
   registerResource: handle(req => { const input = z.object({ scaleId: z.string().guid(), mode: z.enum(['INDIVIDUAL','GROUP','TEACHER_INDIVIDUAL','TEACHER_GROUP']).default('INDIVIDUAL') }).strict().parse(req.body); return registerDescriptiveResource(actor(req), input.scaleId, input.mode) }),
+  registerLibraryGroup:handle(req=>registerEducationLibraryGroupResource(actor(req),req.params.resourceId,req.body)),
   transitionResource: handle(req => transitionDescriptiveResource(actor(req), req.params.resourceId, z.enum(['review', 'publish', 'retire']).parse(req.params.action))),
   listSpecs: handle(req => listPlatformReportingSpecs(actor(req), z.coerce.number().int().min(1).default(1).parse(req.query.page))),
   createDescriptiveSpec: handle(async req => {

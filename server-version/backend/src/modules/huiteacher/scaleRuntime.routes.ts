@@ -60,6 +60,7 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
       AND track."resource_family"='SCALE'
       AND ((track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
         OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+        OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'
         OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
     JOIN "users" actual_respondent
       ON actual_respondent."id"=${input.actorUserId}
@@ -133,6 +134,7 @@ export async function listOwnTeacherScaleTasks(userId:string){
       AND track."resource_family"='SCALE'
       AND ((track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL' OR track."resource_key" LIKE 'teacher-scale:%:GROUP')
         OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+        OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'
         OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
     JOIN "registered_assessment_resources" registered
       ON registered."resource_key"=track."resource_key"

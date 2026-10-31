@@ -19,9 +19,10 @@ import {readEducationLibraryUse,educationLibraryUseInput} from './education-use'
 import {educationLibraryEntry,educationLibraryProduct,fail,type EducationLibraryProduct} from './contracts'
 
 const sourceInput=z.object({product:educationLibraryProduct,resourceKey:z.string().min(1).max(240),
-  resourceVersion:z.literal('1.0.0'),purpose:z.enum(['NEW_USE','EXISTING_EXECUTION','HISTORY'])}).strict()
+  resourceVersion:z.union([z.literal('1.0.0'),z.string().regex(/^2\.0\.\d+$/)]),purpose:z.enum(['NEW_USE','EXISTING_EXECUTION','HISTORY'])}).strict()
 type ResourceRow={id:string;resource_key:string;resource_version:string;scale_id:string;definition_hash:string;
-  composite_id:string;entry:EducationLibraryResourceEntry;entry_hash:string;status:string}
+  composite_id:string;entry:EducationLibraryResourceEntry;entry_hash:string;status:string;
+  created_by_user_id:string;reviewed_by_user_id:string|null;reviewed_at:Date|null;published_at:Date|null}
 
 /** Runtime allocation projection only. Never rewrite the approved declaration
  * or its contract hash; unsupported approved pairs may be adapted in the future. */
@@ -59,8 +60,10 @@ export async function readEducationLibraryRegisteredSource(tx:Prisma.Transaction
   const input=sourceInput.parse(raw)
   const [row]=await tx.$queryRaw<ResourceRow[]>(Prisma.sql`SELECT * FROM registered_assessment_resources
     WHERE resource_key=${input.resourceKey} AND resource_version=${input.resourceVersion} FOR SHARE`)
-  if(!row||row.status!=='PUBLISHED'||canonicalHash(row.entry)!==row.entry_hash)fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
+  if(!row||canonicalHash(row.entry)!==row.entry_hash)fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
   const origin=educationLibraryOriginSchema.parse(row.entry.libraryOrigin)
+  const group=origin.adapterVersion!=='1.0.0'
+  if(row.status!=='PUBLISHED'&&!(group&&input.purpose==='HISTORY'&&row.status==='RETIRED'))fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
   if(origin.product!==input.product||educationLibraryResourceKey(origin)!==input.resourceKey||origin.adapterVersion!==input.resourceVersion)
     fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
   const {entry,submission}=await loadEntry(tx,origin.entryId)
@@ -78,6 +81,8 @@ export async function readEducationLibraryRegisteredSource(tx:Prisma.Transaction
   await tx.$queryRaw(Prisma.sql`SELECT id FROM scales WHERE id=${row.scale_id} FOR SHARE`)
   const scale=await tx.scale.findUnique({where:{id:row.scale_id}})
   if(!scale||scale.libraryEntryId!==entry.id||scale.definitionHash!==row.definition_hash)fail('EDUCATION_LIBRARY_WRAPPER_IDENTITY_MISMATCH')
+  if(group&&(!row.reviewed_by_user_id||!row.reviewed_at||!row.published_at
+    ||row.reviewed_by_user_id===row.created_by_user_id||row.reviewed_by_user_id===scale.creatorId))fail('EDUCATION_LIBRARY_GROUP_REVIEW_REQUIRED')
   const source=await readLibraryScaleMeasurementSource(tx,scale,input.purpose==='NEW_USE'?'NEW_USE':'FROZEN_IDENTITY')
   if(source.release.releaseId!==origin.releaseId||source.release.contentHash!==origin.contentHash)fail('EDUCATION_LIBRARY_EXACT_VERSION_MISMATCH')
   if(input.purpose!=='HISTORY')await assertScaleLibraryCollectionAllowed(tx,[origin.releaseId])
@@ -93,7 +98,8 @@ export async function readEducationLibraryRegisteredSource(tx:Prisma.Transaction
     ||unit.measurement.releaseId!==origin.releaseId||unit.measurement.contentHash!==origin.contentHash
     ||unit.measurement.measurementHash!==source.release.content.measurementHash||unit.report!==undefined||unit.referencePolicy!==undefined)
     fail('EDUCATION_LIBRARY_COMPOSITE_IDENTITY_MISMATCH')
-  const expected=educationLibraryResourceEntry({origin,variant,title:submission.snapshot.title,definition:source.definition,compositeId:composite.id})
+  const expected=educationLibraryResourceEntry({origin,variant,title:submission.snapshot.title,definition:source.definition,compositeId:composite.id,
+    ...(group?{disclosure:row.entry.resultDisclosure}:{})})
   if(canonicalHash(expected)!==row.entry_hash)fail('EDUCATION_LIBRARY_REGISTERED_POLICY_MISMATCH')
   return {...origin,scaleId:scale.id,compositeId:composite.id,compositeItemId:composite.items[0].id,
     resultDisclosure:expected.resultDisclosure!,resourceEntry:expected,libraryStatus:entry.status,identityOnly:true as const}
@@ -103,7 +109,7 @@ export async function readEducationLibraryRegisteredSource(tx:Prisma.Transaction
  * server-owned context. Must be called BEFORE the caller takes any org lock;
  */
 export async function assertEducationLibraryRegisteredUse(tx:Prisma.TransactionClient,input:{
-  product:EducationLibraryOrigin['product'];organizationId:string;actorId:string;resourceKey:string;resourceVersion:'1.0.0';
+  product:EducationLibraryOrigin['product'];organizationId:string;actorId:string;resourceKey:string;resourceVersion:string;
 }){
   await assertEducationLibraryReadCommitted(tx)
   const [header]=await tx.$queryRaw<Array<{origin:unknown}>>(Prisma.sql`SELECT entry->'libraryOrigin' AS origin FROM registered_assessment_resources
@@ -120,6 +126,18 @@ export async function assertEducationLibraryRegisteredUse(tx:Prisma.TransactionC
   const authority=await readEducationLibraryUse(tx,context,{onlyGrantId:selected.grantId})
   const source=await readEducationLibraryRegisteredSource(tx,{product:input.product,resourceKey:input.resourceKey,resourceVersion:input.resourceVersion,purpose:'NEW_USE'})
   return {source,authority}
+}
+
+/** One frozen policy wrapper per registered resource, as required by the
+ * existing unique composite_id. All policy versions retain the same approved C. */
+export async function createEducationLibraryPolicyWrapper(tx:Prisma.TransactionClient,input:{title:string;scaleId:string;instruction:string|null;actorId:string}){
+ const composite=await tx.compositeAssessment.create({data:{code:'org-library-resource-'+randomUUID(),name:input.title,
+  instruction:input.instruction,createdBy:input.actorId,productKind:'ORGANIZATION_RESOURCE',publicEnabled:false,
+  items:{create:{type:'SCALE',position:0,required:true,scaleId:input.scaleId}}},include:{items:{include:{scale:true}}}})
+ const content=await prepareTrainingContentSnapshot(tx,composite,new Map())
+ await tx.compositeAssessment.update({where:{id:composite.id},data:{status:'PUBLISHED',publishedAt:new Date(),
+  trainingContentSnapshot:content.snapshot as unknown as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}})
+ return composite
 }
 
 /** INTERNAL ONLY until the actual runtime/media/report lane is connected.
@@ -184,12 +202,7 @@ export async function prepareEducationLibraryResources(tx:Prisma.TransactionClie
       if(canonicalHash(prior.entry.libraryOrigin)!==canonicalHash(origin))fail('EDUCATION_LIBRARY_REGISTERED_ORIGIN_CONFLICT')
       resources.push(verified);continue
     }
-    const composite=await tx.compositeAssessment.create({data:{code:'org-library-resource-'+randomUUID(),name:submission.snapshot.title,
-      instruction:scale.instruction,createdBy:input.actorId,productKind:'ORGANIZATION_RESOURCE',publicEnabled:false,
-      items:{create:{type:'SCALE',position:0,required:true,scaleId:scale.id}}},include:{items:{include:{scale:true}}}})
-    const content=await prepareTrainingContentSnapshot(tx,composite,new Map())
-    await tx.compositeAssessment.update({where:{id:composite.id},data:{status:'PUBLISHED',publishedAt:new Date(),
-      trainingContentSnapshot:content.snapshot as unknown as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}})
+    const composite=await createEducationLibraryPolicyWrapper(tx,{title:submission.snapshot.title,scaleId:scale.id,instruction:scale.instruction,actorId:input.actorId})
     const resource=educationLibraryResourceEntry({origin,variant,title:submission.snapshot.title,definition,compositeId:composite.id})
     await tx.$executeRaw(Prisma.sql`INSERT INTO registered_assessment_resources
       (id,resource_key,resource_version,scale_id,definition_hash,composite_id,entry,entry_hash,status,created_by_user_id,published_by_user_id,published_at)
