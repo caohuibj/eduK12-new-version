@@ -2537,8 +2537,8 @@
           ],
           "historicalTestDifference": {
             "path": "server-version/frontend/src/components/education-tools/EducationCompositionSchoolConsumers.test.tsx",
-            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'\u666e\u901a\u95ee\u5377'})).toBeEnabled())",
-            "afterAwait": "await waitFor(()=>expect(screen.queryByText('\u6b63\u5728\u8bfb\u53d6\u6216\u4fdd\u5b58\uff0c\u8bf7\u7a0d\u5019\u2026')).not.toBeInTheDocument())",
+            "beforeAwait": "await waitFor(()=>expect(screen.getByRole('button',{name:'普通问卷'})).toBeEnabled())",
+            "afterAwait": "await waitFor(()=>expect(screen.queryByText('正在读取或保存，请稍候…')).not.toBeInTheDocument())",
             "affectsSelectedCases": false,
             "failedCaseQualifiedBy": "school-recheck"
           }
@@ -3051,7 +3051,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "task group leaf statistics keeps zero, signed values and per-metric missing denominators, using existing statistics",
@@ -3078,11 +3078,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'completed then NOT_SHOWN in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-\u2026' retains frozen provenance and unchanged stored metrics without rescoring",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports 'NOT_SHOWN then completed in research-…' retains frozen provenance and unchanged stored metrics without rescoring",
               "status": "passed"
             },
             {
@@ -3098,11 +3098,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_LONG codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
               "status": "passed"
             },
             {
@@ -3118,11 +3118,11 @@
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'completed then NOT_SHOWN in research-…'",
               "status": "passed"
             },
             {
-              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-\u2026'",
+              "fullName": "Imported cognitive source provenance survives real FINAL projection and score exports SCORE_WIDE codebook and ticket manifest agree 'NOT_SHOWN then completed in research-…'",
               "status": "passed"
             },
             {
@@ -3985,7 +3985,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4425,7 +4425,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -4826,7 +4826,7 @@
             "server-version/backend/src/services/materialGrant.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey generated group snapshot / real HTTP and PostgreSQL generates the real Form report, then reopens without FINAL decryption or regeneration",
@@ -5057,7 +5057,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "Survey task group artifacts selects scale before metric extraction, so repeated total keys remain isolated",
@@ -5305,7 +5305,7 @@
             "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
           ],
           "sourceAssociationBasis": "Unsigned original WIP evidence associated retrospectively with its retained reference commit, not invented original execution provenance.",
-          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate\u2019s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
+          "deltaRationale": "Reviewed original source changes are explicit: stable reporting math/leaf identity/authority assertions remain; the subsequent bounded page/map/projection P2 is covered by the selected wide case. Upstream native Cognitive compatibility and Training picker changes are main inputs already qualified independently. Current merged backend types plus exact-main artifact native migration/restore evidence close this candidate’s missing checks. Main8bd catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay. Mainb85 catalog alignment adds only reviewed source catalogs/generated registry and docs; Survey/statistics/runtime/schema/locked dependency inputs remain equal to the qualified7c checkpoint. No original case or database journey replay.",
           "cases": [
             {
               "fullName": "exact main task artifact migration and native backup upgrades exact main, restores encrypted artifacts with native PostgreSQL and preserves immutable rows",
@@ -9864,7 +9864,7 @@
               "status": "passed"
             },
             {
-              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
+              "fullName": "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
               "status": "passed"
             },
             {
@@ -9878,7 +9878,7 @@
           ],
           "selectedCases": [
             "Reviewed nonempty reports register against the original independent C/P axes 'cfq7_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
-            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res\u2026' retains its default and composes a distinct real report with the exact same C/P",
+            "Reviewed nonempty reports register against the original independent C/P axes 'ipip_neo_c1_self_efficacy10_zh_cn_res…' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes 'bps9_zh_cn_research' retains its default and composes a distinct real report with the exact same C/P",
             "Reviewed nonempty reports register against the original independent C/P axes rejects stale C/P bindings, reused R versions and empty report variants without changing the source"
           ],
@@ -11708,6 +11708,379 @@
             "Original publication/participant reused;only four necessary new synthetic completions.",
             "Cognitive/SJT not independently proved as multi-person disclosed aggregates;no browser or production claim."
           ]
+        }
+      ]
+    },
+    "420": {
+      "schemaVersion": 1,
+      "product": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "limitations": [
+          "Fresh local unsigned recovered-candidate evidence; old original local logs unavailable.",
+          "Official build/lint accepted only as successful steps in cancelled run41082809728 attempt1; whole-run qualification not claimed.",
+          "Local runtime clock is retained as emitted, not backdated; GitHub original timestamps unchanged.",
+          "No browser, PG, platform, baseline rebuild, deployment or merge verification."
+        ]
+      },
+      "reports": [
+        {
+          "id": "personal-chart-four-cases",
+          "path": "docs/evidence/personal-chart-loading-20261030/report-tests-results.json",
+          "sha256": "af4976cb6553c54a70ac6820fce54fd5eda863e6272c04c625335c1539e8cd6d",
+          "originalSourceAssociation": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedUnrelatedSourceDelta": [],
+          "deltaRationale": "Complete frontend tree unchanged since exact fresh execution.",
+          "sourceAssociationBasis": "Actual execution remained local f4fa39bdb98d3d6984538b45de5797a46b52bda5. Remote comparison anchor dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1 has identical full git tree cfc70c7f34d96cb40fcd50e715e9c9d3e7762480 (fetched and verified). originalSourceAssociation is only this retrievable comparison anchor; original report/command receipt bytes and timestamps are unchanged, not a remote execution.",
+          "cases": [
+            {
+              "fullName": "personal changes chart loading loads no chart for waiting feedback and preserves numeric content during chart loading",
+              "status": "passed"
+            },
+            {
+              "fullName": "Personal changes report shows a disclosed wholly missing metric and its release/validity notes",
+              "status": "passed"
+            },
+            {
+              "fullName": "Personal changes report keeps zero, actual dates, signed baseline differences and a missing-wave note",
+              "status": "passed"
+            },
+            {
+              "fullName": "Personal changes report shows eligibility in the report response without a separate request",
+              "status": "passed"
+            }
+          ],
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "actualLocalExecutionSource": "f4fa39bdb98d3d6984538b45de5797a46b52bda5"
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/personal-chart-loading-20261030/frontend-types-qualified.json",
+          "sha256": "ba0591d839148b402803798736fa6c51d1c216e8c1a0a2bba4d09e67d0df28b5",
+          "component": "frontend",
+          "componentTree": "8d7f9214106aa965d1379b75464136d7cc5b90e5",
+          "exitField": "exitCode",
+          "log": "docs/evidence/personal-chart-loading-20261030/frontend-types-qualified.log"
+        }
+      ],
+      "executionSourceMapping": {
+        "actualLocalExecutionSource": "f4fa39bdb98d3d6984538b45de5797a46b52bda5",
+        "remoteComparisonAnchor": "dbb76d123beb88480ce23b16a1f3f58ca5f1c2e1",
+        "identicalFullTree": "cfc70c7f34d96cb40fcd50e715e9c9d3e7762480",
+        "basis": "Fetched remote commit and compared full git tree to actual local execution commit. Remote anchor is a comparison identity, NOT the original execution SHA; original receipts/report bytes and times unchanged."
+      }
+    },
+    "422": {
+      "schemaVersion": 1,
+      "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Original reports are unsigned;source49538293f association is retrospective,not a reconstructed execution signature.",
+          "Before the first native run no complete source receipt was captured. The sole subsequent application delta is archived-task catalog/read-only support;the dedicated archive case passed afterward. Complete final backend type inputs were captured before/after compilation.",
+          "Original unit fixture startup and control assertion failures remain in raw evidence;zero-case startup failure is not promoted to passed. Exactly4 distinct passed application cases;duplicate earlier unit successes and filtered five-person row are not counted again.",
+          "Backend types are exact tree3981ae7a7afa5716834f69315b708075b93c6c76. Frontend/schema/migrations/locks equal main;no old81/175/41 application,PG,browser or Cognitive timing replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "standalone-unit",
+          "path": "docs/evidence/group-report-training-standalone-20261030/unit-current.json",
+          "sha256": "aeebfb57caaefdbc9841df9ddac0a97fed032f0dcb5ae9f15757ed224a5e22a0",
+          "originalSourceAssociation": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Two actual current adapter cases; exact final backend type manifest retained. Unsigned output,retrospective association with product49538293f,not an execution signature.",
+          "deltaRationale": "Product49538293f is the explicit retrospective reference point for these raw outputs;formal follow-up changes controls only. Original native source-capture limitation and the exact post-first-run archive delta are disclosed in the committed README. No claim that unsigned originals were signed or executed at a Git commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "selects the completed session first, preserves zero and missing, and respects persisted report visibility",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps protocol, Profile and published units separate instead of pooling incompatible values",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "standalone-native-five",
+          "path": "docs/evidence/group-report-training-standalone-20261030/postgres-first.json",
+          "sha256": "537247cf7ba156fb5bc321522b0cc51863f26b1b7b616ec15b620cc92243c107",
+          "originalSourceAssociation": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Actual standalone publication,5 legitimate synthetic final submissions,generation and stored read. Execution preceded only archived-catalog/read-only support and a second test addition;the PUBLISHED generation and frozen reader behavior did not change. Original pre-execution full source inventory was not captured;association with49538293f is retrospective,not an exact execution signature.",
+          "deltaRationale": "Product49538293f is the explicit retrospective reference point for these raw outputs;formal follow-up changes controls only. Original native source-capture limitation and the exact post-first-run archive delta are disclosed in the committed README. No claim that unsigned originals were signed or executed at a Git commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "generates a disclosed standalone Cognitive course report and reopens its frozen version without reading result payloads",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "standalone-archived",
+          "path": "docs/evidence/group-report-training-standalone-20261030/postgres-archive.json",
+          "sha256": "804ee3c5f64e50385c85ed12fd1cc94065e6f1756db34088bf5f93275d545eaa",
+          "originalSourceAssociation": "49538293f19cc8dea5d1d2df5292906d5e483a0e",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Actual one-case continuation on the retained generated artifact after adding archived state support;the original five-person test remained filtered and was not replayed. Current backend tree manifest later captured unchanged complete inputs.",
+          "deltaRationale": "Product49538293f is the explicit retrospective reference point for these raw outputs;formal follow-up changes controls only. Original native source-capture limitation and the exact post-first-run archive delta are disclosed in the committed README. No claim that unsigned originals were signed or executed at a Git commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "generates a disclosed standalone Cognitive course report and reopens its frozen version without reading result payloads",
+              "status": "skipped"
+            },
+            {
+              "fullName": "keeps an archived standalone task and its original version reachable while disabling generation",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-training-standalone-20261030/backend-types.json",
+          "sha256": "620fac6ab8286bec16ea1f3e45348708aa2a530ba26330bb050d0ed4957b10f9",
+          "component": "backend",
+          "componentTree": "3981ae7a7afa5716834f69315b708075b93c6c76",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-training-standalone-20261030/backend-types.log"
+        }
+      ],
+      "groupReportObservations": [
+        {
+          "kind": "standalone-cognitive",
+          "path": "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-proof.json",
+          "sha256": "ecf8d2f9625906adb8647252fde1116c2f250631adf381d7cf38672f1df7366b",
+          "sourceAssociationBasis": "Actual isolated native observation corroborated by the corresponding unchanged raw reporter;no result/answer replay in CI.",
+          "limitations": [
+            "Synthetic local database,not production or performance evidence.",
+            "Original receipts unsigned;first native full source inventory was not captured at execution time."
+          ]
+        },
+        {
+          "kind": "standalone-archived",
+          "path": "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-archived-proof.json",
+          "sha256": "f0df726f176762ef32707c731b3f949246105bdf1444c7db4ab6a4d47f50a99c",
+          "sourceAssociationBasis": "Actual isolated native observation corroborated by the corresponding unchanged raw reporter;no result/answer replay in CI.",
+          "limitations": [
+            "Synthetic local database,not production or performance evidence.",
+            "Original receipts unsigned;first native full source inventory was not captured at execution time."
+          ]
+        }
+      ]
+    },
+    "423": {
+      "schemaVersion": 1,
+      "product": "f7e90457e7fd30c0efbd1f9a3da0a128f025d4a9",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Four existing passed application cases are reused; no application, FINAL, broad PG or browser replay. Original reporters and source associations are unsigned historical records, not reconstructed signatures.",
+          "Legacy compatibility is brought forward from #425 before #423 merge. Full original-to-product source deltas are bound per record; source rationale distinguishes startup/admission from unused group-report adapters. Static module review is supporting analysis only.",
+          "Both current component type receipts bind the exact combined backend/frontend trees with actual exit0 and stable inputs; no install/build, schema, migration, production or new role changes."
+        ]
+      },
+      "reports": [
+        {
+          "id": "course-owner-unit",
+          "path": "docs/evidence/group-report-training-scale-course-20261030/unit.json",
+          "sha256": "2ba71492a7ff8048f5692d15ffb4237f961c42511d92b149fb1a3638ae2444f7",
+          "originalSourceAssociation": "a52af7a4a7aee6e6e1d06c862104e224a59e1524",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original course-owner permission case; only a different function's reviewed Legacy course predicate and its PG test changed. No caller, grant selection, locks or dependencies changed. Unsigned original, retrospectively indexed at its saved source snapshot; not a signed execution at a commit.",
+          "deltaRationale": "Original course-owner permission case; only a different function's reviewed Legacy course predicate and its PG test changed. No caller, grant selection, locks or dependencies changed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "uses only the requested course owner grant for a new course-bound standalone start",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "course-context-ui",
+          "path": "docs/evidence/group-report-training-scale-course-20261030/frontend.json",
+          "sha256": "ec85220854d9ea4f808c44d1a3a426273592c4c98bd4237c108ad3a80d45c718",
+          "originalSourceAssociation": "a52af7a4a7aee6e6e1d06c862104e224a59e1524",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+            "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+          ],
+          "sourceAssociationBasis": "ScaleAssessment/context-case source bytes unchanged. The main chart-loading delta is outside its static import closure; current combined frontend compiled once. Original six filtered cases remain filtered. Unsigned original, retrospectively indexed at its saved source snapshot; not a signed execution at a commit.",
+          "deltaRationale": "ScaleAssessment/context-case source bytes unchanged. The main chart-loading delta is outside its static import closure; current combined frontend compiled once. Original six filtered cases remain filtered.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 6
+          },
+          "cases": [
+            {
+              "fullName": "ScaleAssessment answer navigation Training advances after an explicit answer and retains final submission and back navigation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "ScaleAssessment answer navigation appends locally and advances explicitly before the batched network flush",
+              "status": "skipped"
+            },
+            {
+              "fullName": "ScaleAssessment answer navigation keeps the pending checkpoint when the batch flush fails",
+              "status": "skipped"
+            },
+            {
+              "fullName": "ScaleAssessment answer navigation does not issue one network request per answer",
+              "status": "skipped"
+            },
+            {
+              "fullName": "ScaleAssessment answer navigation keeps the last question visible and only completes after an explicit click",
+              "status": "skipped"
+            },
+            {
+              "fullName": "ScaleAssessment context preflight carries the Training course hint through the actual start and required-context round trip",
+              "status": "passed"
+            },
+            {
+              "fullName": "ScaleAssessment context preflight collects only required facts and does not display items before admission",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "new-course-native",
+          "path": "docs/evidence/group-report-training-scale-course-20261030/postgres-first.json",
+          "sha256": "b351c2b1f5f6730ececfe3d9b60bc9c542a41a092be0e4bc22098ad35b2199cf",
+          "originalSourceAssociation": "a52af7a4a7aee6e6e1d06c862104e224a59e1524",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Actual controller/start/resume/conflict/restart/FINAL original. The only production delta is allowing existing LEGACY_COURSE alongside TRAINING_COURSE in the same allocation/membership predicate; TRAINING_COURSE admission is unchanged, with the complementary Legacy case below. No new FINALs or lifecycle replay. Unsigned original, retrospectively indexed at its saved source snapshot; not a signed execution at a commit.",
+          "deltaRationale": "Actual controller/start/resume/conflict/restart/FINAL original. The only production delta is allowing existing LEGACY_COURSE alongside TRAINING_COURSE in the same allocation/membership predicate; TRAINING_COURSE admission is unchanged, with the complementary Legacy case below. No new FINALs or lifecycle replay.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "freezes trusted new Scale course delivery, preserves it through restart and FINAL, and never relabels another source",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "legacy-course-native",
+          "path": "docs/evidence/group-report-legacy-course-20261030/postgres.json",
+          "sha256": "56fdc3b0a831fbfd2633fcc3245a2101730b6ff270bf0d227b5390f0582a07c0",
+          "originalSourceAssociation": "8ee77177ffb6cea6e14e94c14d37fba8f0f9d13f",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+            "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+            "server-version/backend/src/modules/training-analysis/group-source.ts",
+            "server-version/backend/src/modules/training-analysis/source.ts"
+          ],
+          "sourceAssociationBasis": "Exact Legacy start test, controller, access and restart source from the passed continuation. Original snapshot also contained #424 group report adapters; those only define report-selection functions and are not called by this first-start scenario. Their absence is explicitly retained in the whole-component delta; current types cover the assembled module interfaces. Unsigned original, retrospectively indexed at its saved source snapshot; not a signed execution at a commit.",
+          "deltaRationale": "Exact Legacy start test, controller, access and restart source from the passed continuation. Original snapshot also contained #424 group report adapters; those only define report-selection functions and are not called by this first-start scenario. Their absence is explicitly retained in the whole-component delta; current types cover the assembled module interfaces.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "preserves an authorized LEGACY_COURSE first Scale start without converting its course type or rewriting history",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.json",
+          "sha256": "64cb7d937a709214de4575538b0257d9b6140d5bdea01206b724276224e1d0d2",
+          "component": "backend",
+          "componentTree": "4b2481a35fa01fccff933f85676c99883d6fc52d",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.json",
+          "sha256": "409d4e1c25cfff754d55a236302b866ba74b3867b6d8ee6077d7ab84f03f2f7b",
+          "component": "frontend",
+          "componentTree": "6dd9390e0104306cad051c7048aac9b05c82e27a",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log"
         }
       ]
     }

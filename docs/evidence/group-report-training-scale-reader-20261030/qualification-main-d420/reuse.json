@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "candidateSource": "9236e3c7141ace35c258928a49df0af05761daae",
+  "parentCandidate": "c7940ed885ed52243dd05447460a45ac05bec759",
+  "main": "d420e90e46036b4518a0f729cb3e1ef4b9ca3306",
+  "backendComponentTree": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+  "frontendComponentTree": "6dd9390e0104306cad051c7048aac9b05c82e27a",
+  "typeReceipts": [
+    {
+      "path": "docs/evidence/group-report-legacy-course-20261030/backend-types.json",
+      "sha256": "bb78e3cf229e05c6b3d1232bb6ba81fe25ad6cd684386e7f06115cfe75f9e661",
+      "originalExecutionRetained": true
+    },
+    {
+      "path": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.json",
+      "sha256": "409d4e1c25cfff754d55a236302b866ba74b3867b6d8ee6077d7ab84f03f2f7b",
+      "originalExecutionRetained": true
+    }
+  ],
+  "applicationReports": [
+    {
+      "path": "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json",
+      "sha256": "c8f65584fcfc0738d72dd82f9b6fb0bbb6096140b480e23454c94f6ad43bac8e"
+    },
+    {
+      "path": "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json",
+      "sha256": "8248695a17d724242d358fc16f8b20061e9bc4972358e0da76e0260f98959cfa"
+    },
+    {
+      "path": "docs/evidence/group-report-training-scale-reader-20261030/picker-current-proof.json",
+      "sha256": "346c7dc5f82a1f186cfda9706cc637b5bee338d842f5c453a6a2e994ce490a6a"
+    }
+  ],
+  "applicationReplay": false,
+  "typeReplay": false,
+  "ciExecuted": false,
+  "mergeExecuted": false,
+  "backendEqualsReviewedLegacyCandidate": true
+}
