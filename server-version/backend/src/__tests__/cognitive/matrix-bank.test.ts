@@ -8,7 +8,7 @@ import { matrixBankFileSchema } from '../../modules/cognitive/banks/matrix-bank-
  * 渲染回归由 SVG 结构断言承担（每格/每选项必须是完整 svg 文档且无退化 NA 节点）；
  * 规则覆盖与干扰项可用性按 roadmap 质检门槛断言。
  */
-const BANK_PATH = path.resolve('../tools/matrix-generation/bank-matgen.json')
+const BANK_PATH = path.resolve('src/modules/cognitive/banks/bank-matgen.json')
 
 describe('matRiks generated matrix bank (roadmap v2.0 PR2)', () => {
   const bank = matrixBankFileSchema.parse(JSON.parse(readFileSync(BANK_PATH, 'utf8')))

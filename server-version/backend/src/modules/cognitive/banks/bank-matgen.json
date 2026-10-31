@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "generator": "matRiks 0.1.5 (MIT); offline pipeline generate-matrices.R",
   "seed": 20261031,
-  "generatedAtUtc": "2026-10-31T04:52:09Z",
+  "generatedAtUtc": "2026-10-31T05:07:28Z",
   "provenance": "Generated offline for EduK12 internal use; rule system MIT-licensed matRiks; items are internal-authored derivatives, not copies of any published test.",
   "coverage": {
     "byMatrixType": {

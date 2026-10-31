@@ -11,5 +11,16 @@ export const scientificGovernance: CognitiveGovernanceV1[] = [
     "protocolApplicability": "",
     "knownLimitations": [],
     "evidence": []
+  },
+  {
+    "schemaVersion": 1,
+    "testType": "icarmatrix",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredMaturity": "PILOT",
+    "claimScope": null,
+    "protocolApplicability": "",
+    "knownLimitations": [],
+    "evidence": []
   }
 ]

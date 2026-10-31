@@ -34,5 +34,38 @@ export const executionSemantics: CognitiveExecutionSemanticsV1[] = [
       "validRtCount": "processing_speed"
     },
     "legacyStatus": "PUBLISHED"
+  },
+  {
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "icarmatrix/2.0.0/1.0.0",
+      "version": "2.0.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "matgen-bank-v1.0.0",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "qualityEffects": {
+      "interpretable": "none",
+      "interrupted": "limited",
+      "excessiveTimeouts": "limited",
+      "rapidGuessing": "limited"
+    },
+    "metricCategories": {
+      "accuracy": "fluid_reasoning",
+      "medianRtMs": "processing_speed",
+      "correctCount": "fluid_reasoning",
+      "accuracyByRuleTag": "fluid_reasoning"
+    },
+    "legacyStatus": "PUBLISHED"
   }
 ]

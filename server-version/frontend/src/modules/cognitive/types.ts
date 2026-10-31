@@ -1123,3 +1123,28 @@ export type AuditorynbackTrialPayload = {
   interrupted: boolean
   audioLatencyMs: number | null
 }
+
+/** Icarmatrix v2 冻结 config（与后端 icarmatrix-v2.config schema 一致）。 */
+export interface IcarmatrixV2Config {
+  totalTrials: number
+  matrixType: '2x2' | '3x3'
+  stimulusSetVersion: 'matgen-bank-v1.0.0'
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Icarmatrix v2 单 trial payload（与后端 icarmatrix-v2.trial schema 一致）。 */
+export type IcarmatrixV2TrialPayload = {
+  trialIndex: number
+  bankItemId: string
+  responseIndex: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

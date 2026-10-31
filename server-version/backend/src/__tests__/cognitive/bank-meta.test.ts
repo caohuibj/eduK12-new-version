@@ -40,7 +40,7 @@ describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
     const declared = ['icarmatrix', 'cogest', 'logicdeduce', 'proofread', 'readingcomp', 'semanticfluency', 'seriescomplete', 'wordanalogy', 'wordmeaning', 'wordproblem']
     for (const task of declared) {
       const declaration = JSON.parse(readFileSync(path.join(tasksDir, task, 'task-package.json'), 'utf8'))
-      expect(declaration.banks, `${task} declares banks`).toHaveLength(1)
+      expect(declaration.banks?.length ?? 0, `${task} declares banks`).toBeGreaterThan(0)
       const bankModule = await import(path.join(tasksDir, task, declaration.banks[0].file))
       const parsed = cognitiveBankMetaSchema.safeParse(bankModule[declaration.banks[0].export])
       expect(parsed.success, `${task} bankMeta parses`).toBe(true)

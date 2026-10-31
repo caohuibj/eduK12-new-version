@@ -8,6 +8,12 @@
       "engineVersion": "1.0.0",
       "scoringVersion": "1.0.0",
       "order": 117
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 133
     }
   ],
   "backend": {
@@ -20,11 +26,21 @@
       "engineVersion": "1.0.0",
       "file": "server-version/frontend/src/modules/cognitive/tasks/icarmatrix/icarmatrix.registry.ts",
       "export": "icarmatrixRegistryEntry"
+    },
+    {
+      "testType": "icarmatrix",
+      "engineVersion": "2.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/icarmatrix/icarmatrix.registry.ts",
+      "export": "icarmatrixV2RegistryEntry"
     }
   ],
   "banks": [
     {
       "file": "generator.ts",
+      "export": "bankMeta"
+    },
+    {
+      "file": "generator-v2.ts",
       "export": "bankMeta"
     }
   ],
@@ -36,7 +52,10 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
-      117
+      117,
+      133,
+      133,
+      133
     ]
   },
   "presentation": {
@@ -50,7 +69,8 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/icarmatrix/__tests__/IcarmatrixTask.test.tsx",
-      "src/modules/cognitive/tasks/icarmatrix/__tests__/generator.test.ts"
+      "src/modules/cognitive/tasks/icarmatrix/__tests__/generator.test.ts",
+      "src/modules/cognitive/tasks/icarmatrix/__tests__/IcarmatrixV2Task.test.tsx"
     ]
   }
 }

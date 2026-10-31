@@ -30,7 +30,7 @@ arg_value <- function(flag) {
 seed <- { v <- arg_value("--seed"); if (is.na(v)) 20261031L else as.integer(v) }
 out_path <- { v <- arg_value("--out"); if (is.na(v)) {
   script <- sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])
-  file.path(dirname(script), "bank-matgen.json")
+  file.path(dirname(script), "..", "..", "backend", "src", "modules", "cognitive", "banks", "bank-matgen.json")
 } else v }
 
 CELL_SVG_IN <- 1.15  # inches per rendered cell/response
@@ -107,7 +107,6 @@ counter <- new.env(parent = emptyenv()); counter$n <- 0L
 emit <- function(matrix_type, hrule, vrule, fig_expr, extra_tags = character(0)) {
   counter$n <- counter$n + 1L
   item <- render_item(plan_id(counter$n, matrix_type, hrule, vrule), matrix_type, hrule, vrule, fig_expr, extra_tags)
-  cat("DEBUG plan", counter$n, matrix_type, hrule, vrule, "item_null=", is.null(item), "\n")
   add_item(item)
 }
 
@@ -158,7 +157,14 @@ payload <- list(
   items = items
 )
 
-writeLines(jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = TRUE, null = "null"), out_path)
+bank_json <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = TRUE, null = "null")
+writeLines(bank_json, out_path)
+# 前端副本（与后端规范位置保持同步；前端 runner 渲染同一题库）
+frontend_dir <- file.path(dirname(out_path), "..", "..", "..", "..", "..", "frontend", "src", "modules", "cognitive", "tasks", "icarmatrix")
+if (dir.exists(normalizePath(frontend_dir, mustWork = FALSE))) {
+  writeLines(bank_json, file.path(normalizePath(frontend_dir), "bank-matgen.json"))
+  cat("frontend copy written\n")
+}
 cat(sprintf("items=%d (3x3=%d, 2x2=%d) rules=%s failedPlans=%d -> %s (%.1f KB)\n",
             length(items), coverage[["3x3"]], coverage[["2x2"]],
             paste(names(rule_cov), collapse = "/"), length(failures),

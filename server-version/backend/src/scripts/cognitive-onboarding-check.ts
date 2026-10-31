@@ -265,7 +265,9 @@ async function main() {
               })
               continue
             }
-            const seedStimulusVersions = seeds
+            // 题库是 task 级资产：对齐该 testType 全部 seed（多引擎可各带题库版本）。
+            const seedStimulusVersions = cognitiveSeeds
+              .filter((s) => s.testType === id.testType)
               .map((s) => (s.config as { stimulusSetVersion?: unknown }).stimulusSetVersion)
               .filter((v): v is string => typeof v === 'string')
             if (seedStimulusVersions.length > 0 && !seedStimulusVersions.includes(parsed.data.stimulusSetVersion)) {

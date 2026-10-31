@@ -7,7 +7,7 @@ export const catalog: CognitiveLibraryCatalogEntry = {
   interactionFamily: 'multi_option_selection',
   rtSensitivity: 'low',
   fineMotorSensitivity: 'low',
-  adminScientificNotes: '图形矩阵推理范式（ICAR matrix reasoning 公共领域范式结构；Sandia MatGen 生成思路）；题源双轨：前 8 题为冻结手写题库（跨 seed 稳定、可横向比较），其余按 session seed 生成（重复施测不复现）；正确项由服务端按 seed+index 重建推导。与既有 matrix 任务（4 选项 itemId 题库）为不同身份。被试人群变体（儿童/青少年/成人）通过独立 configVersion 承载试次数差异，不得改生成器版本、scoringVersion 阈值或 presentationVersion 文案。',
+  adminScientificNotes: '图形矩阵推理范式（ICAR matrix reasoning 公共领域范式结构；Sandia MatGen 生成思路）；题源双轨：前 8 题为冻结手写题库（跨 seed 稳定、可横向比较），其余按 session seed 生成（重复施测不复现）；正确项由服务端按 seed+index 重建推导。engineVersion 2.0.0（规则题库版）改用 matRiks（MIT）离线生成的冻结题库（2x2 儿童轨 / 3x3 标准轨，seed 确定性选题与选项呈现排序），与 1.0.0 并存、历史数据不受影响。与既有 matrix 任务（4 选项 itemId 题库）为不同身份。被试人群变体（儿童/青少年/成人）通过独立 configVersion 承载试次数差异，不得改生成器版本、scoringVersion 阈值或 presentationVersion 文案。',
   knownLimitations: [
     '正确率不换算 IQ、不与 Raven APM 等价。',
     '生成题的难度随规则组合波动，未做逐题难度标定。',

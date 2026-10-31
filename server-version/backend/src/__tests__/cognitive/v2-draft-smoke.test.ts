@@ -12,7 +12,10 @@ import {
 const sceneIds = Array.from({ length: 6 }, (_, index) => `scene-${String(index + 1).padStart(2, '0')}`)
 const pairResponses = Array.from({ length: 6 }, (_, index) => ({ itemId: `pair-${String(index + 1).padStart(2, '0')}`, selectedPosition: index % 4 }))
 
-const payloadFor = (testType: string): { phase: 'test' | 'learning'; payload: unknown } => {
+const payloadFor = (testType: string, engineVersion = '1.0.0'): { phase: 'test' | 'learning'; payload: unknown } => {
+  if (testType === 'icarmatrix' && engineVersion === '2.0.0') {
+    return { phase: 'test', payload: { trialIndex: 0, bankItemId: 'matgen-std-rotate-rotate-006', responseIndex: 2, rtMs: 300, interrupted: false } }
+  }
   switch (testType) {
     case 'fake': return { phase: 'test', payload: { correct: true, rtMs: 400 } }
     case 'reaction': return { phase: 'test', payload: { foreperiodMs: 700, rtMs: 350, prematureCount: 0, interrupted: false, inputMode: 'pointer' } }
@@ -85,8 +88,11 @@ describe('Cognitive v2 exact-identity contract smoke fixtures', () => {
   const definitions = listCognitiveV2TaskDefinitions()
 
   it('covers every registered exact identity with a seeded config and valid envelope payload', () => {
-    expect(definitions).toHaveLength(COGNITIVE_SEEDS.length)
+    const seedIdentities = new Set(COGNITIVE_SEEDS.map((seed: { testType: string; engineVersion: string; scoringVersion: string }) => `${seed.testType}/${seed.engineVersion}/${seed.scoringVersion}`))
+    expect(definitions).toHaveLength(seedIdentities.size)
     for (const definition of definitions) {
+      expect(seedIdentities.has(`${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`)).toBe(true)
+    }    for (const definition of definitions) {
       const seed = seedFor(definition)
       expect(seed, `${definition.testType}/${definition.scoringVersion} is missing a seed fixture`).toBeTruthy()
       if (!seed) continue
@@ -96,7 +102,7 @@ describe('Cognitive v2 exact-identity contract smoke fixtures', () => {
         config: seed.config,
       })
       expect(snapshot.protocolSignature).toMatch(/^[0-9a-f]{64}$/)
-      const fixture = payloadFor(definition.testType)
+      const fixture = payloadFor(definition.testType, definition.engineVersion)
       const payload = definition.trialSchema.parse(fixture.payload)
       const envelope = createTrialEnvelope({
         trialIndex: 0,

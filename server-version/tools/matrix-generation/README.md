@@ -2,7 +2,7 @@
 
 ## 是什么
 
-用 [matRiks](https://github.com/OttaviaE/matRiks)（MIT 许可的 R 包）离线生成瑞文式图形矩阵题库，输出为提交入库的 JSON（含逐格/逐选项 SVG）。**R 不进请求链路**：运行时只读取本目录的 `bank-matgen.json`。
+用 [matRiks](https://github.com/OttaviaE/matRiks)（MIT 许可的 R 包）离线生成瑞文式图形矩阵题库，输出为提交入库的 JSON（含逐格/逐选项 SVG），规范位置为 `backend/src/modules/cognitive/banks/bank-matgen.json`。**R 不进请求链路**：运行时只读取该文件。
 
 - 3×3 标准轨（青少年/成人）规则轴：shape / rotate / shade / identity
 - 2×2 儿童轨：rotate / shade / size 双值规则
@@ -11,7 +11,7 @@
 ## 重新生成
 
 ```bash
-Rscript generate-matrices.R                 # 默认 seed 20261031 → ./bank-matgen.json
+Rscript generate-matrices.R                 # 默认 seed 20261031 → backend/src/modules/cognitive/banks/bank-matgen.json
 Rscript generate-matrices.R --seed 42 --out ./bank-matgen.json
 ```
 

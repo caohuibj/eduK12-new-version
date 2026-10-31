@@ -163,4 +163,143 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "1.0.0",
+    "testType": "icarmatrix",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "1.0.0",
+    "title": "图形矩阵推理 · 规则题库版",
+    "metrics": {
+      "accuracy": {
+        "label": "总体正确率",
+        "explanation": "总体正确率：答对的图形矩阵题占全部题目的比例。",
+        "singleExplanation": "总体正确率：你答对的比例。"
+      },
+      "medianRtMs": {
+        "label": "作答中位用时"
+      },
+      "correctCount": {
+        "label": "答对题数"
+      },
+      "accuracyByRuleTag": {
+        "label": "规则维度正确率"
+      }
+    },
+    experienceHeadline: "accuracy",
+    hiddenMetrics: ["accuracyByRuleTag"],
+    suppressTips: false,
+    protocols: {},
+    practicalTips: ["先横着看每行变了什么，再竖着验证。", "规则可能组合：位置、旋转、填充、大小分开看。"],
+    singleHiddenMetrics: [],
+    disclaimer: "结果只描述本次图形矩阵推理的表现，正确率不换算 IQ、不与 Raven 等价，也不是年龄常模判断。",
+    reportReading: {
+      version: "1.0.0",
+      title: "图形里的规律，你能找到几条？",
+      introduction: "从这次作答出发，读懂一个与你有关的认知过程。",
+      summary: {
+        template: "这一次，你答对了 {accuracy} 的图形矩阵题。",
+        metricKeys: ["accuracy"]
+      },
+      summaryByProfile: {
+        experience: {
+          template: "这次简短体验中，你答对了 {accuracy}；体验版仅供体验。",
+          metricKeys: ["accuracy"]
+        }
+      },
+      studentMetricKeys: ["accuracy", "correctCount"],
+      processMetricKeys: ["medianRtMs"],
+      withholdFlags: ["legacyUninterpretable", "excessiveTimeouts", "rapidGuessing"],
+      metricGates: {},
+      nextStep: "找规律的能力可以通过图形游戏、折纸、拼图这类活动自然练习。",
+      chart: {
+        "kind": "metrics",
+        "metricKeys": ["accuracy"]
+      },
+      caveatTerms: {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      illustration: "rules",
+      popular: {
+        conceptTitle: "先弄懂，这个任务在看什么",
+        concept: "每个题目都是一张 3×3（或 2×2）的图形表格，右下角缺了一块。图形在行和列上按规律变化——形状在换、方向在转、颜色深浅在变。你要做的，就是找出规律，从选项里挑出缺失的那一块。",
+        takeaway: "先看行、再看列；一次只追一种变化，规则是可以叠起来的。",
+        exampleTitle: "走出任务：生活里的一个例子",
+        example: "发现两串脚步声的间隔规律、看出日历数字的排列规律、理解表格数据的行列关系，用的都是同一种「找规律」的思维。它只是推理能力的一个侧面。",
+        scene: "rules",
+        frames: [
+          {
+            "title": "看行",
+            "text": "从左到右，什么在变？"
+          },
+          {
+            "title": "看列",
+            "text": "从上到下，规律还成立吗？"
+          },
+          {
+            "title": "选出缺失块",
+            "text": "用你发现的规律挑出右下角缺的图。"
+          }
+        ],
+        boundary: "这是理解概念的场景示例，不是职业资格、考试排名或同龄人比较。",
+        metricHelp: {
+          "accuracy": {
+            "label": "答对的比例",
+            "explanation": "答对的图形矩阵题占全部题目的比例。"
+          },
+          "medianRtMs": {
+            "label": "用了多久",
+            "explanation": "每道题作答时间的代表值；想得久不等于能力弱。"
+          }
+        }
+      },
+      professional: {
+        construct: "流体推理（图形规则归纳）",
+        procedure: "题目取自 matRiks（MIT）离线生成的冻结题库（stimulusSetVersion matgen-bank-v1.0.0）；按 seed 确定性选题并生成选项呈现排序（必含正确项）；matrixType 区分 2x2（儿童轨）与 3x3（青少年/成人轨）；每题限时 timeoutMs。正确性由服务端按题库推导，客户端仅上报呈现序选项与用时。",
+        interpretation: "accuracy 为主要指标；medianRtMs 作描述性参考。规则维度正确率（accuracyByRuleTag）仅用于科研画像，不进入被试报告。注意：相似图形结构的题目难度未必相同（见 MaRs-IB 后续 IRT 研究），规则数不作为难度证据。",
+        confounders: [
+          "图形结构相似的题目难度并不必然相同，逐题难度未做本地标定。",
+          "屏幕尺寸与触控/鼠标影响作答用时，用时指标跨设备不可直接比较。",
+          "本报告不提供经过验证的人口常模，不换算 IQ，不与 Raven/韦氏等价。"
+        ],
+        metricNotes: {
+          "accuracy": {
+            "definition": "correctCount / totalTrials。",
+            "readingHint": "主要指标；儿童轨（2x2）与标准轨（3x3）难度不同，不可混比。"
+          },
+          "medianRtMs": {
+            "definition": "非超时试次作答时间中位数。",
+            "readingHint": "描述性参考，不进入主结论。"
+          },
+          "correctCount": {
+            "definition": "服务端判定的正确试次数。",
+            "readingHint": "受总题数影响，跨 profile 不可比。"
+          },
+          "accuracyByRuleTag": {
+            "definition": "按题库规则标签（shape/rotate/shade/size/identity）分维度的正确率。",
+            "readingHint": "科研画像用；样本不足时波动大。"
+          }
+        },
+        configFields: [
+          { "key": "totalTrials", "label": "计划试次数" },
+          { "key": "matrixType", "label": "矩阵规格（2x2/3x3）" },
+          { "key": "stimulusSetVersion", "label": "题库版本" },
+          { "key": "timeoutMs", "label": "每题限时（毫秒）" }
+        ]
+      }
+    }
+  },
 ]
