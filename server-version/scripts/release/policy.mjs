@@ -109,6 +109,7 @@ const releaseToolFiles=new Set([
  '.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs',
  '.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs',
  '.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs',
+ '.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml',
  '.github/workflows/scale-onboarding-boundary.yml',
  ...selectedScaleControlFiles,
  'docs/development/scale-intake-ci-20261029.md',
@@ -121,7 +122,7 @@ const releaseToolFiles=new Set([
  'server-version/docs/release-candidate-checklist-v1.md','server-version/docs/release-verify-local.md',
  ...['ingress.py','test_ingress.py','policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh'].map(f=>'server-version/scripts/release/'+f),
 ]);
-export function toolingOnly(entries){return entries.some(e=>releaseToolFiles.has(e.file))&&entries.every(e=>(releaseToolFiles.has(e.file)||engineeringEvidenceFile(e.file)||backendTestFile(e.file))&&e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644')));}
+export function toolingOnly(entries){return entries.some(e=>releaseToolFiles.has(e.file))&&entries.every(e=>(releaseToolFiles.has(e.file)||engineeringEvidenceFile(e.file)||backendTestFile(e.file))&&(e.file==='.github/scripts/build-ci-images.sh'?e.status==='M'&&e.oldMode==='100755'&&e.newMode==='100755':e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644'))));}
 export function componentFingerprint(sha,component){
  const roots=component==='frontend'?[front]:['server-version/backend/'];
  const files=git('ls-tree','-r',sha,'--',...roots).trim().split('\n').filter(Boolean);

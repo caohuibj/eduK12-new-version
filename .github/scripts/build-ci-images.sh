@@ -3,10 +3,11 @@ set -euo pipefail
 ci_task_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ci_task_repo/server-version"
 : "${RUNNER_TEMP:?RUNNER_TEMP is required}"
-case "${FRONTEND_ONLY:-}" in
-  true) images=(frontend) ;;
-  false) images=(backend worker frontend) ;;
-  *) echo 'FRONTEND_ONLY must be true or false' >&2; exit 1 ;;
+case "${FRONTEND_ONLY:-}:${BACKEND_ONLY:-false}" in
+  true:false) images=(frontend) ;;
+  false:true) images=(backend worker) ;;
+  false:false) images=(backend worker frontend) ;;
+  *) echo 'Select frontend-only, backend-only or full images' >&2; exit 1 ;;
 esac
 ci_task_bake_dir="$(mktemp -d "$RUNNER_TEMP/eduk12-ci-images.XXXXXX")"
 trap 'rm -rf -- "$ci_task_bake_dir"' EXIT
