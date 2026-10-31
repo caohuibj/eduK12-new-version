@@ -124,4 +124,24 @@ describe('SharegameTask', () => {
     expect(submit.mock.calls[0][0]).toMatchObject({response:'timeout',given:null,rtMs:null})
   })
 
+  it('retries the original explicit zero after save failure beyond the deadline',async()=>{
+    const submit=vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+    render(<SharegameTask taskContext={context} trialIndex={0} onTrialComplete={submit}/>)
+    fireEvent.click(screen.getByText('开始练习'));await act(async()=>{vi.advanceTimersByTime(400)})
+    chooseLabel('给一半');fireEvent.click(screen.getByText('开始正式测评'))
+    await act(async()=>{vi.advanceTimersByTime(400)})
+    vi.mocked(performance.now).mockReturnValue(2000)
+    chooseLabel('全部自留');await act(async()=>{})
+    const original=submit.mock.calls[0][0]
+    expect(original).toMatchObject({response:'choice',given:0,rtMs:1000})
+    expect(screen.queryByRole('button',{name:/全部自留/})).toBeNull()
+    vi.mocked(performance.now).mockReturnValue(25000)
+    await act(async()=>{vi.advanceTimersByTime(24000)})
+    expect(submit).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button',{name:'重试保存原选择'}));await act(async()=>{})
+    expect(submit).toHaveBeenCalledTimes(2)
+    expect(submit.mock.calls[1][0]).toBe(original)
+    expect(submit.mock.calls[1][0]).toMatchObject({response:'choice',given:0,rtMs:1000})
+  })
+
 })
