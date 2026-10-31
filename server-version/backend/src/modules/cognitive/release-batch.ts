@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { evaluateCognitiveProductReadiness } from './library/product-readiness'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
+import { collectBankPublishBlockers } from './banks/publish-gate'
 
 export const cognitiveBatchPublicationInputSchema = z.object({
   schemaVersion: z.literal(1),
@@ -87,6 +88,8 @@ export const planCognitiveConfigBatchPublication = async (
       else {
         const readiness = evaluateCognitiveProductReadiness(definition, config.config)
         blockers.push(...readiness.blockers.map((blocker) => `${blocker.stage}/${blocker.code}`))
+        const bankBlockers = await collectBankPublishBlockers([{ testType: config.testType, config: config.config }])
+        blockers.push(...bankBlockers.map((blocker) => `BANK/${blocker.code}`))
       }
     }
 

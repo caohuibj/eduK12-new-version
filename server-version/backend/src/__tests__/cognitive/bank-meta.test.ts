@@ -27,6 +27,8 @@ describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
   it('gates public release to the allowlist and keeps research-restricted internal', () => {
     const meta = (license: (typeof PUBLIC_RELEASE_LICENSES)[number] | 'research-restricted') =>
       cognitiveBankMetaSchema.parse({ stimulusSetVersion: 'x-v1.0.0', source: 's', license })
+    expect(cognitiveBankMetaSchema.safeParse({ stimulusSetVersion: 'x-v1', source: 's', license: 'verified' }).success).toBe(false)
+    expect(cognitiveBankMetaSchema.safeParse({ stimulusSetVersion: 'x-v1', source: 's', license: 'verified', rightsEvidenceRef: 'rights/approval-1' }).success).toBe(true)
     for (const license of PUBLIC_RELEASE_LICENSES) {
       expect(resolveBankReleaseState(meta(license))).toBe('public-release-eligible')
       expect(isBankPublicReleaseAllowed(meta(license))).toBe(true)
@@ -49,12 +51,19 @@ describe('cognitive bank meta (roadmap v2.0 PR1)', () => {
   })
 
   it('collectBankPublishBlockers resolves declared banks and would block restricted licenses', async () => {
-    const eligible = await collectBankPublishBlockers([{ testType: 'wordanalogy' }, { testType: 'icarmatrix' }, { testType: 'wordanalogy' }])
+    const eligible = await collectBankPublishBlockers([
+      { testType: 'wordanalogy', config: { stimulusSetVersion: 'wordanalogy-zh-v1.0.0' } },
+      { testType: 'icarmatrix', config: { stimulusSetVersion: 'matgen-bank-v1.0.0' } },
+      { testType: 'icarmatrix', config: { stimulusSetVersion: 'icarmatrix-gen-v1.0.0' } },
+    ])
     expect(eligible).toEqual([])
 
-    const restrictedDir = path.resolve('src/modules/cognitive/tasks')
-    const declaration = JSON.parse(readFileSync(path.join(restrictedDir, 'wordanalogy', 'task-package.json'), 'utf8'))
-    expect(declaration.banks[0].export).toBe('bankMeta')
-    // 模拟受限：直接走 schema 层验证 publish-gate 的判定逻辑已由 isBankPublicReleaseAllowed 覆盖。
+    const mismatch = await collectBankPublishBlockers([{ testType: 'icarmatrix', config: { stimulusSetVersion: 'unknown-bank' } }])
+    expect(mismatch.map((entry) => entry.code)).toContain('BANK_VERSION_MISMATCH')
+
+    const missing = await collectBankPublishBlockers([{ testType: 'nonexistent-task', config: {} }])
+    expect(missing.map((entry) => entry.code)).toContain('BANK_DECLARATION_INVALID')
+    const unversioned = await collectBankPublishBlockers([{ testType: 'wordanalogy', config: {} }])
+    expect(unversioned.map((entry) => entry.code)).toContain('BANK_VERSION_MISMATCH')
   })
 })

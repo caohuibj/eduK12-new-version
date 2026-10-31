@@ -7,6 +7,7 @@ import { assertConfigStatusTransition } from './config-immutability'
 import { BAD_REQUEST, CONFLICT, NOT_FOUND } from './cognitive.errors'
 import { evaluateCognitiveProductReadiness } from './library/product-readiness'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
+import { collectBankPublishBlockers } from './banks/publish-gate'
 
 const lifecycleSelect = {
   id: true,
@@ -56,6 +57,12 @@ export const publishCognitiveConfig = async (configId: string, actorUserId?: str
   const readiness = evaluateCognitiveProductReadiness(definition, config.config)
   if (!readiness.ready) {
     throw BAD_REQUEST(`Cognitive product readiness failed: ${readinessBlockerMessage(readiness.blockers)}`)
+  }
+
+  // All publication entry points use the same fail-closed, exact frozen-bank decision.
+  const bankBlockers = await collectBankPublishBlockers([{ testType: config.testType, config: config.config }])
+  if (bankBlockers.length) {
+    throw BAD_REQUEST(`Cognitive bank publication blocked: ${bankBlockers.map((b) => `${b.code}(${b.testType}/${b.stimulusSetVersion})`).join(', ')}`)
   }
 
   // Authenticated actor provenance is required even for the administrative CLI.

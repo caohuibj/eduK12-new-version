@@ -38,6 +38,7 @@ export const cognitiveBankMetaSchema = z
     source: z.string().min(1),
     license: z.enum(COGNITIVE_BANK_LICENSE_VALUES),
     licenseNote: z.string().optional(),
+    rightsEvidenceRef: z.string().min(1).optional(),
     itemSetRole: z.enum(cognitiveBankItemSetRoleValues).default('form'),
     itemSize: z.number().int().positive().optional(),
     ruleTags: z.array(z.string().min(1)).optional(),
@@ -50,6 +51,10 @@ export const cognitiveBankMetaSchema = z
       .optional(),
   })
   .strict()
+  .refine((meta) => meta.license !== 'verified' || Boolean(meta.rightsEvidenceRef), {
+    message: 'verified bank license requires a traceable rightsEvidenceRef',
+    path: ['rightsEvidenceRef'],
+  })
 
 export type CognitiveBankMeta = z.infer<typeof cognitiveBankMetaSchema>
 
