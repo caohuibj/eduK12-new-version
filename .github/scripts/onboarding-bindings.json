@@ -4674,6 +4674,243 @@
         "backend": "7955b8d801126e4cf952a1e979833bdd7aef2895",
         "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
       }
+    },
+    "426": {
+      "schemaVersion": 1,
+      "pr": 426,
+      "enabled": true,
+      "base": "e4b569c96c0b3d804adb51529b1d4c5ff613efb1",
+      "product": "2ae11d44cb43ac00261394b07e24bc46d54334b9",
+      "controlCheckpoint": "3274e427cdb366d0e4c5218aac7a7a9e8b3e96fc",
+      "source": {
+        ".github/scripts/group-report-draft.mjs": {
+          "before": "6be9a8e42fc295e6bf3ac3a58c9a3856e673f9bf",
+          "after": "30c894d96b7b184148a85afd690cdae5c67e7c9a"
+        },
+        ".github/scripts/group-report-draft.test.mjs": {
+          "before": "a5211b0625eb419e5a6a00eb4c386f7d98257fa6",
+          "after": "65bb3112b91c312ff8d9041dc6779ae12c49bc8b"
+        },
+        "docs/development/education-self-group-v2-handoff-20261030.md": {
+          "before": "ec55129647b82efaaa8399c8ca4cff548c4c9174",
+          "after": "d6b33ec682e33e82f6396bb1533c258adb461f47"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/README.md": {
+          "before": null,
+          "after": "9102f014611102ffdbc412a36f9234db58c5afc7"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/backend-types.json": {
+          "before": null,
+          "after": "2044388eff688fb70404cd2111d601e1a4682090"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend-types.json": {
+          "before": null,
+          "after": "e3ddbb17e826e45fac481bb8fde58168e57c487b"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend.json": {
+          "before": null,
+          "after": "e448964afc3bc770c71f12287d1d399f17eeeb2d"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/frontend.log": {
+          "before": null,
+          "after": "ca480aa963cce21ac0eb5833d631d557df54d39b"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/native.json": {
+          "before": null,
+          "after": "fc610610dbef76a7eb83ffe4f1a7e520fcf9c16d"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/native.log": {
+          "before": null,
+          "after": "7dba03f4796f8f658806b2c1d1b9c72b5d3b0edb"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "d517376295a55f5f72ba0a773186386d4bfcf245"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.json": {
+          "before": null,
+          "after": "4d442a7d7249b45a0c3a138bdfe6dab9471bf02c"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.json": {
+          "before": null,
+          "after": "7f5b2ec0eb2e58c8419ba48f7445e837ef58eccb"
+        },
+        "docs/evidence/education-self-group-publishing-20261030/qualification-main-d420/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-v2-20261030/README.md": {
+          "before": null,
+          "after": "a7c792eeb0b435731dcd4b012f78a0ee6c71faf5"
+        },
+        "docs/evidence/education-self-group-v2-20261030/backend-types.json": {
+          "before": null,
+          "after": "af3938fc890a438ad2f1f6fbdbd26a6be1f8a557"
+        },
+        "docs/evidence/education-self-group-v2-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/education-self-group-v2-20261030/contract.json": {
+          "before": null,
+          "after": "2b34657ed235f8d4a29b4394e5b713c39d12e5c7"
+        },
+        "docs/evidence/education-self-group-v2-20261030/contract.log": {
+          "before": null,
+          "after": "0e53333dc0d11472fefb5fa8556e28110a6c5958"
+        },
+        "docs/evidence/self-group-bundle-leaf-ceiling-20261030/README.md": {
+          "before": null,
+          "after": "34604573931db2dbfc78d0c17d4168638a0eef1b"
+        },
+        "docs/evidence/self-group-bundle-leaf-ceiling-20261030/contract.json": {
+          "before": null,
+          "after": "b9790f0c1524ea43bc73a6d41711a52d6497837e"
+        },
+        "docs/evidence/self-group-bundle-leaf-ceiling-20261030/contract.log": {
+          "before": null,
+          "after": "d436c794a698f67b2484b74e6f7345f810b93f88"
+        },
+        "docs/evidence/self-group-inbox-disclosure-20261030/README.md": {
+          "before": null,
+          "after": "42e955f5ea3c964c39f117e150b3b43a6921699e"
+        },
+        "docs/evidence/self-group-inbox-disclosure-20261030/contract.json": {
+          "before": null,
+          "after": "96f7bff38963a168c93a6acd7348d5fb6ef45f66"
+        },
+        "docs/evidence/self-group-inbox-disclosure-20261030/contract.log": {
+          "before": null,
+          "after": "380195a1d48bd120ff5e79c9161879311de67dbf"
+        },
+        "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts": {
+          "before": "5cd2b563ec43005eb755b9a6b8d6e8be5d4065f3",
+          "after": "48981895f199004e4d46a9caee6e32955db2c4ab"
+        },
+        "server-version/backend/src/__tests__/assessment-policy/self-group-contract.test.ts": {
+          "before": null,
+          "after": "cfb9fb5d88fb0e261ca26a24775788b763b19d85"
+        },
+        "server-version/backend/src/__tests__/bundle-onboarding/education-self-group-leaf-ceiling.test.ts": {
+          "before": null,
+          "after": "3f0bca223a9a07d1764eda5de6dd64764bd4372c"
+        },
+        "server-version/backend/src/__tests__/education-tools/assessment-resource.self-group.test.ts": {
+          "before": null,
+          "after": "a395dcb6a08761b707abb656f012dee928b521c2"
+        },
+        "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": {
+          "before": "d35c6a4ec22b5231905fc282e4d9588ee3349b05",
+          "after": "959892c5b2892d3b6194c58edb2c0eadcd485766"
+        },
+        "server-version/backend/src/modules/assessment-policy/self-group-contract.ts": {
+          "before": null,
+          "after": "a60b80d6180266ea1131e904884aa8922ec86eaf"
+        },
+        "server-version/backend/src/modules/assessment-relational/product-registry.ts": {
+          "before": "4214484c39ec2881dbf65494bba37617444f1226",
+          "after": "295084487894c3500cc5b2eeaf1e09b0f02919e2"
+        },
+        "server-version/backend/src/modules/bundle-product/education-adapter.ts": {
+          "before": "408a3b4ca7d8bd8e0cdedabe9001e5bba1e77158",
+          "after": "03a13e1877193ddd1aca7ecfa9168d11f5079b87"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.catalog.ts": {
+          "before": "54e2a85e92edbe9f5e83458d19555a0add7e1aee",
+          "after": "076bc5f8ee06f666df9f223f9d7cc5105ecf859f"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": {
+          "before": "eb61e88f84ea455eebc29fb66dd9e721d19a0763",
+          "after": "bb5da7c2bc7f08b8ba4a484cd3b3fe86482012c2"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.marker-contract.ts": {
+          "before": "2c131002ecfff33e5dbbe853f824430bf9a6bfc4",
+          "after": "4755469de300e15e62c998fd0b7e590ac614b78c"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.marker.ts": {
+          "before": "3c052a40475e777c3decee2b1a7343bded01d3e9",
+          "after": "6a650e28adf59a21f0767202f06d35111a4569fe"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts": {
+          "before": "65c08968e6bc67a27de0e225019b5cb01e969ecf",
+          "after": "ce622de6bf42e8ce7d8148ff8bc8d86ace16ce98"
+        },
+        "server-version/backend/src/modules/education-tools/assessment-resource.service.ts": {
+          "before": "ccc4d57523fd6dfe7cb80f7d7158b08f9e56574e",
+          "after": "386e7395a67aebdba9383aecbdfee2680ecdceac"
+        },
+        "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts": {
+          "before": "5cdbb55238a2d7216a0646792896ec67979b2267",
+          "after": "49c8b6a4183f6ce7e8f608f25231d5864bad067c"
+        },
+        "server-version/backend/src/modules/huiteacher/assessmentRuntime.access.ts": {
+          "before": "ce4b142daa87c53a4774c12b70ec0ce70e9fb933",
+          "after": "af15a7a632c3207c9c81c9ba091be8c6ae129536"
+        },
+        "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": {
+          "before": "e862c25933648a9f72e0e71ca99ea2276a7429fe",
+          "after": "f740348bbfca84bf15566cf6ff8796f7c0be2221"
+        },
+        "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts": {
+          "before": "e42b6ac3720a53041c832ea0e2346da21e8ab99c",
+          "after": "938343ca81c2f5f7ce46955c9b56b32c5050a876"
+        },
+        "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": {
+          "before": "5a52debb678293ddc7fe5c2a1c2a34275771f2a9",
+          "after": "a2d19cce74cfe25c51fbc14e30c8ab414df28675"
+        },
+        "server-version/backend/src/modules/reporting/respondentSummary.ts": {
+          "before": "dbffca79bab712da49e2a6d2a95ffc310396f969",
+          "after": "f59bc3c807c6b67957a63d1fbbf7bdc46e53833b"
+        },
+        "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx": {
+          "before": "3a5a87f4c2ba63a96ce68492e098a990f6a95d53",
+          "after": "2290f7d7ec1c25a330187f6bfa248ef079ecebf7"
+        },
+        "server-version/frontend/src/components/education-tools/EducationAssessmentRegistrationPanel.tsx": {
+          "before": "d7a0ffb27930725e0ff251949b5763ee3a2ff788",
+          "after": "764e6e66d1dfac4446f5c6271f78d1b4d895fa94"
+        },
+        "server-version/frontend/src/components/education-tools/assessmentResourceClient.ts": {
+          "before": "517ba17a464e69c0ad072b251b9ec92eac151639",
+          "after": "1e06a8247797c37572883be3f81f47e51dc7bd46"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "93895455bb842ceb8e1bc4e7fd81dcddb0675504",
+        ".github/scripts/onboarding-checks.mjs": "27163eaa7801463c867ff0111d95781773f51404",
+        ".github/scripts/onboarding-controls.test.mjs": "8f7bb201c70a81eeef07411f0b8ada6230166c5d",
+        ".github/scripts/onboarding-evidence.json": "da1344c7fd92e9d21f5d4fcf6ae56a428c22e07b",
+        ".github/scripts/onboarding-scope.mjs": "9be979c4f4aa309758910ab95fc4e6cf5261031d",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "e8091e6935e791e2ee86609424919c7274a74207"
+      },
+      "components": {
+        "backend": "770f31e559fb0384eaeb219b3fe1854e5f703799",
+        "frontend": "351d797491ef24a75dffd40678245a6626e3323c"
+      }
     }
   }
 }
