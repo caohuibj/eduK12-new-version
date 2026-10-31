@@ -13,9 +13,10 @@ it('requires an explicit audience choice and discards it on opt-out; stale sourc
  }
  const view=render(<Editor/>)
  fireEvent.click(screen.getByLabelText('为新来源版本明确选择群体披露'))
- expect(changes).toHaveBeenLastCalledWith({schemaVersion:1,minimumRespondents:12,leaves:[]})
+ expect(changes).toHaveBeenLastCalledWith({schemaVersion:1,minimumRespondents:10,leaves:[]})
  fireEvent.click(screen.getByLabelText('心理专业人员 · 总分'))
  const selected=changes.mock.lastCall![0] as SchoolPrivateGroupSelection
+ expect(selected.minimumRespondents).toBe(12)
  expect(selected.leaves).toEqual([{blockId:'block-A',versionId:'fixed-A',contentHash:'hash-A',audiences:{PROFESSIONAL:['total'],TEACHER:[],ORGANIZATION:[]}}])
  expect((screen.getByLabelText('学校管理者 · 总分') as HTMLInputElement).checked).toBe(false)
  expect(screen.queryByLabelText('教师 · 总分')).toBeNull()

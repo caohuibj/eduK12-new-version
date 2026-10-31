@@ -242,7 +242,7 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
- assert(['task1','choice-page',404,408,414,415,418,419,420,421,422,423,424,426,432,434,435,436,437,444,439,442,428,429,430,438,443,446,449,445].includes(p.pr));assert.equal(p.product,b.product);
+ assert(['task1','choice-page',404,408,414,415,418,419,420,421,422,423,424,426,432,434,435,436,437,450,448,444,447,439,442,428,429,430,438,443,446,449,445].includes(p.pr));assert.equal(p.product,b.product);
  const paths=[...Object.keys(b.source),...([404,419,422].includes(p.pr)?['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']:[]),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
@@ -594,9 +594,9 @@ export function verifyQuestionnaire442Evidence(review,p,readBytes=path=>readFile
 
 async function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,404,408,414,415,418,419,420,421,422,423,424,426,432,434,435,436,437,444,439,442,'task1','choice-page',428,429,430,438,443,446,449,445].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,404,408,414,415,418,419,420,421,422,423,424,426,432,434,435,436,437,450,448,444,447,439,442,'task1','choice-page',428,429,430,438,443,446,449,445].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,421,422,423,424,426,432,434,435,436,437,444,439,442,428,429,430,438,443,446,449,445].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,421,422,423,424,426,432,434,435,436,437,450,448,444,447,439,442,428,429,430,438,443,446,449,445].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   if(p.pr===442){
@@ -625,7 +625,7 @@ async function admit(){
     assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
     for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
     const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
-    assert.deepEqual(delta,[404,408,414,415,418,419,421,422,423,424,426,432,434,435,436,437,444,428,429,430,438,443,446,449,445].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
+    assert.deepEqual(delta,[404,408,414,415,418,419,421,422,423,424,426,432,434,435,436,437,450,448,444,447,428,429,430,438,443,446,449,445].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
     admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
@@ -644,10 +644,10 @@ async function admit(){
   if([372,374,404,408,414,418,423,426,432,434,435,436,437,444,428,429].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   // The fixed415 source plan proves its backend tree equals the exact base.
   // Do not rerun or invent a compiler receipt for this unchanged component.
-  if([415,420,449,445].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['frontend']);
+  if([415,420,447,449,445].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['frontend']);
   let official420=null;
   if(p.pr===420){assert.equal(admitted.flatMap(r=>r.caseNames).length,4);verifyPr420ExecutionMapping(readOriginal(review.types[0]),review.executionSourceMapping,p.product,git('rev-parse',p.product+'^{tree}'));official420=await reusePr420Official(p);}
-  if([419,422,424,430].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['backend']);
+  if([419,422,424,430,450].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['backend']);
   const observations=[];
   if([404,408,414,415,418,419,422].includes(p.pr)){
     assert.equal(review.groupReportObservations.length,p.pr===415?1:2);

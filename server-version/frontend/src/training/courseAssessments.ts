@@ -57,9 +57,10 @@ async function availableComposites(courseId: string): Promise<Composite[]> {
   // legacy "course" property null. The existing student task feed is the
   // authority for this cross-course presentation; never infer from visibility.
   if (available.some(item => item.productKind === 'QUESTIONNAIRE' && !item.course)) {
+    const unverified = new Set(available.filter(item => item.course?.id !== courseId).map(item => item.id))
     let page = 1, read = 0, total = 1
     const pageSize = 100
-    while (read < total && page <= 50) {
+    while (unverified.size > 0 && read < total && page <= 50) {
       const result = await apiClient.get<{
         list: Array<{ id: string; kind: string; courses: Array<{ id: string }> }>
         total: number
@@ -69,12 +70,15 @@ async function availableComposites(courseId: string): Promise<Composite[]> {
       total = result.data?.total ?? 0
       if (!rows.length && read < total) throw new Error('课程任务列表不完整')
       for (const row of rows) {
-        if (row.kind === 'COMPOSITE' && row.courses?.some(course => course.id === courseId)) delivered.add(row.id)
+        if (row.kind === 'COMPOSITE' && row.courses?.some(course => course.id === courseId)) {
+          delivered.add(row.id)
+          unverified.delete(row.id)
+        }
       }
       read += rows.length
       page += 1
     }
-    if (read < total) throw new Error('课程任务数量超出本次查询限制，请联系培训师')
+    if (unverified.size > 0 && read < total) throw new Error('课程任务数量超出本次查询限制，请联系培训师')
   }
   return available.filter(item => item.course?.id === courseId || delivered.has(item.id))
 }

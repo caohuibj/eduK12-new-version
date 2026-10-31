@@ -61,7 +61,7 @@ describe('real education host private report image transport',()=>{
   await waitFor(()=>expect(screen.getByRole('button',{name:'报告文案'})).toBeEnabled())
   fireEvent.click(screen.getByRole('button',{name:'报告文案'}))
   const image=new File(['png'],'report.png',{type:'image/png'})
-  fireEvent.change(screen.getByLabelText('上传反馈图片'),{target:{files:[image]}})
+  fireEvent.change(await screen.findByLabelText('上传反馈图片'),{target:{files:[image]}})
   await waitFor(()=>expect(screen.getByLabelText('图片说明')).toHaveValue('report'))
   await waitFor(()=>expect(screen.getByRole('img',{name:'report'})).toHaveAttribute('src','blob:private-report'))
   const upload=request.mock.calls.find(([url])=>url===base+'/assets/images')

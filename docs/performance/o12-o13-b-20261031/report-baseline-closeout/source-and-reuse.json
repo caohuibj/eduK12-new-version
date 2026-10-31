@@ -1,0 +1,16 @@
+{
+  "pr": 448,
+  "base": "25cad994ec20b32b53ed8735c732143376536da0",
+  "product": "aa1666a82f8a528577626904a6a80b600b7c60f6",
+  "productTree": "a0b8caa340366e3b29ceef2c7b0c21f39616c986",
+  "backend": "4dfcd69abc6d086f68463e71488ad88dad61e1e7",
+  "frontend": "abac9400eea6d4c9ee7a4ab5024d4c5a35299f57",
+  "frontendUnchanged": true,
+  "compilerProducer": "23b4cd640321a0cb530ae494595948e6fb0bf92b",
+  "selectedPermissionContract": 1,
+  "filteredPermissionCases": 6,
+  "oldCandidateValuesRetained": 30,
+  "originalPublicEvidenceObjects": 32,
+  "formalCI": "NOTRUN",
+  "productionWrite": false
+}

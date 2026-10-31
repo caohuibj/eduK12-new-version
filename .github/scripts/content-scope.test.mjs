@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, frontendFile, frontendTestFile, frontendTestOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
+import { classify, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, backendModuleFilesOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
@@ -15,6 +15,107 @@ const root = 'server-version/backend/src/modules/';
 const scale = `${root}scale/instruments/new_scale/1.0.0/instrument.ts`;
 const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
+test('backend modules retain backend qualification without admitting frontend schema or shared API changes',()=>{
+  const files=[`${root}campus/group-reports.ts`,'server-version/backend/src/__tests__/campus/group-reports.test.ts','docs/evidence/group/as-run-probe.py','docs/evidence/group/query.sql.gz','docs/evidence/group/SHA256SUMS'];
+  assert.equal(backendModuleFilesOnly(files),true);
+  assert.equal(backendModuleFilesOnly([`${root}scale/onboarding/report-variants.ts`,`${root}scale/instruments/example/1.0.0/report-variants.json`,'docs/scale-intake/alignment.md']),true);
+  for(const file of ['server-version/frontend/src/pages/student/CourseDetail.tsx','server-version/backend/prisma/schema.prisma','server-version/backend/src/routes/scales.ts',`${root}scale/scale.routes.ts`,`${root}assessment-runtime/compiler.ts`,`${root}reporting/schema.ts`,`${root}scale/scale-scoring.ts`,`${root}training/auth.ts`,`${root}parent-portal/authorization.ts`,`${root}survey/identity.service.ts`,'server-version/backend/package-lock.json','server-version/docker-compose.yml','.github/workflows/ci.yml','docs/evidence/group/run.sh'])assert.equal(backendModuleFilesOnly([...files,file]),false,file);
+  const entries=files.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+  assert.equal(classifyChanges(entries).backend_modules,true);
+  assert.equal(classifyChanges(entries,true).backend_modules,false);
+  assert.equal(classifyChanges([{...entries[0],newMode:'120000'}]).backend_modules,false);
+});
+test('backend module aggregate retains all existing backend jobs and rejects selected failure or missing checks',()=>{
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'backend'})}};
+    const expected=draft?['scope','pr-light-backend']:['scope','backend','backend-regression','docker','codeql'];
+    assert.deepEqual(requiredChecks(needs,draft),expected);
+    for(const name of expected)needs[name]={...needs[name],result:'success'};
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const name of expected)for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...needs,[name]:{...needs[name],result}},draft).includes(name));
+    assert(failedChecks({...needs,scope:{result:'success',outputs:{...needs.scope.outputs,media2:'true'}}},draft).includes('scope'));
+  }
+});
+test('backend module workflow removes only unrelated outer frontend and acceptance jobs',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  for(const draft of [true,false]){
+    const outputs=scopeOutputs('false','false','false',{scenario:'backend',application_route:'legacy'});
+    const needs={scope:{result:'success',outputs}};
+    const github={event_name:'pull_request',ref_name:'feature/backend',event:{pull_request:{draft,number:1,head:{ref:'feature/backend'}}}};
+    for(const name of ['maintenance','pr-light-backend','pr-light-frontend','backend','backend-regression','frontend','frontend-build','browser','backend-browser-build','miniprogram','docker','post-merge-smoke']){
+      const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
+      const actual=new Function('needs','github','vars','cancelled','fromJSON',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse);
+      assert.equal(Boolean(actual),draft?name==='pr-light-backend':['backend','backend-regression','docker'].includes(name),name+' draft='+draft);
+    }
+  }
+  assert.match(block('codeql'),/BACKEND_MODULES:.*scenario == 'backend'/);
+  assert.match(block('codeql'),/BACKEND_MODULES==='true'\?\{paths:\['server-version\/backend\/src'\]\}/);
+});
+test('backend module CLI classifies a real Git diff without broad frontend acceptance',()=>{
+  const cwd=process.cwd(),dir=mkdtempSync(join(tmpdir(),'backend-route-'));
+  const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const commit=()=>{git('add','.');git('-c','user.name=Scope fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');};
+  try{
+    git('init','-q');writeFileSync(join(dir,'README.md'),'fixture');commit();const base=git('rev-parse','HEAD');
+    const file=join(dir,'server-version/backend/src/modules/campus/group-reports.ts');mkdirSync(dirname(file),{recursive:true});writeFileSync(file,'export const fixture=true;');commit();
+    process.chdir(dir);
+    const env={...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_HEAD_REF:'feature/backend-modules',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',CI_FORCE_FULL:'',GITHUB_OUTPUT:''};
+    const result=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{env,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+    assert.equal(result.scenario,'backend');assert.equal(result.application_route,'legacy');assert.equal(result.frontend_build,false);assert.equal(result.codeql,true);assert.equal(result.visual_hosted,false);
+    for(const key of Object.keys(acceptanceFor([])))assert.equal(result[key],false,key);
+    assert.deepEqual(result.platformReasons,[]);
+  }finally{process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
+});
+test('engineering records follow the affected component without admitting executable or scientific inputs',()=>{
+  const records=['docs/performance/navigation/README.md','docs/evidence/cli/metadata.json','docs/evidence/cli/checks.json.gz'];
+  const page='server-version/frontend/src/pages/student/CourseDetail.tsx';
+  assert.equal(classify(records).documentation,true);
+  assert.equal(classify([page,...records]).frontend,true);
+  assert.equal(classify([scale,...records]).content,true);
+  assert.equal(classify([page,'docs/scale-instruments/scientific.md']).content,true);
+  assert.equal(frontendAffected([page,'docs/scale-instruments/scientific.md']),false);
+  for(const file of ['docs/evidence/cli/check.ts','docs/evidence/../secret.md','server-version/backend/src/index.ts'])assert.equal(classify([page,file]).frontend,false,file);
+});
+test('local page selection keeps shared runtime, explicit media and mixed changes on existing paths',()=>{
+  const page='server-version/frontend/src/pages/student/CourseDetail.tsx';
+  assert.equal(frontendAffected([page,'server-version/frontend/src/pages/teacher/TeacherCourseDetail.tsx','docs/performance/navigation/README.md']),true);
+  for(const file of ['server-version/frontend/src/pages/student/ScaleAssessment.tsx','server-version/frontend/src/components/app-shell/Shell.tsx','server-version/frontend/src/api/course.ts',`${root}cognitive/service.ts`])assert.equal(frontendAffected([page,file]),false,file);
+  const entry={file:page,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([entry]).frontend_affected,true);
+  assert.equal(classifyChanges([entry],true).frontend_affected,false);
+  assert.equal(classifyChanges([{...entry,newMode:'120000'}]).frontend_affected,false);
+});
+test('affected frontend uses existing jobs and every selected failure remains blocking',()=>{
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true'})}};
+    const expected=draft?['scope','frontend']:['scope','frontend','docker','frontend-build','codeql'];
+    assert.deepEqual(requiredChecks(needs,draft),expected);
+    for(const job of expected)needs[job]={...needs[job],result:'success'};
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const job of expected)for(const result of ['skipped','failure','cancelled',undefined])assert.ok(failedChecks({...needs,[job]:{...needs[job],result}},draft).includes(job));
+  }
+});
+test('affected frontend workflow conditions agree with the existing merge jobs',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  for(const draft of [true,false]){
+    const outputs=scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true',application_route:'legacy'});
+    const needs={scope:{outputs,result:'success'},'frontend-build':{result:'success'},'backend-browser-build':{result:'success'}};
+    const github={event_name:'pull_request',ref_name:'feature/local-page',event:{pull_request:{draft,number:1,head:{ref:'feature/local-page'}}}};
+    for(const name of ['frontend','frontend-build','pr-light-frontend','backend-browser-build','browser','docker','post-merge-smoke']){
+      const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
+      const selected=new Function('needs','github','vars','cancelled',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false);
+      assert.equal(Boolean(selected),name==='frontend'||['frontend-build','docker'].includes(name)&&!draft,name+' draft='+draft);
+    }
+  }
+  const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
+  assert.match(block('frontend'),/affected_only:.*frontend_affected/);
+  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src\]'/);
+  assert.match(frontend,/npm test -- --changed "\$CI_BASE_SHA"/);
+  assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
+  assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true\n        run: npm test/);
+});
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);
   assert.deepEqual(classify([scale, cognitive, sjt]), { maintenance:false, documentation:false, content: true, frontend: false, presentation: false, domains: ['cognitive', 'scale', 'situational'] });
@@ -254,6 +355,63 @@ test('UI-only route saves backend regression but retains real API browser, Docke
   for (const job of requiredChecks(needs,false))
     for (const result of ['skipped','cancelled','failure',undefined])
       assert.ok(failedChecks({...needs,[job]:{result}},false).includes(job));
+});
+test('measurement pages and React hooks use full frontend without widening narrow shortcuts',()=>{
+  const src='server-version/frontend/src/';
+  const files=[
+    'training/courseAssessments.ts','training/courseAssessments.pagination.test.ts',
+    'pages/public/PublicQuestionnaire.tsx','pages/public/__tests__/PublicQuestionnaire.start.test.tsx',
+    'modules/cognitive/core/useCognitiveSession.ts','modules/cognitive/core/__tests__/useCognitiveSession.error-race.test.tsx',
+    'modules/cognitive/pages/CognitiveAssignmentEntry.tsx','modules/cognitive/__tests__/CognitiveAssignmentEntry.navigation.test.tsx',
+    'modules/composite/CompositeReportPage.tsx','modules/composite/__tests__/CompositeReportPage.navigation.test.tsx',
+    'school/SchoolCompositeRunner.tsx','school/SchoolCompositeRunner.test.tsx',
+  ].map(file=>src+file).concat('docs/performance/frontend-entry-scope/README.md');
+  const entries=files.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+  const result=classifyChanges(entries);
+  assert.equal(result.frontend,true);assert.equal(result.frontend_affected,false);assert.equal(result.frontend_test,false);
+  // Architectural roles, not a list of the current six product files.
+  for(const file of ['modules/cognitive/pages/FutureEntry.tsx','modules/cognitive/components/Status.tsx',
+    'modules/composite/hooks/useReportNavigation.ts','modules/cognitive/core/useSessionNotice.ts']){
+    assert.equal(classify([src+file]).frontend,true,file);
+    assert.equal(frontendFile(src+file),false,file);
+  }
+  const tests=files.filter(file=>file.includes('/modules/')&&file.endsWith('.test.tsx'));
+  assert.equal(classify(tests).frontend,true);assert.equal(frontendTestOnly(tests),false);
+  const selected=acceptanceFor(files);
+  assert.equal(selected.canonical_visual,true);
+  for(const key of ['perf_smoke','media2','media7','situational_video','situational_branching'])assert.equal(selected[key],false,key);
+});
+test('measurement frontend retains cognitive and browser consumers and selected failures',()=>{
+  const src='server-version/frontend/src/';
+  const selected=acceptanceFor([src+'pages/public/PublicQuestionnaire.tsx',src+'modules/composite/CompositeReportPage.tsx']);
+  const outputs=scopeOutputs('false','false','true',Object.fromEntries(Object.entries(selected).map(([key,value])=>[key,String(value)])));
+  const needs={scope:{result:'success',outputs}};
+  const expected=['scope','backend-browser-build','frontend','browser','docker','frontend-build','codeql','accept-ui'];
+  assert.deepEqual(requiredChecks(needs,false),expected);
+  for(const name of expected)needs[name]={...needs[name],result:'success'};
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for(const name of expected)for(const result of ['failure','skipped','cancelled'])
+    assert.ok(failedChecks({...needs,[name]:{...needs[name],result}},false).includes(name),name+':'+result);
+  const build=readFileSync(new URL('../workflows/ci-backend-browser-build.yml',import.meta.url),'utf8');
+  assert.match(build,/bash "\$GITHUB_WORKSPACE\/\.github\/scripts\/cognitive-ci-diagnostics.sh"/);
+  const cognitive=readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
+  assert.match(cognitive,/cognitive:onboarding-check -- --all --json/);
+});
+test('measurement engines protocols and mixed components retain their original scope',()=>{
+  const ui='server-version/frontend/src/modules/composite/CompositeReportPage.tsx';
+  for(const file of ['modules/cognitive/pages/CognitiveRunner.tsx','modules/cognitive/tasks/cpt/runner.tsx',
+    'modules/cognitive/generated/runners.ts','modules/cognitive/registry.ts','modules/cognitive/api.ts','modules/cognitive/types.ts',
+    'modules/cognitive/core/session-ledger.ts','modules/cognitive/core/trial-envelope.ts','modules/cognitive/core/response-timing.ts',
+    'modules/composite/api.ts','modules/composite/types.ts','modules/composite/scoring.ts',
+    'modules/composite/components/scorer.tsx','modules/assessment-runtime/Runner.tsx','services/persistence/finalDraftStore.ts'])
+    assert.equal(classify([ui,'server-version/frontend/src/'+file]).frontend,false,file);
+  for(const file of ['server-version/backend/src/routes/cognitive.ts','server-version/backend/prisma/schema.prisma',
+    'server-version/frontend/package-lock.json','package-lock.json','.github/workflows/ci.yml'])
+    assert.equal(classify([ui,file]).frontend,false,file);
+  const entry={file:ui,status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(classifyChanges([entry],true).frontend,false);
+  for(const newMode of ['100755','120000','000000'])assert.equal(classifyChanges([{...entry,newMode}]).frontend,false);
+  for(const file of [ui.replace('/modules/','//modules/'),ui.replace('composite','..'),ui+'\n'])assert.equal(classify([file]).frontend,false);
 });
 test('measurement runtimes, timing/scoring, dependencies, schema and CI cannot use frontend route', () => {
   const ui = 'server-version/frontend/src/pages/Portal.tsx';

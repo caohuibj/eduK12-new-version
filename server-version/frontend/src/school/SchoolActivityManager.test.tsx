@@ -42,13 +42,16 @@ describe('Huischool Activity peer allocation after reopen',()=>{
 describe('School activity and assessment states',()=>{
   it.each(['PAUSED','CLOSED'])('keeps %s batch status without requesting forbidden details',async(status)=>{
     const detail={...activity,status,runs:[{runId:'run-a',name:'适应测评',status:'PUBLISHED'}]}
-    const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
+    const api=vi.fn(async(path:string)=>path.endsWith('/tracking')?{baselineId:null,ordinal:null,choices:[]}:path.endsWith('pageSize=50')?{list:[detail]}:detail)
     render(<SchoolActivityManager api={api as unknown as SchoolApi} organizationId={org} isAdmin classes={[]}/>)
     fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
     const batch=await screen.findByRole('button',{name:'适应测评 · 已发布'})
     expect(batch).toBeDisabled()
     fireEvent.click(batch)
-    expect(api.mock.calls.some(([path])=>path.includes('/runs/'))).toBe(false)
+    const tracking=`/organizations/${org}/activities/${course}/runs/run-a/tracking`
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(tracking))
+    // Tracking has its own editor contract; it does not read the forbidden run detail.
+    expect(api.mock.calls.filter(([path])=>path.includes('/runs/')).map(([path])=>path)).toEqual([tracking])
     expect(screen.getByText(/当前活动状态不支持读取测评批次详情/)).toBeInTheDocument()
   })
   it('explains the separate publication step after an activity opens',async()=>{
@@ -195,6 +198,7 @@ it('publishes own psychologist batch using server run capabilities without isAdm
   const api=vi.fn(async(path:string)=>{
     if(path.endsWith('pageSize=50'))return {list:[detail]}
     if(path===base+'/runs/run-own')return {run:{id:'run-own',name:'本人测评',status:'DRAFT',version:2}}
+    if(path.endsWith('/tracking'))return {baselineId:null,ordinal:null,choices:[]}
     if(path.endsWith('/preview'))return {tracks:[{executionCount:1,subjectCount:1,respondentCount:1}]}
     return detail
   })
@@ -206,7 +210,7 @@ it('publishes own psychologist batch using server run capabilities without isAdm
     fireEvent.click(await screen.findByRole('button',{name:'预览合法参与者数量'}))
     await waitFor(()=>expect(screen.getByRole('button',{name:'正式发布本人测评'})).toBeEnabled())
     fireEvent.click(screen.getByRole('button',{name:'正式发布本人测评'}))
-    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2}))
+    await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2,tracking:{mode:'SINGLE',metrics:[],visibleMetrics:[]}}))
   }finally{window.confirm=original}
 })
 

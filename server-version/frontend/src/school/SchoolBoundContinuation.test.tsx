@@ -37,8 +37,9 @@ describe('School real inbox → runner consent sequence',()=>{
   it.each(['student','parent','teacher'] as const)('%s resumes a server-confirmed binding without signing new admission consent',async role=>{
     const api=setup(role,true)
     fireEvent.click(await screen.findByRole('button',{name:entryButtons[role]}))
+    const start=await screen.findByRole('button',{name:'开始或继续正式测评'})
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+    fireEvent.click(start)
     await screen.findByText('已读取授权的原有作答')
     expect(api.mock.calls.filter(([path])=>!path.startsWith('/my/')).map(([path])=>path))
       .toEqual([prefix+'/start','/composite-attempts/bound-attempt?view=current-unit'])
@@ -46,9 +47,9 @@ describe('School real inbox → runner consent sequence',()=>{
   it.each(['student','parent','teacher'] as const)('%s still requires explicit consent for new admission',async role=>{
     const api=setup(role,false)
     fireEvent.click(await screen.findByRole('button',{name:entryButtons[role]}))
-    expect(screen.getByRole('button',{name:'开始或继续正式测评'})).toBeDisabled()
+    expect(await screen.findByRole('button',{name:'开始或继续正式测评'})).toBeDisabled()
     fireEvent.click(screen.getByRole('checkbox'))
-    fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+    fireEvent.click(await screen.findByRole('button',{name:'开始或继续正式测评'}))
     await screen.findByText('已读取授权的原有作答')
     expect(api.mock.calls.filter(([path])=>!path.startsWith('/my/')).map(([path])=>path))
       .toEqual([prefix+'/consent/accept',prefix+'/start','/composite-attempts/bound-attempt?view=current-unit'])
@@ -56,7 +57,7 @@ describe('School real inbox → runner consent sequence',()=>{
   it('does not reopen or re-sign consent when protected continuation is rejected',async()=>{
     const api=setup('parent',true,true)
     fireEvent.click(await screen.findByRole('button',{name:entryButtons.parent}))
-    fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+    fireEvent.click(await screen.findByRole('button',{name:'开始或继续正式测评'}))
     await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('当前作答访问被拒绝'))
     expect(screen.queryByText('已读取授权的原有作答')).not.toBeInTheDocument()
     expect(api.mock.calls.some(([path])=>path.endsWith('/consent/accept'))).toBe(false)

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ],
+  "startedAt": "2026-10-31T09:52:30.141873+00:00",
+  "endedAt": "2026-10-31T09:53:15.602400+00:00",
+  "seconds": 45.46053156800008,
+  "exitCode": 0,
+  "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+  "inputs": {
+    "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": "e75d807fcf71b663a5e572e52e245219bca301978955e356878cdd1ee3c58127",
+    "server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx": "2228c8fe2a65ddbbedf954ada833f6c36678a2e242ac10f8dc6734a80bdc66a3",
+    "server-version/frontend/src/modules/reporting/__tests__/QuestionnaireResult.test.tsx": "e53755510b21d4b5fcdda7dc783f1eaed9ff0c11bc9117d96f31bfc2236a0428",
+    "server-version/frontend/src/api/publicCapabilityClient.ts": "a9dee09e8dc48849a2cbd93be2092be929b8f25a27172a77ad649059c5e63c34",
+    "server-version/frontend/src/utils/questionnaireResume.ts": "eec19f1cda2ccfb00d5249e4f1cae4e43e10ec9e22fb1cacaf3e98d473d18c53",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/src/test/setup.ts": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+  },
+  "scope": "This independent public-report candidate; no authenticated-page checks/qualification borrowed from445"
+}

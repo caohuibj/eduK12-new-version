@@ -1,0 +1,151 @@
+{
+  "scope": "retrospective unsigned source/original binding, not formal CI qualification",
+  "sourceBase": "555f705dd272f0ee9c7ac0d80770010d2d6e9675",
+  "observedLaterMain": "093d86e842da12d443301fd4a37d5d046ecb9185",
+  "inputs": {
+    "server-version/backend/src/modules/composite/composite.service.ts": "01818702bf4039ce89a27115f195b875d974bedd6483fb4bcb8e163f52be88d3",
+    "server-version/backend/src/__tests__/composite/training-variant-export.test.ts": "647d46ed2c0dd12d8c5e1a3ba1660839b84062aaee3368e5d1045e0c8d18e24d",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/package.json": "eb9818ccb8e7797f201d86d20752aa23bb3c13685d4660ec395f4f905a28f87a",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc"
+  },
+  "originals": [
+    {
+      "path": "pg-migrate.log",
+      "bytes": 38844,
+      "decodedSHA256": "8bc7da68df53dadce90bb3c4d00ff8bb9dcb89841dc35dd50b60dd4a3bbcd810"
+    },
+    {
+      "path": "types.json",
+      "bytes": 1576,
+      "decodedSHA256": "a67e0849c0213de74026db39fea10be28fb4012dcfa30ab579dd69b74bdc9744"
+    },
+    {
+      "path": "baseline-r2.log",
+      "bytes": 91,
+      "decodedSHA256": "07a5a2b4235fa9e1fa1d167c1bbcdd29dd06fbb09092273a44cfeb8319b5f0b4"
+    },
+    {
+      "path": "candidate-query.json",
+      "bytes": 7911,
+      "decodedSHA256": "c4a1ed447866f3e9b03330980aa352a0d4145379274217f23594a9b26f0d929b"
+    },
+    {
+      "path": "pg-start.log",
+      "bytes": 65,
+      "decodedSHA256": "7726af224eee9dd8ea42d90e55292b9de8a4b129e390795c2a646ad810036ff6"
+    },
+    {
+      "path": "baseline.log",
+      "bytes": 88,
+      "decodedSHA256": "ad0e84779c2cc01469f97c07857501dfc8dcfee628de9cecf98f42e0db71f161"
+    },
+    {
+      "path": "candidate.log",
+      "bytes": 89,
+      "decodedSHA256": "a5505fa1408e6545711606e97385cf8a7223b44bd37090c544682bc63c71ce8d"
+    },
+    {
+      "path": "candidate.json",
+      "bytes": 9616,
+      "decodedSHA256": "f30d495c9f457614c05ba8b8944f8b48cef051eec9eb60a8dd2bc047fbcc9d74"
+    },
+    {
+      "path": "baseline-query.json",
+      "bytes": 7695,
+      "decodedSHA256": "b9d4e9c1922dae68af0054f7a2268f8808ac2b4bcd55450262ff7f7100e89e2c"
+    },
+    {
+      "path": "baseline-r2.json",
+      "bytes": 10009,
+      "decodedSHA256": "964c8a5431e281005954429b38f85d5860adece0a759fb31fb2030d7ded81724"
+    },
+    {
+      "path": "pg-stop.log",
+      "bytes": 85,
+      "decodedSHA256": "bcf10e95917bf40c73becc683b8613523c7b12ccdcada4e16f99b73d74a58c72"
+    },
+    {
+      "path": "pg-result.json",
+      "bytes": 2216,
+      "decodedSHA256": "a3e59ed3bf38a7e58b40f814e94aba34a1e1dd64db4ff05bb4565acbd99f692b"
+    },
+    {
+      "path": "baseline.json",
+      "bytes": 10415,
+      "decodedSHA256": "5d6a90336344ce1375ca8adaf832f03e3553ade2c30f654b0e1529b40fc13e31"
+    },
+    {
+      "path": "pg-probe.log",
+      "bytes": 1688,
+      "decodedSHA256": "cadbc9e76b969ed29625a7c0db2c622490476e98450fe50ea46a2b5c4d3f53c5"
+    },
+    {
+      "path": "pg-execution.json",
+      "bytes": 351,
+      "decodedSHA256": "2732f0dac9c670e6219eccc8343156641da1f6695c13f8b79f1232c2af3c717c"
+    },
+    {
+      "path": "types.log",
+      "bytes": 0,
+      "decodedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "executions": [
+    {
+      "stage": "fixture-preparation-r1",
+      "actualExitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "filtered": 25,
+      "reason": "synthetic cached report omitted selected form items; existing real scope guard rejected it"
+    },
+    {
+      "stage": "baseline-r2",
+      "actualExitCode": 1,
+      "passed": 0,
+      "failed": 1,
+      "filtered": 26,
+      "reason": "only missing narrow job projection assertion failed; real page reports otherwise produced"
+    },
+    {
+      "stage": "candidate",
+      "actualExitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "filtered": 25
+    }
+  ],
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15",
+    "dependencies": "copied saved backend installation; follow-redirects1.16.1 vs current lock1.16.2; no fresh install/audit or full byte provenance",
+    "dbRole": "owner-only disposable query replay, not production runtime-policy verification"
+  },
+  "notExecuted": [
+    "HTTP/browser/full report lifecycle",
+    "old25independent cases",
+    "officialCI/build/image/audit/security qualification",
+    "production access/flags/config or load",
+    "4C4G capacity"
+  ],
+  "additionalDirectConsumer": {
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/composite/training-variant-export.test.ts",
+      "-t",
+      "loads selected typed snapshots once for a multi-person teacher report page",
+      "--maxWorkers=1",
+      "--reporter=json"
+    ],
+    "exitCode": 0,
+    "passed": 1,
+    "filtered": 26,
+    "rawReporterUTF8": "{\"numTotalTestSuites\":5,\"numPassedTestSuites\":5,\"numFailedTestSuites\":0,\"numPendingTestSuites\":0,\"numTotalTests\":27,\"numPassedTests\":1,\"numFailedTests\":0,\"numPendingTests\":26,\"numTodoTests\":0,\"snapshot\":{\"added\":0,\"failure\":false,\"filesAdded\":0,\"filesRemoved\":0,\"filesRemovedList\":[],\"filesUnmatched\":0,\"filesUpdated\":0,\"matched\":0,\"total\":0,\"unchecked\":0,\"uncheckedKeysByFile\":[],\"unmatched\":0,\"updated\":0,\"didUpdate\":false},\"startTime\":1793447501211,\"success\":true,\"testResults\":[{\"assertionResults\":[{\"ancestorTitles\":[\"teacher variant batch report job projection\"],\"fullName\":\"teacher variant batch report job projection reads saved reports with only the frozen job binding and report ciphertext\",\"status\":\"skipped\",\"title\":\"reads saved reports with only the frozen job binding and report ciphertext\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"teacher variant batch report job projection\"],\"fullName\":\"teacher variant batch report job projection keeps owner and exact frozen-version refusals before publishing saved reports\",\"status\":\"skipped\",\"title\":\"keeps owner and exact frozen-version refusals before publishing saved reports\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata\",\"status\":\"skipped\",\"title\":\"exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope retains variant provenance and strata in the same CSV/ZIP artifact dictionary\",\"status\":\"skipped\",\"title\":\"retains variant provenance and strata in the same CSV/ZIP artifact dictionary\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope previews count the full exact scope while sampling rows\",\"status\":\"skipped\",\"title\":\"previews count the full exact scope while sampling rows\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope fails closed for allocation drift before child payload reads\",\"status\":\"skipped\",\"title\":\"fails closed for allocation drift before child payload reads\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope fails closed for slot drift before child payload reads\",\"status\":\"skipped\",\"title\":\"fails closed for slot drift before child payload reads\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope fails closed for publication drift before child payload reads\",\"status\":\"skipped\",\"title\":\"fails closed for publication drift before child payload reads\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope fails closed for definition drift before child payload reads\",\"status\":\"skipped\",\"title\":\"fails closed for definition drift before child payload reads\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope provides usable stratified administration counts without reading answers or excluding uncompleted attempts\",\"status\":\"skipped\",\"title\":\"provides usable stratified administration counts without reading answers or excluding uncompleted attempts\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope rejects cached report provenance or union leakage before compact source reads\",\"status\":\"skipped\",\"title\":\"rejects cached report provenance or union leakage before compact source reads\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant export scope\"],\"fullName\":\"weighted variant export scope invalidates artifact identity when either frozen configuration or publication changes\",\"status\":\"skipped\",\"title\":\"invalidates artifact identity when either frozen configuration or publication changes\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers counts and exports only selected current-epoch unified cognitive raw trials without zero filling another group\",\"status\":\"skipped\",\"title\":\"counts and exports only selected current-epoch unified cognitive raw trials without zero filling another group\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers full preview loads bounded selected raw and preserves fractional values without a missing-raw fallback\",\"status\":\"skipped\",\"title\":\"full preview loads bounded selected raw and preserves fractional values without a missing-raw fallback\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers preflights combined scoped legacy and unified trial bounds before raw source reads\",\"status\":\"skipped\",\"title\":\"preflights combined scoped legacy and unified trial bounds before raw source reads\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers fails closed on missing unified raw without legacy fallback\",\"status\":\"skipped\",\"title\":\"fails closed on missing unified raw without legacy fallback\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers fails closed on duplicate unified raw without legacy fallback\",\"status\":\"skipped\",\"title\":\"fails closed on duplicate unified raw without legacy fallback\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers fails closed on epoch unified raw without legacy fallback\",\"status\":\"skipped\",\"title\":\"fails closed on epoch unified raw without legacy fallback\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers fails closed on encoding unified raw without legacy fallback\",\"status\":\"skipped\",\"title\":\"fails closed on encoding unified raw without legacy fallback\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers fails closed on count unified raw without legacy fallback\",\"status\":\"skipped\",\"title\":\"fails closed on count unified raw without legacy fallback\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers resolves shared FSP2 plans in one batch for all selected attempts\",\"status\":\"skipped\",\"title\":\"resolves shared FSP2 plans in one batch for all selected attempts\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"weighted variant raw, batch and history consumers\"],\"fullName\":\"weighted variant raw, batch and history consumers history filters unselected and old-epoch child rows before counts and result parsing\",\"status\":\"skipped\",\"title\":\"history filters unselected and old-epoch child rows before counts and result parsing\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"variant report page canonical batches\"],\"fullName\":\"variant report page canonical batches loads selected typed snapshots once for a multi-person teacher report page\",\"status\":\"passed\",\"title\":\"loads selected typed snapshots once for a multi-person teacher report page\",\"duration\":2708.546227,\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"variant report page canonical batches\"],\"fullName\":\"variant report page canonical batches rejects parent drift in a batched typed source\",\"status\":\"skipped\",\"title\":\"rejects parent drift in a batched typed source\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"variant report page canonical batches\"],\"fullName\":\"variant report page canonical batches rejects epoch drift in a batched typed source\",\"status\":\"skipped\",\"title\":\"rejects epoch drift in a batched typed source\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[\"variant report page canonical batches\"],\"fullName\":\"variant report page canonical batches rejects section drift in a batched typed source\",\"status\":\"skipped\",\"title\":\"rejects section drift in a batched typed source\",\"failureMessages\":[],\"meta\":{},\"tags\":[]},{\"ancestorTitles\":[],\"fullName\":\"history rejects draft-only variant metadata instead of treating it as ordinary history\",\"status\":\"skipped\",\"title\":\"history rejects draft-only variant metadata instead of treating it as ordinary history\",\"failureMessages\":[],\"meta\":{},\"tags\":[]}],\"startTime\":1793447506936,\"endTime\":1793447509644.5461,\"status\":\"passed\",\"message\":\"\",\"name\":\"/workspace/eduk12-b-opt/server-version/backend/src/__tests__/composite/training-variant-export.test.ts\"}]}",
+    "rawReporterSHA256": "1e72e44c700eae9829ec9eff8278e84e530ef2a332f844135b43fffa6e4d86cc",
+    "rawLogUTF8": "JSON report written to /workspace/eduk12-b-handoff/variant-job-projection/existing-consumer.json\n"
+  }
+}

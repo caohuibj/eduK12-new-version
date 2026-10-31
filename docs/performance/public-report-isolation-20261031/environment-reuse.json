@@ -1,0 +1,9 @@
+{
+  "sourcePR": 445,
+  "sourceHead": "e00829d0011995035843b13a22f583ae3a658503",
+  "path": "docs/performance/report-read-recovery-20261031/environment.json",
+  "sourceFileSHA256": "42f721264020279aa909909260a56b1c142c495979ebebaaad21745dac860204",
+  "sameFrontendInstall": true,
+  "sameFrontendLock": true,
+  "note": "Only dependency/environment inventory reused; this candidate has separate actual test/types/lint executions. No445 application success is relabeled as current public-page success."
+}

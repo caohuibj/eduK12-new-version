@@ -37,6 +37,14 @@ export function dependencyFile(file) {
     || /^server-version\/frontend\/src\/(?:[^/]+\/)*__tests__\/[^\x00-\x1f\\]+\.test\.tsx?$/.test(file);
 }
 
+// A component selector after dependencyScope admission, not a package exception.
+// Backend/test or CI-policy companions keep the existing combined route.
+export function frontendDependencyFilesOnly(entries) {
+  const root='server-version/frontend/';
+  return entries.some(({file})=>file===root+'package.json'||file===root+'package-lock.json')
+    && entries.every(({file})=>file.startsWith(root)&&dependencyFile(file));
+}
+
 export function manifestDependencyOnly(before, after, oldLock, newLock) {
   if (![before,after,oldLock,newLock].every(clean)
       || canonical(omit(before,sections)) !== canonical(omit(after,sections))

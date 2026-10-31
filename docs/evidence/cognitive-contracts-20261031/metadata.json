@@ -1,0 +1,72 @@
+{
+  "baseMain": "92e398025fb6fbefe1b051520cf5507295173859",
+  "scope": "one standalone DraftPR, three commits; excludes456/360/368/441",
+  "completedCommits": [
+    "f797826bfe8ed7ae00a8e0d890c2ee8efb6729f5",
+    "a52d8a0b785e0bf0d2995aa7f6cd812c2fc7d8eb"
+  ],
+  "applicationFiles": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/assignment-api.test.ts",
+      "sha256": "a52894cc74d03015b681c8ef00e134f7d8694574e682c074da7bd7bb88063513",
+      "blob": "e958e8619ddf9d7c31bba4253805d4d0791bf050"
+    },
+    {
+      "path": "server-version/backend/src/scripts/cognitive-onboarding-check.ts",
+      "sha256": "888f8f2c510e6956996497ad5d19ba9a17014c8d338c9b859564f6cf34aa5435",
+      "blob": "89f3652b7124af8db9212a876af6930f4c37f1fa"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/onboarding-cli.test.ts",
+      "sha256": "dc9aead909e1ddc897a00ce9f709896248b9cf9a893404dc8361fbe578d1f62a",
+      "blob": "b062662275a63268dfb198d19672e7971aa21ae1"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/product-eligibility.test.ts",
+      "sha256": "5b58b5c5970075f498be390179f25a0487516a645dfe04826c72d8c3b793f19a",
+      "blob": "b00a72e038d44a7931bbe99ec899442d331507b4"
+    }
+  ],
+  "results": {
+    "api": {
+      "passed": 11,
+      "failed": 0
+    },
+    "cli": {
+      "passed": 5,
+      "failed": 0
+    },
+    "product": {
+      "passed": 11,
+      "failed": 0
+    },
+    "backendTypes": {
+      "exitCode": 0
+    }
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "packages": {
+      "vitest": "4.1.11",
+      "typescript": "5.9.3",
+      "tsx": "4.23.12",
+      "@prisma/client": "5.22.0",
+      "follow-redirects": "1.16.1"
+    },
+    "dependencySetup": "private copy of existing node_modules; no install, migration or production access",
+    "lockSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "mainLockMatches": true,
+    "freshLockQualified": false,
+    "knownDependencyDifference": "installed follow-redirects1.16.1 versus lock1.16.2; no fresh audit/CI claim"
+  },
+  "evidenceSha256": "6f4532a116f646883f297128948766f14eb304b7b9a5c6e5f878b60c5e4b51e3",
+  "formalCiQualified": false,
+  "productionTouched": false,
+  "readProhibitedSessions": false,
+  "limits": [
+    "Controller and catalog tests use explicit storage/service mocks; no live HTTP/PG/grant lifecycle was run.",
+    "Existing real service precise-profile contract is unchanged; the existing training-cognitive-profile.http.postgres.integration.test.ts covers omitted fixed profile and profileLocked. Its evidence is reused by mother DOT, not claimed re-executed by B.",
+    "CLI subprocesses use supported node --import tsx to exercise the same TypeScript entry without tsx CLI IPC. Invalid legacy and batch selections still stop before acceptance.",
+    "All B targeted commands passed on first attempt; mother DOT baseline failures are recorded separately, not relabeled. Source hashes are post-run reconstructions from unchanged source; not signed/full-byte environment attestations."
+  ]
+}

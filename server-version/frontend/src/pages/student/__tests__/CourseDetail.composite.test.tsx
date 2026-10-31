@@ -103,9 +103,9 @@ describe('CourseDetail composite availability', () => {
     mockGet.mockImplementation((path: string) => {
       if (path === '/composite-assessments/available') return Promise.resolve({ code: 0,
         data: { list: [questionnaire('my-questionnaire'), questionnaire('other-course-questionnaire')] } })
-      if (path === '/courses/my/tasks?page=1&pageSize=100') return Promise.resolve({ code: 0,
+      if (path === '/courses/my/tasks?page=1&pageSize=100&courseId=course-1') return Promise.resolve({ code: 0,
         data: { total: 101, list: [{ id: 'other-course-questionnaire', kind: 'COMPOSITE', courses: [{ id: 'course-2' }] }] } })
-      if (path === '/courses/my/tasks?page=2&pageSize=100') return Promise.resolve({ code: 0,
+      if (path === '/courses/my/tasks?page=2&pageSize=100&courseId=course-1') return Promise.resolve({ code: 0,
         data: { total: 101, list: [{ id: 'my-questionnaire', kind: 'COMPOSITE', courses: [{ id: 'course-1' }] }] } })
       return baseGet(path)
     })
