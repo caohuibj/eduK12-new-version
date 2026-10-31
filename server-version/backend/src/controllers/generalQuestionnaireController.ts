@@ -955,7 +955,13 @@ export const generalQuestionnaireController = {
       const questionnaire = await generalQuestionnaire(req.params.id)
       if (!questionnaire) return notFound(res, '问卷不存在')
       if (!(await canManageGeneral(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
-      return success(res, { list: await formSectionService.listQuestionnaireFormSections(req.params.id) })
+      const list = await formSectionService.listQuestionnaireFormSections(req.params.id)
+      // Reuse the repaired section snapshot; default callers keep the original DTO.
+      if (req.query?.include === 'units') {
+        const units = await formSectionService.listQuestionnaireContentUnits(req.params.id, list)
+        return success(res, { list, units })
+      }
+      return success(res, { list })
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       logger.error('获取泛化问卷表单区段错误', err)

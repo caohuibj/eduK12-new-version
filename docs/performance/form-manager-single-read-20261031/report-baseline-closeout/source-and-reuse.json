@@ -1,0 +1,21 @@
+{
+  "base": "63f849c5bb3dfd7c215d719fc9b75e233664dca8",
+  "product": "e2011568f5ca4f217a4b1b7d9c055738f27193cb",
+  "localProduct": "947b737dd43d473b079cd1ce645e7040dc21a54a",
+  "equalFullProductTree": "4aee5ed98a11d9c14222db0c6922679e5ccd3968",
+  "compilerProducer": "9671eee374fe2bc7e1fa3b36cb6280945942267a",
+  "components": {
+    "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+    "frontend": "abac9400eea6d4c9ee7a4ab5024d4c5a35299f57"
+  },
+  "caseSelectionDistinct": 39,
+  "caseSelection": {
+    "backend": 14,
+    "frontend": 25,
+    "oldFrontendNonduplicate": 17,
+    "currentMutationAndLoad": 8
+  },
+  "previousCandidateCount": 29,
+  "allPreviousRegistryValuesPreserved": true,
+  "formalCI": "NOTRUN"
+}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import apiClient from '../api/client'
 import { apiErrorMessage } from '../utils/apiErrorMessage'
 
@@ -55,29 +55,46 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
+  const loadSequence = useRef(0)
+  const resourceSequence = useRef(0)
+
+  useEffect(() => {
+    resourceSequence.current += 1
+    setSaving(false)
+    setNotice(null)
+    return () => { resourceSequence.current += 1 }
+  }, [basePath])
 
   const load = useCallback(async () => {
+    const request = ++loadSequence.current
     setLoading(true)
     try {
-      const projection = basePath.startsWith('/general-questionnaires/') || basePath.startsWith('/questionnaires/')
-        ? '?projection=units' : ''
-      const [sectionResponse, contentResponse] = await Promise.all([
-        apiClient.get<{ list: FormSection[] }>(`${basePath}/form-sections`),
-        apiClient.get<{ units?: ContentUnit[] }>(`${basePath}/content${projection}`),
-      ])
+      const combined = basePath.startsWith('/general-questionnaires/') || basePath.startsWith('/questionnaires/')
+      const [sectionResponse, contentResponse] = combined
+        ? await apiClient.get<{ list: FormSection[]; units?: ContentUnit[] }>(`${basePath}/form-sections?include=units`)
+          .then(response => [response, response] as const)
+        : await Promise.all([
+          apiClient.get<{ list: FormSection[] }>(`${basePath}/form-sections`),
+          apiClient.get<{ units?: ContentUnit[] }>(`${basePath}/content`),
+        ])
+      if (request !== loadSequence.current) return
       if (sectionResponse.code !== 0) throw new Error(sectionResponse.message || '区段加载失败')
       if (contentResponse.code !== 0) throw new Error(contentResponse.message || '内容顺序加载失败')
       setSections((sectionResponse.data?.list ?? []).slice().sort((left, right) => left.position - right.position))
       setUnits((contentResponse?.code === 0 ? contentResponse.data?.units ?? [] : []).slice().sort((left, right) => left.position - right.position))
       setNotice(null)
     } catch (error) {
-      setNotice(apiErrorMessage(error, '区段加载失败'))
+      if (request === loadSequence.current) setNotice(apiErrorMessage(error, '区段加载失败'))
     } finally {
-      setLoading(false)
+      if (request === loadSequence.current) setLoading(false)
     }
   }, [basePath])
 
-  useEffect(() => { void load() }, [load, refreshKey])
+  useEffect(() => {
+    void load()
+    // A previous resource/refresh must not publish into the current editor.
+    return () => { loadSequence.current += 1 }
+  }, [load, refreshKey])
 
   // Management section responses contain every field after server-side
   // membership repair. Derive membership from that same canonical snapshot;
@@ -87,16 +104,20 @@ const FormSectionManager: React.FC<FormSectionManagerProps> = ({ basePath, readO
     .map(item => ({ ...item, formSectionId: section.id }))), [sections])
 
   const run = async (operation: () => Promise<{ code: number | string; message: string }>) => {
+    const resource = resourceSequence.current
+    const current = () => resource === resourceSequence.current
     setSaving(true)
     try {
       const response = await operation()
+      if (!current()) return
       if (response.code !== 0) throw new Error(response.message || '保存失败')
       await load()
+      if (!current()) return
       await onChange?.()
     } catch (error) {
-      setNotice(apiErrorMessage(error, '保存失败'))
+      if (current()) setNotice(apiErrorMessage(error, '保存失败'))
     } finally {
-      setSaving(false)
+      if (current()) setSaving(false)
     }
   }
 

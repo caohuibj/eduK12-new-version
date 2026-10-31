@@ -1,0 +1,33 @@
+✖ PR444 exact qualifier preserves required component scope and rejects unknown paths (4.578254ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 167.539542
+
+✖ failing tests:
+
+test at .github/scripts/onboarding-controls.test.mjs:628:1
+✖ PR444 exact qualifier preserves required component scope and rejects unknown paths (4.578254ms)
+  AssertionError [ERR_ASSERTION]: No frontend change in backend onboarding route
+  + actual - expected
+  
+  + '3333333333333333333333333333333333333333'
+  - '9999999999999999999999999999999999999999'
+  
+      at onboardingPlan (file:///workspace/dot-cloud-pr444-closeout-20261031/.github/scripts/onboarding-scope.mjs:117:156)
+      at TestContext.<anonymous> (file:///workspace/dot-cloud-pr444-closeout-20261031/.github/scripts/onboarding-controls.test.mjs:632:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '3333333333333333333333333333333333333333',
+    expected: '9999999999999999999999999999999999999999',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
