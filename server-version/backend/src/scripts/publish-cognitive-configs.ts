@@ -21,19 +21,8 @@ const main = async () => {
     JSON.parse(readFileSync(args[inputIndex + 1], 'utf8')),
   )
 
-  // The batch planner and publishCognitiveConfig enforce the same bank gate.
-  if (args.includes('--apply')) {
-        console.error('Research-restricted banks block public release:')
-        for (const blocker of bankBlockers) {
-          console.error(` - ${blocker.testType}: ${blocker.stimulusSetVersion} license=${blocker.license} (${blocker.source})`)
-        }
-        console.error(`Pass ${allowFlag} only for internal pilot rounds that never reach public deployment.`)
-        process.exitCode = 3
-        return
-      }
-      console.warn('Note: release contains research-restricted banks; --apply would be blocked without' + allowFlag)
-    }
-  }
+  // The batch planner and publishCognitiveConfig enforce the same bank gate
+  // (fail-closed via collectBankPublishBlockers; no CLI-side override).
 
   if (args.includes('--apply')) {
     const actorIndex = args.indexOf('--actor')
