@@ -28,7 +28,7 @@ test('selected route is exact success, not a job count; login keeps SAST boundar
 });
 
 test('tooling-only C never implies application builds or data recovery; mixed files/modes are rejected',()=>{
- const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
+ const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
  for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),regular('.github/scripts/onboarding-bindings.json'),regular('.github/scripts/onboarding-new-check.mjs'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'},{...files[0],newMode:'120000'}])assert.equal(toolingOnly([...files,extra]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}}};assert.deepEqual(requiredChecks(needs,true),['scope','release-tools']);assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
 });

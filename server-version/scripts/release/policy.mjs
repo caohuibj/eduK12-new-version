@@ -108,6 +108,7 @@ const releaseToolFiles=new Set([
  '.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs',
  '.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs',
  '.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs',
+ '.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs',
  '.github/workflows/scale-onboarding-boundary.yml',
  ...selectedScaleControlFiles,
  'docs/development/scale-intake-ci-20261029.md',

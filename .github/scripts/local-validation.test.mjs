@@ -51,6 +51,11 @@ test('unrelated documentation does not invalidate tooling evidence',()=>fixture(
  assert.equal(admit(signed,pub,base,git('rev-parse','HEAD')).checks[0].check,'release-tools');
 }));
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+test('dependency routing controls use their existing bounded tools contract',()=>fixture(({base,head})=>{
+ const commands=recipe('release-tools',base,head);
+ assert(commands.some(argv=>argv.includes('.github/scripts/dependency-routing.test.mjs')));
+ assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
+},'.github/scripts/dependency-scope.mjs'));
 test('development CLI recipe selects API catalog and subprocess consumers plus compiler without app builds',()=>{
  const cli='server-version/backend/src/scripts/cognitive-onboarding-check.ts';
  const tests=['assignment-api','onboarding-cli','product-eligibility'].map(name=>'server-version/backend/src/__tests__/cognitive/'+name+'.test.ts');
