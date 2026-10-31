@@ -127,3 +127,21 @@ node --test --test-name-pattern='^(onboarding (accepts unchanged main controls|s
 frontend-build 和 Docker 仍各自生成既有产物，未借本片重写为统一打包系统；重复前端编译是已知后续可独立收敛项。
 本线未执行上述业务测试、应用构建、镜像、数据库、浏览器、生产操作；本地结果不能称正式 CI 资格。
 Hui 错误清单读取仍为 `NOT_FOUND`（404），未改用其他账号或通道；正式激活和合并顺序交母 DOT。
+
+## 后续小片：前端依赖升级不再执行未变后台
+
+基线 `4e99fbc87ec5cf8679664b79ddf53635b2b67fb2`，源码观察点 `acaf2290baa8dd311a194d56bb280ec659e10364`。
+既有 dependencyScope 的完整差异、普通文件、manifest/lock 一致及 scripts/engines 等拒绝规则不变。
+仅当前端依赖文件和前端测试伴随项组成全部差异时，选择现有 frontend、frontend-build、frontend-only Docker 扫描和 CodeQL，取消无关 maintenance、backend、backend-regression；不启动数据库或完整 UI。
+前端依赖仍可能影响整体前端，故现有安装、HIGH/CRITICAL 审计、类型、单测及构建继续保留，不为某个包设置跳过特例。
+后端依赖、双端或控制文件伴随变化不进入此减项，继续保留原组合资格；本片不声称后端依赖已对称收窄。共享前后端声明的安装/Prisma 生成仍仅服务前端类型检查，不执行后台服务验收。
+
+Node v24.21.0：依赖路由 12 PASS、工具接纳 2 PASS；随后只扩充原 lock-only 一例为前端/双端/后端三个真实 Git 差异对照，该例 1 PASS。必需 job 的 failure/skipped/cancelled/missing 仍拒绝，force-full、混合运行时及未知模式仍走原边界。
+对公开 #464 `385a55119e5bfffe6c1f3d1017e4b1dbc1dbe266` 的真实一文件差异只读分类：dependencyScope=true、frontendOnly=true；Draft/Ready 均要求 scope、frontend-build、frontend、docker、codeql。本工具候选自身为 release-tooling。
+本线未复跑 D 的 audit 或业务检查；未改其 lock 文件、未下载新 bundle、未改 GitHub 设置或操作生产。没有新 scenario、包白名单、签名接纳、候选台账或哈希链；两个路由文件使用既有工具 recipe 的有限控制测试。
+
+首次公开 head `9fe7f4856ea24aded91945ec51056b72d568fa8b` 的 workflow run `41230728348` 在工作流解析阶段 failure，未产生可读 run log/check-run，应用与工具 jobs 未执行；Situational 独立 run `41230787114` 成功，不能替代主 CI。
+源码定位：新增 CodeQL 分支使原配置表达式由 20,913 字符增至 21,015；[Actions runner 的原生限制为 21,000](https://github.com/actions/runner/blob/main/src/Sdk/DTExpressions2/Expressions2/ExpressionConstants.cs)。这是本轮解析失败的直接原因判断，未伪造服务端 annotation 原文。
+修复将本片路径选择移到既有 CodeQL job 的一个配置 step，使用原输出优先序，表达式变为 20,949 字符；旧分支及扫描断言不删改。只补验现有 workflow 选择用例 1 PASS、YAML 和 diff 检查，不重复业务验证，也不新增长度门禁。
+下轮只核工具候选 scope/release-tools 与稳定 gate；Ready 后按原要求 CodeQL，#464 的 audit/types/build/image 仍由其自己的正常前端路线承担。
+同一 Hui 错误清单 `404d2763-5a38-8186-ac80-de3593da05a5` 再读仍为 NOT_FOUND，回写尚未完成；以上为可复制的脱敏回写条目，未声称已写入、未换账号/通道。原失败与后续运行各保留原 head/run 身份。

@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync } from 'node:fs';
 import { join,dirname } from 'node:path';
 import { tmpdir } from 'node:os';
-import { manifestDependencyOnly,dependencyScope,dependencyFile,imageMirrorOnly } from './dependency-scope.mjs';
+import { manifestDependencyOnly,dependencyScope,dependencyFile,imageMirrorOnly,frontendDependencyFilesOnly } from './dependency-scope.mjs';
 import { changedEntries,acceptanceFor,runnerPlan } from './content-scope.mjs';
 import { requiredChecks,failedChecks } from './merge-gate.mjs';
 const root='server-version/backend';
@@ -91,6 +91,58 @@ function outputs() {
     codeql:'true',scenario:'dependencies',runner_profile:'hosted',frontend_build:'true',
     ui_required:'false',visual_hosted:'false',media_selection:'[]',media_groups:'[]'};
 }
+test('frontend lock-only changes select the existing frontend jobs and preserve real failures',()=>fixture(({base,put,commit,git})=>{
+  const next=lock(baseManifest);next.packages['node_modules/source-map-js'].version='1.2.2';
+  put('server-version/frontend/package-lock.json',next);commit();
+  const cli=new URL('./content-scope.mjs',import.meta.url).pathname;
+  const env={...process.env,CI_EVENT:'pull_request',CI_PR_REPOSITORY:'example/repo',GITHUB_REPOSITORY:'example/repo',CI_BASE_SHA:base,CI_FORCE_FULL:'',GITHUB_OUTPUT:''};
+  const selected=JSON.parse(execFileSync(process.execPath,[cli],{env,encoding:'utf8'}));
+  assert.equal(selected.scenario,'dependencies');assert.equal(selected.dependencies_frontend_only,true);
+  const outputs=Object.fromEntries(Object.entries(selected).map(([k,v])=>[k,String(v)]));
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs}};
+    assert.deepEqual(requiredChecks(needs,draft),['scope','frontend-build','frontend','docker','codeql']);
+    for(const name of requiredChecks(needs,draft))needs[name]={...needs[name],result:'success'};
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const name of requiredChecks(needs,draft))for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...needs,[name]:{...needs[name],result}},draft).includes(name));
+    for(const value of ['TRUE','',true])assert(failedChecks({...needs,scope:{result:'success',outputs:{...outputs,dependencies_frontend_only:value}}},draft).includes('scope'));
+  }
+  assert.equal(JSON.parse(execFileSync(process.execPath,[cli],{env:{...env,CI_FORCE_FULL:'true'},encoding:'utf8'})).dependencies_frontend_only,false);
+  // Real Git classifications for frontend-only, both, then backend-only. Backend
+  // qualification stays intact; this small patch only removes the frontend case's
+  // unrelated backend/maintenance work.
+  for(const kind of ['both','backend']){
+    if(kind==='backend')git('reset','--hard',base);
+    put('server-version/backend/package-lock.json',next);commit();
+    const selected=JSON.parse(execFileSync(process.execPath,[cli],{env,encoding:'utf8'}));
+    assert.equal(selected.scenario,'dependencies',kind);assert.equal(selected.dependencies_frontend_only,false,kind);
+    assert(requiredChecks({scope:{outputs:Object.fromEntries(Object.entries(selected).map(([k,v])=>[k,String(v)]))}},false).includes('backend-regression'),kind);
+  }
+}));
+test('frontend dependency selector never hides backend, runtime or control companions',()=>{
+  const entry=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+  const front=entry('server-version/frontend/package-lock.json');
+  assert.equal(frontendDependencyFilesOnly([front,entry('server-version/frontend/src/pages/__tests__/Example.test.tsx')]),true);
+  for(const file of ['server-version/backend/package-lock.json','server-version/backend/src/__tests__/api.test.ts','.github/workflows/ci.yml','server-version/frontend/src/api/client.ts','server-version/frontend/Dockerfile'])assert.equal(frontendDependencyFilesOnly([front,entry(file)]),false,file);
+  assert.equal(frontendDependencyFilesOnly([]),false);
+});
+test('frontend dependency workflow dispatch agrees with the aggregate and frontend-only image target',()=>{
+  const ci=source('ci');
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs:{...outputs(),application_route:'legacy',dependencies_frontend_only:'true'}}};
+    const github={event_name:'pull_request',ref_name:'feature/dependencies',event:{pull_request:{draft,number:1,head:{ref:'feature/dependencies'}}}};
+    for(const name of ['maintenance','backend','backend-regression','frontend','frontend-build','docker']){
+      const expr=job(ci,name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
+      const selected=new Function('needs','github','vars','cancelled','fromJSON',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse);
+      assert.equal(Boolean(selected),['frontend','frontend-build','docker'].includes(name),name+' draft='+draft);
+    }
+    const expr=job(ci,'docker').match(/frontend_only: \$\{\{ (.+) \}\}/)[1];
+    assert.equal(new Function('needs',`return (${expr})`)(needs),true);
+  }
+  assert.match(job(ci,'codeql'),/id: deps-codeql\n        if: needs\.scope\.outputs\.dependencies_frontend_only == 'true'/);
+  assert.match(job(ci,'codeql'),/paths:\['server-version\/frontend\/src'\]/);
+  assert.match(job(ci,'codeql'),/\$\{\{ steps\.deps-codeql\.outputs\.config \|\|/);
+});
 test('draft and ready dependency aggregate require every formal affected component and reject skips or forged selections',()=>{
   for(const draft of [true,false]) {
     const needs={scope:{result:'success',outputs:outputs()}};

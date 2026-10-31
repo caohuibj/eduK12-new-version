@@ -55,7 +55,7 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import { posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
-import { dependencyScope } from './dependency-scope.mjs';
+import { dependencyScope, frontendDependencyFilesOnly } from './dependency-scope.mjs';
 import { plan as applicationPlan, toolingOnly, engineeringEvidenceFile } from '../../server-version/scripts/release/policy.mjs';
 
 // Keep route refusal independent of the candidate verifier. The official
@@ -468,6 +468,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
+  const frontendDependencies = dependencies && frontendDependencyFilesOnly(entries);
   const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
   requireSurveyWaveSelectionScope(process.env.CI_SURVEY_SELECTION_REQUIRED === 'true', surveySelection, event, process.env.CI_FORCE_FULL);
   const performance = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
@@ -516,6 +517,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   const output = { personal_tracking_draft:personalTrackingDraftScope(entries,{event,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'}), admin_permissions_functional_only:Boolean(adminFunctional), admin_permissions_functional_plan:JSON.stringify(adminFunctional), training_functional_only:Boolean(trainingFunctional), run_performance_tests:!(trainingFunctional || adminFunctional), training_functional_plan:JSON.stringify(trainingFunctional), survey_mac_ui_plan:JSON.stringify(surveyMac), reviewed_candidate_plan:JSON.stringify(reviewedCandidate), survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:trainingFunctional || adminFunctional ? 'legacy' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, codeql, scenario, frontend_affected:affectedFrontend,
+    dependencies_frontend_only:frontendDependencies,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
     cognitive_intake_light:result.cognitive_intake_light === true,cognitive_intake_plan:JSON.stringify(result.cognitive_intake_plan || null),
