@@ -70,10 +70,13 @@ jobs:
       TASK_GROUP_HISTORY_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR363_FEEDBACK_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       LIBRARY_DISCOVERY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TEACHER_PRIVATE_GROUP_LONGITUDINAL_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       UPLOAD_DIR: /tmp/eduk12-ci-uploads
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      # Same synthetic eligibility fixture key as the existing report-planning CI.
+      CAMPUS_ELIGIBILITY_HMAC_KEY: '5757575757575757575757575757575757575757575757575757575757575757'
       COGNITIVE_MODULE_ENABLED: 'true'
       REDIS_URL: redis://localhost:6379
       MINI_OPERATIONS_TEST_REDIS_URL: redis://localhost:6379
@@ -237,6 +240,7 @@ jobs:
         if: inputs.focus == 'full'
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          TEACHER_PRIVATE_GROUP_LONGITUDINAL_CHECKPOINT: ${{ runner.temp }}/teacher-private-group-longitudinal-${{ github.run_id }}-${{ github.run_attempt }}.json
         # Real-PG suites remain serial. The single hardware-sensitive burst is
         # covered by the isolated backend job. Producers precede their consumers;
         # roster and export use Redis DB14/15. Reports cover the disjoint executions.
