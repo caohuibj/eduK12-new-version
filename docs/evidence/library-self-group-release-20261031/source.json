@@ -1,0 +1,27 @@
+{
+  "scope": {
+    "organizationId": "6540be55-5879-4b34-8e2a-c1035939f791",
+    "eventId": "e9c5aa2a-2371-4094-b600-d85f4b7b0f7b",
+    "actorUserId": "fbd22c11-0282-411c-a299-e9d314693f4d"
+  },
+  "runId": "59186b4c-0060-4005-bbd4-69aa68f4a1ea",
+  "groupId": "e80878e7-b592-4171-8dbc-173b440a401e",
+  "scaleId": "3a2c90fb-9167-48f3-a68f-ee63205e3597",
+  "actor": {
+    "userId": "4d7bb823-9288-453a-a2ec-d8ef3d93c724",
+    "platformRole": "SYSTEM_ADMIN"
+  },
+  "users": [
+    "fbd22c11-0282-411c-a299-e9d314693f4d",
+    "857c2d60-f9a0-4068-a9ac-45093613bdf7",
+    "51ac872d-c0c9-4fd9-a0c5-2a00ab00ca91",
+    "20db6ca5-3309-4657-b85f-4af6b39cfafa",
+    "88c09b07-d02e-4f83-9220-5b8f94d59c6c",
+    "b1dcdae9-d24e-45fe-b777-4df3db101bc9",
+    "1d614ffe-7132-4235-b996-904d9645fa44",
+    "13c8eea0-1494-4c47-a993-a1a2a008f8ee",
+    "bb57f764-bbec-4420-944f-c5ca1a882bfd",
+    "e0223efa-36b1-415f-b1ac-8966e20252f9"
+  ],
+  "completedExecutionId": "f4de63b8-6ab1-47e4-ac1d-443c3200f50a"
+}

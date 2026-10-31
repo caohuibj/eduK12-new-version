@@ -8,6 +8,27 @@ const source={sourceCompositeId:id(2),title:'获授权来源',canPrepare:true,un
 const prep={resourceId:id(8),product:'TEACHER',organizationId:id(1),family:'BUNDLE',sourceCompositeId:id(2),runtimeCompositeId:id(9),preparationHash:'p'.repeat(64),title:'新登记',canPublish:false,licenses:pinnedLicenses,units:[{itemId:id(4),family:'COGNITIVE',measurement:{releaseId:id(5),contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}}]}
 const options={emptySelectionAllowed:true,units:[{...prep.units[0],references:[{releaseId:id(6),contentHash:'c'.repeat(64),selectable:true,unavailableReason:null,licenses:[{resourceId:id(6),grantId:id(16)},{resourceId:id(10),grantId:id(20)},{resourceId:id(11),grantId:id(21)}],choices:[{entryKey:'approved-reference',metricKey:'accuracy',referenceKind:'PERCENTILE'}]}],reports:[{releaseId:id(7),contentHash:'d'.repeat(64),selectable:true,unavailableReason:null,licenses:[{resourceId:id(7),grantId:id(17)},{resourceId:id(10),grantId:id(20)},{resourceId:id(11),grantId:id(21)},{resourceId:id(12),grantId:id(22)}],audience:'teacher',title:'批准报告',metricKeys:['accuracy']}]}]}
 afterEach(cleanup)
+it('registers explicit per-tool GROUP audiences while preserving the selected own report and scheduled opening',async()=>{
+ const {api}=setup(path=>path.endsWith('/content-choices')?{...options,units:options.units.map(unit=>({...unit,groupMetricKeys:['accuracy']}))}:undefined)
+ await prepare()
+ fireEvent.change(screen.getByLabelText('报告用途'),{target:{value:'GROUP'}})
+ fireEvent.change(screen.getByLabelText('群体人数下限'),{target:{value:'20'}})
+ fireEvent.click(screen.getByRole('checkbox',{name:'认知测评 1：组织管理者群体汇总'}))
+ fireEvent.change(screen.getByLabelText('精确报告 R'),{target:{value:id(7)}})
+ fireEvent.change(screen.getByLabelText('本人披露'),{target:{value:'INDIVIDUAL_SUMMARY'}})
+ fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'SCHEDULED'}})
+ fireEvent.change(screen.getByLabelText('开放时间（本地时区）'),{target:{value:'2099-01-02T03:04'}})
+ fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}))
+ await screen.findByLabelText('冻结登记详情')
+ const payload=api.mock.calls.find(([path])=>path.endsWith('/register'))?.[2]
+ expect(payload).toMatchObject({analysisMode:'COHORT_AGGREGATE',disclosure:{policyKey:'EDUCATION_SELF_GROUP_V2',minimumRespondents:20},
+  reports:[{itemId:id(4),releaseId:id(7)}],feedbackPolicy:{mode:'SCHEDULED',releaseAt:new Date('2099-01-02T03:04').toISOString()}})
+ expect(payload.groupUnits).toHaveLength(1)
+ const rules=payload.groupUnits[0].disclosure.audiences
+ expect(rules.RESPONDENT).toMatchObject({mode:'INDIVIDUAL_SUMMARY',metricKeys:['accuracy']})
+ expect(rules.ORGANIZATION).toMatchObject({mode:'AGGREGATE_ONLY',metricKeys:['accuracy']})
+ expect(rules.PROFESSIONAL.mode).toBe('NONE');expect(rules.TEACHER.mode).toBe('NONE');expect(rules.SUBJECT.mode).toBe('NONE')
+})
 function setup(custom?:(path:string,method:string,data:any)=>unknown){
  let preparedId=id(8)
  const api=vi.fn(async(path:string,method='GET',data?:any)=>{

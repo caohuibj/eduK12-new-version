@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "ec2ea9bc88171859c61d9ca7f90dc87337aa7123",
+  "applicationSourceTree": "8673a6e54b74d5e623b77cd1237fb58802e5e842",
+  "backendTree": "4b0bee2bc6a6ae40c986ddd41eaaeb935d875754",
+  "frontendTree": "d7eec8052d3c7c14565e34ed80671e94543a158f",
+  "formalCIExecuted": false,
+  "productionAccessed": false,
+  "newFinalSubmissions": 0,
+  "rawManifest": "raw-sha256.json"
+}

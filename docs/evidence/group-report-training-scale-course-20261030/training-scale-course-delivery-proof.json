@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "trustedCourseAllocationAndMembership": true,
+  "newEpisodeUsesExistingField": true,
+  "sameCourseResumesOriginal": true,
+  "crossCourseInProgressRejected": true,
+  "legacyUnscopedAttemptNotBackfilled": true,
+  "restartKeepsEpisode": true,
+  "finalKeepsEpisode": true,
+  "newSchema": false,
+  "historyRewritten": false,
+  "productionAccessed": false
+}

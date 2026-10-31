@@ -1,3 +1,4 @@
+import {assertTeacherGroupAuthority} from '../huiteacher/groupReportAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../organization/access'
@@ -128,7 +129,7 @@ export const assertFixedPopulationArtifactDisclosure = async (input: {
   if (!['GROUP', 'REPEATED_COHORT', 'MATCHED_LONGITUDINAL', 'PROTECTED_FEEDBACK'].includes(artifact.analysisKind)) return
   // This supplements (never substitutes for) existing Run/read/export authority.
   const domain = artifact.analysisKind === 'PROTECTED_FEEDBACK' ? 'ORG_PROTECTED_FEEDBACK_V1' : 'ORG_GROUP_REPORT_V1'
-  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: artifact.organizationId })
+  const context = await resolveOrganizationAccessContext({ principal: input.principal, organizationId: artifact.organizationId,educationProduct:input.principal.product })
   if (!context?.membershipId || context.explicitDenies.some((deny) => ['*', 'REPORT_READ', domain].includes(deny))) {
     return reportingFail('REPORT_ARTIFACT_NOT_FOUND', 'reporting artifact not found', 404)
   }
@@ -137,6 +138,12 @@ export const assertFixedPopulationArtifactDisclosure = async (input: {
     // Generation still refuses suspension before reaching this disclosure gate.
     if (input.principal.platformRole === 'SYSTEM_ADMIN' && artifact.analysisKind !== 'PROTECTED_FEEDBACK') return
     reportingFail('ORGANIZATION_SUSPENDED', 'organization is suspended', 409)
+  }
+  if(input.principal.product==='HUITEACHER'&&artifact.analysisKind==='GROUP'){
+    const cohorts=await readReportingCohorts([artifact.cohortSnapshotId??fixedPopulationPrivacyFailure()])
+    if(cohorts.some(c=>c.organizationId!==artifact.organizationId))fixedPopulationPrivacyFailure()
+    await assertTeacherGroupAuthority({actorUserId:input.principal.userId,organizationId:artifact.organizationId,runIds:cohorts.map(c=>c.sourceRunId)})
+    return
   }
   if (context.orgRole === 'ORG_ADMIN' || context.capabilities.includes('PSYCHOLOGY_STAFF')) return
   if (!context.personas.some((persona) => persona === 'TEACHER' || persona === 'COUNSELOR')) {

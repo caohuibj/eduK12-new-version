@@ -212,7 +212,7 @@ const QuestionnaireAssessment: React.FC = () => {
   const startAssessment = async () => {
     try {
       // 先检查是否已经完成过该问卷
-      const availableResponse = await apiClient.get<{ list: Array<{ id: string; completed: boolean; inProgress?: boolean; assessmentId: string | null }> }>('/questionnaires/available')
+      const availableResponse = await apiClient.get<{ list: Array<{ id: string; completed: boolean; inProgress?: boolean; assessmentId: string | null }> }>('/questionnaires/available', { params: { questionnaireId } })
       if (availableResponse.code === 0) {
         const existingRecord = availableResponse.data.list.find(q => q.id === questionnaireId)
         // An active attempt is authoritative even when a prior completed

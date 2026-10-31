@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "actualPostgres": true,
+  "actualPrismaTransactionExpiry": true,
+  "persistAttemptedAfterExpiry": true,
+  "persistenceErrorCode": "P2028",
+  "artifactRows": 0,
+  "auditRows": 0,
+  "advisoryLockReacquired": true,
+  "finalsReplayed": 0,
+  "canonicalResultsDecoded": 0,
+  "productionAccessed": false
+}

@@ -4,10 +4,11 @@ import { buildTrainingFlowUnits } from '../composite/training-flow-definition'
 import { Prisma, UserRole } from '@prisma/client'
 import { parseCompiledWeightedVariants } from '../assessment-core/weighted-variants'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
-import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
+import { isScaleReportFactsView, prefetchCompactScaleTemplates, restoreCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
+import { loadStoredCanonicalUnitResults, createStoredScaleFactsReader } from '../assessment-runtime/compact-assessment-storage'
+import { publicTemplatesForDatabase } from '../assessment-runtime/public-templates'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
-import { parseVersionedFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { parseVersionedFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, type SharedScaleArtifactRecord } from '../assessment-runtime/shared-scale-runtime'
 import { compositeItemSlotKey, formSectionSlotKey, type FrozenActiveSlotSetV1 } from '../assessment-runtime/slot-set'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
@@ -23,7 +24,10 @@ import { createScaleProjectionContext } from '../scale/projection/context-factor
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { resolveTrainingComparability } from './core'
-import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, trainingGroupLeafItems, type TrainingGroupSource } from './group-source'
+import { trainingGroupFormDefinitions, trainingGroupFormQuestion, selectLatestTrainingGroupParents, trainingGroupLeafItems, trainingCognitiveGroupTaskKey, trainingCognitiveGroupAssignmentId, trainingStandaloneCognitiveFacts, selectLatestTrainingCognitiveSessions, trainingScaleGroupTaskKey, trainingScaleGroupId, trainingStandaloneScaleMeasurement, trainingStandaloneScaleFacts, type TrainingGroupSource } from './group-source'
+import { decryptCognitivePayload } from '../cognitive/cognitive.security'
+import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
+import { readTaskGroupArtifact } from '../reporting/task-artifact'
 import type { GroupMetricDefinition, GroupMetricObservation } from '../reporting/group-summary'
 import type { TrainingAnalysisRequestV1, TrainingAnalysisSourceV1, TrainingAnalysisWaveV1, TrainingMetricIdentityV1, TrainingNumericObservationV1, TrainingObservationReason } from './types'
 
@@ -760,5 +764,179 @@ export function trainingGroupSnapshotHash(row: any) {
 
 export async function listTrainingGroupTasks(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
   await assertTrainingGroupAccess(tx, actor, courseId)
-  return tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100})
+  const [composite,cognitive,scales]=await Promise.all([
+    tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId, true), publishedAt: {not: null}}, select: {id: true, name: true}, orderBy: {publishedAt: 'desc'}, take: 100}),
+    tx.cognitiveAssignment.findMany({where:{courseId,listedStandalone:true,status:{in:['PUBLISHED','ARCHIVED']},publishedAt:{not:null},resolvedConfigHash:{not:null},resolvedReportSnapshotEncrypted:{not:null},courseSnapshot:{path:['id'],equals:courseId},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})},select:{id:true,title:true,status:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:100}),
+    tx.$queryRaw<Array<{id:string;name:string}>>`SELECT DISTINCT s.id,s.name FROM assessments a JOIN assessment_episodes e ON e.id=a.episode_id JOIN scales s ON s.id=a.scale_id
+      WHERE ${standaloneScaleCourseWhere(courseId)} ORDER BY s.id LIMIT 100`,
+  ])
+  return [...composite,...cognitive.map(row=>({id:trainingCognitiveGroupTaskKey(row.id),name:row.title+' · 独立认知'+(row.status==='ARCHIVED'?'（已归档，只读）':'')})),
+    ...scales.map(row=>({id:trainingScaleGroupTaskKey(row.id),name:row.name+' · 独立量表'}))]
+}
+
+async function standaloneCognitiveGroupHeader(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,historical=false){
+  await authority(tx,actor,courseId,'SHARE')
+  const id=trainingCognitiveGroupAssignmentId(taskId)
+  if(!id)unavailable()
+  const assignment=await tx.cognitiveAssignment.findFirst({where:{id,courseId,listedStandalone:true,status:historical?{in:['PUBLISHED','ARCHIVED']}:'PUBLISHED',publishedAt:{not:null},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})}})
+  const report=readFrozenReport(assignment?.resolvedReportSnapshotEncrypted)
+  if(!assignment?.resolvedConfigHash||!report||(assignment.courseSnapshot as {id?:string}|null)?.id!==courseId)unavailable()
+  const contractHash=hash({id,courseId,publishedAt:iso(assignment.publishedAt),resolvedConfigHash:assignment.resolvedConfigHash,report})
+  const tool={key:trainingCognitiveGroupTaskKey(assignment.id),kind:'COGNITIVE' as const,title:assignment.title,
+    source:{taskId,taskName:assignment.title,publication:iso(assignment.publishedAt)!,configDigest:assignment.resolvedConfigHash,variantKey:null}}
+  return {assignment,report,contractHash,tool}
+}
+const standaloneSessionHash=(row:{id:string;userId:string|null;participantKey:string;attemptNo:number;status:string;finishedAt:Date|string|null;resultDigest:string|null})=>hash({...row,finishedAt:iso(row.finishedAt)})
+export interface TrainingStandaloneCognitiveBindings {kind:'COGNITIVE_ASSIGNMENT';contractHash:string;sessions:Array<{id:string;hash:string}>}
+
+/** Tool selection reads the frozen assignment only, not participants/results. */
+export async function trainingStandaloneCognitiveGroupTool(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string){
+  const {assignment,tool}=await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId,true)
+  return assignment.status==='PUBLISHED'?tool:null
+}
+
+/** Same creator/professional-report boundary as standalone Cognitive. No raw
+ * trials, current roster join, live scoring or fake composite parent. */
+export async function loadTrainingStandaloneCognitiveGroup(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string){
+  const {assignment,report,contractHash,tool}=await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId)
+  const rows=await tx.cognitiveSession.findMany({where:{assignmentId:assignment.id,compositeAttemptId:null,status:'COMPLETED',finishedAt:{not:null}},select:{id:true,userId:true,participantKey:true,attemptNo:true,status:true,finishedAt:true,resultSnapshotEncrypted:true},orderBy:[{finishedAt:'desc'},{id:'desc'}],take:TRAINING_ANALYSIS_SOURCE_LIMIT+1})
+  if(rows.length>TRAINING_ANALYSIS_SOURCE_LIMIT)throw Object.assign(new Error('正式认知结果超过现有6000份来源上限'),{statusCode:413})
+  const facts=trainingStandaloneCognitiveFacts({assignmentId:assignment.id,resolvedConfigHash:assignment.resolvedConfigHash!,report,sessions:selectLatestTrainingCognitiveSessions(assignment.id,rows).map(row=>({...row,finishedAt:row.finishedAt!,result:row.resultSnapshotEncrypted?parseCognitiveResultSnapshot(decryptCognitivePayload(row.resultSnapshotEncrypted)):null}))})
+  if(!facts)return null
+  const byId=new Map(rows.map(row=>[row.id,row]))
+  const bindings:TrainingStandaloneCognitiveBindings={kind:'COGNITIVE_ASSIGNMENT',contractHash,sessions:facts.selected.map(row=>{const {resultSnapshotEncrypted,...metadata}=byId.get(row.id)!;return {id:row.id,hash:standaloneSessionHash({...metadata,resultDigest:resultSnapshotEncrypted?createHash('md5').update(resultSnapshotEncrypted).digest('hex'):null})}})}
+  return {...facts,bindings,tool}
+}
+
+/** Frozen pointer verification only. New sessions never change an old snapshot. */
+export async function readTrainingStandaloneCognitiveGroupArtifact(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,artifactId:string){
+  const {assignment,contractHash}=await standaloneCognitiveGroupHeader(tx,actor,courseId,taskId,true)
+  const artifact=await readTaskGroupArtifact(tx,{product:'TRAINING',containerId:courseId,taskId},artifactId)
+  if(!artifact)return null
+  const bindings=artifact.sourceBindings as TrainingStandaloneCognitiveBindings
+  if(bindings.kind!=='COGNITIVE_ASSIGNMENT'||bindings.contractHash!==contractHash)invalid('原独立认知来源或纳入资格已变化，请生成更新版报告')
+  const rows=bindings.sessions.length?await tx.$queryRaw<Array<{id:string;userId:string|null;participantKey:string;attemptNo:number;status:string;finishedAt:Date|null;resultDigest:string|null}>>`SELECT id,user_id AS "userId",participant_key AS "participantKey",attempt_no AS "attemptNo",status,finished_at AS "finishedAt",md5(result_snapshot_encrypted) AS "resultDigest" FROM cognitive_sessions WHERE id IN (${Prisma.join(bindings.sessions.map(row=>row.id))}) AND assignment_id=${assignment.id} AND composite_attempt_id IS NULL AND status='COMPLETED'`:[]
+  const hashes=new Map(rows.map(row=>[row.id,standaloneSessionHash(row)]))
+  if(hashes.size!==bindings.sessions.length||bindings.sessions.some(row=>hashes.get(row.id)!==row.hash))invalid('原独立认知快照的正式结果已变化，请生成更新版报告')
+  return artifact
+}
+
+/** Only new course-bound SELF starts from the real standalone allocation path.
+ * A present-day roster or CourseScale link never supplies historical ownership. */
+const standaloneScaleCourseWhere = (courseId:string,scaleId?:string) => Prisma.sql`
+  e.course_id=${courseId} AND e.campaign_key='training-standalone-scale-v1:'||a.scale_id
+  AND a.user_id IS NOT NULL AND e.subject_user_id=a.user_id AND e.initiated_by_user_id=a.user_id
+  AND e.initiation_mode='STUDENT_SELF' AND a.subject_user_id=a.user_id AND a.respondent_user_id=a.user_id
+  AND a.respondent_type='SELF' AND a.assignment_ref IS NULL
+  AND a.composite_attempt_id IS NULL AND a.questionnaire_assessment_id IS NULL
+  ${scaleId ? Prisma.sql`AND a.scale_id=${scaleId}` : Prisma.empty}`
+
+type StandaloneScaleHeader = {
+  id:string;scaleId:string;userId:string;status:string;attemptEpoch:number;submissionId:string|null;submissionPayloadHash:string|null;
+  completedAt:Date;episodeId:string;courseId:string;subjectId:string;initiatorId:string;campaignKey:string;episodeCreatedAt:Date;
+  instrumentClass:string;runtimeGeneration:string|null;deliveryMode:string;compiledRuntimeHash:string|null;
+  resultDigest:string|null;runtimeDigest:string|null;factsDigest:string|null;sourceResultHash:string|null;runtimeSnapshotEncrypted:string|null
+}
+const standaloneScaleHeaderSql = (withRuntime:boolean,withPins=true) => Prisma.sql`
+  SELECT a.id,a.scale_id AS "scaleId",a.user_id AS "userId",a.status,a.attempt_epoch AS "attemptEpoch",
+    a.submission_id AS "submissionId",a.submission_payload_hash AS "submissionPayloadHash",a.completed_at AS "completedAt",
+    e.id AS "episodeId",e.course_id AS "courseId",e.subject_user_id AS "subjectId",e.initiated_by_user_id AS "initiatorId",
+    e.campaign_key AS "campaignKey",e.created_at AS "episodeCreatedAt",s.instrument_class AS "instrumentClass",
+    a.runtime_generation AS "runtimeGeneration",a.delivery_mode AS "deliveryMode",a.compiled_runtime_hash AS "compiledRuntimeHash",
+    ${withPins ? Prisma.sql`md5(a.result::text)` : Prisma.sql`NULL::text`} AS "resultDigest",
+    ${withPins ? Prisma.sql`md5(a.runtime_snapshot_encrypted)` : Prisma.sql`NULL::text`} AS "runtimeDigest",
+    ${withPins ? Prisma.sql`md5(f.facts_encrypted)` : Prisma.sql`NULL::text`} AS "factsDigest",
+    ${withPins ? Prisma.sql`f.source_result_hash` : Prisma.sql`NULL::text`} AS "sourceResultHash",
+    ${withRuntime ? Prisma.sql`a.runtime_snapshot_encrypted` : Prisma.sql`NULL::text`} AS "runtimeSnapshotEncrypted"
+  FROM assessments a JOIN assessment_episodes e ON e.id=a.episode_id JOIN scales s ON s.id=a.scale_id
+  ${withPins ? Prisma.sql`LEFT JOIN assessment_result_facts f ON f.assessment_id=a.id AND f.attempt_epoch=a.attempt_epoch AND a.result->>'k'='SFF1'` : Prisma.empty}`
+const standaloneScaleHeaderHash = (row:StandaloneScaleHeader) => {
+  const {runtimeSnapshotEncrypted:_runtime,...metadata}=row
+  return hash({...metadata,completedAt:iso(row.completedAt),episodeCreatedAt:iso(row.episodeCreatedAt)})
+}
+
+async function standaloneScaleGroupAuthority(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string) {
+  await authority(tx,actor,courseId,'SHARE')
+  const id=trainingScaleGroupId(taskId)
+  if(!id)unavailable()
+  const scale=await tx.scale.findUnique({where:{id},select:{id:true,name:true}})
+  if(!scale)unavailable()
+  return scale
+}
+
+/** Discovery reads only this task's frozen runtime/policy, never result payloads.
+ * Latest parent selection precedes version and disclosure filtering. */
+async function standaloneScaleGroupSources(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,withPins=false) {
+  const scale=await standaloneScaleGroupAuthority(tx,actor,courseId,taskId)
+  const headers=await tx.$queryRaw<StandaloneScaleHeader[]>`${standaloneScaleHeaderSql(true,withPins)}
+    WHERE ${standaloneScaleCourseWhere(courseId,scale.id)} AND a.status='COMPLETED' AND a.completed_at IS NOT NULL
+    ORDER BY a.completed_at DESC,a.id DESC LIMIT ${TRAINING_ANALYSIS_SOURCE_LIMIT+1}`
+  if(headers.length>TRAINING_ANALYSIS_SOURCE_LIMIT)throw Object.assign(new Error('正式量表结果超过现有6000份来源上限'),{statusCode:413})
+  const latest=selectLatestTrainingGroupParents(headers,new Map(headers.map(row=>[row.id,{participantKey:'user:'+row.userId}])))
+  const runtimes=new Map<string,VersionedFrozenScaleRuntimeSnapshot>(),byCipher=new Map<string,VersionedFrozenScaleRuntimeSnapshot>()
+  const groups=new Map<string,{runtime:VersionedFrozenScaleRuntimeSnapshot;rows:StandaloneScaleHeader[]}>()
+  for(const row of latest) {
+    if(!row.runtimeSnapshotEncrypted||row.runtimeGeneration!=='UNIFIED_V1'||row.deliveryMode!=='FINAL_ONLY')invalid('正式独立量表缺少可用的冻结测量来源')
+    let runtime=byCipher.get(row.runtimeSnapshotEncrypted)
+    if(!runtime){runtime=await loadFrozenScaleRuntimeSnapshot(row.runtimeSnapshotEncrypted,tx);byCipher.set(row.runtimeSnapshotEncrypted,runtime)}
+    if(runtime.compiledRuntime.compiledRuntimeHash!==row.compiledRuntimeHash)invalid('量表冻结运行时与正式来源不一致')
+    const policy=resolveProjectionPolicyForAssessment({...row,scale:{code:runtime.instrumentKey,instrumentVersion:runtime.instrumentVersion,instrumentClass:row.instrumentClass}},null,runtime)
+    if(policy.snapshotError)invalid('量表冻结数值披露不可用')
+    const capability=resolveEffectiveScaleDisclosure(createScaleProjectionContext({instrumentKey:runtime.instrumentKey,instrumentVersion:runtime.instrumentVersion,
+      audience:'teacher',purpose:'export',principalId:actor.userId,frozenPolicy:policy.policy}))
+    if(!capability.numericScores)continue
+    runtimes.set(row.id,runtime)
+    const digest=hash(trainingStandaloneScaleMeasurement(runtime)),group=groups.get(digest)??{runtime,rows:[]}
+    group.rows.push(row);groups.set(digest,group)
+  }
+  const tools=[...groups].map(([configDigest,group])=>{
+    const publication=group.rows.map(row=>iso(row.episodeCreatedAt)!).sort()[0]
+    return {key:taskId,kind:'SCALE' as const,title:`${scale.name}（${group.runtime.instrumentVersion}，${publication.slice(0,10)}）`,
+      source:{taskId,taskName:scale.name,publication,configDigest,variantKey:null}}
+  })
+  return {scale,groups,runtimes,tools}
+}
+
+export async function trainingStandaloneScaleGroupTools(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string) {
+  return (await standaloneScaleGroupSources(tx,actor,courseId,taskId)).tools
+}
+export interface TrainingStandaloneScaleBindings {kind:'SCALE_COURSE';rows:Array<{id:string;hash:string}>}
+
+export async function loadTrainingStandaloneScaleGroup(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,configDigest:string|null,publication:string) {
+  const source=await standaloneScaleGroupSources(tx,actor,courseId,taskId,true)
+  const tool=source.tools.find(row=>row.source.configDigest===configDigest&&row.source.publication===publication)
+  if(!tool||!configDigest)unavailable()
+  const group=source.groups.get(configDigest)!,entries:Array<Parameters<typeof trainingStandaloneScaleFacts>[1][number]>=[]
+  for(let offset=0;offset<group.rows.length;offset+=200) {
+    const page=group.rows.slice(offset,offset+200)
+    const records=await tx.assessment.findMany({where:{id:{in:page.map(row=>row.id)}},select:{id:true,scaleId:true,attemptEpoch:true,submissionId:true,submissionPayloadHash:true,compositeAttemptId:true,result:true}})
+    if(records.length!==page.length)invalid('量表来源数量已变化')
+    const reader=await createStoredScaleFactsReader(records,tx,true),templates=publicTemplatesForDatabase(tx)
+    const decoded=new Map(records.map(row=>[row.id,reader.read(row,tx).facts]))
+    await prefetchCompactScaleTemplates([...decoded.values()].filter((facts):facts is NonNullable<typeof facts>=>Boolean(facts)),templates,{canonical:false})
+    for(const row of records) {
+      const facts=decoded.get(row.id),value=facts?(await restoreCompactScaleFacts(facts,{reportOnly:true,canonical:false},templates)).result:row.result
+      const result=readScaleResult(value)
+      if(result.decryptError)invalid('量表正式分数不可读；未重新评分或回退旧值')
+      entries.push({id:row.id,scaleId:row.scaleId,runtime:source.runtimes.get(row.id)!,result:result.result})
+    }
+  }
+  const facts=trainingStandaloneScaleFacts(group.runtime,entries)
+  const bindings:TrainingStandaloneScaleBindings={kind:'SCALE_COURSE',rows:group.rows.map(row=>({id:row.id,hash:standaloneScaleHeaderHash(row)}))}
+  return {...facts,tool,bindings,parents:group.rows}
+}
+
+/** Authorization plus exact original pointers only: no newest discovery, result
+ * decryption, raw answers, current roster, scoring or source re-aggregation. */
+export async function readTrainingStandaloneScaleGroupArtifact(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,taskId:string,artifactId:string) {
+  const scale=await standaloneScaleGroupAuthority(tx,actor,courseId,taskId)
+  const artifact=await readTaskGroupArtifact(tx,{product:'TRAINING',containerId:courseId,taskId},artifactId)
+  if(!artifact)return null
+  const bindings=artifact.sourceBindings as TrainingStandaloneScaleBindings
+  if(bindings.kind!=='SCALE_COURSE')invalid('独立量表快照来源不一致')
+  const rows=bindings.rows.length?await tx.$queryRaw<StandaloneScaleHeader[]>`${standaloneScaleHeaderSql(false)}
+    WHERE ${standaloneScaleCourseWhere(courseId,scale.id)} AND a.status='COMPLETED' AND a.id IN (${Prisma.join(bindings.rows.map(row=>row.id))})`:[]
+  const hashes=new Map(rows.map(row=>[row.id,standaloneScaleHeaderHash(row)]))
+  if(hashes.size!==bindings.rows.length||bindings.rows.some(row=>hashes.get(row.id)!==row.hash))invalid('原独立量表来源或冻结结果已变化，请生成更新版报告')
+  return artifact
 }

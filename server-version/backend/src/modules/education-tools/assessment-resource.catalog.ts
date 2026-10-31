@@ -55,15 +55,15 @@ export async function listEducationAssessmentResources(input:EducationAssessment
   if(input.product==='TEACHER'&&await tx.huiteacherStudentEvaluationConfig.findUnique({where:{
    organizationId_eventId:{organizationId:input.organizationId,eventId:input.workflowId}},select:{id:true}}))
    deny('HUITEACHER_STUDENT_EVAL_TRACK_READONLY',403)
-  const rows=await tx.$queryRaw<Array<{id:string;family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE'}>>(Prisma.sql`
-   SELECT id,family FROM education_assessment_deliveries
+  const rows=await tx.$queryRaw<Array<{id:string;family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';version:string}>>(Prisma.sql`
+   SELECT id,family,entry->'educationOrigin'->>'adapterVersion' AS version FROM education_assessment_deliveries
    WHERE product=${input.product} AND organization_id=${input.organizationId} AND status='PUBLISHED'
     ${input.cursor?Prisma.sql`AND id>${input.cursor}`:Prisma.empty}
    ORDER BY id LIMIT 11`)
   const list=[]
   let unavailableCount=0
   for(const row of rows.slice(0,10)){
-   const resource={family:row.family,key:`education-assessment:${input.product}:${input.organizationId}:${row.id}`,version:'1.0.0' as const}
+   const resource={family:row.family,key:`education-assessment:${input.product}:${input.organizationId}:${row.id}`,version:row.version}
    try{
     const source=await assertEducationAssessmentRunUse(tx,{actorUserId:input.actor.userId,organizationId:input.organizationId,runId:input.runId,resource})
     productionRunResourceAuthorityRegistry.assertStartSupported(resource.family)

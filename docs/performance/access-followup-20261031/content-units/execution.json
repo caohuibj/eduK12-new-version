@@ -1,0 +1,138 @@
+{
+  "kind": "LOCAL_UNSIGNED_TASK_OBSERVATIONS",
+  "base": "7cdc9fbce",
+  "node": "v24.21.0",
+  "controllerCommand": "node node_modules/vitest/vitest.mjs run src/__tests__/questionnaire/content-units-projection.test.ts --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "controllerBaseline": {
+    "selection": "skips both",
+    "exitCode": 1,
+    "failed": 2,
+    "filtered": 4,
+    "cause": "Both units projections still executed the legacy discarded payload reads."
+  },
+  "controllerCandidate": {
+    "selection": "all 6 cases in this new file",
+    "exitCode": 0,
+    "passed": 6,
+    "scope": "Actual controllers with mocked database/authorization/service adapters; two projections, two unchanged defaults, two denials."
+  },
+  "managerCommand": "FORM_SECTION_MEASURE_LABEL=<label> FORM_SECTION_MEASURE_OUTPUT=<path> node node_modules/vitest/vitest.mjs run src/components/__tests__/FormSectionManager.http.test.tsx -t 'measures initial shared manager at /(general-questionnaires|questionnaires)/q' --maxWorkers=2 --reporter=json --outputFile=<report>",
+  "managerBaseline": {
+    "exitCode": 0,
+    "passed": 2,
+    "filtered": 10
+  },
+  "managerCandidate": {
+    "exitCode": 0,
+    "passed": 2,
+    "filtered": 10
+  },
+  "measurement": {
+    "manager-baseline": {
+      "/general-questionnaires/q": {
+        "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+        "getCount": 2,
+        "gzipBodyBytes": 2307,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/general-questionnaires/q/form-sections",
+            "status": 200,
+            "rawBytes": 11290,
+            "gzipBodyBytes": 997
+          },
+          {
+            "method": "GET",
+            "path": "/api/general-questionnaires/q/content",
+            "status": 200,
+            "rawBytes": 13628,
+            "gzipBodyBytes": 1310
+          }
+        ]
+      },
+      "/questionnaires/q": {
+        "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+        "getCount": 2,
+        "gzipBodyBytes": 2307,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/questionnaires/q/form-sections",
+            "status": 200,
+            "rawBytes": 11290,
+            "gzipBodyBytes": 997
+          },
+          {
+            "method": "GET",
+            "path": "/api/questionnaires/q/content",
+            "status": 200,
+            "rawBytes": 13628,
+            "gzipBodyBytes": 1310
+          }
+        ]
+      }
+    },
+    "manager-fixed": {
+      "/general-questionnaires/q": {
+        "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+        "getCount": 2,
+        "gzipBodyBytes": 1197,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/general-questionnaires/q/form-sections",
+            "status": 200,
+            "rawBytes": 11290,
+            "gzipBodyBytes": 997
+          },
+          {
+            "method": "GET",
+            "path": "/api/general-questionnaires/q/content?projection=units",
+            "status": 200,
+            "rawBytes": 379,
+            "gzipBodyBytes": 200
+          }
+        ]
+      },
+      "/questionnaires/q": {
+        "fixtureSha256": "2571671e20a5dea42b1a23f01c5b2be6d52802acf31b1aaf870c446888837b5d",
+        "getCount": 2,
+        "gzipBodyBytes": 1197,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/questionnaires/q/form-sections",
+            "status": 200,
+            "rawBytes": 11290,
+            "gzipBodyBytes": 997
+          },
+          {
+            "method": "GET",
+            "path": "/api/questionnaires/q/content?projection=units",
+            "status": 200,
+            "rawBytes": 379,
+            "gzipBodyBytes": 200
+          }
+        ]
+      }
+    }
+  },
+  "sourceSHA256": {
+    "server-version/frontend/src/components/FormSectionManager.tsx": "5856ca4afcf0f8b9ae2faec97d466a6320b73c7e7d88bb647c7b33fc4dc04355",
+    "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": "0498a3da611602cdf5735f94d1f5fb145370c2dab1bf2e710011f96e5c29f0fd",
+    "server-version/backend/src/controllers/generalQuestionnaireController.ts": "b1c298eb1bc6c914d0fed1df6d1f7669f063e282a770deafa17f07bf053867d7",
+    "server-version/backend/src/controllers/questionnaireController.ts": "11b33c97a56d22e50ea54b02a5444dec0631467fbf0858f9994ce669eb04c89a",
+    "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts": "50a4465e5be52f17a5ba08a7bc011ef2db68133ec09374fd8aa8d1893a4528c4",
+    "server-version/backend/src/services/questionnaire-form-section.service.ts": "624ec1c973e5f45c13a333cb7becd836b9c3756934b5b845bd024c79f4c16a11",
+    "server-version/backend/src/services/questionnaireAuthorizationService.ts": "f7829acb97c3c7e193fb878ac0eb9f3420df1fce6e6791f931f78de931e286d7",
+    "server-version/frontend/src/api/client.ts": "5ac0e77902d8b51147b131bcb59f82114553658fd4fc25804b2c75e44636288c",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "limits": [
+    "Real API client/React jsdom over gzip loopback HTTP, synthetic fixture, no-store; no real backend authentication, SQL timings, production network or latency claim.",
+    "The byte fixture contains form fields; omitted scale.definition reads are established by controller call assertions, not scale-byte measurements.",
+    "Composite endpoint/component behavior unchanged; no Composite/parent complete journey replay.",
+    "Baseline and candidate harness differ only in request-path expectations needed by the new explicit projection; old test input snapshot retained."
+  ]
+}

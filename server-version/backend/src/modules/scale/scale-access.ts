@@ -5,6 +5,7 @@ import { assertContentAuthority } from '../measurement-content/content-authority
 import { publicScaleScope } from './scale-public-delivery'
 import { CourseStudentStatus, type Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 
 export type StudentScaleAccessRecord = {
   id: string
@@ -59,11 +60,11 @@ export const canStudentAccessScale = async (
 /** New standalone collection is a new use, even when an old course link exists.
  * Existing attempts never call this; course ownership alone is not a grant. */
 export async function canStartLibraryCourseScale(
-  scale: StudentScaleAccessRecord & { libraryEntryId?: string | null }, studentId: string, db: Db,
+  scale: StudentScaleAccessRecord & { libraryEntryId?: string | null }, studentId: string, db: Db, courseId?: string,
 ): Promise<boolean> {
   if (!scale.libraryEntryId) return true
   if (scale.visibility !== 'COURSE') return false
-  const memberships = await db.courseStudent.findMany({ where: { studentId,
+  const memberships = await db.courseStudent.findMany({ where: { studentId, ...(courseId ? {courseId} : {}),
     status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
     course: { courseScales: { some: { scaleId: scale.id } } },
   }, select: { course: { select: { creatorId: true } } } })
@@ -76,4 +77,23 @@ export async function canStartLibraryCourseScale(
     }
   }
   return false
+}
+
+export const trainingScaleCourseCampaignKey = (scaleId: string) => `training-standalone-scale-v1:${scaleId}`
+
+/** A navigation hint becomes delivery identity only after the actual allocation
+ * and active membership are checked in the existing new-start transaction. */
+export async function assertTrainingCourseScaleStart(db: Db, courseId: string, scaleId: string, userId: string) {
+  const membership = await db.courseStudent.findFirst({where: {courseId, studentId: userId,
+    status: {in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]},
+    course: {courseType: {in: ['TRAINING_COURSE', 'LEGACY_COURSE']}, isLibrary: false, courseScales: {some: {scaleId}}},
+  }, select: {id: true}})
+  if (!membership) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '当前课程没有可用的量表投放或参加资格', 403)
+}
+
+/** Keep the existing global in-progress constraint. Never reassign a legacy or
+ * another course's attempt merely because the caller supplied a course hint. */
+export function assertStandaloneScaleCourseMatch(assessment: {episode?: {courseId: string | null} | null}, courseId?: string) {
+  if (courseId && assessment.episode?.courseId !== courseId)
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '已有其他来源的在途作答，请先从原入口完成，再开始本课程测评', 409)
 }
