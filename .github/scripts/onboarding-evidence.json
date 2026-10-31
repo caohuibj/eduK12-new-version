@@ -15370,19 +15370,331 @@
         }
       ]
     },
-    "435": {
+    "446": {
       "schemaVersion": 1,
-      "product": "236a865da0abaf961f7b4bf3d817dfe897eeb9a0",
+      "product": "fd1e53da167d2b728262891924b41ae20d02b14b",
       "reviewer": "delegated Codex scoped self-review",
       "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
       "ciExecuted": false,
       "originalExecutionSigned": false,
       "environment": {
-        "kind": "Retained cloud unsigned originals; fresh local complete-component types after main alignment",
+        "node": "v24.21.0",
+        "limitations": [
+          "Twelve distinct focused assertions: original/shared and native adapter contracts, approved library pointer/real existing reader, one actual private Scale N10 service journey, one changed internal producer invocation using retained FINALs, one Studio fixture. Not a fresh HTTP/browser/native full-protocol or two-wave Long journey.",
+          "All fixture/type failures and earlier successful stage receipts remain with their original identity. No production access, FINAL replay, new schema, platform audit, auth layer or unapproved legacy GROUP widening."
+        ]
+      },
+      "reports": [
+        {
+          "id": "unit-initial",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/unit-initial.json",
+          "sha256": "85487e7b509ca06688a7cfc9438df894f57238fa9ecde1bb913fe6d554713ed1",
+          "originalSourceAssociation": "56c4ae0248e70907300b99fe47ff37009147d4b1",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 5,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "binds the authorized slot and actual source identity without same-key or audience fallback (synthetic core only)",
+              "status": "passed"
+            },
+            {
+              "fullName": "School explicit private group publisher selection (not publication) retains separate audience and block ceilings, canonicalizes order and never selects a fallback audience",
+              "status": "passed"
+            },
+            {
+              "fullName": "School explicit private group publisher selection (not publication) rejects stale fixed sources, same-named score borrowing, insufficient N and non-School SELF",
+              "status": "passed"
+            },
+            {
+              "fullName": "freezes an explicit Teacher SELF choice with organization-only native/original ceilings and retains the own rule",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps private Cognitive/SJT slot, runner version and physical units separate even with equal score names",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "binds the authorized slot and actual source identity without same-key or audience fallback (synthetic core only)",
+            "School explicit private group publisher selection (not publication) retains separate audience and block ceilings, canonicalizes order and never selects a fallback audience",
+            "School explicit private group publisher selection (not publication) rejects stale fixed sources, same-named score borrowing, insufficient N and non-School SELF",
+            "keeps private Cognitive/SJT slot, runner version and physical units separate even with equal score names"
+          ]
+        },
+        {
+          "id": "unit",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/unit.json",
+          "sha256": "3d606e7b1a55c0b05a3f01c2ea1519fbfec1ebb101860f287a3cf76f8b670627",
+          "originalSourceAssociation": "f3ecfcc5e0b03103dacfe4ea4e0bbf06f69d8bda",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "freezes an explicit Teacher SELF choice with organization-only native/original ceilings and retains the own rule",
+              "status": "passed"
+            },
+            {
+              "fullName": "offers native choices from already authorized exact profile headers without substituting their base measurement identity",
+              "status": "passed"
+            },
+            {
+              "fullName": "keeps private Cognitive/SJT slot, runner version and physical units separate even with equal score names",
+              "status": "skipped"
+            }
+          ]
+        },
+        {
+          "id": "library-unit",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/library-unit.json",
+          "sha256": "0c0df484acdfb3e3ca180a8958a0ed446b55860da38bed2501367491b30e2395",
+          "originalSourceAssociation": "d47bc2883c656f2aab02bc1fe37f4f69e1378df4",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "pins independently approved library GROUP identity and N without promoting personal material-use rights",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "frontend",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/frontend.json",
+          "sha256": "d00676d2bd14ff6d9c3d2f0be8608a1e1e613f40142b1ece01c31bde94e4e2d2",
+          "originalSourceAssociation": "d47bc2883c656f2aab02bc1fe37f4f69e1378df4",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "pins approved library policy alongside original/native choices and raises N only when that library source is selected",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "postgres",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/postgres.json",
+          "sha256": "50fcefbec96d019c4baff25110ec0a249d0b058a9dd4fb3cf8c41d7a9681211f",
+          "originalSourceAssociation": "f3ecfcc5e0b03103dacfe4ea4e0bbf06f69d8bda",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-compiler.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.composition-source.ts",
+            "server-version/backend/src/modules/education-tools/private-tool.service.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
+            "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "publishes a new Teacher private GROUP composition, retains own feedback below group N and reads its sufficient-N snapshot",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "library-policy-postgres",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/library-policy-postgres.json",
+          "sha256": "cd70a16de1c9b875b1be7d93d1e504d01b0373136dc430a90712e599fa4221ae",
+          "originalSourceAssociation": "d47bc2883c656f2aab02bc1fe37f4f69e1378df4",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts"
+          ],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "publishes a new Teacher private GROUP composition, retains own feedback below group N and reads its sufficient-N snapshot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "reuses the exact approved library GROUP policy through its existing historical identity reader without FINAL work",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "internal-producer-postgres",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/internal-producer-postgres.json",
+          "sha256": "96c60ac9d3c8b8006c4f8d42c1fcfe75e3d8147aca4f13a25720e66ae7da2639",
+          "originalSourceAssociation": "fd1e53da167d2b728262891924b41ae20d02b14b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "publishes a new Teacher private GROUP composition, retains own feedback below group N and reads its sufficient-N snapshot",
+              "status": "skipped"
+            },
+            {
+              "fullName": "reuses the exact approved library GROUP policy through its existing historical identity reader without FINAL work",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the internal planned-metric producer on the retained private composition without publishing or submitting again",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "disclosure-budget",
+          "path": "docs/evidence/teacher-private-composition-group-20261031/disclosure-budget.json",
+          "sha256": "16e83cac6df2abe4f0ee87fecec98c3e168de136008b5472aeb8ff657b0fef24",
+          "originalSourceAssociation": "fd1e53da167d2b728262891924b41ae20d02b14b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned stage reporter associated retrospectively with the saved source stage; no original execution signature or full historical node_modules byte manifest is claimed. Exact current component types are separate receipts.",
+          "deltaRationale": "Explicit approved-library pointer is optional and applies only to selected LIBRARY_SCALE: original/native and School branches retain source/slot/units and own contract; final library UI/unit/real reader checks cover that new path. Erased optional-unit typing has no runtime change. Final internal-only partial key-budget fixes are covered by the expanded real producer-hook counterexample and retained-source PostgreSQL invocation; default single-wave behavior and actual completed results are unchanged. Current types compile the complete final component. Prior source fixtures, first failures and unmodified accidental invocation remain raw, not extra admitted cases.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "keeps allowed A when withheld B has a small contributor change, through the same producer transaction",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-private-composition-group-20261031/backend-types.json",
+          "sha256": "62c4be602a9c44e84ce06dd5a5d1d311f1c3467b3214efad6d528107fd2cd292",
+          "component": "backend",
+          "componentTree": "458a4d8ccaa6a79f083f0c4205f29fab36c2c931",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-private-composition-group-20261031/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-private-composition-group-20261031/frontend-types.json",
+          "sha256": "98a74b04bc330f446f8b0ab6e40241c9d0503d92e0132af74d9068c8dc137059",
+          "component": "frontend",
+          "componentTree": "97b0f40bd6787dfed20097ec0519881c9afe42dd",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-private-composition-group-20261031/frontend-types.log"
+        }
+      ]
+    },
+    "435": {
+      "schemaVersion": 1,
+      "product": "6f70016bd93392990dff07833029c1361538e691",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "Retained original case reports; fresh exact-component compiler executions on completed Group/Long main baseline",
         "limitations": [
           "Three selected original backend cases retained (including unchanged failed baseline and successful continuations), plus one fresh affected combined Scale/Composite frontend loader case. Historical frontend original retained but not double-counted.",
           "Controller Prisma and frontend API mocks only; not SQL latency or production load evidence.",
-          "Fresh local Node v24.22.1 types with recorded hashes, isolated copied dependencies, current generated Prisma and lock-verified follow-redirects 1.16.2. No complete node_modules attestation."
+          "Fresh local Node v24.21.0 types with isolated backend dependency copy, current generated Prisma, official lock-verified follow-redirects 1.16.2. Frontend installed 1.16.1 matches its own lock. No complete node_modules byte attestation."
         ]
       },
       "reports": [
@@ -15436,6 +15748,7 @@
             "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
             "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql",
             "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql",
+            "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql",
             "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts",
             "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts",
@@ -15448,18 +15761,25 @@
             "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
             "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.routes.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts",
             "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
             "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
             "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
             "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionLongitudinal.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
             "server-version/backend/src/__tests__/scale/available-course.test.ts",
@@ -15467,6 +15787,7 @@
             "server-version/backend/src/__tests__/survey/group-report.test.ts",
             "server-version/backend/src/controllers/scaleController.ts",
             "server-version/backend/src/controllers/trainingAnalysisController.ts",
+            "server-version/backend/src/index.ts",
             "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
             "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
             "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
@@ -15494,6 +15815,9 @@
             "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
             "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
             "server-version/backend/src/modules/education-tools/school-private-group-source.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts",
             "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
             "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
             "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
@@ -15520,7 +15844,7 @@
             "server-version/backend/src/services/studentTasks.ts"
           ],
           "sourceAssociationBasis": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
-          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types."
+          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types. Final main555f report merge review: complete Scale controller and fixture bytes equal the successful original association. Selected handler uses mocked database plus handler-local ordering/projection. All four recorded Scale/Composite loader, fixture, Composite API and frontend lock SHA256 match. Reporting additions are not called by these synthetic cases; no historical invocation is relabeled as current execution."
         },
         {
           "id": "backend-candidate",
@@ -15562,6 +15886,7 @@
             "server-version/backend/prisma/migrations/20261030200000_group_longitudinal_artifact_kind/migration.sql",
             "server-version/backend/prisma/migrations/20261030210000_school_group_longitudinal_store/migration.sql",
             "server-version/backend/prisma/migrations/20261030223000_school_private_group_source_identity/migration.sql",
+            "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql",
             "server-version/backend/src/__tests__/campus/group-longitudinal-plan.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/campus/group-longitudinal-plan.routes.test.ts",
             "server-version/backend/src/__tests__/campus/group-longitudinal-plan.test.ts",
@@ -15574,23 +15899,31 @@
             "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
             "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.routes.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts",
             "server-version/backend/src/__tests__/huiteacher/native-group-source.test.ts",
             "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts",
             "server-version/backend/src/__tests__/huiteacher/numeric-group-source-boundary.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-group.test.ts",
+            "server-version/backend/src/__tests__/huiteacher/private-composition-library-group.test.ts",
             "server-version/backend/src/__tests__/integration/schoolPrivateGroupSource.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/schoolSelfGroupCompositionDelta.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/schoolSelfGroupNative.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/schoolSelfGroupNativeReports.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/taskGroupHistoryPagination.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNativeGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNumericGroup.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/integration/teacherNumericPartial.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts",
+            "server-version/backend/src/__tests__/integration/teacherPrivateCompositionLongitudinal.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/reporting/group-longitudinal.postgres.integration.test.ts",
             "server-version/backend/src/__tests__/reporting/group-longitudinal.test.ts",
             "server-version/backend/src/__tests__/services/studentTasks.test.ts",
             "server-version/backend/src/__tests__/survey/group-report.test.ts",
             "server-version/backend/src/controllers/trainingAnalysisController.ts",
+            "server-version/backend/src/index.ts",
             "server-version/backend/src/modules/assessment-run/educationCompositionExecution.ts",
             "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
             "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
@@ -15618,6 +15951,9 @@
             "server-version/backend/src/modules/education-tools/school-private-group-leaf.ts",
             "server-version/backend/src/modules/education-tools/school-private-group-selection.ts",
             "server-version/backend/src/modules/education-tools/school-private-group-source.ts",
+            "server-version/backend/src/modules/education-tools/teacher-composition-group-source.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts",
+            "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts",
             "server-version/backend/src/modules/huiteacher/groupReport.routes.ts",
             "server-version/backend/src/modules/huiteacher/groupReport.service.ts",
             "server-version/backend/src/modules/huiteacher/groupReportAuthority.ts",
@@ -15644,7 +15980,7 @@
             "server-version/backend/src/services/studentTasks.ts"
           ],
           "sourceAssociationBasis": "Unsigned original execution on uncommitted bytes in execution.before/after; Git associations indexed afterwards, not contemporaneous Git authentication.",
-          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types."
+          "deltaRationale": "The selected Scale available function, its mocks/fixture and course loader imports are unchanged from product b1fc5493. Baseline default-path case passed before the optional predicate existed; its request has no courseId, so the conditional path remains inactive. Original uncommitted test bytes and execution input hashes remain preserved. Main reporting/longitudinal/schema edits do not alter these controller Prisma-mocked or API-mocked invocations; follow-redirects patch updates an unused network transport (no live HTTP in these cases). Current complete-component compiler results are separate fresh executions, not reused historical types. Final main555f report merge review: complete Scale controller and fixture bytes equal the successful original association. Selected handler uses mocked database plus handler-local ordering/projection. All four recorded Scale/Composite loader, fixture, Composite API and frontend lock SHA256 match. Reporting additions are not called by these synthetic cases; no historical invocation is relabeled as current execution."
         },
         {
           "id": "frontend-current-combined-loader",
@@ -15717,31 +16053,41 @@
           "selectedCases": [
             "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
           ],
-          "originalSourceAssociation": "528269c2a2f419bc7adb85ef0301340aa8b3b8f0",
+          "originalSourceAssociation": "236a865da0abaf961f7b4bf3d817dfe897eeb9a0",
           "sourceRoots": [
             "server-version/frontend"
           ],
-          "reviewedSourceDelta": [],
-          "sourceAssociationBasis": "Recorded fresh local execution after Scale and Composite loader auto-merge, exact committed source inputs. Equal full product tree at remote 236a865d.",
-          "deltaRationale": "Fresh single affected loader case verifies both courseId parameters; original reporter preserved separately without double-counting."
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionTeacherGroup.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx"
+          ],
+          "sourceAssociationBasis": "Recorded fresh local execution after Scale and Composite loader auto-merge, exact committed source inputs. Equal full product tree at remote 236a865d. Local producer528269 and remote236a have recorded identical complete tree9ecf3693; all four recorded consumed input SHA256 match this candidate. Remote immutable tree is used for Git delta indexing only, not to authenticate historical execution.",
+          "deltaRationale": "Fresh single affected loader case verifies both courseId parameters; original reporter preserved separately without double-counting. Final main555f report merge review: complete Scale controller and fixture bytes equal the successful original association. Selected handler uses mocked database plus handler-local ordering/projection. All four recorded Scale/Composite loader, fixture, Composite API and frontend lock SHA256 match. Reporting additions are not called by these synthetic cases; no historical invocation is relabeled as current execution.",
+          "originalExecutionSourceAssociation": "528269c2a2f419bc7adb85ef0301340aa8b3b8f0"
         }
       ],
       "types": [
         {
-          "path": "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.json",
-          "sha256": "a1e19f9f44820a4427a60f431ecd0f65bb1cc7689f790f856c13c58980d11e82",
+          "path": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.json",
+          "sha256": "377af309ae61e0de3ed38dcffa48e4b93fe59fcd94d9897b3694e6dd002fc8b9",
           "component": "backend",
-          "componentTree": "94ebc079e565e1c5ce22253c0c52ac07155fff68",
+          "componentTree": "5cbbc96236eb7787b0e31da27a2ed06ece2b2bf2",
           "exitField": "exitCode",
-          "log": "docs/performance/course-scale-scope-20261031/final-qualification/backend-types.log"
+          "log": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/backend-types.log"
         },
         {
-          "path": "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.json",
-          "sha256": "047924b0cd3d5fee5d620ebb45066a1998fdb05fcc7b3c56dcbc262765639d7f",
+          "path": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.json",
+          "sha256": "fa166e6c05c8da865ac5154957401f6010fc71de0db3173dc07aa2e01b4ee30e",
           "component": "frontend",
-          "componentTree": "5daa3daf80ae5bdde2d55f21901ae59cf675fd65",
+          "componentTree": "4c7fb5a4a8c25475052fae1b567affb42d09487c",
           "exitField": "exitCode",
-          "log": "docs/performance/course-scale-scope-20261031/final-qualification/frontend-types.log"
+          "log": "docs/performance/course-scale-scope-20261031/report-baseline-closeout/frontend-types.log"
         }
       ]
     }

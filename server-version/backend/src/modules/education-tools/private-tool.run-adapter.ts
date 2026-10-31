@@ -34,7 +34,7 @@ export async function addPrivateCompositionRunTrack(input:PrivateRunAttachmentCo
   if(!version)privateToolFail('PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',404)
   const administration=privateCompositionAdministrationSchema.parse(version.administration),variant=privateScaleVariant(product,administration)
   const groupReporting=version.groupReporting==null?null:schoolPrivateGroupSelectionSchema.parse(version.groupReporting)
-  if(groupReporting&&(product!=='SCHOOL'||variant.variantKey!=='STUDENT:SELF'))privateToolFail('SCHOOL_PRIVATE_GROUP_SELECTION_INVALID')
+  if(groupReporting&&(variant.variantKey!==(product==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF')))privateToolFail('SCHOOL_PRIVATE_GROUP_SELECTION_INVALID')
   assertPrivateAdministrationSelection(variant.responseMode,selected)
   return addAssessmentRunTrackDraft({...input,tx,expectedVersion:selected.expectedVersion,expectedRunId:input.runId,
    educationWorkflow:{product,id:input.parent.id},privateComposition:selected.privateComposition,

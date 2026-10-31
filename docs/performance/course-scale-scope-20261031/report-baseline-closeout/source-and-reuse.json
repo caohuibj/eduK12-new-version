@@ -1,0 +1,42 @@
+{
+  "localCompilerProducer": "92f2673615eaf79b3a9561a9740657fb5a502648",
+  "remoteProduct": "6f70016bd93392990dff07833029c1361538e691",
+  "equalCompleteTree": "6f64daf70eb6c3c5049fe583112165f008a209eb",
+  "base": "555f705dd272f0ee9c7ac0d80770010d2d6e9675",
+  "preservedRegistrations": [
+    "393",
+    "395",
+    "404",
+    "408",
+    "414",
+    "415",
+    "418",
+    "419",
+    "420",
+    "421",
+    "422",
+    "423",
+    "424",
+    "426",
+    "428",
+    "429",
+    "430",
+    "432",
+    "434",
+    "437",
+    "438",
+    "439",
+    "442",
+    "443",
+    "446",
+    "choice-page",
+    "task1"
+  ],
+  "formalCI": "not-activated",
+  "checks": {
+    "backendTypes": 0,
+    "frontendTypes": 0,
+    "PR435ControlContract": 0
+  },
+  "originalCasesReusedDistinct": 4
+}

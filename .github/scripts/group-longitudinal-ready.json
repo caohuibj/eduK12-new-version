@@ -2173,6 +2173,662 @@
         "step": "audit backend when no admitted exact-input success",
         "maximumAgeHours": 24
       }
+    },
+    "feat/teacher-group-longitudinal-20261031": {
+      "schemaVersion": 1,
+      "slice": "group",
+      "branch": "feat/teacher-group-longitudinal-20261031",
+      "base": "dc83843daabe2be21b1d1dcb8879df69d4c5630c",
+      "reviewedCandidate": "a7ce2d2a50ea895e7fb41356fe33d3d0e91ea604",
+      "originalSource": "a7ce2d2a50ea895e7fb41356fe33d3d0e91ea604",
+      "originalReportPrefix": "docs/evidence/teacher-group-longitudinal-20261031/",
+      "originalCaseCount": 12,
+      "reviewBasis": "Twelve scoped local originals across preserved stages, not rerun at archive commit. Consumes merged Group443 partial option and Group446 private source directly. Two-metric null projection is a mock adapter boundary; separate real PG wider-spec test keeps the original one-metric published plan and all20 FINALs intact. New private source boundary publishes two real waves with only2 new FINALs and preserves actual N10 small-sample suppression/read; full-N private positive source reuses Group446 original. Every original failure/continuation preserved. Current exact-main TEACHER CHECK upgrade/native restore and missing frontend app/types/lint/images/scoped SAST must execute once; no new feature work or production changes.",
+      "reports": [
+        {
+          "id": "adapter-run3",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/adapter-run3.json",
+          "sha256": "593b832ea583aaeb6b3111dd37cf3cbe2d6ad9203570f0b44bc332a988d59d95",
+          "review": {
+            "cases": [
+              {
+                "fullName": "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+                "status": "passed"
+              },
+              {
+                "fullName": "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+                "status": "passed"
+              },
+              {
+                "fullName": "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+                "status": "passed"
+              },
+              {
+                "fullName": "checks real organization authority and keeps historical reads subject to current numeric disclosure",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 4,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+              "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+              "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+              "checks real organization authority and keeps historical reads subject to current numeric disclosure"
+            ]
+          }
+        },
+        {
+          "id": "new-boundaries",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/new-boundaries.json",
+          "sha256": "5fd75742e13de30079b84ea47182008041c5b0971a4a023a04d8215c13014aeb",
+          "review": {
+            "cases": [
+              {
+                "fullName": "retains the existing admin/MFA route boundary, precise read cursor and strict explicit generation contract over HTTP",
+                "status": "passed"
+              },
+              {
+                "fullName": "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+                "status": "skipped"
+              },
+              {
+                "fullName": "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+                "status": "skipped"
+              },
+              {
+                "fullName": "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+                "status": "skipped"
+              },
+              {
+                "fullName": "checks real organization authority and keeps historical reads subject to current numeric disclosure",
+                "status": "skipped"
+              },
+              {
+                "fullName": "uses the existing Scale points/score raw-unit names only after the same frozen C, and rejects other units",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 2,
+              "numFailedTests": 0,
+              "numPendingTests": 4
+            },
+            "selectedCases": [
+              "retains the existing admin/MFA route boundary, precise read cursor and strict explicit generation contract over HTTP",
+              "uses the existing Scale points/score raw-unit names only after the same frozen C, and rejects other units"
+            ]
+          }
+        },
+        {
+          "id": "ui-first",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/ui-first.json",
+          "sha256": "478b6ce561a703eef5572cab23bacba6e6170e3f0636f895bbf9648bff64462c",
+          "review": {
+            "cases": [
+              {
+                "fullName": "keeps the shared saved reader/history while configuration changes and posts only the selected spec/group once",
+                "status": "passed"
+              },
+              {
+                "fullName": "discards the old configuration response after switching the actual event endpoint",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 2,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "keeps the shared saved reader/history while configuration changes and posts only the selected spec/group once",
+              "discards the old configuration response after switching the actual event endpoint"
+            ]
+          }
+        },
+        {
+          "id": "native-read-continuation",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/native-read-continuation.json",
+          "sha256": "590b56fed2737e8191ef439b8c4788769deb9bbda72d52753c64e206bdbebfb8",
+          "review": {
+            "cases": [
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 1
+            },
+            "selectedCases": [
+              "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary"
+            ]
+          }
+        },
+        {
+          "id": "partial-adapter",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-adapter.json",
+          "sha256": "ebcb148cb95a97b6233fd8dad9b7d783751114680455655cef7d0b58a075f155",
+          "review": {
+            "cases": [
+              {
+                "fullName": "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+                "status": "skipped"
+              },
+              {
+                "fullName": "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+                "status": "skipped"
+              },
+              {
+                "fullName": "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+                "status": "skipped"
+              },
+              {
+                "fullName": "checks real organization authority and keeps historical reads subject to current numeric disclosure",
+                "status": "skipped"
+              },
+              {
+                "fullName": "uses the existing Scale points/score raw-unit names only after the same frozen C, and rejects other units",
+                "status": "skipped"
+              },
+              {
+                "fullName": "uses the internal partial-source producer and keeps B null when only A is disclosed in the second planned wave",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 5
+            },
+            "selectedCases": [
+              "uses the internal partial-source producer and keeps B null when only A is disclosed in the second planned wave"
+            ]
+          }
+        },
+        {
+          "id": "partial-native-final",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-native-final.json",
+          "sha256": "b26f0db64c01500ab4b34edb727c6ffb15347f273effaf85fb828654d7880cea",
+          "review": {
+            "cases": [
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+                "status": "skipped"
+              },
+              {
+                "fullName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 2
+            },
+            "selectedCases": [
+              "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric"
+            ]
+          }
+        },
+        {
+          "id": "private-native",
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/private-native.json",
+          "sha256": "e4814d9af25fa8e21b0c2473de766368df686c86ce1198899686d47982cefbac",
+          "review": {
+            "cases": [
+              {
+                "fullName": "publishes two private composition waves through the real source and preserves small-N suppression and saved reads",
+                "status": "passed"
+              }
+            ],
+            "summary": {
+              "success": true,
+              "numPassedTests": 1,
+              "numFailedTests": 0,
+              "numPendingTests": 0
+            },
+            "selectedCases": [
+              "publishes two private composition waves through the real source and preserves small-N suppression and saved reads"
+            ]
+          }
+        }
+      ],
+      "historicalFailures": [
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/adapter-run.json",
+          "sha256": "15c8a84c7ae1e7212a14cb5a6a7d6606e9dc9b42a16b139456d31d56f4bd9d8d",
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 4,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+              "status": "failed"
+            },
+            {
+              "fullName": "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+              "status": "failed"
+            },
+            {
+              "fullName": "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+              "status": "failed"
+            },
+            {
+              "fullName": "checks real organization authority and keeps historical reads subject to current numeric disclosure",
+              "status": "failed"
+            }
+          ],
+          "continuation": "adapter-run3"
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/adapter-run2.json",
+          "sha256": "ab5494cdd7133879cfa8daf0bbb40ecc24be9174c8b81deb42f0413152ba7e0d",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 3,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "uses baseline-owned plans with inherited later bindings, actual slot/time and original aggregate readers",
+              "status": "failed"
+            },
+            {
+              "fullName": "retains a whole missing middle round without inventing a leaf, numbers, or replaying its generator",
+              "status": "failed"
+            },
+            {
+              "fullName": "rejects an actual changed frozen measurement and never flattens another slot with the same score key",
+              "status": "passed"
+            },
+            {
+              "fullName": "checks real organization authority and keeps historical reads subject to current numeric disclosure",
+              "status": "failed"
+            }
+          ],
+          "continuation": "adapter-run3"
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/native-first.json",
+          "sha256": "9a5e35dc8d036bb89eb4da62d8262e4f6c335a18b49b71b221b60f8a5e911c7c",
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 1,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+              "status": "failed"
+            }
+          ],
+          "continuation": "native-read-continuation"
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/native-continuation.json",
+          "sha256": "e993e17a2f6db552fc10afe414ee48c5333c0007955f9191667e69627cc46cc4",
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 1,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+              "status": "failed"
+            }
+          ],
+          "continuation": "native-read-continuation"
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-native.json",
+          "sha256": "bf39c06d1c8713ff567d2c5123418448533d69331c9de5b394d7c1f84d824ad3",
+          "cases": [
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "status": "failed"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 1,
+            "numPendingTests": 2
+          },
+          "continuations": [
+            {
+              "failedCaseName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "successfulReportId": "partial-native-final"
+            }
+          ]
+        },
+        {
+          "file": "docs/evidence/teacher-group-longitudinal-20261031/partial-native-repair.json",
+          "sha256": "fd09c25ca9b0197620075a7083672a9ffe4c663dcb3e0f370ed33dabb48fa2ec",
+          "cases": [
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan publishes T1, inherits T2, saves twenty new FINAL once and reads own, single and saved longitudinal projections",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan continues saved twenty FINAL without resubmission and verifies only the repaired aggregate/read boundary",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "status": "failed"
+            }
+          ],
+          "summary": {
+            "success": false,
+            "numPassedTests": 0,
+            "numFailedTests": 1,
+            "numPendingTests": 2
+          },
+          "continuations": [
+            {
+              "failedCaseName": "Teacher numeric group longitudinal native published plan uses a real published plan and wider spec on retained FINALs without inventing an unauthorized metric",
+              "successfulReportId": "partial-native-final"
+            }
+          ]
+        }
+      ],
+      "addedMigrations": [
+        "20261031040000_teacher_group_longitudinal_store"
+      ],
+      "nativeProduct": "TEACHER",
+      "repository": "caohuibj/eduK12-new-version",
+      "markerBefore": "a34742f916bc9352814ae6dc9eac75824a32a255",
+      "components": {
+        "backend": "eff527e14bd662b26c73329b068164eb41279625",
+        "frontend": "0537c22c2c339b808782c92e0d3948379584d605"
+      },
+      "files": {
+        ".github/scripts/personal-tracking-ready.mjs": {
+          "before": "2b89e153c9067be86ea40d21afaea10e1cd17ce8",
+          "after": "10a9314ebd6f4405f24a4aeb4209c36c1f03feb2"
+        },
+        ".github/scripts/personal-tracking-ready.test.mjs": {
+          "before": "fd9bdfaeaea3a72aaacda2bca96aaf40b4b34976",
+          "after": "fa8567afe1a2706ee39a710ef3528b35db766dc0"
+        },
+        ".github/workflows/ci.yml": {
+          "before": "c1f0b342232fc9272fffe7427e7506d0b251ca09",
+          "after": "dadc0aa76b32da9e09be922da563ad2f8e9ac597"
+        },
+        "docs/development/teacher-group-longitudinal-20261031.md": {
+          "before": null,
+          "after": "1315ddeb8cf61f4f1ccff20495c9699ec772fdcd"
+        },
+        "docs/development/teacher-group-longitudinal-owner-handoff-20261031.md": {
+          "before": null,
+          "after": "0b5140995a41698614b2742a961f42ef8fd26e38"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/README.md": {
+          "before": null,
+          "after": "b4b25153ee192974abf609e2024f4c08e2d8e54e"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-first.json": {
+          "before": null,
+          "after": "2ee53e6a5c4532ef8b3c7db24748294c1f041ebf"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-first.log": {
+          "before": null,
+          "after": "8d84d1dcd9ca280543d6ff9848a5cfa80defe67c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-run.json": {
+          "before": null,
+          "after": "d5136dc5a716a9520b97e85e15042d51b604f197"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-run.log": {
+          "before": null,
+          "after": "f547bf535d63509cb221102867ce403d0e8453cb"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-run2.json": {
+          "before": null,
+          "after": "f8021de500a31f192f8eb32c688e0bc981a29268"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-run2.log": {
+          "before": null,
+          "after": "bf6a805800e81ae77ffbdb5e152e418276386111"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-run3.json": {
+          "before": null,
+          "after": "366dd1fc9fa705e3f786deacb41836d8b16911f6"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/adapter-run3.log": {
+          "before": null,
+          "after": "77cb59720c511a4f64388bd4494b2915af1f25d7"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/migrate-fixture.log": {
+          "before": null,
+          "after": "3ae285629ae92cb891b630cbd2ce5b2c2a4a73e6"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-continuation.json": {
+          "before": null,
+          "after": "8f4d4b8d272fec61a2649ea10d0a1b55863a1d5c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-continuation.log": {
+          "before": null,
+          "after": "86e19ea681742dbd884b71f173bde93501d4cbe1"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-first.json": {
+          "before": null,
+          "after": "20672010f133082a895978f65d8ce27f108fb8cb"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-first.log": {
+          "before": null,
+          "after": "8b2e058e2a33dca4d295bfefc8526fd11fa8d1ec"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-fixture.json": {
+          "before": null,
+          "after": "4db7f9735cbcedfb2939a23ec08b119b376cc69c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-proof.json": {
+          "before": null,
+          "after": "780115c1bc0cba183d1e311cc23a49f5474f286e"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-read-continuation.json": {
+          "before": null,
+          "after": "e252c46a0fc15c0c63a2ab9210c5bca018df8a0d"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/native-read-continuation.log": {
+          "before": null,
+          "after": "851e69a0ea6523bc96431b70a105a0e5517827a0"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/new-boundaries.json": {
+          "before": null,
+          "after": "8571cfa8987709df9b158a7953559b3cf1ddcc53"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/new-boundaries.log": {
+          "before": null,
+          "after": "55bba668edc253fcba64254984fc2aee201b0b75"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-adapter.json": {
+          "before": null,
+          "after": "bafa805efecc3c26625821c97a93a09231131c6d"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-adapter.log": {
+          "before": null,
+          "after": "e62413726cf73275e9e24c9e60a439a526e925e5"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-final.json": {
+          "before": null,
+          "after": "936e12a52cef91a39646b370822304cd8d382610"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-final.log": {
+          "before": null,
+          "after": "97b2d754a80bccb3d5a27dd4271e06dcdf5bceea"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-proof.json": {
+          "before": null,
+          "after": "b814bb8e62576d594e4454dbe7e09147a4868d80"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-repair.json": {
+          "before": null,
+          "after": "310217bc0aa42dd10b6b4789ff6ea752a2e9decb"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native-repair.log": {
+          "before": null,
+          "after": "991cba7120723818416e7570dfbe3e39c4569d01"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native.json": {
+          "before": null,
+          "after": "104d9af0b4286a24b745d636e39f38f9c2f1456c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/partial-native.log": {
+          "before": null,
+          "after": "539d216475fd683c8cc49b8c28dd27c5727b861c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/private-native-proof.json": {
+          "before": null,
+          "after": "2b61d4d0d1ae318ba3c3b341269a9008c0840480"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/private-native.json": {
+          "before": null,
+          "after": "d902a80e1d3d18fbe45b3627a031967ddb5c0d0c"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/private-native.log": {
+          "before": null,
+          "after": "61cf5c50da274624ce51b2d037bf4eebebed4ffc"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/selected-types-first.log": {
+          "before": null,
+          "after": "6b3e308f6e7cb60d0e5a8028a38932ed62b3c99b"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/selected-types-frontend.json": {
+          "before": null,
+          "after": "fb88e2da6a347f2911b784b4641433afe95a7d49"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/selected-types.cjs": {
+          "before": null,
+          "after": "d58702a5bc2d94fbd9c9aa2601c77104141ccee2"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/sha256.json": {
+          "before": null,
+          "after": "a034c77aae578236b621a4ec13f6ec23f4a26c60"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/static-review.json": {
+          "before": null,
+          "after": "41bd48fceee0a2622edac2448476873f1ec5bdca"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/ui-first.json": {
+          "before": null,
+          "after": "bbec42d31ad579800afdd60ab973f979aab15d63"
+        },
+        "docs/evidence/teacher-group-longitudinal-20261031/ui-first.log": {
+          "before": null,
+          "after": "0a1c6c7729817fdab82f808fa71084d0f0f12587"
+        },
+        "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql": {
+          "before": null,
+          "after": "c92cd9e47f14519e9d63e51a709c29a910bce9c5"
+        },
+        "server-version/backend/src/__tests__/huiteacher/group-longitudinal.routes.test.ts": {
+          "before": null,
+          "after": "a46fb9c55bda012b30929e56cd3316546796aba7"
+        },
+        "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts": {
+          "before": null,
+          "after": "704bb8cf1507f3e21859272103b7b0cc75dee813"
+        },
+        "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8ae518963af57d1efc255b42018560f9ee719082"
+        },
+        "server-version/backend/src/__tests__/integration/teacherPrivateCompositionLongitudinal.postgres.integration.test.ts": {
+          "before": null,
+          "after": "2d13ab6f4d11e39a5ca6cab3afb45b5d6a36fdfa"
+        },
+        "server-version/backend/src/index.ts": {
+          "before": "76cb77d52377a590e5ce757075e5729e97099a96",
+          "after": "ce182833fc063c276a3e29abcc751bcfbbd21929"
+        },
+        "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts": {
+          "before": null,
+          "after": "8f5a34cb477c551512de30c679300eb3a9f1d5bc"
+        },
+        "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts": {
+          "before": null,
+          "after": "33698a352a14dbd2a20761f76368a2586efecf32"
+        },
+        "server-version/backend/src/modules/reporting/task-artifact.ts": {
+          "before": "71b7d3ad6f3664d89ced78b92b881e152f552620",
+          "after": "8d04ca03829a694615d13c4dc461a91530092f16"
+        },
+        "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+          "before": "af767156f64e878f7e5628f18f680397d79cfb22",
+          "after": "e06a3109e204f4ec2989341e48e6a28a64ee7f12"
+        },
+        "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx": {
+          "before": null,
+          "after": "cfd6dc916b1a7779617b7091ebdea53436b8c823"
+        },
+        "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx": {
+          "before": null,
+          "after": "14f11268071b31c3172be2001f4a72bebef5715c"
+        }
+      },
+      "backendAuditReuse": {
+        "runId": 41169063761,
+        "jobId": 124442932394,
+        "sourceHead": "385615d481cdf5114f421519e627a14658e44cba",
+        "executionHead": "dfa45d6a2a97539b3e4e6225756327bec83f4caf",
+        "step": "audit backend when no admitted exact-input success",
+        "maximumAgeHours": 24
+      },
+      "frontendAuditReuse": {
+        "sourceHead": "e34438dc35ac2f21b2ae48ec291e20c80d9903f8",
+        "executionHead": "7ca965681cc92ff669d36d2495660ef263b6977a",
+        "runId": 41053670118,
+        "jobId": 124055865989,
+        "step": "install frontend tools and audit locked inputs",
+        "maximumAgeHours": 24
+      },
+      "earlierOriginalSource": "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
+      "evidenceArchiveHistory": [
+        "de230c9464f57dd603ee7fc9b1a8915a03e6b875",
+        "371ceb7701bdda8d6f5bc4eed18b40f739a9d0f4",
+        "673ef062adbd20a2f0da0a308be8d6d476547f93"
+      ]
     }
   }
 }

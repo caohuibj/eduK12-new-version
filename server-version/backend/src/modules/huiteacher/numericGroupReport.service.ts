@@ -1,6 +1,7 @@
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
 import {isSelfGroupV2Entry} from '../assessment-policy/self-group-contract'
 import {resolveHistoricalRelationalEntry} from '../assessment-run/registeredResources'
 import {readReportingArtifactRecord} from '../reporting/artifact'
@@ -20,7 +21,7 @@ const hidden=():never=>reportingFail('REPORT_NOT_FOUND','Teacher group report un
 export function teacherAggregateReady(rule:{mode:string;delaySeconds?:number},closedAt:Date|null,now=Date.now()){
  return rule.mode==='AGGREGATE_ONLY'||rule.mode==='DELAYED_AGGREGATE'&&!!closedAt&&now>=closedAt.getTime()+rule.delaySeconds!*1000
 }
-async function source(input:TeacherNumericScope,trackId?:string){
+async function source(input:TeacherNumericScope,trackId?:string,leaf?:ReportingLeafSourceV2){
  const [run]=await prisma.$queryRaw<Array<{runId:string;name:string;eventStatus:string;runStatus:string;closedAt:Date|null}>>`
   SELECT r.id AS "runId",e.title AS name,e.status AS "eventStatus",r.status AS "runStatus",r.closed_at AS "closedAt"
   FROM huiteacher_evaluation_run_links l JOIN huiteacher_evaluation_events e ON e.id=l.event_id AND e.organization_id=l.organization_id
@@ -30,18 +31,33 @@ async function source(input:TeacherNumericScope,trackId?:string){
  await assertTeacherGroupAuthority({...input,runIds:[run.runId]})
  const principal={userId:input.actorUserId,platformRole:'STANDARD' as const,product:'HUITEACHER' as const}
  const canGenerate=['OPEN','CLOSED'].includes(run.eventStatus)&&['PUBLISHED','CLOSED'].includes(run.runStatus)
- if(!trackId)return {...run,principal,minimumN:teacherResourceMinimum(),canGenerate,allowedMetricKeys:[] as string[]}
- const [track]=await prisma.$queryRaw<Array<{family:string;key:string;version:string;policy:any;hash:string}>>`
-  SELECT resource_family AS family,resource_key AS key,resource_version AS version,frozen_resource_policy AS policy,resource_policy_hash AS hash
-  FROM assessment_run_tracks WHERE organization_id=${input.organizationId} AND run_id=${run.runId} AND id=${trackId}`
+ if(!trackId)return {...run,principal,minimumN:teacherResourceMinimum(),canGenerate,allowedMetricKeys:[] as string[],allowedSourceMetricKeys:[] as string[]}
+ const itemId=leaf?.slotKey.slice(leaf.slotKey.indexOf(':')+1)??null
+ const [track]=await prisma.$queryRaw<Array<{family:string;key:string;version:string;policy:any;hash:string;blockId:string|null}>>`
+  SELECT t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,t.frozen_resource_policy AS policy,t.resource_policy_hash AS hash,
+   CASE WHEN ${itemId}::text IS NOT NULL AND t.resource_key LIKE 'education-composition:TEACHER:%' THEN (
+    SELECT block->>'blockId' FROM composite_assessments c,
+     LATERAL jsonb_array_elements(c.training_content_snapshot#>'{educationBinding,manifest}') block
+    WHERE c.id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}' AND block->'itemIds' ? ${itemId}
+   ) END AS "blockId"
+  FROM assessment_run_tracks t WHERE t.organization_id=${input.organizationId} AND t.run_id=${run.runId} AND t.id=${trackId}`
  if(!track||canonicalHash(track.policy)!==track.hash)hidden()
  const scale=track.family==='SCALE'&&track.key.endsWith(':GROUP')&&['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix))
- if(!scale&&!teacherNativeGroupTrack(track))hidden()
+ const privateComposition=track.family==='BUNDLE'&&track.version==='1.0.0'&&track.key.startsWith('education-composition:TEACHER:')
+ if(!scale&&!privateComposition&&!teacherNativeGroupTrack(track))hidden()
  const entry=await resolveHistoricalRelationalEntry({resourceKind:track.family,resourceKey:track.key,resourceVersion:track.version} as any)
  if(!entry||!isSelfGroupV2Entry(entry)||!entry.resultDisclosure?.audiences.ORGANIZATION.mode.includes('AGGREGATE')
   ||!track.policy.subjectRoles?.every((r:string)=>r==='TEACHER')||!track.policy.respondentRoles?.every((r:string)=>r==='TEACHER')
   ||canonicalHash(entry.resultDisclosure)!==canonicalHash(track.policy.resultDisclosure))hidden()
- return {...run,principal,track,allowedMetricKeys:entry!.resultDisclosure!.audiences.ORGANIZATION.metricKeys,canGenerate:canGenerate&&teacherAggregateReady(entry!.resultDisclosure!.audiences.ORGANIZATION,run.closedAt),minimumN:Math.max(teacherResourceMinimum(),track.policy.minimumRespondents??0,entry!.resultDisclosure!.minimumRespondents??0)}
+ const parent=entry!.resultDisclosure!.audiences.ORGANIZATION
+ let sourceKeys=parent.metricKeys
+ if(leaf&&(privateComposition||teacherNativeGroupTrack(track))){
+  const unit=privateComposition?track.policy.educationComposition?.unitReports.find((unit:{blockId:string})=>unit.blockId===track.blockId):
+   (entry as any).educationOrigin?.units.find((unit:{itemId:string;family:string})=>compositeItemSlotKey(unit.itemId,unit.family==='SJT'?'SITUATIONAL':unit.family as 'SCALE'|'COGNITIVE')===leaf.slotKey)
+  const rule=unit?.groupDisclosure?.audiences.ORGANIZATION
+  sourceKeys=rule&&teacherAggregateReady(rule,run.closedAt)?sourceKeys.filter(key=>rule.metricKeys.includes(key)):[]
+ }
+ return {...run,principal,track,allowedMetricKeys:parent.metricKeys,allowedSourceMetricKeys:sourceKeys,canGenerate:canGenerate&&teacherAggregateReady(parent,run.closedAt),minimumN:Math.max(teacherResourceMinimum(),track.policy.minimumRespondents??0,entry!.resultDisclosure!.minimumRespondents??0)}
 }
 
 /** Content-owned new GROUP only. A result directory is never an authorization
@@ -65,14 +81,20 @@ export async function listTeacherNumericGroups(input:TeacherNumericScope,options
  const sources:Array<{trackId:string;title:string;tools:Awaited<ReturnType<typeof listAuthoritativeRunLeafSources>>;minimumN:number;canGenerate:boolean;groups:Awaited<ReturnType<typeof listEducationGroupSelections>>}>=[]
  if(options.configure){
  const tracks=await prisma.$queryRaw<Array<{trackId:string;title:string}>>`
-  SELECT t.id AS "trackId",COALESCE(r.entry,n.entry)->>'title' AS title FROM assessment_run_tracks t
+  SELECT t.id AS "trackId",COALESCE(COALESCE(r.entry,n.entry)->>'title',composition.name) AS title FROM assessment_run_tracks t
   LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
   LEFT JOIN education_assessment_deliveries n ON t.resource_key='education-assessment:TEACHER:'||n.organization_id||':'||n.id
     AND n.organization_id=t.organization_id AND n.product='TEACHER' AND t.resource_version='2.0.0'
+  LEFT JOIN composite_assessments composition ON composition.creation_key=t.resource_key
+   AND composition.training_content_snapshot#>>'{educationBinding,origin,entry}'='TEACHER'
+   AND composition.training_content_snapshot#>>'{educationBinding,origin,organizationId}'=t.organization_id
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${run.runId}
     AND ((t.resource_family='SCALE' AND (t.resource_key LIKE 'teacher-scale:%:GROUP' OR t.resource_key LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'))
      OR (t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND n.entry->'educationOrigin'->>'adapterVersion'='2.0.0'
-      AND n.entry->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE')))
+      AND n.entry->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE'))
+     OR (t.resource_family='BUNDLE' AND t.resource_key LIKE 'education-composition:TEACHER:%' AND t.resource_version='1.0.0'
+      AND t.frozen_resource_policy->'resultDisclosure'->>'policyKey'='EDUCATION_SELF_GROUP_V2'
+      AND t.frozen_resource_policy->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE')))
   ORDER BY t.id`
  for(const track of tracks){
   const valid=await source(input,track.trackId)
@@ -118,15 +140,18 @@ const countsVisible=(payload:ReportingGroupArtifactPayload,minimumN:number)=>{
 /** Existing small-change rule, now over immutable actual contributor sets,
  * including per-metric quality/missingness subsets instead of invitee lists. */
 export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>},db:Prisma.TransactionClient|typeof prisma=prisma){
- const metrics=disclosedMetrics(input.payload)
+ const metrics=disclosedMetrics(input.payload).filter(id=>input.metricRules.some(rule=>rule.metricId===id))
  if(!countsVisible(input.payload,input.minimumN)&&!metrics.length)return {comparedArtifacts:0,measurementHash:null}
- const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
+ const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash') AS hash
   FROM assessment_run_tracks t LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
   LEFT JOIN scales s ON s.id=r.scale_id LEFT JOIN measurement_content_releases release ON release.id=s.measurement_release_id
   LEFT JOIN education_assessment_deliveries native ON t.resource_key='education-assessment:TEACHER:'||native.organization_id||':'||native.id
    AND native.organization_id=t.organization_id AND native.product='TEACHER' AND t.resource_version='2.0.0'
   LEFT JOIN LATERAL jsonb_array_elements(native.entry->'educationOrigin'->'units') native_unit(value)
    ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=${input.leaf.slotKey}
+  LEFT JOIN composite_assessments composition ON composition.creation_key=t.resource_key AND t.resource_key LIKE 'education-composition:TEACHER:%'
+  LEFT JOIN LATERAL jsonb_array_elements(composition.training_content_snapshot->'units') private_unit(value)
+   ON (CASE private_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(private_unit.value->>'family') END)||':'||(private_unit.value->>'itemId')=${input.leaf.slotKey}
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${input.cohort.sourceRunId} AND t.id=${input.cohort.sourceTrackId}`
  if(!measurement?.hash)return hidden()
  const prior=await db.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
@@ -145,10 +170,13 @@ export async function assertTeacherNumericDisclosure(input:{organizationId:strin
    AND native.organization_id=t.organization_id AND native.product='TEACHER' AND t.resource_version='2.0.0'
   LEFT JOIN LATERAL jsonb_array_elements(native.entry->'educationOrigin'->'units') native_unit(value)
    ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=a.artifact_payload->'source'->'leaf'->>'slotKey'
+  LEFT JOIN composite_assessments composition ON composition.creation_key=t.resource_key AND t.resource_key LIKE 'education-composition:TEACHER:%'
+  LEFT JOIN LATERAL jsonb_array_elements(composition.training_content_snapshot->'units') private_unit(value)
+   ON (CASE private_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(private_unit.value->>'family') END)||':'||(private_unit.value->>'itemId')=a.artifact_payload->'source'->'leaf'->>'slotKey'
   WHERE a.organization_id=${input.organizationId} AND a.analysis_kind='GROUP'
-    AND (a.artifact_payload->'source'->'leaf' IS NULL OR COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') IS NULL
+    AND (a.artifact_payload->'source'->'leaf' IS NULL OR COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash') IS NULL
       OR (a.artifact_payload->'source'->'leaf'->>'unitType'=${input.leaf.unitType}
-        AND (COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash')=${measurement.hash} OR a.artifact_payload->'source'->'leaf'->>'instrumentKey'=${input.leaf.instrumentKey})))`)
+        AND (COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash')=${measurement.hash} OR a.artifact_payload->'source'->'leaf'->>'instrumentKey'=${input.leaf.instrumentKey})))`)
 
  const currentContributors=contributorUsers(input.payload)!
  for(const old of prior){
@@ -198,7 +226,7 @@ export async function readTeacherNumericGroup(input:TeacherNumericScope&{artifac
  return present({...artifact,artifactPayload:{...artifact.artifactPayload,projection:result.projection}} as typeof artifact,minimumN)
 }
 export async function generateTeacherNumericGroup(input:TeacherNumericScope&{trackId:string;leaf:ReportingLeafSourceV2;specId:string;selection:EducationGroupSelection},internal:{allowPartialSourceMetrics?:true}={}){
- const run=await source(input,input.trackId)
+ const run=await source(input,input.trackId,internal.allowPartialSourceMetrics?input.leaf:undefined)
  if(!run.canGenerate)reportingFail('HUITEACHER_GROUP_NOT_AVAILABLE','任务状态或该工具合同的披露时机尚未满足',409)
  const spec=await getPublishedReportingSpec(input.specId)
  if(spec.definition.analysisKind!=='GROUP')return reportingFail('REPORT_SPEC_INVALID','方案须为已发布的单次群体方案',409)
@@ -209,7 +237,10 @@ export async function generateTeacherNumericGroup(input:TeacherNumericScope&{tra
  // shared leaf/source projection still narrows every generated and saved read.
  if(!permitted.length||!internal.allowPartialSourceMetrics&&permitted.length!==spec.definition.metricRules.length)reportingFail('REPORT_SPEC_SCOPE','方案指标超出该来源的组织群体上限',409)
  const minimumN=Math.max(run.minimumN,spec.definition.minimumCohortN,spec.definition.minimumContributorN)
- const metricRules=spec.definition.metricRules
+ // A withheld planned metric is not a new disclosure. Its private contributor
+ // changes must not consume the budget of the still-authorized trend metric.
+ const metricRules=internal.allowPartialSourceMetrics?permitted.filter(rule=>run.allowedSourceMetricKeys.includes(rule.sourceMetricKey)):spec.definition.metricRules
+ if(!metricRules.length)reportingFail('REPORT_SPEC_SCOPE','该固定叶没有获准的计划群体指标',409)
  const cohortSelector=await educationGroupSelector(input.organizationId,'TEACHER',input.selection)
  const generated=await prisma.$transaction(async tx=>{
   await lockTeacherDisclosure(tx,input.organizationId)

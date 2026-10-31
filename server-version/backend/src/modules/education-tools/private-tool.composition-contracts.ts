@@ -45,7 +45,7 @@ export const privateCompositionDefinitionSchema=z.object({schemaVersion:z.union(
  if(new Set(value.blocks.map(block=>block.blockId)).size!==value.blocks.length)
   ctx.addIssue({code:'custom',path:['blocks'],message:'问卷工具块身份不能重复'})
  if(value.groupReporting){
-  if(value.administration.population!=='STUDENT'||value.administration.responseMode!=='SELF')ctx.addIssue({code:'custom',message:'本群体投放只适用于明确的学生本人新版本'})
+  if(value.administration.responseMode!=='SELF')ctx.addIssue({code:'custom',message:'群体投放只适用于明确的本人新版本'})
   for(const selected of value.groupReporting.leaves){const block=value.blocks.find(block=>block.blockId===selected.blockId)
    if(!block||block.source.kind==='FORM'||block.source.versionId!==selected.versionId||block.source.contentHash!==selected.contentHash)
     ctx.addIssue({code:'custom',message:'群体选择必须绑定当前问卷的固定叶工具，不能借用同名指标'})

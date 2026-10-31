@@ -13,7 +13,7 @@ export type CompositionDefinition={schemaVersion:1|2;adapterVersion:'1.0.0'|'2.0
  contextFields?:Array<{contextKey:import('../../modules/assessment-context/options').AssessmentContextKey;formType:'year_month'|'single_choice'|'fill_blank';formLabel:string;formOptions:Array<{value:string;label:string}>}>;
  instruction:string;blocks:Array<{blockId:string;instruction:string;longitudinal?:boolean;source:CompositionSource}>}
 export type CompositionReference=(Pick<PrivateToolVersion,'id'|'title'|'sourceRevision'|'contentHash'>&{toolId:string;kind:'SCALE'|'FORM';sourceProvider:'PRIVATE_VERSION';groupChoice?:SchoolPrivateGroupChoice})|
- {id:string;kind:'FORM'|'SCALE'|'COGNITIVE'|'SJT';sourceProvider:'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'|'COGNITIVE_CONFIG'|'SJT_RELEASE';title:string;contentHash:string;version:string;versions?:{content:string;parameters:string|null;report:string|null};requiredContextKeys?:string[]}
+ {id:string;kind:'FORM'|'SCALE'|'COGNITIVE'|'SJT';sourceProvider:'PUBLIC_FORM'|'STANDARD_SCALE'|'LIBRARY_SCALE'|'COGNITIVE_CONFIG'|'SJT_RELEASE';title:string;contentHash:string;version:string;versions?:{content:string;parameters:string|null;report:string|null};requiredContextKeys?:string[];groupChoice?:SchoolPrivateGroupChoice}
 export type CompositionSummary=Omit<PrivateToolSummary,'kind'>&{kind:'COMPOSITION'}
 export type CompositionTool=CompositionSummary&{definition:CompositionDefinition;references?:CompositionReference[]}
 export const compositionTitle=(block:CompositionDefinition['blocks'][number],references:CompositionReference[])=>
