@@ -17192,6 +17192,157 @@
         "originalEightCasesRerun": false,
         "originalLintRerun": false
       }
+    },
+    "445": {
+      "schemaVersion": 1,
+      "product": "0afb7006a5f2c8c6e16245fa1cd864e01644cbdd",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "components": {
+        "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+        "frontend": "aaacedc9b62bb21e801b3a0d66507636646f3a88"
+      },
+      "environment": {
+        "node": "v24.21.0 original cases and current app types; same official binary SHA256",
+        "limitations": [
+          "Original13 are React/jsdom with mocked API, not live authorization/native browser or performance evidence; filtered2 public-only cases are retained, not counted.",
+          "Original2 failed counterexamples, candidate13 PASS, original lint exit0/warning and original source/environment receipts are retained without replay.",
+          "Current exact frontend component app types executed once after main449 integration. Backend matches main and is not compiled in this UI route.",
+          "Only selected compiler/config/dependency inputs recorded; no complete node_modules attestation, no fresh audit/install or backend runtime claim."
+        ]
+      },
+      "reports": [
+        {
+          "id": "pr445-original-thirteen-jsdom",
+          "path": "docs/performance/report-read-recovery-20261031/candidate.json",
+          "sha256": "3abbdc39de05abada63e5a3d1937975c7b10eba1fd23dc30db043c0fe85a3c4e",
+          "originalSourceAssociation": "e00829d0011995035843b13a22f583ae3a658503",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/components/FormSectionManager.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.mutation-race.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.race.test.tsx",
+            "server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionStudio.tsx",
+            "server-version/frontend/src/components/education-tools/EducationCompositionTeacherGroup.test.tsx",
+            "server-version/frontend/src/components/education-tools/SchoolPrivateGroupDisclosure.tsx",
+            "server-version/frontend/src/components/education-tools/educationCompositionClient.ts",
+            "server-version/frontend/src/huiteacher/DotCrossPrUi.review.test.tsx",
+            "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+            "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx",
+            "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx",
+            "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx",
+            "server-version/frontend/src/modules/cognitive/__tests__/api.test.ts",
+            "server-version/frontend/src/modules/cognitive/api.ts",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "deltaRationale": "Main changes unrelated Teacher/School authoring, Cognitive API and Training discovery modules. Both result pages, all3 executed case files, utilities, ReportShell, setup, package and lock hashes in the original12-input inventory remain identical.",
+          "sourceAssociationBasis": "The public e00829d0 complete tree72fc3014 equals the original reviewed local e7ae26de tree. Original candidate-execution inputs and environment hashes bind unchanged raw reporter bytes; this is an explicit public association, not an invented original runtime commit.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 13,
+            "numFailedTests": 0,
+            "numPendingTests": 2
+          },
+          "cases": [
+            {
+              "fullName": "Questionnaire Scale report UI matrix renders the shared DTO without aggregate/overall semantics in authenticated and public pages",
+              "status": "passed"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix clears the previous authenticated report when the next record cannot be read",
+              "status": "passed"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix ignores a late authenticated report after switching records",
+              "status": "passed"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix does not leave a missing public session id in an infinite loading state",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Questionnaire Scale report UI matrix fails closed with an actionable entry path when the public resume capability is missing",
+              "status": "skipped"
+            },
+            {
+              "fullName": "questionnaire offers explicit read recovery after a transport failure, without duplicate requests",
+              "status": "passed"
+            },
+            {
+              "fullName": "scale offers explicit read recovery after a transport failure, without duplicate requests",
+              "status": "passed"
+            },
+            {
+              "fullName": "questionnaire preserves an explicit denied read and its existing course return path",
+              "status": "passed"
+            },
+            {
+              "fullName": "scale preserves an explicit denied read and its existing course return path",
+              "status": "passed"
+            },
+            {
+              "fullName": "questionnaire ignores a late success from the previous record retry",
+              "status": "passed"
+            },
+            {
+              "fullName": "scale ignores a late success from the previous record retry",
+              "status": "passed"
+            },
+            {
+              "fullName": "questionnaire ignores a late failure from the previous record retry",
+              "status": "passed"
+            },
+            {
+              "fullName": "scale ignores a late failure from the previous record retry",
+              "status": "passed"
+            },
+            {
+              "fullName": "ScaleResult ReportShell renders completion facts and frozen scale report content",
+              "status": "passed"
+            },
+            {
+              "fullName": "ScaleResult ReportShell keeps report read failure distinct from submission failure",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/report-read-recovery-20261031/qualification-main194/frontend-types.json",
+          "sha256": "6fd460005d34250cd477b7c4071ecf9c5928026c8eb502deed175df353d9890e",
+          "component": "frontend",
+          "componentTree": "aaacedc9b62bb21e801b3a0d66507636646f3a88",
+          "exitField": "exitCode",
+          "log": "docs/performance/report-read-recovery-20261031/qualification-main194/frontend-types.log"
+        }
+      ],
+      "originalLint": {
+        "path": "docs/performance/report-read-recovery-20261031/changed-lint.log",
+        "sha256": "962ca8d1dfb6112895c8ef371799383ddfcf357383082c8efd174547a6ecc311",
+        "exitPath": "docs/performance/report-read-recovery-20261031/changed-lint.exit",
+        "exitCode": 0
+      },
+      "retainedBaseline": {
+        "path": "docs/performance/report-read-recovery-20261031/baseline.json",
+        "sha256": "d49d0d79f7b97dac362ade0e2bd0c47013d22cc341dea6f424244b9d6f5029dd",
+        "failedCases": 2,
+        "pendingCases": 6,
+        "admittedAsPassing": false
+      },
+      "reuseProof": {
+        "path": "docs/performance/report-read-recovery-20261031/qualification-main194/source-and-reuse.json",
+        "sha256": "8cc5e3d6858abd2d7b0703a1f568ec54d2ebe92b50f941c4a0ec2c4a32f5cc2a"
+      }
     }
   }
 }
