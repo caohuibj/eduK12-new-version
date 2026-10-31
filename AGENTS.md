@@ -28,7 +28,9 @@
 - 独立宿主机数据库/服务器配置备份 wrapper 使用 maintenance 门禁并增加真实隔离加密备份/恢复及失败匿名卷清理；原有 backup/restore 脚本不变。新备份必须远端指定版本回读、认证解密和隔离恢复成功才可轮换本组件本地副本；COS 清理维持 plan_only，附件未完成盘点或未通过 DB 引用一致恢复不得声称完整恢复点。
 - 独立 `scripts/cos-cleanup` 的明确白名单文件使用 maintenance 门禁，覆盖历史索引/版本分页、联合恢复与引用保护、真实文件事务、中断恢复、指定 VersionId 删除协议、宿主机双写入锁和隔离回收。默认 plan_only；生产执行须完成联合恢复验证、专用删除身份和写入者事务守卫部署。不得用宽目录白名单绕过未知执行器，不得因开发清理功能启动平台全量 CI。真实 COS 删除只在唯一合成前缀验证，不能用生产备份作测试。
 
-- 纯依赖版本升级及现有测试兼容修复采用 dependencies 范围门禁：必须保留前后端审计、编译/类型/回归、受控迁移与既有性能门、生产镜像构建/安全扫描、CI 路由与 CodeQL；不运行无关浏览器/媒体/UI/Ops 全体验收。依赖声明须与锁文件对应，scripts/engines/业务/数据库/Compose/Dockerfile 或未知路径变动不适用此路线。所有选中项必须成功才能合并。
+- 纯依赖版本升级及现有测试兼容修复采用 dependencies 范围门禁。前端版本型依赖文件可与已准入前端源码、同目录或模块内测试及非生产说明组合，执行完整前端锁定安装/审计、类型/测试/构建、frontend-only 生产镜像扫描、CI 路由及 CodeQL，不能借 frontend_affected 缩测试。后端、根依赖、CI/控制或跨组件差异仍走对应范围；共享 API/测评运行时代码及命中既有特殊媒体/app-shell 验收的生产文件不借此降级。依赖声明须与锁文件对应，scripts/engines、后端业务、数据库、Compose/Dockerfile 或未知路径变动不适用前端单端路线。所有选中项必须成功才能合并，不运行无关浏览器/媒体/UI/Ops 全体验收。
+
+- 纯后端产品模块、伴随测试及非生产证据可使用 backend 类别；FE、schema、依赖、CI/Compose、共享 API/DTO、身份或测评核心运行时变化不适用。此类别解除独立 frontend/browser/media/UI/Ops/perf 验收层，Draft 保留 pr-light-backend，Ready 保留原 backend、backend-regression、Docker 和后端 SAST；Docker 仅构建 backend/worker 并扫描实际后端镜像。原 backend 内部固定回归/性能和跨树前端依赖尚未定向收窄，不声称本片消除了全部无关工作。历史证据脚本不自动成为当次 PG 集成成功；实际共享契约影响仍须按审阅结果扩展范围。
 
 ## CI 激活与失败回写（2026-10-26 用户追加）
 

@@ -28,7 +28,7 @@ test('selected route is exact success, not a job count; login keeps SAST boundar
 });
 
 test('tooling-only C never implies application builds or data recovery; mixed files/modes are rejected',()=>{
- const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
+ const files=['server-version/scripts/release/executor.py','.github/workflows/ci.yml','.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs','.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs','docs/development/ci-gate-cleanup-20261031.md'].map(regular);assert.equal(toolingOnly(files),true);
  for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),regular('.github/scripts/onboarding-bindings.json'),regular('.github/scripts/onboarding-new-check.mjs'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'},{...files[0],newMode:'120000'}])assert.equal(toolingOnly([...files,extra]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}}};assert.deepEqual(requiredChecks(needs,true),['scope','release-tools']);assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
 });
@@ -39,6 +39,12 @@ test('registered development tools retain changed backend tests without admittin
  assert.equal(toolingOnly(files.slice(1)),false,'tests alone do not claim a registered tool consumer');
  for(const file of ['server-version/backend/src/modules/cognitive/service.ts','server-version/backend/prisma/schema.prisma','docs/evidence/cli/run.ts','server-version/backend/src/__tests__/../runtime.test.ts'])assert.equal(toolingOnly([...files,regular(file)]),false,file);
  for(const newMode of ['120000','100755','000000'])assert.equal(toolingOnly([...files,{...regular(cli),newMode}]),false);
+});
+test('image tooling preserves the existing executable script without admitting chmod or new executables',()=>{
+ const script={...regular('.github/scripts/build-ci-images.sh'),oldMode:'100755',newMode:'100755'};
+ const files=[script,...['.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].map(regular)];
+ assert.equal(toolingOnly(files),true);
+ for(const extra of [{...script,newMode:'100644'},{...script,status:'A',oldMode:'000000'},{...script,newMode:'120000'},{...script,file:'.github/scripts/unknown-images.sh'}])assert.equal(toolingOnly([...files,extra]),false);
 });
 
 

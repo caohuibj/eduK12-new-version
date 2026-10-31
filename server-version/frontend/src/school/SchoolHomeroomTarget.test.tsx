@@ -6,7 +6,7 @@ const base='/organizations/org/activities/activity'
 const modes=['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS','SELECTED_CLASS_TEACHERS']
 async function setup(isAdmin:boolean,allowedTargetModes:string[]=modes){
  const activity={courseId:'activity',organizationId:'org',title:'教师他评活动',purpose:'SCHOOL_CLIMATE',status:'DRAFT',version:1,participantCount:0,runCount:1,runs:[{runId:'run',name:'他评批次',status:'DRAFT'}],capabilities:{canSubmit:true,canOpen:false,canPause:false,canResume:false,canClose:false,canPublishRun:false,ownPsychologyPublisher:true}}
- const resource={family:'SCALE',key:'library-scale:first',version:'v1',title:'量表甲',scientificMaturity:'PILOT',subjectRoles:['STUDENT'],respondentRoles:['TEACHER'],relationshipKinds:['CLASS_TEACHER_STUDENT'],perspectives:['TEACHER_REPORT'],analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'EDUCATION_LIBRARY_APPROVED_CONTENT_V1',minimumRespondents:null,allowedTargetModes}
+ const resource={family:'SCALE',key:'library-scale:first',version:'v1',title:'量表甲',scientificMaturity:'PILOT',subjectRoles:['STUDENT'],respondentRoles:['TEACHER'],relationshipKinds:['CLASS_TEACHER_STUDENT'],perspectives:['OBSERVER_REPORT'],analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'EDUCATION_LIBRARY_APPROVED_CONTENT_V1',minimumRespondents:null,allowedTargetModes}
  const api=vi.fn(async(path:string,method='GET')=>{
   if(path.endsWith('pageSize=50'))return {list:[activity]}
   if(path===base)return activity

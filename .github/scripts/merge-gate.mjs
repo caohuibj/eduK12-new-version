@@ -147,10 +147,11 @@ export function requiredChecks(needs, draft) {
     return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
   }
   if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft?['codeql']:[])];
+  if (scope.scenario === 'backend') return ['scope',...(draft?['pr-light-backend']:['backend','backend-regression','docker','codeql'])];
   if (scope.cognitive_intake_light === 'true') return ['scope','content',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
-  if (dependencies) checks.push('maintenance','backend','backend-regression','frontend-build','frontend','docker');
+  if (dependencies) checks.push(...(scope.dependencies_frontend_only==='true'?[]:['maintenance','backend','backend-regression']),'frontend-build','frontend','docker');
   if (scope.scenario === 'frontend-test') checks.push('frontend');
   if (scope.maintenance === 'true') checks.push('maintenance');
   else if (scope.documentation === 'true') checks.push('documentation');
@@ -482,11 +483,13 @@ export function failedChecks(needs, draft) {
   if(scope.personal_tracking_draft==='true'&&(!draft||scope.application_route!=='legacy'||scope.scenario!=='platform'))failed.push('scope');
   if(scope.frontend_affected!==undefined&&(!['true','false'].includes(scope.frontend_affected)
     ||scope.frontend_affected==='true'&&(scope.scenario!=='frontend'||scope.frontend!=='true')))failed.push('scope');
+  if(scope.dependencies_frontend_only!==undefined&&(!['true','false'].includes(scope.dependencies_frontend_only)
+    ||scope.dependencies_frontend_only==='true'&&scope.scenario!=='dependencies'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
-  const scenarios = {'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
+  const scenarios = {backend:['false','false','false','false'], 'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
   const expected = scenarios[scope.scenario];
-  const requiresCodeql = ['platform','dependencies','frontend','content-frontend','release-tooling'].includes(scope.scenario);
+  const requiresCodeql = ['platform','backend','dependencies','frontend','content-frontend','release-tooling'].includes(scope.scenario);
   if ((scope.scenario === 'dependencies' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false'))
       || (scope.maintenance !== String(scope.scenario === 'maintenance'))
       || (scope.scenario === 'maintenance' && (scope.codeql !== 'false' || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
@@ -508,6 +511,7 @@ export function failedChecks(needs, draft) {
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
     || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== ((trainingFunctional || adminFunctional) && key === 'perf_smoke' ? 'false' : 'true')));
   if (scope.scenario === 'release-tooling' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
+  if (scope.scenario === 'backend' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
     if (!failed.includes('scope')) failed.unshift('scope');
