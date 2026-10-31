@@ -10,7 +10,7 @@ dependencies are extracted. The other eight bank tasks are not included.
 | icarmatrix | Project matrix pilot, engine 2.1.0 / scoring 1.1.0; seven reviewed 3×3 items | 4 / 7, same seven-item pool | Initial independent implementation `3f0c5900146ba343bc727aad25478a54e6215df2`; name clarification `0c8ec8b4dae436d6ee17d9d9c31a2cb9bec97588`; review follow-up/source records `5df5da26fac7baf26daf0d60611f61398490ded1` |
 | lineangle | Unoriented axes modulo 180°, engine/scoring 2.0.0 | 12 / 60 | `c60e54a7425e92c0de144c6114888f4158394b77` |
 | sharegame | Explicit choice including zero vs timeout/omitted, engine/scoring 2.0.0 | 3 / 8 | `63f5b8443e6caee8b02ed65d8782c187edef6a57`, including preservation across failed save/retry |
-| embeddedfigures | Original seven-choice line-context matching, engine/scoring 1.1.0 | 6 / 16 | Initial `6a319ba4f761a52d685ac124e32df61bb1cace8e`; recovery follow-up pending |
+| embeddedfigures | Original seven-choice line-context matching, engine/scoring 1.1.0 | 6 / 16 | `373c2907d1af7b2cff8aa86bdb991a5e930c19f5`, including resumed-index completion and final-confirmation retry |
 
 ## Integration changes
 
@@ -36,7 +36,7 @@ dependencies are extracted. The other eight bank tasks are not included.
 Each source team's targeted tests and synthetic component browser evidence are
 retained in its handoff document; they are not replayed as a combined full suite.
 The matrix task records 36 tests, Lineangle 19, Sharegame 19 plus its one new retry
-case, Embeddedfigures 23 initial tests plus its pending recovery evidence. These
+case, Embeddedfigures 23 initial tests plus its author-provided recovery increment. These
 are development evidence, not independent formal release qualification.
 
 New integration checks (four tests) pass for generated frontend/backend exact
@@ -53,8 +53,13 @@ Backend task dependency type checking passes for all four task/schema/scorer
 closures. Whole-backend compilation is not claimed: this environment's stale
 Prisma client lacks current schema fields and the attempted full check produced
 68 diagnostics in ten unchanged modules. No database/client generation was done.
-Frontend combined type checking is deferred until the pending renderer fix is
-integrated to avoid repeating the same component check.
+Frontend combined cognitive type checking passes after the renderer recovery
+increment. Final integration tests (four cases), frontend type checking and
+backend task-closure type checking were run with the already available Node
+24.21.0, matching the package engine requirement. Earlier root checks used the
+environment default Node 24.19.0 and are recorded only as development evidence;
+no formal qualification is inferred from them. Existing source-team suites were
+not replayed.
 
 The matrix user name is 项目矩阵推理试测版（七题范围）. It uses only 3×3 figures and
 three simple rule families; item 009 is mandatory, forms overlap, and no parallel
@@ -67,11 +72,18 @@ themselves establish that every SVG is a MIT-licensed image. Output rights remai
 independently unverified and must stay disclosed; no new permission framework
 or gate has been introduced for the other tasks.
 
-At this checkpoint Embeddedfigures is not a full GO: restoring at a nonzero
-trialIndex and retrying failed final completion are under source-team repair.
+Embeddedfigures recovery fixes from 373c2907 are integrated: completion uses
+the accepted final itemIndex rather than a fresh local count, and failed final
+confirmation has a visible retry action without resubmitting the saved response.
+The parent independent incremental review remains pending at this checkpoint;
+this Draft must not be described as full acceptance.
 No task is installed/published by this PR. HTTP-persisted FINAL, installed four
 entry flows, native devices and formal CI qualification are NOT_RUN. Viewport
 screenshots are not native-device certification. No CI activation, production
 access, Ready conversion, approval, merge or deployment is authorized by these
-local results. The final handoff must replace this pending entry when the new
-source head and review arrive.
+local results. The existing isolated Cognitive-intake scope planner returns NOT_SELECTED /
+shared-or-mixed-input for the full base-to-head diff, which includes old schema/
+scorer paths, direct bank dependencies and shared type additions. This is not a
+content-only or supported selected-browser qualification. No CI route was changed
+to bypass that decision, and no run was activated. Independent review/qualification
+and the missing matrix output-rights record remain explicit review limitations.
