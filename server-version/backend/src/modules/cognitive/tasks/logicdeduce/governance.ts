@@ -7,11 +7,11 @@ export const catalog: CognitiveLibraryCatalogEntry = {
   interactionFamily: 'multi_option_selection',
   rtSensitivity: 'high',
   fineMotorSensitivity: 'low',
-  adminScientificNotes: '多条件逻辑推断范式（ICAR Verbal Reasoning 同族结构）；主要构念为言语关系推理（晶体-流体混合）；题库为内部原创中文题（logicdeduce-zh-v1.0.0），正确性由服务端按题库推导。被试人群变体（儿童/青少年/成人）通过独立 configVersion 承载题库版本与试次数差异，不得改动 scoringVersion 阈值或 presentationVersion 文案。',
+  adminScientificNotes: '项目自编中文四选一条件推断题，描述排序、必要条件、集合关系和有限约束推断的本次表现。V2题池为36题，另有独立练习；体验/标准/科研配置分别18/30/36题。未建立与其他测验的等值关系、常模或信效度证据。',
   knownLimitations: [
     '阅读理解能力是必要的但不是充分的，核心是逻辑推导。',
     '题库有限，重复施测存在练习效应。',
   ],
-  sourceNotes: ['Mind Benders / ICAR 同族范式结构；题目为内部原创并逐题手工验算。'],
+  sourceNotes: ['固定441项目自编候选逐题审计；V2新增12道原创正式题及1道独立练习。未从外部标准化题库复制素材。'],
   rightsProvenance: 'internal-generated',
 }
