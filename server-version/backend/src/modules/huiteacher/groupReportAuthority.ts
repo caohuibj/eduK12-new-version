@@ -41,6 +41,12 @@ export async function teacherScaleLeafContract(source:Source,leaf:ReportingLeafS
   FROM assessment_run_tracks t JOIN huiteacher_evaluation_run_links l ON l.run_id=t.run_id AND l.organization_id=t.organization_id
   WHERE t.organization_id=${source.organizationId} AND t.run_id=${source.runId} AND t.id=${source.trackId}`)
  if(!track)return null
+ if(track.family==='BUNDLE'&&track.key.startsWith('education-composition:TEACHER:')){
+  const {loadSchoolPrivateGroupDisclosure,schoolPrivateGroupLeafDisclosure}=await import('../education-tools/school-private-group-leaf')
+  const exact=await loadSchoolPrivateGroupDisclosure(db,source)
+  if(!exact)hidden()
+  return schoolPrivateGroupLeafDisclosure(exact!,leaf).contract
+ }
  if(teacherNativeGroupTrack(track))return teacherNativeLeafContract(source,track,leaf,db)
  if(track.family!=='SCALE'||leaf.unitType!=='SCALE'||!track.key.endsWith(':GROUP')
   ||!['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix)))return null

@@ -36,7 +36,8 @@ async function source(input:TeacherNumericScope,trackId?:string){
   FROM assessment_run_tracks WHERE organization_id=${input.organizationId} AND run_id=${run.runId} AND id=${trackId}`
  if(!track||canonicalHash(track.policy)!==track.hash)hidden()
  const scale=track.family==='SCALE'&&track.key.endsWith(':GROUP')&&['teacher-scale:','library-scale:'].some(prefix=>track.key.startsWith(prefix))
- if(!scale&&!teacherNativeGroupTrack(track))hidden()
+ const privateComposition=track.family==='BUNDLE'&&track.version==='1.0.0'&&track.key.startsWith('education-composition:TEACHER:')
+ if(!scale&&!privateComposition&&!teacherNativeGroupTrack(track))hidden()
  const entry=await resolveHistoricalRelationalEntry({resourceKind:track.family,resourceKey:track.key,resourceVersion:track.version} as any)
  if(!entry||!isSelfGroupV2Entry(entry)||!entry.resultDisclosure?.audiences.ORGANIZATION.mode.includes('AGGREGATE')
   ||!track.policy.subjectRoles?.every((r:string)=>r==='TEACHER')||!track.policy.respondentRoles?.every((r:string)=>r==='TEACHER')
@@ -65,14 +66,20 @@ export async function listTeacherNumericGroups(input:TeacherNumericScope,options
  const sources:Array<{trackId:string;title:string;tools:Awaited<ReturnType<typeof listAuthoritativeRunLeafSources>>;minimumN:number;canGenerate:boolean;groups:Awaited<ReturnType<typeof listEducationGroupSelections>>}>=[]
  if(options.configure){
  const tracks=await prisma.$queryRaw<Array<{trackId:string;title:string}>>`
-  SELECT t.id AS "trackId",COALESCE(r.entry,n.entry)->>'title' AS title FROM assessment_run_tracks t
+  SELECT t.id AS "trackId",COALESCE(COALESCE(r.entry,n.entry)->>'title',composition.name) AS title FROM assessment_run_tracks t
   LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
   LEFT JOIN education_assessment_deliveries n ON t.resource_key='education-assessment:TEACHER:'||n.organization_id||':'||n.id
     AND n.organization_id=t.organization_id AND n.product='TEACHER' AND t.resource_version='2.0.0'
+  LEFT JOIN composite_assessments composition ON composition.creation_key=t.resource_key
+   AND composition.training_content_snapshot#>>'{educationBinding,origin,entry}'='TEACHER'
+   AND composition.training_content_snapshot#>>'{educationBinding,origin,organizationId}'=t.organization_id
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${run.runId}
     AND ((t.resource_family='SCALE' AND (t.resource_key LIKE 'teacher-scale:%:GROUP' OR t.resource_key LIKE 'library-scale:%:TEACHER:TEACHER:SELF:GROUP'))
      OR (t.resource_family IN ('COGNITIVE','SITUATIONAL','BUNDLE') AND n.entry->'educationOrigin'->>'adapterVersion'='2.0.0'
-      AND n.entry->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE')))
+      AND n.entry->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE'))
+     OR (t.resource_family='BUNDLE' AND t.resource_key LIKE 'education-composition:TEACHER:%' AND t.resource_version='1.0.0'
+      AND t.frozen_resource_policy->'resultDisclosure'->>'policyKey'='EDUCATION_SELF_GROUP_V2'
+      AND t.frozen_resource_policy->'resultDisclosure'->'audiences'->'ORGANIZATION'->>'mode' IN ('AGGREGATE_ONLY','DELAYED_AGGREGATE')))
   ORDER BY t.id`
  for(const track of tracks){
   const valid=await source(input,track.trackId)
@@ -120,13 +127,16 @@ const countsVisible=(payload:ReportingGroupArtifactPayload,minimumN:number)=>{
 export async function assertTeacherNumericDisclosure(input:{organizationId:string;cohort:ReportingCohortSnapshotRecord;leaf:ReportingLeafSourceV2;minimumN:number;payload:ReportingGroupArtifactPayload;metricRules:Array<{metricId:string;sourceMetricKey:string}>},db:Prisma.TransactionClient|typeof prisma=prisma){
  const metrics=disclosedMetrics(input.payload)
  if(!countsVisible(input.payload,input.minimumN)&&!metrics.length)return {comparedArtifacts:0,measurementHash:null}
- const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') AS hash
+ const [measurement]=await db.$queryRaw<Array<{hash:string}>>`SELECT COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash') AS hash
   FROM assessment_run_tracks t LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
   LEFT JOIN scales s ON s.id=r.scale_id LEFT JOIN measurement_content_releases release ON release.id=s.measurement_release_id
   LEFT JOIN education_assessment_deliveries native ON t.resource_key='education-assessment:TEACHER:'||native.organization_id||':'||native.id
    AND native.organization_id=t.organization_id AND native.product='TEACHER' AND t.resource_version='2.0.0'
   LEFT JOIN LATERAL jsonb_array_elements(native.entry->'educationOrigin'->'units') native_unit(value)
    ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=${input.leaf.slotKey}
+  LEFT JOIN composite_assessments composition ON composition.creation_key=t.resource_key AND t.resource_key LIKE 'education-composition:TEACHER:%'
+  LEFT JOIN LATERAL jsonb_array_elements(composition.training_content_snapshot->'units') private_unit(value)
+   ON (CASE private_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(private_unit.value->>'family') END)||':'||(private_unit.value->>'itemId')=${input.leaf.slotKey}
   WHERE t.organization_id=${input.organizationId} AND t.run_id=${input.cohort.sourceRunId} AND t.id=${input.cohort.sourceTrackId}`
  if(!measurement?.hash)return hidden()
  const prior=await db.$queryRaw<Array<{payload:ReportingGroupArtifactPayload;minimumN:number;metricRules:Array<{metricId:string;sourceMetricKey:string}>}>>(Prisma.sql`
@@ -145,10 +155,13 @@ export async function assertTeacherNumericDisclosure(input:{organizationId:strin
    AND native.organization_id=t.organization_id AND native.product='TEACHER' AND t.resource_version='2.0.0'
   LEFT JOIN LATERAL jsonb_array_elements(native.entry->'educationOrigin'->'units') native_unit(value)
    ON (CASE native_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(native_unit.value->>'family') END)||':'||(native_unit.value->>'itemId')=a.artifact_payload->'source'->'leaf'->>'slotKey'
+  LEFT JOIN composite_assessments composition ON composition.creation_key=t.resource_key AND t.resource_key LIKE 'education-composition:TEACHER:%'
+  LEFT JOIN LATERAL jsonb_array_elements(composition.training_content_snapshot->'units') private_unit(value)
+   ON (CASE private_unit.value->>'family' WHEN 'SJT' THEN 'situational' ELSE lower(private_unit.value->>'family') END)||':'||(private_unit.value->>'itemId')=a.artifact_payload->'source'->'leaf'->>'slotKey'
   WHERE a.organization_id=${input.organizationId} AND a.analysis_kind='GROUP'
-    AND (a.artifact_payload->'source'->'leaf' IS NULL OR COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash') IS NULL
+    AND (a.artifact_payload->'source'->'leaf' IS NULL OR COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash') IS NULL
       OR (a.artifact_payload->'source'->'leaf'->>'unitType'=${input.leaf.unitType}
-        AND (COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash')=${measurement.hash} OR a.artifact_payload->'source'->'leaf'->>'instrumentKey'=${input.leaf.instrumentKey})))`)
+        AND (COALESCE(release.content->>'measurementHash',native_unit.value->'measurement'->>'measurementHash',private_unit.value->'measurement'->>'measurementHash')=${measurement.hash} OR a.artifact_payload->'source'->'leaf'->>'instrumentKey'=${input.leaf.instrumentKey})))`)
 
  const currentContributors=contributorUsers(input.payload)!
  for(const old of prior){

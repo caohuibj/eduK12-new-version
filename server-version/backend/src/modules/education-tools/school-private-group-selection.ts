@@ -36,7 +36,7 @@ export function parseSchoolPrivateGroupSelection(raw:unknown,context:{
  sources:ReadonlyArray<SchoolPrivateGroupSourceCeiling>
 }){
  const selected=schoolPrivateGroupSelectionSchema.parse(raw)
- if(context.entry!=='SCHOOL'||context.administration.population!=='STUDENT'||context.administration.responseMode!=='SELF')fail()
+ if(context.administration.population!==(context.entry==='SCHOOL'?'STUDENT':'TEACHER')||context.administration.responseMode!=='SELF')fail()
  const sources=new Map<string,SchoolPrivateGroupSourceCeiling>()
  for(const source of context.sources){
   const key=source.blockId??'standalone'

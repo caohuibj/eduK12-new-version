@@ -26,6 +26,7 @@ import {readLockedEducationLibraryUses,type LockedEducationLibraryUses} from './
 import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
 import {selectedSourceBindingsFromBlocks} from './selected-source-binding'
 import {parseSchoolPrivateGroupSelection} from './school-private-group-selection'
+import {teacherCompositionGroupChoice} from './teacher-composition-group-source'
 import {schoolPrivateScaleGroupChoice} from './school-private-group-source'
 
 export type CompositionLeaf={provider:'LIBRARY_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;library:EducationLibraryLeaf}|{provider:'STANDARD_SCALE';kind:'SCALE';version:Pick<EducationPrivateToolVersion,'id'|'toolId'|'title'|'contentHash'>;definition:ScaleDefinitionV2;standard:EducationStandardLeaf}|({provider:'PRIVATE_VERSION';version:EducationPrivateToolVersion}&(
@@ -162,7 +163,10 @@ export async function compilePrivateComposition(tx:Prisma.TransactionClient,c:Pr
  if(definition.groupReporting){
   const sources=definition.blocks.flatMap(block=>{
    const leaf=leaves.get(compositionLeafKey(block.source))!
-   const choice=leaf.provider==='PRIVATE_VERSION'&&leaf.kind==='SCALE'?schoolPrivateScaleGroupChoice(leaf.version,leaf.definition):null
+   const choice=c.entry==='TEACHER'?teacherCompositionGroupChoice(leaf.version,{provider:leaf.provider,kind:leaf.kind,
+    metricKeys:leaf.kind==='SCALE'?leaf.definition.scoring.scores.map(score=>score.key):leaf.kind==='COGNITIVE'||leaf.kind==='SJT'?leaf.native.measurement.content.metrics.map(metric=>metric.metricKey):[],
+    license:leaf.provider==='PRIVATE_VERSION'&&leaf.kind==='SCALE'?leaf.definition.license:null}):
+    leaf.provider==='PRIVATE_VERSION'&&leaf.kind==='SCALE'?schoolPrivateScaleGroupChoice(leaf.version,leaf.definition):null
    return choice?[{...choice,blockId:block.blockId}]:[]
   })
   parseSchoolPrivateGroupSelection(definition.groupReporting,{entry:c.entry,administration:definition.administration,sources})

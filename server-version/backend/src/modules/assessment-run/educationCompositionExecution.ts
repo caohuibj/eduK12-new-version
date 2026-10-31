@@ -46,7 +46,7 @@ export async function readFrozenCompositionIdentity(tx:Tx,input:{policy:RunResou
  const policy=input.policy,binding=educationCompositionPolicyBindingSchema.parse(policy.educationComposition),origin=binding.origin
  if(origin.variantKey==='TEACHER:EXPERT_REPORT')privateToolFail('PRIVATE_COMPOSITION_FIELD_INVITATION_REQUIRED',400)
  const variant=educationCompositionVariant(origin)
- const group=origin.entry==='SCHOOL'&&origin.variantKey==='STUDENT:SELF'&&policy.analysisMode==='COHORT_AGGREGATE'
+ const group=origin.variantKey===(origin.entry==='SCHOOL'?'STUDENT:SELF':'TEACHER:SELF')&&policy.analysisMode==='COHORT_AGGREGATE'
   &&policy.resultDisclosure?.policyKey==='EDUCATION_SELF_GROUP_V2'
  if(input.version!=='1.0.0'||policy.version!==input.version||policy.family!=='BUNDLE'||policy.key!==input.key
   ||educationCompositionKey(origin)!==input.key||origin.organizationId!==input.organizationId||canonicalHash(policy)!==input.policyHash
