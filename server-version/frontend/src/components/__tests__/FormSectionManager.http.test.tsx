@@ -49,7 +49,7 @@ beforeAll(async () => {
     if (req.method === 'GET' && url.pathname.startsWith(`/api${basePath}`)) {
       if (suffix === failedSuffix) { status = 503; body = { code: 503, message: '合成暂时不可用', data: null } }
       else if (suffix === '') body = envelope(metadata)
-      else if (suffix === '/form-sections') body = envelope({ list: sections })
+      else if (suffix === '/form-sections') body = envelope({ list: sections, ...(url.searchParams.get('include') === 'units' ? { units: sections.map(section => ({ type: 'form-section', id: section.id, label: section.title, position: section.position, itemCount: section.items.length, contextSection: section.contextSection })) } : {}) })
       else if (suffix === '/form-items') body = envelope({ list: sections.flatMap(section => section.items) })
       else if (suffix === '/content') {
         const units = sections.map(section => ({ type: 'form-section', id: section.id, label: section.title, position: section.position, itemCount: section.items.length, contextSection: section.contextSection }))
@@ -121,7 +121,7 @@ describe('canonical section field source over synthetic HTTP', () => {
     expect(within(target()).getByRole('option', { name: field1 })).toBeInTheDocument()
     expect(within(target()).queryByRole('option', { name: field2 })).toBeNull()
     expect(within(target()).queryByRole('option', { name: '背景字段' })).toBeNull()
-    expect(requests.map(r => r.path)).toEqual([`/api${path}/form-sections`, `/api${path}/content${path.startsWith('/composite') ? '' : '?projection=units'}`])
+    expect(requests.map(r => r.path)).toEqual(path.startsWith('/composite') ? [`/api${path}/form-sections`, `/api${path}/content`] : [`/api${path}/form-sections?include=units`])
     record(path, started, cpu)
   })
 
@@ -149,12 +149,12 @@ describe('canonical section field source over synthetic HTTP', () => {
     basePath = path; sections = fixture(path.startsWith('/composite'))
     render(<FormSectionManager basePath={path} />)
     await ready()
-    expect(requests.map(r => r.path)).toEqual([`/api${path}/form-sections`, `/api${path}/content${path.startsWith('/composite') ? '' : '?projection=units'}`])
+    expect(requests.map(r => r.path)).toEqual(path.startsWith('/composite') ? [`/api${path}/form-sections`, `/api${path}/content`] : [`/api${path}/form-sections?include=units`])
     await userEvent.selectOptions(target(), 'field-1-0')
     await waitFor(() => expect(within(target()).queryByRole('option', { name: field1 })).toBeNull())
     expect(within(screen.getByRole('combobox', { name: '向分区1添加字段' })).getByRole('option', { name: field1 })).toBeInTheDocument()
     expect(requests.filter(r => r.method === 'POST').map(r => r.path)).toEqual([`/api${path}/form-sections/section-2/items/field-1-0`])
-    expect(requests.filter(r => r.method === 'GET')).toHaveLength(4)
+    expect(requests.filter(r => r.method === 'GET')).toHaveLength(basePath.startsWith('/composite') ? 4 : 2)
     expect(requests.some(r => r.path.endsWith('/form-items'))).toBe(false)
   })
 
@@ -164,7 +164,7 @@ describe('canonical section field source over synthetic HTTP', () => {
     sections[1].items.push({ id: 'new-field', label: '新增字段', contextKey: null, position: 99 })
     view.rerender(<FormSectionManager basePath={basePath} refreshKey={1} />)
     expect(await within(await ready()).findByRole('option', { name: '新增字段' })).toBeInTheDocument()
-    expect(requests.filter(r => r.method === 'GET')).toHaveLength(4)
+    expect(requests.filter(r => r.method === 'GET')).toHaveLength(basePath.startsWith('/composite') ? 4 : 2)
   })
 
   it('derives membership when nested field DTOs omit their enclosing section IDs', async () => {
@@ -177,15 +177,16 @@ describe('canonical section field source over synthetic HTTP', () => {
     expect(within(target()).getByRole('option', { name: field1 })).toBeInTheDocument()
     expect(within(target()).queryByRole('option', { name: field2 })).toBeNull()
     expect(within(target()).queryByRole('option', { name: '背景字段' })).toBeNull()
-    expect(requests).toHaveLength(2)
+    expect(requests).toHaveLength(basePath.startsWith('/composite') ? 2 : 1)
   })
 
   it.each(['/form-sections', '/content'])('keeps a failed %s distinguishable from an empty section list', async suffix => {
     failedSuffix = suffix
+    if (suffix === '/content') { basePath = basePaths[2]; sections = fixture(true) }
     render(<FormSectionManager basePath={basePath} />)
     expect(await screen.findByRole('alert')).toHaveTextContent('服务暂时不可用，请稍后重试。')
     expect(screen.queryByRole('combobox')).toBeNull()
-    expect(requests).toHaveLength(2)
+    expect(requests).toHaveLength(basePath.startsWith('/composite') ? 2 : 1)
   })
 
   it('keeps published/read-only section management non-mutating', async () => {

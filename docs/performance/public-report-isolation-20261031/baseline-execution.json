@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx",
+    "--maxWorkers=1",
+    "--testNamePattern=old report success",
+    "--reporter=json",
+    "--outputFile=/workspace/dot-cloud-public-report-20261031/docs/performance/public-report-isolation-20261031/baseline.json"
+  ],
+  "startedAt": "2026-10-31T09:51:25.128483+00:00",
+  "endedAt": "2026-10-31T09:51:26.712961+00:00",
+  "seconds": 1.5844820449997314,
+  "exitCode": 1,
+  "base": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+  "inputs": {
+    "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": "3326caa0044ae396979214cf1bf5ff3b1b89711e2c63e6861002591f401cf43a",
+    "server-version/frontend/src/pages/public/__tests__/PublicQuestionnaireResult.race.test.tsx": "2228c8fe2a65ddbbedf954ada833f6c36678a2e242ac10f8dc6734a80bdc66a3",
+    "server-version/frontend/src/api/publicCapabilityClient.ts": "a9dee09e8dc48849a2cbd93be2092be929b8f25a27172a77ad649059c5e63c34",
+    "server-version/frontend/src/utils/questionnaireResume.ts": "eec19f1cda2ccfb00d5249e4f1cae4e43e10ec9e22fb1cacaf3e98d473d18c53",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  }
+}

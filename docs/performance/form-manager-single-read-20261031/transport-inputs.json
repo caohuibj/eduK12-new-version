@@ -1,0 +1,11 @@
+{
+  "axiosRealpath": "/workspace/scratch/5a77e8bdc1ae/dot-main-review-perf-20261030/server-version/frontend/node_modules/axios",
+  "sha256": {
+    "package.json": "cc221510be6315b0ebf648d7e4346680e47a828fafcbb9cc141922d2d219761e",
+    "lib/adapters/adapters.js": "2d3df49937264cb77ddfae5121bfb15f606b6b8d74582da4691bca983fc81a5d",
+    "lib/adapters/fetch.js": "017c61b81b549c1e8ced539306df7495f41a433b3178a03d9e0771eef1eb2c9a",
+    "lib/adapters/http.js": "e4382f442f2165ded2c29ad23dedd47d98fb82419b688609638816778974a76b",
+    "index.d.ts": "2368a31d44ccc59758e3b3c682fee74e820b08fad98623905a85092018c06e3b"
+  },
+  "transport": "fixture forces fetch; follow-redirects absence from module load graph not recorded"
+}

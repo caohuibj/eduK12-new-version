@@ -6,6 +6,9 @@ on:
       survey_selection:
         type: boolean
         default: false
+      affected_only:
+        type: boolean
+        default: false
       runner_labels:
         type: string
         required: true
@@ -27,11 +30,14 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       NODE_OPTIONS: --max-old-space-size=3072
       TZ: UTC
+      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
     defaults:
       run:
         working-directory: server-version/frontend
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -57,16 +63,25 @@ jobs:
           npm ci --ignore-scripts
           npx prisma generate
       - name: lint
-        if: inputs.survey_selection != true
+        if: inputs.survey_selection != true && inputs.affected_only != true
         run: npm run lint
+      - name: lint changed local page surfaces
+        if: inputs.affected_only
+        run: |
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          const files=execFileSync('git',['diff','--name-only','-z','--no-renames',process.env.CI_BASE_SHA,'HEAD'],{encoding:'utf8'}).split('\0').filter(file=>/^server-version\/frontend\/src\/.*\.tsx?$/.test(file)).map(file=>file.slice('server-version/frontend/'.length));
+          if(!files.length)throw Error('No changed frontend source to lint');
+          execFileSync('npm',['exec','--','eslint',...files],{stdio:'inherit'});
+          JS
       - name: lint changed Wave integration surfaces
         if: inputs.survey_selection
         run: npx eslint src/survey/SurveyWaveContentSelection.tsx src/survey/SurveyWaveContentSelection.test.tsx src/survey/SurveyWaveStudio.tsx src/survey/SurveyWaveStudio.content.test.tsx src/survey/SurveyWaveStudio.feedback.test.tsx
       - name: typecheck
-        if: inputs.survey_selection != true
+        if: inputs.survey_selection != true && inputs.affected_only != true
         run: npm run typecheck
       - name: integrated application types without duplicate cognitive subset
-        if: inputs.survey_selection
+        if: inputs.survey_selection || inputs.affected_only
         run: |
           npm run pretypecheck
           npx tsc -p tsconfig.app.json --noEmit
@@ -84,8 +99,17 @@ jobs:
           done
           exit 1
       - name: full frontend tests
-        if: inputs.survey_selection != true
+        if: inputs.survey_selection != true && inputs.affected_only != true
         run: npm test
+      - name: dependency-related frontend tests
+        if: inputs.affected_only
+        run: |
+          npm test -- --changed "$CI_BASE_SHA" --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/frontend-affected.json"
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          const report=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/frontend-affected.json','utf8'));
+          if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
+          JS
       - name: affected Wave selector and direct consumers
         if: inputs.survey_selection
         run: |

@@ -79,11 +79,21 @@ export function classify(changes,read){
  }
  return {route:reasons.length?'C':kinds.has('B')?'B':'A',reasons,surfaces:[...surfaces].sort()};
 }
-// Tooling-only C is not an application release. Its exact diff must leave both
-// component trees unchanged; unknown files/modes and mixed app changes escalate.
+// Passive engineering records do not change an application consumer. Executable
+// fixtures and scientific/publication inputs retain their existing routes.
+export function engineeringEvidenceFile(file) {
+ return typeof file==='string' && !/[\\\x00-\x1f\x7f]/.test(file)
+  && file.split('/').every(p=>p&&p!=='.'&&p!=='..')
+  && /^docs\/(?:development|performance|evidence)\/[a-zA-Z0-9_./-]+\.(?:md|json|json\.gz|txt|log|exit)$/.test(file);
+}
+export const backendTestFile=file=>typeof file==='string'&&/^server-version\/backend\/src\/__tests__\/[a-zA-Z0-9_/-]+(?:\.[a-zA-Z0-9_-]+)*\.test\.ts$/.test(file)&&file.split('/').every(p=>p&&p!=='.'&&p!=='..');
+// Tooling-only C is not an application release. Registered development tools
+// may travel with their changed tests; runtime source and unknown modes escalate.
 const selectedCognitiveControlFiles=new Set(cognitiveIntakeToolingInputs.filter(file=>file.startsWith('server-version/backend/')));
 const selectedScaleControlFiles=new Set(['server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
 const releaseToolFiles=new Set([
+ '.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs',
+ 'docs/development/ci-gate-cleanup-20261031.md',
  ".github/scripts/school-teacher-native.mjs", ".github/scripts/school-teacher-native.test.mjs",
  "docs/performance/codeql-analysis-20261030.md",
  ...cognitiveIntakeToolingInputs,
@@ -103,18 +113,19 @@ const releaseToolFiles=new Set([
  'docs/development/scale-intake-ci-20261029.md',
  'server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/renew-school.sh',
  '.github/PULL_REQUEST_TEMPLATE.md','.github/release-tools/package.json','.github/release-tools/package-lock.json',
- '.github/workflows/ci.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',
+ '.github/workflows/ci.yml','.github/workflows/ci-frontend.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/merge-gate.mjs',
  '.github/scripts/local-validation.mjs','.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs',
  '.gitignore','AGENTS.md','docs/ci-runner-policy.md','docs/release/README.md','docs/release/audit-20261009.md','docs/release/validation-20261009.md',
  'server-version/docs/release-candidate-checklist-v1.md','server-version/docs/release-verify-local.md',
  ...['ingress.py','test_ingress.py','policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh'].map(f=>'server-version/scripts/release/'+f),
 ]);
-export function toolingOnly(entries){return entries.length>0&&entries.every(e=>releaseToolFiles.has(e.file)&&e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644')));}
+export function toolingOnly(entries){return entries.some(e=>releaseToolFiles.has(e.file))&&entries.every(e=>(releaseToolFiles.has(e.file)||engineeringEvidenceFile(e.file)||backendTestFile(e.file))&&e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644')));}
 export function componentFingerprint(sha,component){
  const roots=component==='frontend'?[front]:['server-version/backend/'];
  const files=git('ls-tree','-r',sha,'--',...roots).trim().split('\n').filter(Boolean);
- return hash(files.filter(row=>!selectedScaleControlFiles.has(row.split('\t')[1])&&!selectedCognitiveControlFiles.has(row.split('\t')[1])).join('\n'));
+ // backend tsconfig excludes src/__tests__; these files do not enter dist.
+ return hash(files.filter(row=>{const file=row.split('\t')[1];return !selectedScaleControlFiles.has(file)&&!selectedCognitiveControlFiles.has(file)&&!backendTestFile(file)}).join('\n'));
 }
 function toolFingerprint(sha,files){try{return hash(files.map(f=>`${f}\0${readAt(sha,f)}`).join('\0'));}catch{return null;}}
 export function plan(base,head){
