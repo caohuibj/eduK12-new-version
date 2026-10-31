@@ -1,3 +1,4 @@
+vi.hoisted(() => { process.env.COGNITIVE_MODULE_ENABLED = 'true' })
 import { beforeAll, describe, expect, it } from 'vitest'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'

@@ -186,6 +186,11 @@ describe('catalog single-source-of-truth boundaries', () => {
         expect(fs.readFileSync(file, 'utf8').match(/from\s+['"][^'"]*cognitive\/library[^'"]*/g))
           .toEqual(["from '../cognitive/library/product-readiness"]); return false
       }
+      if (file === path.join(SRC_DIR, 'src/modules/survey/catalog-discovery.ts')) {
+        // Management-only discovery projection (doc comment in the file); never in snapshot/hash paths.
+        expect(fs.readFileSync(file, 'utf8').match(/from\s+['"][^'"]*cognitive\/library[^'"]*/g))
+          .toEqual(["from '../cognitive/library/catalog"]); return false
+      }
       const content = fs.readFileSync(file, 'utf8')
       return /from\s+['"][^'"]*cognitive\/library/.test(content)
     })
