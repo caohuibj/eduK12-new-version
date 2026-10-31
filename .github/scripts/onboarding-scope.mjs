@@ -71,7 +71,7 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
  const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
  const number=String(env.CI_PR_NUMBER);
  const candidates=b.candidates;
- for(const id of ['448','444','393','395','task1','choice-page','404','408','414','415','418','419','420','421','422','423','424','426','432','434','435','436','437','439','442','428','429','430','438','443','446']){const candidate=candidates?.[id];
+ for(const id of ['448','444','393','395','task1','choice-page','404','408','414','415','418','419','420','421','422','423','424','426','432','434','435','436','437','439','442','428','429','430','438','443','446','449','445']){const candidate=candidates?.[id];
  if(candidate&&(number===id||ref===BRANCHES[id]||(env.CI_EVENT==='push'&&base===candidate.base)))b=candidate;}
  const branch=BRANCHES[String(b.pr)];
  if(!Object.values(BRANCHES).includes(ref)&&!Object.hasOwn(BRANCHES,number)&&!entries.some(e=>e.file===MARKER))return null;
@@ -117,8 +117,8 @@ export function onboardingPlan(entries,base,head,read=git,env=process.env,b=bind
  }
  for(const path of controls.filter(path=>path!==MARKER&&!changedControls.includes(path)))assert.equal(read('ls-tree',head,'--',path),read('ls-tree',b.controlCheckpoint,'--',path));
  assert.deepEqual(Object.keys(b.components).sort(),['backend','frontend']);
- if([378,380,381,395,415,420,442,449].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/backend'),read('rev-parse',base+':server-version/backend'),'Frontend loading must not change backend');
- if(![372,374,376,378,380,381,395,404,408,414,415,418,420,423,426,432,434,435,436,437,444,439,442,'task1','choice-page',428,429,438,443,446,449].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/frontend'),read('rev-parse',base+':server-version/frontend'),'No frontend change in backend onboarding route');
+ if([378,380,381,395,415,420,442,449,445].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/backend'),read('rev-parse',base+':server-version/backend'),'Frontend loading must not change backend');
+ if(![372,374,376,378,380,381,395,404,408,414,415,418,420,423,426,432,434,435,436,437,444,439,442,'task1','choice-page',428,429,438,443,446,449,445].includes(b.pr))assert.equal(read('rev-parse',head+':server-version/frontend'),read('rev-parse',base+':server-version/frontend'),'No frontend change in backend onboarding route');
  for(const [component,tree]of Object.entries(b.components)){
   sha(tree);assert.equal(read('rev-parse',head+':server-version/'+component),tree);
   assert.equal(object(b.product,':server-version/'+component),tree);
