@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "embeddedfigures",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Original synthetic line contexts; expected counts/ratios hand specified; target ids regenerated from fixed seed. No original test material.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "embeddedfigures-zh-v1.1.0",
+          "showTargetMs": 3000,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 400,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemIndex": 0,
+              "clickedShapeId": "s3",
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemIndex": 1,
+              "clickedShapeId": "s3",
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemIndex": 2,
+              "clickedShapeId": "s4",
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemIndex": 3,
+              "clickedShapeId": "s3",
+              "rtMs": 900,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianRtMs": 900,
+          "errorCount": 0,
+          "timeoutCount": 0,
+          "validRtCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "wrong-zero-rt",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "embeddedfigures-zh-v1.1.0",
+          "showTargetMs": 3000,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 400,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemIndex": 0,
+              "clickedShapeId": "s0",
+              "rtMs": 0,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemIndex": 1,
+              "clickedShapeId": "s0",
+              "rtMs": 0,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemIndex": 2,
+              "clickedShapeId": "s0",
+              "rtMs": 0,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemIndex": 3,
+              "clickedShapeId": "s0",
+              "rtMs": 0,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "accuracy": 0,
+          "medianRtMs": null,
+          "errorCount": 4,
+          "timeoutCount": 0,
+          "validRtCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": true,
+          "lowAccuracy": true,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "timeout-null",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "embeddedfigures-zh-v1.1.0",
+          "showTargetMs": 3000,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 400,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemIndex": 0,
+              "clickedShapeId": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemIndex": 1,
+              "clickedShapeId": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemIndex": 2,
+              "clickedShapeId": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemIndex": 3,
+              "clickedShapeId": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "accuracy": 0,
+          "medianRtMs": null,
+          "errorCount": 0,
+          "timeoutCount": 4,
+          "validRtCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": true,
+          "lowAccuracy": true,
+          "interrupted": false
+        }
+      }
+    }
+  ]
+}
