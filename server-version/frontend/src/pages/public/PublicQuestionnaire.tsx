@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
 import { completePOW } from '../../utils/powService'
@@ -18,8 +18,14 @@ const PublicQuestionnaire: React.FC = () => {
   const [questionnaire, setQuestionnaire] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const startInFlight = useRef(false)
+  const entryEpoch = useRef(0)
 
   useEffect(() => {
+    entryEpoch.current += 1
+    startInFlight.current = false
+    setPowLoading(false)
+    setActionError(null)
     let cancelled = false
     const load = async () => {
       setLoading(true)
@@ -51,17 +57,21 @@ const PublicQuestionnaire: React.FC = () => {
       }
     }
     void load()
-    return () => { cancelled = true }
+    return () => { cancelled = true; entryEpoch.current += 1 }
   }, [token, navigate])
 
   const startAssessment = async () => {
+    if (startInFlight.current) return
+    startInFlight.current = true
+    const epoch = entryEpoch.current
+    const current = () => epoch === entryEpoch.current
     try {
       setPowLoading(true)
       setActionError(null)
 
       // 1. POW 验证（防止机器人）
       const powResult = await completePOW()
-      setPowLoading(false)
+      if (!current()) return
 
       // 2. 开始测评
       const sessionId = readQuestionnaireSessionId(token)
@@ -76,8 +86,11 @@ const PublicQuestionnaire: React.FC = () => {
         saveQuestionnaireResumeToken(token, data.data.sessionId, data.data.resumeToken)
       }
 
+      if (!current()) return
       window.location.href = `/public/questionnaire/${token}/assessment?sessionId=${data.data.sessionId}`
     } catch (err) {
+      if (!current()) return
+      startInFlight.current = false
       setPowLoading(false)
       setActionError(err instanceof Error ? err.message : '开始测评失败')
     }

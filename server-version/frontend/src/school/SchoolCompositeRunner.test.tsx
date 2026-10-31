@@ -1,5 +1,5 @@
 import {describe,expect,it,vi} from 'vitest'
-import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import type {SchoolApi} from './SchoolRecovery'
 
 const m=vi.hoisted(()=>({entry:vi.fn(),cognitive:vi.fn(),presentation:vi.fn()}))
@@ -23,6 +23,23 @@ vi.mock('../modules/cognitive/pages/CognitiveRunner',()=>({
 }))
 vi.mock('../modules/situational/pages/SituationalRunner',()=>({default:()=>null}))
 import {SchoolCompositeRunner} from './SchoolCompositeRunner'
+
+it.each([false,true])('keeps consent continuation within the mounted execution (leave=%s)',async leave=>{
+ let accept!:()=>void
+ const pending=new Promise<void>(resolve=>{accept=resolve})
+ const api=vi.fn(async(path:string)=>{
+  if(path.endsWith('/consent/accept'))return pending
+  if(path.endsWith('/start'))return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}
+  return {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'}
+ })
+ const ui=render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={{organizationId:'synthetic-school',courseId:'synthetic-course',runId:'synthetic-run',executionId:'synthetic-execution',consentRequired:true}} onExit={vi.fn()} onFinished={vi.fn()}/>)
+ fireEvent.click(screen.getByRole('checkbox'))
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await waitFor(()=>expect(api).toHaveBeenCalledTimes(1))
+ if(leave)ui.unmount()
+ await act(async()=>{accept()})
+ expect(api.mock.calls.filter(([path])=>path.endsWith('/start'))).toHaveLength(leave?0:1)
+})
 
 const execution={organizationId:'school-a',courseId:'campus-act-1',runId:'run-1',
   executionId:'execution-1'}
