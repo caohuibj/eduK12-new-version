@@ -1,0 +1,1002 @@
+[91merror[0m[90m TS2468: [0mCannot find global value 'Promise'.
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m2[0m:[93m38[0m - [91merror[0m[90m TS6142: [0mModule '../modules/reporting/GroupLongitudinalPanel' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/modules/reporting/GroupLongitudinalPanel.tsx', but '--jsx' is not set.
+
+[7m2[0m import {GroupLongitudinalPanel} from '../modules/reporting/GroupLongitudinalPanel'
+[7m [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m16[0m:[93m38[0m - [91merror[0m[90m TS2585: [0m'Promise' only refers to a type, but is being used as a value here. Do you need to change your target library? Try changing the 'lib' compiler option to es2015 or later.
+
+[7m16[0m   if(method==='POST'&&!specId)return Promise.reject(new Error('请先选择已有的已发布群体报告方案'))
+[7m  [0m [91m                                     ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m17[0m:[93m61[0m - [91merror[0m[90m TS2585: [0m'Promise' only refers to a type, but is being used as a value here. Do you need to change your target library? Try changing the 'lib' compiler option to es2015 or later.
+
+[7m17[0m   if(method==='POST'&&dimension!=='ALL'&&!ids.length)return Promise.reject(new Error('请选择报告人群'))
+[7m  [0m [91m                                                            ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m20[0m:[93m18[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m20[0m  if(!open)return <button type="button" onClick={()=>setOpen(true)}>查看群体纵向报告</button>
+[7m  [0m [91m                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m21[0m:[93m70[0m - [91merror[0m[90m TS2583: [0mCannot find name 'Map'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m21[0m  const choices=configuration?.groups?.options??[],dimensions=[...new Map(choices.filter(c=>c.kind==='LABELS').map(c=>[c.dimensionId!,c.dimensionName!]))]
+[7m  [0m [91m                                                                     ~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m23[0m:[93m17[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m23[0m  async function configure(){
+[7m  [0m [91m                ~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m29[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m29[0m  return <section aria-label="教师群体纵向报告"><h3>教师群体纵向报告</h3>
+[7m  [0m [91m        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m29[0m:[93m40[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m29[0m  return <section aria-label="教师群体纵向报告"><h3>教师群体纵向报告</h3>
+[7m  [0m [91m                                       ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m30[0m:[93m3[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m30[0m   <p>只使用正式冻结的追踪计划。各轮分别统计当时人群，不把均值差解释为同一人的平均改变。</p>
+[7m  [0m [91m  ~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m31[0m:[93m3[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m31[0m   <button type="button" disabled={busy} onClick={()=>void configure()}>配置纵向群报方案与人群</button>
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m32[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m32[0m   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在读取群报配置…</p>}
+[7m  [0m [91m          ~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m32[0m:[93m46[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m32[0m   {error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在读取群报配置…</p>}
+[7m  [0m [91m                                             ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m33[0m:[93m46[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m33[0m   {configuration?.status==='NOT_CONFIGURED'&&<p>此任务没有正式冻结的 longitudinal 计划。</p>}
+[7m  [0m [91m                                             ~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m34[0m:[93m42[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m34[0m   {configuration?.status==='CONFIGURED'&&<>
+[7m  [0m [91m                                         ~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m35[0m:[93m4[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m35[0m    <label>纵向群报方案<select aria-label="纵向群报方案" disabled={busy} value={specId} onChange={e=>setSpecId(e.target.value)}><option value="">选择已发布方案</option>{configuration.specs?.map(s=><option key={s.specId} value={s.specId}>{s.title}</option>)}</select></label>
+[7m  [0m [91m   ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m35[0m:[93m17[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m35[0m    <label>纵向群报方案<select aria-label="纵向群报方案" disabled={busy} value={specId} onChange={e=>setSpecId(e.target.value)}><option value="">选择已发布方案</option>{configuration.specs?.map(s=><option key={s.specId} value={s.specId}>{s.title}</option>)}</select></label>
+[7m  [0m [91m                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m35[0m:[93m116[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m35[0m    <label>纵向群报方案<select aria-label="纵向群报方案" disabled={busy} value={specId} onChange={e=>setSpecId(e.target.value)}><option value="">选择已发布方案</option>{configuration.specs?.map(s=><option key={s.specId} value={s.specId}>{s.title}</option>)}</select></label>
+[7m  [0m [91m                                                                                                                   ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m35[0m:[93m178[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m35[0m    <label>纵向群报方案<select aria-label="纵向群报方案" disabled={busy} value={specId} onChange={e=>setSpecId(e.target.value)}><option value="">选择已发布方案</option>{configuration.specs?.map(s=><option key={s.specId} value={s.specId}>{s.title}</option>)}</select></label>
+[7m  [0m [91m                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m36[0m:[93m4[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m36[0m    <label>纵向报告人群<select aria-label="纵向报告人群" disabled={busy} value={dimension} onChange={e=>{setDimension(e.target.value);setIds([])}}><option value="ALL">全部合格参与教师</option>{choices.some(c=>c.kind==='CLASSES')&&<option value="CLASSES">任教班级</option>}{dimensions.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
+[7m  [0m [91m   ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m36[0m:[93m17[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m36[0m    <label>纵向报告人群<select aria-label="纵向报告人群" disabled={busy} value={dimension} onChange={e=>{setDimension(e.target.value);setIds([])}}><option value="ALL">全部合格参与教师</option>{choices.some(c=>c.kind==='CLASSES')&&<option value="CLASSES">任教班级</option>}{dimensions.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
+[7m  [0m [91m                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m36[0m:[93m135[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m36[0m    <label>纵向报告人群<select aria-label="纵向报告人群" disabled={busy} value={dimension} onChange={e=>{setDimension(e.target.value);setIds([])}}><option value="ALL">全部合格参与教师</option>{choices.some(c=>c.kind==='CLASSES')&&<option value="CLASSES">任教班级</option>}{dimensions.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
+[7m  [0m [91m                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m36[0m:[93m210[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m36[0m    <label>纵向报告人群<select aria-label="纵向报告人群" disabled={busy} value={dimension} onChange={e=>{setDimension(e.target.value);setIds([])}}><option value="ALL">全部合格参与教师</option>{choices.some(c=>c.kind==='CLASSES')&&<option value="CLASSES">任教班级</option>}{dimensions.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
+[7m  [0m [91m                                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m36[0m:[93m277[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m36[0m    <label>纵向报告人群<select aria-label="纵向报告人群" disabled={busy} value={dimension} onChange={e=>{setDimension(e.target.value);setIds([])}}><option value="ALL">全部合格参与教师</option>{choices.some(c=>c.kind==='CLASSES')&&<option value="CLASSES">任教班级</option>}{dimensions.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
+[7m  [0m [91m                                                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m37[0m:[93m39[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m37[0m    {dimension!=='ALL'&&options.map(c=><label key={c.id}><input type="checkbox" checked={ids.includes(c.id)} disabled={busy} onChange={e=>setIds(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{c.name}</label>)}
+[7m  [0m [91m                                      ~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m37[0m:[93m57[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m37[0m    {dimension!=='ALL'&&options.map(c=><label key={c.id}><input type="checkbox" checked={ids.includes(c.id)} disabled={busy} onChange={e=>setIds(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{c.name}</label>)}
+[7m  [0m [91m                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m37[0m:[93m93[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m37[0m    {dimension!=='ALL'&&options.map(c=><label key={c.id}><input type="checkbox" checked={ids.includes(c.id)} disabled={busy} onChange={e=>setIds(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{c.name}</label>)}
+[7m  [0m [91m                                                                                            ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m38[0m:[93m49[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m38[0m    {configuration.groups?.limitations.map(text=><p key={text}>{text}</p>)}
+[7m  [0m [91m                                                ~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx[0m:[93m40[0m:[93m3[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m40[0m   <GroupLongitudinalPanel key={endpoint} base={endpoint} request={request}/>
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m1[0m:[93m40[0m - [91merror[0m[90m TS6142: [0mModule './TeacherGroupLongitudinal' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx', but '--jsx' is not set.
+
+[7m1[0m import {TeacherGroupLongitudinal} from './TeacherGroupLongitudinal'
+[7m [0m [91m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m2[0m:[93m42[0m - [91merror[0m[90m TS6142: [0mModule './TeacherNumericGroupReports' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx', but '--jsx' is not set.
+
+[7m2[0m import {TeacherNumericGroupReports} from './TeacherNumericGroupReports'
+[7m [0m [91m                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m3[0m:[93m40[0m - [91merror[0m[90m TS6142: [0mModule './TeacherFormGroupVersions' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx', but '--jsx' is not set.
+
+[7m3[0m import {TeacherFormGroupVersions} from './TeacherFormGroupVersions'
+[7m [0m [91m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m4[0m:[93m70[0m - [91merror[0m[90m TS6142: [0mModule './TeacherFormGroupReport' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/TeacherFormGroupReport.tsx', but '--jsx' is not set.
+
+[7m4[0m import {TeacherFormGroupReport,type TeacherFormGroupProjection} from './TeacherFormGroupReport'
+[7m [0m [91m                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m5[0m:[93m58[0m - [91merror[0m[90m TS6142: [0mModule './TeacherPersonalTracking' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/TeacherPersonalTracking.tsx', but '--jsx' is not set.
+
+[7m5[0m import {TeacherTrackingPublish,TeacherTrackingNext} from './TeacherPersonalTracking'
+[7m [0m [91m                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m6[0m:[93m48[0m - [91merror[0m[90m TS6142: [0mModule '../school/SchoolTaskHelp' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/school/SchoolTaskHelp.tsx', but '--jsx' is not set.
+
+[7m6[0m import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
+[7m [0m [91m                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m7[0m:[93m35[0m - [91merror[0m[90m TS6142: [0mModule '../modules/assessment-core/composition/SelectedToolOutline' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/modules/assessment-core/composition/SelectedToolOutline.tsx', but '--jsx' is not set.
+
+[7m7[0m import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m8[0m:[93m43[0m - [91merror[0m[90m TS6142: [0mModule '../components/education-tools/EducationPrivateScalePicker' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx', but '--jsx' is not set.
+
+[7m8[0m import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
+[7m [0m [91m                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m9[0m:[93m45[0m - [91merror[0m[90m TS6142: [0mModule '../components/education-tools/EducationCompositionRunPicker' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/components/education-tools/EducationCompositionRunPicker.tsx', but '--jsx' is not set.
+
+[7m9[0m import {EducationCompositionRunPicker} from '../components/education-tools/EducationCompositionRunPicker'
+[7m [0m [91m                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m10[0m:[93m49[0m - [91merror[0m[90m TS6142: [0mModule '../components/education-tools/EducationAssessmentResourcePicker' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/components/education-tools/EducationAssessmentResourcePicker.tsx', but '--jsx' is not set.
+
+[7m10[0m import {EducationAssessmentResourcePicker} from '../components/education-tools/EducationAssessmentResourcePicker'
+[7m  [0m [91m                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m12[0m:[93m39[0m - [91merror[0m[90m TS6142: [0mModule './HuiteacherGrowthManager' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/HuiteacherGrowthManager.tsx', but '--jsx' is not set.
+
+[7m12[0m import {HuiteacherGrowthManager} from './HuiteacherGrowthManager'
+[7m  [0m [91m                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m14[0m:[93m40[0m - [91merror[0m[90m TS6142: [0mModule './HuiteacherFieldManager' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/HuiteacherFieldManager.tsx', but '--jsx' is not set.
+
+[7m14[0m import { HuiteacherFieldManager } from './HuiteacherFieldManager'
+[7m  [0m [91m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m15[0m:[93m52[0m - [91merror[0m[90m TS6142: [0mModule './HuiteacherStudentEvaluationManager' was resolved to '/workspace/eduK12-teacher-group-longitudinal/server-version/frontend/src/huiteacher/HuiteacherStudentEvaluationManager.tsx', but '--jsx' is not set.
+
+[7m15[0m import { HuiteacherStudentEvaluationManager } from './HuiteacherStudentEvaluationManager'
+[7m  [0m [91m                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m18[0m:[93m66[0m - [91merror[0m[90m TS2550: [0mProperty 'from' does not exist on type 'ArrayConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m18[0m const mergeRows=<T extends {id:string}>(old:T[],next:T[])=>Array.from(new Map([...old,...next].map(item=>[item.id,item])).values())
+[7m  [0m [91m                                                                 ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m18[0m:[93m75[0m - [91merror[0m[90m TS2583: [0mCannot find name 'Map'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m18[0m const mergeRows=<T extends {id:string}>(old:T[],next:T[])=>Array.from(new Map([...old,...next].map(item=>[item.id,item])).values())
+[7m  [0m [91m                                                                          ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m41[0m:[93m76[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m41[0m   if(!run)return ['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+[7m  [0m [91m                                                                           ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m99[0m:[93m33[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m99[0m   const loadTargets=useCallback(async(cursor?:string)=>{
+[7m  [0m [91m                                ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m114[0m:[93m32[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m114[0m   const loadEvents=useCallback(async(cursor?:string)=>{
+[7m   [0m [91m                               ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m128[0m:[93m17[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m128[0m   const refresh=async()=>{await Promise.all([loadTargets(),loadEvents()])}
+[7m   [0m [91m                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m128[0m:[93m33[0m - [91merror[0m[90m TS2585: [0m'Promise' only refers to a type, but is being used as a value here. Do you need to change your target library? Try changing the 'lib' compiler option to es2015 or later.
+
+[7m128[0m   const refresh=async()=>{await Promise.all([loadTargets(),loadEvents()])}
+[7m   [0m [91m                                ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m152[0m:[93m8[0m - [91merror[0m[90m TS2550: [0mProperty 'finally' does not exist on type 'Promise<void>'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2018' or later.
+
+[7m152[0m       .finally(()=>{actionPending.current=false;setWorking(false)})
+[7m   [0m [91m       ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m154[0m:[93m31[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m154[0m   const addTarget=()=>perform(async()=>{
+[7m   [0m [91m                              ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m163[0m:[93m30[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m163[0m   const addEvent=()=>perform(async()=>{
+[7m   [0m [91m                             ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m169[0m:[93m42[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m169[0m   const createRun=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                         ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m174[0m:[93m43[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m174[0m   const inspectRun=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                          ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m178[0m:[93m41[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m178[0m   const reloadReleasedForms=()=>perform(async()=>{
+[7m   [0m [91m                                        ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m189[0m:[93m22[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m189[0m   const reloadScales=async(event:Event,cursor?:string)=>{
+[7m   [0m [91m                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m211[0m:[93m44[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m211[0m   const attachScale=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                           ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m212[0m:[93m51[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'TeacherScale[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m212[0m     const selected=(releasedScales[event.id]??[]).find(
+[7m   [0m [91m                                                  ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m237[0m:[93m43[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m237[0m   const attachForm=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                          ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m238[0m:[93m30[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'Form[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m238[0m     const form=releasedForms.find(f=>f.id===formChoice[event.id])
+[7m   [0m [91m                             ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m258[0m:[93m43[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m258[0m   const previewRun=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                          ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m260[0m:[93m89[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'Event[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m260[0m     const current=()=>{const context=previewContext.current;const latest=context.events.find(row=>row.id===event.id)
+[7m   [0m [91m                                                                                        ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m270[0m:[93m107[0m - [91merror[0m[90m TS2550: [0mProperty 'isSafeInteger' does not exist on type 'NumberConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m270[0m       !track.trackId||[track.executionCount,track.subjectCount,track.respondentCount].some(count=>!Number.isSafeInteger(count)||count<0)))throw new Error('预览版本或人数响应无效，请重新预览任务配置。')
+[7m   [0m [91m                                                                                                          ~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m274[0m:[93m61[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m274[0m   const publishRun=(event:Event,tracking?:unknown)=>perform(async()=>{
+[7m   [0m [91m                                                            ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m284[0m:[93m45[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m284[0m   const readProgress=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                            ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m288[0m:[93m41[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m288[0m   const closeRun=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                        ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m293[0m:[93m42[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m293[0m   const cancelRun=(event:Event)=>perform(async()=>{
+[7m   [0m [91m                                         ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m298[0m:[93m59[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m298[0m   const readGroup=(event:Event,historical=false)=>perform(async()=>{
+[7m   [0m [91m                                                          ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m303[0m:[93m24[0m - [91merror[0m[90m TS1343: [0mThe 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+[7m303[0m     const releasedOnly=import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+[7m   [0m [91m                       ~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m303[0m:[93m36[0m - [91merror[0m[90m TS2339: [0mProperty 'env' does not exist on type 'ImportMeta'.
+
+[7m303[0m     const releasedOnly=import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+[7m   [0m [91m                                   ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m309[0m:[93m86[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'Form[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m309[0m     setReports({[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formId)?.title??formId}})
+[7m   [0m [91m                                                                                     ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m311[0m:[93m74[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m311[0m   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
+[7m   [0m [91m                                                                         ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m319[0m:[93m10[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m319[0m   return <section className="ht-panel ht-admin-panel ht-evaluation-workbench" aria-label="Huiteacher 评价活动管理">
+[7m   [0m [91m         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m320[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m320[0m     <header className="ht-section-heading"><h2>评价对象与活动</h2><ManagementHelp label="学校评价活动说明" buttonText=""><p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p><p>活动和作答任务分别发布；结果仍按原有授权与隐私规则开放。</p></ManagementHelp></header>
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m320[0m:[93m44[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m320[0m     <header className="ht-section-heading"><h2>评价对象与活动</h2><ManagementHelp label="学校评价活动说明" buttonText=""><p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p><p>活动和作答任务分别发布；结果仍按原有授权与隐私规则开放。</p></ManagementHelp></header>
+[7m   [0m [91m                                           ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m320[0m:[93m60[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m320[0m     <header className="ht-section-heading"><h2>评价对象与活动</h2><ManagementHelp label="学校评价活动说明" buttonText=""><p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p><p>活动和作答任务分别发布；结果仍按原有授权与隐私规则开放。</p></ManagementHelp></header>
+[7m   [0m [91m                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m320[0m:[93m107[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m320[0m     <header className="ht-section-heading"><h2>评价对象与活动</h2><ManagementHelp label="学校评价活动说明" buttonText=""><p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p><p>活动和作答任务分别发布；结果仍按原有授权与隐私规则开放。</p></ManagementHelp></header>
+[7m   [0m [91m                                                                                                          ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m320[0m:[93m168[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m320[0m     <header className="ht-section-heading"><h2>评价对象与活动</h2><ManagementHelp label="学校评价活动说明" buttonText=""><p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p><p>活动和作答任务分别发布；结果仍按原有授权与隐私规则开放。</p></ManagementHelp></header>
+[7m   [0m [91m                                                                                                                                                                       ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m321[0m:[93m14[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m321[0m     {notice&&<p role="status" className="ht-notice">{notice}</p>}
+[7m   [0m [91m             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m322[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m322[0m     <details className="ht-admin-action"><summary>创建稳定评价对象</summary>
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m322[0m:[93m42[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m322[0m     <details className="ht-admin-action"><summary>创建稳定评价对象</summary>
+[7m   [0m [91m                                         ~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m323[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m323[0m     <div className="ht-inline">
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m324[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m324[0m       <label className="ht-field"><span>对象类型</span><select value={targetKind}
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m324[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m324[0m       <label className="ht-field"><span>对象类型</span><select value={targetKind}
+[7m   [0m [91m                                  ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m324[0m:[93m52[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m324[0m       <label className="ht-field"><span>对象类型</span><select value={targetKind}
+[7m   [0m [91m                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m325[0m         onChange={e=>setTargetKind(e.target.value)}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m326[0m:[93m17[0m - [91merror[0m[90m TS2550: [0mProperty 'entries' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2017' or later.
+
+[7m326[0m         {Object.entries(targetLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+[7m   [0m [91m                ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m326[0m:[93m58[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m326[0m         {Object.entries(targetLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+[7m   [0m [91m                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m328[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m328[0m       <label className="ht-field"><span>名称</span><input value={targetName}
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m328[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m328[0m       <label className="ht-field"><span>名称</span><input value={targetName}
+[7m   [0m [91m                                  ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m328[0m:[93m50[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m328[0m       <label className="ht-field"><span>名称</span><input value={targetName}
+[7m   [0m [91m                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m329[0m         maxLength={200} onChange={e=>setTargetName(e.target.value)}/></label>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m330[0m:[93m31[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m330[0m       {targetKind==='PERSON'&&<label className="ht-field"><span>已核验人员 User ID（选填）</span>
+[7m   [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m330[0m:[93m59[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m330[0m       {targetKind==='PERSON'&&<label className="ht-field"><span>已核验人员 User ID（选填）</span>
+[7m   [0m [91m                                                          ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m331[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m331[0m         <input value={subjectUserId} placeholder="不填写则为待关联档案"
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m332[0m           onChange={e=>setSubjectUserId(e.target.value)}/></label>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m333[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m333[0m       <button disabled={working||!targetName.trim()} onClick={addTarget}>新增评价对象</button>
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m336[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m336[0m     <div className="ht-units">{targets.map(x=><span key={x.id} className="ht-tag">
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m336[0m:[93m47[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m336[0m     <div className="ht-units">{targets.map(x=><span key={x.id} className="ht-tag">
+[7m   [0m [91m                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m338[0m:[93m21[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m338[0m     {targetLoading&&<p role="status">正在读取评价对象…</p>}
+[7m   [0m [91m                    ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m339[0m:[93m19[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m339[0m     {targetError&&<p role="alert">{targetError} <button disabled={targetLoading} onClick={()=>void loadTargets(targetCursor??undefined)}>重试评价对象</button></p>}
+[7m   [0m [91m                  ~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m339[0m:[93m49[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m339[0m     {targetError&&<p role="alert">{targetError} <button disabled={targetLoading} onClick={()=>void loadTargets(targetCursor??undefined)}>重试评价对象</button></p>}
+[7m   [0m [91m                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m340[0m:[93m56[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m340[0m     {!targetLoading&&!targetError&&targets.length===0&&<p className="ht-empty">尚无评价对象，请先新增。</p>}
+[7m   [0m [91m                                                       ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m341[0m:[93m20[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m341[0m     {targetCursor&&<button disabled={targetLoading||working} onClick={()=>void loadTargets(targetCursor)}>加载更多评价对象</button>}
+[7m   [0m [91m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m342[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m342[0m     <details className="ht-admin-action"><summary>创建评价活动</summary>
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m342[0m:[93m42[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m342[0m     <details className="ht-admin-action"><summary>创建评价活动</summary>
+[7m   [0m [91m                                         ~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m343[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m343[0m     <div className="ht-inline">
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m344[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m344[0m       <label className="ht-field"><span>所属评价对象</span><select value={eventTargetId}
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m344[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m344[0m       <label className="ht-field"><span>所属评价对象</span><select value={eventTargetId}
+[7m   [0m [91m                                  ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m344[0m:[93m54[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m344[0m       <label className="ht-field"><span>所属评价对象</span><select value={eventTargetId}
+[7m   [0m [91m                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m345[0m         onChange={e=>setEventTargetId(e.target.value)}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m346[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m346[0m         <option value="">选择对象</option>
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m347[0m:[93m25[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m347[0m         {targets.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}
+[7m   [0m [91m                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m349[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m349[0m       <label className="ht-field"><span>活动类型</span><select value={eventKind}
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m349[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m349[0m       <label className="ht-field"><span>活动类型</span><select value={eventKind}
+[7m   [0m [91m                                  ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m349[0m:[93m52[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m349[0m       <label className="ht-field"><span>活动类型</span><select value={eventKind}
+[7m   [0m [91m                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m350[0m         onChange={e=>setEventKind(e.target.value)}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m351[0m:[93m17[0m - [91merror[0m[90m TS2550: [0mProperty 'entries' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2017' or later.
+
+[7m351[0m         {Object.entries(eventLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+[7m   [0m [91m                ~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m351[0m:[93m57[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m351[0m         {Object.entries(eventLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+[7m   [0m [91m                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m353[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m353[0m       <label className="ht-field"><span>活动标题</span><input value={eventTitle}
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m353[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m353[0m       <label className="ht-field"><span>活动标题</span><input value={eventTitle}
+[7m   [0m [91m                                  ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m353[0m:[93m52[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m353[0m       <label className="ht-field"><span>活动标题</span><input value={eventTitle}
+[7m   [0m [91m                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m354[0m         onChange={e=>setEventTitle(e.target.value)} maxLength={200}/></label>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m355[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m355[0m       <button disabled={working||!eventTargetId||!eventTitle.trim()} onClick={addEvent}>创建活动草稿</button>
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m358[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m358[0m     <div className="ht-admin-list-heading"><h3>近期活动</h3>
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m358[0m:[93m44[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m358[0m     <div className="ht-admin-list-heading"><h3>近期活动</h3>
+[7m   [0m [91m                                           ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m359[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m359[0m       <button type="button" disabled={working} onClick={reloadReleasedForms}>
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m363[0m:[93m18[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m363[0m     {formsError&&<p role="alert">已发布表单暂不可用：{formsError}。可使用上方刷新按钮重试。</p>}
+[7m   [0m [91m                 ~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m364[0m:[93m20[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m364[0m     {eventLoading&&<p role="status">正在读取评价活动…</p>}
+[7m   [0m [91m                   ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m365[0m:[93m18[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m365[0m     {eventError&&<p role="alert">{eventError} <button disabled={eventLoading} onClick={()=>void loadEvents(eventCursor??undefined)}>重试评价活动</button></p>}
+[7m   [0m [91m                 ~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m365[0m:[93m47[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m365[0m     {eventError&&<p role="alert">{eventError} <button disabled={eventLoading} onClick={()=>void loadEvents(eventCursor??undefined)}>重试评价活动</button></p>}
+[7m   [0m [91m                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m366[0m:[93m53[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m366[0m     {!eventLoading&&!eventError&&events.length===0&&<p className="ht-empty">尚无评价活动，可以先创建草稿。</p>}
+[7m   [0m [91m                                                    ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m367[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m367[0m     <div className="ht-event-list">{events.map(event=><article key={event.id} className="ht-event">
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m367[0m:[93m55[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m367[0m     <div className="ht-event-list">{events.map(event=><article key={event.id} className="ht-event">
+[7m   [0m [91m                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m368[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m368[0m       <strong>{event.title}</strong>
+[7m   [0m [91m      ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m369[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m369[0m       <span className="ht-tag">{eventLabels[event.kind]??event.kind} · 活动：{statusLabel(event.status)}</span>
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m370[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m370[0m       <p className="ht-muted">下一步：{nextAction(event,runMap[event.id])}</p>
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m371[0m:[93m7[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m371[0m       <div className="ht-inline">
+[7m   [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m372[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m372[0m         <button onClick={()=>inspectRun(event)} disabled={working}>查看任务配置</button>
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m373[0m:[93m34[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m373[0m         {event.status==='DRAFT'&&<button onClick={()=>createRun(event)} disabled={working||!!runMap[event.id]}>创建评价任务草稿</button>}
+[7m   [0m [91m                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m374[0m:[93m34[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m374[0m         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')}
+[7m   [0m [91m                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m375[0m           disabled={working||(
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m378[0m               :!['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m379[0m           )}>
+[7m   [0m [91m~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m378[0m:[93m75[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m378[0m               :!['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+[7m   [0m [91m                                                                          ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m383[0m:[93m71[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m383[0m           &&['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+[7m   [0m [91m                                                                      ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m384[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m384[0m           &&<p className="ht-muted">纯现场观察无需创建测评任务；需先邀请至少一位专家／同行并由其接受，再开放活动。</p>}
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m385[0m:[93m34[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m385[0m         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>取消草稿</button>}
+[7m   [0m [91m                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m386[0m:[93m33[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m386[0m         {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')}
+[7m   [0m [91m                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m387[0m           disabled={working||(runMap[event.id]&&runMap[event.id].status!=='CLOSED')}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m391[0m:[93m26[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m391[0m       {runMap[event.id]&&<div>
+[7m   [0m [91m                         ~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m392[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m392[0m         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
+[7m   [0m [91m        ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m393[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m393[0m         <SelectedToolOutline disabled={working} onRemove={event.status==='DRAFT'&&runMap[event.id].status==='DRAFT'?trackId=>perform(async()=>{
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m394[0m           if(!window.confirm('从本轮草稿移除此投放？追踪工具缺失或定义变化将阻止发布；请加入保留冻结指标的新问卷版本。'))return
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m401[0m           version:track.sourceRevision?'修订 '+track.sourceRevision:track.resourceVersion,
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m402[0m         }))}/>
+[7m   [0m [91m~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m393[0m:[93m134[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m393[0m         <SelectedToolOutline disabled={working} onRemove={event.status==='DRAFT'&&runMap[event.id].status==='DRAFT'?trackId=>perform(async()=>{
+[7m   [0m [91m                                                                                                                                     ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m398[0m:[93m62[0m - [91merror[0m[90m TS2550: [0mProperty 'startsWith' does not exist on type 'string'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m398[0m           id:track.id,title:track.title??((track.resourceKey.startsWith('education-composition:')?'普通问卷':
+[7m   [0m [91m                                                             ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m400[0m:[93m34[0m - [91merror[0m[90m TS2550: [0mProperty 'startsWith' does not exist on type 'string'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m400[0m           kind:track.resourceKey.startsWith('education-composition:')?'普通问卷':({SCALE:'量表',FORM:'表单',BUNDLE:'正式整包',COGNITIVE:'认知测验',SITUATIONAL:'情境判断'} as Record<string,string>)[track.resourceFamily]??'测评工具',
+[7m   [0m [91m                                 ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m405[0m:[93m18[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m405[0m           return <section className="ht-panel" aria-label="任务配置预览"><h4>任务配置预览 · 版本 {snapshot.data.version}</h4>
+[7m   [0m [91m                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m405[0m:[93m68[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m405[0m           return <section className="ht-panel" aria-label="任务配置预览"><h4>任务配置预览 · 版本 {snapshot.data.version}</h4>
+[7m   [0m [91m                                                                   ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m406[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m406[0m             <p>预计作答任务：{snapshot.data.tracks.reduce((total,track)=>total+track.executionCount,0)} 个</p>
+[7m   [0m [91m            ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m407[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m407[0m             <p className="ht-muted">人数仅在各工具内去重，同一教师可能参与多个工具；不将各工具人数相加视为独立人数。发布时仍会重新校验资格。</p>
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m408[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m408[0m             <ul>{snapshot.data.tracks.map((track,index)=><li key={track.trackId}>工具 {index+1}：被测者 {track.subjectCount} 人 · 作答者 {track.respondentCount} 人 · 作答任务 {track.executionCount} 个</li>)}</ul>
+[7m   [0m [91m            ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m408[0m:[93m58[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m408[0m             <ul>{snapshot.data.tracks.map((track,index)=><li key={track.trackId}>工具 {index+1}：被测者 {track.subjectCount} 人 · 作答者 {track.respondentCount} 人 · 作答任务 {track.executionCount} 个</li>)}</ul>
+[7m   [0m [91m                                                         ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m411[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m411[0m         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
+[7m   [0m [91m        ~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m411[0m:[93m18[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m411[0m         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
+[7m   [0m [91m                 ~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m411[0m:[93m43[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m411[0m         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
+[7m   [0m [91m                                          ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m411[0m:[93m61[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m411[0m         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
+[7m   [0m [91m                                                            ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m412[0m:[93m45[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m412[0m         {runMap[event.id].status==='DRAFT'&&<>
+[7m   [0m [91m                                            ~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m413[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m413[0m           <EducationAssessmentResourcePicker
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m414[0m             scope={{product:'TEACHER',organizationId,actorKey,workflowId:event.id,runId:runMap[event.id].runId,expectedVersion:runMap[event.id].version}}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m415[0m             adapter={assessmentResources} disabled={working} onBusy={privateBusy}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m416[0m             onRefresh={async()=>{await fetchRun(event)}}/>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m416[0m:[93m24[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m416[0m             onRefresh={async()=>{await fetchRun(event)}}/>
+[7m   [0m [91m                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m417[0m:[93m45[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m417[0m           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
+[7m   [0m [91m                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m418[0m             key={`private:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m424[0m               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m425[0m             }}/>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m421[0m:[93m64[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m421[0m             disabled={working} onBusy={privateBusy} onRefresh={async()=>{
+[7m   [0m [91m                                                               ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m426[0m:[93m45[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m426[0m           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker kind="FORM"
+[7m   [0m [91m                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m427[0m             key={`private-form:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m433[0m               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m434[0m             }}/>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m430[0m:[93m64[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m430[0m             disabled={working} onBusy={privateBusy} onRefresh={async()=>{
+[7m   [0m [91m                                                               ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m435[0m:[93m45[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m435[0m           {canAuthorPrivateTools&&actorKey&&<EducationCompositionRunPicker
+[7m   [0m [91m                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m436[0m             key={`composition:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`} api={api} entry="TEACHER"
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m437[0m             organizationId={organizationId} actorKey={actorKey} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m438[0m             expectedVersion={runMap[event.id].version} disabled={working} onBusy={privateBusy} onRefresh={async()=>{await fetchRun(event)}}/>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m438[0m:[93m107[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m438[0m             expectedVersion={runMap[event.id].version} disabled={working} onBusy={privateBusy} onRefresh={async()=>{await fetchRun(event)}}/>}
+[7m   [0m [91m                                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m439[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m439[0m           <div className="ht-inline"><button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m439[0m:[93m38[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m439[0m           <div className="ht-inline"><button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>
+[7m   [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m442[0m:[93m36[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m442[0m           {scaleLoading[event.id]&&<p role="status">正在读取授权量表…</p>}
+[7m   [0m [91m                                   ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m443[0m:[93m34[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m443[0m           {scaleError[event.id]&&<div><p role="alert">{scaleError[event.id]} 已配置的测评项目不受影响。</p>
+[7m   [0m [91m                                 ~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m443[0m:[93m39[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m443[0m           {scaleError[event.id]&&<div><p role="alert">{scaleError[event.id]} 已配置的测评项目不受影响。</p>
+[7m   [0m [91m                                      ~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m444[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m444[0m             <button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>重新查询授权量表</button></div>}
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m445[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m445[0m           {scaleCursor[event.id]&&<button disabled={working||scaleLoading[event.id]}
+[7m   [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m446[0m             onClick={()=>void reloadScales(event,scaleCursor[event.id]!)}>继续加载授权量表</button>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m447[0m:[93m98[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m447[0m           {releasedScales[event.id]?.length===0&&!scaleLoading[event.id]&&!scaleError[event.id]&&<p>
+[7m   [0m [91m                                                                                                 ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m449[0m:[93m53[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m449[0m           {(releasedScales[event.id]?.length??0)>0&&<div className="ht-inline">
+[7m   [0m [91m                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m450[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m450[0m             <label className="ht-field"><span>正式教师自评量表 · 固定版本</span>
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m450[0m:[93m41[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m450[0m             <label className="ht-field"><span>正式教师自评量表 · 固定版本</span>
+[7m   [0m [91m                                        ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m451[0m:[93m15[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m451[0m               <select value={scaleChoice[event.id]??''}
+[7m   [0m [91m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m452[0m                 onChange={e=>setScaleChoice(old=>({...old,[event.id]:e.target.value}))}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m453[0m:[93m17[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m453[0m                 <option value="">选择已获学校授权的教师自评资源</option>
+[7m   [0m [91m                ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m455[0m:[93m19[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m455[0m                   <option key={item.id} value={item.id}>{item.title}（{item.version}） · {item.key.startsWith('library-scale:')?'共用量表库':'原专用库'}</option>)}
+[7m   [0m [91m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m455[0m:[93m98[0m - [91merror[0m[90m TS2550: [0mProperty 'startsWith' does not exist on type 'string'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m455[0m                   <option key={item.id} value={item.id}>{item.title}（{item.version}） · {item.key.startsWith('library-scale:')?'共用量表库':'原专用库'}</option>)}
+[7m   [0m [91m                                                                                                 ~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m458[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m458[0m             <button disabled={working||scaleLoading[event.id]||!scaleChoice[event.id]} onClick={()=>attachScale(event)}>
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m462[0m:[93m35[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m462[0m           {scaleChoice[event.id]&&<p className="ht-muted">
+[7m   [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m463[0m:[93m45[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'TeacherScale[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m463[0m             {(releasedScales[event.id]??[]).find(item=>item.id===scaleChoice[event.id])?.personalReportAvailable===true
+[7m   [0m [91m                                            ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m466[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m466[0m           <p className="ht-muted">这里只使用本校获授权的教师自评固定版本：原专用库保留独立审核，共用量表库沿用入库审批。
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m468[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m468[0m           <label className="ht-field"><span>向当前教师发布的 Form（不计分）</span>
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m468[0m:[93m39[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m468[0m           <label className="ht-field"><span>向当前教师发布的 Form（不计分）</span>
+[7m   [0m [91m                                      ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m469[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m469[0m             <select value={formChoice[event.id]??''}
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m470[0m               onChange={e=>setFormChoice(old=>({...old,[event.id]:e.target.value}))}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m471[0m:[93m15[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m471[0m               <option value="">请选择正式已发布 Form</option>
+[7m   [0m [91m              ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m472[0m:[93m40[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m472[0m               {releasedForms.map(form=><option key={form.id} value={form.id}>
+[7m   [0m [91m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m476[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m476[0m           <div className="ht-inline">
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m477[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m477[0m             <button onClick={()=>attachForm(event)} disabled={working||!formChoice[event.id]}>
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m480[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m480[0m             <button onClick={()=>previewRun(event)} disabled={working}>预览任务配置</button>
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m481[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m481[0m             <TeacherTrackingPublish key={event.id+':'+runMap[event.id].version+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working||event.status!=='OPEN'} publish={tracking=>publishRun(event,tracking)}/>
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m484[0m:[93m33[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m484[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherTrackingNext key={event.id+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working} create={()=>perform(async()=>{await api(base+'/evaluation-events/'+event.id+'/run/next-wave','POST',{requestId:crypto.randomUUID()});await refresh();setNotice('下一轮活动草稿已创建，继承固定追踪来源；请查看配置并开放、发布。')})}/>}
+[7m   [0m [91m                                ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m484[0m:[93m68[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m484[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherTrackingNext key={event.id+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working} create={()=>perform(async()=>{await api(base+'/evaluation-events/'+event.id+'/run/next-wave','POST',{requestId:crypto.randomUUID()});await refresh();setNotice('下一轮活动草稿已创建，继承固定追踪来源；请查看配置并开放、发布。')})}/>}
+[7m   [0m [91m                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m484[0m:[93m216[0m - [91merror[0m[90m TS2705: [0mAn async function or method in ES5 requires the 'Promise' constructor.  Make sure you have a declaration for the 'Promise' constructor or include 'ES2015' in your '--lib' option.
+
+[7m484[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherTrackingNext key={event.id+':'+actorKey} api={api} path={base+'/evaluation-events/'+event.id+'/run'} disabled={working} create={()=>perform(async()=>{await api(base+'/evaluation-events/'+event.id+'/run/next-wave','POST',{requestId:crypto.randomUUID()});await refresh();setNotice('下一轮活动草稿已创建，继承固定追踪来源；请查看配置并开放、发布。')})}/>}
+[7m   [0m [91m                                                                                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m485[0m:[93m49[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m485[0m         {runMap[event.id].status==='PUBLISHED'&&<>
+[7m   [0m [91m                                                ~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m486[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m486[0m           <button onClick={()=>readProgress(event)} disabled={working}>查看正式完成进度</button>
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m487[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m487[0m           <button onClick={()=>closeRun(event)} disabled={working||event.status!=='OPEN'}>关闭评价任务</button>
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m488[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m488[0m           <button onClick={()=>cancelRun(event)} disabled={working||event.status!=='OPEN'}>取消评价任务</button>
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m490[0m:[93m33[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m490[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherNumericGroupReports key={event.id+':numeric:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/numeric-group-reports'}/>}
+[7m   [0m [91m                                ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m490[0m:[93m68[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m490[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherNumericGroupReports key={event.id+':numeric:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/numeric-group-reports'}/>}
+[7m   [0m [91m                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m491[0m:[93m33[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m491[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherGroupLongitudinal key={event.id+':group-longitudinal:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/group-longitudinal-reports'}/>}
+[7m   [0m [91m                                ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m491[0m:[93m68[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m491[0m         {['PUBLISHED','CLOSED'].includes(runMap[event.id].status)&&<TeacherGroupLongitudinal key={event.id+':group-longitudinal:'+actorKey} api={api} endpoint={base+'/evaluation-events/'+event.id+'/group-longitudinal-reports'}/>}
+[7m   [0m [91m                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m493[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m493[0m           <div className="ht-inline">
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m494[0m:[93m13[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m494[0m             <label className="ht-field"><span>报告对应 Form</span><select
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m494[0m:[93m41[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m494[0m             <label className="ht-field"><span>报告对应 Form</span><select
+[7m   [0m [91m                                        ~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m494[0m:[93m63[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m494[0m             <label className="ht-field"><span>报告对应 Form</span><select
+[7m   [0m [91m                                                              ~~~~~~~[0m
+[7m495[0m               value={formChoice[event.id]??''}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m496[0m               onChange={e=>setFormChoice(old=>({...old,[event.id]:e.target.value}))}>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m497[0m:[93m15[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m497[0m               <option value="">选择已发布表单</option>
+[7m   [0m [91m              ~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m498[0m:[93m40[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m498[0m               {releasedForms.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
+[7m   [0m [91m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m500[0m:[93m14[0m - [91merror[0m[90m TS1343: [0mThe 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+[7m500[0m             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+[7m   [0m [91m             ~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m500[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'env' does not exist on type 'ImportMeta'.
+
+[7m500[0m             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+[7m   [0m [91m                         ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m501[0m:[93m38[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m501[0m               ?formChoice[event.id]&&<TeacherFormGroupVersions key={event.id+':'+formChoice[event.id]}
+[7m   [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m502[0m                 api={api} endpoint={base+'/evaluation-events/'+event.id+'/forms/'+formChoice[event.id]+'/group-report'}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m503[0m                 onReport={report=>setReports(report?{[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formChoice[event.id])?.title??formChoice[event.id]}}:{})}/>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m503[0m:[93m123[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'Form[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m503[0m                 onReport={report=>setReports(report?{[event.id]:{report,activityTitle:event.title,formTitle:releasedForms.find(form=>form.id===formChoice[event.id])?.title??formChoice[event.id]}}:{})}/>
+[7m   [0m [91m                                                                                                                          ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m504[0m:[93m16[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m504[0m               :<button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>查看学校群体报告</button>}
+[7m   [0m [91m               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m505[0m:[93m14[0m - [91merror[0m[90m TS1343: [0mThe 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+[7m505[0m             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
+[7m   [0m [91m             ~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m505[0m:[93m26[0m - [91merror[0m[90m TS2339: [0mProperty 'env' does not exist on type 'ImportMeta'.
+
+[7m505[0m             {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
+[7m   [0m [91m                         ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m506[0m:[93m15[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m506[0m               <button onClick={()=>readGroup(event,true)} disabled={working||!formChoice[event.id]}>
+[7m   [0m [91m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m510[0m:[93m30[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m510[0m         {progress[event.id]&&<p>已完成 {progress[event.id].counts.COMPLETED??0} /
+[7m   [0m [91m                             ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m513[0m:[93m8[0m - [91merror[0m[90m TS1343: [0mThe 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+[7m513[0m       {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
+[7m   [0m [91m       ~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m513[0m:[93m20[0m - [91merror[0m[90m TS2339: [0mProperty 'env' does not exist on type 'ImportMeta'.
+
+[7m513[0m       {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
+[7m   [0m [91m                   ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m516[0m:[93m11[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m516[0m         &&<HuiteacherStudentEvaluationManager
+[7m   [0m [91m          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m517[0m           key={'student-feedback:'+event.id} organizationId={organizationId}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m520[0m           teacherName={targets.find(x=>x.id===event.targetId)?.name??'已核验教师'}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m521[0m           forms={releasedForms} api={api}/>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m520[0m:[93m32[0m - [91merror[0m[90m TS2550: [0mProperty 'find' does not exist on type 'Target[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.
+
+[7m520[0m           teacherName={targets.find(x=>x.id===event.targetId)?.name??'已核验教师'}
+[7m   [0m [91m                               ~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m522[0m:[93m66[0m - [91merror[0m[90m TS2550: [0mProperty 'includes' does not exist on type 'string[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2016' or later.
+
+[7m522[0m       {['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)&&
+[7m   [0m [91m                                                                 ~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m523[0m:[93m9[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m523[0m         <HuiteacherFieldManager key={'field:'+event.id}
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m524[0m           organizationId={organizationId} eventId={event.id}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m525[0m           eventStatus={event.status} api={api}/>}
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m526[0m:[93m27[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m526[0m       {reports[event.id]&&<TeacherFormGroupReport {...reports[event.id]}/>}
+[7m   [0m [91m                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m529[0m:[93m19[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m529[0m     {eventCursor&&<button disabled={eventLoading||working} onClick={()=>void loadEvents(eventCursor)}>加载更多评价活动</button>}
+[7m   [0m [91m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m530[0m:[93m2[0m - [91merror[0m[90m TS1343: [0mThe 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+[7m530[0m {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
+[7m   [0m [91m ~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m530[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'env' does not exist on type 'ImportMeta'.
+
+[7m530[0m {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
+[7m   [0m [91m             ~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m531[0m:[93m5[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m531[0m   &&<HuiteacherGrowthManager api={api} organizationId={organizationId} targets={targets}/>}
+[7m   [0m [91m    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mserver-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx[0m:[93m532[0m:[93m1[0m - [91merror[0m[90m TS17004: [0mCannot use JSX unless the '--jsx' flag is provided.
+
+[7m532[0m <p className="ht-muted">Form-only 使用正式发布版本、正式评价任务和加密最终提交；没有计分规则，不产生 Scale 得分。低于最小样本量的群体报告保持抑制。</p>
+[7m   [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+{"selectedModuleSemanticCheck":true,"records":[{"component":"backend","typescript":"5.9.3","files":["src/modules/huiteacher/groupLongitudinalReport.service.ts","src/modules/huiteacher/groupLongitudinalReport.routes.ts"],"diagnostics":0},{"component":"frontend","typescript":"5.6.3","files":["src/huiteacher/TeacherGroupLongitudinal.tsx","src/huiteacher/HuiteacherEvaluationStudio.tsx"],"diagnostics":231}],"fullBuild":false}

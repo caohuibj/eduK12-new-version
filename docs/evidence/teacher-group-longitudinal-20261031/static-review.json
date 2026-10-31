@@ -1,0 +1,162 @@
+{
+  "kind": "developer-static-review-and-preparation",
+  "notAdditionalGate": true,
+  "base": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+  "head": "b4670dd5eeb50af402ec51599ca572286abf8bfb",
+  "tree": "d6f2708d72ffab3cf49671cf1ba6061c10d3ec6b",
+  "completeChangedPaths": [
+    ".github/scripts/group-longitudinal-ready.json",
+    ".github/scripts/personal-tracking-ready.mjs",
+    ".github/scripts/personal-tracking-ready.test.mjs",
+    ".github/workflows/ci.yml",
+    "docs/development/teacher-group-longitudinal-20261031.md",
+    "docs/evidence/teacher-group-longitudinal-20261031/README.md",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-first.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-first.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-run.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-run.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-run2.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-run2.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-run3.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/adapter-run3.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/migrate-fixture.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-continuation.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-continuation.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-first.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-first.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-fixture.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-proof.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-read-continuation.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/native-read-continuation.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/new-boundaries.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/new-boundaries.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/selected-types-first.log",
+    "docs/evidence/teacher-group-longitudinal-20261031/selected-types-frontend.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/selected-types.cjs",
+    "docs/evidence/teacher-group-longitudinal-20261031/sha256.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/ui-first.json",
+    "docs/evidence/teacher-group-longitudinal-20261031/ui-first.log",
+    "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql",
+    "server-version/backend/src/__tests__/huiteacher/group-longitudinal.routes.test.ts",
+    "server-version/backend/src/__tests__/huiteacher/group-longitudinal.test.ts",
+    "server-version/backend/src/__tests__/integration/teacherGroupLongitudinal.postgres.integration.test.ts",
+    "server-version/backend/src/index.ts",
+    "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts",
+    "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts",
+    "server-version/backend/src/modules/reporting/task-artifact.ts",
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx",
+    "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.test.tsx",
+    "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx"
+  ],
+  "productionBlobs": {
+    "server-version/backend/src/index.ts": "ce182833fc063c276a3e29abcc751bcfbbd21929",
+    "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts": "8f5a34cb477c551512de30c679300eb3a9f1d5bc",
+    "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts": "a57bcd25ac3d80c4f157afc93b612e6e9430436a",
+    "server-version/backend/src/modules/reporting/task-artifact.ts": "8d04ca03829a694615d13c4dc461a91530092f16",
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": "e06a3109e204f4ec2989341e48e6a28a64ee7f12",
+    "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx": "14f11268071b31c3172be2001f4a72bebef5715c"
+  },
+  "applicationComponents": {
+    "backend": "3f67f5260693b530748e19537fa0f079da24edb0",
+    "frontend": "9a5eb898478486952884bae543334ec93bd7ab4c"
+  },
+  "migration": "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql",
+  "migrationBlob": "c92cd9e47f14519e9d63e51a709c29a910bce9c5",
+  "observations": [
+    "Concrete formal Run links; source/track/slot and frozen C before metric projection; P/R not cross-wave identity.",
+    "Existing current Teacher org/admin and numeric leaf authority remain; no participant report grant or GROUP fallback from own-report visibility.",
+    "Current missing-round null is saved without inferred counts; existing immutable group artifact references and saved projection only on history reads.",
+    "Teacher CHECK only adds product; no table, dropped history or FINAL mutation.",
+    "Actual native Cognitive producers persist protocolSignature; existing decoder/discovery provides it. No new protocol fallback platform added.",
+    "HTTP mount and event API base agree; strict body does not accept internal partial-source options; shared UI retains old history when config changes."
+  ],
+  "confirmedRemaining": [
+    "Existing final bounded official migration/restore, frontend types/lint, production build/scans and scoped SAST; normal merge after success. No remaining intended feature work."
+  ],
+  "formalDraftCI": {
+    "run": 41172913061,
+    "conclusion": "success",
+    "businessReplay": false
+  },
+  "formalReadyCIExecuted": false,
+  "productionAccessed": false,
+  "scopeCorrection": "User explicitly excludes native Teacher numeric Form longitudinal from this round; retained plan only, not a #440 delivery blocker. No new Form implementation.",
+  "mainAlignment": {
+    "actualMain": "769141d5bc4954919b163a8d8d522530048fbfb6",
+    "preBindingCheckpoint": "c34db48f5e3178769e7c1d0397ceb31f4f4c48fd",
+    "mergeConflicts": false,
+    "featureBlobs": {
+      "server-version/backend/src/index.ts": {
+        "before": "ce182833fc063c276a3e29abcc751bcfbbd21929",
+        "after": "ce182833fc063c276a3e29abcc751bcfbbd21929"
+      },
+      "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.routes.ts": {
+        "before": "8f5a34cb477c551512de30c679300eb3a9f1d5bc",
+        "after": "8f5a34cb477c551512de30c679300eb3a9f1d5bc"
+      },
+      "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts": {
+        "before": "a57bcd25ac3d80c4f157afc93b612e6e9430436a",
+        "after": "a57bcd25ac3d80c4f157afc93b612e6e9430436a"
+      },
+      "server-version/backend/src/modules/reporting/task-artifact.ts": {
+        "before": "8d04ca03829a694615d13c4dc461a91530092f16",
+        "after": "8d04ca03829a694615d13c4dc461a91530092f16"
+      },
+      "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+        "before": "e06a3109e204f4ec2989341e48e6a28a64ee7f12",
+        "after": "e06a3109e204f4ec2989341e48e6a28a64ee7f12"
+      },
+      "server-version/frontend/src/huiteacher/TeacherGroupLongitudinal.tsx": {
+        "before": "14f11268071b31c3172be2001f4a72bebef5715c",
+        "after": "14f11268071b31c3172be2001f4a72bebef5715c"
+      },
+      "server-version/backend/prisma/migrations/20261031040000_teacher_group_longitudinal_store/migration.sql": {
+        "before": "c92cd9e47f14519e9d63e51a709c29a910bce9c5",
+        "after": "c92cd9e47f14519e9d63e51a709c29a910bce9c5"
+      }
+    },
+    "featureRuntimeChanged": false,
+    "businessCasesReexecuted": false,
+    "exactMainRuntimeChanges": [
+      "server-version/backend/src/modules/campus/auth.routes.ts",
+      "server-version/frontend/src/school/SchoolApp.tsx",
+      "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx"
+    ],
+    "formalCIActive": false,
+    "reason": "Prepare current real base without changing frozen PR440 or replaying unaffected feature observations. Group owner delta still missing."
+  },
+  "partialMetricsIntegration": {
+    "groupMerge": "f941e745d1c4148bd2e692a1c6e75af847d93fa5",
+    "ownerProducerHead": "5f72668a2e35192086184408c8ee744f87814bea",
+    "actualProducerBlob": "37f4b07c78a1888572c4b99ba7c73f65a954537f",
+    "ownChangedProductionPaths": [
+      "server-version/backend/src/modules/huiteacher/groupLongitudinalReport.service.ts"
+    ],
+    "newFocusedCases": 1,
+    "previousCasesReexecuted": false,
+    "finalsReexecuted": false,
+    "report": "partial-adapter.json"
+  },
+  "partialNativeBoundary": {
+    "report": "partial-native-final.json",
+    "newCases": 1,
+    "newOrReplayedFinals": 0,
+    "actualPublishedPlanMetrics": 1,
+    "publishedSpecMetrics": 2,
+    "unapprovedMetricExposed": false,
+    "originalTwoWavePlanAndParentFactsUnchanged": true,
+    "separateTwoMetricNullProof": "partial-adapter.json",
+    "formalReadyQualification": false
+  },
+  "privateCompositionIntegration": {
+    "groupMerge": "dc83843daabe2be21b1d1dcb8879df69d4c5630c",
+    "realPGReport": "private-native.json",
+    "newSourceFinals": 2,
+    "oldFinalsReplayed": 0,
+    "actualPublishedWaves": 2,
+    "sourceRegistryResultMock": false,
+    "minimumN": 10,
+    "smallNSuppressed": true,
+    "savedCanonicalReads": 0
+  }
+}

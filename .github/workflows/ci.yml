@@ -402,11 +402,11 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: fetch the immutable reviewed personal tracking source
-        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/personal-longitudinal-survey-20261030","feat/personal-longitudinal-training-20261030","feat/personal-longitudinal-education-20261030","feat/personal-longitudinal-school-20261030","feat/group-longitudinal-survey-training-20261030","feat/school-group-longitudinal-complete-20261031"]'), github.event.pull_request.head.ref)
+        if: github.event_name == 'pull_request' && contains(fromJSON('["feat/personal-longitudinal-survey-20261030","feat/personal-longitudinal-training-20261030","feat/personal-longitudinal-education-20261030","feat/personal-longitudinal-school-20261030","feat/group-longitudinal-survey-training-20261030","feat/school-group-longitudinal-complete-20261031","feat/teacher-group-longitudinal-20261031"]'), github.event.pull_request.head.ref)
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';import {execFileSync} from 'node:child_process';
-          const group=['feat/group-longitudinal-survey-training-20261030','feat/school-group-longitudinal-complete-20261031'].includes(process.env.GITHUB_HEAD_REF);
+          const group=['feat/group-longitudinal-survey-training-20261030','feat/school-group-longitudinal-complete-20261031','feat/teacher-group-longitudinal-20261031'].includes(process.env.GITHUB_HEAD_REF);
           const b=group?JSON.parse(readFileSync('.github/scripts/group-longitudinal-ready.json')).candidates[process.env.GITHUB_HEAD_REF]:JSON.parse(readFileSync('.github/scripts/personal-tracking-ready.json'));
           const refs=[b.reviewedCandidate,b.originalSource,b.backendAuditReuse?.sourceHead,b.frontendAuditReuse?.sourceHead,b.qualificationReuse?.sourceHead,...Object.values(b.files).map(v=>v.originalBase)].filter(Boolean);
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',...new Set(refs)],{stdio:'inherit'});

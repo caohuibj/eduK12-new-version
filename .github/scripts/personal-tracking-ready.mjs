@@ -47,7 +47,7 @@ export function personalTrackingReadyPlan(entries,base,head,{event,branch,draft,
 // This adds no application producer, authorization layer or alternate gate.
 export function groupLongitudinalReadyPlan(entries,base,head,{event,branch,draft,forceFull=false}){
  assert.equal(binding.slice,'group');assert.equal(event,'pull_request');assert.equal(branch,binding.branch);
- assert(['feat/group-longitudinal-survey-training-20261030','feat/school-group-longitudinal-complete-20261031'].includes(branch));
+ assert(['feat/group-longitudinal-survey-training-20261030','feat/school-group-longitudinal-complete-20261031','feat/teacher-group-longitudinal-20261031'].includes(branch));
  assert.equal(forceFull,false);assert.equal(base,binding.base);
  const marker='.github/scripts/group-longitudinal-ready.json';
  assert.deepEqual(entries.map(e=>e.file).sort(),[...Object.keys(binding.files),marker].sort(),'Complete group candidate inventory changed');
