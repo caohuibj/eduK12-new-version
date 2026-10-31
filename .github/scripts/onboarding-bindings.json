@@ -6436,6 +6436,159 @@
         }
       },
       "activationNote": "Reuse original two quota PostgreSQL cases; execute only missing current backend compiler in existing onboarding route and bounded CodeQL. No new image workflow or frontend/migration work."
+    },
+    "438": {
+      "schemaVersion": 1,
+      "pr": 438,
+      "enabled": true,
+      "base": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+      "product": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",
+      "controlCheckpoint": "47c3e73e5d167834f98d2ef6289dbafaad2ddcb4",
+      "source": {
+        "docs/evidence/teacher-form-group-history-20261031/README.md": {
+          "before": null,
+          "after": "770f8c2bcad3ac164800bb93248a7d85728fe621"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/backend-types.json": {
+          "before": null,
+          "after": "a8fa08e871a76a0be9ba29dcaa31baa205762ad5"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/candidate-tree.json": {
+          "before": null,
+          "after": "2401530a0d796e09a631cb5d7b279e50a3272744"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend-initial-cli.log": {
+          "before": null,
+          "after": "5b232c18331b3c9121b453280c015949bdce4d46"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend-types-initial.json": {
+          "before": null,
+          "after": "873c2fb27f4d4736a53f7febf27f42ded67888de"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend-types-initial.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend-types.json": {
+          "before": null,
+          "after": "410aaa0b44ba27888b13258c437433f2c6863ba9"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend.json": {
+          "before": null,
+          "after": "edccbe800eed4859c26984a3a7b0652042742110"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/frontend.log": {
+          "before": null,
+          "after": "61867dddd4fbc4cf01c67708b5d2272a5ed19b26"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/backend-types.json": {
+          "before": null,
+          "after": "925ab6cf4a813c3d1ce245975ba5927072a51efc"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/candidate-tree.json": {
+          "before": null,
+          "after": "6f6429f83251817f4a45ec3aff7cc79712031d26"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/frontend-types.json": {
+          "before": null,
+          "after": "a0f60a866c537ab56407893a3bcc4caac7500caa"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/postgres-initial-engine-missing.json": {
+          "before": null,
+          "after": "8a4e76ceb7bc25fda665da9098e9f8584fda9d81"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/postgres-initial-engine-missing.log": {
+          "before": null,
+          "after": "88652a195c8d377c26c8d16ece18c31bc01343ed"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/postgres-proof.json": {
+          "before": null,
+          "after": "c8abb82359edbfd3fc6519c0723602d558d43236"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/postgres.json": {
+          "before": null,
+          "after": "a068e3f826ee085877fbf195fa615ca1db4f72e2"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/postgres.log": {
+          "before": null,
+          "after": "2647bb4a0883600f7b0cd3859a31b6cbc6e8eeea"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/integrated/raw-sha256.json": {
+          "before": null,
+          "after": "61184fc8cc76b5fcad1ccb371429b8a677004c9c"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/raw-sha256.json": {
+          "before": null,
+          "after": "2f2dc7662f263417ca55ce7eba9dde05026327cb"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/source-switch.json": {
+          "before": null,
+          "after": "85dd600ced9a44f7cc0eee2dfffef702cde9aea0"
+        },
+        "docs/evidence/teacher-form-group-history-20261031/source-switch.log": {
+          "before": null,
+          "after": "c6d3eaf273410503d6e29c43b3e5ff1fe61ce52d"
+        },
+        "server-version/backend/src/__tests__/integration/teacherFormGroupHistory.postgres.integration.test.ts": {
+          "before": null,
+          "after": "55ac2f34855e712717fed26fd4103379b2f6e372"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": {
+          "before": "66a750af19b4a2b4188248f5a5b00b0fc85a6f8b",
+          "after": "89e7163cdf4c4de3599513235a2b201b4595d878"
+        },
+        "server-version/backend/src/modules/huiteacher/groupReport.service.ts": {
+          "before": "692abcd005cf2fc7be3e1056f2505a9d38c91ed8",
+          "after": "b82e7f2cb71a40d9f532c808ecc8554fdd27468e"
+        },
+        "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.history.test.tsx": {
+          "before": null,
+          "after": "917509bd4d7ac68c6b9f579a1a87c08faf38faee"
+        },
+        "server-version/frontend/src/huiteacher/TeacherFormGroupVersions.tsx": {
+          "before": "56e938b28c4f163b71c9c4e86cfb013e622837fa",
+          "after": "fa9ac57474918380cf51d64937729c10210534a0"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "635b9266d8a78578f4724852ffb3fda8b382c6f6",
+        ".github/scripts/onboarding-checks.mjs": "18ac0e0729f82660789f03242fd4376477fa3a74",
+        ".github/scripts/onboarding-controls.test.mjs": "bf9d8f4b58e64e244ca4ced2480a069eb9ef899d",
+        ".github/scripts/onboarding-evidence.json": "ad5cdf9e0616dff6891836a5dbeedac50641ebf4",
+        ".github/scripts/onboarding-scope.mjs": "84e181d90c669e50cba5df0017f44ce436d5348c",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "84d95686d025d1a6073472f00742e741a8cf1ad7"
+      },
+      "components": {
+        "backend": "e9dd4a0a1f5f218f5880df5069f0841b61140075",
+        "frontend": "716ffa297676cad39f74fdc7afa5eb5dfdc90c96"
+      }
     }
   }
 }
