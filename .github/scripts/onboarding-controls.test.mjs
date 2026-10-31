@@ -207,8 +207,8 @@ test('PR381 binds the two frontend files, exact evidence and unchanged backend w
   assert.throws(()=>onboardingPlan(entries.map(e=>e.file===path?{...e,file:outside}:e),base,head,f.read,env,{...b,source:{[outside]:{before:null,after:blob}}}));
  }
  for(const patch of [{CI_EVENT:'workflow_dispatch'},{CI_HEAD_REF:BRANCHES[380]},{CI_PR_NUMBER:'380'},{CI_FORCE_FULL:'true'},{CI_SOURCE_HEAD:h('9')}]){
-  const read=(cmd,a,...rest)=>a===h('9')+'^{tree}'?h('9'):read(cmd,a,...rest);
-  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b));
+  const read=(cmd,a,...rest)=>a===h('9')+'^{tree}'?h('9'):f.read(cmd,a,...rest);
+  assert.throws(()=>onboardingPlan(entries,base,head,read,{...env,...patch},b),error=>error instanceof assert.AssertionError&&(!patch.CI_SOURCE_HEAD||/Source\/merge tree drift/.test(error.message)));
  }
  assert.throws(()=>onboardingPlan(entries,base,head,(cmd,a,...rest)=>a===base+':server-version/backend'?h('9'):f.read(cmd,a,...rest),env,b));
  assert.throws(()=>onboardingPlan([...entries,{file:'unknown',newMode:'100644'}],base,head,f.read,env,b));
