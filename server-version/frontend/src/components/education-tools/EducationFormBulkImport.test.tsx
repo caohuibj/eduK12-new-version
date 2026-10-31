@@ -74,6 +74,7 @@ describe('School form import confirmation workflow',()=>{
   const state=vi.fn(),confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
   render(<EducationPrivateToolStudio api={api as PrivateToolApi} entry="SCHOOL" organizationId="org" actorId="author" onDraftStateChange={state}/> )
   fireEvent.click(await screen.findByRole('button',{name:'编辑 已有表单'}));await waitFor(()=>expect(screen.getByRole('button',{name:'保存草稿'})).toBeEnabled())
+  await screen.findByLabelText('题干')
   enter();expect(screen.getByRole('button',{name:'保存草稿'})).toBeDisabled();expect(screen.getByRole('button',{name:'检查定义'})).toBeDisabled();expect(screen.getByLabelText('题干')).toBeDisabled()
   expect(state).toHaveBeenLastCalledWith({dirty:true,writing:false})
   fireEvent.click(screen.getByRole('button',{name:'返回我的工具'}));expect(confirm).toHaveBeenCalled();expect(screen.getByLabelText('表单待导入内容')).toHaveValue(content)

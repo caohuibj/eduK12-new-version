@@ -35,7 +35,7 @@ describe('compact private-tool workspace preserves authoring gates',()=>{
   expect(screen.getByRole('button',{name:'检查定义'})).toBeDisabled()
   expect(screen.getByRole('button',{name:'固定私有版本'})).toBeDisabled()
   fireEvent.click(save)
-  await screen.findByText('草稿已保存。固定版本需另外运行检查。')
+  await screen.findByText(entry==='SCHOOL'?'草稿已保存 · 修订 2':'草稿已保存。固定版本需另外运行检查。')
   expect(api).toHaveBeenCalledWith(base+'/draft','PUT',expect.objectContaining({expectedRevision:1,title:'已修订工作区量表'}))
   expect(screen.getByRole('button',{name:'固定私有版本'})).toBeDisabled()
   fireEvent.click(screen.getByRole('button',{name:'检查定义'}))
