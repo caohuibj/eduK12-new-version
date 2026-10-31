@@ -1,7 +1,7 @@
 # Existing generation records and their limits
 
-These are archived source records, not a newly executed generation or a rights
-certificate. Do not execute these snapshots as an application/runtime step.
+These are archived source records; no new generation run was performed.
+Do not execute these snapshots as an application/runtime step.
 Historical comments such as child/standard and internal-generated are preserved
 verbatim; they are not the current pilot's age/rights claims.
 
@@ -57,6 +57,20 @@ R/dependency environment ran or that either timestamp was independently logged.
 
 The current seven-item subset reuses these existing SVG bytes. No new R run,
 regenerated bank, replacement timestamp or reconstructed session log was made.
-The prior source's QC/test claims are not counted as a fresh reproducibility or
-rights audit. See ../THIRD_PARTY_NOTICES.md for the distinction between program
-licenses, generated SVG rights and standard-test material rights.
+The source-specific independent review separately checked both fixed R scripts,
+matRiks commit `eb5bd6159bfb006be5823f4959a75d21499a59f1` (DESCRIPTION,
+MIT LICENSE, figure definitions and draw source), and the existing bank. Inputs
+are mathematical geometry parameters, without external item images/banks. The
+18 items' 264 SVG fragments contain polygon/rect and related drawing primitives,
+with no image/text/use nodes or href/data references. No restricted external
+standard-test item image input was found.
+
+已检查固定生成脚本、生成器图形定义及现存SVG，未发现受限外部题图输入；本批图形按参数化程序生成材料处理，保留生成器署名与许可证。历史R/依赖版本及运行日志缺失，因此不承诺逐字节重建。
+
+This source conclusion does not automatically classify every possible generated
+output as MIT, and does not require extra per-SVG licenses, full old-environment
+hash recovery or new author contacts. No generic rights HOLD or new gate is
+created. The prior source's test/QC claims are not counted as a fresh
+byte-for-byte rebuild. See ../THIRD_PARTY_NOTICES.md for license attribution;
+psychometric validity, norms and age adaptation remain unverified.
+

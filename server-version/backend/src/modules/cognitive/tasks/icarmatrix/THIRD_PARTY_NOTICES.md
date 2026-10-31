@@ -39,26 +39,30 @@ license is **GPL (>= 2)**. See its [fixed official DESCRIPTION](https://github.c
 The DescTools version used to generate this bank is not recorded; this current
 source inspection does not identify the installed historical version.
 
-The matRiks MIT grant above concerns software. It is **not a declaration that all
-bank SVGs are MIT-licensed images**. Similarly, DescTools' program license alone
-does not establish the license or copyright status of every generated output.
-No independent output-rights grant/provenance record was found for these specific
-SVGs; source review remains open. A separate per-SVG license or old dependency
-hash is not automatically required to establish that the inputs were procedural;
-its absence alone does not show a restricted input or justify a permanent HOLD.
-Exact old-environment replay and actual input rights are separate questions.
-The script uses parameterized figures (such
-as `pacman()`), not an embedded original standard-test image, but that observation
-does not resolve all rights by itself. The historical `internal-generated` label
-is not proof of output rights or a claim that EduK12 authored matRiks.
+The source-specific independent review checked both archived R scripts,
+matRiks commit `eb5bd6159bfb006be5823f4959a75d21499a59f1` (DESCRIPTION,
+MIT LICENSE, figure definitions and draw source), and the existing SVG bank.
+Inputs are mathematical geometry parameters. All 264 SVG fragments across the
+18 items use polygon/rect and related drawing primitives; no image/text/use
+nodes or href/data references were found. The parameterized `pacman()` figure
+is not an embedded standard-test image. No restricted external ICAR/Raven/
+MaRs-IB item image input was found.
 
-Fixed generation scripts and existing bank history are archived under
-[provenance](provenance/README.md). They are source records only and are not
-executed by the application. The exact historical R/DescTools/svglite/jsonlite
-environment and retained generation stdout are missing; no reproducible rebuild
-is claimed. No package source beyond those archived project scripts is vendored.
-Neither these software licenses nor this notice supplies psychometric norms,
-an ICAR/Raven material license, or permission for unrelated test materials.
+已检查固定生成脚本、生成器图形定义及现存SVG，未发现受限外部题图输入；本批图形按参数化程序生成材料处理，保留生成器署名与许可证。历史R/依赖版本及运行日志缺失，因此不承诺逐字节重建。
+
+The matRiks MIT grant above concerns its software, and DescTools declares
+GPL (>=2) for its program. This conclusion is based on the inspected inputs and
+source, not on a rule that any output of MIT software automatically becomes a
+MIT-licensed image. The historical `internal-generated` label is not a claim that
+EduK12 authored matRiks. No generic output-rights HOLD, extra per-SVG license
+requirement or historical-dependency-hash gate is introduced.
+
+[Archived source and bank history](provenance/README.md) retain the existing
+records. The exact historical R/DescTools/svglite/jsonlite environment and stdout
+are missing, so byte-for-byte reconstruction is not promised. These scripts are
+not executed by the application, and no package source beyond the archived
+project scripts is vendored. These records supply no psychometric norms or
+permission for unrelated external test material.
 
 MaRs-IB is an alternative discussed in the literature. Its paper is open access,
 but the paper describes its test forms as non-commercial-use materials. Those

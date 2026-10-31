@@ -110,12 +110,19 @@ be interpreted as reliable sub-ability scores. Independent review found the
 80/64px figures clear in its available rendering; neither that review nor this
 work claims native-device or formal acceptance.
 
-The existing source-to-bank records and two fixed script snapshots are now
-provided in provenance/README.md. Exact historical R/DescTools/svglite/jsonlite
-versions and generation stdout are absent; this is explicitly unverified, not
-reconstructed. matRiks MIT software and DescTools GPL>=2 are distinguished from
-specific SVG output rights, for which independent evidence remains missing.
-Source review remains open to distinguish actual restricted inputs, if any,
-from missing exact historical-environment reproducibility. Missing per-SVG
-licenses or dependency hashes alone are not evidence of restricted inputs and
-do not create an automatic or permanent HOLD or a new gate for other tasks.
+The source-specific independent review is complete. It checked both fixed R
+scripts and matRiks commit `eb5bd6159bfb006be5823f4959a75d21499a59f1`:
+DESCRIPTION, MIT LICENSE, parameterized figure definitions and draw source. The
+inputs are mathematical geometry parameters, not external item images or banks.
+The existing 18 items contain 264 SVG fragments built from polygon/rect and
+related drawing primitives, with no image/text/use nodes or href/data references.
+No restricted external standard ICAR/Raven/MaRs-IB item images were found.
+
+已检查固定生成脚本、生成器图形定义及现存SVG，未发现受限外部题图输入；本批图形按参数化程序生成材料处理，保留生成器署名与许可证。历史R/依赖版本及运行日志缺失，因此不承诺逐字节重建。
+
+The matRiks MIT software license and DescTools GPL>=2 program license remain
+separate from a blanket claim that every possible output is automatically MIT.
+There is no generic output-rights HOLD or new per-image/dependency-hash gate.
+No regeneration, complete historical-hash reconstruction or individual-image
+author contact is required by this conclusion. The seven-item scope, absent
+psychometric validation and absent norms remain as documented above.
