@@ -194,6 +194,180 @@
     }
   },
   "candidates": {
+    "434": {
+      "schemaVersion": 1,
+      "pr": 434,
+      "enabled": true,
+      "base": "f3c3b7def0ecb663a328c9effb7a7ae90753178b",
+      "product": "f44a207d1e20bbfdf502e7e7a7c1e44df3479708",
+      "controlCheckpoint": "fc30acefc99edf7277a3cf48e2281fe48450cf85",
+      "components": {
+        "backend": "f1add827fbed7ba266f9978428688ae4ec4629ad",
+        "frontend": "a6fba422c422bb589c5793d4b75d67d03ee8330c"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "02431fa1e8cea88af348adbf2fe2c3f0338b962a",
+        ".github/scripts/onboarding-checks.mjs": "c7d52cb988f1f0f409349c3e35e0ae40e260c3b8",
+        ".github/scripts/onboarding-controls.test.mjs": "a39ff9d41f0984de059cb73ca986f44a8fafb69e",
+        ".github/scripts/onboarding-evidence.json": "bd71e4dce21914f7c51fd20713f370a6d0698b05",
+        ".github/scripts/onboarding-scope.mjs": "be840fc9ee3fbec3f338a6cd5ab0fabdfdfc64a3",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "1e8bfe293da8513f8c3a0dbd93dc195a533023ae"
+      },
+      "source": {
+        "docs/performance/questionnaire-target-20261031/PR432-CLOSEOUT-READONLY.md": {
+          "before": null,
+          "after": "005e5399ed63c3258255c8c5b677897f62015037"
+        },
+        "docs/performance/questionnaire-target-20261031/PUBLISH-PLAN.md": {
+          "before": null,
+          "after": "aa56a3bb15557a8ccc6249c9c92fae092fc54a54"
+        },
+        "docs/performance/questionnaire-target-20261031/README.md": {
+          "before": null,
+          "after": "0af70e79e37e93fb942a9eb86d4a442ce5418d41"
+        },
+        "docs/performance/questionnaire-target-20261031/backend-baseline.json.gz": {
+          "before": null,
+          "after": "903538f4509dcf1c575b301ab3fe7ebfc7ee5f7f"
+        },
+        "docs/performance/questionnaire-target-20261031/backend-baseline.log.gz": {
+          "before": null,
+          "after": "a2f2a47049708ac015d9478d74eb9b0b01111a20"
+        },
+        "docs/performance/questionnaire-target-20261031/backend-baseline.ndjson.gz": {
+          "before": null,
+          "after": "91d2461797973d3f5d9dba12c766789861dbb678"
+        },
+        "docs/performance/questionnaire-target-20261031/backend-fixed.json.gz": {
+          "before": null,
+          "after": "2110fb199583ffb9aa4080506e1921d5441589ce"
+        },
+        "docs/performance/questionnaire-target-20261031/backend-fixed.log.gz": {
+          "before": null,
+          "after": "e324a587adb09a3680279215e9d09ff710d2f50f"
+        },
+        "docs/performance/questionnaire-target-20261031/backend-fixed.ndjson.gz": {
+          "before": null,
+          "after": "392ac8aba2099863e19edeec763149df56c1f068"
+        },
+        "docs/performance/questionnaire-target-20261031/execution.json": {
+          "before": null,
+          "after": "5c5ebafe24b8a68331a082849a1adfaf0f7b5ef1"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "0250a48ff5cb189a9dc60d3eaec98a94fe961b09"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/actionlint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "1db984751b74c80548a42234571b760c0b69fe0c"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/control-command-index.json": {
+          "before": null,
+          "after": "d77dda663f591cb4ed1b1b77246b5a68add80bb2"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/control-test.log": {
+          "before": null,
+          "after": "e55fa095f3057c34f11ce525d8b085bbd59b4b15"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "f516d63a05a0d3d43efd0a0783eb63c7253cc7d8"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-target-20261031/final-qualification/run-typecheck.py": {
+          "before": null,
+          "after": "54cac31ae104142af3d267ec538dda44aa83e559"
+        },
+        "docs/performance/questionnaire-target-20261031/frontend-baseline.json.gz": {
+          "before": null,
+          "after": "9dea1adecf93b7182dd96a075f5222346dd55f49"
+        },
+        "docs/performance/questionnaire-target-20261031/frontend-baseline.log.gz": {
+          "before": null,
+          "after": "a97f634edeb89ccdb80dd78bad78765dd0d8d8c2"
+        },
+        "docs/performance/questionnaire-target-20261031/frontend-fixed.json.gz": {
+          "before": null,
+          "after": "f67db030a3283e05e009af06dd16907c151d27ec"
+        },
+        "docs/performance/questionnaire-target-20261031/frontend-fixed.log.gz": {
+          "before": null,
+          "after": "772feac45331e9c6b7758e21f6a6c76105b8b1f1"
+        },
+        "docs/performance/questionnaire-target-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "62ed337b76aabc6508c112e7da2fc9b9da4c6481"
+        },
+        "docs/performance/questionnaire-target-20261031/types/backend.json": {
+          "before": null,
+          "after": "c4c3246926d67f9bddd9a52b767e39d63119746c"
+        },
+        "docs/performance/questionnaire-target-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-target-20261031/types/frontend.json": {
+          "before": null,
+          "after": "143c884db6d361929b3787c762fe07aea51ecb8f"
+        },
+        "docs/performance/questionnaire-target-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/questionnaire-target-20261031/types/prisma-generate.log": {
+          "before": null,
+          "after": "7ed8f0f2e92d5e39553d4effa02ef6169c8ca4c5"
+        },
+        "docs/performance/questionnaire-target-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "a126c0bba9cd176f8da60380dcfc085df52f32e3"
+        },
+        "server-version/backend/src/__tests__/questionnaire/available-target.test.ts": {
+          "before": null,
+          "after": "0d817f9a86e092839c9bf9cd166a7e76d9580651"
+        },
+        "server-version/backend/src/controllers/questionnaireController.ts": {
+          "before": "de5b3a010469c9087b7748468dc5acbfa87e73e2",
+          "after": "d39ec92047d3516c6baf5d955288b1df6e22f916"
+        },
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": {
+          "before": "9a52c0264d6a44d8ec7a65f4eeada6925d489a50",
+          "after": "30ff3ad018a5864d44c1f0a85e44e676830172f2"
+        },
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": {
+          "before": null,
+          "after": "4e9c5b3f980015e2ea37412fa9d48e293d681fcc"
+        }
+      },
+      "activationReview": {
+        "reviewer": "delegated Codex scoped self-review; independent review before activation",
+        "scope": "Existing original admission and changed-input CodeQL; no application/build/DB replay",
+        "userAuthorization": "DOT delegated user 2026-10-31T02:53:52Z allows PR432 and exact target slice publish Ready scoped CI and merge; no deployment"
+      }
+    },
     "432": {
       "schemaVersion": 1,
       "pr": 432,
@@ -5222,9 +5396,9 @@
       "schemaVersion": 1,
       "pr": 428,
       "enabled": true,
-      "base": "6627b41580ae7852ceff9ea33b853985f4390f55",
-      "product": "1338e82efdce0d478d4db1bf98c3f46a5ee74c69",
-      "controlCheckpoint": "9e3cbe991885d98c45a11aea7ce2daa94acffd0c",
+      "base": "f3c3b7def0ecb663a328c9effb7a7ae90753178b",
+      "product": "2c1ef5d3df1211635b04fac219cc993a5d68bfef",
+      "controlCheckpoint": "18726ca25d0b8ddb28ba105ead6acdf274ae3627",
       "source": {
         "docs/evidence/library-self-group-release-20261031/README.md": {
           "before": null,
@@ -5343,6 +5517,26 @@
           "after": "6b7888ed5c91178794c2ca265667c7cce8633fff"
         },
         "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/README.md": {
+          "before": null,
+          "after": "49e89654e1ba81a2d8e5afbf6bf9cdd95388ca0e"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/backend-types.json": {
+          "before": null,
+          "after": "67204d2773818e35c95adc098a4d2a54d7a0e2f3"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.json": {
+          "before": null,
+          "after": "acfeab6ffb32e9b2cd376b7d0d5e01b1cb7f0fa1"
+        },
+        "docs/evidence/teacher-group-transaction-boundary-20261031/backport-428/main432/frontend-types.log": {
           "before": null,
           "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
         },
@@ -5698,11 +5892,11 @@
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "b7c8c4374b7f04ac7d182ebb6ac9ee1859ead767",
-        ".github/scripts/onboarding-checks.mjs": "6c39e7e2a329fcf03f4d27bdf4406dbaedbf1f97",
-        ".github/scripts/onboarding-controls.test.mjs": "f59ab4ea334d1404d1f100c3f165d4fc3c64186f",
-        ".github/scripts/onboarding-evidence.json": "1da3b796d8f0fb4888886bf2bbdcd710cd960778",
-        ".github/scripts/onboarding-scope.mjs": "66b4dee206aa512c8526d1685fdb258bed78f4d1",
+        ".github/scripts/onboarding-bindings.json": "02431fa1e8cea88af348adbf2fe2c3f0338b962a",
+        ".github/scripts/onboarding-checks.mjs": "c7d52cb988f1f0f409349c3e35e0ae40e260c3b8",
+        ".github/scripts/onboarding-controls.test.mjs": "a39ff9d41f0984de059cb73ca986f44a8fafb69e",
+        ".github/scripts/onboarding-evidence.json": "bd71e4dce21914f7c51fd20713f370a6d0698b05",
+        ".github/scripts/onboarding-scope.mjs": "be840fc9ee3fbec3f338a6cd5ab0fabdfdfc64a3",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -5712,11 +5906,11 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "7e254b9280ee1efe390c1098742edbf964d5a5d6"
+        ".github/workflows/ci.yml": "1e8bfe293da8513f8c3a0dbd93dc195a533023ae"
       },
       "components": {
-        "backend": "f5190a3bba8069a768c53cf7ff69d832280fad99",
-        "frontend": "9bfa314a1fdf9eba874c4e88c5a69b03289a0a52"
+        "backend": "a904d85585fd635c7521f5f025eaa5a6660843e9",
+        "frontend": "1a014099924357f420821fc7c8aca1344ab472b0"
       }
     }
   }

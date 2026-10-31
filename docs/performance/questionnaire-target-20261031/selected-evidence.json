@@ -1,0 +1,102 @@
+{
+  "kind": "LOCAL_SELECTION_NOT_CI_ADMISSION",
+  "productHead": "2685b3dbc78d59ec790138966af4935191d8a70d",
+  "distinctCases": 9,
+  "reports": [
+    {
+      "path": "docs/performance/questionnaire-target-20261031/backend-fixed.json.gz",
+      "gzipSHA256": "abc9a24c4d364b8b9bbd8f21ef05ae752203fcfcc02315f922b73869dfd1f7f7",
+      "originalJSONSHA256": "59fc728d5b3665b1866be1f3843c0519a8faa78b3d3f9500ac7a7102be1efdfa",
+      "originalSourceAssociation": "2685b3dbc78d59ec790138966af4935191d8a70d",
+      "associationKind": "Unsigned local cases ran on uncommitted source later preserved in the product commit; no invented contemporaneous execution Git identity.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "originalCases": [
+        {
+          "fullName": "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps not-joined outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps draft outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps general outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps private outside target availability",
+          "status": "passed"
+        },
+        {
+          "fullName": "keeps missing outside target availability",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "keeps the default catalog and identical target DTO while narrowing questionnaire and attempt rows",
+        "keeps not-joined outside target availability",
+        "keeps draft outside target availability",
+        "keeps general outside target availability",
+        "keeps private outside target availability",
+        "keeps missing outside target availability"
+      ]
+    },
+    {
+      "path": "docs/performance/questionnaire-target-20261031/frontend-fixed.json.gz",
+      "gzipSHA256": "18189e9b10a1b76a790cfbc4858e11aef4a31aa2cda93ccb6307bb139ca5e0d1",
+      "originalJSONSHA256": "e2584822b82ddb43e173acfafbf0dd774d6de2d5849ead133f14df13b9e0551f",
+      "originalSourceAssociation": "2685b3dbc78d59ec790138966af4935191d8a70d",
+      "associationKind": "Unsigned local cases ran on uncommitted source later preserved in the product commit; no invented contemporaneous execution Git identity.",
+      "originalSummary": {
+        "success": true,
+        "numPassedTests": 3,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "originalCases": [
+        {
+          "fullName": "opens only the target questionnaire with unchanged active-with-completed dispatch",
+          "status": "passed"
+        },
+        {
+          "fullName": "opens only the target questionnaire with unchanged completed dispatch",
+          "status": "passed"
+        },
+        {
+          "fullName": "opens only the target questionnaire with unchanged unstarted dispatch",
+          "status": "passed"
+        }
+      ],
+      "selectedCases": [
+        "opens only the target questionnaire with unchanged active-with-completed dispatch",
+        "opens only the target questionnaire with unchanged completed dispatch",
+        "opens only the target questionnaire with unchanged unstarted dispatch"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "path": "docs/performance/questionnaire-target-20261031/types/backend.json",
+      "sha256": "eb3c0ec16c3a7081ce1cff91f0b176e7381f02cb627ad736953a3803df7a6228",
+      "component": "backend",
+      "exitCode": 0,
+      "componentTree": "a05e7a9bedabb422d91c34e21399883f38a2010d"
+    },
+    {
+      "path": "docs/performance/questionnaire-target-20261031/types/frontend.json",
+      "sha256": "775332b775097b120c090989abd440f6904bd12e3b7209ce90c72122418b04b9",
+      "component": "frontend",
+      "exitCode": 0,
+      "componentTree": "5dc591fe9d9de5adb8f2e24290bdb25d8df09e9c"
+    }
+  ]
+}
