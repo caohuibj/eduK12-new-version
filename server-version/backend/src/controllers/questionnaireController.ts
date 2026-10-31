@@ -1958,12 +1958,13 @@ export const questionnaireController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
-      const { courseId } = req.query
+      const { courseId, questionnaireId } = req.query
 
       let where: any = {
         status: 'PUBLISHED',
         type: 'COURSE',
       }
+      if (questionnaireId) where.id = questionnaireId as string
 
       if (userRole === UserRole.STUDENT) {
         // 获取学生所在的所有课程ID
