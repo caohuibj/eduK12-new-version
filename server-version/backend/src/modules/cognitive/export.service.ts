@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { prisma } from '../../config/database'
 import { decryptCognitivePayload } from './cognitive.security'
+import { buildResearchTrialDataset, extractValidRtFloorMs, type ResearchTrialDataset } from './research-trial-dataset'
 import { saveToFile, SavVariable, VariableMeasure, VariableType } from 'sav-writer'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -77,6 +78,8 @@ interface CognitiveExportSession {
   scoringVersion: string
   startedAt: Date
   finishedAt: Date | null
+  randomSeed?: string
+  configSnapshotEncrypted?: string
   scoreEncrypted: string | null
   metricsEncrypted: string | null
   qualityFlagsEncrypted: string | null
@@ -714,6 +717,42 @@ const tableToCsv = (headers: string[], rows: Array<Record<string, unknown>>): st
     lines.push(headers.map((header) => csvValue(row[header])).join(','))
   }
   return `${lines.join('\n')}\n`
+}
+
+/**
+ * Roadmap v2.0 PR4 — 逐试次研究数据集（item-level）。
+ * 复用 full 详情的限流与双代际试次解码；validRtFloorMs 来自会话解密的
+ * frozen config snapshot；dataOrigin 固定 'real'。
+ */
+export const getCognitiveResearchTrialDataset = async (
+  assignmentId: string,
+  options: CognitiveExportOptions = {},
+): Promise<ResearchTrialDataset> => {
+  const assignment = await getAssignment(assignmentId)
+  const sessions = await getSessions(assignmentId, 'full', options.dateRange, options.previewLimit)
+  const decoded = sessions.map(decodeSession)
+  return buildResearchTrialDataset(
+    decoded.map((session, index) => {
+      const raw = sessions[index]
+      const configSnapshot = raw.configSnapshotEncrypted
+        ? decryptCognitivePayload<unknown>(raw.configSnapshotEncrypted)
+        : null
+      return {
+        id: session.id,
+        userId: session.userId,
+        anonymousCode: session.anonymousCode,
+        attemptNo: session.attemptNo,
+        testType: session.testType,
+        engineVersion: session.engineVersion,
+        scoringVersion: session.scoringVersion,
+        configVersion: session.configVersion,
+        randomSeed: raw.randomSeed ?? '',
+        validRtFloorMs: extractValidRtFloorMs(configSnapshot),
+        trials: session.trials,
+      }
+    }),
+    { anonymize: options.anonymize ?? true },
+  )
 }
 
 export const buildCognitiveResearchPackage = (
