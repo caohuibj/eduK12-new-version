@@ -503,3 +503,14 @@ test('quota candidate requires exact source and backend image success without se
  for(const change of [{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'},{CI_PR_NUMBER:'422'},{CI_PR_REPOSITORY:'outside/repo'}])
   assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...change},f.b));
 });
+
+test('Training course delivery qualifier binds its backend/frontend and reviewed Legacy compatibility without widening source scope',()=>{
+ const f=fixture(),backend='server-version/backend/src/modules/scale/scale-access.ts',frontend='server-version/frontend/src/pages/student/ScaleAssessment.tsx';
+ f.b.pr=423;f.b.source=Object.fromEntries([backend,frontend].map(path=>[path,{before:null,after:blob}]));
+ f.entries=[backend,frontend,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'423',CI_HEAD_REF:BRANCHES[423]};
+ const read=(cmd,a,...r)=>cmd==='rev-parse'&&a===base+':server-version/frontend'?h('9'):f.read(cmd,a,...r);
+ const p=onboardingPlan(f.entries,base,head,read,f.env,f.b);assert.equal(p.pr,423);assert(task1SastConfig(p,f.b).paths.includes(frontend));
+ const unknown='server-version/backend/src/modules/scale/unrelated-new-runtime.ts';
+ assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});

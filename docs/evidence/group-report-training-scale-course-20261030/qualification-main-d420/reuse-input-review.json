@@ -1,0 +1,56 @@
+[
+  {
+    "origin": "a52af7a4a7aee6e6e1d06c862104e224a59e1524",
+    "entry": "server-version/backend/src/__tests__/scale/course-delivery.test.ts",
+    "delta": [
+      "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+      "server-version/backend/src/modules/scale/scale-access.ts"
+    ],
+    "staticImportClosureFiles": 1426,
+    "changedInStaticImportClosure": [
+      "server-version/backend/src/modules/scale/scale-access.ts"
+    ],
+    "limitation": "TypeScript static module resolution only; not a signed historical execution or arbitrary dynamic runtime proof"
+  },
+  {
+    "origin": "a52af7a4a7aee6e6e1d06c862104e224a59e1524",
+    "entry": "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx",
+    "delta": [
+      "server-version/frontend/src/modules/reporting/PersonalChangesReport.tsx",
+      "server-version/frontend/src/modules/reporting/__tests__/PersonalChangesReport.loading.test.tsx"
+    ],
+    "staticImportClosureFiles": 46,
+    "changedInStaticImportClosure": [],
+    "limitation": "TypeScript static module resolution only; not a signed historical execution or arbitrary dynamic runtime proof"
+  },
+  {
+    "origin": "a52af7a4a7aee6e6e1d06c862104e224a59e1524",
+    "entry": "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts",
+    "delta": [
+      "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+      "server-version/backend/src/modules/scale/scale-access.ts"
+    ],
+    "staticImportClosureFiles": 1433,
+    "changedInStaticImportClosure": [
+      "server-version/backend/src/modules/scale/scale-access.ts"
+    ],
+    "limitation": "TypeScript static module resolution only; not a signed historical execution or arbitrary dynamic runtime proof"
+  },
+  {
+    "origin": "8ee77177ffb6cea6e14e94c14d37fba8f0f9d13f",
+    "entry": "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+    "delta": [
+      "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts",
+      "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts",
+      "server-version/backend/src/modules/training-analysis/group-report.service.ts",
+      "server-version/backend/src/modules/training-analysis/group-source.ts",
+      "server-version/backend/src/modules/training-analysis/source.ts"
+    ],
+    "staticImportClosureFiles": 1429,
+    "changedInStaticImportClosure": [
+      "server-version/backend/src/modules/training-analysis/group-source.ts",
+      "server-version/backend/src/modules/training-analysis/source.ts"
+    ],
+    "limitation": "TypeScript static module resolution only; not a signed historical execution or arbitrary dynamic runtime proof"
+  }
+]

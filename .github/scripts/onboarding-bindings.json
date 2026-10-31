@@ -4345,6 +4345,195 @@
       },
       "activationNote": "Existing backend-only onboarding route422. Original4 distinct app cases,2 native observations and exact final backend type receipt admitted unsigned with source-capture limits disclosed. No app/PG/browser/frontend/participant replay,no schema change,no new workflow. Scope/admission/CodeQL/gate only;not a merge or deployment."
     },
+    "423": {
+      "schemaVersion": 1,
+      "pr": 423,
+      "enabled": true,
+      "base": "d420e90e46036b4518a0f729cb3e1ef4b9ca3306",
+      "product": "f7e90457e7fd30c0efbd1f9a3da0a128f025d4a9",
+      "controlCheckpoint": "caa48cccb190b33a82fd5ce66da0c76792d5f76a",
+      "source": {
+        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
+          "before": null,
+          "after": "1b7cc443194acbb917244111d9d6032951f91636"
+        },
+        "docs/development/training-scale-course-delivery-20261030.md": {
+          "before": null,
+          "after": "18598413a5c09bdbdf167061a3b01425be84e4d8"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/README.md": {
+          "before": null,
+          "after": "638ea2b55cb22cf5c9a95a9b6542b6c56244661b"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "c4a26260812845d6d244081ed0e041f7b59f411d"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/backend-types.json": {
+          "before": null,
+          "after": "c006e1bd300c4e23716f124b6189a54046e4c75e"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/native-proof.json": {
+          "before": null,
+          "after": "7877b5406193dcc705f10a275a83a9bf1038a553"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/postgres.json": {
+          "before": null,
+          "after": "da98629192ad1ff1673ea655c746af652ab58d9f"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/postgres.json.log": {
+          "before": null,
+          "after": "fd985f70b13126cc0a01c6c61a29e94c621457e2"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "e55b4b48c81ff83ec0393f2a0c8cefde4404505d"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/README.md": {
+          "before": null,
+          "after": "4888b22383072271d5396bf35293c473480afffb"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-type-preflight-first.json": {
+          "before": null,
+          "after": "c809261a356140e38ddc42de94090fc43b832334"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "46aab730b762297092a1d51bf44109bbb304031e"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-types.json": {
+          "before": null,
+          "after": "424d4f1eef5e4fb9fb0088bc932ec67a6046bf24"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend-types.json": {
+          "before": null,
+          "after": "a0e5772532269593115fd194a3bac6f15b4c2464"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend.json": {
+          "before": null,
+          "after": "09b590acd455dd5b18a19ddc991d156a390e8726"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend.log": {
+          "before": null,
+          "after": "fc2833093c0b79ff6ea39397fdcb8558f9a7eefa"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/postgres-first.json": {
+          "before": null,
+          "after": "2366511db403f821dfa464e07e69ceeb27e1c0ad"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/postgres-first.log": {
+          "before": null,
+          "after": "3fca880b384811e23d12ff3634648af1b3ef71e2"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "75b437510d8c7a35cc83d34febfa6c755db05372"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.json": {
+          "before": null,
+          "after": "7ac364bd8e7ba9c0125e7c02f0b96fee8b63fa37"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.json": {
+          "before": null,
+          "after": "de608dd96f67e255676da0749e659750d798aaea"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/reuse-input-review.json": {
+          "before": null,
+          "after": "66c61e9ad601ef0c95aa77bc1cf79ab172147d3b"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/training-scale-course-delivery-proof.json": {
+          "before": null,
+          "after": "7dd3c47ce4c50447051cec369ed1bf42d8bb8b5d"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "077ac855ab1e087c47a8cbd1e9bce9820e229f84"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/unit.json": {
+          "before": null,
+          "after": "166d0827f1a74d081d41254cb20a0ecf63547d2b"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/unit.log": {
+          "before": null,
+          "after": "40d18d89fb4bc080cac879c4c30844d73649ea38"
+        },
+        "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts": {
+          "before": null,
+          "after": "9583dd52829163f19eb974af852a5145a3209006"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4133686e953e2352fc099bf6ffb5c271941b39ee"
+        },
+        "server-version/backend/src/__tests__/scale/course-delivery.test.ts": {
+          "before": null,
+          "after": "2d51cad33ec704185540e24f1592dfa8fe79e931"
+        },
+        "server-version/backend/src/modules/scale/scale-access.ts": {
+          "before": "6b2826cb18bba6d10a27ef7fc10be12c76b45b20",
+          "after": "df98da1e029c91e51b357d6d576f77fab172c5b0"
+        },
+        "server-version/backend/src/modules/scale/scale-restart.service.ts": {
+          "before": "9b8f252095068544a57624c9943830b06eff3784",
+          "after": "0049de59daf3267997d83c09e64caa190be9b9db"
+        },
+        "server-version/backend/src/modules/scale/scale-start.controller.ts": {
+          "before": "ed3a7020e54b843117094421b738cdc236c833ef",
+          "after": "3010d9ad9b56e062de91491040ed411b344528b2"
+        },
+        "server-version/frontend/src/pages/student/ScaleAssessment.tsx": {
+          "before": "0b5f68cdf56eb8b27f01e33289dba9177c83046c",
+          "after": "c303ac2bcb6d19aa07bf7008d88c856059d66d25"
+        },
+        "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx": {
+          "before": "fba6385f8ae1d5a200c5720f417492e2cb024e87",
+          "after": "cb1d740ad628e4b25d35eea71411b95afad5f3a4"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "b17da768ed4f0b766b6b345961e89e7de278034f",
+        ".github/scripts/onboarding-checks.mjs": "04c4a3ca3d93797c11e3a6a05dccfae6343222c3",
+        ".github/scripts/onboarding-controls.test.mjs": "7f7a59c8dede45e89cc9dd97a085d84cde50d1b3",
+        ".github/scripts/onboarding-evidence.json": "fdca7a1e4e2d6c790fbfee1ce8ef7e1de4c1a6c4",
+        ".github/scripts/onboarding-scope.mjs": "d0bc3ad38e317e77206d53cb88880adf456ce70d",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "2cf40fea1fdc22619dd1072a027a782f601d7307"
+      },
+      "components": {
+        "backend": "4b2481a35fa01fccff933f85676c99883d6fc52d",
+        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
+      }
+    },
     "421": {
       "schemaVersion": 1,
       "pr": 421,

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "firstStartStatus": 200,
+  "trustedAllocationAndMembership": true,
+  "realLegacyCourseIdPreserved": true,
+  "courseType": "LEGACY_COURSE",
+  "oldUnscopedAttemptUnchanged": true,
+  "oldTrainingLifecycleReplayed": false,
+  "productionAccessed": false
+}

@@ -219,7 +219,7 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
- assert(['task1','choice-page',404,408,414,415,418,419,420,421,422].includes(p.pr));assert.equal(p.product,b.product);
+ assert(['task1','choice-page',404,408,414,415,418,419,420,421,422,423].includes(p.pr));assert.equal(p.product,b.product);
  const paths=[...Object.keys(b.source),...(p.pr===421?[...QUOTA_CONTROLS,'.github/scripts/merge-gate.mjs']:[]),...([404,419,422].includes(p.pr)?['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']:[]),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
@@ -514,9 +514,9 @@ export function verifyPr420ExecutionMapping(receipt,mapping,product,productTree)
 
 async function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,404,408,414,415,418,419,420,421,422,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,404,408,414,415,418,419,420,421,422,423,'task1','choice-page'].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,421,422].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,421,422,423].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
   if(p.pr==='choice-page'){
@@ -536,7 +536,7 @@ async function admit(){
     assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
     for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
     const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
-    assert.deepEqual(delta,[404,408,414,415,418,419,421,422].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
+    assert.deepEqual(delta,[404,408,414,415,418,419,421,422,423].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
     admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
@@ -553,7 +553,7 @@ async function admit(){
   if(p.pr===421){assert.deepEqual(review.types,[]);assert.equal(review.compilerLocation,'REQUIRED_BACKEND_PRODUCTION_IMAGE');}
   const types=p.pr===421?[{component:'backend',status:'REQUIRED_BACKEND_PRODUCTION_IMAGE',ciExecuted:false}]:p.pr===395?admitPr395LocalTypes(p,review):p.pr===393?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>verifyTypeReceipt(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if([372,374,404,408,414,418].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374,404,408,414,418,423].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   // The fixed415 source plan proves its backend tree equals the exact base.
   // Do not rerun or invent a compiler receipt for this unchanged component.
   if([415,420].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['frontend']);
