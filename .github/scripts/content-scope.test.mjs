@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
+import { classify, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, backendModuleFilesOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
@@ -15,6 +15,58 @@ const root = 'server-version/backend/src/modules/';
 const scale = `${root}scale/instruments/new_scale/1.0.0/instrument.ts`;
 const cognitive = `${root}cognitive/tasks/STROOP/seeds.ts`;
 const sjt = `${root}situational/instruments/new-sjt/1.0.0/instrument.json`;
+test('backend modules retain backend qualification without admitting frontend schema or shared API changes',()=>{
+  const files=[`${root}campus/group-reports.ts`,'server-version/backend/src/__tests__/campus/group-reports.test.ts','docs/evidence/group/as-run-probe.py','docs/evidence/group/query.sql.gz','docs/evidence/group/SHA256SUMS'];
+  assert.equal(backendModuleFilesOnly(files),true);
+  assert.equal(backendModuleFilesOnly([`${root}scale/onboarding/report-variants.ts`,`${root}scale/instruments/example/1.0.0/report-variants.json`,'docs/scale-intake/alignment.md']),true);
+  for(const file of ['server-version/frontend/src/pages/student/CourseDetail.tsx','server-version/backend/prisma/schema.prisma','server-version/backend/src/routes/scales.ts',`${root}scale/scale.routes.ts`,`${root}assessment-runtime/compiler.ts`,`${root}reporting/schema.ts`,`${root}scale/scale-scoring.ts`,`${root}training/auth.ts`,`${root}parent-portal/authorization.ts`,`${root}survey/identity.service.ts`,'server-version/backend/package-lock.json','server-version/docker-compose.yml','.github/workflows/ci.yml','docs/evidence/group/run.sh'])assert.equal(backendModuleFilesOnly([...files,file]),false,file);
+  const entries=files.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+  assert.equal(classifyChanges(entries).backend_modules,true);
+  assert.equal(classifyChanges(entries,true).backend_modules,false);
+  assert.equal(classifyChanges([{...entries[0],newMode:'120000'}]).backend_modules,false);
+});
+test('backend module aggregate retains all existing backend jobs and rejects selected failure or missing checks',()=>{
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'backend'})}};
+    const expected=draft?['scope','pr-light-backend']:['scope','backend','backend-regression','docker','codeql'];
+    assert.deepEqual(requiredChecks(needs,draft),expected);
+    for(const name of expected)needs[name]={...needs[name],result:'success'};
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const name of expected)for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...needs,[name]:{...needs[name],result}},draft).includes(name));
+    assert(failedChecks({...needs,scope:{result:'success',outputs:{...needs.scope.outputs,media2:'true'}}},draft).includes('scope'));
+  }
+});
+test('backend module workflow removes only unrelated outer frontend and acceptance jobs',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  for(const draft of [true,false]){
+    const outputs=scopeOutputs('false','false','false',{scenario:'backend',application_route:'legacy'});
+    const needs={scope:{result:'success',outputs}};
+    const github={event_name:'pull_request',ref_name:'feature/backend',event:{pull_request:{draft,number:1,head:{ref:'feature/backend'}}}};
+    for(const name of ['maintenance','pr-light-backend','pr-light-frontend','backend','backend-regression','frontend','frontend-build','browser','backend-browser-build','miniprogram','docker','post-merge-smoke']){
+      const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
+      const actual=new Function('needs','github','vars','cancelled','fromJSON',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse);
+      assert.equal(Boolean(actual),draft?name==='pr-light-backend':['backend','backend-regression','docker'].includes(name),name+' draft='+draft);
+    }
+  }
+  assert.match(block('codeql'),/BACKEND_MODULES:.*scenario == 'backend'/);
+  assert.match(block('codeql'),/BACKEND_MODULES==='true'\?\{paths:\['server-version\/backend\/src'\]\}/);
+});
+test('backend module CLI classifies a real Git diff without broad frontend acceptance',()=>{
+  const cwd=process.cwd(),dir=mkdtempSync(join(tmpdir(),'backend-route-'));
+  const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const commit=()=>{git('add','.');git('-c','user.name=Scope fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');};
+  try{
+    git('init','-q');writeFileSync(join(dir,'README.md'),'fixture');commit();const base=git('rev-parse','HEAD');
+    const file=join(dir,'server-version/backend/src/modules/campus/group-reports.ts');mkdirSync(dirname(file),{recursive:true});writeFileSync(file,'export const fixture=true;');commit();
+    process.chdir(dir);
+    const env={...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_HEAD_REF:'feature/backend-modules',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',CI_FORCE_FULL:'',GITHUB_OUTPUT:''};
+    const result=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{env,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+    assert.equal(result.scenario,'backend');assert.equal(result.application_route,'legacy');assert.equal(result.frontend_build,false);assert.equal(result.codeql,true);assert.equal(result.visual_hosted,false);
+    for(const key of Object.keys(acceptanceFor([])))assert.equal(result[key],false,key);
+    assert.deepEqual(result.platformReasons,[]);
+  }finally{process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
+});
 test('engineering records follow the affected component without admitting executable or scientific inputs',()=>{
   const records=['docs/performance/navigation/README.md','docs/evidence/cli/metadata.json','docs/evidence/cli/checks.json.gz'];
   const page='server-version/frontend/src/pages/student/CourseDetail.tsx';
