@@ -7099,6 +7099,99 @@
         "backend": "9940cf26dec648ef1d7b7c4688ce285c3cc9c2b6",
         "frontend": "b63667c1ad041a74c903b55e37d03b3a122b6afe"
       }
+    },
+    "443": {
+      "schemaVersion": 1,
+      "pr": 443,
+      "enabled": true,
+      "base": "3ae9cb534e8c934cc10d1e4b9000db64d0aed8cc",
+      "product": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+      "controlCheckpoint": "449dea31605ce281af74456ce145a662de58d4db",
+      "source": {
+        "docs/evidence/teacher-group-closeout-20261031/README.md": {
+          "before": null,
+          "after": "09208845b6babf4a24e9b08779c8b758b0291442"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/backend-types.json": {
+          "before": null,
+          "after": "2645612d01d8b0b5aec4db828a6852f8e422a33d"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/candidate-tree.json": {
+          "before": null,
+          "after": "17c1ab43099618453c1b0833239e301c8351b02b"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/frontend-types.json": {
+          "before": null,
+          "after": "d6d20c842bc75c94bab5dad07743efbc41f07b42"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/initial-read-retry.json": {
+          "before": null,
+          "after": "868a67163dd198df15a57e7a622885c3e20fb496"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/initial-read-retry.log": {
+          "before": null,
+          "after": "0eb7d2df7456b932070af050bac525c9f65e82a5"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/partial-metrics.json": {
+          "before": null,
+          "after": "9bfa6b0ddb56e2f7e48267bcbb78b556ffa6420c"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/partial-metrics.log": {
+          "before": null,
+          "after": "e4aa5e462ca94b0bb14132ec2237bd141461c4a7"
+        },
+        "docs/evidence/teacher-group-closeout-20261031/raw-sha256.json": {
+          "before": null,
+          "after": "8f3c4bdc07ac4eaec3606f86fe3dec1742c39321"
+        },
+        "server-version/backend/src/__tests__/huiteacher/numeric-group-partial-metrics.test.ts": {
+          "before": null,
+          "after": "456dc2d702e1ff1042a5e76eb34f82d708d279c0"
+        },
+        "server-version/backend/src/modules/huiteacher/numericGroupReport.service.ts": {
+          "before": "26d6cf32f5689749e96ebde72dfe814363d3d7d8",
+          "after": "37f4b07c78a1888572c4b99ba7c73f65a954537f"
+        },
+        "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.retry.test.tsx": {
+          "before": null,
+          "after": "151b087514ca9af197971251b05a8f87f1b2a2f2"
+        },
+        "server-version/frontend/src/huiteacher/TeacherNumericGroupReports.tsx": {
+          "before": "f67edde4970bfdfc1c780f2820f0c4047e7f319a",
+          "after": "37f798c0aa2d9ef5227cc9787fda6faca338aba4"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "c50f63c775c883a3494f3a388f2cd69203953239",
+        ".github/scripts/onboarding-checks.mjs": "5febf0f2b4d338f4419897d018e7eff78fe02800",
+        ".github/scripts/onboarding-controls.test.mjs": "8eeee7b90d75eb34b746f020d1df1819f06a39a2",
+        ".github/scripts/onboarding-evidence.json": "2784a08db1564fe3082f15e50f62eea1d4cf2a09",
+        ".github/scripts/onboarding-scope.mjs": "a5e21212ab371eed2cd47157049d0b05f029f656",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "6a5f89a18a17b9909abf3fe6ee43640f3379a461"
+      },
+      "components": {
+        "backend": "29b86b19038c196aa5b2728f5e33579a8ba56ee5",
+        "frontend": "dfdc072b45a35f04261c807c72a89021f5c9aa1b"
+      }
     }
   }
 }

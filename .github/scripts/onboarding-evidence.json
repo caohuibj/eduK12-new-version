@@ -15286,6 +15286,89 @@
           "log": "docs/evidence/teacher-form-group-history-20261031/main437/frontend-types.log"
         }
       ]
+    },
+    "443": {
+      "schemaVersion": 1,
+      "product": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "One focused producer mock boundary and one React initial-read retry case, not a new real PostgreSQL/native/two-wave journey.",
+          "The producer keeps the existing engine/read and same-transaction hook; current exact types include the unchanged Form parent. No whole-suite, FINAL or prior pointer-success replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "partial-metrics.json",
+          "path": "docs/evidence/teacher-group-closeout-20261031/partial-metrics.json",
+          "sha256": "24e5295759d917fca867114c412418c73c5c22c532bf8d7153552ba498b03b3a",
+          "originalSourceAssociation": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned actual focused execution associated with saved5f4ab3 source bytes; neither original receipt is signed. Subsequent Form/main merges change only controls/docs, not either compiled component.",
+          "deltaRationale": "The same two-file producer/UI fix and focused tests are unchanged; both exact component types passed once. Existing common governance, contributor/TX, native FINAL and pointer success originals are reused, not replayed. Long owns the real two-wave planned-contract adapter boundary.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "allows a planned metric superset only internally and returns the existing narrowed projection through the same transaction",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "initial-read-retry.json",
+          "path": "docs/evidence/teacher-group-closeout-20261031/initial-read-retry.json",
+          "sha256": "32d05feb71a155449532c7d112fe3e90834a6543056cd9b68f90abdd5de9b33a",
+          "originalSourceAssociation": "5f4ab3a0141dc956dcdb3730eb48313677aecb80",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [],
+          "sourceAssociationBasis": "Unsigned actual focused execution associated with saved5f4ab3 source bytes; neither original receipt is signed. Subsequent Form/main merges change only controls/docs, not either compiled component.",
+          "deltaRationale": "The same two-file producer/UI fix and focused tests are unchanged; both exact component types passed once. Existing common governance, contributor/TX, native FINAL and pointer success originals are reused, not replayed. Long owns the real two-wave planned-contract adapter boundary.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "retries an initial directory failure in place using GET only",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/teacher-group-closeout-20261031/backend-types.json",
+          "sha256": "b1872e7693c125e9bcfc2199e4225f1483c8cda6d3bdba57b790e668093ec26f",
+          "component": "backend",
+          "componentTree": "29b86b19038c196aa5b2728f5e33579a8ba56ee5",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-closeout-20261031/backend-types.log"
+        },
+        {
+          "path": "docs/evidence/teacher-group-closeout-20261031/frontend-types.json",
+          "sha256": "daae5862a5704d3cb7b220161d2c6d628cbeb271945ac14babea94eff548c6cd",
+          "component": "frontend",
+          "componentTree": "dfdc072b45a35f04261c807c72a89021f5c9aa1b",
+          "exitField": "exitCode",
+          "log": "docs/evidence/teacher-group-closeout-20261031/frontend-types.log"
+        }
+      ]
     }
   }
 }
