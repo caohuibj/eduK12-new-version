@@ -57,7 +57,8 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/lineangle/__tests__/LineangleTask.test.tsx",
-      "src/modules/cognitive/tasks/lineangle/__tests__/prng.test.ts"
+      "src/modules/cognitive/tasks/lineangle/__tests__/prng.test.ts",
+      "src/modules/cognitive/tasks/lineangle/__tests__/axis-v2.test.tsx"
     ]
   }
 }
