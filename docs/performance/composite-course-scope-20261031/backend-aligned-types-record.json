@@ -1,0 +1,16 @@
+{
+  "kind": "RETAINED_LOCAL_COMPILER_EXIT",
+  "component": "backend",
+  "componentTree": "6971e3f4076f0a9e1f439e9c4e57d77f706d95c5",
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "exitCode": 0,
+  "node": "v24.22.1",
+  "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "originalExitFile": "docs/performance/composite-course-scope-20261031/backend-aligned-types.exit",
+  "originalExitSHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "sourceAssociationBasis": "Actual direct compiler execution after main 7a69762e alignment. Component tree unchanged throughout execution; unsigned local record. Backend Prisma client generated from current unchanged schema; frontend imports that local client."
+}
