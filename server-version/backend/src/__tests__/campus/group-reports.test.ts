@@ -22,6 +22,12 @@ vi.mock('../../modules/reporting/cohort',()=>({readReportingCohort:mock.cohort})
 vi.mock('../../modules/reporting/artifact',()=>({readReportingArtifactRecord:mock.artifact}))
 vi.mock('../../modules/reporting/service',()=>({generateOrganizationGroupAnalysis:mock.generate}))
 vi.mock('../../modules/reporting/pr4Service',()=>({readOrganizationReportingArtifact:mock.read}))
+// The selected-leaf test supplies synthetic source "a"; its published contract
+// is a storage boundary, independent of the overlap calculation under test.
+vi.mock('../../modules/reporting/governedDisclosure',async importOriginal=>({
+  ...await importOriginal<typeof import('../../modules/reporting/governedDisclosure')>(),
+  reportingLeafDisclosureContract:vi.fn().mockResolvedValue({minimumRespondents:10}),
+}))
 
 import {
   CAMPUS_GROUP_MIN_N,assertReviewedCampusGroupSpec,projectCampusGroupReport,projectCampusLeafGroupReport,assertCampusLeafGroupDifferencing,
@@ -139,10 +145,11 @@ describe('Huischool internal group reporting privacy boundary',()=>{
       actor:admin as any,organizationId:org,runId:run,trackId:track,specId:spec,
     })
     expect(mock.generate).toHaveBeenCalledWith({principal:{
-      userId:'school-admin',platformRole:'STANDARD',
-    },organizationId:org,runId:run,trackId:track,specId:spec})
+      userId:'school-admin',platformRole:'STANDARD',groupAudience:'ORGANIZATION',
+    },organizationId:org,runId:run,trackId:track,specId:spec,
+      leaf:undefined,cohortSelector:undefined,presentation:undefined,beforeCompute:undefined,beforePersist:undefined})
     expect(mock.read).toHaveBeenCalledWith({principal:{
-      userId:'school-admin',platformRole:'STANDARD',
+      userId:'school-admin',platformRole:'STANDARD',groupAudience:'ORGANIZATION',
     },organizationId:org,artifactId:artifact})
     expect(result.state).toBe('READY')
     expect(mock.lock).toHaveBeenCalledWith(org,expect.any(Function))
