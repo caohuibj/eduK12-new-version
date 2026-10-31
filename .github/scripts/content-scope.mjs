@@ -177,6 +177,21 @@ export function frontendTestOnly(files) {
   return files.some(frontendTestFile) && files.every(file=>frontendTestFile(file)||engineeringEvidenceFile(file));
 }
 
+// Compose the existing version-only dependency check with frontend source/test
+// admission. This selects the full frontend lane, never frontend_affected.
+export function frontendDependencyScope(entries,{base,head='HEAD'}) {
+  const manifests=new Set(['server-version/frontend/package.json','server-version/frontend/package-lock.json']);
+  const dependencyEntries=entries.filter(({file})=>manifests.has(file));
+  if(!dependencyEntries.length||!entries.every(({file,status,oldMode,newMode})=>
+    typeof file==='string'&&!/[\\\x00-\x1f\x7f]/.test(file)&&file.split('/').every(p=>p&&p!=='.'&&p!=='..')
+    &&newMode==='100644'&&((status==='A'&&oldMode==='000000')||(status==='M'&&oldMode==='100644'))
+    &&(manifests.has(file)||frontendFile(file)||engineeringEvidenceFile(file)
+      ||file.startsWith(frontendSrc)&&/\.(?:test|spec)\.tsx?$/.test(file))))return false;
+  const production=entries.map(({file})=>file).filter(file=>frontendFile(file)&&!/\.(?:test|spec)\.tsx?$/.test(file));
+  if(Object.entries(acceptanceFor(production)).some(([id,selected])=>id!=='canonical_visual'&&selected))return false;
+  return dependencyScope(dependencyEntries,{base,head});
+}
+
 // Local product pages use dependency-related unit tests. Shared shells, API,
 // scientific runtimes and explicit media/Ops acceptance retain their own lanes.
 export function frontendAffected(files) {
@@ -484,9 +499,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     console.log(JSON.stringify({kind:'cognitive-intake-refusal',base,...refused}));
     throw Error('UNSUPPORTED_COGNITIVE_INTAKE:'+refused.reason+': explicit affected route required; no platform fallback');
   }
-  const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+  const basicDependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
-  const frontendDependencies = dependencies && frontendDependencyFilesOnly(entries);
+  const mixedFrontendDependencies = !basicDependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+    && frontendDependencyScope(entries,{base});
+  const dependencies = basicDependencies || mixedFrontendDependencies;
+  const frontendDependencies = mixedFrontendDependencies || basicDependencies && frontendDependencyFilesOnly(entries);
   const backendModules = result.backend_modules && !result.content && !result.frontend && !result.presentation && !result.documentation;
   const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
   requireSurveyWaveSelectionScope(process.env.CI_SURVEY_SELECTION_REQUIRED === 'true', surveySelection, event, process.env.CI_FORCE_FULL);

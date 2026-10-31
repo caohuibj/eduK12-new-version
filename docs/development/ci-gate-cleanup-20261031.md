@@ -170,6 +170,13 @@ Node24.21.0：6 个 image-plan 控制用例 PASS，覆盖前端/后端/完整三
 
 ### 前端整合基线：只读协调结论
 
-公开 #467 `14c73aaeaa853ebebe3fcc99cebac982812b4d8a` 是 11 个前端源码/测试文件，单独可进入 frontend；#464 的 FE lock 加入后，frontendFile 不接 lock，而 dependencyFile 不接 SchoolStudentTasks.tsx，组合会回退 platform。这是路径准入结论，不是组合分支或 CI 资格。
+在本节观察基线 28b8cbe4 时，公开 #467 `14c73aaeaa853ebebe3fcc99cebac982812b4d8a` 是 11 个前端源码/测试文件，单独可进入 frontend；#464 的 FE lock 加入后，frontendFile 不接 lock，而 dependencyFile 不接 SchoolStudentTasks.tsx，组合会回退 platform。这是路径准入结论，不是组合分支或 CI 资格。
 三个独立提交整合后正常 CI 一次可以解除循环等待，但不会自动获得前端窄路线。A 组完整差异未定，不能预先声称全部可按前端处理。若全部符合已有前端边界，后续可只组合现有前端准入与版本型 manifest/lock 检查，仍走完整前端安装/audit/types/tests/build/scan/SAST；不新建认证、场景例外或绕过 required checks。
-本线未组合提交、未修改/关闭 #464/#467，也未在本 Docker 小片放宽前端分类。
+本线未组合提交、未修改/关闭 #464/#467，也未在本 Docker 小片放宽前端分类。该组合误分类随后由已合 #470 修正，以下保留其完整记录。
+
+## 前端代码与版本锁组合：独立紧急分类片
+
+观察基线 `28b8cbe4be407cce063e5584b905cadbaecb9498`，源码观察点 `714c6ec0d6af71c7f22a8c91a14f816d07144b0f`。复用现有 dependencies 场景及 dependencies_frontend_only 标记，不改 workflow 或汇总选择。将全量普通 A/M 差异分为前端 manifest/lock 与现有前端源码/测试/非生产说明；manifest/lock 子集仍由原 dependencyScope 验证版本型变化，scripts/engines 等拒绝规则不变。
+同目录、模块内测试仅在此完整前端组合路线接纳，不扩展 frontend_affected 或测试专用轻量路线。Ready/Draft 均选择 scope、frontend-build、frontend、docker、codeql；原完整前端安装/audit/types/tests/build/image scan/SAST 保留，未变后台/数据库/media 不选。生产共享 API/测评运行时代码沿用 frontendFile 排除；命中特殊 media/app-shell 等既有验收的生产改动仍回原范围，不能混锁后省掉相关检查。
+Node24.21.0 四个定向分类/命令选择用例 PASS；随后只对增补的相关验收反例补验原组合一例，1 PASS。真实 Git fixture 覆盖 School 产品源、同目录测试及认知模块测试，结果 dependencies_frontend_only=true、frontend_affected=false；混入 BE、根依赖、CI、共享前端 API、测评 runtime、媒体生产文件及脚本变更均拒绝该组合范围。未运行 D 的 audit 或任何前端业务基线。
+母线提供的本地整合 head `2f70bdf630385fdc92ecba24d8ce5a8d1367162b` 尚未公开，本线没有读取该 Git 对象、组合提交或关闭原 PR；规则覆盖所述“1 lock＋1 School 产品源＋25 现有测试”形态，公开后仍按实际完整差异进行正常 CI。Docker backend-only 已独立公开 #469，不与本片捆绑，也不取消现有运行。
