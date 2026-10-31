@@ -4533,6 +4533,147 @@
         "backend": "4b2481a35fa01fccff933f85676c99883d6fc52d",
         "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
       }
+    },
+    "424": {
+      "schemaVersion": 1,
+      "pr": 424,
+      "enabled": true,
+      "base": "112b944811160e8e2a018563b73e59f5ba542a5c",
+      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
+      "controlCheckpoint": "0f65de649683efde8c69281355dfcb0d4f05e9dc",
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": "b048a3f18702f3eab76083826cf5ed429ff39997",
+          "after": "bcac2e624988b59627963fddb8496210a0b3294e"
+        },
+        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
+          "before": "1b7cc443194acbb917244111d9d6032951f91636",
+          "after": "84afb5bb14724024926de00a4165fdbfaef49e2b"
+        },
+        "docs/development/training-standalone-scale-group-reader-20261030.md": {
+          "before": null,
+          "after": "19d83f2688c362729baeca44a581c2a472b9a26e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/README.md": {
+          "before": null,
+          "after": "3dc68d06733a17945e4c59c11c5b8b910a9f047e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "92bc239292053663109e34d093bb0d2c33190e6b"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.json": {
+          "before": null,
+          "after": "d90fab117d46bfb552948554253621cf249eb198"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types-command.log": {
+          "before": null,
+          "after": "b63c9243d5b047d27ad9e751800e61023cdadcd4"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.json": {
+          "before": null,
+          "after": "0c32fea3d012a2b20d0e568a76a9fd4168b0f72f"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-type-candidate-tree.json": {
+          "before": null,
+          "after": "814f32f63501269a6afdf317aae46a15644c7a22"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/native-proof.json": {
+          "before": null,
+          "after": "1d3989f3c1b78b01c5db55241258f8addf2bd152"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current-proof.json": {
+          "before": null,
+          "after": "bcc03df134e39b9f09dd6233b898e05298f83dbb"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.log": {
+          "before": null,
+          "after": "3fb5ed7357564b3ae342e9eea011274763e07840"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.ts": {
+          "before": null,
+          "after": "493b6f630dc20dc148bbfd10c8f970fec6538521"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json": {
+          "before": null,
+          "after": "33e99faf115496798a324dba05abe8dd06b3695a"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.log": {
+          "before": null,
+          "after": "fdb3c35d1649e36442b04f01ce51b4c10cb7bf45"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "629341af1db45cfbc4486ff72fb4149bf88a76a5"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/reuse.json": {
+          "before": null,
+          "after": "ec3ca1ce3ac4ab33fda3100b4f02f9db871fcc1e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "150872c2690befb93883c0f3a4a7bca697a6e06f"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json": {
+          "before": null,
+          "after": "b5081416da119f779eb88ab5c0b8538b792e4717"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.log": {
+          "before": null,
+          "after": "c44fff22808b7c7f83aa3ab525e0da9188260e58"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "e8be0dde6b2b36f5e27dcdcd85e261279f5f339f"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts": {
+          "before": null,
+          "after": "2897bd80a59374800701edf18af6689f31d786eb"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "e777b59546ad3a41d7888e1c2f91cd5875b03309",
+          "after": "bcc0125d00c180d2f45d354ad047a07d2c7bacbe"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": "3c66d2199b82f8650ba00137c605a126f317a1cf",
+          "after": "96c5f22c9da5fbe472999aab638940ec65230837"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "5c604adeef92dd997944f33f188ba1ca48403b46",
+          "after": "d93481f61741aa48f5b16637784eccfe621d2bce"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "5c32efae2ab0189e8146b503215188bc36027ba0",
+        ".github/scripts/onboarding-checks.mjs": "5e96d8b49c6732772b6d9546713523cbbd8b1275",
+        ".github/scripts/onboarding-controls.test.mjs": "cb606bdefaa175d7307aa3089f7f0ee6677135a4",
+        ".github/scripts/onboarding-evidence.json": "a7deae80cf47a0f000a2ef72c99513ea5708ddfb",
+        ".github/scripts/onboarding-scope.mjs": "ffb98bc26e2c8908960837861b9d62685d545520",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "8b84efc626b9c08f5dba499620310b0112302d84"
+      },
+      "components": {
+        "backend": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
+      }
     }
   }
 }
