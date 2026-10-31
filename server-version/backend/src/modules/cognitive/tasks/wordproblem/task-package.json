@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "task": "wordproblem",
+  "order": 116,
+  "identities": [
+    {
+      "testType": "wordproblem",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 116
+    },
+    {
+      "testType": "wordproblem",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "2.0.0",
+      "order": 1116
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "wordproblem",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/wordproblem/wordproblem.registry.ts",
+      "export": "wordproblemRegistryEntry"
+    },
+    {
+      "testType": "wordproblem",
+      "engineVersion": "2.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/wordproblem/wordproblem.registry.ts",
+      "export": "wordproblemRegistryEntryV2"
+    }
+  ],
+  "banks": [
+    {
+      "file": "bank.ts",
+      "export": "bankMeta"
+    },
+    {
+      "file": "bank-v2.ts",
+      "export": "bankMetaV2"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      113,
+      1113
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/wordproblem/__tests__/WordproblemTask.test.tsx",
+      "src/modules/cognitive/tasks/wordproblem/__tests__/prng.test.ts"
+    ]
+  }
+}
