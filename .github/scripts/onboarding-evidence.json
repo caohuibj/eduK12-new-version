@@ -12083,6 +12083,88 @@
           "log": "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log"
         }
       ]
+    },
+    "424": {
+      "schemaVersion": 1,
+      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "node": "v24.21.0",
+        "limitations": [
+          "Two passed application cases remain original unsigned observations, not fresh CI execution.",
+          "Complete backend equals original reviewed Legacy type receipt; frontend unchanged from aligned423 and not compiled again.",
+          "Picker read-only continuation is retained documentation, not a third application test; no broad browser/PG/migration/FINAL replay."
+        ]
+      },
+      "reports": [
+        {
+          "id": "scale-adapter",
+          "path": "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json",
+          "sha256": "c8f65584fcfc0738d72dd82f9b6fb0bbb6096140b480e23454c94f6ad43bac8e",
+          "originalSourceAssociation": "298e1dc960b898327f437f24368d219f5edfb933",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "deltaRationale": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "adapts official Scale zero, missing and signed values with their true ranges; changes to R do not change C",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "id": "scale-native",
+          "path": "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json",
+          "sha256": "8248695a17d724242d358fc16f8b20061e9bc4972358e0da76e0260f98959cfa",
+          "originalSourceAssociation": "298e1dc960b898327f437f24368d219f5edfb933",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts",
+            "server-version/backend/src/modules/scale/scale-access.ts"
+          ],
+          "sourceAssociationBasis": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "deltaRationale": "Original unsigned local execution retained. Retrospective association to saved reader candidate298e; the read-only picker optimization is separately documented with its actual continuation. Current whole backend equals reviewed8ee candidate: only the complementary Legacy start predicate/test changed since298e, with report-reader logic unchanged; no historical replay or reconstructed signature.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "generates and reads a disclosed five-person standalone Scale report from frozen course Episodes without roster inference",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/evidence/group-report-legacy-course-20261030/backend-types.json",
+          "sha256": "bb78e3cf229e05c6b3d1232bb6ba81fe25ad6cd684386e7f06115cfe75f9e661",
+          "component": "backend",
+          "componentTree": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+          "exitField": "exitCode",
+          "log": "docs/evidence/group-report-legacy-course-20261030/backend-types.log"
+        }
+      ]
     }
   }
 }
