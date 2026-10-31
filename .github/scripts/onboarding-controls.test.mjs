@@ -495,3 +495,13 @@ test('Training course delivery qualifier binds its backend/frontend and reviewed
  const unknown='server-version/backend/src/modules/scale/unrelated-new-runtime.ts';
  assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
 });
+
+
+test('Training standalone Scale reader qualifier uses retained cases and stays within its exact backend source',()=>{
+ const f=fixture(),file='server-version/backend/src/modules/training-analysis/source.ts';
+ f.b.pr=424;f.b.source={[file]:{before:null,after:blob}};
+ f.entries=[file,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));
+ f.env={...f.env,CI_PR_NUMBER:'424',CI_HEAD_REF:BRANCHES[424]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,424);assert(task1SastConfig(p,f.b).paths.includes(file));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,(cmd,a,...r)=>cmd==='rev-parse'&&a===head+':server-version/frontend'?h('9'):f.read(cmd,a,...r),f.env,f.b));
+});
