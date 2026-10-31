@@ -14283,6 +14283,825 @@
       "types": [],
       "missingCheck": "CURRENT_COMBINED_BACKEND_TYPES"
     },
+    "439": {
+      "schemaVersion": 1,
+      "product": "6d2d4dcc52a0d7ed6a6115ed795e2af445f5a21f",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "localReviewedHead": "f071b64c99d2d164627e94c1da5f8692c2b72b55",
+      "identicalFullTree": "525c48f69e4e9bbd8986dfa19c4169092ae81e45",
+      "components": {
+        "frontend": "429f3b43ee47d034c6b0eb65df86fe500ce9fb93",
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3"
+      },
+      "environment": {
+        "kind": "DOT-local unsigned original reports and recorded exits, reviewed retrospective Git association",
+        "limitations": [
+          "Synthetic fetch and mocked router dependencies; not real browser cookie, DB or production latency evidence.",
+          "Selected 14 distinct cases span separate executions; failed and skipped rows remain original. Withdrawn operation-401 logout assertion is not qualification.",
+          "Types were actually executed; records are unsigned and do not contain full contemporaneous dependency-byte attestations. Current main and both component trees remain unchanged from reviewed candidate.",
+          "Backend route tests ran with copied dependencies before follow-redirects update; they do not import it. Backend types followed verified lock-matching 1.16.2 and local Prisma generation."
+        ]
+      },
+      "reports": [
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-final.json.gz",
+          "sha256": "16b17faf212dc31828220dd3c130287ea840910fcb549663faeec433cb913b3e",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "5b21704f55918729ddaf0068773634d0e0a63dc4dc08ec4c371cfd4657f20a43",
+          "id": "frontend-final",
+          "summary": {
+            "success": true,
+            "numPassedTests": 9,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+            "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+            "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+            "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+            "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-non-session-final.json.gz",
+          "sha256": "6875e52abb2b9128f96b1e4fab08d3c4a9346bead44e7c49a430323075ba74f3",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "c3f9b70756f02d3eac2053b2983d71401a1d580dd3d1c9cc3bf605d334042812",
+          "id": "frontend-non-session-final",
+          "summary": {
+            "success": true,
+            "numPassedTests": 3,
+            "numFailedTests": 0,
+            "numPendingTests": 7
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+            "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-baseline-corrected.json.gz",
+          "sha256": "0cb86d69b7518fc88d2ef750597daf10ff2ae7fa3eed285639d47b24e9721191",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "15c6c5c54ccfde8dac8afaf5a6970aada3ec0615956e560e50a9c06cf3a34775",
+          "id": "frontend-baseline-corrected",
+          "summary": {
+            "success": false,
+            "numPassedTests": 4,
+            "numFailedTests": 4,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/frontend-review-candidate.json.gz",
+          "sha256": "45926e1b214ed87c530f379c9b5e6a432ce938200384a5bd72c0b69ec9989b3e",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "c332b8d8788e7a30ec55e8cfc310b53e92a826d83619d9ab0e361a75519ad83f",
+          "id": "frontend-review-candidate",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 9
+          },
+          "cases": [
+            {
+              "fullName": "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+              "status": "skipped"
+            },
+            {
+              "fullName": "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+            "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/backend-baseline.json.gz",
+          "sha256": "2dcda877e05c4de27cec6413ccaaaf73ef441bd722e45b782f567529647725db",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "26fe5a40191dba8eefd35dbf3650e29ed24e4776d65cad4a9669e0a8235a811c",
+          "id": "backend-baseline",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 2,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=false",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=true",
+              "status": "failed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity"
+          ]
+        },
+        {
+          "path": "docs/performance/school-login-projection-20261031/backend-candidate.json.gz",
+          "sha256": "f86095667e3a57573f2f1ccb8ec284c907fb2f9e7448ffc23e71401a6306cea8",
+          "encoding": "gzip-json",
+          "originalJSONSHA256": "8b328c575b436cdb841aec9848251c80e8b8bce8bfa970c3049e08148cc3c85f",
+          "id": "backend-candidate",
+          "summary": {
+            "success": true,
+            "numPassedTests": 2,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=false",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields returns the same public identity with forced=true",
+              "status": "passed"
+            },
+            {
+              "fullName": "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "School login projection matches me without private fields returns the same public identity with forced=false",
+            "School login projection matches me without private fields returns the same public identity with forced=true"
+          ]
+        }
+      ],
+      "expectedCases": [
+        "School login projection matches me without private fields keeps an MFA challenge separate from an authenticated identity",
+        "School login projection matches me without private fields returns the same public identity with forced=false",
+        "School login projection matches me without private fields returns the same public identity with forced=true",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"network\":true}",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":403}",
+        "School login safe projection and existing-request recovery does not log out on a non-session read failure {\"readStatus\":503}",
+        "School login safe projection and existing-request recovery keeps an unauthenticated login error distinct from an expired session",
+        "School login safe projection and existing-request recovery keeps forced password change isolated without a second me request",
+        "School login safe projection and existing-request recovery keeps forced password form available after a wrong-password 401",
+        "School login safe projection and existing-request recovery keeps the account page available after a wrong step-up code 401",
+        "School login safe projection and existing-request recovery retains MFA challenge and post-MFA me lookup",
+        "School login safe projection and existing-request recovery returns to login when an existing initial read rejects the new session",
+        "School login safe projection and existing-request recovery uses ordinary login projection without a second me request",
+        "School login safe projection and existing-request recovery uses the existing me fallback for an older login response missing the forced-password flag"
+      ],
+      "withdrawnCase": "School login safe projection and existing-request recovery returns to login on a session failure from an existing operation",
+      "records": {
+        "initial": {
+          "path": "docs/performance/school-login-projection-20261031/execution-record.json",
+          "sha256": "389b1e48b5926f77a3b5ccdc7c25d4a6bf90227d3f05097fe18c074cab7dcc55"
+        },
+        "review": {
+          "path": "docs/performance/school-login-projection-20261031/review-execution-record.json",
+          "sha256": "b18153e8965c2eea33d859b4bd5b45645c4dc67239174e7a5998b6de1a08d51a"
+        }
+      },
+      "sourceAssociationBasis": "Actual reported executions on local working inputs subsequently committed; no invented contemporaneous head/signature. Remote product is full-tree identical to independently reviewed local head.",
+      "reuseRationale": "Final review only removed run recoverSession; ordinary success, initial reads, non-session errors, legacy fallback and MFA branches unchanged. Wrong-password and step-up cases are final correction executions. Backend projection/helper unchanged after recorded checks. Test-only await/navigation improvements do not change retained cases.",
+      "failureDisposition": "The wrong operation-401-must-logout assertion is withdrawn, not repaired or admitted. Other selected-report product failures have a selected passing continuation with the same name. Initial fixture-only reports remain archived but are not selected."
+    },
+    "442": {
+      "schemaVersion": 1,
+      "product": "1b458b80057eae441833d1556c3a699efe3a5f37",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "components": {
+        "backend": "80c037dde9dd1450eb9ac6ae7342bd8ac65a29f3",
+        "frontend": "ed36c29b835587819a73a04fb3ef383291f05c15"
+      },
+      "environment": {
+        "node": "v24.22.1",
+        "limitations": [
+          "Original Vitest default reporter records only 5 passed summary, not per-case result identities or separately printed numeric exit. No JSON reporter is fabricated.",
+          "Prior logs and tool terminal excerpt are unsigned, retrospectively indexed. Input hashes are post-execution observations, not an atomic execution attestation.",
+          "The baseline 1 failed / 3 passed and missing-dependency types failure remain original; no full-suite, production, build, browser or deployment claim.",
+          "Fulfilled code404 fixture is not actual HTTP404 rejection; actual rejection displays its normalized error and manual retry."
+        ]
+      },
+      "originals": {
+        "baseline": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-red.log",
+          "sha256": "453a5369c4e754409a762453201a86b92b37e0f8d88ec01ff9fd6d9d11432e7a"
+        },
+        "passed": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-green-final.log",
+          "sha256": "f0e2b416d3359040ab86c75963ec2882a5fb76143be7eefbb4f3167a1b94c953"
+        },
+        "lint": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-lint.log",
+          "sha256": "93e413077110bcb7192d384de7453a10c34c3d7e3714158a857d17f195593c39"
+        },
+        "oldTypesTerminal": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/types-terminal-excerpt.txt",
+          "sha256": "5e8d634e61aab3651dd053f63ca7fee7d2a159a7b7ff7fd5da36caf3615ae16b"
+        },
+        "oldTypesLog": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types-deps.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "missingDependencyTypes": {
+          "path": "docs/performance/questionnaire-open-retry-20261031/o11-questionnaire-types.log",
+          "sha256": "df58aaa5d57d20e37de01676178a17fb6f49594f95c1110a7c948ba5105e7ef5"
+        }
+      },
+      "sourceHashes": {
+        "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": "8d8de6f5eedf8d50d61b5f6e639d12344bfc45cef4a7ddd68a2fa101a15b9e91",
+        "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx": "c429713f54f5a31e3c814e05aa62ee17cf8bbb46be32a4de8bbac7bdcfc7ea08",
+        "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+      },
+      "types": {
+        "path": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.json",
+        "sha256": "40eef16d8b868ba2763c17d72559eafbab7205122b3f3d8d0d56042c5a5b69a9",
+        "log": "docs/performance/questionnaire-open-retry-20261031/qualification/frontend-types.log"
+      },
+      "sourceAssociationBasis": "Original five-pass execution bound by unchanged questionnaire source, test, lock and tsconfig hashes; summary only, no invented individual result identities.",
+      "reuseRationale": "439 changed School inputs but not questionnaire test loaded modules. Reuse original application tests; fresh recorded frontend app types covers the integrated whole component. Backend equals current main and is not recompiled."
+    },
+    "437": {
+      "schemaVersion": 1,
+      "product": "6d4116c9ee8e889a139705d5d88b831d85766041",
+      "reviewer": "delegated Codex scoped self-review",
+      "decision": "ADMIT_REVIEWED_LOCAL_RESULTS",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "environment": {
+        "kind": "DOT local original reports and retained compiler shell exits",
+        "limitations": [
+          "Synthetic Prisma/controller/task-feed observations, not SQL/browser/concurrency measurements.",
+          "Original failures and filtered cases preserved; eight disjoint selected passes across original invocations.",
+          "Aligned BE and FE direct compiler invocations each exit 0 on final component trees. Unsigned local records; historical preliminary qualification files retained as history, not current admission.",
+          "PR439 changed campus auth routes, SchoolApp and their own fixtures only; no Composite service/controller/studentTasks or Training loader imports those entry modules. Membership, shared Prisma schema, locks, configuration and test setup unchanged. No business case repeated.",
+          "Final main442 changes only QuestionnaireAssessment page and its own fixture, not imported by Composite/Training selected cases; backend tree unchanged. Only affected frontend whole-tree compiler rerun once, actual exit0; earlier compiler records retained."
+        ]
+      },
+      "reports": [
+        {
+          "id": "o09-backend-baseline",
+          "path": "docs/performance/composite-course-scope-20261031/backend-baseline.json",
+          "sha256": "5630fcae62cc243e6f7cf40756fc332fa9ba70390afab250e4e8d06cd9bd73a2",
+          "originalSourceAssociation": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+            "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts",
+            "server-version/backend/src/modules/composite/composite.controller.ts",
+            "server-version/backend/src/modules/composite/composite.service.ts",
+            "server-version/backend/src/services/studentTasks.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Only the selected unchanged default/history behavior is reused from this baseline. The added course argument changes scoped calls; source and fixture delta explicitly listed. The archived frontend projection and task-feed pagination are unchanged; removing an extra assertion from an unselected test does not change this selected case. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 4,
+            "numPendingTests": 0
+          },
+          "cases": [
+            {
+              "fullName": "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+              "status": "failed"
+            },
+            {
+              "fullName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+              "status": "failed"
+            },
+            {
+              "fullName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+              "status": "failed"
+            },
+            {
+              "fullName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
+              "status": "failed"
+            }
+          ],
+          "selectedCases": [
+            "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback"
+          ],
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+              "reportId": "o09-backend-candidate"
+            },
+            {
+              "caseName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+              "reportId": "o09-backend-candidate"
+            },
+            {
+              "caseName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+              "reportId": "o09-backend-candidate"
+            },
+            {
+              "caseName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
+              "reportId": "o09-backend-candidate"
+            }
+          ]
+        },
+        {
+          "id": "o09-backend-candidate",
+          "path": "docs/performance/composite-course-scope-20261031/backend-candidate.json",
+          "sha256": "ce2016185f210158ca00d67695745a211de8516899280b0a7a0ede9f5494edab",
+          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 4,
+            "numFailedTests": 0,
+            "numPendingTests": 1
+          },
+          "cases": [
+            {
+              "fullName": "Composite course-scoped availability retains default catalog, archived continuation and latest completed feedback",
+              "status": "skipped"
+            },
+            {
+              "fullName": "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+              "status": "passed"
+            },
+            {
+              "fullName": "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read",
+              "status": "passed"
+            }
+          ],
+          "selectedCases": [
+            "Composite course-scoped availability narrows before materialization while preserving the exact multi-course projection",
+            "Composite course-scoped availability does not create entitlement from a caller-selected unjoined course",
+            "Composite course-scoped availability forwards the available endpoint course to the same authorized service",
+            "Composite course-scoped availability keeps task-feed counts, ordering and page continuation while reducing each page read"
+          ]
+        },
+        {
+          "id": "o09-task-default-candidate",
+          "path": "docs/performance/composite-course-scope-20261031/task-default-candidate.json",
+          "sha256": "90ce03f6bc0e4e65b6e0dc7fbd8d4481c3bc1fb270e6c5f8dc1244c756ccd29d",
+          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
+          "sourceRoots": [
+            "server-version/backend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/backend/src/__tests__/campus/login-projection.test.ts",
+            "server-version/backend/src/modules/campus/auth.routes.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 11
+          },
+          "cases": [
+            {
+              "fullName": "student task aggregate uses the same actionable rule for the default list, count and pagination",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate filters a course-specific task feed by an actual enrolled relation, not caller-provided authority",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch",
+              "status": "passed"
+            },
+            {
+              "fullName": "student task aggregate keeps exact deadline equality open, distinguishes drafts, and preserves completed tasks after expiry",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate prioritizes a new active attempt over past completion and blocks expired resume links",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate deduplicates questionnaires delivered to several courses and paginates deterministically with global counts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate keeps query count constant with 100 courses and returns no course tasks without membership",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate propagates read failures instead of returning a misleading empty aggregate",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate opens the latest completed questionnaire report without starting a retake",
+              "status": "skipped"
+            },
+            {
+              "fullName": "student task aggregate includes new questionnaires delivered to a member course and rejects unrelated composite contexts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C06 submitted versus task-satisfied keeps report links without reopening submission; historical satisfaction=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "C06 submitted versus task-satisfied keeps report links without reopening submission; historical satisfaction=true",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "student task aggregate limits membership to the current active student and excludes library/private/draft content in every batch"
+          ]
+        },
+        {
+          "id": "o09-frontend-before-edit",
+          "path": "docs/performance/composite-course-scope-20261031/frontend-before-edit.json",
+          "sha256": "15141342087e8a12d7c059b39075ee87dc1c135ccbe29df18e5f7a3998e49721",
+          "originalSourceAssociation": "f5fa29314eb731f0479b90ae962b731da8e08d34",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx",
+            "server-version/frontend/src/training/courseAssessments.test.ts",
+            "server-version/frontend/src/training/courseAssessments.ts"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Only the selected unchanged default/history behavior is reused from this baseline. The added course argument changes scoped calls; source and fixture delta explicitly listed. The archived frontend projection and task-feed pagination are unchanged; removing an extra assertion from an unselected test does not change this selected case. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": false,
+            "numPassedTests": 1,
+            "numFailedTests": 1,
+            "numPendingTests": 12
+          },
+          "cases": [
+            {
+              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+              "status": "passed"
+            },
+            {
+              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "status": "failed"
+            },
+            {
+              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed"
+          ],
+          "allowPartialFailure": true,
+          "failureContinuations": [
+            {
+              "caseName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "reportId": "o09-frontend-candidate"
+            }
+          ]
+        },
+        {
+          "id": "o09-frontend-candidate",
+          "path": "docs/performance/composite-course-scope-20261031/frontend-candidate.json",
+          "sha256": "632693886d04963fa9e5a47671aa735799e910216ca3886ce42fa97ec379a26d",
+          "originalSourceAssociation": "c41e0351fcfd5d4efaef01fd0134785ccab3ff4b",
+          "sourceRoots": [
+            "server-version/frontend"
+          ],
+          "reviewedSourceDelta": [
+            "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx",
+            "server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx",
+            "server-version/frontend/src/school/SchoolApp.tsx",
+            "server-version/frontend/src/school/SchoolLoginProjection.test.tsx"
+          ],
+          "sourceAssociationBasis": "Retained unsigned local invocation. Baselines consumed main production plus the new fixture; main is the production comparison anchor, not a claim that the added fixture was already committed then. Candidate executed uncommitted bytes later retained in the equal-tree published product.",
+          "deltaRationale": "Candidate source bytes equal published product; the frontend file only lost a duplicate new assertion in an unrelated unselected case after execution. Actual selected case, imports and shared setup remain unchanged. Alignment with main 7a69762e additionally retains PR439 campus auth routes/SchoolApp and their fixtures. These entry modules are not imported by the selected Composite/Training test closure; shared dependencies/schema/config unchanged. Whole component type inputs changed, so both compilers were executed once on the aligned tree. Final main442 changes standalone QuestionnaireAssessment entry page and its own fixture only, outside this selected case closure; no altered shared API/schema/config. Original8cases remain reusable; frontend whole-component compiler refreshed.",
+          "summary": {
+            "success": true,
+            "numPassedTests": 1,
+            "numFailedTests": 0,
+            "numPendingTests": 13
+          },
+          "cases": [
+            {
+              "fullName": "course-scope measurement projection retains archived multi-course work and feedback using the authorized task feed",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains archived completed feedback without offering another attempt",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging",
+              "status": "passed"
+            },
+            {
+              "fullName": "course-scope measurement projection distinguishes exhausted cognitive quotas without offering an implicit fresh start",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection fetches historical records but hides unstarted cognitive tasks when disabled",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection OFF links stored current/history sessions directly without offering new starts",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains an unadmitted shell as paused without a runner or start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not turn a blocked assessment into an enabled start link",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection does not present an expired composite attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "course-scope measurement projection retains usable sources and reports partial outages explicitly",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=false",
+              "status": "skipped"
+            },
+            {
+              "fullName": "preserves report and historical qualification in Training course cards: satisfied=true",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses the authorized retry allowance and never presents a submitted attempt as resumable",
+              "status": "skipped"
+            },
+            {
+              "fullName": "uses completion metadata independently from availability, exhausted attempts and active work",
+              "status": "skipped"
+            }
+          ],
+          "selectedCases": [
+            "course-scope measurement projection uses enrolled course scopes, retaining independent source ids without name-only merging"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "path": "docs/performance/composite-course-scope-20261031/backend-aligned-types-record.json",
+          "sha256": "809ac157c5db8f20863788eb13af40656195edbcee81c15546a29654778d6864",
+          "component": "backend",
+          "componentTree": "6971e3f4076f0a9e1f439e9c4e57d77f706d95c5",
+          "log": "docs/performance/composite-course-scope-20261031/backend-aligned-types.log",
+          "exitField": "exitCode"
+        },
+        {
+          "path": "docs/performance/composite-course-scope-20261031/frontend-main442-types-record.json",
+          "sha256": "817519e77128b267a258faa98f306a47c103b9251b7e0d368464adf0eae21744",
+          "component": "frontend",
+          "componentTree": "605a6561883ade842e2006b174125aab343325ce",
+          "log": "docs/performance/composite-course-scope-20261031/frontend-main442-types.log",
+          "exitField": "exitCode"
+        }
+      ]
+    },
     "438": {
       "schemaVersion": 1,
       "product": "6ae85828c9b18b6a1178e771f58c92aa531e4f08",

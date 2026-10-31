@@ -242,7 +242,7 @@ export function verifyTask1Evidence(review,readBytes=path=>readFileSync(path)){
  return {admitted,types,observations:[{kind:'RETAINED_EDUCATION_NATIVE_READBACK',sessionCount:4,trialCount:136,ciExecuted:false},{kind:'REGISTERED_SAME_CP_NONEMPTY_REPORTS',tools:3,reports:6,actualFinals:2,entryBoundary:'SOURCE_IDENTITY_POLICY_ONLY',ciExecuted:false}],openAcceptanceItems:review.openAcceptanceItems};
 }
 export function task1SastConfig(p,b=binding.candidates?.[String(p.pr)]){
- assert(['task1','choice-page',404,408,414,415,418,419,420,421,422,423,424,426,432,434,428,429,430,438].includes(p.pr));assert.equal(p.product,b.product);
+ assert(['task1','choice-page',404,408,414,415,418,419,420,421,422,423,424,426,432,434,437,439,442,428,429,430,438].includes(p.pr));assert.equal(p.product,b.product);
  const paths=[...Object.keys(b.source),...([404,419,422].includes(p.pr)?['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/group-report-draft.mjs','.github/scripts/group-report-draft.test.mjs']:[]),'.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-checks.mjs',p.pr==='task1'?'.github/scripts/task1-onboarding-controls.test.mjs':'.github/scripts/onboarding-controls.test.mjs'].filter(path=>/\.(?:[cm]?js|jsx|tsx?)$/.test(path));
  assert(paths.length);return {paths:[...new Set(paths)].sort()};
 }
@@ -535,13 +535,79 @@ export function verifyPr420ExecutionMapping(receipt,mapping,product,productTree)
  assert.equal(productTree,mapping.identicalFullTree,'Mapped full execution input tree changed');
 }
 
+// PR439 retains a withdrawn, erroneous operation-401 contract in original reports.
+// Read only its explicitly reviewed passed-case union; never relabel historical rows.
+export function verifySchool439Evidence(review,p,readBytes=path=>readFileSync(path)){
+ assert.equal(p.pr,439);assert.equal(review.product,p.product);
+ assert.equal(review.product,'6d2d4dcc52a0d7ed6a6115ed795e2af445f5a21f');
+ assert.deepEqual(p.components,review.components);
+ assert.equal(review.identicalFullTree,'525c48f69e4e9bbd8986dfa19c4169092ae81e45');
+ const original=proof=>decodeOriginal(proof,readBytes(safePath(proof.path)));
+ const admitted=[];
+ for(const r of review.reports){
+  const report=original(r),cases=report.testResults.flatMap(s=>s.assertionResults.map(c=>({fullName:c.fullName,status:c.status})));
+  assert.deepEqual(cases,r.cases,'Original failed/filtered rows changed');
+  assert.deepEqual(Object.fromEntries(['success','numPassedTests','numFailedTests','numPendingTests'].map(k=>[k,report[k]])),r.summary);
+  assert.equal(cases.filter(c=>c.status==='passed').length,report.numPassedTests);
+  assert.equal(cases.filter(c=>c.status==='failed').length,report.numFailedTests);
+  assert.equal(cases.filter(c=>['pending','skipped'].includes(c.status)).length,report.numPendingTests);
+  assert.equal(cases.length,report.numPassedTests+report.numFailedTests+report.numPendingTests);
+  assert(r.selectedCases.length);for(const name of r.selectedCases)assert(cases.some(c=>c.fullName===name&&c.status==='passed'),'Selected case did not actually pass');
+  admitted.push({id:r.id,caseNames:r.selectedCases,originalFailedCount:report.numFailedTests,originalReportSHA256:r.sha256,ciExecuted:false});
+ }
+ const names=admitted.flatMap(r=>r.caseNames);
+ assert.equal(names.length,14);assert.equal(new Set(names).size,14);assert.deepEqual([...names].sort(),review.expectedCases);
+ const withdrawn='School login safe projection and existing-request recovery returns to login on a session failure from an existing operation';
+ assert.equal(review.withdrawnCase,withdrawn);assert(!names.includes(withdrawn));
+ for(const r of review.reports)for(const c of r.cases.filter(c=>c.status==='failed'))assert(c.fullName===withdrawn||names.includes(c.fullName),'Unresolved original product failure');
+ const initial=original(review.records.initial),correction=original(review.records.review);
+ assert.equal(initial['backend-types'].exit,0);assert.equal(correction['frontend-review-types'].exit,0);
+ assert.equal(correction['frontend-review-types'].command,'node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit');
+ const prefix='docs/performance/school-login-projection-20261031/';
+ assert.equal(hash(readBytes(prefix+'backend-types.log')),initial['backend-types'].sha256);
+ assert.equal(hash(readBytes(prefix+'frontend-review-types.log')),correction['frontend-review-types'].sha256);
+ for(const [path,digest] of Object.entries(initial.currentFiles).filter(([path])=>path.startsWith('server-version/backend/')))assert.equal(hash(readBytes(safePath(path))),digest,'Backend original input drift');
+ for(const [path,digest] of Object.entries(correction.currentFiles))assert.equal(hash(readBytes(safePath(path))),digest,'Final frontend input drift');
+ assert(review.sourceAssociationBasis&&review.reuseRationale&&review.failureDisposition);
+ return {admitted,types:['backend','frontend'].map(component=>({component,currentComponentTree:p.components[component],originalExitCode:0,originalSigned:false,coverage:'independently-reviewed-unsigned-command-record-and-unchanged-component-association'})),withdrawnContract:withdrawn,testsExecutedInCI:false};
+}
+
+// PR442's reporter emitted only a five-pass text summary. Keep that format and
+// its failed baseline; never manufacture per-case result rows or historical exits.
+export function verifyQuestionnaire442Evidence(review,p,readBytes=path=>readFileSync(path)){
+ assert.equal(p.pr,442);assert.equal(review.product,p.product);assert.deepEqual(p.components,review.components);
+ const text=name=>{const proof=review.originals[name],bytes=readBytes(safePath(proof.path));assert.equal(hash(bytes),proof.sha256,'Original text evidence drift');return bytes.toString('utf8');};
+ const baseline=text('baseline'),passed=text('passed');
+ assert.match(baseline,/Tests\s+1 failed \| 3 passed \(4\)/);assert.match(baseline,/Unable to find role="alert"/);
+ assert.match(passed,/Test Files\s+1 passed \(1\)/);assert.match(passed,/Tests\s+5 passed \(5\)/);
+ assert(!/\b(?:failed|skipped|pending)\b/i.test(passed),'Not an all-passed original summary');
+ assert.match(text('lint'),/0 errors, 1 warning/);
+ assert.match(text('oldTypesTerminal'),/chunk_id: b6d40b/);assert.match(text('oldTypesTerminal'),/output: types_exit=0\\n/);
+ assert.equal(text('oldTypesLog'),'');assert.match(text('missingDependencyTypes'),/Cannot find module '@prisma\/client'/);
+ for(const [path,digest]of Object.entries(review.sourceHashes))assert.equal(hash(readBytes(safePath(path))),digest,'Original questionnaire execution input drift');
+ assert.deepEqual(Object.keys(review.sourceHashes).sort(),['server-version/frontend/package-lock.json','server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx','server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx','server-version/frontend/tsconfig.app.json'].sort());
+ const receipt=decodeOriginal(review.types,readBytes(safePath(review.types.path)));
+ const types=verifyTypeReceipt(receipt,{component:'frontend',componentTree:p.components.frontend,exitField:'exitCode',log:review.types.log},readBytes,p.components.frontend);
+ assert(review.sourceAssociationBasis&&review.reuseRationale);
+ return {admitted:[{id:'pr442-original-text-summary',passedCount:5,originalFailedBaselineCount:1,perCaseRowsRecorded:false,originalExitCodeRecorded:false,originalReportSHA256:review.originals.passed.sha256,ciExecuted:false}],types:[types],testsExecutedInCI:false};
+}
+
 async function admit(){
   const p=plan(),allReviews=JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json','utf8'));
-  const review=[393,395,404,408,414,415,418,419,420,421,422,423,424,426,432,434,'task1','choice-page',428,429,430,438].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
+  const review=[393,395,404,408,414,415,418,419,420,421,422,423,424,426,432,434,437,439,442,'task1','choice-page',428,429,430,438].includes(p.pr)?allReviews.candidates?.[String(p.pr)]:allReviews;
   assert(review,'Missing exact reviewed evidence');
-  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,421,422,423,424,426,432,434,428,429,430,438].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
+  assert.equal(review.schemaVersion,1);assert.equal(review.product,p.product);assert.equal(review.reviewer,([404,408,414,415,418,419,420,421,422,423,424,426,432,434,437,439,442,428,429,430,438].includes(p.pr)||p.pr==='choice-page')?'delegated Codex scoped self-review':p.pr===395?'independent Codex pr395_review':'root dot');
   assert.equal(review.decision,'ADMIT_REVIEWED_LOCAL_RESULTS');assert.equal(review.ciExecuted,false);assert.equal(review.originalExecutionSigned,false);
   assert(Array.isArray(review.environment.limitations)&&review.environment.limitations.length,'Disclose original evidence limits');
+  if(p.pr===442){
+    const accepted=verifyQuestionnaire442Evidence(review,p);mkdirSync('onboarding-evidence',{recursive:true});
+    writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,...accepted,environment:review.environment,deploymentQualified:false},null,2)+'\n');return;
+  }
+  if(p.pr===439){
+    assert.equal(git('rev-parse',p.product+'^{tree}'),review.identicalFullTree,'Reviewed remote/local product association drift');
+    const accepted=verifySchool439Evidence(review,p);mkdirSync('onboarding-evidence',{recursive:true});
+    writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,...accepted,environment:review.environment,deploymentQualified:false},null,2)+'\n');return;
+  }
   if(p.pr==='choice-page'){
     const accepted=verifyChoicePageEvidence(review,p);mkdirSync('onboarding-evidence',{recursive:true});
     writeFileSync('onboarding-evidence/admission.json',JSON.stringify({schemaVersion:1,source:p,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,...accepted,environment:review.environment,testsExecutedInCI:false,reviewAuthentication:'Delegated scoped self-review of unsigned original receipts; DOT background review is independent',deploymentQualified:false},null,2)+'\n');return;
@@ -559,7 +625,7 @@ async function admit(){
     assert(Array.isArray(roots)&&roots.length&&new Set(roots).size===roots.length);
     for(const root of roots)assert(['server-version/backend','server-version/frontend'].includes(root));
     const delta=git('diff','--name-only',original.originalSourceAssociation,p.product,'--',...roots).split('\n').filter(Boolean);
-    assert.deepEqual(delta,[404,408,414,415,418,419,421,422,423,424,426,432,434,428,429,430,438].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
+    assert.deepEqual(delta,[404,408,414,415,418,419,421,422,423,424,426,432,434,437,428,429,430,438].includes(p.pr)?original.reviewedSourceDelta:original.reviewedUnrelatedSourceDelta,'Reviewed test input delta changed');
     assert(original.deltaRationale&&original.sourceAssociationBasis);
     const caseNames=verifyOriginalReport(readOriginal(original),original);
     admitted.push({id:original.id,caseNames,originalSourceAssociation:original.originalSourceAssociation,sourceAssociationBasis:original.sourceAssociationBasis,originalReportSHA256:original.sha256,originalReportSuccess:original.summary.success,originalFailedCount:original.summary.numFailedTests,ciExecuted:false});
@@ -575,7 +641,7 @@ async function admit(){
   }else assert(!review.pr381LocalChecks);
   const types=p.pr===395?admitPr395LocalTypes(p,review):[393,421].includes(p.pr)?qualifyPr393BackendTypes(p,review):originalTaskChecks?[originalTaskChecks.type]:(Array.isArray(review.types)?review.types:[review.types]).map(record=>([432,434].includes(p.pr)?verifyCloudComponentTypeReceipt:verifyTypeReceipt)(readOriginal(record),record,path=>readFileSync(path),p.components[record.component??'backend']));
   assert(types.length);
-  if([372,374,404,408,414,418,423,426,432,434,428,429,438].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
+  if([372,374,404,408,414,418,423,426,432,434,437,428,429].includes(p.pr))assert.deepEqual(types.map(t=>t.component).sort(),['backend','frontend']);
   // The fixed415 source plan proves its backend tree equals the exact base.
   // Do not rerun or invent a compiler receipt for this unchanged component.
   if([415,420].includes(p.pr))assert.deepEqual(types.map(t=>t.component),['frontend']);

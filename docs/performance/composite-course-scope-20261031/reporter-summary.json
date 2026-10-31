@@ -1,0 +1,44 @@
+[
+  {
+    "file": "backend-baseline.json",
+    "passed": 1,
+    "failed": 4,
+    "skipped": 0,
+    "startTime": 1793423175462
+  },
+  {
+    "file": "backend-candidate.json",
+    "passed": 4,
+    "failed": 0,
+    "skipped": 1,
+    "startTime": 1793423208756
+  },
+  {
+    "file": "frontend-baseline.json",
+    "passed": 0,
+    "failed": 1,
+    "skipped": 13,
+    "startTime": 1793423074639
+  },
+  {
+    "file": "frontend-before-edit.json",
+    "passed": 1,
+    "failed": 1,
+    "skipped": 12,
+    "startTime": 1793423148037
+  },
+  {
+    "file": "frontend-candidate.json",
+    "passed": 1,
+    "failed": 0,
+    "skipped": 13,
+    "startTime": 1793423155532
+  },
+  {
+    "file": "task-default-candidate.json",
+    "passed": 1,
+    "failed": 0,
+    "skipped": 11,
+    "startTime": 1793423259421
+  }
+]

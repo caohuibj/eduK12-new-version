@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {BRANCHES,CONTROLS,GROUP_REPORT_CONTROLS,MARKER,onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,decodeOriginal,verifyCloudComponentTypeReceipt,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
+import {verifyQuestionnaire442Evidence,verifySchool439Evidence,verifyTrainingStandaloneCognitiveObservation,verifyPr420OfficialMetadata,pr420BuildOrigin,verifyTrainingBundleGroupObservation,verifyTeacherSubgroupObservation,verifyTeacherReadingObservation,verifySchoolGroupObservation,verifyGroupReportNativeBaseReuse,verifyOriginalReport,decodeOriginal,verifyCloudComponentTypeReceipt,verifyTypeReceipt,verifyReportPlanningObservation,verifyFailureContinuations,verifyRunStartPlanningObservation,verifyPr381CommandRecords,verifyPr395LocalTypes,verifyPr395SastMetadata,task1SastConfig} from './onboarding-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const h=c=>c.repeat(40),base=h('a'),head=h('b'),source=h('c'),tree=h('d'),blob=h('e');
 test('Training choice pagination uses the existing exact family and refuses unrelated files or guessed PR identities',()=>{
@@ -564,4 +564,54 @@ test('quota candidate reuses the existing missing compiler route without fronten
   assert.throws(()=>onboardingPlan([...f.entries,extra],base,head,f.read,f.env,f.b));
  for(const change of [{CI_EVENT:'workflow_dispatch'},{CI_FORCE_FULL:'true'},{CI_PR_NUMBER:'422'},{CI_PR_REPOSITORY:'outside/repo'}])
   assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...change},f.b));
+});
+
+// PR439 uses original synthetic records; no application case executes here.
+test('PR439 exact mixed scope and SAST reject unknown source and incorrect activation identity',()=>{
+ const f=fixture(),paths=['server-version/backend/src/modules/campus/auth.routes.ts','server-version/frontend/src/school/SchoolApp.tsx'];
+ f.b.pr=439;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'439',CI_HEAD_REF:BRANCHES[439]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,439);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'440'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+const school439Review=()=>JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['439'];
+test('PR439 admits exactly 14 unique actually passed cases while retaining original failures and withdrawn contract',()=>{
+ const r=school439Review(),p={pr:439,product:r.product,components:r.components},v=verifySchool439Evidence(r,p);
+ assert.equal(new Set(v.admitted.flatMap(x=>x.caseNames)).size,14);assert(v.admitted.some(x=>x.originalFailedCount>0));assert(!v.admitted.flatMap(x=>x.caseNames).includes(r.withdrawnCase));assert.deepEqual(v.types.map(x=>x.component),['backend','frontend']);
+});
+test('PR439 rejects withdrawn or filtered selections, changed original bytes, and component/input drift',()=>{
+ const r=school439Review(),p={pr:439,product:r.product,components:r.components};
+ for(const name of [r.withdrawnCase,r.reports[3].cases.find(x=>x.status==='skipped').fullName]){const bad=structuredClone(r);bad.reports[3].selectedCases[0]=name;assert.throws(()=>verifySchool439Evidence(bad,p));}
+ const repeated=structuredClone(r);repeated.reports[0].selectedCases[0]=repeated.reports[0].selectedCases[1];assert.throws(()=>verifySchool439Evidence(repeated,p));
+ assert.throws(()=>verifySchool439Evidence(r,{...p,components:{...p.components,frontend:h('9')}}));
+ for(const target of [r.reports[0].path,r.records.review.path,'server-version/frontend/src/school/SchoolApp.tsx','docs/performance/school-login-projection-20261031/backend-types.log'])assert.throws(()=>verifySchool439Evidence(r,p,path=>path===target?Buffer.from('drift'):readFileSync(path)));
+});
+
+// PR442 consumes original text summaries; it must not synthesize reporter rows.
+test('PR442 exact frontend scope keeps backend unchanged and rejects unrelated sources',()=>{
+ const f=fixture(),paths=['server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx','server-version/frontend/src/pages/student/__tests__/QuestionnaireAssessment.open.test.tsx'];
+ f.b.pr=442;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'442',CI_HEAD_REF:BRANCHES[442]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,442);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
+});
+const questionnaire442Review=()=>JSON.parse(readFileSync('.github/scripts/onboarding-evidence.json')).candidates['442'];
+test('PR442 retains original five-pass text summary without inventing per-case rows or exits',()=>{
+ const r=questionnaire442Review(),v=verifyQuestionnaire442Evidence(r,{pr:442,product:r.product,components:r.components});
+ assert.equal(v.admitted[0].passedCount,5);assert.equal(v.admitted[0].originalFailedBaselineCount,1);assert.equal(v.admitted[0].perCaseRowsRecorded,false);assert.equal(v.admitted[0].originalExitCodeRecorded,false);assert.equal(v.types[0].originalExitCode,0);
+});
+test('PR442 rejects original text, source, component and fresh type-record drift',()=>{
+ const r=questionnaire442Review(),p={pr:442,product:r.product,components:r.components};
+ assert.throws(()=>verifyQuestionnaire442Evidence(r,{...p,components:{...p.components,frontend:h('9')}}));
+ for(const target of [...Object.values(r.originals).map(x=>x.path),...Object.keys(r.sourceHashes),r.types.path,r.types.log])assert.throws(()=>verifyQuestionnaire442Evidence(r,p,path=>path===target?Buffer.from('drift'):readFileSync(path)));
+});
+
+test('PR437 exact mixed scope and SAST reject unknown source and incorrect activation identity',()=>{
+ const f=fixture(),paths=['server-version/backend/src/modules/composite/composite.service.ts','server-version/frontend/src/training/courseAssessments.ts'];
+ f.b.pr=437;f.b.source=Object.fromEntries(paths.map(path=>[path,{before:null,after:blob}]));f.entries=[...paths,...CONTROLS].map(file=>({file,status:'A',oldMode:'000000',newMode:'100644'}));f.env={...f.env,CI_PR_NUMBER:'437',CI_HEAD_REF:BRANCHES[437]};
+ const p=onboardingPlan(f.entries,base,head,f.read,f.env,f.b);assert.equal(p.pr,437);assert.equal(onboardingOutputs(p).application_route,'onboarding-structure');assert.deepEqual(task1SastConfig(p,f.b).paths.filter(path=>path.startsWith('server-version/')),paths.sort());
+ for(const patch of [{CI_HEAD_REF:'other'},{CI_PR_NUMBER:'440'},{CI_FORCE_FULL:'true'}])assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,{...f.env,...patch},f.b));
+ assert.throws(()=>onboardingPlan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}));
+ const unknown='server-version/backend/src/controllers/unrelated.ts';assert.throws(()=>onboardingPlan([...f.entries,{file:unknown,status:'A',oldMode:'000000',newMode:'100644'}],base,head,f.read,f.env,{...f.b,source:{...f.b.source,[unknown]:{before:null,after:blob}}}));
 });

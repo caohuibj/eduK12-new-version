@@ -54,7 +54,7 @@ describe('student task aggregate', () => {
     expect(db.assignment.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { courseId: { in: ['c'] }, status: 'PUBLISHED' }, select: expect.objectContaining({ submissions: { where: { studentId: 'student' }, select: { status: true } } }) }))
     expect(db.checkin.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { courseId: { in: ['c'] } } }))
     expect(db.questionnaire.findMany.mock.calls[0][0].where).toEqual({ status: 'PUBLISHED', type: 'COURSE', OR: [{ visibility: 'PUBLIC' }, { visibility: 'COURSE', courseQuestionnaires: { some: { courseId: { in: ['c'] } } } }] })
-    expect(available).toHaveBeenCalledWith('student', now.getTime())
+    expect(available).toHaveBeenCalledWith('student', now.getTime(), undefined)
   })
   it('keeps exact deadline equality open, distinguishes drafts, and preserves completed tasks after expiry', async () => {
     db.assignment.findMany.mockResolvedValue([
