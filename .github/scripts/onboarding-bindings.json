@@ -8031,6 +8031,271 @@
           "after": "f03774c77209ee32a37eea8df2971309d03fbe23"
         }
       }
+    },
+    "444": {
+      "schemaVersion": 1,
+      "pr": 444,
+      "enabled": false,
+      "base": "63f849c5bb3dfd7c215d719fc9b75e233664dca8",
+      "product": "e2011568f5ca4f217a4b1b7d9c055738f27193cb",
+      "controlCheckpoint": "09fcb1826ba4925bf9ba3e31ad335450640a55d5",
+      "components": {
+        "backend": "aabc532ab1fbb807da0fc194eaeed2a5f9c54134",
+        "frontend": "abac9400eea6d4c9ee7a4ab5024d4c5a35299f57"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "187337f61b252d14562261dc9af15a67492fa2af",
+        ".github/scripts/onboarding-checks.mjs": "e0750ecbd4ed4747a90135f6498f453f5a598c0d",
+        ".github/scripts/onboarding-controls.test.mjs": "9c1d334d3d560613aabf3ebc76c6fcb0db3728a7",
+        ".github/scripts/onboarding-evidence.json": "27c2cd9b1bad74eb00419df976c6b16fdecc30dd",
+        ".github/scripts/onboarding-scope.mjs": "cb3cd65577d72598b98f17266f67d1ce3de769c9",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "008cacc66da4a176280a7eccaea04c70cdfbed85"
+      },
+      "source": {
+        "docs/performance/form-manager-single-read-20261031/README.md": {
+          "before": null,
+          "after": "17ed2e2639edb47be98eced4f7fc79024976ba92"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend.json": {
+          "before": null,
+          "after": "bbc1555850da34d498d651e1c1e2cfe6eec39e0d"
+        },
+        "docs/performance/form-manager-single-read-20261031/backend.log": {
+          "before": null,
+          "after": "61dfab293296a69cb39426f0c10de4bf67925cb3"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional-fixed.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional-fixed.json": {
+          "before": null,
+          "after": "b39534e0a3e2505398604f7cd7f9ce9c01b7502b"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional-fixed.log": {
+          "before": null,
+          "after": "c12f7eae21903353db49d4fa7f617e4904060a2c"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional.json": {
+          "before": null,
+          "after": "11a7815c7cbd619bf2736682c339909c8da7d463"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-additional.log": {
+          "before": null,
+          "after": "2461d75ad6b4787cbc422af88d0e0859c746cacb"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-mixed-fixed.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-mixed-fixed.json": {
+          "before": null,
+          "after": "120e312739d38f0260fee545df0ffd317f44dbf0"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-mixed-fixed.log": {
+          "before": null,
+          "after": "9b277c651f3b6682b5dc5882353ba74af534fc9b"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types-final.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types-final.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend.json": {
+          "before": null,
+          "after": "5cf4f4bb62848916410d2dd1da2f32dcd1a4100d"
+        },
+        "docs/performance/form-manager-single-read-20261031/frontend.log": {
+          "before": null,
+          "after": "cba6c36a02caaf5ee2bcf65885f54365c9729910"
+        },
+        "docs/performance/form-manager-single-read-20261031/http.jsonl": {
+          "before": null,
+          "after": "84ee70d2d3342f9ea07f45313203afe8ea894ab7"
+        },
+        "docs/performance/form-manager-single-read-20261031/inputs.json": {
+          "before": null,
+          "after": "10e55d90b59de2b8e0e9655abee533501467074a"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/README.md": {
+          "before": null,
+          "after": "4a22b614558ff884a5376d964f587034b49965d1"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/lint.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/lint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline-execution.json": {
+          "before": null,
+          "after": "1fc59f523193cbe1467647ef2d4693f19371e9b1"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline.json": {
+          "before": null,
+          "after": "65f027aa999e63588ff69535cb6e689f44463d85"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-baseline.log": {
+          "before": null,
+          "after": "c647a439a7282a9c6f20b7a5daf8d790e555849c"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate-execution.json": {
+          "before": null,
+          "after": "ab8a638152f2b6fad515be2ca10267c17d5d8029"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate.json": {
+          "before": null,
+          "after": "900942e9ea0784231014bc0d5cc1fd81de70a579"
+        },
+        "docs/performance/form-manager-single-read-20261031/mutation-closeout/mutation-candidate.log": {
+          "before": null,
+          "after": "da857c5e89381df8f4bca8bcd07772be9d9b4692"
+        },
+        "docs/performance/form-manager-single-read-20261031/payload.cjs": {
+          "before": null,
+          "after": "bbf186b643fccd599fbce74a1a91189730877b80"
+        },
+        "docs/performance/form-manager-single-read-20261031/payload.json": {
+          "before": null,
+          "after": "a2f8f292687f27fa9f499e164bce3c9813c77f96"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/README.md": {
+          "before": null,
+          "after": "fb6b9c0a59989f384483776930aa4580d7189205"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/backend-types.json": {
+          "before": null,
+          "after": "45a9b02d3efa7dea24d02b41a2d4c8db71768b9d"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control-before-upstream-integration.exit": {
+          "before": null,
+          "after": "d00491fd7e5bb6fa28c517a0bb32b8b506539d4d"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control-before-upstream-integration.log": {
+          "before": null,
+          "after": "50b539c27dce7dde2663ee8112c1344a4a02509e"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control.exit": {
+          "before": null,
+          "after": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/control.log": {
+          "before": null,
+          "after": "3b1b4bb0ac8bd7b3a023f0f84f460c56ed56fbf0"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/frontend-types.json": {
+          "before": null,
+          "after": "f3d1129ba3a07419cb7383e7fc8b61b0b6997822"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/form-manager-single-read-20261031/report-baseline-closeout/source-and-reuse.json": {
+          "before": null,
+          "after": "c1931a230f3352a74651a7f7188dda7de0d4fd64"
+        },
+        "docs/performance/form-manager-single-read-20261031/transport-inputs.json": {
+          "before": null,
+          "after": "2e8662c9786ed96eadfe3251381981b90d2f0655"
+        },
+        "server-version/backend/src/__tests__/questionnaire/form-sections-units.test.ts": {
+          "before": null,
+          "after": "e6a2a04c24fd93575db8c72a9873ee6497d9f9da"
+        },
+        "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
+          "before": "524d096ef16432954971f00ab1d501070025e33d",
+          "after": "b86d8f910ade9bd7a3e0139efef2907c31ad4002"
+        },
+        "server-version/backend/src/controllers/questionnaireController.ts": {
+          "before": "d39ec92047d3516c6baf5d955288b1df6e22f916",
+          "after": "4d1cb5d82bead6a4a6ee378d69c890e0e48c4e5b"
+        },
+        "server-version/frontend/src/components/FormSectionManager.tsx": {
+          "before": "3b941f29627a53bc374df4a6998a673a8b30f849",
+          "after": "fc0a6369901d29c607c5f1349a08f069e8ad55cc"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": {
+          "before": "189384a86c2e60a87b6db62eda66c25db433ca71",
+          "after": "128103559d595548e948460ee45eb84cbf0d1a5b"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.mutation-race.test.tsx": {
+          "before": null,
+          "after": "6a2591e0d2ef42ac9005dd5850d9772e053784a8"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.race.test.tsx": {
+          "before": null,
+          "after": "db63ff0096b6498d47c0d86ba989beb75a6a13f7"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.test.tsx": {
+          "before": "541810a1edb87a2642b04897294c73ac6c21e6d1",
+          "after": "5ff5f1ec445a9b9ba8bda640d28bca77ac474fd6"
+        }
+      }
     }
   }
 }
