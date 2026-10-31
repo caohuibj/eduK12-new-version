@@ -197,14 +197,17 @@ export async function readTeacherNumericGroup(input:TeacherNumericScope&{artifac
  const minimumN=spec.definition.analysisKind==='GROUP'?Math.max(run.minimumN,spec.definition.minimumCohortN,spec.definition.minimumContributorN):run.minimumN
  return present({...artifact,artifactPayload:{...artifact.artifactPayload,projection:result.projection}} as typeof artifact,minimumN)
 }
-export async function generateTeacherNumericGroup(input:TeacherNumericScope&{trackId:string;leaf:ReportingLeafSourceV2;specId:string;selection:EducationGroupSelection}){
+export async function generateTeacherNumericGroup(input:TeacherNumericScope&{trackId:string;leaf:ReportingLeafSourceV2;specId:string;selection:EducationGroupSelection},internal:{allowPartialSourceMetrics?:true}={}){
  const run=await source(input,input.trackId)
  if(!run.canGenerate)reportingFail('HUITEACHER_GROUP_NOT_AVAILABLE','任务状态或该工具合同的披露时机尚未满足',409)
  const spec=await getPublishedReportingSpec(input.specId)
  if(spec.definition.analysisKind!=='GROUP')return reportingFail('REPORT_SPEC_INVALID','方案须为已发布的单次群体方案',409)
  if(spec.definition.minimumCohortN<run.minimumN!||spec.definition.minimumContributorN<run.minimumN!
    ||spec.definition.metricRules.some(m=>m.minimumMetricN<run.minimumN!))reportingFail('REPORT_SPEC_INVALID','方案低于本任务披露人数要求',409)
- if(spec.definition.metricRules.some(m=>!run.allowedMetricKeys.includes(m.sourceMetricKey)))reportingFail('REPORT_SPEC_SCOPE','方案指标超出该来源的组织群体上限',409)
+ const permitted=spec.definition.metricRules.filter(m=>run.allowedMetricKeys.includes(m.sourceMetricKey))
+ // Only configured longitudinal plans may retain a wider frozen spec. The
+ // shared leaf/source projection still narrows every generated and saved read.
+ if(!permitted.length||!internal.allowPartialSourceMetrics&&permitted.length!==spec.definition.metricRules.length)reportingFail('REPORT_SPEC_SCOPE','方案指标超出该来源的组织群体上限',409)
  const minimumN=Math.max(run.minimumN,spec.definition.minimumCohortN,spec.definition.minimumContributorN)
  const metricRules=spec.definition.metricRules
  const cohortSelector=await educationGroupSelector(input.organizationId,'TEACHER',input.selection)

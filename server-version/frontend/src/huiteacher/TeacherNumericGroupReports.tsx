@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react'
+import {useCallback,useEffect,useRef,useState} from 'react'
 import {TaskGroupReport,type TaskGroupArtifact} from '../modules/reporting/TaskGroupReport'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Leaf={slotKey:string;unitType:'SCALE'|'COGNITIVE'|'SITUATIONAL';instrumentKey:string;instrumentVersion:string;compiledRuntimeHash:string}
@@ -9,14 +9,16 @@ export function TeacherNumericGroupReports({api,endpoint}:{api:Api;endpoint:stri
  const [index,setIndex]=useState<Index|null>(null),[selected,setSelected]=useState(''),[spec,setSpec]=useState(''),[dimension,setDimension]=useState('ALL'),[ids,setIds]=useState<string[]>([])
  const [artifact,setArtifact]=useState<TaskGroupArtifact|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[directoryError,setDirectoryError]=useState('')
  const token=useRef(0)
- useEffect(()=>{if(!open)return;const n=++token.current;setIndex(null);setConfigured(false);setArtifact(null);setSelected('');setSpec('');setDimension('ALL');setIds([]);setError('');setBusy(true)
+ const load=useCallback((n:number)=>{setError('');setBusy(true)
   void api<Index>(endpoint).then(async data=>{
    if(n!==token.current)return;setIndex(data)
    if(data.versions[0]){const report=await api<TaskGroupArtifact>(endpoint+'/'+data.versions[0].artifactId);if(n===token.current)setArtifact(report)}
    else{const config=await api<Index>(endpoint+'?configure=true');if(n===token.current){setIndex(config);setConfigured(true)}}
   }).catch(e=>{if(n===token.current)setError(e instanceof Error?e.message:'报告目录暂不可读')}).finally(()=>{if(n===token.current)setBusy(false)})
+ },[api,endpoint])
+ useEffect(()=>{if(!open)return;const n=++token.current;setIndex(null);setConfigured(false);setArtifact(null);setSelected('');setSpec('');setDimension('ALL');setIds([]);setError('');load(n)
   return()=>{token.current++}
- },[api,endpoint,open])
+ },[load,open])
  if(!open)return <button type="button" onClick={()=>setOpen(true)}>查看数值群体报告</button>
  const tools=index?.sources.flatMap(source=>source.tools.map(tool=>({source,tool,key:source.trackId+':'+tool.leaf.slotKey+':'+tool.leaf.compiledRuntimeHash})))??[]
  const choice=tools.find(row=>row.key===selected)
@@ -30,7 +32,7 @@ export function TeacherNumericGroupReports({api,endpoint}:{api:Api;endpoint:stri
   const value=await api<TaskGroupArtifact>(endpoint,'POST',{trackId:choice.source.trackId,leaf:choice.tool.leaf,specId:spec,selection:dimension==='ALL'?{kind:'ALL'}:{kind:dimension==='CLASSES'?'CLASSES':'LABELS',ids}})
   if(n!==token.current)return;setArtifact(value);setIndex(old=>old?{...old,versions:[{artifactId:value.artifactId,generatedAt:value.generatedAt},...old.versions.filter(v=>v.artifactId!==value.artifactId)]}:old);await refreshDirectory(n)
  }catch(e){if(n===token.current)setError(e instanceof Error?e.message:'生成条件不满足')}finally{if(n===token.current)setBusy(false)}}
- return <section aria-label="教师数值群体报告"><h3>数值工具群体报告</h3>{error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在处理报告…</p>}
+ return <section aria-label="教师数值群体报告"><h3>数值工具群体报告</h3>{error&&<p role="alert">{error}</p>}{busy&&<p role="status">正在处理报告…</p>}{!index&&error&&<button type="button" disabled={busy} onClick={()=>load(++token.current)}>重试读取数值报告目录</button>}
   {directoryError&&<p role="status">{directoryError}<button type="button" onClick={()=>void refreshDirectory(token.current)} disabled={busy}>重试读取版本目录</button></p>}
   {index&&<><label>已生成数值报告<select disabled={busy} value={artifact?.artifactId??''} onChange={e=>void read(e.target.value)}><option value="">请选择版本</option>{index.versions.map(v=><option key={v.artifactId} value={v.artifactId}>{new Date(v.generatedAt).toLocaleString('zh-CN')} · {v.artifactId.slice(0,8)}</option>)}</select></label>
    {index.nextCursor&&<button type="button" disabled={busy} onClick={()=>void older()}>更早数值报告版本</button>}
