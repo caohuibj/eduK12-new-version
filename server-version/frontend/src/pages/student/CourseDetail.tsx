@@ -64,7 +64,7 @@ interface CompositeAssessment {
   availability: 'UPCOMING' | 'OPEN' | 'EXPIRED'
 }
 
-const CourseDetail: React.FC = () => {
+const CourseDetailContent: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<CourseSection>('assignments')
@@ -168,7 +168,7 @@ const CourseDetail: React.FC = () => {
   const fetchComposites = async () => {
     beginSectionLoad('composites')
     try {
-      const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available')
+      const response = await apiClient.get<{ list: CompositeAssessment[] }>('/composite-assessments/available', { params: { courseId } })
       if (response.code !== 0) throw new Error(response.message || '获取综合测评列表失败')
       const available = response.data?.list || []
       const deliveredIds = new Set<string>()
@@ -183,7 +183,7 @@ const CourseDetail: React.FC = () => {
           const tasks = await apiClient.get<{
             list: Array<{ id: string; kind: string; courses: Array<{ id: string }> }>
             total: number
-          }>(`/courses/my/tasks?page=${page}&pageSize=${pageSize}`)
+          }>(`/courses/my/tasks?page=${page}&pageSize=${pageSize}&courseId=${encodeURIComponent(courseId || '')}`)
           if (tasks.code !== 0) throw new Error(tasks.message || '获取课程测评任务失败')
           for (const task of tasks.data?.list || []) {
             if (task.kind === 'COMPOSITE' && task.courses.some((linked) => linked.id === courseId)) deliveredIds.add(task.id)
@@ -600,6 +600,11 @@ const CourseDetail: React.FC = () => {
       )}
     </ProductPage>
   )
+}
+
+const CourseDetail: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>()
+  return <CourseDetailContent key={courseId} />
 }
 
 export default CourseDetail
