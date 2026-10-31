@@ -13,7 +13,7 @@ import {getPublishedReportingSpec} from '../reporting/spec'
 import {listTaskGroupLongitudinalArtifactsPage,readTaskGroupLongitudinalArtifact,saveTaskGroupLongitudinalArtifact,type TaskArtifactCursor} from '../reporting/task-artifact'
 import {reportingFail,type ReportingLeafSourceV2} from '../reporting/types'
 import type {TaskGroupProjection} from '../reporting/group-summary'
-import type {EducationGroupSelection} from '../reporting/education-group-selection'
+import {listEducationGroupSelections,type EducationGroupSelection} from '../reporting/education-group-selection'
 import {assertTeacherGroupAuthority} from './groupReportAuthority'
 import {generateTeacherNumericGroup,readTeacherNumericGroup,type TeacherNumericScope} from './numericGroupReport.service'
 
@@ -37,27 +37,38 @@ async function resolvePlan(input:TeacherNumericScope){
   ORDER BY r.personal_tracking_ordinal,r.id LIMIT 101`
  if(!waves.length||waves.length>100||waves[0].id!==anchor.baselineId||waves[0].ordinal!==1)return unavailable('教师追踪计划波次不完整')
  const plan=educationTrackingSchema.parse(waves[0].tracking).plan
- if(!plan||plan.baselineWaveId!==anchor.baselineId||waves.some(w=>educationTrackingSchema.parse(w.tracking).plan?.id!==plan.id))return unavailable('教师追踪计划不一致')
+ if(!plan||plan.baselineWaveId!==anchor.baselineId||waves.some(w=>{const own=educationTrackingSchema.parse(w.tracking).plan;return own!==undefined&&own.id!==plan.id}))return unavailable('教师追踪计划不一致')
  return {plan,waves,source:{product:'TEACHER' as const,containerId:input.organizationId,taskId:anchor.baselineId}}
 }
 
-export async function teacherGroupLongitudinalCatalog(input:TeacherNumericScope&{before?:TaskArtifactCursor}){
+export async function teacherGroupLongitudinalCatalog(input:TeacherNumericScope&{before?:TaskArtifactCursor;configure?:boolean}){
  const state=await resolvePlan(input)
  if(!state)return {status:'NOT_CONFIGURED' as const,tools:[],waves:[],artifacts:[]}
  const page=await prisma.$transaction(tx=>listTaskGroupLongitudinalArtifactsPage(tx,state.source,state.plan.id,input.before))
+ const anchor=state.waves.find(w=>w.eventId===input.eventId)!
+ const trackId=educationTrackingSchema.parse(anchor.tracking).bindings[0].trackId
+ const configuration=input.configure?{specs:await prisma.$queryRaw<Array<{specId:string;title:string}>>`SELECT id AS "specId",spec_key AS title FROM reporting_analysis_specs WHERE status='PUBLISHED' AND definition->>'analysisKind'='GROUP' ORDER BY spec_key,id`,groups:await listEducationGroupSelections({organizationId:input.organizationId,runId:anchor.id,trackId,product:'TEACHER'})}:{}
  return {status:'CONFIGURED' as const,planId:state.plan.id,
   tools:[...new Map(state.plan.metrics.map(m=>[m.sourceKey,{key:m.sourceKey,label:m.label,kind:m.kind}])).values()],
-  waves:state.waves.map(({tracking:_tracking,...w})=>({...w,title:w.name})),...page}
+  waves:state.waves.map(({tracking:_tracking,...w})=>({...w,title:w.name})),...page,...configuration}
 }
 
 /** Binding is a concrete current leaf, not a parent-wide union of score names. */
 export function teacherPlanLeafBinding(tracking:EducationTracking,metrics:TrackedMetric[]){
+ if(tracking.entry!=='TEACHER')return unavailable('不是教师SELF追踪计划')
  const selected=metrics.map(metric=>({metric,binding:tracking.bindings.find(b=>b.metricId===metric.id)}))
  if(!selected.length||selected.some(s=>!s.binding||s.binding.scoreKey!==s.metric.scoreKey)
   ||new Set(selected.map(s=>s.binding!.trackId+':'+s.binding!.itemId)).size!==1)return unavailable('追踪项没有唯一当轮子工具位置')
  const kind=metrics[0].kind,binding=selected[0].binding!
  if(kind==='FORM'||metrics.some(m=>m.kind!==kind))return unavailable('此教师来源没有已接入的数值叶工具')
  return {trackId:binding.trackId,itemId:binding.itemId,slotKey:compositeItemSlotKey(binding.itemId,kind==='SJT'?'SITUATIONAL':kind)}
+}
+
+/** The Scale measurement publisher uses points while the canonical raw-score
+ * adapter uses score. C/item identity has already been matched; no value or
+ * scale conversion is performed. Other units and all cognitive units are exact. */
+function trackedUnitMatches(metric:TrackedMetric,runtimeUnit:string|undefined){
+ return runtimeUnit===metric.unit||metric.kind==='SCALE'&&metric.unit==='points'&&runtimeUnit==='score'
 }
 
 async function resolveLeaves(input:TeacherNumericScope,metrics:TrackedMetric[],waves:Wave[]){
@@ -79,11 +90,13 @@ async function resolveLeaves(input:TeacherNumericScope,metrics:TrackedMetric[],w
   // aggregate metricKeys are the existing GROUP ceiling. longitudinalMetricKeys
   // is participant-summary-only in the shared disclosure schema.
   const tools=await listAuthoritativeRunLeafSources({organizationId:input.organizationId,runId:s.wave.id,trackId:s.trackId,slotKey:s.slotKey,groupAudience:'ORGANIZATION'})
-  const candidates=tools.filter(t=>t.leaf.slotKey===s.slotKey&&t.leaf.unitType===(metrics[0].kind==='SJT'?'SITUATIONAL':metrics[0].kind)
-   &&metrics.some(m=>t.metrics.some(v=>v.key===m.scoreKey&&v.unit===m.unit)))
+  const candidates=tools.filter(t=>t.leaf.slotKey===s.slotKey&&t.leaf.unitType===(metrics[0].kind==='SJT'?'SITUATIONAL':metrics[0].kind))
+  // Discovery already checked the real frozen source and GROUP authority. With
+  // no available leaf metrics, store only a null round, never fabricate a leaf.
+  if(!tools.length){result.push({...s,leaf:null,allowedMetricIds:[] as string[],protocol:null});continue}
   if(candidates.length!==1)return unavailable('追踪叶缺少获准的教师群体数值来源，或存在多个实际配置')
   const tool=candidates[0]
-  if(metrics.some(m=>tool.metrics.some(v=>v.key===m.scoreKey&&v.unit!==m.unit)))return unavailable('教师追踪指标单位变化')
+  if(metrics.some(m=>tool.metrics.some(v=>v.key===m.scoreKey&&!trackedUnitMatches(m,v.unit))))return unavailable('教师追踪指标单位变化')
   result.push({...s,leaf:tool.leaf,allowedMetricIds:metrics.filter(m=>tool.metrics.some(v=>v.key===m.scoreKey)).map(m=>m.id),protocol:tool.protocolSignature??tool.leaf.compiledRuntimeHash})
  }
  return result
@@ -120,7 +133,7 @@ export function teacherGroupNumericView(projection:TaskGroupProjection,keys:stri
   return m?{key,type:m.type,unit:m.unit??null,state:m.state??'present',validN:m.validN??null,missingN:m.missingN??null,mean:m.mean??null,sdSample:m.sdSample??null}:{key,state:'suppressed'}
  })}
 }
-type Ref={runId:string;eventId:string;trackId:string;artifactId:string;snapshotHash:string;projectionHash:string;metricKeys:string[];leaf:ReportingLeafSourceV2}
+type Ref={runId:string;eventId:string;trackId:string}&({missing:true}|{missing?:false;artifactId:string;snapshotHash:string;projectionHash:string;metricKeys:string[];leaf:ReportingLeafSourceV2})
 type Bindings={waves:Ref[];selection:EducationGroupSelection;specId:string}
 
 export async function generateTeacherGroupLongitudinal(input:TeacherNumericScope&{planId:string;sourceKey:string;throughWaveId:string;specId:string;selection?:EducationGroupSelection}){
@@ -140,6 +153,12 @@ export async function generateTeacherGroupLongitudinal(input:TeacherNumericScope
  const leaves=await resolveLeaves(input,metrics,waves),before=await completedHeaders(input.organizationId,leaves)
  const bindings:Bindings={waves:[],selection:input.selection??{kind:'ALL'},specId:input.specId},prepared:GroupLongitudinalWave[]=[]
  for(const source of leaves){
+  if(!source.leaf||!source.allowedMetricIds.length){
+   const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:'教师群体报告',sourceLabel:source.wave.name,populationLabel:'本波次暂无可披露的追踪数值',cutoff:new Date().toISOString(),completedN:null,assignedN:null,countUnit:'PERSON',tool:{key:input.sourceKey,title:metrics[0].label,kind:metrics[0].kind},metrics:[],limitations:['本波次缺失或未获准的数值保持空值，不推定完成或缺失人数。']}
+   prepared.push({id:source.wave.id,ordinal:source.wave.ordinal,label:source.wave.name,projection,metricKeys,observedFrom:null,observedUntil:null,populationKeys:null})
+   bindings.waves.push({runId:source.wave.id,eventId:source.wave.eventId,trackId:source.trackId,missing:true})
+   continue
+  }
   // The single-wave service owns source authority, delay, effective N,
   // differential disclosure and the transaction/lock. No second group engine.
   const safe=await generateTeacherNumericGroup({...input,eventId:source.wave.eventId,trackId:source.trackId,leaf:source.leaf,selection:bindings.selection})
@@ -154,7 +173,7 @@ export async function generateTeacherGroupLongitudinal(input:TeacherNumericScope
   })
   const observed=actual.map(h=>h.completedAt.toISOString()).sort(),base=teacherNumericWaveProjection(safe)
   const withheld=(m:TrackedMetric)=>({key:metricKeys[m.id],label:m.label,type:'NUMBER' as const,unit:m.unit,range:null,measurement:null,state:'suppressed' as const,validN:null,missingN:null,mean:null,sdSample:null,observedRange:null,frequencies:[],qualityCounts:{}})
-  const projection={...base,metrics:metrics.map(m=>source.allowedMetricIds.includes(m.id)?base.metrics.find(v=>v.key===metricKeys[m.id])??withheld(m):withheld(m))}
+  const projection={...base,metrics:metrics.map(m=>{const value=source.allowedMetricIds.includes(m.id)?base.metrics.find(v=>v.key===metricKeys[m.id]):undefined;return value?{...value,unit:m.unit}:withheld(m)})}
   prepared.push({id:source.wave.id,ordinal:source.wave.ordinal,label:source.wave.name,projection,metricKeys,
    observedFrom:observed[0]??null,observedUntil:observed.at(-1)??null,populationKeys:actual.map(h=>h.subjectId),protocols:Object.fromEntries(metrics.map(m=>[m.id,source.protocol]))})
   bindings.waves.push({runId:source.wave.id,eventId:source.wave.eventId,trackId:source.trackId,artifactId:stored.id,snapshotHash:stored.snapshotHash,
@@ -175,6 +194,7 @@ export async function readTeacherGroupLongitudinal(input:TeacherNumericScope&{ar
  const bindings=saved.sourceBindings as Bindings
  if(!bindings.waves.length||bindings.waves.some(ref=>!state.waves.some(w=>w.id===ref.runId&&w.eventId===ref.eventId)))return unavailable('教师纵向快照不属于此计划')
  for(const ref of bindings.waves){
+  if(ref.missing===true)continue
   const safe=await readTeacherNumericGroup({...input,eventId:ref.eventId,artifactId:ref.artifactId}),stored=await readReportingArtifactRecord(ref.artifactId)
   if(stored.organizationId!==input.organizationId||stored.snapshotHash!==ref.snapshotHash
    ||canonicalHash(teacherGroupNumericView(teacherNumericWaveProjection(safe),ref.metricKeys))!==ref.projectionHash)return unavailable('原教师群报的披露范围或快照已变化')

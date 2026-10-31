@@ -1,0 +1,16 @@
+# Teacher numeric group longitudinal: scoped local evidence
+
+Base main `f5fa29314eb731f0479b90ae962b731da8e08d34`. All data is isolated synthetic data. No production access. These are unsigned local originals, not official CI or deployment.
+
+- `adapter-run3`: four new mock service contracts passed; baseline-owned plan and inherited bindings, correct leaf/time/zero, whole missing round, current authority and saved disclosure. Initial `adapter-first` had no tests because the file was created in a nested directory; `adapter-run` failed due to a tagged-template mock, `adapter-run2` due to a missing ownerId in the synthetic source. All retained.
+- `new-boundaries`: two new cases passed: exact Scale points/score raw-unit names after matching frozen C (other units rejected), and loopback HTTP route strict request/cursor/admin/MFA wiring. Auth/MFA/services are mocked; this is not a real login test. The first four service contracts were not rerun.
+- `ui-first`: two jsdom cases passed, shared saved report/history append and stale event configuration handling. No real browser/PG/auth is claimed.
+- `native-first`: actual new registered GROUP Scale, independent review, license, T1 frozen plan, native T2 inheritance, 10 teachers per wave, 20 FINALs, own single reports and own changes. Failed at the new aggregate adapter because measurement `points` vs canonical `score` were treated as different units. No result was replaced or resubmitted.
+- `native-continuation`: reused all 20 completed results, repaired unit adapter generated the group longitudinal snapshot and means/N/delta passed. Failed at a test-only observer because the loaded local environment left NODE_ENV=development.
+- `native-read-continuation`: correct NODE_ENV=test; read the existing saved snapshot rather than generate again. Passed: means 1/3, valid N 10/10, delta 2, points unit, latest pointer, ordinary teacher denied. Canonical materializations during saved reads/catalog = 0. 0 FINALs or group generation in this continuation.
+- `selected-types-first`: backend selected service/routes semantic check passed; frontend diagnostic failures are a check harness mistake (root references-only tsconfig used rather than tsconfig.app.json), not 231 product defects. Correct app config plus vite environment declarations produced `selected-types-frontend` with zero diagnostics. This is selected-module semantics, not a full production build.
+- `migrate-fixture`: creates the schema in a fresh isolated test database. Does not replace the pending official nonempty-main migration/dump/restore qualification.
+
+Pending shared owner dependency: existing numeric generator rejects an entire spec if one source metric is outside a round's organization ceiling. A plan A/B with only A currently disclosed needs an internal partial-source option; B must remain null, default single report and all existing disclosure/transaction boundaries unchanged. No duplicate generator was added. Private education-composition single-wave consumer remains Group-owned. Native Form numeric plan is a separate explicitly pending scope decision.
+
+No old 22/37 cases, old 20 Cognitive/SJT FINALs, or all-tool matrix were rerun. No new statistical engine, account platform, table, scientific gate, Profile, paired analysis, or production change.
