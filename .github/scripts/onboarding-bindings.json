@@ -6351,21 +6351,21 @@
       "schemaVersion": 1,
       "pr": 421,
       "enabled": true,
-      "base": "e092be0d57a5a1df7519c23c8a5c2cf078b870c8",
-      "product": "7003c0e44ec8d8bf2d94f9ae8149d3f596aaf579",
-      "controlCheckpoint": "d875998e4457e6016f49a21f20d1a3945a2800f0",
+      "base": "15e58e0e2d186d041293b3f2e139bc243946d3f3",
+      "product": "078fef00097869d7a4043cf7ce8b50d115f7732e",
+      "controlCheckpoint": "755e2295555044bb450ddbdb854b532d6ba85311",
       "components": {
-        "backend": "c687e555fecbf771dde5c2d5ee974388178f1884",
+        "backend": "32a16236c7b66f4b4efe2d5f6a15cccacdb97398",
         "frontend": "5b108c22d6006abddcfcabd71ce2de67ed886828"
       },
       "controlBefore": {
         ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
         ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "c8376996ebec0da90077db383d21e7d4783dd814",
-        ".github/scripts/onboarding-checks.mjs": "d303798d554fa77fac9101000e4e2c9158f27b8d",
+        ".github/scripts/onboarding-bindings.json": "bad52a06610aca89d02881bb3e9846103fd1570a",
+        ".github/scripts/onboarding-checks.mjs": "a96b7ce2d1aa46b2c7b80e9c3be47a6705e2b8cb",
         ".github/scripts/onboarding-controls.test.mjs": "99bffd299fe472a47597b91e9cccf2197fa2a0f8",
-        ".github/scripts/onboarding-evidence.json": "8f14650ace52e6b01087007dbed18fe98ab20afc",
-        ".github/scripts/onboarding-scope.mjs": "5901bfcec762313b7e6fe44f2f4efb158b2885a9",
+        ".github/scripts/onboarding-evidence.json": "5256efeb0f14ad85101e6d0a7f73f1e7e1b49397",
+        ".github/scripts/onboarding-scope.mjs": "02d4fbb783a223f30e349768b11cfce4f5d6c5ce",
         ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
         ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
         ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
@@ -6375,7 +6375,7 @@
         ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
         ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
         ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "9787125036677b53161c78401afb22b959f2c198"
+        ".github/workflows/ci.yml": "bca5b6b3df304cb4b3b0c5d2710d1cabbc83c56c"
       },
       "source": {
         "docs/evidence/training-cognitive-wave-quota-20261030/README.md": {
