@@ -139,7 +139,9 @@ test('frontend dependency workflow dispatch agrees with the aggregate and fronte
     const expr=job(ci,'docker').match(/frontend_only: \$\{\{ (.+) \}\}/)[1];
     assert.equal(new Function('needs',`return (${expr})`)(needs),true);
   }
-  assert.match(job(ci,'codeql'),/dependencies_frontend_only == 'true' && 'paths: \[server-version\/frontend\/src\]'/);
+  assert.match(job(ci,'codeql'),/id: deps-codeql\n        if: needs\.scope\.outputs\.dependencies_frontend_only == 'true'/);
+  assert.match(job(ci,'codeql'),/paths:\['server-version\/frontend\/src'\]/);
+  assert.match(job(ci,'codeql'),/\$\{\{ steps\.deps-codeql\.outputs\.config \|\|/);
 });
 test('draft and ready dependency aggregate require every formal affected component and reject skips or forged selections',()=>{
   for(const draft of [true,false]) {
