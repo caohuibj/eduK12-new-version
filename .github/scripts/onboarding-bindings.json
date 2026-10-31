@@ -4344,6 +4344,96 @@
         }
       },
       "activationNote": "Existing backend-only onboarding route422. Original4 distinct app cases,2 native observations and exact final backend type receipt admitted unsigned with source-capture limits disclosed. No app/PG/browser/frontend/participant replay,no schema change,no new workflow. Scope/admission/CodeQL/gate only;not a merge or deployment."
+    },
+    "421": {
+      "schemaVersion": 1,
+      "pr": 421,
+      "enabled": true,
+      "base": "d420e90e46036b4518a0f729cb3e1ef4b9ca3306",
+      "product": "3a91432faa2da098aa454d54f9313b7a0d98a1e0",
+      "controlCheckpoint": "de810da4f9afc7ecc492a8ce462e41729d39973d",
+      "components": {
+        "backend": "b46e34b894075612517424ca40943732e0f4d5ae",
+        "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
+      },
+      "controlBefore": {
+        ".github/scripts/build-ci-images.sh": "2a4be34f89a3d14a4be099141107cd69008a7917",
+        ".github/scripts/ci-image-plan.mjs": "e16e07bbe7b31ef0c10b1e770fbb3b2def0f3a97",
+        ".github/scripts/ci-image-plan.test.mjs": "d23e550fc817e6204cf2b28398b6082e71f8169f",
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "b17da768ed4f0b766b6b345961e89e7de278034f",
+        ".github/scripts/onboarding-checks.mjs": "04c4a3ca3d93797c11e3a6a05dccfae6343222c3",
+        ".github/scripts/onboarding-controls.test.mjs": "7f7a59c8dede45e89cc9dd97a085d84cde50d1b3",
+        ".github/scripts/onboarding-evidence.json": "fdca7a1e4e2d6c790fbfee1ce8ef7e1de4c1a6c4",
+        ".github/scripts/onboarding-scope.mjs": "d0bc3ad38e317e77206d53cb88880adf456ce70d",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci-images.yml": "d54c52bbe80dbb91ba70b1092490ae8a7fd22de1",
+        ".github/workflows/ci.yml": "2cf40fea1fdc22619dd1072a027a782f601d7307"
+      },
+      "source": {
+        "docs/evidence/training-cognitive-wave-quota-20261030/README.md": {
+          "before": null,
+          "after": "dbbefa3833fe1056319ae99f2c46ae271ae23f46"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-after-fixture.json": {
+          "before": null,
+          "after": "716ade2681c2259f617de522cd78789a467f1093"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-diagnostic.json": {
+          "before": null,
+          "after": "98612abffb59b0f4f486dc0c1fab343b14692f33"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-final.json": {
+          "before": null,
+          "after": "e8294186179c09d7f936f633a3769215d73c48a4"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/pg-first.json": {
+          "before": null,
+          "after": "f935f96048d504ca1f397f560bef46ba1ce0f8a9"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-final.log": {
+          "before": null,
+          "after": "b70a682621c2a63253e3300c0c12143fc1e31a4c"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-first.log": {
+          "before": null,
+          "after": "9ee1cad68583cdc62aab47ad1bfaac5138e3aec9"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/control-proof.json": {
+          "before": null,
+          "after": "08235b524145a468b01a0be1a20cca046f2563a3"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/plan.txt": {
+          "before": null,
+          "after": "b0e851483e18459dee1338ebb9c5423255813f58"
+        },
+        "docs/evidence/training-cognitive-wave-quota-20261030/qualification/quota-delta-final.log": {
+          "before": null,
+          "after": "6625a143fb223fc6cfb234e3f25ee858f99dddfd"
+        },
+        "server-version/backend/src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts": {
+          "before": null,
+          "after": "8447cbd6d099b676c187b180d6fbed946ecdc22c"
+        },
+        "server-version/backend/src/modules/cognitive/attempt-quota.ts": {
+          "before": "e4a5211bccaeba384633eab9980df2495ac262e4",
+          "after": "9f836b37730c29847b867cde17e3eb2e288a39ee"
+        },
+        "server-version/backend/src/modules/composite/composite.service.ts": {
+          "before": "9ca250db58d9dea364c082d55876655ea40d64d6",
+          "after": "d3c3655e9c328f9b78f648ab916e6294b3560927"
+        }
+      },
+      "activationNote": "User delegated scoped review/qualification/merge on this existing PR; unchanged original two quota PG outcomes are reused, missing backend compiler and runtime scan remain required in the backend-only image job. No frontend or migration selected. DOT reviews asynchronously."
     }
   }
 }
