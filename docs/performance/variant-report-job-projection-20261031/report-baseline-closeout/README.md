@@ -1,9 +1,0 @@
-# PR450 local qualification preparation
-
-Actual base194bb91f9af4feb62d9ed384813e7abf0643c2e8 includes qualified449. This candidate adds the exact original23objects from64fa9e53; only the original narrow seven-field composite job projection and its direct test change application source. No blocked448/445 source or control entries are included. Frontend equals actual main; no frontend compilation was run.
-
-All16 compressed originals pass original decoded hashes. Reuse exactly3different real Vitest assertions:2successful candidate cases,1existing synchronous consumer reporter extracted byte-for-byte from original binding.json and checked against its originalSHA256. Original fixture preparation failure, corrected projection baseline failure and filtered cases remain unchanged. No case or PG replay occurred. PostgreSQL diagnostic2row/25to7field/114035to4719JSONbyte evidence remains synthetic query-result serialization evidence, not production SQL/wire/HTTP/CPU/p95/capacity qualification or a Jest report.
-
-Current complete backend tree06cea014b3dbc8915a3c7cf1a0e011ca568d9a2b differs from original555backend and therefore received exactly one fresh app tsc--noEmit on Node24.21.0:exit0,37.338s. The original follow-redirects1.16.1/lock1.16.2 constraint remains; fresh compiler uses an isolated lock-patched current-schema dependency copy with selected hashes, not full installed-byte/audit attestation. One bounded existing-style route/identity/unknown/manual/frontend-drift control test passed.
-
-Existing exact route only adds450branch/named2source paths/evidenceprefix, original receipt admission/affected CodeQL membership and required single backend type scope. All31prior candidate values and root fields remain unchanged. This is a disabled local candidate, not officialCI, Ready, merge or deployment. Parent exact review and publication coordination are required before formal activation. No new workflow/framework/keys/thresholds or production writes.

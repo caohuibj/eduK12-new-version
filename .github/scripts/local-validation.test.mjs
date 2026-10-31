@@ -14,13 +14,13 @@ const script=fileURLToPath(new URL('local-validation.mjs',import.meta.url));
 const keys=crypto.generateKeyPairSync('ed25519');
 const pub=keys.publicKey.export({type:'spki',format:'pem'});
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
-function fixture(fn) {
+function fixture(fn,file='.github/scripts/contract.mjs') {
  const cwd=process.cwd(),dir=fs.mkdtempSync(path.join(os.tmpdir(),'hui-local-proof-'));
  try {
   process.chdir(dir);git('init');git('config','user.name','Local validation fixture');git('config','user.email','fixture@example.invalid');
-  fs.mkdirSync('.github/scripts',{recursive:true});fs.writeFileSync('.github/scripts/contract.mjs','export const v=1;\n');fs.writeFileSync('AGENTS.md','rules\n');
+  fs.mkdirSync('.github/scripts',{recursive:true});fs.writeFileSync(file,'export const v=1;\n');fs.writeFileSync('AGENTS.md','rules\n');
   git('add','.');git('commit','-m','isolated base');const base=git('rev-parse','HEAD');
-  fs.writeFileSync('.github/scripts/contract.mjs','export const v=2;\n');git('add','.');git('commit','-m','isolated candidate');const head=git('rev-parse','HEAD');
+  fs.writeFileSync(file,'export const v=2;\n');git('add','.');git('commit','-m','isolated candidate');const head=git('rev-parse','HEAD');
   const record={check:'release-tools',status:'success',binding:binding('release-tools',base,head),logSha256:'a'.repeat(64),commands:recipe('release-tools',base,head).map(argv=>({argv,exitCode:0,seconds:0.01}))};
   const payload={schema:1,repository:'caohuibj/eduK12-new-version',base,head,checks:[record]};
   fn({base,head,payload,record});
@@ -51,6 +51,17 @@ test('unrelated documentation does not invalidate tooling evidence',()=>fixture(
  assert.equal(admit(signed,pub,base,git('rev-parse','HEAD')).checks[0].check,'release-tools');
 }));
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+test('onboarding tooling changes select affected controls without application commands',()=>{
+ for(const file of ['.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs'])fixture(({base,head})=>{
+  const commands=recipe('release-tools',base,head),selected=commands.find(argv=>argv.includes('.github/scripts/onboarding-controls.test.mjs'));
+  assert(selected,'Changed onboarding controls must be checked by the existing tools recipe');
+  const pattern=new RegExp(selected.find(arg=>arg.startsWith('--test-name-pattern=')).slice('--test-name-pattern='.length));
+  for(const name of ['onboarding accepts unchanged main controls','onboarding still rejects changed control bytes','onboarding needs before snapshots','onboarding scope binds exact source','stable gate still requires admission','Task1 scope refuses incomplete inventories'])assert(pattern.test(name),name);
+  assert(!pattern.test('Task1 exact candidate remains disabled'));
+  assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
+  assert(!commands.flat().some(arg=>/vitest|playwright|prisma|(?:^|\/)tsc$/.test(arg)));
+ },file);
+});
 test('guidance docs select documentation only; no backend or recovery jobs',()=>{
  const s=classifyChanges(['AGENTS.md','docs/release/README.md','.github/PULL_REQUEST_TEMPLATE.md'].map(regular));
  assert.equal(s.documentation,true);

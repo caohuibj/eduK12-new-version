@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "node_modules/eslint/bin/eslint.js",
+    "src/pages/student/QuestionnaireResult.tsx",
+    "src/pages/student/ScaleResult.tsx",
+    "src/pages/student/__tests__/ReportReadRecovery.test.tsx"
+  ],
+  "startedAt": "2026-10-31T09:45:00.173741+00:00",
+  "endedAt": "2026-10-31T09:45:01.320403+00:00",
+  "seconds": 1.1466686240000854,
+  "exitCode": 0,
+  "sourceInputs": {
+    "server-version/frontend/src/pages/student/QuestionnaireResult.tsx": "10b93ce0a2d4df3445d946b09a3dfcbddbd576ab4dde232cc751d0514d803eaa",
+    "server-version/frontend/src/pages/student/ScaleResult.tsx": "cb8a11e643079e91ff812f221e0798d18910bc8fd02d3da757cb2a08d6d958ad",
+    "server-version/frontend/src/pages/student/__tests__/ReportReadRecovery.test.tsx": "958bb136b7b7c8b4bc776070aee45c25ede4e17ca352ace04bf2b74cb6fa2635",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+  },
+  "environment": "Node24.21.0; existing dependency installation reused; lock versions compared, no full installed-byte attestation/fresh install or audit claim"
+}

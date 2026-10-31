@@ -1,0 +1,27 @@
+{
+  "base": "7e4a5b90c9b9c0a186345a6025f0eb9ef78a3c61",
+  "previousReviewedHead": "e78c903b9ef91def9237e418d343202760209089",
+  "components": {
+    "backend": "4dfcd69abc6d086f68463e71488ad88dad61e1e7",
+    "frontend": "6a16f663bd2f59897acbe91546eea3291ffa1bf2"
+  },
+  "originalTypesReceipt": {
+    "path": "docs/performance/public-report-isolation-20261031/qualification-main92/frontend-types.json",
+    "sha256": "245a00c9d24c5d4250ce202f5177d2f0a7833c4211d48e30210e6424f9bc588e",
+    "componentTree": "6a16f663bd2f59897acbe91546eea3291ffa1bf2",
+    "node": "v24.21.0",
+    "originalExitCode": 0
+  },
+  "compilerInputsStillMatch": {
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "f54c445e4cf20b7d516c47026c190a269c6c2ae8eea5e08d9d3ee018c2115cbc"
+  },
+  "businessCasesReused": 10,
+  "businessCasesReplayed": 0,
+  "typesReplayed": 0,
+  "backendDeltaFromActualMain": [],
+  "controlResolution": "Retain main448 registration and445/449 dispatch/guards; restore447 route/evidence tests and exact SAST selection. CI is sole execution location for affected control checks and CodeQL.",
+  "scope": "No new product changes, database/FINAL/browser or image work."
+}
