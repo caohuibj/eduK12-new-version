@@ -1,17 +1,17 @@
 # 量表内容对齐与本地候选（2026-10-31）
 
-核对基线：`main@a58a16dcdd3998e5262e89a677ff716b8a15b6e7`，实读远端 PR。
-这是源码内容库候选，尚未 push、正式 CI、合并、数据库安装或生产发布。母 DOT 统一审阅与收口，不新建重复内容 PR，不混改 #457/#458。
+初始核对基线：`main@a58a16dcdd3998e5262e89a677ff716b8a15b6e7`。Draft 已追平当前 `main@ac3fe1f000a5b736f39eab886c023b33b5e175aa`（#450，无量表内容或本候选文件重叠）。实读远端 PR。
+这是待独立审阅的源码内容库 Draft，不代表正式 CI、合并、数据库安装或生产发布。母 DOT 统一审阅与收口，不新建重复量表内容 PR，不混改 #457/#458。
 
 ## 已完成的实际缺口
 
 - main 有244个独立 key：124个源码PUBLISHED、8个源码DRAFT、112个CATALOG_ONLY；132个有executable。该数字不是生产数据库的安装／发布数量。
 - #387/#389/#390 的默认增强报告已在main，实际报告文字与计分方向均复核。#401 已接入最早三项附加报告；另55项的旧R／趣味R仍只在docs。本候选将原文字节原样登记到现有 `report-variants` 与 `registeredParts`，没有重写合格报告、改C/P、计分、参考阈值或授权。
-- 7项Skaalvik：24题、独立均分、Pnone、中文R均完整；#400原内容／CodeQL／合并门已成功。本候选仅将源码releaseStatus改为PUBLISHED，并按现有历史合同将catalogManifestVersion递增1→2。C/S/R仍1.0.0，Pnone，译审／专家PENDING及PILOT保留。不是科研审批或数据库PUBLIC发布。
+- 7项Skaalvik：24题、项目独立均分、Pnone、中文R已有技术证据与实质内容，但本次不改其DRAFT，不递增目录版本。原作者完整中间选项标签、评分与缺失算法未取得；当前采用已记录的项目改造规则。技术检查不替代对该改造版本的独立内容定版。译审／专家PENDING及PILOT保留；代码把PENDING列为manualReview，只有locale/version匹配是该模块的自动安装约束，不新增人工状态软件门禁。
 - CTAS-12与TAS-37复用原#383目录元数据并补中文待办说明，进入生成索引；不重复引入已由#390进入main的CTAS-2 C1.0.1，也不引入旧CTAS-2 C1.0.0。
 - APQ42、DBT59简体、DBT59繁体、Psy-Flex6、SPANE12：从既有#379候选提取目录／本地化元数据，沿现有CATALOG_ONLY+candidatePreview保留待审。未复制完整题本、选项、指导语或可执行报告；原候选的完整源码仍由既有PR收口，不重复开PR。
 
-候选共有251个独立key：131个源码PUBLISHED、1个源码DRAFT（CTAS-2）、119个CATALOG_ONLY；executable仍132个。现有seed只物化executable，新行仍DRAFT/HIDDEN；CATALOG_ONLY由现有管理员目录和接入状态读取，不能称数据库草稿已建立。
+候选共有251个独立key：124个源码PUBLISHED、8个源码DRAFT（CTAS-2与Skaalvik7）、119个CATALOG_ONLY；executable仍132个。现有seed只物化executable，新行仍DRAFT/HIDDEN；CATALOG_ONLY由现有管理员目录和接入状态读取，不能称数据库草稿已建立。
 
 ## 待审项目与现有负责人边界
 
@@ -33,12 +33,23 @@ JDR的CBI3+HSE7+TALIS4已源码PUBLISHED；TSES／UWES／BAT／COPSOQ来源目�
 
 - 55项新增登记逐项经真实 `registeredParts → composeTriplet → compileStandardCombinationReport` 消费，55/55通过：默认／旧R／趣味R非空，独立R版本，原C/P、计分与measurement identity不变。没有重跑不变的golden。
 - 现有三项报告登记直接消费者4/4通过，原origin/material身份保留。
-- 7个Skaalvik仅声明与现有 `checkSelectedHistory` 7/7通过；原#400 source blobs与基线一致，复用同输入计分证据，新增计分／报告执行次数0。
+- 原本地Skaalvik状态修订候选曾经声明与 `checkSelectedHistory` 7/7通过；该修订已从本Draft范围移除，七源逐字节等于main，不把旧检查当作最终内容发布批准。原#400技术证据仍保留，不重复计分或报告检查。
 - 7个待审目录已补中文待办说明，经现有schema与preview回读，sourceDiagnostics为0，仍无executable，具体缺口保留。
-- 第一次backend类型检查因保存的Prisma client缺当前main的personalTracking字段而失败；只在本候选隔离node_modules中按当前schema生成client，不连接数据库。最终 `tsc --noEmit` 退出0；不把初次失败改写为通过。
+- 第一次backend类型检查因保存的Prisma client缺当前main的personalTracking字段而失败；只在本候选隔离node_modules中按当前schema生成client，不连接数据库。本地候选d45bee852的 `tsc --noEmit` 退出0；该原执行保留身份。此后仅去掉Skaalvik状态修订、追平main的#450并澄清文档，不重复类型检查，不声称新HEAD已重执行或已获CI资格。
 - 没有运行整库golden、浏览器、四入口、DB、全平台CI或生产施测；也没有取得正式CI或生产资格。后端Docker已有src→tsc/dist及JSON打包链，无需新manifest、下载器或产物协议。
 
-后续由母DOT先审阅本地精确差异，决定如何进入既有累计内容／共享登记PR；正式门禁按实际完整差异执行。本候选修改了共享登记文件，不能伪称仅纯内容路线已合格。系统管理员入口#457/#458仍由原负责人收口，现有状态页已union全部registered与已安装版本；不需要新审核系统。准备发布时，沿既有install/materialize→精确版本/部署策略→publication preview/apply与回读；当前未执行这些数据库或生产动作。
+后续由母DOT独立审阅此Draft精确差异，正式门禁按实际完整差异与已授权范围执行。本候选修改了共享登记文件，不能伪称仅纯内容路线已合格。系统管理员入口#457/#458仍由原负责人收口。现有接入状态接口union全部registered与已安装版本，公共量表治理目录也读取这些CATALOG_ONLY来源；详情可读取reportPlan与中文blockers。这是实际源码接入，不只是文档。当前页面为只读查看，未知blocker的中文内容在“阻断标识”详情内，并无从目录项直接转成可编辑草稿或一键安装的完整操作。未登录真实管理员环境、未作API/浏览器实测。需由#457/#458原负责人将中文待办在主要区域显示，并连接已有导入／草稿操作；取得完整可执行来源后仍沿原流程入库，不宣称这一UI衔接已完成，也不新建审核系统。准备发布时，沿既有install/materialize→精确版本/部署策略→publication preview/apply与回读；当前未执行这些数据库或生产动作。
+
+
+## Skaalvik 状态澄清与来源
+
+源码PUBLISHED在现有实现是技术包可安装状态，和数据库PUBLIC、人工译审完成、科研资格不同。`policy/localization.ts`仅locale与localizationVersion不一致进入blockers；PENDING进入manualReview。`onboarding/install.ts`仍检查SYSTEM_ADMIN、结构/执行合同、发布状态、部署及精确版本。不能从“程序没有阻断PENDING”倒推出“已经获专家批准”。
+
+现有七份报告已写出构念、方向、反思及环境支持建议；每工具5个golden在原PR400正式selected-content作业通过，原job与源blob已核；未取得原作业完整raw log，不补造断言数。原作者完整评分和缺失处理尚缺，本项目规则及局限已有明示，后续原作者规则应走新C/S，不静默覆盖。
+
+公开前重新核对两篇出版页：2016文章页 https://www.scirp.org/journal/paperinformation?paperid=69852 的许可说明、2018 https://link.springer.com/article/10.1007/s11218-018-9464-8 的Rights and permissions均为CC BY 4.0。本推断仅涵盖已注明作者来源和项目改造的文章题文，不替第三方量表、未取得施测表或本地验证背书。本Draft没有增量上传七份题本，七源与main完全相同，保持DRAFT待独立定版。
+
+55项只注册现有报告，未新增、润色或改写文字；逐项old/fun对象与main的原report-materials.json相等，默认R与standardReport相等。任何后续报告语义修订必须新R，不改写历史R。
 
 ## 本次登记的55项原R身份
 
