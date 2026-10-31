@@ -186,6 +186,16 @@ describe('catalog single-source-of-truth boundaries', () => {
         expect(fs.readFileSync(file, 'utf8').match(/from\s+['"][^'"]*cognitive\/library[^'"]*/g))
           .toEqual(["from '../cognitive/library/product-readiness"]); return false
       }
+      // Discovery is a read-only catalog consumer, not a runtime/scorer/hash path.
+      // Admit only this exact metadata derivation import, never the whole Survey tree.
+      if (file === path.join(SRC_DIR, 'src/modules/survey/catalog-discovery.ts')) {
+        const content = fs.readFileSync(file, 'utf8')
+        expect(content.match(/from\s+['"][^'"]*cognitive\/library[^'"]*['"]/g))
+          .toEqual(["from '../cognitive/library/catalog'"])
+        expect(content.match(/import\s+\{[^}]+\}\s+from\s+['"][^'"]*cognitive\/library[^'"]*['"]/g))
+          .toEqual(["import { deriveCatalogDomainSummary } from '../cognitive/library/catalog'"])
+        return false
+      }
       const content = fs.readFileSync(file, 'utf8')
       return /from\s+['"][^'"]*cognitive\/library/.test(content)
     })

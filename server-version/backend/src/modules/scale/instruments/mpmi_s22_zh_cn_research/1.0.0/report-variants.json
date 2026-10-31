@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "mpmi_s22_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "7dba74254e90bc8435c5f487a682a3342a6e5b3b585636b04eac84dce32e700c",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "pma",
+          "pmsi",
+          "pmse"
+        ],
+        "scoreOrder": [
+          "pma",
+          "pmsi",
+          "pmse"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "pma",
+            "headline": "记住要做的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些问题关注你在日常生活中，能不能在合适的时候想起原本打算做的事，例如回电话、还东西或赴约。它记录的是你对自己习惯的描述，不能代替实际的记忆测试。忙碌、疲惫、事情是否重要，以及有没有合适的提醒，都可能影响回答。不必用一次结果给自己贴上“记性好”或“记性差”的标签。可以挑一个最近差点忘记的小事，想想当时是什么帮你记住了它。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次你及时想起要做的事，是什么线索提醒了你？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件小事，把它和一个稳定的日常动作联系起来，比如出门前看一眼待办清单。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pmsi",
+            "headline": "在脑中过一遍",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有些人会在脑中把待办事项过一遍，想象做事的步骤，或在开始一天前先排一排。这部分关注你有多常使用这些心里的小提醒，并不是越常想就一定越好。当事情很多时，反复惦记也可能让人觉得累。你可以观察这种做法什么时候帮到了自己，什么时候需要换一种更轻松的提醒办法。选择一个适合自己的方法，比要求自己始终记着所有事情更实际。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "在脑中排练事情时，你是更清楚了，还是更容易反复担心？"
+              },
+              {
+                "category": "strategy",
+                "text": "明天开始前，只挑一件重要的小事，在脑中想一遍第一步怎么做。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pmse",
+            "headline": "借助身边的提醒",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "清单、日历、便条或提前放好的物品，都可以替我们承担一部分记事的负担。这部分关注你有多常借助身边的提醒，并不表示依赖提醒就是记性不好。就像出门前把要带的东西放到顺手的位置，一点准备有时能减少临时找东西的麻烦。你可以试着把提醒放在真正会看到、也方便行动的地方。方法是否合适，要看它有没有帮到自己的日常生活，而不是看用了多少种工具。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你现在的提醒，通常是在什么地方、什么时刻被自己看见的？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一件要做的事写下来，放在行动前会看见的地方，试一天再调整。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是一份日常习惯的自我描述，不能用来判断是否患有记忆方面的疾病。",
+          "中文题目是平台工作译稿，目前没有适合直接与中国人群比较的依据。",
+          "少量漏答时，只按已经回答的题目整理结果；信息不足时会提示，不能把没回答当作很少发生。"
+        ],
+        "disclaimer": "用于回顾成年人的日常记事与提醒习惯，不是考试，也不能用于诊断。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and plain-language report preparation; not human expert approval",
+            "reviewedAt": "2026-10-26T04:03:36.069Z",
+            "basis": "2019 author Appendix A and article, 2024 GESIS scoring facts; technical student audience slot does not imply K12 applicability."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "pma",
+          "pmsi",
+          "pmse"
+        ],
+        "scoreOrder": [
+          "pma",
+          "pmsi",
+          "pmse"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "pma",
+            "headline": "给未来的自己留个线索，不发记性证书",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：待办可以有帮手，大脑不用独自值全班。\n\n一般日常频率的三项各1–5均分，没有总分，也没固定最近几天。记事这一项统一计分方向后越大，是较常报告及时想起原定事项，不是忘记更多或客观记忆更好。\n\n到了约定时间想起还书，是一个可能场景，报告没有翻你的日历。事情多不多、累不累、提醒是否在合适时刻出现，都值得看。好用线索留下，偶尔漏一件也不必给自己盖“记性差”章，更不能靠问卷判断疾病。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "只选一件普通待办，看看行动前最可能遇到什么线索，不把一天改成记忆测验。"
+              },
+              {
+                "category": "strategy",
+                "text": "给一件非紧急小事留一个贴近行动时刻的提醒，再看有没有用。重要安排照样用可靠方式核实，数字不负责保证万无一失。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pmsi",
+            "headline": "脑内清单不用全天广播",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "内部提醒七题均分1–5，越大是更常在脑中排练、回想或核对待办，不是想得越多就越会记事。\n\n比如先想一下要从哪一步开始，是可能的方法，不是系统已发现你的习惯。有时想清楚会省力，有时一直惦记反而占着精力。\n\n够用的就留着，不用为了分数反复巡查，也不要求所有待办都住在脑中。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "给一件小事只想一次第一步，接着行动。若脑内反复播放让自己累，可把要点写下或换合适提醒，不给检查次数加码。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pmse",
+            "headline": "便条是帮手，不是记性差的证物",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "外部提醒七题均分1–5，越大是较常使用日历、清单、物品或固定安排，不是依赖工具就输了一场能力考试。\n\n把要还的书提前装包，是一个可能场景；报告没知道你用了哪种办法。提醒还得在合适时点被看见，不是贴了就必然有用。\n\n已有好办法继续用，也不用把提醒工具集齐一套。少一点重复通知，有时更贴近真正需要。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "只给一个提醒找对出现时机和位置，注意安全与隐私，再按实际效果改一处。不挡通道、不堆通知，也不因为“有更高级工具”就换掉原来合适的。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅供19–71岁成人回顾日常习惯，本独立中文稿未验证；三项不是客观记忆、疾病或工作能力判断。 若有漏答但仍能计算，均分只依据已答题，解释需更谨慎；漏答不算零分。"
+        ],
+        "disclaimer": "用于回顾成年人的日常记事与提醒习惯，不是考试，也不能用于诊断。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:52:24Z",
+            "basis": "本次AI文字自审对应mpmi_s22_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

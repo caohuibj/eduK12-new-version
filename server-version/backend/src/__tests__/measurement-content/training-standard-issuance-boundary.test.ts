@@ -13,7 +13,7 @@ describe('existing 21B issuance boundary remains explicit',()=>{
     }})
     expect(result.success).toBe(false)
     if(!result.success)expect(result.error.issues).toEqual(expect.arrayContaining([
-      expect.objectContaining({code:'custom',message:expect.stringContaining('Only exact Survey project')}),
+      expect.objectContaining({code:'custom',message:'Only supported exact project, course, governance, entry-distribution or education public-source use grants are allowed'}),
     ]))
   })
   it('reuses the supported 21B exact C distribution scope without widening the root schema',()=>{

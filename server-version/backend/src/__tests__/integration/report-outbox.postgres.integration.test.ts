@@ -355,7 +355,7 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     const submissionId = 'whole-' + createHash('sha256').update(input.submissionId + '/' + first.itemId).digest('hex')
     await submitUnifiedScaleAssessmentFinal({ ...first, assessmentId: child.id, attemptEpoch: 1, submissionId,
       compositeAttemptId: f.parent.id, userId: f.participant.id, contextSnapshotHash: null }, child,
-      { submissionId: input.submissionId, leaseToken: old.leaseToken!, acceptedAtMs: accepted.acceptedAt.getTime() })
+      { submissionId: input.submissionId, payloadHash: accepted.payloadHash, leaseToken: old.leaseToken!, acceptedAtMs: accepted.acceptedAt.getTime() })
     expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(1)
     await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(Date.now() - 1000) } })
     const recovered = await claim()
@@ -732,7 +732,11 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     const parentReads = vi.spyOn(shared.compositeAssessmentAttempt, 'findUnique')
     try {
       await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
-      expect(query).toHaveBeenCalledTimes(2) // admitted owner/header + atomic save
+      const statements=query.mock.calls.map(args=>{const sql=args[0] as any;return sql?.sql??(Array.isArray(sql)?sql.join('?'):String(sql))})
+      // Receipt initialization and current collection authority are separate
+      // work; neither may cause the consent header to be loaded again.
+      expect(statements.filter(sql=>/^\s*SELECT\b/.test(sql)&&sql.includes('"composite_assessment_attempts"'))).toHaveLength(1)
+      expect(statements.filter(sql=>/^\s*WITH\s+parent_cas\s+AS\b/.test(sql))).toHaveLength(1)
       expect(parentReads).not.toHaveBeenCalled()
       await processJob(await claim()); expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(3)
       expect(await budget()).toBe(0)

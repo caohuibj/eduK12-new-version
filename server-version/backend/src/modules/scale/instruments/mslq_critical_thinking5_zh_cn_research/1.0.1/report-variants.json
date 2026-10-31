@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "8c7e926b6627d8d9b7be715b88e1af526c3eb50ed8f0730b7d74a125a508dc2a",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "course_critical_thinking_strategy"
+        ],
+        "scoreOrder": [
+          "course_critical_thinking_strategy"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "在“知道答案”之外，再问一步",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。平均分越高，表示您认为这些做法在这门课中更符合自己的情况。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+          "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+          "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+          "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。"
+        ],
+        "disclaimer": "仅供成人大学课程研究与学习反思；中文译稿未经验证，不用于心理诊断、学生筛选、能力排名或将单门课程结果概括为固定能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:32:00Z",
+            "basis": "AI editorial review: course-specific strategy self-report, complete original module not full MSLQ, no ability/norm inference; not human expert review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "course_critical_thinking_strategy"
+        ],
+        "scoreOrder": [
+          "course_critical_thinking_strategy"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "给结论多留一个“为什么”",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：不是逢结论必反对，而是知道自己凭什么相信。\n\n先把范围圈在一门课里\n\n这五题只整理你在同一门已选课程中的思考做法。均分1–7，越大表示这次更认同自己会查看依据、比较解释、琢磨自己的想法。它不是“聪明指数”，也不是完整MSLQ总分；换一门课，任务和机会不同，回答也可能不同。若刚才混着几门课回答，这个分数就不宜按课程结果解读。\n\n给“这是答案”留一个小书签\n\n假设读到“这个办法有效”，可以在旁边留三句：凭什么？适用于什么情况？还有别的可能吗？不必把讨论变成抬杠，也不用为了有自己的观点就故意选相反答案。查看后觉得原结论有道理，也是一种结果。例子只帮你回顾，不代表系统已识别你的真实学习风格。\n\n如果你已有好用的提问方式，可以继续保留。若暂时不知道从哪里问，先弄懂一个概念、获得一个示例，可能比要求自己立刻看穿所有问题更合适。课程材料、时间和讨论环境也有影响；一个数字不能把这些条件全部算成你的能力。\n\n下面是三个可选的“小书签”，不需要贴满整本书，也不以提高分数为目标。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "书签一：这句话凭什么？从这门课挑一个结论，在旁边写下一条支持它的证据或理由。找不到时先标“待核实”，不用现编一条，也不急着认定它错了。"
+              },
+              {
+                "category": "strategy",
+                "text": "书签二：会不会还有别的解释？只选一种可能，看看需要什么信息才能分辨。缺少背景知识时，先找一个可靠说明或向老师问清概念，不把“什么都自己想”当作独立思考。"
+              },
+              {
+                "category": "support",
+                "text": "书签三：把问题带出去。整理成“我理解的是……，不清楚的是……”并选择合适的交流方式。讨论后看依据是否更清楚，不比谁问得尖锐；不方便公开说时，也可以先私下或书面询问。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文成人课程研究稿尚未验证，无跨课程等级；仅描述同一门课的自述策略，不测智商或固定能力。"
+        ],
+        "disclaimer": "依据 Pintrich、Smith、Garcia、McKeachie（1991）MSLQ手册的完整五题模块。独立中文工作译稿，非作者背书；仅供成人大学课程研究与反思，不用于学生筛选、排名或诊断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:34:00Z",
+            "basis": "本次AI文字自审对应mslq_critical_thinking5_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

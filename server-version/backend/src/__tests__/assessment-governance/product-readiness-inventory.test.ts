@@ -4,6 +4,8 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { listScalePackages } from '../../modules/scale/scale-package.registry'
 import { evaluateScaleProductReadiness } from '../../modules/scale/library/product-readiness'
+import { getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
+import { previewScaleInstrument } from '../../modules/scale/onboarding/preview'
 import { listCognitiveV2TaskDefinitions } from '../../modules/cognitive/v2/registry'
 import { evaluateCognitiveProductReadiness } from '../../modules/cognitive/library/product-readiness'
 import { listSituationPackages } from '../../modules/situational/situation-package.registry'
@@ -26,15 +28,24 @@ const cognitiveFrontendReady = (testType: string, engineVersion: string): boolea
 }
 
 describe('assessment product readiness inventory', () => {
-  it('keeps Scale release status aligned with executable readiness', () => {
+  it('keeps Scale release readiness necessary without automatically publishing ready drafts', () => {
     for (const pkg of listScalePackages().filter((candidate) => candidate.releaseStatus !== 'RETIRED')) {
       const readiness = evaluateScaleProductReadiness(pkg)
       const identity = `${pkg.key}@${pkg.instrumentVersion}`
       if (pkg.releaseStatus === 'PUBLISHED') {
         expect(readiness.ready, readinessMessage(identity, readiness.blockers)).toBe(true)
-      } else {
-        expect(readiness.ready, `${identity}: DRAFT has no executable blocker and should be PUBLISHED`).toBe(false)
       }
+    }
+    // Product correctness does not grant publication: these retained candidates
+    // must still refuse activation, even when their executable contract is ready.
+    for (const [key, version] of [['ctas2_cognitive_en', '1.0.1'], ['skaalvik2016_time_pressure_zh_cn', '1.0.0']]) {
+      const source = getScaleInstrumentSource(key, version)!
+      expect(source.executable!.releaseStatus).toBe('DRAFT')
+      const preview = previewScaleInstrument({ instrumentKey: key, instrumentVersion: version,
+        locale: source.executable!.contentLocale, territory: 'CN', deploymentModes: ['STANDALONE'] })
+      expect(preview.allowActivation).toBe(false)
+      expect(preview.blockers).toContain('EXECUTABLE_NOT_PUBLISHED')
+      expect(source.executable!.releaseStatus).toBe('DRAFT')
     }
   })
 

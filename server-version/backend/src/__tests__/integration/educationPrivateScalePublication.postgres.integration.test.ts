@@ -71,16 +71,24 @@ suite('Private fixed-version education publication and pre-start task state', ()
     expect(await state(f.runId)).toMatchObject({ status: 'PUBLISHED', executions: 1n, relationships: 1n })
     await assertPrivateExecutionPublished(f, track.id)
   }, 60_000)
-  it('requires current Teacher authorship independently of event admin before real product preview/publication', async () => {
+  it('requires current Teacher product administration before real product preview/publication', async () => {
     const { f, track, preview, publish } = await fixture('TEACHER')
     await f.open()
     const member = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: f.organizationId, userId: f.managerUserId, validUntil: null } })
     const author = await db.organizationPersonaGrant.findFirstOrThrow({ where: { membershipId: member.id, persona: 'COUNSELOR', revokedAt: null } })
     await db.organizationPersonaGrant.update({ where: { id: author.id }, data: { revokedAt: new Date() } })
-    await expect(preview()).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED'); await expect(publish()).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
+    // School professional withdrawal does not remove Teacher product authority.
+    await preview()
+    const productAdmin = await db.educationProductRoleGrant.findFirstOrThrow({ where: {
+      membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null,
+    } })
+    await db.educationProductRoleGrant.update({ where: { id: productAdmin.id }, data: { revokedAt: new Date(), revokedByUserId: f.managerUserId } })
+    await expect(preview()).rejects.toMatchObject({ code: 'HUITEACHER_RUN_ADMIN_REQUIRED', statusCode: 403 })
+    await expect(publish()).rejects.toMatchObject({ code: 'HUITEACHER_RUN_ADMIN_REQUIRED', statusCode: 403 })
     expect(await state(f.runId)).toMatchObject({ status: 'DRAFT', executions: 0n, relationships: 0n })
-    expect(await db.educationProductRoleGrant.count({ where: { membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null } })).toBe(1)
-    await db.organizationPersonaGrant.update({ where: { id: author.id }, data: { revokedAt: null } })
+    expect(await db.educationProductRoleGrant.count({ where: { membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', revokedAt: null } })).toBe(0)
+    await db.educationProductRoleGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
+      membershipId: member.id, product: 'HUITEACHER', role: 'PRODUCT_ADMIN', grantedByUserId: f.managerUserId } })
     await preview(); await publish()
     expect(await state(f.runId)).toMatchObject({ status: 'PUBLISHED', executions: 1n, relationships: 1n })
     await assertPrivateExecutionPublished(f, track.id)

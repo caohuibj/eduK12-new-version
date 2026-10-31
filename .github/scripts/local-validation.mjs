@@ -1,5 +1,6 @@
 import {cognitiveIntakeToolingChanged} from './cognitive-intake-scope.mjs';
 import {scaleIntakeToolingChanged} from './scale-intake-scope.mjs';
+import {backendTestFile} from '../../server-version/scripts/release/policy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -31,11 +32,22 @@ const recipes={
  documentation:[['node','.github/scripts/documentation-check.mjs']],
  'release-tools':[['node','--test','server-version/scripts/release/policy.test.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/local-validation.test.mjs']],
 };
+export function toolingBackendTests(files) {
+ const tests=files.filter(backendTestFile);
+ // Keep the subprocess contract even when only the development CLI entry changes.
+ if(files.includes('server-version/backend/src/scripts/cognitive-onboarding-check.ts'))tests.push('server-version/backend/src/__tests__/cognitive/onboarding-cli.test.ts');
+ return [...new Set(tests)].sort().map(file=>file.slice('server-version/backend/'.length));
+}
 export function recipe(check,base,head) {
  if(!recipes[check])throw Error('Unsupported receipt check: '+check);
  const commands=check==='release-tools'&&adapterOnly(base,head)?[['node','--test','.github/scripts/local-validation.integration.test.mjs']]:structuredClone(recipes[check]);
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
+  if(files.some(file=>file==='.github/scripts/dependency-scope.mjs'||file==='.github/scripts/dependency-routing.test.mjs'))commands.push(['node','--test','.github/scripts/dependency-routing.test.mjs']);
+  if(files.some(file=>['.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].includes(file))){
+   commands.push(['node','--test','.github/scripts/ci-image-plan.test.mjs']);
+   commands.push(['node','--test','--test-name-pattern=^frontend route builds only the frontend image','.github/scripts/content-workflows.test.mjs']);
+  }
   if(files.some(f=>f==='.github/scripts/onboarding-scope.mjs'||f==='.github/scripts/onboarding-controls.test.mjs')) {
    commands.push(['node','--test','--test-name-pattern=^(onboarding (accepts unchanged main controls|still rejects changed control bytes|needs before snapshots|scope binds exact source)|stable gate still requires admission|Task1 scope refuses incomplete inventories)',
     '.github/scripts/onboarding-controls.test.mjs','.github/scripts/task1-onboarding-controls.test.mjs']);
@@ -43,6 +55,9 @@ export function recipe(check,base,head) {
   if(cognitiveIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/cognitive-intake-scope.test.mjs','.github/scripts/cognitive-intake-check.test.mjs','server-version/scripts/cognitive/onboarding-selection.test.cjs']);
   }
+  const backendTests=toolingBackendTests(files);
+  if(backendTests.length)commands.push(['npm','--prefix','server-version/backend','test','--',...backendTests,'--maxWorkers=1']);
+  if(files.includes('server-version/backend/src/scripts/cognitive-onboarding-check.ts'))commands.push(['node','server-version/backend/node_modules/typescript/bin/tsc','--project','server-version/backend/tsconfig.json','--noEmit']);
   if(scaleIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/scale-intake-scope.test.mjs','.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs','.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs']);
    commands.push(['node','--import','./server-version/backend/node_modules/tsx/dist/loader.mjs','--test','server-version/backend/scripts/scale-intake-selected-check.test.ts']);

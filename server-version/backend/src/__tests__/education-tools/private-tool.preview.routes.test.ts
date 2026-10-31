@@ -47,7 +47,16 @@ describe('Private scale preview answer error boundary',()=>{
  })
  beforeEach(()=>{
   vi.clearAllMocks()
-  m.query.mockResolvedValue([{organizationId:org,organizationName:'Synthetic',membershipId:'member',orgRole:'MEMBER',productAdmin:true}])
+  m.query.mockImplementation(async(query:{sql:string;values:unknown[]})=>{
+   if(query.sql.includes("SELECT b#>>'{source,versionId}' AS id FROM education_private_tools d")
+    &&query.sql.includes("d.kind='COMPOSITION' AND b#>>'{source,provider}'='SJT_RELEASE'")){
+    expect(query.values).toEqual([tool,expect.stringMatching(/^(SCHOOL|TEACHER)$/),org,expect.stringMatching(new RegExp(`^(${owner}|${other})$`))])
+    return []
+   }
+   if(query.sql.includes('FROM "organizations" o')&&query.sql.includes('JOIN "education_product_entitlements" e')
+    &&query.sql.includes('AS "productAdmin"'))return [{organizationId:org,organizationName:'Synthetic',membershipId:'member',orgRole:'MEMBER',productAdmin:true}]
+   throw new Error('Unexpected private preview query')
+  })
   m.images.mockResolvedValue([])
   m.find.mockImplementation(async({where}:{where:Record<string,string>})=>Object.entries(where).every(([key,value])=>stored[key as keyof typeof stored]===value)?stored:null)
  })

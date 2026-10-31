@@ -134,8 +134,8 @@ describe('Teacher compact workspace',()=>{
  it('keeps school management jumps inside the existing administrator boundary',async()=>{
   session([organization('a',true),organization('b')])
   render(<HuiteacherApp/>)
-  fireEvent.click(await screen.findByRole('button',{name:'学校改进'}))
-  const nav=screen.getByRole('navigation',{name:'学校管理分区'})
+  fireEvent.click(within(await screen.findByRole('navigation',{name:'Teacher 工作台'})).getByRole('button',{name:'学校改进'}))
+  const nav=await screen.findByRole('navigation',{name:'学校管理分区'})
   for(const link of within(nav).getAllByRole('link')){
    fireEvent.click(link)
    const target=screen.getByRole('region',{name:link.textContent!})
@@ -149,8 +149,8 @@ describe('Teacher compact workspace',()=>{
  it('preserves an unsubmitted school input across collapsed actions and section changes without writing',async()=>{
   const fetch=session([organization('a',true)])
   render(<HuiteacherApp/>)
-  fireEvent.click(await screen.findByRole('button',{name:'学校改进'}))
-  const action=screen.getByText('手动创建年级或班级',{selector:'summary'})
+  fireEvent.click(within(await screen.findByRole('navigation',{name:'Teacher 工作台'})).getByRole('button',{name:'学校改进'}))
+  const action=await screen.findByText('手动创建年级或班级',{selector:'summary'})
   fireEvent.click(action)
   const settings=screen.getByRole('region',{name:'学校设置与成员'})
   fireEvent.change(within(settings).getByLabelText('名称'),{target:{value:'尚未创建的年级'}})
@@ -172,7 +172,7 @@ describe('Teacher compact workspace',()=>{
   expect(screen.queryByLabelText('当前学校管理范围')).not.toBeInTheDocument()
   expect(screen.queryByRole('navigation',{name:'个人任务分区'})).not.toBeInTheDocument()
   expect(screen.queryByRole('navigation',{name:'学校管理分区'})).not.toBeInTheDocument()
-  expect(screen.getByLabelText('未提交答案')).toBeInTheDocument()
+  expect(await screen.findByLabelText('未提交答案')).toBeInTheDocument()
  })
  it.each(['ht-personal-forms','ht-personal-private-forms','ht-personal-scales'])('restores legacy %s and browser history without remounting answers',async(fragment)=>{
   window.history.replaceState(null,'','/#'+fragment)

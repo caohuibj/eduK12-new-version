@@ -53,7 +53,7 @@ suite('Private ordinary questionnaire / Teacher SELF real Run publication',()=>{
  afterAll(async()=>{await db?.$disconnect()})
  it('attaches one fixed parent, previews without mutation, and atomically publishes one SELF execution with exact per-unit ceilings',async()=>{
   const x=await fixture(),before=await parent(x.runtime.compositeId)
-  await expect(x.attach({...x.body,privateComposition:{...x.body.privateComposition,contentHash:'a'.repeat(64)}})).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_VERSION_MISMATCH'})
+  await expect(x.attach({...x.body,privateComposition:{...x.body.privateComposition,contentHash:'a'.repeat(64)}})).rejects.toMatchObject({code:'PRIVATE_COMPOSITION_SOURCE_NOT_FOUND',statusCode:404})
   expect(await state(x.f.runId)).toMatchObject({status:'DRAFT',version:x.body.expectedVersion,executions:0n})
   const track=await x.attach(),command={...x.teacher,expectedVersion:x.body.expectedVersion+1}
   await expect(x.attach()).rejects.toMatchObject({code:'RUN_VERSION_CONFLICT'})

@@ -45,8 +45,13 @@ describe('Private workflow context uses current shared facts, not library grants
   expect(m.workflow).not.toHaveBeenCalled();expect(m.rc).not.toHaveBeenCalled()
  })
  it('rejects a private namespace on another family or version before source preparation',async()=>{
-  for(const resource of [{family:'FORM',key:'private-scale:x',version:'1.0.0'},{family:'SCALE',key:'private-scale:x',version:'2.0.0'}])await expect(readPrivateScaleRunSourceForPreparation(tx,{...input,resource})).rejects.toThrow('RESOURCE_INVALID')
+  for(const resource of [{family:'FORM',key:'private-scale:x',version:'1.0.0'},{family:'SCALE',key:'private-scale:x',version:'3.0.0'}])await expect(readPrivateScaleRunSourceForPreparation(tx,{...input,resource})).rejects.toThrow('RESOURCE_INVALID')
   expect(m.read).not.toHaveBeenCalled();expect(m.source).not.toHaveBeenCalled()
+ })
+ it('preserves the supported School group Scale version during source preparation',async()=>{
+  const key='private-scale:SCHOOL:fixed:STUDENT:SELF'
+  await readPrivateScaleRunSourceForPreparation(tx,{...input,resource:{family:'SCALE',key,version:'2.0.0'}})
+  expect(m.source).toHaveBeenCalledExactlyOnceWith(tx,{key,version:'2.0.0',purpose:'NEW_USE',context:{entry:'SCHOOL',organizationId:'org',principal:{userId:'actor',accountDomain:'SCHOOL'}}})
  })
 
 })

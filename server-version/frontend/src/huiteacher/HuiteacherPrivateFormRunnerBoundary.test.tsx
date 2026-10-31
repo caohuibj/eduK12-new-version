@@ -13,7 +13,7 @@ describe('Teacher private form consumer fail-closed boundaries',()=>{
   render(<HuiteacherMyPrivateFormTasks api={api as PrivateToolApi} actorKey="author"/>)
   fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}))
   await screen.findByText('表单运行器 attempt')
-  expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt')
+  expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt?view=current-unit')
   expect(state.items[0].type).toBe('FORM');expect(state.units[0].type).toBe('FORM_SECTION')
  })
 
@@ -31,7 +31,7 @@ describe('Teacher private form consumer fail-closed boundaries',()=>{
   render(<HuiteacherMyPrivateFormTasks api={api as PrivateToolApi} actorKey="author"/>)
   fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}));await screen.findByText('表单运行记录与当前获授权任务不一致，请重新读取。')
   expect(screen.queryByText(/表单运行器/)).not.toBeInTheDocument()
-  expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt')
+  expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt?view=current-unit')
   expect(api.mock.calls.some(([path])=>path.includes('/start-private-form'))).toBe(false)
  })
  it('only resumes a bound started composite in CLOSED runs while event remains OPEN',async()=>{
@@ -62,7 +62,7 @@ describe('Teacher private form consumer fail-closed boundaries',()=>{
   const newer=vi.fn(async()=>({list:[]}))
   const {rerender}=render(<HuiteacherMyPrivateFormTasks api={api as PrivateToolApi} actorKey="old-author"/>)
   fireEvent.click(await screen.findByRole('button',{name:'打开本人表单'}))
-  await waitFor(()=>expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt'))
+  await waitFor(()=>expect(api).toHaveBeenCalledWith('/private-form-composite-attempts/attempt?view=current-unit'))
   rerender(<HuiteacherMyPrivateFormTasks api={(scope==='api'?newer:api) as PrivateToolApi} actorKey={scope==='actor'?'new-author':'old-author'}/>)
   await act(async()=>late.resolve(state))
   expect(screen.queryByText('表单运行器 attempt')).not.toBeInTheDocument()

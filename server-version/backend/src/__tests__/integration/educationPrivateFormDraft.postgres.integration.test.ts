@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { setupEducationLibraryRuntimeFixture } from './educationLibraryRuntimeFixture'
 import * as tools from '../../modules/education-tools/private-tool.service'
+import { resolveEducationToolAuthoringContext } from '../../modules/education-tools/access'
 import type { PrivateToolContext } from '../../modules/education-tools/private-tool.contracts'
 import type { FormDraft } from '../../modules/assessment-core/form/definition'
 import { addPrivateFormRunTrack } from '../../modules/education-tools/private-tool.run-adapter'
@@ -32,13 +33,12 @@ async function fixture(product: 'SCHOOL' | 'TEACHER') {
   const context: PrivateToolContext = { entry: product, organizationId: f.organizationId,
     principal: { userId: f.managerUserId, accountDomain: 'SCHOOL' } }
   if (product === 'TEACHER') {
-    // Event admin is not an implicit private-tool author.
-    await expect(tools.createPrivateTool(context, { kind: 'FORM', title: 'Not an author' })).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
-    const member = await db.organizationMembership.findFirstOrThrow({ where: { organizationId: f.organizationId, userId: f.managerUserId, validUntil: null } })
-    await db.organizationPersonaGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
-      membershipId: member.id, persona: 'COUNSELOR', grantedByUserId: f.managerUserId } })
-    await db.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
-      membershipId: member.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: f.managerUserId } })
+    // Current Teacher authorship comes from product administration.
+    expect(await resolveEducationToolAuthoringContext(context, db)).toMatchObject({
+      entry: 'TEACHER', ownerUserId: f.managerUserId, organizationId: f.organizationId,
+    })
+    expect(await db.organizationCapabilityGrant.count({ where: { organizationId: f.organizationId,
+      membership: { userId: f.managerUserId }, capability: 'PSYCHOLOGY_STAFF', revokedAt: null } })).toBe(0)
   }
   const source = await frozen(context)
   const target = { organizationId: f.organizationId, runId: f.runId, actorUserId: f.managerUserId,

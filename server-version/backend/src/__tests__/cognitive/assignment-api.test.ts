@@ -45,7 +45,7 @@ const makeRes = () => {
 }
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('cognitive assignment API', () => {
@@ -63,7 +63,7 @@ describe('cognitive assignment API', () => {
     })
     const res = makeRes()
     // controller 依赖 route 中间件 requireTeacher；service 层也二次校验
-    ;(assignmentService.createAssignment as any).mockRejectedValue({
+    ;(assignmentService.createAssignment as any).mockRejectedValueOnce({
       statusCode: 403,
       message: 'Teacher role required',
     })
@@ -71,13 +71,30 @@ describe('cognitive assignment API', () => {
     expect(res.statusCode).toBe(403)
   })
 
-  it('returns 400 when profile is omitted from create', async () => {
+  it('delegates an omitted optional profile to the service and preserves its fixed-profile response', async () => {
     const req = makeReq({
       body: { courseId: 'course-1', configId: 'config-1', title: 'x' },
     })
     const res = makeRes()
+    vi.mocked(assignmentService.createAssignment).mockResolvedValueOnce({
+      id: 'asg-fixed', status: 'DRAFT', profile: 'experience', profileLocked: true,
+    } as any)
     await cognitiveController.createAssignment(req, res)
-    expect(res.statusCode).toBe(400)
+    expect(assignmentService.createAssignment).toHaveBeenCalledWith(
+      'teacher-1', UserRole.TEACHER, expect.objectContaining({ courseId: 'course-1', configId: 'config-1', title: 'x' }),
+    )
+    expect(vi.mocked(assignmentService.createAssignment).mock.calls[0][2].profile).toBeUndefined()
+    expect(res.body).toMatchObject({ code: 0, data: { id: 'asg-fixed', profile: 'experience', profileLocked: true } })
+  })
+
+  it.each([400, 403])('retains service HTTP %s decisions when the optional profile is omitted', async (statusCode) => {
+    const req = makeReq({ body: { courseId: 'course-1', configId: 'config-1', title: 'x' } })
+    const res = makeRes()
+    vi.mocked(assignmentService.createAssignment).mockRejectedValueOnce({ statusCode, message: 'Profile selection rejected by service' })
+    await cognitiveController.createAssignment(req, res)
+    expect(assignmentService.createAssignment).toHaveBeenCalledTimes(1)
+    expect(res.statusCode).toBe(statusCode)
+    expect(res.body.code).toBe(-1)
   })
 
   it('returns 400 when strict schema rejects forged fields', async () => {
@@ -93,6 +110,7 @@ describe('cognitive assignment API', () => {
     await cognitiveController.createAssignment(req, res)
     expect(res.statusCode).toBe(400)
     expect(res.body.code).toBe(-1)
+    expect(assignmentService.createAssignment).not.toHaveBeenCalled()
   })
 
   it('returns 400 when dueAt precedes opensAt', async () => {
@@ -108,6 +126,7 @@ describe('cognitive assignment API', () => {
     const res = makeRes()
     await cognitiveController.createAssignment(req, res)
     expect(res.statusCode).toBe(400)
+    expect(assignmentService.createAssignment).not.toHaveBeenCalled()
   })
 
   it('lists published assignments even when the client sends a cache-buster query', async () => {

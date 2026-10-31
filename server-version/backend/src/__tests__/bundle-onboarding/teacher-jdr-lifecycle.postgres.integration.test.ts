@@ -30,7 +30,8 @@ test('installs, reviews, grants the whole fixed JD-R bundle and preserves five s
   const directory=process.env.JDR_EVIDENCE_DIRECTORY,checkpointPath=directory?path.join(directory,'jdr-private-checkpoint.json'):undefined
   const c:Checkpoint=checkpointPath&&fs.existsSync(checkpointPath)?JSON.parse(fs.readFileSync(checkpointPath,'utf8')):{tag:randomUUID(),key:randomBytes(32).toString('hex'),password:randomBytes(24).toString('hex'),bindings:[]}
   const save=()=>{if(checkpointPath)fs.writeFileSync(checkpointPath,JSON.stringify(c),{mode:0o600})};save()
-  const previousKey=process.env.BUNDLE_REVIEW_SIGNING_KEY;process.env.BUNDLE_REVIEW_SIGNING_KEY=c.key
+  const previousKey=process.env.BUNDLE_REVIEW_SIGNING_KEY,previousEnabled=process.env.BUNDLE_PRODUCTS_ENABLED
+  process.env.BUNDLE_REVIEW_SIGNING_KEY=c.key;process.env.BUNDLE_PRODUCTS_ENABLED='true'
   const actor={userId:'jdr-author-'+c.tag,role:UserRole.ADMIN},reviewer={userId:'jdr-review-'+c.tag,role:UserRole.ADMIN},owner={userId:'jdr-owner-'+c.tag,role:UserRole.TEACHER},participant='jdr-participant-'+c.tag,courseId='jdr-course-'+c.tag
   const pack=teacherJdrPackage(),definitionHash=hashDeclarativePackage(pack),key=pack.manifest.definition.bundleKey,version=pack.manifest.definition.bundleVersion
   const smoke=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json'),'utf8')) as {slots:Record<string,{answers:Array<{itemCode:string;responseValue:string}>}>}
@@ -111,5 +112,5 @@ test('installs, reviews, grants the whole fixed JD-R bundle and preserves five s
     const evidence={stage:'ISOLATED_TRAINING_FIXED_JDR',node:process.version,definitionHash,attemptId:c.attemptId,compositeId:c.compositeId,analysisId:report.analysisId,factsHash:report.factsHash,submitted,finalMs,finalCpu,finalSql,readMs,readSql,responseBytes:Buffer.byteLength(JSON.stringify(full)),factsCipherBytes:Buffer.byteLength(stored.payloadEncrypted!),memory:process.memoryUsage(),profileView:reopened.view?.profileView,singleReports:full.unitReports}
     if(directory)fs.writeFileSync(path.join(directory,'jdr-lifecycle-result.json'),JSON.stringify(evidence,null,2)+'\n')
     console.log('JDR_LIFECYCLE_RESULT',JSON.stringify({definitionHash,submitted,finalMs,readMs,reportCount:full.unitReports.length,profile:'J2'}))
-  }finally{if(previousKey===undefined)delete process.env.BUNDLE_REVIEW_SIGNING_KEY;else process.env.BUNDLE_REVIEW_SIGNING_KEY=previousKey;await db.$disconnect()}
+  }finally{if(previousKey===undefined)delete process.env.BUNDLE_REVIEW_SIGNING_KEY;else process.env.BUNDLE_REVIEW_SIGNING_KEY=previousKey;if(previousEnabled===undefined)delete process.env.BUNDLE_PRODUCTS_ENABLED;else process.env.BUNDLE_PRODUCTS_ENABLED=previousEnabled;await db.$disconnect()}
 },180000)
