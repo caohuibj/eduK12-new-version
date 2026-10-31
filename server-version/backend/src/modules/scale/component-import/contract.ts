@@ -6,6 +6,7 @@ import {scaleInstrumentSourceV1Schema} from '../onboarding/schema'
 import {reportTemplateSchema} from '../../measurement-content/report-template'
 import {assetReference} from '../../measurement-content/release'
 import {validateReferenceSetDefinition} from '../../assessment-reference/reference'
+import {parseLocalizationManifest} from '../library/localization-manifest'
 
 const version=z.string().trim().min(1).max(120),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const source=scaleInstrumentSourceV1Schema.shape
@@ -34,7 +35,7 @@ export const componentDraftSchema=z.object({
 }).strict()
 export type ComponentDraft=z.infer<typeof componentDraftSchema>
 export type ImportIssue={sheet:string;row:number;path:string;message:string}
-export type ImportEntry={index:number;toolKey:string|null;draft:ComponentDraft|null;issues:ImportIssue[]}
+export type ImportEntry={index:number;row:number;toolKey:string|null;draft:ComponentDraft|null;issues:ImportIssue[]}
 export function unsupportedFields(raw:unknown,parsed:unknown,path=''):Array<{path:string;message:string}>{
   if(!raw||typeof raw!=='object'||!parsed||typeof parsed!=='object')return []
   return Object.entries(raw).flatMap(([key,value])=>Object.prototype.hasOwnProperty.call(parsed,key)?unsupportedFields(value,(parsed as Record<string,unknown>)[key],path?path+'.'+key:key):[{path:path?path+'.'+key:key,message:'不支持此字段，未保存或执行'}])
@@ -44,10 +45,18 @@ export function parseComponentDraft(value:unknown){
   if(extra.length)throw new z.ZodError(extra.map(i=>({code:'custom',path:i.path.split('.'),message:i.message})))
   const c=draft.changedParts.CONTENT
   if(c){
+    if(canonicalHash(c.definition.report)!==canonicalHash(emptyReport(c.definition.scoring.scores))||c.definition.referencePolicy.type!=='none')
+      throw new z.ZodError([{code:'custom',path:['changedParts','CONTENT','definition'],message:'C 的 report/referencePolicy 仅为占位；请在 REPORT/PARAMETERS 组分编辑真实配置'}])
+    if(c.metadata.localization){
+      const parsed=parseLocalizationManifest({...c.metadata.localization,instrumentKey:draft.toolKey,instrumentVersion:c.version})
+      if(!parsed.ok)throw new z.ZodError(parsed.issues.map(i=>({code:'custom',path:['changedParts','CONTENT','metadata','localization',...i.path.split('.')],message:i.message})))
+    }
     const validation=validateScaleDefinition(c.definition,{instrumentClass:'STANDARD',forPublish:false,scorerKeys:getScaleCustomScorerKeys()})
     const errors=validation.issues.filter(i=>i.severity==='error')
     if(errors.length)throw new z.ZodError(errors.map(i=>({code:'custom',path:['changedParts','CONTENT','definition',...i.path.split('.')],message:i.message})))
   }
+  const report=draft.changedParts.REPORT
+  if(report?.payload){const definition='definition'in report.payload?report.payload.definition:report.payload;if(report.version!==definition.reportVersion)throw new z.ZodError([{code:'custom',path:['changedParts','REPORT','version'],message:'报告组分版本必须与 reportVersion 一致'}])}
   return draft
 }
 export const componentDraftHash=(draft:ComponentDraft)=>canonicalHash(draft)

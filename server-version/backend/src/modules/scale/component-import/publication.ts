@@ -7,21 +7,38 @@ import {toolReference} from '../../survey/tool-reference'
 import {assertStandardSystem,persistStandardTripletApproval,runStandardTrial,standardReleaseRow,type StandardRelease} from '../../survey/standard-triplet.service'
 import {exactStandardCombinationEntryProducts} from '../../assessment-governance/tool-entry-policy'
 import {getScaleInstrumentSource} from '../onboarding/instrument-registry'
+import {importedNativeDefinition} from './native-source'
 import type {AdminSessionProof} from '../../admin-permissions/proof'
 import {databaseContentSource,importedContentPart,importedPolicySource} from './native-source'
 import {compileScalePolicy} from '../policy/compile'
 import {scaleAssessmentMediaReferences} from '../scale-image-retention'
 import {assertAssessmentAssetReferencesReady,retainAssessmentAssetReferences} from '../../assessment-media/assessment-asset'
+import {authorizedTrainingMaterial} from '../../assessment-media/training-materials'
 import {selectedStandardReport} from '../../measurement-content/standard-combination'
 import {componentFail,draftView,type ComponentDraftRow} from './service'
-import type {ComponentDraft} from './contract'
+import {emptyReport,type ComponentDraft} from './contract'
+export async function componentRevisionPrefill(actor:string,pointer:{releaseId:string;combinationHash:string}){
+ await assertStandardSystem(prisma,actor)
+ const row=await standardReleaseRow(prisma,pointer.releaseId)
+ if(row.combination_hash!==pointer.combinationHash)componentFail(409,'来源组合摘要不一致')
+ const t=row.snapshot,part=t.parts.CONTENT,imported=databaseContentSource(part),source=getScaleInstrumentSource(t.toolKey,t.instrumentVersion)
+ const metadata=imported?(part.payload as {administration:{metadata:NonNullable<ComponentDraft['changedParts']['CONTENT']>['metadata']}}).administration.metadata:source?{
+  title:source.catalog.identity.canonicalName,catalog:source.catalog,...Object.fromEntries(['instruction','applicability','disclosure','localization','usageRequirements','educationApplicability','educationExpertApplicability','educationalFeedback'].flatMap(k=>{const v=source[k as keyof typeof source];return v===undefined?[]:[[k,v]]})),
+ }:null
+ if(!metadata)componentFail(409,'没有可编辑的冻结来源元数据')
+ return {toolKey:t.toolKey,configurationName:t.title+' · 新配置',baseCombination:pointer,changedParts:{
+  CONTENT:{version:t.instrumentVersion,definition:imported?importedNativeDefinition(part):{...source!.executable!.definition,report:emptyReport(source!.executable!.definition.scoring.scores),referencePolicy:{type:'none'}},metadata:metadata!},
+  PARAMETERS:{version:t.parts.PARAMETERS.version,payload:t.parts.PARAMETERS.payload},REPORT:{version:t.parts.REPORT.version,payload:t.parts.REPORT.payload},
+ }}
+}
 
 export async function componentCandidate(tx:Prisma.TransactionClient,row:ComponentDraftRow){
- const draft=draftView(row),parts={} as Record<Axis,Part>,blockers:string[]=[]
+ const draft=draftView(row),parts={} as Record<Axis,Part>,blockers:string[]=[],inheritedAssetKeys:string[]=[]
  if(draft.baseCombination){
   const [base]=await tx.$queryRaw<StandardRelease[]>`SELECT * FROM survey_standard_releases WHERE id=${draft.baseCombination.releaseId} FOR SHARE`
   if(!base||base.tool_key!==draft.toolKey||base.combination_hash!==draft.baseCombination.combinationHash)componentFail(409,'基础组合精确身份已变化')
   Object.assign(parts,base.snapshot.parts)
+  inheritedAssetKeys.push(...[...scaleAssessmentMediaReferences(base.snapshot.definition),...selectedStandardReport(base.snapshot.parts.REPORT.payload).assetRefs.map(a=>({assetId:a.assetId,contentHash:a.sha256,mimeType:a.mediaType}))].map(a=>canonicalHash(a)))
  }
  const c=draft.changedParts.CONTENT
  if(c){
@@ -53,7 +70,7 @@ export async function componentCandidate(tx:Prisma.TransactionClient,row:Compone
  const previewHash=canonicalHash({draftId:row.id,revision:row.revision,draft:{toolKey:draft.toolKey,configurationName:draft.configurationName,baseCombination:draft.baseCombination,changedParts:draft.changedParts},combinationHash:triplet?.combinationHash??null,blockers})
  return {draftId:row.id,revision:row.revision,configurationName:draft.configurationName,baseCombination:draft.baseCombination,
   changedParts:Object.keys(draft.changedParts),inheritedParts:(['CONTENT','PARAMETERS','REPORT'] as const).filter(a=>!draft.changedParts[a]&&parts[a]),
-  parts,triplet,blockers:[...new Set(blockers)],previewHash,
+  parts,triplet,blockers:[...new Set(blockers)],previewHash,inheritedAssetKeys,
   reviewNotice:'参数变更可能需要同步修改报告文案。结构检查不能自动确认所有文字中的阈值含义，请核对本次参数与对应报告。'}
 }
 export async function previewComponentPublication(actor:string,id:string){
@@ -81,6 +98,7 @@ export async function publishComponentDraft(actor:string,id:string,input:{reques
   if(!candidate.triplet||candidate.blockers.length)componentFail(409,candidate.blockers.join('；'))
   const t=candidate.triplet!
   const media=[...scaleAssessmentMediaReferences(t.definition),...selectedStandardReport(t.parts.REPORT.payload).assetRefs.map(a=>({assetId:a.assetId,contentHash:a.sha256,mimeType:a.mediaType}))]
+  for(const asset of new Map(media.map(a=>[a.assetId,a])).values())if(!candidate.inheritedAssetKeys.includes(canonicalHash(asset)))await authorizedTrainingMaterial(tx,actor,asset.assetId)
   await assertAssessmentAssetReferencesReady(media,tx)
   await retainAssessmentAssetReferences({owner:{entityType:'AssessmentPublishedDefinition',entityId:'STANDARD_COMBINATION:'+t.combinationHash,field:'media'},references:media,db:tx})
   const release=await persistStandardTripletApproval(tx,actor,{toolKey:t.toolKey,CONTENT:t.parts.CONTENT.hash,PARAMETERS:t.parts.PARAMETERS.hash,REPORT:t.parts.REPORT.hash,requestId:input.requestId,expectedCombinationHash:t.combinationHash,reason:input.reason,allowedProducts:products},t,products)

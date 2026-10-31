@@ -9,6 +9,7 @@ import {readCurrentStandardCombination} from './standard-combination-source'
 import {standardCombinationPointerSchema} from './standard-combination'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {standardNativeScaleJoin} from '../scale/component-import/native-source'
 import {selectedConfigurationBindingSchema} from '../assessment-authorization/selected-configuration'
 import {sealTrainingStandardUseConfiguration,readTrainingStandardUseConfigurationReceipt,trainingStandardUseFromEvidence,selectedConfigurationPointer,selectedConfigurationPointerSchema,type TrainingStandardUseEvidence} from '../assessment-authorization/standard-configuration-binding'
 export {standardCombinationPointerSchema} from './standard-combination'
@@ -229,7 +230,7 @@ function choiceRowsQuery(userId:string,filter:Prisma.Sql){return Prisma.sql`   S
    FROM material_grants g JOIN survey_standard_releases r ON r.id=g.resource_id AND r.combination_hash=g.standard_combination_hash
    JOIN measurement_content_releases m ON m.id=r.measurement_release->>'releaseId' AND m.content_hash=r.measurement_release->>'contentHash'
     AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
-   JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
+   JOIN scales s ON ${standardNativeScaleJoin('s')}
    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL
     ${filter}

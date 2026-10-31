@@ -30,6 +30,24 @@ export function importedNativeDefinition(part:Part):ScaleDefinitionV2{
  return {...d,source:a.provenance,license:a.license,report:emptyReport(d.scoring.scores),referencePolicy:{type:'none'}}
 }
 export const importedMeasurementPayload=(part:Part)=>databaseContentSource(part)?(part.payload as {measurement:unknown}).measurement:part.payload
+/** Exact native C addressing shared by new-use consumers; internal code never
+ * becomes a business instrument key or a parameter/combination identity. */
+export function matchesStandardNativeScale(scale:{id:string;code:string;instrumentVersion:string;standardSourceKind?:string;standardToolKey?:string|null},triplet:Pick<Triplet,'toolKey'|'instrumentVersion'|'parts'>){
+ const pointer=databaseContentSource(triplet.parts.CONTENT)
+ return pointer?scale.standardSourceKind==='DB_IMPORTED'&&scale.id===pointer.scaleId&&scale.standardToolKey===triplet.toolKey&&pointer.toolKey===triplet.toolKey&&pointer.contentHash===triplet.parts.CONTENT.hash&&scale.instrumentVersion===triplet.instrumentVersion&&pointer.instrumentVersion===triplet.instrumentVersion
+  :scale.standardSourceKind!=='DB_IMPORTED'&&scale.code===triplet.toolKey&&scale.instrumentVersion===triplet.instrumentVersion
+}
+export function standardNativeScaleJoin(scaleAlias:'s'|'native',releaseAlias:'r'|'s'='r'){
+ const s=Prisma.raw(scaleAlias),r=Prisma.raw(releaseAlias)
+ return Prisma.sql`(${s}.instrument_version=${r}.snapshot->>'instrumentVersion' AND (
+  (${r}.snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,kind}'='DB_IMPORTED'
+   AND ${s}.standard_source_kind='DB_IMPORTED' AND ${s}.standard_tool_key=${r}.tool_key
+   AND ${s}.id=${r}.snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,scaleId}'
+   AND ${r}.snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,toolKey}'=${r}.tool_key
+   AND ${r}.snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,instrumentVersion}'=${s}.instrument_version
+   AND ${r}.snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,contentHash}'=${r}.snapshot#>>'{parts,CONTENT,hash}')
+  OR (${r}.snapshot#>'{parts,CONTENT,reference,metadata,databaseSource}' IS NULL AND ${s}.standard_source_kind='CODE_PACKAGE' AND ${s}.code=${r}.tool_key)))`
+}
 export function importedPolicySource(part:Part):ScaleInstrumentSourceV1{
  const pointer=databaseContentSource(part)!,meta=part.reference.metadata,definition=importedNativeDefinition(part)
  return {...meta,schemaVersion:1,identity:{instrumentKey:pointer.toolKey,instrumentVersion:pointer.instrumentVersion},

@@ -68,7 +68,7 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
   const entry=parameters.references.find(r=>r.referenceVersion===choice.referenceVersion)?.entries.find(e=>e.scoreKey===choice.scoreKey&&e.referenceKind===choice.referenceKind)
   if(!entry)blockers.push('参数选择缺少对应的精确参考版本：'+choice.referenceVersion)
  }
- blockers.push(...standardReportParameterBlockers(definition,parameters.references,parts.REPORT.payload!==null))
+ blockers.push(...standardReportParameterBlockers(definition,parameters.references,parts.REPORT.payload!==null,selectedReport.template))
  const variant=parts.REPORT.reference.metadata.reportVariant as {title?:unknown}|undefined
  const baseTitle=imported?String(metadata.title):source!.catalog.identity.canonicalName
  const title=typeof variant?.title==='string'?baseTitle+' · '+variant.title:baseTitle

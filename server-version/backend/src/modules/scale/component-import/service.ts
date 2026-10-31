@@ -49,7 +49,7 @@ export async function saveComponentImport(actor:string,input:{requestId:string;e
    entries.push({index:entry.index,toolKey:entry.toolKey,...result,issues:[]})
   }catch(e){
    if(e instanceof AdminPermissionError&&e.statusCode===403)throw e
-   entries.push({index:entry.index,toolKey:entry.toolKey,status:'FAILED',issues:[{sheet:'基本信息',row:entry.index+2,path:'baseCombination',message:e instanceof AdminPermissionError?e.message:'保存结果需核对，请用原请求编号重试'}]})
+   entries.push({index:entry.index,toolKey:entry.toolKey,status:'FAILED',issues:[{sheet:'基本信息',row:entry.row,path:'baseCombination',message:e instanceof AdminPermissionError?e.message:'保存结果需核对，请用原请求编号重试'}]})
   }
  }
  return {digest:parsed.digest,entries}
@@ -77,5 +77,21 @@ export async function editComponentDraft(actor:string,id:string,input:{expectedR
   const [updated]=await tx.$queryRaw<ComponentDraftRow[]>`UPDATE scale_component_drafts SET configuration_name=${draft.configurationName},base_combination_id=${draft.baseCombination?.releaseId??null},base_combination_hash=${draft.baseCombination?.combinationHash??null},changed_parts=${JSON.stringify(draft.changedParts)}::jsonb,revision=revision+1,updated_by=${actor},updated_at=clock_timestamp() WHERE id=${id} RETURNING *`
   await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action:'SCALE_COMPONENT_DRAFT_EDITED',metadata:{draftId:id,revision:updated.revision,digest:canonicalHash(draft)}}})
   return draftView(updated)
+ })
+}
+/** Same draft store for a new revision created in the editor; no Excel upload
+ * is required to revise a previously frozen configuration. */
+export async function createComponentDraft(actor:string,input:{requestId:string;draft:unknown}){
+ const draft=parseComponentDraft(input.draft),digest=canonicalHash(draft)
+ return prisma.$transaction(async tx=>{
+  await assertStandardSystem(tx,actor)
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'scale-component-import:'+input.requestId}))`
+  const prior=await tx.$queryRaw<ComponentDraftRow[]>`SELECT * FROM scale_component_drafts WHERE request_id=${input.requestId} FOR SHARE`
+  if(prior.length){if(prior.length!==1||prior[0].request_digest!==digest||prior[0].created_by!==actor)componentFail(409,'请求编号已用于另一份草稿');return draftView(prior[0])}
+  await checkBase(tx,draft)
+  const id=randomUUID(),[row]=await tx.$queryRaw<ComponentDraftRow[]>`INSERT INTO scale_component_drafts(id,tool_key,configuration_name,base_combination_id,base_combination_hash,changed_parts,request_id,request_index,request_digest,created_by,updated_by)
+   VALUES(${id},${draft.toolKey},${draft.configurationName},${draft.baseCombination?.releaseId??null},${draft.baseCombination?.combinationHash??null},${JSON.stringify(draft.changedParts)}::jsonb,${input.requestId},0,${digest},${actor},${actor}) RETURNING *`
+  await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action:'SCALE_COMPONENT_DRAFT_CREATED',metadata:{draftId:id,digest,requestId:input.requestId}}})
+  return draftView(row)
  })
 }

@@ -5,7 +5,7 @@ import {success,error} from '../../../utils/response'
 import {AdminPermissionError} from '../../admin-permissions/service'
 import {componentTemplateWorkbook} from './excel'
 import * as service from './service'
-import {previewComponentPublication,publishComponentDraft} from './publication'
+import {previewComponentPublication,publishComponentDraft,componentRevisionPrefill} from './publication'
 import {requireRecentAdminKey} from '../../admin-permissions/guards'
 
 /** Inherits existing platform origin, CSRF, authentication and system-admin guards. */
@@ -19,6 +19,8 @@ scaleComponentImportRouter.get('/component-template',async(_req,res,next)=>{try{
 scaleComponentImportRouter.post('/component-import/preview',upload,handle(req=>service.previewComponentImport(req.user!.userId,file(req))))
 scaleComponentImportRouter.post('/component-import/save',upload,handle(req=>{const input=z.object({requestId:z.string().uuid(),expectedDigest:z.string().regex(/^[0-9a-f]{64}$/)}).strict().parse(req.body);return service.saveComponentImport(req.user!.userId,{...input,buffer:file(req)})}))
 scaleComponentImportRouter.get('/component-drafts',handle(req=>service.listComponentDrafts(req.user!.userId,z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page))))
+scaleComponentImportRouter.post('/component-drafts',handle(req=>service.createComponentDraft(req.user!.userId,z.object({requestId:z.string().uuid(),draft:z.unknown()}).strict().parse(req.body))))
+scaleComponentImportRouter.post('/component-revision-prefill',handle(req=>componentRevisionPrefill(req.user!.userId,z.object({releaseId:z.string().uuid(),combinationHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().parse(req.body))))
 scaleComponentImportRouter.get('/component-drafts/:id',handle(req=>service.readComponentDraft(req.user!.userId,z.string().uuid().parse(req.params.id))))
 scaleComponentImportRouter.post('/component-drafts/:id',handle(req=>service.editComponentDraft(req.user!.userId,z.string().uuid().parse(req.params.id),z.object({expectedRevision:z.number().int().positive(),draft:z.unknown()}).strict().parse(req.body))))
 scaleComponentImportRouter.get('/component-drafts/:id/preview',handle(req=>previewComponentPublication(req.user!.userId,z.string().uuid().parse(req.params.id))))
