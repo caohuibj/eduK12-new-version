@@ -194,6 +194,288 @@
     }
   },
   "candidates": {
+    "432": {
+      "schemaVersion": 1,
+      "pr": 432,
+      "enabled": true,
+      "base": "b32efd4058bee06deaef95ed901c294aaa10f7d9",
+      "product": "b8e7dda2497fe21049e8de1f1e8adc17bcd91ea1",
+      "controlCheckpoint": "44ac236617727e0ed7e41caeb336bbea1b50bc0a",
+      "components": {
+        "backend": "fa7da22c1fe95b34f94b7891dc52c02021615cc7",
+        "frontend": "b0dc4d14e64eaa62f5983e7f53e3b87f079f9fd9"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "93895455bb842ceb8e1bc4e7fd81dcddb0675504",
+        ".github/scripts/onboarding-checks.mjs": "27163eaa7801463c867ff0111d95781773f51404",
+        ".github/scripts/onboarding-controls.test.mjs": "8f7bb201c70a81eeef07411f0b8ada6230166c5d",
+        ".github/scripts/onboarding-evidence.json": "da1344c7fd92e9d21f5d4fcf6ae56a428c22e07b",
+        ".github/scripts/onboarding-scope.mjs": "9be979c4f4aa309758910ab95fc4e6cf5261031d",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "e8091e6935e791e2ee86609424919c7274a74207"
+      },
+      "source": {
+        "docs/performance/access-followup-20261031/PUBLISH-PLAN.md": {
+          "before": null,
+          "after": "9e2c8b4a6ed974385383d1c97f8983d34eb876bb"
+        },
+        "docs/performance/access-followup-20261031/README.md": {
+          "before": null,
+          "after": "4d350f04e3a2d63fc769bc9793589d3a266b26bf"
+        },
+        "docs/performance/access-followup-20261031/content-units/content-controller-baseline.json.gz": {
+          "before": null,
+          "after": "b1c38286e346d9f5bf02fa27a477bf634ac021c5"
+        },
+        "docs/performance/access-followup-20261031/content-units/content-controller-baseline.log.gz": {
+          "before": null,
+          "after": "3f177d45d027d2a66e63fe39da8d21187f8506e9"
+        },
+        "docs/performance/access-followup-20261031/content-units/content-controller-fixed.json.gz": {
+          "before": null,
+          "after": "0f0ffd88f90d56613d53fc200ed81babbc17a966"
+        },
+        "docs/performance/access-followup-20261031/content-units/content-controller-fixed.log.gz": {
+          "before": null,
+          "after": "4d345a1dfb9e33494161d240bef5d28c46dc1dce"
+        },
+        "docs/performance/access-followup-20261031/content-units/execution.json": {
+          "before": null,
+          "after": "51c31ec269f8df0303e4d9a5b48b70bfdcf2aeb3"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-baseline.json.gz": {
+          "before": null,
+          "after": "ab47cc22254bd48897eb107a6eb2800229d17aa4"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-baseline.log.gz": {
+          "before": null,
+          "after": "4cbe30bc20b2eaae64bb2193105004157488a6f8"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-baseline.ndjson.gz": {
+          "before": null,
+          "after": "d9094743372d51f059dd7f8b091bf37ecba3e11d"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-fixed.json.gz": {
+          "before": null,
+          "after": "667ae074c9537606984277c3727d558501e55499"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-fixed.log.gz": {
+          "before": null,
+          "after": "236df112d46c2e3d9a15134ba00468e0617bbede"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-fixed.ndjson.gz": {
+          "before": null,
+          "after": "837918840f28764807d1d25db7f795b643c0a3d9"
+        },
+        "docs/performance/access-followup-20261031/content-units/manager-harness-baseline.tsx": {
+          "before": null,
+          "after": "a79f2d186b910cd4e6ae30d1b6972c548a4aedcb"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/README.md": {
+          "before": null,
+          "after": "598f5a1fc49d66f7da721be203f1bc1a4ead5073"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/actionlint.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/backend-types.json": {
+          "before": null,
+          "after": "c9e4be7580000852cad217cdf0831d2df5de7436"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/control-command-index.json": {
+          "before": null,
+          "after": "6c6cf35768f37e3ef07b59e79b4b571be026fb69"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/control-tests-first.log": {
+          "before": null,
+          "after": "0b9049a620945a2d7606fcd2a308735e0dcd86e1"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/control-types-continuation.log": {
+          "before": null,
+          "after": "ac7604cddb6d76385a51fab363c5c654568c9a53"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/frontend-types.json": {
+          "before": null,
+          "after": "c8d02d21a0d0651195fbb5607373e55a753e8177"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/access-followup-20261031/final-qualification/run-typecheck.py": {
+          "before": null,
+          "after": "c5d87902fcbfe50521411ed83b9eff33d29d6dc2"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/execution.json": {
+          "before": null,
+          "after": "48549c7eac877625c70dbedebadd1e601ea6a41b"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/harness-r1.tsx": {
+          "before": null,
+          "after": "3f60a20d36e8941856e2b343136b815748e86629"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline-form.json.gz": {
+          "before": null,
+          "after": "4e0e532b1825d320d791c48d32db51e1cfade47d"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline-form.log.gz": {
+          "before": null,
+          "after": "eb1a5d2f322575d0eb489628f23a839961972e5c"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline.json.gz": {
+          "before": null,
+          "after": "6bb9ebf5dedadcacace904c51f09bf815f01c0f6"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline.log.gz": {
+          "before": null,
+          "after": "9537f73e6ecd1ca1e486446c236d2fce56c54a1f"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-candidate.json.gz": {
+          "before": null,
+          "after": "db49028e55c2b48d591e2dd3eade03375438e5f6"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-candidate.log.gz": {
+          "before": null,
+          "after": "6a1e972a3da33fd59b05eefc4aebeaa9117c9abf"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-fixed.json.gz": {
+          "before": null,
+          "after": "34cf5cf9b9f95564a0bee5cd7338baa13e11633b"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-fixed.log.gz": {
+          "before": null,
+          "after": "ef3fbd9d06077b6856525f05d39334ff2b0b58d8"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-review-repair/baseline.json.gz": {
+          "before": null,
+          "after": "0baf8ae6f8468d80f0e5d247ca148d8deb414517"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-review-repair/baseline.log.gz": {
+          "before": null,
+          "after": "3570df5abaf604cad4d413a0e905c013bf38ee22"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-review-repair/execution.json": {
+          "before": null,
+          "after": "0d627d1e157b2f1e6560ba0c948b23bec3d50492"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-review-repair/fixed.json.gz": {
+          "before": null,
+          "after": "37165b635a29cab0c8cb936e04ca85bd5df75096"
+        },
+        "docs/performance/access-followup-20261031/questionnaire-review-repair/fixed.log.gz": {
+          "before": null,
+          "after": "ffd6b6b9f65eff1157c4b1d48cc225bb4ea02cbc"
+        },
+        "docs/performance/access-followup-20261031/selected-evidence.json": {
+          "before": null,
+          "after": "b26286e215bc4cd09b5bfa72dc483c7df37ccf7f"
+        },
+        "docs/performance/access-followup-20261031/spec-discovery/discovery-baseline.json.gz": {
+          "before": null,
+          "after": "db48026599adf0596251d2c101a62e87e3e078e0"
+        },
+        "docs/performance/access-followup-20261031/spec-discovery/discovery-baseline.log.gz": {
+          "before": null,
+          "after": "281ad1b76133a246cab04e8ac12f01cd567a4f5e"
+        },
+        "docs/performance/access-followup-20261031/spec-discovery/discovery-fixed.json.gz": {
+          "before": null,
+          "after": "3990d5fe009acb135d1c776479a73ae9e5ebb61b"
+        },
+        "docs/performance/access-followup-20261031/spec-discovery/discovery-fixed.log.gz": {
+          "before": null,
+          "after": "d840eccd219a01b4bdf6325b1510841498a01153"
+        },
+        "docs/performance/access-followup-20261031/spec-discovery/execution.json": {
+          "before": null,
+          "after": "227b87954607452556955d70d2d551dd15413a03"
+        },
+        "docs/performance/access-followup-20261031/types/backend.json": {
+          "before": null,
+          "after": "3e0b3545ff2b523237b96b44db7dbe011aaf0b12"
+        },
+        "docs/performance/access-followup-20261031/types/backend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/access-followup-20261031/types/frontend.json": {
+          "before": null,
+          "after": "183d89096bfb71ae64e43d2976aeaf63aa65e550"
+        },
+        "docs/performance/access-followup-20261031/types/frontend.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/performance/access-followup-20261031/types/prisma-generate.log": {
+          "before": null,
+          "after": "b9317f67d6869f1cc72ffbb5b2db0cf64114257b"
+        },
+        "docs/performance/access-followup-20261031/types/run-typecheck.py": {
+          "before": null,
+          "after": "1a0e54b017e02e9847412a5fa9974c473c39778d"
+        },
+        "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts": {
+          "before": null,
+          "after": "48958827f0bf4ff4eefb1670407f4c932bb1d503"
+        },
+        "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts": {
+          "before": null,
+          "after": "0a8f56fbd83a2e2f5b4d0d0b80b92335a1370487"
+        },
+        "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
+          "before": "84cec812826539805d1ee356d209e88c9adb49f3",
+          "after": "524d096ef16432954971f00ab1d501070025e33d"
+        },
+        "server-version/backend/src/controllers/questionnaireController.ts": {
+          "before": "8f9681e6a34310f832e5161c66367696213aa509",
+          "after": "de5b3a010469c9087b7748468dc5acbfa87e73e2"
+        },
+        "server-version/backend/src/modules/reporting/discovery.ts": {
+          "before": "9ebacd7d5706ba89438e6f9d4459373237d18bc0",
+          "after": "ea62e025a7ac159e5a39b773a76afc24c7c00bf7"
+        },
+        "server-version/backend/src/modules/reporting/spec.ts": {
+          "before": "d2e2ec218d70d01d275eb1c07c5c0c69e6964aff",
+          "after": "c9080fca451af2a63888ba95d82f9f7bf30f1923"
+        },
+        "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": {
+          "before": "a3e37e0b4eaaab4bdee241c93d1262a2163741b6",
+          "after": "6f2b29b992524bdec57b11fdc416781c83872cb1"
+        },
+        "server-version/frontend/src/components/FormSectionManager.tsx": {
+          "before": "74f332fad7d94b9e7c0d1d0c49e16e150f66041e",
+          "after": "3b941f29627a53bc374df4a6998a673a8b30f849"
+        },
+        "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx": {
+          "before": "14c6ed6ece3d440d6da2391aa7871e2e14c97e94",
+          "after": "c79f76ee83c727996186c8ea290bc7b912a8195a"
+        },
+        "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": {
+          "before": "a40a38fe914f7d251b7e47c9802914cafa99ab5b",
+          "after": "189384a86c2e60a87b6db62eda66c25db433ca71"
+        }
+      },
+      "activationReview": {
+        "reviewer": "delegated Codex scoped self-review; independent review before activation",
+        "scope": "Existing original admission and changed-input CodeQL; no application/build/DB replay",
+        "userAuthorization": "DOT delegated user 2026-10-31T02:53:52Z allows PR432 align Ready scoped CI and merge; no deployment"
+      }
+    },
     "393": {
       "schemaVersion": 1,
       "pr": 393,
@@ -2674,750 +2956,6 @@
       },
       "activationNote": "Root independent review: bounded GO for exact recovered PR420 candidate. User 2026-10-30 22:42 explicitly authorized the 28-file upload, PR description update and limited CI on the original branch, not merge or deployment. Actual unsigned local execution remains f4fa39bd; remote product dbb76d has its identical full tree. Recovered original official run41082809728 attempt1 remains cancelled: admit only authenticated successful build/lint steps and exact artifact, plus fresh four direct cases and app types. Existing scope/admission/scoped frontend-control CodeQL/stable gate only; no app rebuild, browser, PG or platform suite. Original failures and unavailable old local measurements remain disclosed."
     },
-    "422": {
-      "schemaVersion": 1,
-      "pr": 422,
-      "enabled": true,
-      "base": "0a9c565ce9a46793363fd1b40a3e7a0b1d124019",
-      "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
-      "controlCheckpoint": "3cc544510241948e161f85cf4bc1e30978c45df5",
-      "components": {
-        "backend": "3981ae7a7afa5716834f69315b708075b93c6c76",
-        "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
-      },
-      "controlBefore": {
-        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
-        ".github/scripts/group-report-draft.mjs": "4d4f3723852831f5658cedca7581c8db6f5d903b",
-        ".github/scripts/group-report-draft.test.mjs": "74fd84665dfb994ec7474fdaebf24ca38b806ced",
-        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "7e9a0c3f0253d2488a492e52300063a91a6aa014",
-        ".github/scripts/onboarding-checks.mjs": "5a66ec97be97383964746ef00b604e4a369d11c0",
-        ".github/scripts/onboarding-controls.test.mjs": "b208f5ff03f0a4ab9f0b23debc22112489608159",
-        ".github/scripts/onboarding-evidence.json": "1e7596adb0f37da1dbc29937e27abe9aee451ecf",
-        ".github/scripts/onboarding-scope.mjs": "ec582fcd083c1411f528e973e11c1aed394f582e",
-        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
-        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
-        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
-        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
-        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
-        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
-        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
-        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "7af093473eb685e3c449f2eab3e0c9f85e57eea5"
-      },
-      "source": {
-        "docs/development/group-report-source-matrix-20261030.md": {
-          "before": null,
-          "after": "b048a3f18702f3eab76083826cf5ed429ff39997"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/README.md": {
-          "before": null,
-          "after": "5ec2800e7dcfdfce6b825d7542f6a54ddc5f93dd"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/backend-types-original.json.gz": {
-          "before": null,
-          "after": "7f1e24031f1854737cf9dc4c55d8e0f28c8e4d6c"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/backend-types.json": {
-          "before": null,
-          "after": "0848f98bd71197889ee9b71f3847650f54ba855f"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/draft-control-first.log": {
-          "before": null,
-          "after": "4492ddf0e265d7d3b83954c193b008d5d70bda9c"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/draft-control-repair.log": {
-          "before": null,
-          "after": "06c6f8c9db06b4fc29c2c4b4da5cbad313567b4d"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/postgres-archive.json": {
-          "before": null,
-          "after": "2baebcf937275780f3148d8916efd674cf0ea473"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/postgres-archive.log": {
-          "before": null,
-          "after": "165685e19c661b73b38884acd7a5b849fe163df0"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/postgres-first.json": {
-          "before": null,
-          "after": "52f8e24e3796d394b9f3e574c8156997f324a575"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/postgres-first.log": {
-          "before": null,
-          "after": "eed77b77951ab88971c0fc71dcc6ec7f7c008b16"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-archived-proof.json": {
-          "before": null,
-          "after": "85e7f30a229a681f3612bab22b8b1f45c09d66df"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-proof.json": {
-          "before": null,
-          "after": "864df1b3e47e5e2cfaef4b758c07d42643f1f9ff"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/unit-current.json": {
-          "before": null,
-          "after": "14e34f6ef3fbfe92af555d3999e3925b00c83245"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/unit-current.log": {
-          "before": null,
-          "after": "35ac2af689e92252ba9a06719ee2631f7c7fd9ed"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/unit-first.json": {
-          "before": null,
-          "after": "4cc7fdd6468de667de5aacfd3dcdaf6107041885"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/unit-first.log": {
-          "before": null,
-          "after": "fe38531435b6adea1f431d87dd934d4bf486898a"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/unit-repair.json": {
-          "before": null,
-          "after": "f4d8717a18d4ed95c20fdc49230da6b265e1622d"
-        },
-        "docs/evidence/group-report-training-standalone-20261030/unit-repair.log": {
-          "before": null,
-          "after": "79370440473220bb62140edc1eb2f539a24bc97e"
-        },
-        "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts": {
-          "before": null,
-          "after": "97e56112e547ad350daa3500b1b8f96a53fd53d9"
-        },
-        "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts": {
-          "before": null,
-          "after": "3a580a3fedb833d49f1aebd2ef71e4bcf4bfba0d"
-        },
-        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
-          "before": "542307abd805eaca6559dac518688060acbca5db",
-          "after": "e777b59546ad3a41d7888e1c2f91cd5875b03309"
-        },
-        "server-version/backend/src/modules/training-analysis/group-source.ts": {
-          "before": "968ad284663fcbcd785ed725c42c1aae8e2c388b",
-          "after": "3c66d2199b82f8650ba00137c605a126f317a1cf"
-        },
-        "server-version/backend/src/modules/training-analysis/source.ts": {
-          "before": "785694ca8c7f769cca173036d2f2517c9d25e5a7",
-          "after": "5c604adeef92dd997944f33f188ba1ca48403b46"
-        }
-      },
-      "activationNote": "Existing backend-only onboarding route422. Original4 distinct app cases,2 native observations and exact final backend type receipt admitted unsigned with source-capture limits disclosed. No app/PG/browser/frontend/participant replay,no schema change,no new workflow. Scope/admission/CodeQL/gate only;not a merge or deployment."
-    },
-    "423": {
-      "schemaVersion": 1,
-      "pr": 423,
-      "enabled": true,
-      "base": "d420e90e46036b4518a0f729cb3e1ef4b9ca3306",
-      "product": "f7e90457e7fd30c0efbd1f9a3da0a128f025d4a9",
-      "controlCheckpoint": "caa48cccb190b33a82fd5ce66da0c76792d5f76a",
-      "source": {
-        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
-          "before": null,
-          "after": "1b7cc443194acbb917244111d9d6032951f91636"
-        },
-        "docs/development/training-scale-course-delivery-20261030.md": {
-          "before": null,
-          "after": "18598413a5c09bdbdf167061a3b01425be84e4d8"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/README.md": {
-          "before": null,
-          "after": "638ea2b55cb22cf5c9a95a9b6542b6c56244661b"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/backend-types-command.log": {
-          "before": null,
-          "after": "c4a26260812845d6d244081ed0e041f7b59f411d"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/backend-types.json": {
-          "before": null,
-          "after": "c006e1bd300c4e23716f124b6189a54046e4c75e"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/native-proof.json": {
-          "before": null,
-          "after": "7877b5406193dcc705f10a275a83a9bf1038a553"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/postgres.json": {
-          "before": null,
-          "after": "da98629192ad1ff1673ea655c746af652ab58d9f"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/postgres.json.log": {
-          "before": null,
-          "after": "fd985f70b13126cc0a01c6c61a29e94c621457e2"
-        },
-        "docs/evidence/group-report-legacy-course-20261030/type-candidate-tree.json": {
-          "before": null,
-          "after": "e55b4b48c81ff83ec0393f2a0c8cefde4404505d"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/README.md": {
-          "before": null,
-          "after": "4888b22383072271d5396bf35293c473480afffb"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/backend-type-preflight-first.json": {
-          "before": null,
-          "after": "c809261a356140e38ddc42de94090fc43b832334"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/backend-types-command.log": {
-          "before": null,
-          "after": "46aab730b762297092a1d51bf44109bbb304031e"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/backend-types.json": {
-          "before": null,
-          "after": "424d4f1eef5e4fb9fb0088bc932ec67a6046bf24"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/frontend-types.json": {
-          "before": null,
-          "after": "a0e5772532269593115fd194a3bac6f15b4c2464"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/frontend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/frontend.json": {
-          "before": null,
-          "after": "09b590acd455dd5b18a19ddc991d156a390e8726"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/frontend.log": {
-          "before": null,
-          "after": "fc2833093c0b79ff6ea39397fdcb8558f9a7eefa"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/postgres-first.json": {
-          "before": null,
-          "after": "2366511db403f821dfa464e07e69ceeb27e1c0ad"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/postgres-first.log": {
-          "before": null,
-          "after": "3fca880b384811e23d12ff3634648af1b3ef71e2"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/README.md": {
-          "before": null,
-          "after": "75b437510d8c7a35cc83d34febfa6c755db05372"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.json": {
-          "before": null,
-          "after": "7ac364bd8e7ba9c0125e7c02f0b96fee8b63fa37"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.json": {
-          "before": null,
-          "after": "de608dd96f67e255676da0749e659750d798aaea"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/reuse-input-review.json": {
-          "before": null,
-          "after": "66c61e9ad601ef0c95aa77bc1cf79ab172147d3b"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/training-scale-course-delivery-proof.json": {
-          "before": null,
-          "after": "7dd3c47ce4c50447051cec369ed1bf42d8bb8b5d"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/type-candidate-tree.json": {
-          "before": null,
-          "after": "077ac855ab1e087c47a8cbd1e9bce9820e229f84"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/unit.json": {
-          "before": null,
-          "after": "166d0827f1a74d081d41254cb20a0ecf63547d2b"
-        },
-        "docs/evidence/group-report-training-scale-course-20261030/unit.log": {
-          "before": null,
-          "after": "40d18d89fb4bc080cac879c4c30844d73649ea38"
-        },
-        "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts": {
-          "before": null,
-          "after": "9583dd52829163f19eb974af852a5145a3209006"
-        },
-        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts": {
-          "before": null,
-          "after": "4133686e953e2352fc099bf6ffb5c271941b39ee"
-        },
-        "server-version/backend/src/__tests__/scale/course-delivery.test.ts": {
-          "before": null,
-          "after": "2d51cad33ec704185540e24f1592dfa8fe79e931"
-        },
-        "server-version/backend/src/modules/scale/scale-access.ts": {
-          "before": "6b2826cb18bba6d10a27ef7fc10be12c76b45b20",
-          "after": "df98da1e029c91e51b357d6d576f77fab172c5b0"
-        },
-        "server-version/backend/src/modules/scale/scale-restart.service.ts": {
-          "before": "9b8f252095068544a57624c9943830b06eff3784",
-          "after": "0049de59daf3267997d83c09e64caa190be9b9db"
-        },
-        "server-version/backend/src/modules/scale/scale-start.controller.ts": {
-          "before": "ed3a7020e54b843117094421b738cdc236c833ef",
-          "after": "3010d9ad9b56e062de91491040ed411b344528b2"
-        },
-        "server-version/frontend/src/pages/student/ScaleAssessment.tsx": {
-          "before": "0b5f68cdf56eb8b27f01e33289dba9177c83046c",
-          "after": "c303ac2bcb6d19aa07bf7008d88c856059d66d25"
-        },
-        "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx": {
-          "before": "fba6385f8ae1d5a200c5720f417492e2cb024e87",
-          "after": "cb1d740ad628e4b25d35eea71411b95afad5f3a4"
-        }
-      },
-      "controlBefore": {
-        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
-        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "b17da768ed4f0b766b6b345961e89e7de278034f",
-        ".github/scripts/onboarding-checks.mjs": "04c4a3ca3d93797c11e3a6a05dccfae6343222c3",
-        ".github/scripts/onboarding-controls.test.mjs": "7f7a59c8dede45e89cc9dd97a085d84cde50d1b3",
-        ".github/scripts/onboarding-evidence.json": "fdca7a1e4e2d6c790fbfee1ce8ef7e1de4c1a6c4",
-        ".github/scripts/onboarding-scope.mjs": "d0bc3ad38e317e77206d53cb88880adf456ce70d",
-        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
-        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
-        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
-        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
-        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
-        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
-        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
-        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "2cf40fea1fdc22619dd1072a027a782f601d7307"
-      },
-      "components": {
-        "backend": "4b2481a35fa01fccff933f85676c99883d6fc52d",
-        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
-      }
-    },
-    "424": {
-      "schemaVersion": 1,
-      "pr": 424,
-      "enabled": true,
-      "base": "112b944811160e8e2a018563b73e59f5ba542a5c",
-      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
-      "controlCheckpoint": "0f65de649683efde8c69281355dfcb0d4f05e9dc",
-      "source": {
-        "docs/development/group-report-source-matrix-20261030.md": {
-          "before": "b048a3f18702f3eab76083826cf5ed429ff39997",
-          "after": "bcac2e624988b59627963fddb8496210a0b3294e"
-        },
-        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
-          "before": "1b7cc443194acbb917244111d9d6032951f91636",
-          "after": "84afb5bb14724024926de00a4165fdbfaef49e2b"
-        },
-        "docs/development/training-standalone-scale-group-reader-20261030.md": {
-          "before": null,
-          "after": "19d83f2688c362729baeca44a581c2a472b9a26e"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/README.md": {
-          "before": null,
-          "after": "3dc68d06733a17945e4c59c11c5b8b910a9f047e"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/backend-types-command.log": {
-          "before": null,
-          "after": "92bc239292053663109e34d093bb0d2c33190e6b"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.json": {
-          "before": null,
-          "after": "d90fab117d46bfb552948554253621cf249eb198"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types-command.log": {
-          "before": null,
-          "after": "b63c9243d5b047d27ad9e751800e61023cdadcd4"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.json": {
-          "before": null,
-          "after": "0c32fea3d012a2b20d0e568a76a9fd4168b0f72f"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/initial-type-candidate-tree.json": {
-          "before": null,
-          "after": "814f32f63501269a6afdf317aae46a15644c7a22"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/native-proof.json": {
-          "before": null,
-          "after": "1d3989f3c1b78b01c5db55241258f8addf2bd152"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/picker-current-proof.json": {
-          "before": null,
-          "after": "bcc03df134e39b9f09dd6233b898e05298f83dbb"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.log": {
-          "before": null,
-          "after": "3fb5ed7357564b3ae342e9eea011274763e07840"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.ts": {
-          "before": null,
-          "after": "493b6f630dc20dc148bbfd10c8f970fec6538521"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json": {
-          "before": null,
-          "after": "33e99faf115496798a324dba05abe8dd06b3695a"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.log": {
-          "before": null,
-          "after": "fdb3c35d1649e36442b04f01ce51b4c10cb7bf45"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/README.md": {
-          "before": null,
-          "after": "629341af1db45cfbc4486ff72fb4149bf88a76a5"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/reuse.json": {
-          "before": null,
-          "after": "ec3ca1ce3ac4ab33fda3100b4f02f9db871fcc1e"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/type-candidate-tree.json": {
-          "before": null,
-          "after": "150872c2690befb93883c0f3a4a7bca697a6e06f"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json": {
-          "before": null,
-          "after": "b5081416da119f779eb88ab5c0b8538b792e4717"
-        },
-        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.log": {
-          "before": null,
-          "after": "c44fff22808b7c7f83aa3ab525e0da9188260e58"
-        },
-        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts": {
-          "before": null,
-          "after": "e8be0dde6b2b36f5e27dcdcd85e261279f5f339f"
-        },
-        "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts": {
-          "before": null,
-          "after": "2897bd80a59374800701edf18af6689f31d786eb"
-        },
-        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
-          "before": "e777b59546ad3a41d7888e1c2f91cd5875b03309",
-          "after": "bcc0125d00c180d2f45d354ad047a07d2c7bacbe"
-        },
-        "server-version/backend/src/modules/training-analysis/group-source.ts": {
-          "before": "3c66d2199b82f8650ba00137c605a126f317a1cf",
-          "after": "96c5f22c9da5fbe472999aab638940ec65230837"
-        },
-        "server-version/backend/src/modules/training-analysis/source.ts": {
-          "before": "5c604adeef92dd997944f33f188ba1ca48403b46",
-          "after": "d93481f61741aa48f5b16637784eccfe621d2bce"
-        }
-      },
-      "controlBefore": {
-        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
-        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "5c32efae2ab0189e8146b503215188bc36027ba0",
-        ".github/scripts/onboarding-checks.mjs": "5e96d8b49c6732772b6d9546713523cbbd8b1275",
-        ".github/scripts/onboarding-controls.test.mjs": "cb606bdefaa175d7307aa3089f7f0ee6677135a4",
-        ".github/scripts/onboarding-evidence.json": "a7deae80cf47a0f000a2ef72c99513ea5708ddfb",
-        ".github/scripts/onboarding-scope.mjs": "ffb98bc26e2c8908960837861b9d62685d545520",
-        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
-        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
-        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
-        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
-        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
-        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
-        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
-        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "8b84efc626b9c08f5dba499620310b0112302d84"
-      },
-      "components": {
-        "backend": "7955b8d801126e4cf952a1e979833bdd7aef2895",
-        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
-      }
-    },
-    "432": {
-      "schemaVersion": 1,
-      "pr": 432,
-      "enabled": true,
-      "base": "b32efd4058bee06deaef95ed901c294aaa10f7d9",
-      "product": "b8e7dda2497fe21049e8de1f1e8adc17bcd91ea1",
-      "controlCheckpoint": "44ac236617727e0ed7e41caeb336bbea1b50bc0a",
-      "components": {
-        "backend": "fa7da22c1fe95b34f94b7891dc52c02021615cc7",
-        "frontend": "b0dc4d14e64eaa62f5983e7f53e3b87f079f9fd9"
-      },
-      "controlBefore": {
-        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
-        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
-        ".github/scripts/onboarding-bindings.json": "93895455bb842ceb8e1bc4e7fd81dcddb0675504",
-        ".github/scripts/onboarding-checks.mjs": "27163eaa7801463c867ff0111d95781773f51404",
-        ".github/scripts/onboarding-controls.test.mjs": "8f7bb201c70a81eeef07411f0b8ada6230166c5d",
-        ".github/scripts/onboarding-evidence.json": "da1344c7fd92e9d21f5d4fcf6ae56a428c22e07b",
-        ".github/scripts/onboarding-scope.mjs": "9be979c4f4aa309758910ab95fc4e6cf5261031d",
-        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
-        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
-        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
-        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
-        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
-        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
-        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
-        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
-        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
-        ".github/workflows/ci.yml": "e8091e6935e791e2ee86609424919c7274a74207"
-      },
-      "source": {
-        "docs/performance/access-followup-20261031/PUBLISH-PLAN.md": {
-          "before": null,
-          "after": "9e2c8b4a6ed974385383d1c97f8983d34eb876bb"
-        },
-        "docs/performance/access-followup-20261031/README.md": {
-          "before": null,
-          "after": "4d350f04e3a2d63fc769bc9793589d3a266b26bf"
-        },
-        "docs/performance/access-followup-20261031/content-units/content-controller-baseline.json.gz": {
-          "before": null,
-          "after": "b1c38286e346d9f5bf02fa27a477bf634ac021c5"
-        },
-        "docs/performance/access-followup-20261031/content-units/content-controller-baseline.log.gz": {
-          "before": null,
-          "after": "3f177d45d027d2a66e63fe39da8d21187f8506e9"
-        },
-        "docs/performance/access-followup-20261031/content-units/content-controller-fixed.json.gz": {
-          "before": null,
-          "after": "0f0ffd88f90d56613d53fc200ed81babbc17a966"
-        },
-        "docs/performance/access-followup-20261031/content-units/content-controller-fixed.log.gz": {
-          "before": null,
-          "after": "4d345a1dfb9e33494161d240bef5d28c46dc1dce"
-        },
-        "docs/performance/access-followup-20261031/content-units/execution.json": {
-          "before": null,
-          "after": "51c31ec269f8df0303e4d9a5b48b70bfdcf2aeb3"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-baseline.json.gz": {
-          "before": null,
-          "after": "ab47cc22254bd48897eb107a6eb2800229d17aa4"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-baseline.log.gz": {
-          "before": null,
-          "after": "4cbe30bc20b2eaae64bb2193105004157488a6f8"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-baseline.ndjson.gz": {
-          "before": null,
-          "after": "d9094743372d51f059dd7f8b091bf37ecba3e11d"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-fixed.json.gz": {
-          "before": null,
-          "after": "667ae074c9537606984277c3727d558501e55499"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-fixed.log.gz": {
-          "before": null,
-          "after": "236df112d46c2e3d9a15134ba00468e0617bbede"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-fixed.ndjson.gz": {
-          "before": null,
-          "after": "837918840f28764807d1d25db7f795b643c0a3d9"
-        },
-        "docs/performance/access-followup-20261031/content-units/manager-harness-baseline.tsx": {
-          "before": null,
-          "after": "a79f2d186b910cd4e6ae30d1b6972c548a4aedcb"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/README.md": {
-          "before": null,
-          "after": "598f5a1fc49d66f7da721be203f1bc1a4ead5073"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/actionlint.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/backend-types.json": {
-          "before": null,
-          "after": "c9e4be7580000852cad217cdf0831d2df5de7436"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/backend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/control-command-index.json": {
-          "before": null,
-          "after": "6c6cf35768f37e3ef07b59e79b4b571be026fb69"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/control-tests-first.log": {
-          "before": null,
-          "after": "0b9049a620945a2d7606fcd2a308735e0dcd86e1"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/control-types-continuation.log": {
-          "before": null,
-          "after": "ac7604cddb6d76385a51fab363c5c654568c9a53"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/frontend-types.json": {
-          "before": null,
-          "after": "c8d02d21a0d0651195fbb5607373e55a753e8177"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/frontend-types.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/performance/access-followup-20261031/final-qualification/run-typecheck.py": {
-          "before": null,
-          "after": "c5d87902fcbfe50521411ed83b9eff33d29d6dc2"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/execution.json": {
-          "before": null,
-          "after": "48549c7eac877625c70dbedebadd1e601ea6a41b"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/harness-r1.tsx": {
-          "before": null,
-          "after": "3f60a20d36e8941856e2b343136b815748e86629"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline-form.json.gz": {
-          "before": null,
-          "after": "4e0e532b1825d320d791c48d32db51e1cfade47d"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline-form.log.gz": {
-          "before": null,
-          "after": "eb1a5d2f322575d0eb489628f23a839961972e5c"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline.json.gz": {
-          "before": null,
-          "after": "6bb9ebf5dedadcacace904c51f09bf815f01c0f6"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-baseline.log.gz": {
-          "before": null,
-          "after": "9537f73e6ecd1ca1e486446c236d2fce56c54a1f"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-candidate.json.gz": {
-          "before": null,
-          "after": "db49028e55c2b48d591e2dd3eade03375438e5f6"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-candidate.log.gz": {
-          "before": null,
-          "after": "6a1e972a3da33fd59b05eefc4aebeaa9117c9abf"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-fixed.json.gz": {
-          "before": null,
-          "after": "34cf5cf9b9f95564a0bee5cd7338baa13e11633b"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-recovery/questionnaire-fixed.log.gz": {
-          "before": null,
-          "after": "ef3fbd9d06077b6856525f05d39334ff2b0b58d8"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-review-repair/baseline.json.gz": {
-          "before": null,
-          "after": "0baf8ae6f8468d80f0e5d247ca148d8deb414517"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-review-repair/baseline.log.gz": {
-          "before": null,
-          "after": "3570df5abaf604cad4d413a0e905c013bf38ee22"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-review-repair/execution.json": {
-          "before": null,
-          "after": "0d627d1e157b2f1e6560ba0c948b23bec3d50492"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-review-repair/fixed.json.gz": {
-          "before": null,
-          "after": "37165b635a29cab0c8cb936e04ca85bd5df75096"
-        },
-        "docs/performance/access-followup-20261031/questionnaire-review-repair/fixed.log.gz": {
-          "before": null,
-          "after": "ffd6b6b9f65eff1157c4b1d48cc225bb4ea02cbc"
-        },
-        "docs/performance/access-followup-20261031/selected-evidence.json": {
-          "before": null,
-          "after": "b26286e215bc4cd09b5bfa72dc483c7df37ccf7f"
-        },
-        "docs/performance/access-followup-20261031/spec-discovery/discovery-baseline.json.gz": {
-          "before": null,
-          "after": "db48026599adf0596251d2c101a62e87e3e078e0"
-        },
-        "docs/performance/access-followup-20261031/spec-discovery/discovery-baseline.log.gz": {
-          "before": null,
-          "after": "281ad1b76133a246cab04e8ac12f01cd567a4f5e"
-        },
-        "docs/performance/access-followup-20261031/spec-discovery/discovery-fixed.json.gz": {
-          "before": null,
-          "after": "3990d5fe009acb135d1c776479a73ae9e5ebb61b"
-        },
-        "docs/performance/access-followup-20261031/spec-discovery/discovery-fixed.log.gz": {
-          "before": null,
-          "after": "d840eccd219a01b4bdf6325b1510841498a01153"
-        },
-        "docs/performance/access-followup-20261031/spec-discovery/execution.json": {
-          "before": null,
-          "after": "227b87954607452556955d70d2d551dd15413a03"
-        },
-        "docs/performance/access-followup-20261031/types/backend.json": {
-          "before": null,
-          "after": "3e0b3545ff2b523237b96b44db7dbe011aaf0b12"
-        },
-        "docs/performance/access-followup-20261031/types/backend.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/performance/access-followup-20261031/types/frontend.json": {
-          "before": null,
-          "after": "183d89096bfb71ae64e43d2976aeaf63aa65e550"
-        },
-        "docs/performance/access-followup-20261031/types/frontend.log": {
-          "before": null,
-          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
-        },
-        "docs/performance/access-followup-20261031/types/prisma-generate.log": {
-          "before": null,
-          "after": "b9317f67d6869f1cc72ffbb5b2db0cf64114257b"
-        },
-        "docs/performance/access-followup-20261031/types/run-typecheck.py": {
-          "before": null,
-          "after": "1a0e54b017e02e9847412a5fa9974c473c39778d"
-        },
-        "server-version/backend/src/__tests__/questionnaire/content-units-projection.test.ts": {
-          "before": null,
-          "after": "48958827f0bf4ff4eefb1670407f4c932bb1d503"
-        },
-        "server-version/backend/src/__tests__/reporting/spec-discovery-reads.test.ts": {
-          "before": null,
-          "after": "0a8f56fbd83a2e2f5b4d0d0b80b92335a1370487"
-        },
-        "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
-          "before": "84cec812826539805d1ee356d209e88c9adb49f3",
-          "after": "524d096ef16432954971f00ab1d501070025e33d"
-        },
-        "server-version/backend/src/controllers/questionnaireController.ts": {
-          "before": "8f9681e6a34310f832e5161c66367696213aa509",
-          "after": "de5b3a010469c9087b7748468dc5acbfa87e73e2"
-        },
-        "server-version/backend/src/modules/reporting/discovery.ts": {
-          "before": "9ebacd7d5706ba89438e6f9d4459373237d18bc0",
-          "after": "ea62e025a7ac159e5a39b773a76afc24c7c00bf7"
-        },
-        "server-version/backend/src/modules/reporting/spec.ts": {
-          "before": "d2e2ec218d70d01d275eb1c07c5c0c69e6964aff",
-          "after": "c9080fca451af2a63888ba95d82f9f7bf30f1923"
-        },
-        "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": {
-          "before": "a3e37e0b4eaaab4bdee241c93d1262a2163741b6",
-          "after": "6f2b29b992524bdec57b11fdc416781c83872cb1"
-        },
-        "server-version/frontend/src/components/FormSectionManager.tsx": {
-          "before": "74f332fad7d94b9e7c0d1d0c49e16e150f66041e",
-          "after": "3b941f29627a53bc374df4a6998a673a8b30f849"
-        },
-        "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx": {
-          "before": "14c6ed6ece3d440d6da2391aa7871e2e14c97e94",
-          "after": "c79f76ee83c727996186c8ea290bc7b912a8195a"
-        },
-        "server-version/frontend/src/components/__tests__/FormSectionManager.http.test.tsx": {
-          "before": "a40a38fe914f7d251b7e47c9802914cafa99ab5b",
-          "after": "189384a86c2e60a87b6db62eda66c25db433ca71"
-        }
-      },
-      "activationReview": {
-        "reviewer": "delegated Codex scoped self-review; independent review before activation",
-        "scope": "Existing original admission and changed-input CodeQL; no application/build/DB replay",
-        "userAuthorization": "DOT delegated user 2026-10-31T02:53:52Z allows PR432 align Ready scoped CI and merge; no deployment"
-      }
-    },
     "task1": {
       "schemaVersion": 1,
       "pr": "task1",
@@ -4956,6 +4494,468 @@
         "frontend": "43e5e363e2b8ac8f40da27af293d02a73a89eb8c"
       },
       "activationNote": "Ready synchronize after initial Draft/Ready event competition; exact source/control unchanged, original cancelled/Draft runs retained. Qualify existing admission, scoped SAST and stable gate only."
+    },
+    "422": {
+      "schemaVersion": 1,
+      "pr": 422,
+      "enabled": true,
+      "base": "0a9c565ce9a46793363fd1b40a3e7a0b1d124019",
+      "product": "676063e8989b8119fbae176d99dcbd0c8c331a97",
+      "controlCheckpoint": "3cc544510241948e161f85cf4bc1e30978c45df5",
+      "components": {
+        "backend": "3981ae7a7afa5716834f69315b708075b93c6c76",
+        "frontend": "8d7f9214106aa965d1379b75464136d7cc5b90e5"
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/group-report-draft.mjs": "4d4f3723852831f5658cedca7581c8db6f5d903b",
+        ".github/scripts/group-report-draft.test.mjs": "74fd84665dfb994ec7474fdaebf24ca38b806ced",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "7e9a0c3f0253d2488a492e52300063a91a6aa014",
+        ".github/scripts/onboarding-checks.mjs": "5a66ec97be97383964746ef00b604e4a369d11c0",
+        ".github/scripts/onboarding-controls.test.mjs": "b208f5ff03f0a4ab9f0b23debc22112489608159",
+        ".github/scripts/onboarding-evidence.json": "1e7596adb0f37da1dbc29937e27abe9aee451ecf",
+        ".github/scripts/onboarding-scope.mjs": "ec582fcd083c1411f528e973e11c1aed394f582e",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "7af093473eb685e3c449f2eab3e0c9f85e57eea5"
+      },
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": null,
+          "after": "b048a3f18702f3eab76083826cf5ed429ff39997"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/README.md": {
+          "before": null,
+          "after": "5ec2800e7dcfdfce6b825d7542f6a54ddc5f93dd"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/backend-types-original.json.gz": {
+          "before": null,
+          "after": "7f1e24031f1854737cf9dc4c55d8e0f28c8e4d6c"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/backend-types.json": {
+          "before": null,
+          "after": "0848f98bd71197889ee9b71f3847650f54ba855f"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/draft-control-first.log": {
+          "before": null,
+          "after": "4492ddf0e265d7d3b83954c193b008d5d70bda9c"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/draft-control-repair.log": {
+          "before": null,
+          "after": "06c6f8c9db06b4fc29c2c4b4da5cbad313567b4d"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-archive.json": {
+          "before": null,
+          "after": "2baebcf937275780f3148d8916efd674cf0ea473"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-archive.log": {
+          "before": null,
+          "after": "165685e19c661b73b38884acd7a5b849fe163df0"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-first.json": {
+          "before": null,
+          "after": "52f8e24e3796d394b9f3e574c8156997f324a575"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/postgres-first.log": {
+          "before": null,
+          "after": "eed77b77951ab88971c0fc71dcc6ec7f7c008b16"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-archived-proof.json": {
+          "before": null,
+          "after": "85e7f30a229a681f3612bab22b8b1f45c09d66df"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/training-standalone-cognitive-group-proof.json": {
+          "before": null,
+          "after": "864df1b3e47e5e2cfaef4b758c07d42643f1f9ff"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-current.json": {
+          "before": null,
+          "after": "14e34f6ef3fbfe92af555d3999e3925b00c83245"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-current.log": {
+          "before": null,
+          "after": "35ac2af689e92252ba9a06719ee2631f7c7fd9ed"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-first.json": {
+          "before": null,
+          "after": "4cc7fdd6468de667de5aacfd3dcdaf6107041885"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-first.log": {
+          "before": null,
+          "after": "fe38531435b6adea1f431d87dd934d4bf486898a"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-repair.json": {
+          "before": null,
+          "after": "f4d8717a18d4ed95c20fdc49230da6b265e1622d"
+        },
+        "docs/evidence/group-report-training-standalone-20261030/unit-repair.log": {
+          "before": null,
+          "after": "79370440473220bb62140edc1eb2f539a24bc97e"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "97e56112e547ad350daa3500b1b8f96a53fd53d9"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-standalone-cognitive.test.ts": {
+          "before": null,
+          "after": "3a580a3fedb833d49f1aebd2ef71e4bcf4bfba0d"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "542307abd805eaca6559dac518688060acbca5db",
+          "after": "e777b59546ad3a41d7888e1c2f91cd5875b03309"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": "968ad284663fcbcd785ed725c42c1aae8e2c388b",
+          "after": "3c66d2199b82f8650ba00137c605a126f317a1cf"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "785694ca8c7f769cca173036d2f2517c9d25e5a7",
+          "after": "5c604adeef92dd997944f33f188ba1ca48403b46"
+        }
+      },
+      "activationNote": "Existing backend-only onboarding route422. Original4 distinct app cases,2 native observations and exact final backend type receipt admitted unsigned with source-capture limits disclosed. No app/PG/browser/frontend/participant replay,no schema change,no new workflow. Scope/admission/CodeQL/gate only;not a merge or deployment."
+    },
+    "423": {
+      "schemaVersion": 1,
+      "pr": 423,
+      "enabled": true,
+      "base": "d420e90e46036b4518a0f729cb3e1ef4b9ca3306",
+      "product": "f7e90457e7fd30c0efbd1f9a3da0a128f025d4a9",
+      "controlCheckpoint": "caa48cccb190b33a82fd5ce66da0c76792d5f76a",
+      "source": {
+        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
+          "before": null,
+          "after": "1b7cc443194acbb917244111d9d6032951f91636"
+        },
+        "docs/development/training-scale-course-delivery-20261030.md": {
+          "before": null,
+          "after": "18598413a5c09bdbdf167061a3b01425be84e4d8"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/README.md": {
+          "before": null,
+          "after": "638ea2b55cb22cf5c9a95a9b6542b6c56244661b"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "c4a26260812845d6d244081ed0e041f7b59f411d"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/backend-types.json": {
+          "before": null,
+          "after": "c006e1bd300c4e23716f124b6189a54046e4c75e"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/native-proof.json": {
+          "before": null,
+          "after": "7877b5406193dcc705f10a275a83a9bf1038a553"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/postgres.json": {
+          "before": null,
+          "after": "da98629192ad1ff1673ea655c746af652ab58d9f"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/postgres.json.log": {
+          "before": null,
+          "after": "fd985f70b13126cc0a01c6c61a29e94c621457e2"
+        },
+        "docs/evidence/group-report-legacy-course-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "e55b4b48c81ff83ec0393f2a0c8cefde4404505d"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/README.md": {
+          "before": null,
+          "after": "4888b22383072271d5396bf35293c473480afffb"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-type-preflight-first.json": {
+          "before": null,
+          "after": "c809261a356140e38ddc42de94090fc43b832334"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "46aab730b762297092a1d51bf44109bbb304031e"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-types.json": {
+          "before": null,
+          "after": "424d4f1eef5e4fb9fb0088bc932ec67a6046bf24"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend-types.json": {
+          "before": null,
+          "after": "a0e5772532269593115fd194a3bac6f15b4c2464"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend.json": {
+          "before": null,
+          "after": "09b590acd455dd5b18a19ddc991d156a390e8726"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/frontend.log": {
+          "before": null,
+          "after": "fc2833093c0b79ff6ea39397fdcb8558f9a7eefa"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/postgres-first.json": {
+          "before": null,
+          "after": "2366511db403f821dfa464e07e69ceeb27e1c0ad"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/postgres-first.log": {
+          "before": null,
+          "after": "3fca880b384811e23d12ff3634648af1b3ef71e2"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "75b437510d8c7a35cc83d34febfa6c755db05372"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.json": {
+          "before": null,
+          "after": "7ac364bd8e7ba9c0125e7c02f0b96fee8b63fa37"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.json": {
+          "before": null,
+          "after": "de608dd96f67e255676da0749e659750d798aaea"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/frontend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/qualification-main-d420/reuse-input-review.json": {
+          "before": null,
+          "after": "66c61e9ad601ef0c95aa77bc1cf79ab172147d3b"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/training-scale-course-delivery-proof.json": {
+          "before": null,
+          "after": "7dd3c47ce4c50447051cec369ed1bf42d8bb8b5d"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "077ac855ab1e087c47a8cbd1e9bce9820e229f84"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/unit.json": {
+          "before": null,
+          "after": "166d0827f1a74d081d41254cb20a0ecf63547d2b"
+        },
+        "docs/evidence/group-report-training-scale-course-20261030/unit.log": {
+          "before": null,
+          "after": "40d18d89fb4bc080cac879c4c30844d73649ea38"
+        },
+        "server-version/backend/src/__tests__/integration/trainingLegacyScaleStart.postgres.integration.test.ts": {
+          "before": null,
+          "after": "9583dd52829163f19eb974af852a5145a3209006"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleCourse.postgres.integration.test.ts": {
+          "before": null,
+          "after": "4133686e953e2352fc099bf6ffb5c271941b39ee"
+        },
+        "server-version/backend/src/__tests__/scale/course-delivery.test.ts": {
+          "before": null,
+          "after": "2d51cad33ec704185540e24f1592dfa8fe79e931"
+        },
+        "server-version/backend/src/modules/scale/scale-access.ts": {
+          "before": "6b2826cb18bba6d10a27ef7fc10be12c76b45b20",
+          "after": "df98da1e029c91e51b357d6d576f77fab172c5b0"
+        },
+        "server-version/backend/src/modules/scale/scale-restart.service.ts": {
+          "before": "9b8f252095068544a57624c9943830b06eff3784",
+          "after": "0049de59daf3267997d83c09e64caa190be9b9db"
+        },
+        "server-version/backend/src/modules/scale/scale-start.controller.ts": {
+          "before": "ed3a7020e54b843117094421b738cdc236c833ef",
+          "after": "3010d9ad9b56e062de91491040ed411b344528b2"
+        },
+        "server-version/frontend/src/pages/student/ScaleAssessment.tsx": {
+          "before": "0b5f68cdf56eb8b27f01e33289dba9177c83046c",
+          "after": "c303ac2bcb6d19aa07bf7008d88c856059d66d25"
+        },
+        "server-version/frontend/src/pages/student/__tests__/ScaleAssessment.test.tsx": {
+          "before": "fba6385f8ae1d5a200c5720f417492e2cb024e87",
+          "after": "cb1d740ad628e4b25d35eea71411b95afad5f3a4"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "b17da768ed4f0b766b6b345961e89e7de278034f",
+        ".github/scripts/onboarding-checks.mjs": "04c4a3ca3d93797c11e3a6a05dccfae6343222c3",
+        ".github/scripts/onboarding-controls.test.mjs": "7f7a59c8dede45e89cc9dd97a085d84cde50d1b3",
+        ".github/scripts/onboarding-evidence.json": "fdca7a1e4e2d6c790fbfee1ce8ef7e1de4c1a6c4",
+        ".github/scripts/onboarding-scope.mjs": "d0bc3ad38e317e77206d53cb88880adf456ce70d",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "2cf40fea1fdc22619dd1072a027a782f601d7307"
+      },
+      "components": {
+        "backend": "4b2481a35fa01fccff933f85676c99883d6fc52d",
+        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
+      }
+    },
+    "424": {
+      "schemaVersion": 1,
+      "pr": 424,
+      "enabled": true,
+      "base": "112b944811160e8e2a018563b73e59f5ba542a5c",
+      "product": "a77e353c3a689bcdc428285eb39d88963ab0b867",
+      "controlCheckpoint": "0f65de649683efde8c69281355dfcb0d4f05e9dc",
+      "source": {
+        "docs/development/group-report-source-matrix-20261030.md": {
+          "before": "b048a3f18702f3eab76083826cf5ed429ff39997",
+          "after": "bcac2e624988b59627963fddb8496210a0b3294e"
+        },
+        "docs/development/teacher-nonform-group-contract-proposal-20261030.md": {
+          "before": "1b7cc443194acbb917244111d9d6032951f91636",
+          "after": "84afb5bb14724024926de00a4165fdbfaef49e2b"
+        },
+        "docs/development/training-standalone-scale-group-reader-20261030.md": {
+          "before": null,
+          "after": "19d83f2688c362729baeca44a581c2a472b9a26e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/README.md": {
+          "before": null,
+          "after": "3dc68d06733a17945e4c59c11c5b8b910a9f047e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types-command.log": {
+          "before": null,
+          "after": "92bc239292053663109e34d093bb0d2c33190e6b"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.json": {
+          "before": null,
+          "after": "d90fab117d46bfb552948554253621cf249eb198"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types-command.log": {
+          "before": null,
+          "after": "b63c9243d5b047d27ad9e751800e61023cdadcd4"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.json": {
+          "before": null,
+          "after": "0c32fea3d012a2b20d0e568a76a9fd4168b0f72f"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-backend-types.log": {
+          "before": null,
+          "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/initial-type-candidate-tree.json": {
+          "before": null,
+          "after": "814f32f63501269a6afdf317aae46a15644c7a22"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/native-proof.json": {
+          "before": null,
+          "after": "1d3989f3c1b78b01c5db55241258f8addf2bd152"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current-proof.json": {
+          "before": null,
+          "after": "bcc03df134e39b9f09dd6233b898e05298f83dbb"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.log": {
+          "before": null,
+          "after": "3fb5ed7357564b3ae342e9eea011274763e07840"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/picker-current.ts": {
+          "before": null,
+          "after": "493b6f630dc20dc148bbfd10c8f970fec6538521"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.json": {
+          "before": null,
+          "after": "33e99faf115496798a324dba05abe8dd06b3695a"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/postgres-first.log": {
+          "before": null,
+          "after": "fdb3c35d1649e36442b04f01ce51b4c10cb7bf45"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/README.md": {
+          "before": null,
+          "after": "629341af1db45cfbc4486ff72fb4149bf88a76a5"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/qualification-main-d420/reuse.json": {
+          "before": null,
+          "after": "ec3ca1ce3ac4ab33fda3100b4f02f9db871fcc1e"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/type-candidate-tree.json": {
+          "before": null,
+          "after": "150872c2690befb93883c0f3a4a7bca697a6e06f"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.json": {
+          "before": null,
+          "after": "b5081416da119f779eb88ab5c0b8538b792e4717"
+        },
+        "docs/evidence/group-report-training-scale-reader-20261030/unit-first.log": {
+          "before": null,
+          "after": "c44fff22808b7c7f83aa3ab525e0da9188260e58"
+        },
+        "server-version/backend/src/__tests__/integration/trainingStandaloneScaleGroup.postgres.integration.test.ts": {
+          "before": null,
+          "after": "e8be0dde6b2b36f5e27dcdcd85e261279f5f339f"
+        },
+        "server-version/backend/src/__tests__/training-analysis/group-standalone-scale.test.ts": {
+          "before": null,
+          "after": "2897bd80a59374800701edf18af6689f31d786eb"
+        },
+        "server-version/backend/src/modules/training-analysis/group-report.service.ts": {
+          "before": "e777b59546ad3a41d7888e1c2f91cd5875b03309",
+          "after": "bcc0125d00c180d2f45d354ad047a07d2c7bacbe"
+        },
+        "server-version/backend/src/modules/training-analysis/group-source.ts": {
+          "before": "3c66d2199b82f8650ba00137c605a126f317a1cf",
+          "after": "96c5f22c9da5fbe472999aab638940ec65230837"
+        },
+        "server-version/backend/src/modules/training-analysis/source.ts": {
+          "before": "5c604adeef92dd997944f33f188ba1ca48403b46",
+          "after": "d93481f61741aa48f5b16637784eccfe621d2bce"
+        }
+      },
+      "controlBefore": {
+        ".github/scripts/content-scope.mjs": "dda26c9d04bbd070c2a25deceda9ce74fdfd4bd6",
+        ".github/scripts/merge-gate.mjs": "f3993c6f84da530c912d5bfecace5c2cbe1ae0ef",
+        ".github/scripts/onboarding-bindings.json": "5c32efae2ab0189e8146b503215188bc36027ba0",
+        ".github/scripts/onboarding-checks.mjs": "5e96d8b49c6732772b6d9546713523cbbd8b1275",
+        ".github/scripts/onboarding-controls.test.mjs": "cb606bdefaa175d7307aa3089f7f0ee6677135a4",
+        ".github/scripts/onboarding-evidence.json": "a7deae80cf47a0f000a2ef72c99513ea5708ddfb",
+        ".github/scripts/onboarding-scope.mjs": "ffb98bc26e2c8908960837861b9d62685d545520",
+        ".github/scripts/pr374-browser.mjs": "f11fd8eb123f06d180cf10cc47a536d95f2b8d33",
+        ".github/scripts/pr374-evidence.mjs": "f78e7db622df8709916e78cd8bbd66953d3fe6d1",
+        ".github/scripts/pr376-browser.mjs": "7da6c4bd5480e15dbeb58f45e7ed9e8d6c3312df",
+        ".github/scripts/pr378-browser.mjs": "0142d5f4f676ceb7fc10dabc9222823d7d11c976",
+        ".github/scripts/pr380-browser-reuse.mjs": "35fde26a8103c0c32c28f0cc458278c47ccb7067",
+        ".github/scripts/pr380-browser-reuse.test.mjs": "6da41c90df0b9d4aae0106a45eede5e0afae89c3",
+        ".github/scripts/pr380-browser.mjs": "93c275550c7522aa47db0d55f6109ce665ae3803",
+        ".github/scripts/pr381-browser.mjs": "39d72c1d9ecbcb9f5c09bade83bd884bd00c9d2b",
+        ".github/scripts/pr395-browser.mjs": "431b693ce9acba4987678248f9e9dec029ced033",
+        ".github/workflows/ci.yml": "8b84efc626b9c08f5dba499620310b0112302d84"
+      },
+      "components": {
+        "backend": "7955b8d801126e4cf952a1e979833bdd7aef2895",
+        "frontend": "6dd9390e0104306cad051c7048aac9b05c82e27a"
+      }
     }
   }
 }
