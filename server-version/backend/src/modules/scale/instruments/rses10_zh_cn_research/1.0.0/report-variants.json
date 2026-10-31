@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "rses10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "d953c5df70384c7e43e12d8e8b9e56f478bdeaeade0860b02100c5274ec672df",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "rses10"
+        ],
+        "scoreOrder": [
+          "rses10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "rses10",
+            "headline": "自尊：你怎样看待自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项关注你对自己的总体感受和价值感。分数越高，表示这次更认可积极的自我描述。它像一张此刻自我评价的快照，不是给整个人打分。近期的经历、比较和关系可能影响回答。不能凭分数判断你的能力、成就或未来。一次不顺利的表现，不必变成对自己全部价值的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一次你对自己不满意的时候：你是在评价一件具体的事，还是把那件事变成了对整个人的结论？"
+              },
+              {
+                "category": "strategy",
+                "text": "试着把“我就是不行”换成更具体的说法：“这次的……没有做好，我需要……”。再记下一件你认可自己的小事实，不必很出色，只要真实。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+          "没有可通用于所有人的高低分界；不能拿一个固定分数给自己贴标签，也不能据此评价个人价值。",
+          "原版曾用于青少年，不代表本项目这份中文译稿已经适合未成年人。",
+          "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、能力排名或教师考核。"
+        ],
+        "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。来源：Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). 本中文为项目工作译稿，非作者认可版本。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:42:00Z",
+            "basis": "AI editorial check: adult self-description, correct source identity, no universal cutoffs or objective ability claims; not human expert review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "rses10"
+        ],
+        "scoreOrder": [
+          "rses10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "rses10",
+            "headline": "一件事的差评，不是整个人的总评",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：把问题说具体，别把自己缩成一句判词。\n\n数字记录感受，不给价值标价\n\n十题统一方向后合计0–30，越大表示这次更认可积极的自我价值描述。它不是能力分、成功率或“值不值得被喜欢”的价格签；没有中文等级线，也不能诊断心理疾病。题本问总体感受，没有固定一周、一月时窗。\n\n给“我就是不行”多留一点空间\n\n假设一次汇报没讲清，你可以改准备或表达方式；它不需要自动升级成“我这个人不行”。这里是帮助回顾的例子，不是系统已找到你的挫折。认真对待不足和不否定整个人，可以同时做到，也不要求你每时每刻都很自信。\n\n如果已有能把事情与自己分开的办法，可以继续用；如果正很难这样看，也不用再责怪自己“连自我接纳都做不好”。生活经历、关系和比较都可能有影响，问卷没查明你的原因，更没有替你写好未来。\n\n下面不是每日夸夸清单。挑一个能让问题具体一点的入口即可，别把自尊变成另一项必须达标的作业。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先拆开“事情”和“判词”：写一件真实发生的事，再看看自己有没有把它扩成“总是”“全都”“我就是”。这不是辩论，暂时改不了看法也可以，只先把两者分开摆着。"
+              },
+              {
+                "category": "strategy",
+                "text": "把总评改成一个小问题：从“我不行”走到“哪一步需要调整、我缺什么帮助”。可以留一条真实的小事实作为参照，不用夸张，也不用为了这份报告现找一个优点。"
+              },
+              {
+                "category": "support",
+                "text": "给难处找一位可靠的听众：愿意时谈一件具体经历，说明希望倾听还是一起想办法。自我否定持续带来痛苦或妨碍生活时，也可以寻求适当专业支持；不必先得到一张“自尊够低”的凭证。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文成人工作稿尚未验证，无通用高低界线；分数描述自我感受，不判定真实价值或诊断疾病。"
+        ],
+        "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。来源：Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). 本中文为项目工作译稿，非作者认可版本。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:56:08Z",
+            "basis": "本次AI文字自审对应rses10_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

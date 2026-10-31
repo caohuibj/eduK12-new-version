@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ffmq15_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "631c16ac07251c04743cac1437836b90b750f3a7aba6adcd1291094feeb5ac0c",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "observe",
+          "describe",
+          "act_aware",
+          "nonjudge",
+          "nonreact"
+        ],
+        "scoreOrder": [
+          "observe",
+          "describe",
+          "act_aware",
+          "nonjudge",
+          "nonreact"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "observe",
+            "headline": "留意身边和身体的感觉",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你平时会不会留意身体感觉、声音或身边的小变化。有人很容易注意到细节，也有人做事时更专注于眼前任务。注意到更多，并不自动表示更放松或更会照顾自己；同样的感觉，在不同处境里也可能有不同意义。可以挑一个中性的声音或触感，短暂留意后，再把注意力带回正在做的事。如果这样做让你不舒服，可以停下来，换一种适合自己的方式。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近你注意到的一个身体感觉或周围变化，是怎样影响你的？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个中性的声音或触感短暂留意，再回到手头的事；不舒服时可以停止。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "describe",
+            "headline": "把感受说出来",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有时候我们知道自己不舒服，却一时说不出是委屈、烦躁还是担心。这部分关注你能否用语言描述自己的体验，不是在考表达水平。感受本来就可能混在一起，也不需要一次说得很准确。你可以先用一个大致的词，再补一句“它让我想做什么”或“身体哪里有感觉”。慢慢找词语，有时能帮助自己和愿意倾听的人更清楚地理解当下。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果只选一个词，你会怎样形容此刻的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "先用一个大致的感受词，再补一句“我现在需要什么”。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "act_aware",
+            "headline": "留意正在做的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "忙碌时，我们可能一边做事，一边想着别的事情，回过神来才发现刚才像在自动运行。这部分关注你是否留意正在做的活动，分心并不等于做事不认真，更不能用来判断一个人的价值。可以选一件熟悉的小事，例如倒水或整理桌面，短暂看清自己正在做哪一步。不需要逼自己一直专注；发现走神时，再温和地回到手头的事就可以。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "今天哪件小事最容易让你一边做、一边想别的事情？"
+              },
+              {
+                "category": "strategy",
+                "text": "做一件熟悉的小事时，只留意当前这一步，发现走神再回来。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonjudge",
+            "headline": "少一点急着评价自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有些时候，难受之后又会冒出一句“我怎么能这样想”或“我不该有这种感觉”。这部分关注你会不会急着评价自己的内心，不是要求你赞同所有想法，也不意味着任何行为都不用负责。出现不喜欢的念头，不等于你这个人不好。可以试着把“我不该这样”换成“我现在确实有这样的感受”，再决定怎样行动。允许看见感受，和选择下一步，是可以分开的。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "当你不喜欢自己的某种感受时，会怎样对自己说话？"
+              },
+              {
+                "category": "strategy",
+                "text": "试着说“我现在有这样的感受”，然后再选择一个合适的小行动。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonreact",
+            "headline": "给想法留一点空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一个令人苦恼的念头出现时，我们有时会马上跟着它走，有时也能稍微停一下，知道“这是一个正在出现的想法”。这部分关注你怎样和想法、画面相处，不是要求把它们赶走或假装没有。可以把念头想成暂时经过的消息：先看见，再决定是否需要回应。若某个想法持续让你很困扰，也可以向信任的人寻求支持，不必独自把一切处理好。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近有什么念头让你很快就跟着它行动了？"
+              },
+              {
+                "category": "strategy",
+                "text": "先给自己一个短暂停顿，再决定要不要回应这个念头。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+          "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+          "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+          "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+          "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+        ],
+        "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+            "reviewedAt": "2026-10-26T05:40:35.708Z",
+            "basis": "Jenny Gu作者2018修订PDF第1页完整15题、第2页Scoring Information；2016上传稿题文一致但短版开发引文有更正；来源研究边界如实记录，technical student audience slot does not imply K12 validation。"
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "observe",
+          "describe",
+          "act_aware",
+          "nonjudge",
+          "nonreact"
+        ],
+        "scoreOrder": [
+          "observe",
+          "describe",
+          "act_aware",
+          "nonjudge",
+          "nonreact"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "observe",
+            "headline": "留意一点，不用给自己装感觉放大器",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：五个小窗口，不是一张正念成绩单。\n\n五个侧面各三题、每项3–15，统一方向后分别看，没有人格或正念总分。题本问平时，没有额外的一周或一月窗口。\n\n观察越大，表示更常说自己留意身体和周围的感觉。比如洗澡时知道水碰到皮肤是什么感觉，不必顺便分析全身，也不保证立刻放松。例子不是系统对你的判断。\n\n留意有用就保留，不舒服也能停，不需要把感受调得更大才算认真。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "只给一个中性触感或周围感觉留一瞬，再回到原事。愿意、安全才试，不舒服就换或停，别把觉察变成硬撑。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "describe",
+            "headline": "给感受一个暂用名，不交作文",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "描述这三题统一计分方向后相加为3–15；越大表示更常觉得能用词语表达感受，不是词汇量成绩。\n\n例如，“有点烦，但还说不清”也比强找一个完美词更贴近当时。这只是例子，不是问卷发现你不会表达。\n\n已有好用的词就继续用；说不明白可以先留问号，也不必把私人的内容公开才算完成。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先起个暂用名，再加一句“我需要……”。找不到也可以停，不用把每种心情写成标准答案。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "act_aware",
+            "headline": "自动运行被看见了，就留个接头",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "觉察行动这三题统一计分方向后相加为3–15，越大表示较少报告分心和自动做事，不是走神更多，也不是注意力等级。\n\n假设忙完才发现刚才没留意过程，可以从一个清楚步骤重新接上。分数没有替你找出是疲惫、干扰还是别的原因。\n\n已有省力安排就保留，不要求从此不拐弯；需要休息或澄清任务时也可以先处理条件。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "给当前一步留一个路标，走神后找到能继续的位置。不是全天监控自己的任务，也不靠责备把注意力拉回来。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonjudge",
+            "headline": "感受来了，不必再补一张自责单",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "不评判这三题统一计分方向后相加为3–15；越大表示较少说自己不该这样想、不该有某种情绪。不是“什么都对”的通行证。\n\n比如生气后又批评自己不该生气，可以先分清感受与行为。这是例子，不是系统替你安排了一种情绪。\n\n承认心情和不做伤害性的事可以同时存在，不需要先把内心改成好看的样子。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "少加一句判词：先说“我确实有这个感受”，再决定合适的下一步。该补救就补救，不用顺手把整个人判成不好。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonreact",
+            "headline": "念头不是每条都要秒回的消息",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "不反应三题和分3–15，越大表示更常报告能看见困扰念头、留点空间，不马上跟着它走。不是把感受静音，也不保证念头消失。\n\n例如想反复解释一句话时，可以先看有没有真正需要补充的信息。这里只是回顾场景，不是问卷指认的习惯。\n\n有用的停顿继续用；觉得难时可以找支持，不必独自应付所有消息。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "在安全且不误必要行动时，先看见、再选择是否回应。越停越难受时换个办法或求助，不把“放过念头”变成对自己的新命令。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "每侧面仅3题，来源样本有限，本中文尚未验证；五项不排能力强弱，也不判断练习疗效。"
+        ],
+        "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:18:04Z",
+            "basis": "本次AI文字自审对应ffmq15_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

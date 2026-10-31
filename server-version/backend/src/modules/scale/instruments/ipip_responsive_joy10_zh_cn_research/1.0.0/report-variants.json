@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "43f89eedfe82ca1cf7627cf739a95b499239f11830f87842b0b510b6199ab42b",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "ipip_responsive_joy10"
+        ],
+        "scoreOrder": [
+          "ipip_responsive_joy10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_responsive_joy10",
+            "headline": "共感愉悦：别人的开心会怎样传到你这里",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项关注你在别人开心、庆祝时，是否也感受到愉快。分数越高，表示这次更认可被他人的快乐感染的描述。有的人会一起欢呼，有的人会安静地听完好消息；外在反应与内心感受也未必一样。分数不能判断你是否关心别人，更不代表整体共情或照顾能力。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近有人向你分享好消息时，你心里有什么反应？你怎样让对方知道自己听见了？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次听到好消息，可以问一句：“哪一部分让你最开心？”给对方一点继续分享的空间，不需要勉强自己表现出同样强烈的情绪。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+          "目前没有可靠依据划分高低或排名；结果不代表整体共情、善良程度或照顾他人的能力。",
+          "题目中的生日聚会、儿童礼物等情境，可能受生活经历和文化背景影响。原英文研究的数据也不能当作中文版本已经验证的证明。",
+          "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。共感愉悦不是整体共情、善良程度或教师/亲职能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:41:00Z",
+            "basis": "AI editorial check: adult descriptive self-report, no ability/character diagnosis or unsupported norm transfer; not human expert translation review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "ipip_responsive_joy10"
+        ],
+        "scoreOrder": [
+          "ipip_responsive_joy10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_responsive_joy10",
+            "headline": "别人的开心，不是你的表情考试",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：可以真诚祝福，也可以保留自己的心情。\n\n数字说的是“会不会被带动”，不是“够不够好”\n\n十题统一方向后合计10–50，越大表示这次更认可自己会受他人的笑声、好心情或庆祝气氛感染。它不是快乐库存，也不是共情能力或善良排名；没有可用的中文等级线，题本也没有固定一周、一月的窗口。\n\n听到好消息，不只有欢呼一种回应\n\n假设朋友讲一件盼了很久的好事，你可以笑着听，也可以认真问一句后来怎样。这个例子没有替你推断真实表现，外表安静也不等于心里没在意。题目里的生日聚会或礼物场景还可能与你的经历不贴近，不必从活动偏好跳到品格判断。\n\n如果分享方式让双方自在，可以继续用。如果你自己正难受，也不用为了“别扫兴”立刻改成开心模式。承认对方的好消息和承认自己的心情可以并存。\n\n下面三个入口不用全开。真诚而不勉强，比交一张标准开心脸更贴近日常相处。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先看见自己的真实反应：回顾一次分享好消息的经历，记下心里感受和实际回应。它们不必一样热闹，也不需要拿来证明自己是不是关心别人。"
+              },
+              {
+                "category": "strategy",
+                "text": "把“恭喜”接上一句具体的问题：愿意时问对方哪一段最开心，或回应你确实听见的一个细节。不是为了让自己也兴奋，而是给对方一个可以继续说、也可以停下的空间。"
+              },
+              {
+                "category": "environment",
+                "text": "给分享选个舒服的场景：消息、短聊或活动都可以，按双方意愿和条件来。疲惫或不想参加时说明自己的界限，不把生日聚会喜好变成关心程度测验。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "独立中文成人工作稿尚未验证，场景受经历与文化影响；不分等级，也不代表整体共情或品格。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。共感愉悦不是整体共情、善良程度或教师/亲职能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:56:08Z",
+            "basis": "本次AI文字自审对应ipip_responsive_joy10_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

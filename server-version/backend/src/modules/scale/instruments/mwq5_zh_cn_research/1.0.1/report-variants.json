@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "mwq5_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "0d2ec9bd126f179ed522e0f24853c04a47473dade3bd88ae9e3cabe622bbc3e6",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "mind_wandering"
+        ],
+        "scoreOrder": [
+          "mind_wandering"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "看看注意力什么时候悄悄拐了弯",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+          "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+          "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+          "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。"
+        ],
+        "disclaimer": "仅供成人研究与非诊断自我了解；中文研究译稿尚待验证，不用于心理诊断、学生筛选或能力排名。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:31:00Z",
+            "basis": "AI editorial review: adult descriptive self-report, source adolescent evidence not Chinese validation, no ADHD inference; not human expert review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "mind_wandering"
+        ],
+        "scoreOrder": [
+          "mind_wandering"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "思绪拐了弯，给任务留一个回来点",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：发现走神，不是宣布失败；先知道下一步从哪儿接上。\n\n这不是“专注力电量表”\n\n五题把你对平时走神频率的回答取平均，范围1–6。越大表示这次整体报告简单工作、阅读或听讲中的这些情况更常发生；不是走神分钟数、今天的表现或意志力评分。题本没有固定一周、一月窗口，这里也不加一个；更不会拿它作ADHD筛查或给你贴“注意力差”的标签。\n\n眼睛翻页了，思绪可能去了别处\n\n假设读完一段，才发现脑中一直在安排另一件事。回头重读可以是一个重新接上的动作，而不是“我就是不行”的证据。这个例子不代表系统已知道你在阅读时走神最多，五题均分也不能告诉你具体原因。\n\n如果你已有一个回来办法，可以继续保留。如果总是很难接上，可以看看任务是否太大、是否疲惫、有无一直挂心的事，或环境里有什么打扰。它们是可核对的线索，不是问卷给你的诊断；现实条件不合适时，也需要支持，不是只靠提醒自己“专心一点”。\n\n下面三步不用全做。先给任务留一个接头位置，比要求大脑从不拐弯更具体。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给拐弯处留个小路标：只回顾一次，写“在做什么—在哪里发现—当时有什么条件”。不用全天盯着自己，也不用把每个念头登记成一次失误。"
+              },
+              {
+                "category": "strategy",
+                "text": "给当前任务存个“续点”：开始前写清这一小步的终点，如读一段后用一句话复述。发现走神时，先找到续点；若方便，再把挂心事项记一句留待稍后。不必把脑子变成空白，才允许自己继续。"
+              },
+              {
+                "category": "environment",
+                "text": "先移开一块真障碍：能减少的打扰减少一点，要求不清就问清，累了且条件允许就休息。办法没帮助可以换；若困难持续影响生活，也可以寻求适当专业帮助，不用在一个走神分数里自己找诊断答案。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本独立中文成人工作稿尚未验证，无等级或排名；走神自述不是ADHD筛查、能力或意志力评价。"
+        ],
+        "disclaimer": "MWQ：Mrazek 等（2013），CC BY 3.0（https://creativecommons.org/licenses/by/3.0/）。本中文翻译与反馈为独立改编，非作者背书；仅供成人研究与非诊断自我了解。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T15:34:00Z",
+            "basis": "本次AI文字自审对应mwq5_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

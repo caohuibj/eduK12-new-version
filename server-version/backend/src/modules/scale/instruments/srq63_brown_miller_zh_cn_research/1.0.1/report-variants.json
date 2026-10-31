@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "srq63_brown_miller_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "8237111373fbaa9ba2a03d59eb19e9d579450ca7d6a5afb19b16ec4e8b813d7a",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "self_regulation_total"
+        ],
+        "scoreOrder": [
+          "self_regulation_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "self_regulation_total",
+            "headline": "把想法一步步变成行动",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注您如何发现问题、制定计划、执行并回看效果。它像一张行动路线的草图，不是给意志力贴标签。总分越高，通常表示您在回答中报告了更多有助于推进和调整行动的做法。阅读结果时，更值得留意的是最近哪个环节顺手、哪个环节容易卡住；本工作译本不据此判断您处于什么等级。例如，想完成一个学习或工作任务时，有人卡在开始，有人容易被打断，也有人做完后忘了回看方法是否有效。相似的结果，可能对应完全不同的日常情境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选一件最近想推进的小事：最难的是定目标、开始行动，还是中途调整？哪些环境和帮助让它容易一点？"
+              },
+              {
+                "category": "strategy",
+                "text": "把下一步缩小到今天能完成的一件具体小事，约定一个回看的时间。若没有完成，先看看哪里需要调整，不必急着责怪自己。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "由专业人员在研究或交流中使用。本中文为独立工作译稿，尚未验证；结果不用于诊断、临床决策、学生筛选或评价个人品德。",
+          "原作者不建议用这份问卷作临床决策；七个理论环节不分别输出能力等级。",
+          "原文试探性分段存在边界遗漏且来自英文临床/大学样本，不移作本中文分界或人群排名。",
+          "63题均需完整作答，漏答不补零、不推测；完整作答规则为项目保守实现。"
+        ],
+        "disclaimer": "由专业人员组织成人研究及结果交流；中文工作译稿未经验证，不用于心理诊断、临床决策、学生筛选或个人品德评价。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:29:00Z",
+            "basis": "AI editorial check: professional adult research, no seven-subscale or threshold inference, not expert translation review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "self_regulation_total"
+        ],
+        "scoreOrder": [
+          "self_regulation_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "self_regulation_total",
+            "headline": "给行动画条可走的路，不发自律奖惩单",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：路线需要调整和支持，不需要把自己判成“没毅力的人”。\n\n本版63题统一方向后求和63–315，越大表示整体更认同推进、组织与调整行动的相关自述，不是任务完成率或意志力等级。一般倾向没有固定几天窗口，也没有中文达标线。\n\n比如，计划写好了却被现实不断打断，和已经行动但需要换方法，可以得到相近数字。这只是两个场景，不是系统读出你卡在开始还是坚持。七个理论环节没有七张成绩单，不能从一个总分自动展开成七种强弱。\n\n好用的安排留下，走不通时也允许换路、减量或请帮手。时间、健康、环境、任务和支持不全由个人决定，不需要把每次受阻都变成一场毅力审判。报告可以在专业组织的研究交流中帮助提问，但不会替你决定病因、价值或该不该继续某个目标；生活不必为了让数字变大而更难过。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "只挑一件愿意推进的小事，写三句：想去哪里、眼下堵在哪、缺什么条件。不把它做成人格检讨，也不假装报告已经定位了某个理论阶段。"
+              },
+              {
+                "category": "strategy",
+                "text": "给下一步留一格现实空间：一个小动作，加上所需信息、时间或帮助。空间不够先调整条件，不把计划表越排越满当成努力证明。"
+              },
+              {
+                "category": "support",
+                "text": "到合适时机看看这条路是否真能走，再决定保留、改动或找人协助。没走完也可以重新选，不用拿总分给自己罚站，更不据此自诊或代替专业判断。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅限专业人员组织成人研究交流，本独立中文稿未验证；仅总分、不出七维等级，不作诊断、临床或品德判断。"
+        ],
+        "disclaimer": "由专业人员组织成人研究及结果交流；中文工作译稿未经验证，不用于心理诊断、临床决策、学生筛选或个人品德评价。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:52:24Z",
+            "basis": "本次AI文字自审对应srq63_brown_miller_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}
