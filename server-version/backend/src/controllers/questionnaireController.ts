@@ -1757,6 +1757,7 @@ export const questionnaireController = {
       if (!(await canManageCourseQuestionnaire(req, questionnaire))) return forbidden(res, '无权限查看此问卷')
 
       const units = await formSectionService.listQuestionnaireContentUnits(id)
+      if (req.query?.projection === 'units') return success(res, { units })
 
       // 并行获取表单题目和量表
       const [formItems, scales] = await Promise.all([
