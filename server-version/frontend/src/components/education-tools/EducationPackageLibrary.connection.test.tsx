@@ -40,7 +40,7 @@ it('connects an exact whole package to existing registration while retaining ori
  expect(screen.getByLabelText('精确报告 R')).toHaveValue('report');expect(screen.getByLabelText('精确报告 R')).toBeDisabled()
  // Dirty preparation does not reset the package or trigger a new catalog read.
  expect(api.mock.calls.filter(call=>call[0]===base)).toHaveLength(1)
- expect(screen.getByRole('button',{name:'搜索'})).toBeDisabled()
+ expect(screen.getByRole('button',{name:'检索'})).toBeDisabled()
  fireEvent.change(screen.getByLabelText('本人披露'),{target:{value:'INDIVIDUAL_SUMMARY'}})
  fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'IMMEDIATE'}})
  fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}))

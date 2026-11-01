@@ -1,4 +1,7 @@
 import { ScaleLibraryError } from '../modules/scale-library-governance/contracts'
+import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryJoin,discoverySqlFilter} from '../modules/survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../modules/scale/library/catalog-discovery'
+import {Prisma} from '@prisma/client'
 import {canReadLibraryScale} from '../modules/scale-library-governance/readers'
 import { setScalePublicDelivery } from '../modules/scale/scale-public-delivery'
 import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
@@ -148,26 +151,29 @@ export const scaleController = {
         extra.status = status as string
       }
 
-      const where = await scaleWhereForViewer(userId as string, userRole as UserRole, extra)
-
       // Opt-in directory DTO; default authoring/list clients retain their full
       // contract. Resolve current visibility above for both paths, unchanged.
       if (req.query.view === 'training-catalog') {
-        const [list, total] = await Promise.all([
-          prisma.scale.findMany({
-            where,
-            select: {
-              id: true, name: true, code: true, instrumentVersion: true,
-              instrumentClass: true, libraryEntryId: true, status: true, description: true,
-            },
-            orderBy: { createdAt: 'desc' },
-            skip: pagination.skip,
-            take: pagination.take,
-          }),
-          prisma.scale.count({ where }),
-        ])
-        return success(res, buildPaginatedResult(list, total, pagination))
+        const filters=z.object(catalogDiscoveryQueryFields).parse(req.query)
+        const visibility=await scaleWhereForViewer(userId as string,userRole as UserRole,{},'sql')
+        const records=catalogDiscoveryRecords()
+        const [result]=await prisma.$queryRaw<Array<{total:number;facetTags:CatalogClassificationTag[];list:Array<{id:string;name:string;code:string;instrumentVersion:string;instrumentClass:string;libraryEntryId:string|null;status:string;description:string|null;tags:string[];classificationTags:CatalogClassificationTag[]}>}>>(Prisma.sql`
+          WITH visible AS MATERIALIZED (
+            SELECT s.id,s.name,s.code,s.instrument_version AS "instrumentVersion",s.instrument_class::text AS "instrumentClass",s.library_entry_id AS "libraryEntryId",
+              s.status::text AS status,s.description,COALESCE(s.tags,ARRAY[]::text[]) AS tags,discovery.tags AS "classificationTags",discovery.ids,discovery.terms,s.created_at
+            FROM scales s ${standardDiscoveryMetadataJoin(Prisma.sql`s.code`,Prisma.sql`s.instrument_version`)} ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(s.tags)`)}
+            WHERE ${visibility}
+              ${status&&status!=='all'?Prisma.sql`AND s.status::text=${String(status)}`:Prisma.empty}
+              ${courseId?Prisma.sql`AND EXISTS(SELECT 1 FROM course_scales cs WHERE cs.scale_id=s.id AND cs.course_id=${String(courseId)})`:Prisma.empty}
+          ) , matches AS (SELECT v.* FROM visible v CROSS JOIN LATERAL (SELECT v.ids,v.terms) discovery
+            WHERE ${discoverySqlFilter([Prisma.sql`v.name`,Prisma.sql`v.code`,Prisma.sql`v.description`,Prisma.sql`v."instrumentVersion"`],filters)})
+          SELECT (SELECT count(*)::int FROM matches) AS total,
+            COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM visible CROSS JOIN LATERAL jsonb_array_elements("classificationTags") tag),'[]'::jsonb) AS "facetTags",
+            COALESCE((SELECT jsonb_agg(page) FROM (SELECT id,name,code,"instrumentVersion","instrumentClass","libraryEntryId",status,description,tags,"classificationTags"
+              FROM matches ORDER BY created_at DESC,id LIMIT ${pagination.take} OFFSET ${pagination.skip}) page),'[]'::jsonb) AS list`)
+        return success(res,{...buildPaginatedResult(result.list,result.total,pagination),tagFacets:catalogTagFacets([result.facetTags])})
       }
+      const where=await scaleWhereForViewer(userId as string,userRole as UserRole,extra)
 
       // 并行查询量表列表和总数
       const [scales, total] = await Promise.all([
@@ -219,6 +225,7 @@ export const scaleController = {
       const result = buildPaginatedResult(withSource, total, pagination)
       return success(res, result)
     } catch (err) {
+      if(err instanceof z.ZodError)return error(res,'检索条件无效',-1,400)
       logger.error('获取量表列表错误', err)
       return error(res, '获取量表列表失败')
     }

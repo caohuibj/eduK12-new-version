@@ -9,6 +9,9 @@ on:
       cognitive_product_plan:
         type: string
         default: ''
+      catalog_discovery:
+        type: boolean
+        default: false
       survey_selection:
         type: boolean
         default: false
@@ -142,6 +145,7 @@ jobs:
           COGNITIVE_PRODUCT: ${{ inputs.cognitive_product }}
           FRONTEND_ONLY: ${{ inputs.frontend_only }}
           BACKEND_ONLY: ${{ inputs.backend_only }}
+          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery }}
         run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
       - name: verify production Nginx static asset MIME and security headers
         if: inputs.backend_only != true

@@ -78,9 +78,7 @@ COPY scripts/check-scale-source-qualification.ts ./scripts/check-scale-source-qu
 COPY scripts/generate-situational-instruments.mjs ./scripts/generate-situational-instruments.mjs
 COPY src ./src
 COPY assets ./assets
-ARG COGNITIVE_PRODUCT_BUILD=false
-# The directed product job already checks Cognitive manifests and dependencies.
-RUN if [ "$COGNITIVE_PRODUCT_BUILD" = true ]; then npx tsc; else npm run build; fi
+RUN npm run build
 
 # Prune development-only tooling before transferring dependencies into the
 # long-running image.  This keeps the runtime copy small and avoids a costly
