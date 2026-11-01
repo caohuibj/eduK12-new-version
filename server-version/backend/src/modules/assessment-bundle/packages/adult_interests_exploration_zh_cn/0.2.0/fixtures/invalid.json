@@ -1,0 +1,71 @@
+{
+  "values": {
+    "orvis.leadership": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.organization": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.altruism": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.creativity": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.analysis": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.production": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.adventure": {
+      "state": "present",
+      "value": 2
+    },
+    "orvis.erudition": {
+      "state": "present",
+      "value": 2
+    },
+    "nfc.need_for_cognition": {
+      "state": "invalid"
+    },
+    "context.birth_year_month": {
+      "state": "present",
+      "value": "1990-01"
+    }
+  },
+  "expectedRuleIds": [
+    "interest_01_leadership",
+    "interest_02_organization",
+    "interest_03_altruism",
+    "interest_04_creativity",
+    "interest_05_analysis",
+    "interest_06_production",
+    "interest_07_adventure",
+    "interest_08_erudition",
+    "exploration_plan",
+    "theme_subdued",
+    "state_invalid"
+  ],
+  "expectedKind": "COMPUTED",
+  "expectedDerived": {
+    "maxSets": {
+      "interest_max": [
+        "orvis.leadership",
+        "orvis.organization",
+        "orvis.altruism",
+        "orvis.creativity",
+        "orvis.analysis",
+        "orvis.production",
+        "orvis.adventure",
+        "orvis.erudition"
+      ]
+    }
+  }
+}

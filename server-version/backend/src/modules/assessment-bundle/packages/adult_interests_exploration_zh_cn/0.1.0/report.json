@@ -1,0 +1,170 @@
+{
+  "key": "adult_interests_exploration_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "continuous_scores",
+      "kind": "evidence",
+      "title": "本次连续结果：兴趣八域为1–5均分；认知需求为10–50总分",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "interest_leadership",
+      "kind": "conclusions",
+      "title": "1. 带领与影响（12题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_01_leadership"
+      ]
+    },
+    {
+      "blockId": "interest_organization",
+      "kind": "conclusions",
+      "title": "2. 组织与安排（13题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_02_organization"
+      ]
+    },
+    {
+      "blockId": "interest_altruism",
+      "kind": "conclusions",
+      "title": "3. 助人与照顾（13题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_03_altruism"
+      ]
+    },
+    {
+      "blockId": "interest_creativity",
+      "kind": "conclusions",
+      "title": "4. 艺术与创作（14题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_04_creativity"
+      ]
+    },
+    {
+      "blockId": "interest_analysis",
+      "kind": "conclusions",
+      "title": "5. 分析与探究（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_05_analysis"
+      ]
+    },
+    {
+      "blockId": "interest_production",
+      "kind": "conclusions",
+      "title": "6. 动手与自然（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_06_production"
+      ]
+    },
+    {
+      "blockId": "interest_adventure",
+      "kind": "conclusions",
+      "title": "7. 运动与冒险（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_07_adventure"
+      ]
+    },
+    {
+      "blockId": "interest_erudition",
+      "kind": "conclusions",
+      "title": "8. 语言与阅读（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_08_erudition"
+      ]
+    },
+    {
+      "blockId": "exploration_style",
+      "kind": "conclusions",
+      "title": "探索方式：把思考倾向作为独立参考",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "nfc_exploration"
+      ]
+    },
+    {
+      "blockId": "exploration_themes",
+      "kind": "conclusions",
+      "title": "可选的探索提示",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "theme_broad",
+        "theme_subdued"
+      ]
+    },
+    {
+      "blockId": "next_steps",
+      "kind": "conclusions",
+      "title": "选两条方向做一次小尝试",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "exploration_plan"
+      ]
+    },
+    {
+      "blockId": "limitations",
+      "kind": "limitations",
+      "title": "结果范围与待补信息",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "state_missing",
+        "state_invalid",
+        "state_not_applicable",
+        "state_out_of_range"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "部分结果缺失；独立结果可保留，不补零或推断缺失部分。",
+    "limited": "部分结果质量有限；只保留质量允许的独立解释。",
+    "unavailable": "当前没有足够可解释的结果；不生成画像或以零分代替。"
+  }
+}
