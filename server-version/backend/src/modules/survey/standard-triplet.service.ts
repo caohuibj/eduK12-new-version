@@ -86,12 +86,13 @@ export async function standardTripletDetail(actor:string,key:string,version:stri
  const available=await partsFor(prisma,key)
  const history=await prisma.$queryRaw<StandardRelease[]>`SELECT * FROM survey_standard_releases WHERE tool_key=${key} ORDER BY created_at DESC LIMIT 50`
  const registered=sourceParts(key,version),stored=history.find(r=>r.snapshot.instrumentVersion===version)
- const defaults=registered.length?registered:stored?Object.values(stored.snapshot.parts):[]
+ // Historical details use the approved snapshot; a new preview checks current sources.
+ const defaults=stored?Object.values(stored.snapshot.parts):registered
  const selection=Object.fromEntries(defaults.map(p=>[p.axis,p.hash])) as Omit<Selection,'toolKey'>
  const trials=history.length?await prisma.$queryRaw(Prisma.sql`SELECT release_id AS "releaseId",run_id AS "runId",case_index AS "caseIndex",record_hash AS "recordHash",created_at AS "createdAt",scores,report FROM survey_standard_trials WHERE release_id IN (${Prisma.join(history.map(r=>r.id))}) ORDER BY created_at DESC LIMIT 150`):[]
  const measurements=await getContentReleaseBatch(prisma,history.flatMap(r=>r.measurement_release?[r.measurement_release.releaseId]:[]))
  const versionMappings=history.map(r=>describeStandardCombination(r,r.measurement_release?measurements.get(r.measurement_release.releaseId)??null:null))
- return {available,selection:{toolKey:key,...selection},history:history.map(r=>({...stateView(r),reference:r.reference})),versionMappings,trials,reference:defaults.length===3?(await previewStandardTriplet(prisma,actor,{toolKey:key,...selection})).reference:defaults[0]?.reference??null}
+ return {available,selection:{toolKey:key,...selection},history:history.map(r=>({...stateView(r),reference:r.reference})),versionMappings,trials,reference:stored?stored.reference:defaults.length===3?(await previewStandardTriplet(prisma,actor,{toolKey:key,...selection})).reference:defaults[0]?.reference??null}
 }
 
 async function audit(db:Prisma.TransactionClient,actor:string,action:string,metadata:object){await db.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action,metadata:metadata as Prisma.InputJsonValue}})}
