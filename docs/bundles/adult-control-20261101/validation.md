@@ -44,3 +44,23 @@ BUNDLE_CONTENT_BASE_SHA=24061f5e349d1f8df34b0ed5dd99a33e3014da8c node node_modul
 只交付 Draft 候选，提交带 `[skip ci]`，不主动启动资格 CI、转 Ready 或合并。原因来自已读取的仓库 AGENTS/CI 清单：真正激活前由主对话 dot 核对精确候选及未跑范围。该标记不构成任何 merge-ready 资格；后续如推进需按原流程独立复核并正常激活缺失门禁。无需增加审核系统。
 
 本次没有 PostgreSQL/Redis/START-FINAL/报告真实落盘/恢复、真实角色权限 E2E、其他浏览器、认知任务实机计时、全平台编译、SAST、CI 或生产安装/发布/部署。来源与授权附注不阻止本 DRAFT 源码整理。
+
+## 后续共享显示词表增量：TEXI 与 Flanker
+
+在原审阅 head `dd8081a354d40f1149a97d92f00beadd45005f5b` 上只新增五个显示词条和两个定向消费者例；原成人包、Go/No-Go/CPT 七项显示、整数兼容、报告组件及引擎均不修改。该增量与原候选分开审阅，不声称原 head 的有界 GO 自动覆盖新词表。
+
+核对青少年冻结内容提交 `48a8e7cae3fb9797c9a3e4d7ace78057511e3985` 的 evidence-map 与真正 TEXI 自评 source：`working_memory`、`inhibition` 为 9/11 题均分，高分表示报告的困难更多；[官方计分说明](https://chexi.se/onewebmedia/TEXI%20subscales.pdf) 和[官方简体自评来源](https://chexi.se/onewebmedia/Teenage%20Self%20report%20Executive%20Functioning%20Inventory_SimplifiedChinese.pdf) 已交叉核验。没有复制题文或私有覆盖包。
+
+| 显示构念 | 冻结 selector / 单位 | 展示 |
+| --- | --- | --- |
+| texi.working_memory_mean | working_memory / points，aggregation=mean | 1–5 原均分，高分为困难更多，9 题 |
+| texi.inhibition_mean | inhibition / points，aggregation=mean | 1–5 原均分，高分为困难更多，11 题 |
+| flanker.flanker_effect_ms | flankerEffectMs / ms | 不一致减一致条件的正确有效中位反应时差；保留负值，无预设范围轴 |
+| flanker.congruent_accuracy | congruentAccuracy / ratio | 正确有效次数／该条件试次数，原值 0–1，百分比仅为显示换算 |
+| flanker.incongruent_accuracy | incongruentAccuracy / ratio | 正确有效次数／该条件试次数，原值 0–1，百分比仅为显示换算 |
+
+Flanker 另核当前冻结 definitions 与 scorer 实际公式，不凭字段名把值当成 0–100，也不将有符号时差夹到零。所有词条沿用原 sourceKind 配对、缺失/质量与范围保护；TEXI 均分不冒用 ADEXI 合计范围。
+
+新增两个例分别验证原均分/比例/有符号毫秒及 invalid/redacted/missing/out-of-range：初次为 1 PASS / 1 FAIL / 6 filtered，唯一失败是正文与折叠详情都有同一毫秒标签，测试使用了错误的唯一文本查询。只把断言定位到原 ReportMetric 可见标签，未改应用、放宽数值/范围断言；仅失败例复验为 1 PASS / 7 filtered。两例实际成功取不相交并集；[原失败与首个成功](evidence/texi-flanker-initial.json)、[修正例结果](evidence/texi-flanker-fixed.json) 均保留。
+
+前端直接类型闭包 292 文件、0 diagnostics，[原件](evidence/texi-flanker-types.json)；两个变更文件 ESLint 0 errors / 0 warnings。未重跑原六个图表例、后端或包流程；原显示词条/实现字节未变，其原通过证据保留原身份。没有新增浏览器、全 CI、数据库或生产检查；本次只改现有范围组件所消费的词表，不声称新增真实浏览器资格。

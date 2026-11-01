@@ -53,4 +53,32 @@ describe('separate cognitive and questionnaire evidence display', () => {
     expect(screen.queryByRole('img')).toBeNull()
     expect(api.get).not.toHaveBeenCalled(); expect(api.post).not.toHaveBeenCalled()
   })
+  it('uses TEXI 1–5 means and Flanker ratio units, while retaining signed milliseconds without an invented axis', () => {
+    show(report([
+      item('flanker.flanker_effect_ms', -18.5), item('flanker.congruent_accuracy', .95), item('flanker.incongruent_accuracy', .85),
+      item('texi.working_memory_mean', 3.2, 'SCALE_SCORE'), item('texi.inhibition_mean', 2.4, 'SCALE_SCORE'),
+    ]))
+    expect(screen.getByRole('heading', { name: '日常生活中的体验' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /TEXI · 工作记忆.*范围 1 到 5.*本次结果 3.2/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /TEXI · 抑制.*范围 1 到 5.*本次结果 2.4/ })).toBeInTheDocument()
+    expect(screen.getByText(/9 题原始均分，高分表示报告的日常困难更多/)).toBeInTheDocument()
+    expect(screen.getByText(/11 题原始均分，高分表示报告的日常困难更多/)).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /Flanker · 一致条件准确率，范围 0 到 1，本次结果 0.95/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /Flanker · 不一致条件准确率，范围 0 到 1，本次结果 0.85/ })).toBeInTheDocument()
+    expect(screen.getByText('95%')).toBeInTheDocument(); expect(screen.getByText('85%')).toBeInTheDocument()
+    expect(screen.getAllByText('-18.5').length).toBeGreaterThan(0)
+    expect(screen.getByText('Flanker · 干扰效应（ms）', { selector: '.report-metric__label' })).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /干扰效应/ })).toBeNull()
+    expect(screen.queryByText(/原始范围 9–45|原始范围 5–25/)).toBeNull()
+  })
+  it('does not put ADEXI sums on TEXI mean axes or turn unavailable Flanker evidence into zero', () => {
+    show(report([
+      item('texi.working_memory_mean', 23, 'SCALE_SCORE'), item('texi.inhibition_mean', null, 'SCALE_SCORE', 'unavailable', 'missing'),
+      item('flanker.congruent_accuracy', .9, 'COGNITIVE_METRIC', 'invalid'), item('flanker.incongruent_accuracy', .8, 'COGNITIVE_METRIC', 'unavailable', 'redacted'),
+    ], 'limited'))
+    expect(screen.queryByRole('img')).toBeNull()
+    expect(screen.getAllByText('暂无可展示结果').length).toBeGreaterThan(0)
+    expect(screen.queryByText('0%')).toBeNull()
+    expect(screen.getByText(/数值超出原量尺，本次不绘图/)).toBeInTheDocument()
+  })
 })
