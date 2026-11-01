@@ -1,5 +1,5 @@
 import {cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
-import {catalogDiscoveryScope} from './catalog-discovery-scope.mjs';
+import {catalogDiscoveryScope,bundleRuntimeSelectionMatches} from './catalog-discovery-scope.mjs';
 import {cognitiveMixedProductScope, acceptanceFor} from './content-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
@@ -558,7 +558,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
-  if(needs.scope?.outputs?.scenario==='catalog-discovery'){const {changedEntries}=await import('./content-scope.mjs');if(!catalogDiscoveryScope(changedEntries(process.env.CI_BASE_SHA)))failed.push('recomputed-catalog-discovery');}
+  if(needs.scope?.outputs?.scenario==='catalog-discovery'){const {changedEntries}=await import('./content-scope.mjs');const entries=changedEntries(process.env.CI_BASE_SHA);if(!catalogDiscoveryScope(entries))failed.push('recomputed-catalog-discovery');if(!bundleRuntimeSelectionMatches(entries,needs.scope.outputs))failed.push('recomputed-bundle-runtime');}
   if(needs.scope?.outputs?.application_route==='personal-tracking'){try{const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(needs.scope.outputs.personal_tracking_plan);const actual=personalTrackingReadyPlan(changedEntries(process.env.CI_BASE_SHA),process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF,draft,forceFull:process.env.CI_FORCE_FULL==='true'});if(JSON.stringify(p)!==JSON.stringify(actual))failed.push('recomputed-personal-tracking-plan');}catch{failed.push('recomputed-personal-tracking-plan');}}
   if(needs.scope?.outputs?.personal_tracking_draft==='true'){
     try{const {changedEntries}=await import('./content-scope.mjs');if(!personalTrackingDraftScope(changedEntries(process.env.CI_BASE_SHA),{event:process.env.CI_EVENT,draft,forceFull:process.env.CI_FORCE_FULL==='true'}))failed.push('recomputed-personal-tracking-draft');}catch{failed.push('recomputed-personal-tracking-draft');}

@@ -20,7 +20,18 @@ export function bundleFamilyScope(entries){
   && entries.every(e=>(allowed.has(e.file)||/^docs\/(?:bundles\/|bundle-declarative-onboarding\/cognitive-adolescent-20261101\.md$|cognitive-control-child-(?:draft-20261101\.md|validation-20261101\.json)$|child-shared-display-integration\.patch$)/.test(e.file))
    &&e.newMode==='100644'&&(e.status==='A'&&e.oldMode==='000000'||e.status==='M'&&e.oldMode==='100644'));
 }
-export function catalogDiscoveryScope(entries){return catalogSurfaceScope(entries)||bundleFamilyScope(entries);}
+export const bundleRuntimeChecks=JSON.parse(readFileSync(new URL('../config/bundle-runtime-checks.json',import.meta.url)));
+export function bundleRuntimeScope(entries){
+ const allowed=new Set([...bundleRuntimeChecks.sources,...bundleRuntimeChecks.tests,...bundleRuntimeChecks.documents,...bundleRuntimeChecks.controls]);
+ return entries.some(e=>bundleRuntimeChecks.sources.includes(e.file))
+  &&new Set(entries.map(e=>e.file)).size===entries.length
+  &&entries.every(e=>allowed.has(e.file)&&e.newMode==='100644'&&(e.status==='A'&&e.oldMode==='000000'||e.status==='M'&&e.oldMode==='100644'));
+}
+export function bundleRuntimeSelectionMatches(entries,outputs){
+ return (outputs.bundle_runtime||'false')===String(bundleRuntimeScope(entries))
+  &&!(outputs.bundle_runtime==='true'&&outputs.bundle_family==='true');
+}
+export function catalogDiscoveryScope(entries){return catalogSurfaceScope(entries)||bundleFamilyScope(entries)||bundleRuntimeScope(entries);}
 
 // The event can retain the PR's creation-time base while refs/pull/N/merge
 // already uses current main. Select that parent only for this bounded diff.
