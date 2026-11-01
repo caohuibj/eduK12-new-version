@@ -135,7 +135,8 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
 }
 /** Current participant authority is owned by the caller. All core single reports
  * and selected metrics must also be released before their combined explanation. */
-export function savedSurveyNativeFeedback(packages:readonly FrozenGovernedPackage[],result:SurveyComputedFinal,released:ReadonlyMap<string,ReadonlySet<string>>){
+export type SurveyNativeFeedback={importId:string;title:string;status:SurveyNativeReport['status'];factsHash:string|null;profileView:ProfileView|null;derivedView?:DerivedBundleView|null}
+export function savedSurveyNativeFeedback(packages:readonly FrozenGovernedPackage[],result:SurveyComputedFinal,released:ReadonlyMap<string,ReadonlySet<string>>):SurveyNativeFeedback[]{
  return packages.filter(p=>p.nativeBundle).flatMap(p=>{
   const native=p.nativeBundle!,{pack}=nativeProfilePackage(native),saved=result.nativeBundleReports?.find(r=>r.importId===p.importId)
   if(!saved||saved.definitionHash!==native.source.definitionHash||requiresSurveyNativeAdmission(p)&&!readSurveyNativeAdmission(p,result))return []

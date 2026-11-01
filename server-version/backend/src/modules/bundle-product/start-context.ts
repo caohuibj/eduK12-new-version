@@ -74,5 +74,14 @@ export async function loadBundleScaleStartContext(db: PrismaClient | Prisma.Tran
     if (value === undefined || value === null || typeof value === 'string' && !value.trim() || requirement.allowedValues && !requirement.allowedValues.includes(value as string | number | boolean)) invalid('背景信息不满足此量表声明的测量情境')
   }
   if (mapping.birthYearMonthContextKey && (!demographicContext?.birthYearMonth || demographicContext.birthYearMonth !== values[mapping.birthYearMonthContextKey])) invalid('请先通过既有出生年月上下文完成年龄确认')
+  if (mapping.birthYearMonthContextKey) {
+    const population=frozen.bundleSnapshot.bundleDefinition.population
+    if (population.subjectMinAgeYears!==undefined || population.subjectMaxAgeYears!==undefined) {
+      const months=demographicContext?.ageMonthsAtFreeze
+      if (typeof months!=='number' || !Number.isInteger(months) || months<0) invalid('出生年月上下文缺少已冻结的年龄事实')
+      if (population.subjectMinAgeYears!==undefined && months!<population.subjectMinAgeYears*12 ||
+          population.subjectMaxAgeYears!==undefined && months!>=(population.subjectMaxAgeYears+1)*12) invalid('冻结出生年月年龄不符合本测评包的适用范围')
+    }
+  }
   return { assessmentContext: mapping.assessmentContext, facts: contextFacts }
 }

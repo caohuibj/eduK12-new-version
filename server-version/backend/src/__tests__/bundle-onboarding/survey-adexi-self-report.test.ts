@@ -1,6 +1,7 @@
 import {it,expect,vi,beforeAll,afterAll} from 'vitest'
 import path from 'node:path'
-import {loadPackage} from '../../modules/assessment-bundle/onboarding/loader'
+import {runtimePackageFixture} from './runtime-packages.fixture'
+import {prepareSurveyNativeAdmissions} from '../../modules/bundle-product/survey-native-admission'
 import {packageEntry} from '../../modules/assessment-bundle/onboarding/catalog'
 import {freezeBundleProductionDefinition} from '../../modules/bundle-product/definition-provider'
 import {computeSurveyNativeReports,savedSurveyNativeFeedback,surveyNativeSourceReportAudience,surveyNativeFeedbackAudience,type SurveyNativeBundle} from '../../modules/bundle-product/survey-native'
@@ -21,7 +22,7 @@ beforeAll(()=>vi.stubEnv('DATA_ENCRYPTION_KEY','1'.repeat(64)))
 afterAll(()=>vi.unstubAllEnvs())
 
 it('keeps the existing ADEXI SELF release without inventing an R contract or widening report selection',()=>{
- const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/working_memory_everyday_adult_zh_cn/0.1.0'))
+ const pack=runtimePackageFixture('B15',true)
  const definition=getExecutableScalePackage('adexi_v1','2.0.0')!.definition
  const original=canonicalHash(definition)
  expect(definition.respondentType).toBe('participant_self_report')
@@ -41,9 +42,9 @@ it('keeps the existing ADEXI SELF release without inventing an R contract or wid
  expect(surveyNativeSourceReportAudience({...selected,definition:explicit})).toBeNull()
 
  const frozen=freezeBundleProductionDefinition(packageEntry(pack),{frozenAt:'2026-11-01T00:00:00.000Z',sourceReference:'synthetic-adexi-self'})
- const native:SurveyNativeBundle={schemaVersion:1,source:{compositeId:'11111111-1111-4111-8111-111111111111',definitionHash:frozen.contentHash,bindingsHash:'1'.repeat(64),context:[{contextKey:'subject_age_years',slotKey:'context',itemKey:'age'}]},ownerId:'synthetic',definition:frozen,policies:{everyday:policy},reportAudiences:{everyday:surveyNativeSourceReportAudience(selected)}}
+ const native:SurveyNativeBundle={schemaVersion:1,source:{compositeId:'11111111-1111-4111-8111-111111111111',definitionHash:frozen.contentHash,bindingsHash:'1'.repeat(64),context:[{contextKey:'subject_age_years',slotKey:'context',itemKey:'age'},{contextKey:'birth_year_month',slotKey:'context',itemKey:'dob'}]},ownerId:'synthetic',definition:frozen,policies:{everyday:policy},reportAudiences:{everyday:surveyNativeSourceReportAudience(selected)}}
  const unit:any={draftId:'adexi',instrumentKey:'adexi',kind:'SCALE',title:'ADEXI',sourceDigest:canonicalHash(definition),scoringDigest:canonicalHash(definition.scoring),compiledDefinition:definition,displayDefinition:{},sourceProvenance:{reportConfigured:true,reportAudience:'student'},nativeBundleReport:{definitionHash:frozen.contentHash,audience:surveyNativeFeedbackAudience(native,'everyday',definition),policy},participantFeedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['working_memory'],release:'AFTER_FINAL'},measurementRelease:{releaseId:'synthetic-published-measurement'}}
- const result:any={schemaVersion:1,definitionDigest:'synthetic-final',units:[{instrumentKey:'adexi',kind:'SCALE',sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,rawAnswers:{},missing:[],privateScoring:{quality:{status:'interpretable',flags:[]},itemScores:[],scores:[{...definition.scoring.scores.find(s=>s.key==='working_memory'),value:36,status:'calculated',range:{min:9,max:45},expectedItems:[],answeredItems:[],prorated:false}]}},{instrumentKey:'context',kind:'FORM',sourceDigest:'form',scoringDigest:null,rawAnswers:{age:30},missing:[],privateScoring:null}]}
+ const result:any={schemaVersion:1,definitionDigest:'synthetic-final',units:[{instrumentKey:'adexi',kind:'SCALE',sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,rawAnswers:{},missing:[],privateScoring:{quality:{status:'interpretable',flags:[]},itemScores:[],scores:[{...definition.scoring.scores.find(s=>s.key==='working_memory'),value:36,status:'calculated',range:{min:9,max:45},expectedItems:[],answeredItems:[],prorated:false}]}},{instrumentKey:'context',kind:'FORM',sourceDigest:'form',scoringDigest:null,rawAnswers:{age:30,dob:'1996-01'},missing:[],privateScoring:null}]}
  const governed:any={importId:'b15',title:'B15',nativeBundle:native,slots:[{slotKey:'everyday',draftId:'adexi',instrumentKey:'adexi',kind:'SCALE'},{slotKey:'context',draftId:'context',instrumentKey:'context',kind:'FORM'}]}
  const snapshot:any={units:[unit,{draftId:'context',instrumentKey:'context',kind:'FORM',title:'Background',sourceDigest:'form',scoringDigest:null,compiledDefinition:{},displayDefinition:{}}],governedPackages:[governed]}
  // Unchanged task-report bridge uses recorded synthetic metrics, not a scorer.
@@ -61,6 +62,7 @@ it('keeps the existing ADEXI SELF release without inventing an R contract or wid
  }
  // Recorded valid score, not a rerun of the leaf scorer or cognitive tasks.
  expect((rawParticipantFeedback(unit,result.units[0],true) as any).metrics).toMatchObject([{key:'working_memory',value:36}])
+ result.nativeBundleAdmissions=prepareSurveyNativeAdmissions(snapshot.governedPackages,Object.fromEntries(result.units.map((u:any)=>[u.instrumentKey,u.rawAnswers])),new Date('2026-11-01T00:00:00.000Z'),'adexi')
  result.nativeBundleReports=computeSurveyNativeReports(snapshot,result)
  const saved=result.nativeBundleReports[0]
  expect(saved,JSON.stringify(saved)).toMatchObject({status:'READY',errorCode:null})

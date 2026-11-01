@@ -1,7 +1,7 @@
 import {beforeAll,afterAll,afterEach,it,expect,vi} from 'vitest'
 import path from 'node:path'
 import fs from 'node:fs'
-import {loadPackage} from '../../modules/assessment-bundle/onboarding/loader'
+import {runtimePackageFixture} from './runtime-packages.fixture'
 import {packageEntry} from '../../modules/assessment-bundle/onboarding/catalog'
 import {freezeBundleProductionDefinition} from '../../modules/bundle-product/definition-provider'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
@@ -23,7 +23,7 @@ const startedAt=new Date('2026-11-01T00:00:00.000Z')
 const answers=(result:SurveyComputedFinal)=>Object.fromEntries(result.units.map(u=>[u.instrumentKey,u.rawAnswers]))
 /** Reuse the actual B10 candidate and hand-recorded score facts. No leaf scorer. */
 function fixture(dob='2010-01'){
- const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/adult_bedtime_sleep_zh_cn/0.1.0'))
+ const pack=runtimePackageFixture('B10')
  const definition=freezeBundleProductionDefinition(packageEntry(pack),{frozenAt:'2026-11-01T00:00:00.000Z',sourceReference:'synthetic-native-age'})
  const native:SurveyNativeBundle={schemaVersion:1,source:{compositeId:'00000000-0000-4000-8000-000000000001',definitionHash:definition.contentHash,bindingsHash:'1'.repeat(64),context:definition.contextDefinition!.fields.map(f=>({contextKey:f.contextKey,slotKey:'context',itemKey:f.contextKey}))},ownerId:'synthetic-owner',definition,policies:{},reportAudiences:{}}
  const units:ResearchFrozenPublication['units']=[],results:SurveyComputedFinal['units']=[]
