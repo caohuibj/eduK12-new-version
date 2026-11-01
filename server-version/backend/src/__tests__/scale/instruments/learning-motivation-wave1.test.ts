@@ -26,7 +26,7 @@ describe('learning motivation first wave',()=>{
  })
  it('includes subject learning situations, distinct actions and explicit source limitations',()=>{
   const markers:Record<string,string>={mathematics:'函数',chemistry:'反应式',physics:'电路',biology:'生命过程',english:'单词',chinese:'原文'}
-  for(const s of sources){for(const i of s.executable!.definition.report.interpretations){if(['academic_self_concept','academic_self_efficacy'].includes(i.scoreKey))expect(i.summary).toContain(markers[s.executable!.definition.versionAxes!.subjectKey]);expect(i.summary).not.toMatch(/Value|Cost/);expect(new Set(i.bands.map(b=>JSON.stringify(b.guidance))).size).toBe(5)}}
+  for(const s of sources){for(const i of s.executable!.definition.report.interpretations){if(['academic_self_concept','academic_self_efficacy'].includes(i.scoreKey))expect(i.summary).toContain(markers[s.executable!.definition.versionAxes!.subjectKey]);expect(i.summary).not.toMatch(/Value|Cost/);const expectedBands=s.identity.instrumentKey==='teacher_subject_liking_chemistry_zh_cn'?['very_low','low','high','very_high']:['very_low','low','middle','high','very_high'];expect(i.bands.map(b=>b.key)).toEqual(expectedBands);expect(new Set(i.bands.map(b=>JSON.stringify(b.guidance))).size).toBe(expectedBands.length)}}
   const math=sources.find(s=>s.identity.instrumentKey==='value_cost_mathematics_zh_cn')!;expect(math.catalog.evidence.filter(e=>e.evidenceId.startsWith('cost')).every(e=>e.notes?.includes('cross-loading'))).toBe(true)
   const tutor=sources.find(s=>s.identity.instrumentKey==='tutoring_necessity_chemistry_zh_cn')!;expect(tutor.executable!.definition.source.title).toContain('self-developed')
  })

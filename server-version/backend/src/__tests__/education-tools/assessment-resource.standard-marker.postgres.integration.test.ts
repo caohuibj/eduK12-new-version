@@ -118,6 +118,8 @@ suite('Education exact standard marker real approved source',()=>{
    for(const choice of unit.referencePolicy.choices)await validateTrainingReferenceRelease(tx,{unit,ownerId:author.principal.userId,compositeId:runtime.id,releaseId:choice.releaseId,purpose:'HISTORY',releases})
    await validateTrainingReportPointer(tx,{unit,ownerId:author.principal.userId,compositeId:runtime.id,reportReleaseId:unit.report.releaseId,publication:false,releases})
   })
+  // Continue from this new publication; the first source keeps its revoked use revision.
+  completedResourceId=p.resourceId
  })
  it('continues published exact education target reports through real STANDARD attempt binding for both products',async()=>{
   const resourceId=completedResourceId??process.env.EDUCATION_STANDARD_MARKER_RESOURCE_ID
