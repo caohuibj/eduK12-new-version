@@ -18,3 +18,12 @@ test('actual workflow skips full regression for Form focus and keeps ordinary ba
  assert.equal(selected('form-intake'),false);assert.equal(selected('full'),true);assert.equal(selected('full','catalog-discovery'),false);
  assert.match(text,/name: bounded backend API route and actual job selection contracts\n        if: steps\.scope\.outputs\.backend_focus == 'form-intake'/);
 });
+
+ test('Form image input reuses existing compilation recipe without changing ordinary backend content checks',async()=>{
+ const {readFileSync}=await import('node:fs'),{runInNewContext}=await import('node:vm');
+ const text=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8'),block=text.split('\n  docker:\n')[1].split('\n  codeql:\n')[0];
+ const expression=/^      catalog_discovery: \$\{\{ (.*) \}\}$/m.exec(block)?.[1];assert.ok(expression);
+ const selected=(scenario,backend_focus)=>runInNewContext(expression,{needs:{scope:{outputs:{scenario,backend_focus}}}});
+ assert.equal(selected('backend','form-intake'),true);assert.equal(selected('backend','full'),false);assert.equal(selected('catalog-discovery','full'),true);
+ assert.match(block,/backend_only: \$\{\{ needs\.scope\.outputs\.scenario == 'backend' \}\}/);
+});
