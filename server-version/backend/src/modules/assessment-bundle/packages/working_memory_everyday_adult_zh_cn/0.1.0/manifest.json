@@ -67,7 +67,16 @@
         "respondentType": "SELF",
         "valueSelectors": [
           "working_memory"
-        ]
+        ],
+        "admissionContext": {
+          "assessmentContext": "ADULT_WORKING_MEMORY_SELF_REPORT",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
       }
     ],
     "engine": {

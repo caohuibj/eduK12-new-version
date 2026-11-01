@@ -7,6 +7,11 @@
       "contextKey": "subject_age_years",
       "required": true,
       "valueType": "number"
+    },
+    {
+      "contextKey": "birth_year_month",
+      "required": true,
+      "valueType": "string"
     }
   ]
 }
