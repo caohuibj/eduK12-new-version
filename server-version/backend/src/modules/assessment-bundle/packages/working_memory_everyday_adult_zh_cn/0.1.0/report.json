@@ -5,35 +5,52 @@
   "blocks": [
     {
       "blockId": "spatial",
-      "kind": "conclusions",
+      "kind": "evidence",
       "title": "空间序列｜顺序保持记录",
       "audience": [
         "student"
       ],
       "ruleIds": [
         "spatial_record"
+      ],
+      "rowKeys": [
+        "spatial_n",
+        "spatial_correct",
+        "spatial_ratio",
+        "spatial_span"
       ]
     },
     {
       "blockId": "backward",
-      "kind": "conclusions",
+      "kind": "evidence",
       "title": "倒背数字｜倒序操作记录",
       "audience": [
         "student"
       ],
       "ruleIds": [
         "backward_record"
+      ],
+      "rowKeys": [
+        "backward_levels",
+        "backward_n",
+        "backward_correct",
+        "backward_ratio",
+        "backward_span"
       ]
     },
     {
       "blockId": "everyday",
-      "kind": "conclusions",
+      "kind": "evidence",
       "title": "日常记忆组织｜ADEXI工作记忆合计9–45",
       "audience": [
         "student"
       ],
       "ruleIds": [
         "everyday_record"
+      ],
+      "rowKeys": [
+        "everyday_sum",
+        "everyday_position"
       ]
     },
     {
@@ -47,7 +64,8 @@
         "wm1",
         "wm2",
         "wm3"
-      ]
+      ],
+      "rowKeys": []
     },
     {
       "blockId": "coverage",
@@ -59,12 +77,198 @@
       "ruleIds": [
         "wm4",
         "scope"
-      ]
+      ],
+      "rowKeys": []
     }
   ],
   "states": {
     "missing": "WM4｜证据尚不完整。保留已获准展示的独立结果，不补值或生成跨方法结论。",
     "limited": "WM4｜部分来源只能有限解释。请先阅读可用单项记录，本次不据此形成跨方法结论。",
     "unavailable": "WM4｜当前来源不满足组合解释条件；这不代表能力较低。年龄未知或不在18–100岁时，本版本不适用。"
-  }
+  },
+  "narrativeContent": "BUNDLE_OWNED_SELF",
+  "rows": [
+    {
+      "rowKey": "spatial_n",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "spatial.trials"
+      },
+      "label": "空间序列｜实际正式序列数",
+      "unit": "count",
+      "order": 0,
+      "range": {
+        "min": 0,
+        "max": 12
+      },
+      "timeframe": "本次Corsi顺序回忆标准协议"
+    },
+    {
+      "rowKey": "spatial_correct",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "spatial.correct"
+      },
+      "label": "空间序列｜完全正确序列数",
+      "unit": "count",
+      "order": 1,
+      "range": {
+        "min": 0,
+        "max": 12
+      },
+      "timeframe": "本次Corsi顺序回忆标准协议",
+      "denominatorRef": {
+        "kind": "evidence",
+        "key": "spatial.trials"
+      }
+    },
+    {
+      "rowKey": "spatial_ratio",
+      "valueRef": {
+        "kind": "derived",
+        "key": "spatial.ratio"
+      },
+      "label": "空间序列｜本协议正确率",
+      "unit": "ratio",
+      "order": 2,
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "timeframe": "本次Corsi顺序回忆标准协议",
+      "denominatorRef": {
+        "kind": "evidence",
+        "key": "spatial.trials"
+      }
+    },
+    {
+      "rowKey": "spatial_span",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "spatial.span"
+      },
+      "label": "空间序列｜最大完全正确长度（方块数）",
+      "unit": "count",
+      "order": 3,
+      "range": {
+        "min": 0,
+        "max": 8
+      },
+      "timeframe": "本次完整Corsi标准协议"
+    },
+    {
+      "rowKey": "backward_levels",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "backward.levels"
+      },
+      "label": "倒背数字｜完整完成级数（每级2序列）",
+      "unit": "count",
+      "order": 4,
+      "range": {
+        "min": 0,
+        "max": 6
+      },
+      "timeframe": "本次倒背数字标准协议"
+    },
+    {
+      "rowKey": "backward_n",
+      "valueRef": {
+        "kind": "derived",
+        "key": "backward.trials"
+      },
+      "label": "倒背数字｜实际正式序列数",
+      "unit": "count",
+      "order": 5,
+      "range": {
+        "min": 0,
+        "max": 12
+      },
+      "timeframe": "本次倒背数字标准协议"
+    },
+    {
+      "rowKey": "backward_correct",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "backward.correct"
+      },
+      "label": "倒背数字｜完全正确序列数",
+      "unit": "count",
+      "order": 6,
+      "range": {
+        "min": 0,
+        "max": 12
+      },
+      "timeframe": "本次倒背数字标准协议",
+      "denominatorRef": {
+        "kind": "derived",
+        "key": "backward.trials"
+      }
+    },
+    {
+      "rowKey": "backward_ratio",
+      "valueRef": {
+        "kind": "derived",
+        "key": "backward.ratio"
+      },
+      "label": "倒背数字｜本协议正确率",
+      "unit": "ratio",
+      "order": 7,
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "timeframe": "本次倒背数字标准协议",
+      "denominatorRef": {
+        "kind": "derived",
+        "key": "backward.trials"
+      }
+    },
+    {
+      "rowKey": "backward_span",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "backward.span"
+      },
+      "label": "倒背数字｜最大完全正确长度（数字个数）",
+      "unit": "count",
+      "order": 8,
+      "range": {
+        "min": 0,
+        "max": 7
+      },
+      "timeframe": "本次完整倒背数字标准协议"
+    },
+    {
+      "rowKey": "everyday_sum",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "everyday.wm"
+      },
+      "label": "日常记忆组织｜ADEXI工作记忆九项合计",
+      "unit": "sum",
+      "order": 9,
+      "range": {
+        "min": 9,
+        "max": 45
+      },
+      "timeframe": "近期日常体验；沿用来源指令",
+      "itemCount": 9
+    },
+    {
+      "rowKey": "everyday_position",
+      "valueRef": {
+        "kind": "derived",
+        "key": "everyday.position"
+      },
+      "label": "日常记忆组织｜量尺位置（不是百分位）",
+      "unit": "position",
+      "order": 10,
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "timeframe": "近期日常体验；沿用来源指令"
+    }
+  ]
 }

@@ -38,5 +38,13 @@
     "wm4",
     "scope"
   ],
-  "expectedKind": "COMPUTED"
+  "expectedKind": "COMPUTED",
+  "expectedDerived": {
+    "scalars": {
+      "spatial.ratio": 0.6666666666666666,
+      "backward.trials": 12,
+      "backward.ratio": null,
+      "everyday.position": 0.75
+    }
+  }
 }

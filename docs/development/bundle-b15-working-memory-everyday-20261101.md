@@ -1,99 +1,90 @@
-# B15 工作记忆任务与日常执行：声明草稿交接
+# B15 工作记忆任务与日常执行：schema3 内容交接
 
-本候选是新组合 `working_memory_everyday_adult_zh_cn@0.1.0`，不是旧
-`working_memory_v1` 的优化。开工实际 fetch main 为
-`74423a1c4b40f65c084797434aaa86271594e687`；未修改旧包、源工具或#482报告。
+本候选为新组合 `working_memory_everyday_adult_zh_cn@0.1.0`，不是旧
+`working_memory_v1` 的优化。同一未合并Draft继续开发，本线未执行0.1.0安装或发布；
+不覆盖任何生产冻结、旧报告或源工具。
 
-已真实读取B15独立设计v1.0及共享画像与实施规范v1.0。本版不包含私人来源链接、
-文件标识或创建/修改时间；具体来源核验记录保留在受控对话。
+已真实读取B15独立设计v1.0及共享画像与实施规范v1.0。公开候选不包含私人来源链接、
+文件标识或创建/修改时间；来源核验记录保留在受控对话。
 
-上述设计基线4588不是本次实际main。文档不是专家审核、科学效度、授权、安装或部署证明；
-不复制完整第三方题本或上传原始环境材料。
+## 实际来源与依赖状态
 
-## 已准备的内容与实际边界
+- 原开发基线仍为 `74423a1c4b40f65c084797434aaa86271594e687`，未偷偷改写来源。
+- 本轮fetch main为 `8ae80a2323fddee756f521f9aff126b09f49f548`。
+  #484已经合入integer→number兼容；整数问题不再是待合缺口，本包没有重复实现。
+- schema3 / `declarative-evidence-v1@1.2.0` 来自仍为Draft的共享核心
+  #502，精确head `4379ce8431dc53ac0960ea68dd2ae8f330fc61a7`，
+  开发基线 `fadc877e922773bb92c33cdc955ee68c886be06e`。**没有声称核心已进入main。**
+- 课程context及数值前端接线仍由共享线负责，本轮组合未包含、未验收这些适配。
+  最终generated登记也留给集成人统一完成，不互相覆盖。
 
-11份包内JSON：manifest、evidence-map、rules、report、context、scientific、publication，
-以及valid/missing/invalid/not-applicable四份fixtures。全为DRAFT/EXPERIMENTAL。
-
-| 来源 | 固定绑定 | 只读结果与协议 |
+| 来源 | 固定绑定 | 实际协议与选择 |
 | --- | --- | --- |
-| Corsi | config/engine/scoring/report 1.0.0，standard，referenceMode none | 顺序回忆、startSpan3/maxSpan8、每级2次；本级全错或最大长度停止。trialCount、totalCorrectTrials、maxSpan |
-| 倒背数字 | config/engine/scoring/report 1.0.0，standard，referenceMode none | 完全倒序、startSpan2/maxSpan7、每级2次；本级全错或最大长度停止。completedLevelCount、totalCorrectTrials、maxSpan。seed仍DRAFT |
-| ADEXI | adexi_v1@2.0.0，内容/计分/报告2.0.0，referencePolicy.type none | 实施完整14题；仅working_memory九项SUM9–45参与本包。抑制五项留在原报告，无截题/重复加权 |
+| Corsi | config/engine/scoring/report 1.0.0，standard，referenceMode none | 顺序回忆，startSpan3/maxSpan8，每级2次；本级全错或最大长度停止。读取trialCount、totalCorrectTrials、maxSpan |
+| 倒背数字 | config/engine/scoring/report 1.0.0，standard，referenceMode none | 完全倒序，startSpan2/maxSpan7，每级2次；本级全错或最大长度停止。读取completedLevelCount、totalCorrectTrials、maxSpan；seed仍DRAFT |
+| ADEXI | adexi_v1@2.0.0，内容/计分/报告2.0.0，referencePolicy.type none | 完整14题；仅working_memory九项SUM9–45参与本包，抑制五项留在原报告，不截题或重复加权 |
 
-ADEXI当前本地化版本仍为来源声明的1.0.0，不把referencePolicy none或本地化版本
-冒充运行参数轴。语言为当前中文实现，主体/答者SELF，18–100成人；任务为本次协议，
-问卷沿用来源的“近期日常体验”，不编造具体回顾周数。年龄通过既有FORM/context冻结。
+ADEXI本地化仍为来源声明的1.0.0，不把referencePolicy none或本地化身份当作参数轴。
+成人18–100，主体/答者SELF，中文。任务为本次标准协议；ADEXI沿用“近期日常体验”，
+不编造回顾周数。年龄继续使用既有FORM/context冻结，不另加认证、权限或引擎。
 
-WM1原分≥36、WM2≤18、WM3位于中间，分别等价于w≥.75/w≤.25/中间；
-仍为EXPERIMENTAL日常叙事，不判两任务高低。WM1–3要求核心来源可解释且计数存在。
-WM4保留可用单项，不补值；limited使用既有报告state文本并抑制跨来源规则。
-只做确定性模板，不在线调用LLM、拟合模型或访问真实答卷。
+## 已升级的本包声明
 
-**尚未完成完整B15设计。** 当前只有原始指标映射与三段固定说明，不能把它叫作
-已导入、完整三面板、已发布或生产可用。未编辑generated/packages.json：最终登记与
-生成索引按母节点安排统一完成，不互相覆盖。
+11份JSON，manifest packageSchemaVersion=3、engine=1.2.0，保持DRAFT/EXPERIMENTAL。
+规则、模板及Bundle版本均为尚未安装发布的0.1.0；没有改变叶C/P/R、计分或历史冻结。
 
-## 已确证的共享缺口及最小接线方案
+四个既有核心操作声明：
 
-1. **数值兼容缺陷，当前阻止真实check通过。**
-   `assessment-bundle/onboarding/dependencies.ts:27`直接比较
-   `metric.valueType !== e.valueType`；同目录contract的evidence只允许number/string/boolean，
-   `cognitive/task-primitives.ts:25`却把count/level声明为integer。因此本包六个合法认知
-   selector都被拒绝，单位逐项相符。已只读确认待合共享分支
-   `handoff/cognitive-three-age-public-20261101` 的
-   `eef3e9bd33a394c6fa29e35bdc5719fbe449058f` 正好把integer当作JSON number子类型，
-   保留其他类型及精确单位检查。本包依赖该待合修复，不重复实现，也不改原main基线。
-   临时仅叠加该提交的dependencies.ts一文件运行本包check，退出0；随后已还原，
-   没有复制三年龄功能、提交共享修复或声称该修复已进入main。
+| 派生键 | 既有操作 | 本包定义 |
+| --- | --- | --- |
+| spatial.ratio | RATIO | spatial.correct / spatial.trials |
+| backward.trials | SCALE factor2 | 2 × backward.levels |
+| backward.ratio | RATIO denominatorMultiplier2 | backward.correct / (2 × backward.levels) |
+| everyday.position | RANGE_POSITION DIRECT | (working_memory − 9) / 36 |
 
-2. **派生计数/比例不在现有声明能力中。**
-   `onboarding/contract.ts:41–45`只支持单一selector，`onboarding/engine.ts:46–57`
-   直接读取raw；不能表达Corsi正确数/trialCount，倒背N=2×completedLevelCount及
-   正确数/N，或日常坐标(WM−9)/36。倒背权威scorer确实强制完整每级2试次，
-   `cognitive/scoring/digitbackward.v1.ts:23–25,78`是此N公式的依据。
-   最小方案是在现有证据投影增加有界、显式的同一来源数值派生声明，仅支持乘常数、
-   线性量尺位置和比例；不使用eval、任意函数或新的scorer/引擎。来源selector、
-   denominator selector、系数、单位与精确版本随现有包冻结；只在来源质量有效、
-   计数有限且分母>0时派生，null/invalid不补推，0分子保留0，不能分母取maxSpan。
-   合成8/12、6/(2×6)应为2/3与1/2并保留各自分母，不能解释成跨任务能力差。
-   当前本包没有在selector中伪造派生字段；现有四fixtures也不冒充派生公式已验。
+倒背N公式只用于完整每级2试次的精确1.0.0来源；不从maxSpan或裸原始试次推估。
+两任务比例保留各自分母，不相减、不排名、不相加为工作记忆总分或IQ。
+日常位置不是百分位、常模或能力指数。null、invalid不补推，0分子保留0，0分母不出比例。
 
-3. **报告按证据分组缺少声明接线。**
-   `onboarding/contract.ts:56`的block没有evidenceKeys；
-   `bundle-product/analysis.ts:192–198`对每个evidence块都投影全部非context证据。
-   因此不能仅靠写三个evidence块实现设计要求的三面板。本候选使用三个真实的
-   conclusions块，避免把重复列表假装完成分组。最小方案是给现有block增加可选的
-   既有evidenceKeys筛选并验证引用，analysis按已授权投影筛选，未声明时保持旧行为；
-   数字、单位与分母复用已有报告结构，不另建页面、引擎或权限系统。共享维护方需
-   同时确认当前通用前端的单位/标签呈现；当前草稿未声称此组合展示已验收。
+report用既有rows/rowKeys声明11行和三个互不混入的数字组：空间序列4行、倒背5行、
+日常2行。每组提供标签、单位、时间窗；任务比例带denominatorRef，ADEXI保留SUM、9项、
+范围9–45以及独立量尺位置。最大完全正确长度只来自原scorer，不用既有score比例冒充百分位。
 
-上述方案先交母节点统一选择/维护，不在本包内重写共享运行时。源工具完整，
-不等于新组合所需的表达能力已齐全。倒背seed DRAFT及ADEXI受限再分发许可边界
-仍保留；本包不产生新的公开授权或科学批准。
+WM1原分≥36、WM2≤18、WM3为中间区，分别等价w≥.75/w≤.25/中间；
+WM1–3要求有效核心来源，WM4保留可用独立结果。limited沿既有状态与质量语义处理。
+**不声明双轴theme**：本包是三类互补证据的连续向量，不能为了套类型而造第二轴。
+报告文案为本包原创SELF叙事，沿核心既有数值/解释权限，不开放叶标签、题本或分享。
 
-## 本地定向检查与CI范围
+## 定向证据与准确边界
 
-本包纯JSON+本说明按main已接入的#494内容路线分类：bundle content-light。
-必要项为schema、依赖引用、四fixtures与受影响映射/报告/冻结读取；不运行PG/Redis、
-全后端编译、全产品浏览器、性能或恢复演练。若后续真的修改上述共享代码，应仅增加
-对应类型/单位兼容、派生和报告筛选检查，不把纯内容资格冒用于运行时代码。
+官方Node24.21.0，复用既有依赖。没有改锁文件、源码scorer、共享核心或生成索引。
 
-执行环境官方Node24.21.0；复用既有依赖，无锁文件/安装/生成物变化。
+- 早期main基线的真实check曾因六个integer/number比较失败，原记录保留；
+  后续临时叠加既有整数修复曾退出0。这是历史定位，不是本轮重复测试目标。
+- 本轮隔离组合：main `8ae80a232` + 待合核心 `4379ce843` 的七个运行模块 +
+  本包新JSON。dependencies.ts按两侧共同基线三方合并，保留main整数兼容及核心
+  新schema3检查，合并无冲突。没有把这些模块提交到B15分支或复制三年龄功能。
+- 新声明的 `check <本目录>` 在该组合中退出0，包含四fixtures的新expectedDerived。
+  初次临时组合误用整文件覆盖，撤掉main整数兼容而失败；已定位为组合构造错误，
+  改用三方合并后仅重验此失败检查。不是新的main产品缺陷。
+- 本包新映射/授权DTO五组检查通过：
+  1. 合成Corsi8/12→2/3、倒背6/(2×6)→1/2且N=12、ADEXI WM36→位置.75；
+     三组rowKeys分别4/5/2行，theme=null，无跨任务总分。
+  2. 分母缺失时N与比例缺失，独立正确数和另一任务仍保留，抑制联合叙事。
+  3. 来源invalid时不派生、不生成联合叙事，另一来源不被抹除。
+  4. 0分子保持比例0及真实分母12。
+  5. 0分母保留N=0但比例missing，不伪报零正确率或联合画像。
+- 原14题/WM九项、计分、六个不变叙事阈值条件及共享核心已有测试不重复执行。
+  原来源Blob在开工基线到本轮main之间未变；没有重审题本或重算旧报告。
 
-- 真实 `bundle-onboarding.ts check <本目录>`：**失败**，六个计数的integer/number
-  兼容诊断，原始错误保留；没有声称该main基线或CI通过。
-- 后续临时组合检查：仅叠加待合 `eef3e9bd` 的dependencies.ts，执行同一条
-  `check <本目录>` 退出0，确认其解决全部六个计数阻碍；检查后恢复原文件。
-  该结果只属于此临时组合，不能当作main已修复、整三年龄包通过或B15全部完成。
-- 独立调用现有load/parse及verifyPackageFixtures：四fixtures通过；实际规则边界
-  WM=9/18/19/35/36/45对应WM2/WM2/WM3/WM3/WM1/WM1通过。
-- 通过现有mapDeclarativeEvidence/runDeclarativeEvidence核对原始来源投影、null与
-  真实0区别、invalid来源抑制联合规则；未实现/未测试派生算式。
-- 源定义实查为14题、WM选择9项SUM；所有六个计数的源metric确为integer、unit匹配。
-- 现有freezeBundleProductionDefinition/readFrozenBundleProductionDefinition合成回读通过。
-  这是已有冻结合同的源码检查，不是DB安装/生产报告验收。
-- 未重新审题、改scorer、修改#482、全平台测试、CI激活、签名、导入、授权、发布或部署。
+上述通过属于**隔离的main+待合核心+本包组合**。不是裸main已支持schema3，也不是
+课程FINAL、浏览器三列排版、真实施测、原生设备或生产报告验收。
+数值C适配、课程context接入、最终生成登记和发布状态仍待母节点统一收口；
+本包尚不能声称全入口完成。倒背源DRAFT与ADEXI受限再分发边界不被本包绕过。
 
-原始本地输出与短验证脚本在执行环境保留供母节点核对，不上传环境材料。
-只提交本包和本说明；共享修复与最终登记待集成，Draft不转Ready、不合并。
+## CI与交付
+
+仅本包JSON和本说明仍属Bundle content-light范围，复用#494定向内容检查。
+待合核心/适配须按各自实际代码范围验证，不能借本包纯内容分类降级共享运行时。
+本轮没有启动CI、PG/Redis、全后端编译、全平台/恢复/性能、DB导入、签名、授权或部署。
+原始本地输出和短检查脚本留在执行环境，不上传环境材料。保持Draft，不Ready、不合并。

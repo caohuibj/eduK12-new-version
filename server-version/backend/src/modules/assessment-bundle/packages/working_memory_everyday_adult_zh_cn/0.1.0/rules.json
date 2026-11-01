@@ -55,7 +55,7 @@
         ]
       },
       "kind": "independent_summary",
-      "text": "倒背数字｜这里记录完整完成级数和完全正确序列数。冻结标准协议每级2试次；本草稿尚未显示派生序列总数与正确率，请勿把完成级数当作序列总数。",
+      "text": "倒背数字｜这里按本次完整协议记录倒序回忆结果。每个完整级数包含2个正式序列，序列总数和正确率保留实际分母；它们不能与空间序列的比例直接比较谁更强。",
       "evidenceKeys": [
         "backward.levels",
         "backward.correct"
@@ -461,6 +461,36 @@
         "everyday.wm"
       ],
       "supportRefs": []
+    }
+  ],
+  "derivations": [
+    {
+      "key": "spatial.ratio",
+      "op": "RATIO",
+      "numerator": "spatial.correct",
+      "denominator": "spatial.trials",
+      "denominatorMultiplier": 1
+    },
+    {
+      "key": "backward.trials",
+      "op": "SCALE",
+      "input": "backward.levels",
+      "factor": 2
+    },
+    {
+      "key": "backward.ratio",
+      "op": "RATIO",
+      "numerator": "backward.correct",
+      "denominator": "backward.levels",
+      "denominatorMultiplier": 2
+    },
+    {
+      "key": "everyday.position",
+      "op": "RANGE_POSITION",
+      "input": "everyday.wm",
+      "min": 9,
+      "max": 45,
+      "orientation": "DIRECT"
     }
   ]
 }
