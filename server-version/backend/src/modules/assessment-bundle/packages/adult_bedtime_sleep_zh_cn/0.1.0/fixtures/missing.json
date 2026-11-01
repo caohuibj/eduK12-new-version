@@ -17,5 +17,15 @@
     "missing_core",
     "method_scope"
   ],
-  "expectedKind": "COMPUTED"
+  "expectedKind": "COMPUTED",
+  "expectedDerived": {
+    "scalars": {
+      "b": 0.19444444444444442,
+      "s": null
+    },
+    "theme": {
+      "state": "INSUFFICIENT",
+      "profileId": null
+    }
+  }
 }
