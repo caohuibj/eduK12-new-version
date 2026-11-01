@@ -8,6 +8,8 @@ const change=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
 test('catalog query surfaces remain bounded across entrypoints and reject schema, runtime and dependency changes',()=>{
  const entries=catalogChecks.sources.map(change);
  assert(catalogDiscoveryScope(entries));
+ assert(catalogDiscoveryScope([...entries,{...change('.github/scripts/build-ci-images.sh'),oldMode:'100755',newMode:'100755'}]));
+ assert(!catalogDiscoveryScope([...entries,{...change('.github/scripts/build-ci-images.sh'),oldMode:'000000',newMode:'100755',status:'A'}]));
  assert(!catalogDiscoveryScope([]));
  for(const file of ['server-version/backend/prisma/schema.prisma','server-version/backend/src/modules/survey/runtime.service.ts','server-version/backend/package-lock.json','server-version/frontend/src/modules/cognitive/CognitiveRunner.tsx'])assert(!catalogDiscoveryScope([...entries,change(file)]));
  assert(!catalogDiscoveryScope([{...entries[0],status:'D',newMode:'000000'}]));

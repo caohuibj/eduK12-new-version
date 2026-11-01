@@ -5,6 +5,7 @@ const controls=new Set(['.github/scripts/catalog-discovery-scope.test.mjs','.git
 // Query selection only: no commit/PR identities, new persisted catalog or permission exception.
 export function catalogDiscoveryScope(entries){
  return entries.some(e=>catalogChecks.sources.includes(e.file))&&entries.every(e=>
-  (files.has(e.file)||controls.has(e.file))&&e.newMode==='100644'
-  &&(e.status==='M'&&e.oldMode==='100644'||e.status==='A'&&e.oldMode==='000000'));
+  (files.has(e.file)||controls.has(e.file))&&((e.newMode==='100644'
+  &&(e.status==='M'&&e.oldMode==='100644'||e.status==='A'&&e.oldMode==='000000'))
+  ||e.file==='.github/scripts/build-ci-images.sh'&&e.status==='M'&&e.oldMode==='100755'&&e.newMode==='100755'));
 }
