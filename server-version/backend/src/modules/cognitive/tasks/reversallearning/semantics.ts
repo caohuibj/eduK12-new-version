@@ -46,3 +46,9 @@ export const executionSemantics: CognitiveExecutionSemanticsV1[] = [
     "legacyStatus": "PUBLISHED"
   }
 ]
+
+executionSemantics.push({
+  ...executionSemantics[0],
+  protocol: { ...executionSemantics[0].protocol, key: 'reversallearning/1.1.0/1.0.0', version: '1.1.0' },
+  legacyStatus: 'DRAFT',
+})

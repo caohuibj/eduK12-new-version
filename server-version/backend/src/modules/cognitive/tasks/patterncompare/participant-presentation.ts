@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -251,8 +251,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "correctCount": {
         "label": "正确比较次数",
-        "explanation": "正确比较次数：本次正式计时内完成并判断正确的试次数。",
-        "singleExplanation": "正确比较次数：本次正式计时内完成并判断正确的试次数。"
+        "explanation": "选对且反应用时达到本次有效下限的正式次数；选对但过快的不计入。",
+        "singleExplanation": "选对且反应用时达到本次有效下限的次数。"
       },
       "completedTrialCount": {
         "label": "完成比较次数",
@@ -385,6 +385,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "label": "完成的尝试",
             "explanation": "本次实际完成的正式记录数量。"
           },
+          "correctCount": {
+            "label": "正确有效次数",
+            "explanation": "选对且反应用时达到本次有效下限的正式次数；过快选对不计入。"
+          },
           "lapseRate": {
             "label": "未回应比例",
             "explanation": "未作答比例：正式试次中未在有效时间内作答的比例。"
@@ -419,8 +423,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
           },
           "correctCount": {
-            "definition": "正确比较次数：本次正式计时内完成并判断正确的试次数。",
-            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            "definition": "正式题中选对且rtMs不缺失、达到冻结validRtFloorMs下限的次数。",
+            "readingHint": "过快选对不纳入正确次数，但保留在比例分母中。"
           },
           "completedTrialCount": {
             "definition": "完成比较次数：本次正式计时内进入评分的试次数。",

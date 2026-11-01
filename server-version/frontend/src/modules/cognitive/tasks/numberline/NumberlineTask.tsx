@@ -19,12 +19,13 @@ const positionFromEvent = (event: { clientX: number }, track: HTMLElement | null
   return Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
 }
 
-const NumberlineTrack: React.FC<{
+export const NumberlineTrack: React.FC<{
   lineMax: number
+  showReferenceTicks?: boolean
   onPick: (position: number) => void
   disabled?: boolean
   marker?: { position: number; kind: 'response' | 'target' } | null
-}> = ({ lineMax, onPick, disabled, marker }) => {
+}> = ({ lineMax, onPick, disabled, marker, showReferenceTicks = true }) => {
   const trackRef = useRef<HTMLDivElement>(null)
   const pointerHandledRef = useRef(false)
   const [keyboardPosition, setKeyboardPosition] = useState<number | null>(null)
@@ -49,7 +50,7 @@ const NumberlineTrack: React.FC<{
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault()
       const delta = event.key === 'ArrowLeft' ? -step : step
-      setKeyboardPosition((current) => Math.min(1, Math.max(0, (current ?? 0.5) + delta)))
+      setKeyboardPosition((current) => Math.min(1, Math.max(0, (current ?? (showReferenceTicks ? 0.5 : 0)) + delta)))
       return
     }
     if (event.key === 'Home') { event.preventDefault(); setKeyboardPosition(0); return }
@@ -77,7 +78,7 @@ const NumberlineTrack: React.FC<{
         className="relative h-16 cursor-pointer"
       >
         <div className="absolute left-0 right-0 top-8 h-1.5 rounded bg-gray-300" />
-        {[0, 0.25, 0.5, 0.75, 1].map((tick) => (
+        {(showReferenceTicks ? [0, 0.25, 0.5, 0.75, 1] : [0, 1]).map((tick) => (
           <div key={tick} className="absolute top-6 h-5 w-px bg-gray-400" style={{ left: `calc(${tick * 100}% - 0.5px)` }} />
         ))}
         {shownMarker && (
@@ -88,7 +89,7 @@ const NumberlineTrack: React.FC<{
         )}
       </div>
       <div className="flex justify-between text-sm text-gray-500 mt-1" aria-hidden="true">
-        <span>0</span><span>{Math.round(lineMax / 2)}</span><span>{lineMax}</span>
+        <span>0</span>{showReferenceTicks && <span>{Math.round(lineMax / 2)}</span>}<span>{lineMax}</span>
       </div>
     </div>
   )

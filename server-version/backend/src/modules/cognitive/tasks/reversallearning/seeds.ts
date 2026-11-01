@@ -1,6 +1,6 @@
 import type { CognitiveSeed } from '../../task-seed.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const seeds: CognitiveSeed[] = [
   {
     "testType": "reversallearning",
@@ -38,6 +38,52 @@ export const seeds: CognitiveSeed[] = [
       "rewardProbability": 0.8,
       "trialTimeoutMs": 3000,
       "stimulusSetVersion": "reversal-symbols-v1.0.0",
+      "report": {
+        "reportVersion": "3.0.0",
+        "referenceMode": "none"
+      }
+    }
+  },
+  {
+    "testType": "reversallearning",
+    "configVersion": "1.1.0",
+    "name": "Probabilistic Reversal Project Variant v1.1.0",
+    "status": "DRAFT",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.0",
+    "config": {
+      "totalTrials": 120,
+      "acquisitionTrials": 60,
+      "reversalTrials": 60,
+      "criterionConsecutiveCorrect": 6,
+      "rewardProbability": 0.8,
+      "trialTimeoutMs": 3000,
+      "stimulusSetVersion": "reversal-symbols-v1.0.0",
+      "practiceTrialCount": 4,
+      "practiceAcquisitionOnly": false,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    }
+  },
+  {
+    "testType": "reversallearning",
+    "configVersion": "1.1.0-report3",
+    "name": "Probabilistic Reversal Project Variant v1.1.0 / report 3.0.0",
+    "status": "DRAFT",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.0",
+    "config": {
+      "totalTrials": 120,
+      "acquisitionTrials": 60,
+      "reversalTrials": 60,
+      "criterionConsecutiveCorrect": 6,
+      "rewardProbability": 0.8,
+      "trialTimeoutMs": 3000,
+      "stimulusSetVersion": "reversal-symbols-v1.0.0",
+      "practiceTrialCount": 4,
+      "practiceAcquisitionOnly": false,
       "report": {
         "reportVersion": "3.0.0",
         "referenceMode": "none"

@@ -664,9 +664,12 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "title": "在声音中跟住隔一个的音",
       "introduction": "像听旋律时发现同一个音再次出现，这里只比较隔一个的音。它记录这次音高匹配，不给记忆能力定级。",
       "summary": {
-        "template": "这一次，本次匹配区分指标 d′ 为 {dPrime}。",
+        "template": "这次共有 {matchCount} 次匹配机会与 {nonmatchCount} 次非匹配机会；匹配音的按键比例为 {hitRate}，非匹配音的按键比例为 {falseAlarmRate}。",
         "metricKeys": [
-          "dPrime"
+          "matchCount",
+          "nonmatchCount",
+          "hitRate",
+          "falseAlarmRate"
         ]
       },
       "summaryByProfile": {

@@ -305,10 +305,10 @@
   {
     "group": "R1",
     "task": "reversallearning",
-    "engineVersion": "1.0.0",
+    "engineVersion": "1.1.0",
     "scoringVersion": "1.0.0",
-    "previousConfigVersion": "1.0.0",
-    "configVersion": "1.0.0-report3",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
     "reportVersion": "3.0.0",
     "profiles": {
       "experience": {
@@ -350,10 +350,13 @@
         "configPatch": {
           "totalTrials": 240,
           "acquisitionTrials": 120,
-          "reversalTrials": 120
+          "reversalTrials": 120,
+          "trialTimeoutMs": 2000,
+          "practiceTrialCount": 30,
+          "practiceAcquisitionOnly": true
         },
         "reportCaveats": [
-          "科研版增加固定阶段的试次，仍不等同于人格、决策能力或风险偏好测量。"
+          "研究变式：30题无反转概率练习、2秒响应、500毫秒反馈；仍是固定一次反转，不是Cools 2002三组多次反转协议。"
         ]
       }
     }

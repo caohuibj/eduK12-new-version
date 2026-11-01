@@ -569,7 +569,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "testType": "sentencecheck",
     "engineVersion": "1.1.0",
     "scoringVersion": "1.1.0",
-    "title": "句图验证推理",
+    "title": "句子和图片对一对",
     "metrics": {
       "accuracy": {
         "label": "总体正确率",
@@ -607,7 +607,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "disclaimer": "只描述本次自编句图核对，不作诊断或年龄比较；条件安排与旧版不同，结果不直接比较。",
     "reportReading": {
       "version": "3.0.0",
-      "title": "这句话，和图片对得上吗？",
+      "title": "这句话，说的是眼前的图吗？",
       "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
       "summary": {
         "template": "这一次，你判断对了 {accuracy}；正确判断的典型用时是 {medianRtMs}。",

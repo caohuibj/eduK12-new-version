@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -194,6 +194,215 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           {
             "key": "maxResponseMs",
             "label": "单试次时限（毫秒）"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "1.1.1",
+    "testType": "numberline",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "title": "数字到位置估计（NP数字适配）",
+    "metrics": {
+      "paePercent": {
+        "label": "平均偏离整条线多远",
+        "explanation": "平均绝对误差：你点的位置和正确位置平均差多远，用整条线段长度的比例表示，越小越贴近目标。",
+        "singleExplanation": "平均绝对误差：你点的位置和正确位置平均差多远，用整条线段长度的比例表示。"
+      },
+      "biasPercent": {
+        "label": "整体偏左还是偏右",
+        "explanation": "方向偏差：本次有位置回应的试次中，正值表示平均偏右（偏大），负值表示平均偏左（偏小）；接近 0 也可能是左右偏差互相抵消，要和平均绝对误差一起看。",
+        "singleExplanation": "方向偏差：整体上你倾向于把数点得偏大还是偏小。"
+      },
+      "withinTenRate": {
+        "label": "落在目标附近的比例",
+        "explanation": "十格命中率：有位置回应的试次中，位置误差不超过整条线段长度10%的比例，边界也计入。",
+        "singleExplanation": "十格命中率：有位置回应的试次中，位置误差不超过整条线段长度10%的比例，边界也计入。"
+      },
+      "medianRtMs": {
+        "label": "选定位置的通常用时",
+        "explanation": "作答用时中位数：纳入用时统计的回应中，从出现数字到选定位置所用的典型时间。",
+        "singleExplanation": "作答用时中位数：纳入统计的回应中，从出现数字到选定位置的典型时间。"
+      },
+      "validTrialCount": {
+        "label": "有位置回应的题数"
+      },
+      "timeoutCount": {
+        "label": "超时次数"
+      }
+    },
+    "experienceHeadline": "paePercent",
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {},
+    "practicalTips": [
+      "回看本次回应数量和位置误差；不据六个点给自己贴能力类型标签。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "本项目NP单范围六点数字适配，不是完整NP/PN研究、纸笔25厘米复刻或年龄常模。",
+    "reportReading": {
+      "version": "1.1.1",
+      "title": "这次，数字被放在了哪里？",
+      "introduction": "你这次在一个固定范围内估计六个数字的位置。先看回应数量，再看与目标的平均距离。",
+      "summary": {
+        "template": "这一次，你的点平均偏离目标 {paePercent}；整体方向偏差为 {biasPercent}。",
+        "metricKeys": [
+          "paePercent",
+          "biasPercent"
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次短体验：这次简短体验中，有位置回应的试次平均偏离目标 {paePercent}；试次较少，先把它作为本次记录。 只描述本次记录，不能据此认定稳定能力。",
+          "metricKeys": [
+            "paePercent"
+          ]
+        }
+      },
+      "studentMetricKeys": [
+        "paePercent",
+        "withinTenRate",
+        "biasPercent"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientValidTrials",
+        "excessiveTimeouts"
+      ],
+      "metricGates": {
+        "biasPercent": [
+          "insufficientValidTrials"
+        ]
+      },
+      "nextStep": "结合本次范围、预定作答时限和回应数阅读位置误差；不把六次估计拟合成个人能力类型。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "paePercent",
+          "biasPercent"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "sequence",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "这个任务只观察数字到位置的对应：看到数字，再在线段上点击你估计的位置。",
+        "takeaway": "单范围六点只描述本次估计，不代表稳定数感或同龄排名。",
+        "exampleTitle": "把过程放进一个生活场景",
+        "example": "看温度计刻度或估地图上一段路的位置时，也会用到参照点。这个例子帮助理解数量与位置，不代表任务已经验证了日常数学能力。",
+        "scene": "sequence",
+        "frames": [
+          {
+            "title": "读范围和数字",
+            "text": "确认线段两个端点，再读本题数字。"
+          },
+          {
+            "title": "给出位置",
+            "text": "在预定时间内点击估计的位置。"
+          },
+          {
+            "title": "回看记录",
+            "text": "六次误差和缺失分别保留，不补零。"
+          }
+        ],
+        "boundary": "范围、A/B及4或30秒在配置中冻结；没有中点策略教学、正确位置练习反馈或15%练习门槛。",
+        "metricHelp": {
+          "paePercent": {
+            "label": "平均偏离整条线多远",
+            "explanation": "有位置回应的试次离正确位置的平均距离，占整条线段的比例；越小越贴近目标，超时未回应不计入这个均值。"
+          },
+          "biasPercent": {
+            "label": "整体偏左还是偏右",
+            "explanation": "本次平均偏大还是偏小；左右偏差可能互相抵消，接近0也要结合平均误差阅读。"
+          },
+          "withinTenRate": {
+            "label": "落在目标附近的比例",
+            "explanation": "有位置回应的试次中，误差不超过整条线段10%的比例；不是及格率。"
+          },
+          "medianRtMs": {
+            "label": "选定位置的通常用时",
+            "explanation": "纳入统计的回应中，从出现数字到选定位置的典型用时；请与位置误差一起看。"
+          },
+          "validTrialCount": {
+            "label": "有位置回应的题数",
+            "explanation": "有位置回应的题数"
+          }
+        }
+      },
+      "professional": {
+        "construct": "0-N 数字线上的数值位置估计",
+        "procedure": "依据Siegler & Opfer (2003), DOI 10.1111/1467-9280.02438 Method，冻结0–100或0–1000单范围A/B六个原选点，块内种子洗牌，预定4或30秒。两范围通过既有独立配置安排，不新增混合范围/PN/双session调度。网页无中点/四分位参照刻度，只端点；一题中性点击练习无正确位置反馈。数字界面不声称物理25厘米或时序已校准。",
+        "interpretation": "本次单范围六点描述性记录，不判定线性/对数表征类型；原研究的NP/PN、两session设计未整体复刻。",
+        "confounders": [
+          "设备屏幕宽度、触控或鼠标点击精度会影响位置记录。",
+          "作答中断、超时和有效试次数影响误差估计的稳定性。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或学业成绩预测。",
+          "题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。"
+        ],
+        "metricNotes": {
+          "paePercent": {
+            "definition": "平均绝对误差：仅对有位置回应的试次，计算|估计值 − 目标数|占线段总长比例的均值；估计值 = 回应位置比例 × lineMax，超时未回应不进入分母。",
+            "readingHint": "越低越贴近目标；有效试次不足时谨慎解释。"
+          },
+          "biasPercent": {
+            "definition": "方向偏差：(估计值 − 目标数) 占线段总长比例的均值，正值代表整体右偏。",
+            "readingHint": "有符号量，需与 PAE 同读；不代表每个试次都偏。"
+          },
+          "withinTenRate": {
+            "definition": "估计误差不超过线段长度 10% 的试次比例。",
+            "readingHint": "描述本次任务内的粗略命中率，不是及格线。"
+          },
+          "medianRtMs": {
+            "definition": "有效作答（rtMs ≥ validRtFloorMs）的反应时中位数。",
+            "readingHint": "与 PAE 同读；速度与准确率的权衡会改变解释。"
+          },
+          "validTrialCount": {
+            "definition": "按本次冻结任务定义记录“有效试次数”。",
+            "readingHint": "与计划试次总数对照阅读。"
+          },
+          "timeoutCount": {
+            "definition": "按本次冻结任务定义记录“超时次数”。",
+            "readingHint": "超时过多时误差指标需谨慎解释。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "lineMax",
+            "label": "本次范围右端数值"
+          },
+          {
+            "key": "targetSet",
+            "label": "冻结选点组"
+          },
+          {
+            "key": "maxResponseMs",
+            "label": "预定响应上限（毫秒）"
+          },
+          {
+            "key": "totalTrials",
+            "label": "正式点数"
+          },
+          {
+            "key": "stimulusSetVersion",
+            "label": "数值设置版本"
           }
         ]
       }
@@ -429,6 +638,215 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           {
             "key": "validRtFloorMs",
             "label": "纳入用时统计的最短时间（毫秒）"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "numberline",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "title": "数字到位置估计（NP数字适配）",
+    "metrics": {
+      "paePercent": {
+        "label": "平均偏离整条线多远",
+        "explanation": "平均绝对误差：你点的位置和正确位置平均差多远，用整条线段长度的比例表示，越小越贴近目标。",
+        "singleExplanation": "平均绝对误差：你点的位置和正确位置平均差多远，用整条线段长度的比例表示。"
+      },
+      "biasPercent": {
+        "label": "整体偏左还是偏右",
+        "explanation": "方向偏差：本次有位置回应的试次中，正值表示平均偏右（偏大），负值表示平均偏左（偏小）；接近 0 也可能是左右偏差互相抵消，要和平均绝对误差一起看。",
+        "singleExplanation": "方向偏差：整体上你倾向于把数点得偏大还是偏小。"
+      },
+      "withinTenRate": {
+        "label": "落在目标附近的比例",
+        "explanation": "十格命中率：有位置回应的试次中，位置误差不超过整条线段长度10%的比例，边界也计入。",
+        "singleExplanation": "十格命中率：有位置回应的试次中，位置误差不超过整条线段长度10%的比例，边界也计入。"
+      },
+      "medianRtMs": {
+        "label": "选定位置的通常用时",
+        "explanation": "作答用时中位数：纳入用时统计的回应中，从出现数字到选定位置所用的典型时间。",
+        "singleExplanation": "作答用时中位数：纳入统计的回应中，从出现数字到选定位置的典型时间。"
+      },
+      "validTrialCount": {
+        "label": "有位置回应的题数"
+      },
+      "timeoutCount": {
+        "label": "超时次数"
+      }
+    },
+    "experienceHeadline": "paePercent",
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {},
+    "practicalTips": [
+      "回看本次回应数量和位置误差；不据六个点给自己贴能力类型标签。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "本项目NP单范围六点数字适配，不是完整NP/PN研究、纸笔25厘米复刻或年龄常模。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "这次，数字被放在了哪里？",
+      "introduction": "你这次在一个固定范围内估计六个数字的位置。先看回应数量，再看与目标的平均距离。",
+      "summary": {
+        "template": "这一次，你的点平均偏离目标 {paePercent}；整体方向偏差为 {biasPercent}。",
+        "metricKeys": [
+          "paePercent",
+          "biasPercent"
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次短体验：这次简短体验中，有位置回应的试次平均偏离目标 {paePercent}；试次较少，先把它作为本次记录。 只描述本次记录，不能据此认定稳定能力。",
+          "metricKeys": [
+            "paePercent"
+          ]
+        }
+      },
+      "studentMetricKeys": [
+        "paePercent",
+        "withinTenRate",
+        "biasPercent"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientValidTrials",
+        "excessiveTimeouts"
+      ],
+      "metricGates": {
+        "biasPercent": [
+          "insufficientValidTrials"
+        ]
+      },
+      "nextStep": "结合本次范围、预定作答时限和回应数阅读位置误差；不把六次估计拟合成个人能力类型。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "paePercent",
+          "biasPercent"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "sequence",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "这个任务只观察数字到位置的对应：看到数字，再在线段上点击你估计的位置。",
+        "takeaway": "单范围六点只描述本次估计，不代表稳定数感或同龄排名。",
+        "exampleTitle": "把过程放进一个生活场景",
+        "example": "看温度计刻度或估地图上一段路的位置时，也会用到参照点。这个例子帮助理解数量与位置，不代表任务已经验证了日常数学能力。",
+        "scene": "sequence",
+        "frames": [
+          {
+            "title": "读范围和数字",
+            "text": "确认线段两个端点，再读本题数字。"
+          },
+          {
+            "title": "给出位置",
+            "text": "在预定时间内点击估计的位置。"
+          },
+          {
+            "title": "回看记录",
+            "text": "六次误差和缺失分别保留，不补零。"
+          }
+        ],
+        "boundary": "范围、A/B及4或30秒在配置中冻结；没有中点策略教学、正确位置练习反馈或15%练习门槛。",
+        "metricHelp": {
+          "paePercent": {
+            "label": "平均偏离整条线多远",
+            "explanation": "有位置回应的试次离正确位置的平均距离，占整条线段的比例；越小越贴近目标，超时未回应不计入这个均值。"
+          },
+          "biasPercent": {
+            "label": "整体偏左还是偏右",
+            "explanation": "本次平均偏大还是偏小；左右偏差可能互相抵消，接近0也要结合平均误差阅读。"
+          },
+          "withinTenRate": {
+            "label": "落在目标附近的比例",
+            "explanation": "有位置回应的试次中，误差不超过整条线段10%的比例；不是及格率。"
+          },
+          "medianRtMs": {
+            "label": "选定位置的通常用时",
+            "explanation": "纳入统计的回应中，从出现数字到选定位置的典型用时；请与位置误差一起看。"
+          },
+          "validTrialCount": {
+            "label": "有位置回应的题数",
+            "explanation": "有位置回应的题数"
+          }
+        }
+      },
+      "professional": {
+        "construct": "0-N 数字线上的数值位置估计",
+        "procedure": "依据Siegler & Opfer (2003), DOI 10.1111/1467-9280.02438 Method，冻结0–100或0–1000单范围A/B六个原选点，块内种子洗牌，预定4或30秒。两范围通过既有独立配置安排，不新增混合范围/PN/双session调度。网页无中点/四分位参照刻度，只端点；一题中性点击练习无正确位置反馈。数字界面不声称物理25厘米或时序已校准。",
+        "interpretation": "本次单范围六点描述性记录，不判定线性/对数表征类型；原研究的NP/PN、两session设计未整体复刻。",
+        "confounders": [
+          "设备屏幕宽度、触控或鼠标点击精度会影响位置记录。",
+          "作答中断、超时和有效试次数影响误差估计的稳定性。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或学业成绩预测。",
+          "题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。"
+        ],
+        "metricNotes": {
+          "paePercent": {
+            "definition": "平均绝对误差：仅对有位置回应的试次，计算|估计值 − 目标数|占线段总长比例的均值；估计值 = 回应位置比例 × lineMax，超时未回应不进入分母。",
+            "readingHint": "越低越贴近目标；有效试次不足时谨慎解释。"
+          },
+          "biasPercent": {
+            "definition": "方向偏差：(估计值 − 目标数) 占线段总长比例的均值，正值代表整体右偏。",
+            "readingHint": "有符号量，需与 PAE 同读；不代表每个试次都偏。"
+          },
+          "withinTenRate": {
+            "definition": "估计误差不超过线段长度 10% 的试次比例。",
+            "readingHint": "描述本次任务内的粗略命中率，不是及格线。"
+          },
+          "medianRtMs": {
+            "definition": "有效作答（rtMs ≥ validRtFloorMs）的反应时中位数。",
+            "readingHint": "与 PAE 同读；速度与准确率的权衡会改变解释。"
+          },
+          "validTrialCount": {
+            "definition": "按本次冻结任务定义记录“有效试次数”。",
+            "readingHint": "与计划试次总数对照阅读。"
+          },
+          "timeoutCount": {
+            "definition": "按本次冻结任务定义记录“超时次数”。",
+            "readingHint": "超时过多时误差指标需谨慎解释。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "lineMax",
+            "label": "本次范围右端数值"
+          },
+          {
+            "key": "targetSet",
+            "label": "冻结选点组"
+          },
+          {
+            "key": "maxResponseMs",
+            "label": "预定响应上限（毫秒）"
+          },
+          {
+            "key": "totalTrials",
+            "label": "正式点数"
+          },
+          {
+            "key": "stimulusSetVersion",
+            "label": "数值设置版本"
           }
         ]
       }

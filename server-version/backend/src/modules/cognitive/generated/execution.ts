@@ -125,6 +125,7 @@ export const cognitiveExecutionEntries = [
   task56[0],
   task42[1],
   task42[2],
+  task20[1],
   task16[1],
   task32[1],
   task41[1],
@@ -135,5 +136,6 @@ export const cognitiveExecutionEntries = [
   task52[1],
   task53[1],
   task56[1],
+  task25[1],
   task21[1],
 ]

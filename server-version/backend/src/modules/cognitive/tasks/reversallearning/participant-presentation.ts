@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -272,6 +272,306 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   },
   {
     "schemaVersion": 1,
+    "presentationVersion": "1.3.1",
+    "testType": "reversallearning",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.0",
+    "title": "跟着反馈找规律",
+    "metrics": {
+      "acquisitionAccuracy": {
+        "label": "变化前选到较有利符号的比例",
+        "explanation": "初始学习阶段选择当前优势符号的比例。",
+        "singleExplanation": "初始学习阶段选择当前优势符号的比例。"
+      },
+      "reversalAccuracy": {
+        "label": "变化后选到较有利符号的比例",
+        "explanation": "规则反转后选择新优势符号的比例。",
+        "singleExplanation": "规则反转后选择新优势符号的比例。"
+      },
+      "reversalCost": {
+        "label": "反转准确率变化",
+        "explanation": "初始学习正确率减去反转阶段正确率；需结合两阶段数据阅读。",
+        "singleExplanation": "初始学习正确率减去反转阶段正确率；需结合两阶段数据阅读。"
+      },
+      "perseverativeErrorCount": {
+        "label": "变化后仍选原有利符号的次数",
+        "explanation": "反转后仍选择原优势符号的次数。",
+        "singleExplanation": "反转后仍选择原优势符号的次数。"
+      },
+      "trialsToAcquisitionCriterion": {
+        "label": "变化前达到设定连续正确次数所需题数",
+        "explanation": "达到冻结配置criterionConsecutiveCorrect设定的连续正确次数所需题数；默认6，可设4–10。未达到时保留缺失。",
+        "singleExplanation": "达到本次设定的连续正确次数用了多少题；没达到不填0。"
+      },
+      "trialsToReversalCriterion": {
+        "label": "变化后达到设定连续正确次数所需题数",
+        "explanation": "达到冻结配置criterionConsecutiveCorrect设定的连续正确次数所需题数；默认6，可设4–10。未达到时保留缺失。",
+        "singleExplanation": "达到本次设定的连续正确次数用了多少题；没达到不填0。"
+      },
+      "feedbackWinRate": {
+        "label": "实际得到奖励的比例",
+        "explanation": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。",
+        "singleExplanation": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。"
+      },
+      "omissionRate": {
+        "label": "遗漏比例",
+        "explanation": "遗漏比例：应该响应但没有响应的比例。",
+        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+      },
+      "medianRtMs": {
+        "label": "反应时中位数",
+        "explanation": "典型反应速度：多数有效反应所需的时间。",
+        "singleExplanation": "典型反应速度：多数有效反应所需的时间。"
+      },
+      "validResponseCount": {
+        "label": "有效响应次数",
+        "explanation": "本次两个阶段的有效选择次数。",
+        "singleExplanation": "本次两个阶段的有效选择次数。"
+      }
+    },
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "这份报告描述本次跟着反馈找规律的作答记录。",
+        "reportCaveats": [
+          "40题，前后各20；4题练习中至少3次选到当时较有利的符号；含说明约3–4分钟（配置估计，未实测）。单次固定反转只能描述这一段选择变化。",
+          "体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "正式版",
+        "participantConclusion": "这份报告描述本次跟着反馈找规律的作答记录。",
+        "reportCaveats": [
+          "只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究版",
+        "participantConclusion": "这次记录描述固定一次规则反转前后的选择变化。",
+        "reportCaveats": [
+          "正式240题120/120、每题2秒；先做30题无反转概率练习，练习自定步速。正式反馈500毫秒为调度下限，未作实机显示校准。原文多组、多次且按表现反转，本项目仍为研究变式。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "看看一段时间的反馈，再决定是否换方法。回顾报告时，先对照变化前后各有多少记录；不用一次奖励或一次负反馈评价自己。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "本项目固定一次反转变式。统一负反馈且不显示阶段；研究档30题无反转练习、2秒响应、500毫秒反馈。不代表原研究完整复刻、稳定能力或诊断。",
+    "reportReading": {
+      "version": "1.2.1",
+      "title": "刚才管用的方法，现在还管用吗？",
+      "introduction": "选一个符号，看看反馈，再决定下一次怎么选。中途较有利的符号会改变，而且偶尔会给出出人意料的反馈。",
+      "summary": {
+        "template": "规则变化前，你答对了 {acquisitionAccuracy}；变化后，正确比例是 {reversalAccuracy}。",
+        "metricKeys": [
+          "acquisitionAccuracy",
+          "reversalAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "acquisitionAccuracy",
+        "reversalAccuracy",
+        "perseverativeErrorCount"
+      ],
+      "processMetricKeys": [
+        "validResponseCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientAcquisitionTrials",
+        "insufficientReversalTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "看看一段时间的反馈，再决定是否换方法。回顾报告时，先对照变化前后各有多少记录；不用一次奖励或一次负反馈评价自己。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "acquisitionAccuracy",
+          "reversalAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "acquisition": "规则变化前阶段",
+        "reversal": "规则变化后阶段",
+        "criterion": "达标规则",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "rules",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "这次记录你在有不确定反馈时怎样逐步调整选择。较有利的符号也可能得到负反馈，所以一次“没奖励”不能直接证明选错了。",
+        "takeaway": "“奖励比例”与“选到当时较有利符号的比例”是两件事。后者按生成规则计分；前者还受概率影响，不能互相替代。",
+        "exampleTitle": "把过程放进一个生活场景",
+        "example": "试一条上学路线，偶尔遇到红灯不代表路线就不好；连续多次的情况才提供更多线索。这只是理解反馈不确定性的比喻，不是现实决策能力评定。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "作一个选择",
+            "text": "选左或右的符号，看看反馈。"
+          },
+          {
+            "title": "多看几次",
+            "text": "较有利符号也可能偶尔没有奖励。"
+          },
+          {
+            "title": "留意变化",
+            "text": "中途规律反转；回看前后两段记录。"
+          }
+        ],
+        "boundary": "体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
+        "metricHelp": {
+          "acquisitionAccuracy": {
+            "label": "变化前选到较有利符号的比例",
+            "explanation": "只看变化前阶段中的正确比例。"
+          },
+          "reversalAccuracy": {
+            "label": "变化后选到较有利符号的比例",
+            "explanation": "只看反馈或规则变化后阶段中的正确比例。"
+          },
+          "perseverativeErrorCount": {
+            "label": "变化后仍选原有利符号的次数",
+            "explanation": "按任务规则统计的这类错误次数，不能据此判断性格。"
+          },
+          "omissionRate": {
+            "label": "需要回应时，没有留下回应",
+            "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+          },
+          "medianRtMs": {
+            "label": "通常一次回应用了多久",
+            "explanation": "把有效用时从短到长排好，取中间的那个；不会只挑最快的一次。"
+          },
+          "validResponseCount": {
+            "label": "留下了多少有效回应",
+            "explanation": "本次按任务要求完成的有效选择数量。"
+          },
+          "feedbackWinRate": {
+            "label": "实际得到奖励的比例",
+            "explanation": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。"
+          },
+          "trialsToAcquisitionCriterion": {
+            "label": "变化前达到设定连续正确次数所需题数",
+            "explanation": "达到本次设定的连续正确次数所需题数（默认6次，可设4–10）；没达到时保留缺失，不填0。"
+          },
+          "trialsToReversalCriterion": {
+            "label": "变化后达到设定连续正确次数所需题数",
+            "explanation": "达到本次设定的连续正确次数所需题数（默认6次，可设4–10）；没达到时保留缺失，不填0。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "反馈驱动选择中的反转学习",
+        "procedure": "本项目正确选择正反馈概率由冻结rewardProbability决定（默认0.8），错误选择正反馈概率0；新版两类负反馈文字相同，正式界面不显示阶段；500毫秒仅为正式反馈调度下限，不是已实机校准的显示时长。研究档30题无反转练习自定步速，正式2秒响应依据Cools et al. 2002 Materials and Methods；不是双选项80/20模型。原文没有指定独立固定0.8概率，不能据此称本参数已复刻原协议。项目正式仍240题固定一次反转，原文三组多次反转/特定误导反馈串未实现。",
+        "interpretation": "研究版是本项目的较长配置，不是标准化或信效度认证。体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
+          "题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。"
+        ],
+        "metricNotes": {
+          "acquisitionAccuracy": {
+            "definition": "初始学习阶段选择当前优势符号的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "reversalAccuracy": {
+            "definition": "规则反转后选择新优势符号的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "reversalCost": {
+            "definition": "初始学习正确率减去反转阶段正确率；需结合两阶段数据阅读。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "perseverativeErrorCount": {
+            "definition": "反转后仍选择原优势符号的次数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "trialsToAcquisitionCriterion": {
+            "definition": "初始学习阶段首次达到连续正确门槛所需的试次数；未达到时不显示数值。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "trialsToReversalCriterion": {
+            "definition": "反转阶段首次达到连续正确门槛所需的试次数；未达到时不显示数值。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "feedbackWinRate": {
+            "definition": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "medianRtMs": {
+            "definition": "典型反应速度：多数有效反应所需的时间。",
+            "readingHint": "与有效记录量、遗漏和提前反应联合阅读；不是最快一次，也不是跨情境速度等级。"
+          },
+          "validResponseCount": {
+            "definition": "本次两个阶段的有效选择次数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式题数/轮数"
+          },
+          {
+            "key": "acquisitionTrials",
+            "label": "变化前题数"
+          },
+          {
+            "key": "reversalTrials",
+            "label": "变化后题数"
+          },
+          {
+            "key": "rewardProbability",
+            "label": "较有利选择的正反馈概率"
+          },
+          {
+            "key": "trialTimeoutMs",
+            "label": "每题响应上限（毫秒）"
+          },
+          {
+            "key": "criterionConsecutiveCorrect",
+            "label": "描述性达标连续次数"
+          }
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次短体验：规则变化前，你答对了 {acquisitionAccuracy}；变化后，正确比例是 {reversalAccuracy}。 只描述本次记录，不能据此认定稳定能力。",
+          "metricKeys": [
+            "acquisitionAccuracy",
+            "reversalAccuracy"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
     "presentationVersion": "3.0.0",
     "testType": "reversallearning",
     "engineVersion": "1.0.0",
@@ -484,6 +784,306 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "professional": {
         "construct": "反馈驱动选择中的反转学习",
         "procedure": "按冻结反馈序列与规则阶段重建选择结果，记录反转前后正确或适宜选择及恢复过程。 方法与文献核对：研究档240题，前120题A符号较有利、后120题B符号较有利；位置逐题随机，反馈种子随机，较有利选择获正反馈概率由冻结参数决定（默认0.8），另一符号获正反馈概率为0（并非0.2）。默认响应窗3000毫秒，4题练习中至少3次选到当时较有利的符号。Cools等(2002), DOI 10.1523/JNEUROSCI.22-11-04563.2002，原研究涉及概率反馈与反转；已核Cools原文方法：30题无反转训练，每组9次反转，累计10–15次正确选择后反转（含概率错误），每段0–4次误导负反馈，响应2秒、反馈500毫秒。原文不规定错误选项20%正反馈，不能以第三方实现替代原文。本C1.0.0仍固定一次反转，不以设定连续次数触发反转；原协议关键机制尚未对齐完成，新C修复另行交接。",
+        "interpretation": "研究版是本项目的较长配置，不是标准化或信效度认证。体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
+          "题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。"
+        ],
+        "metricNotes": {
+          "acquisitionAccuracy": {
+            "definition": "初始学习阶段选择当前优势符号的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "reversalAccuracy": {
+            "definition": "规则反转后选择新优势符号的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "reversalCost": {
+            "definition": "初始学习正确率减去反转阶段正确率；需结合两阶段数据阅读。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "perseverativeErrorCount": {
+            "definition": "反转后仍选择原优势符号的次数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "trialsToAcquisitionCriterion": {
+            "definition": "初始学习阶段首次达到连续正确门槛所需的试次数；未达到时不显示数值。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "trialsToReversalCriterion": {
+            "definition": "反转阶段首次达到连续正确门槛所需的试次数；未达到时不显示数值。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "feedbackWinRate": {
+            "definition": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "medianRtMs": {
+            "definition": "典型反应速度：多数有效反应所需的时间。",
+            "readingHint": "与有效记录量、遗漏和提前反应联合阅读；不是最快一次，也不是跨情境速度等级。"
+          },
+          "validResponseCount": {
+            "definition": "本次两个阶段的有效选择次数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式题数/轮数"
+          },
+          {
+            "key": "acquisitionTrials",
+            "label": "变化前题数"
+          },
+          {
+            "key": "reversalTrials",
+            "label": "变化后题数"
+          },
+          {
+            "key": "rewardProbability",
+            "label": "较有利选择的正反馈概率"
+          },
+          {
+            "key": "trialTimeoutMs",
+            "label": "每题响应上限（毫秒）"
+          },
+          {
+            "key": "criterionConsecutiveCorrect",
+            "label": "描述性达标连续次数"
+          }
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次短体验：规则变化前，你答对了 {acquisitionAccuracy}；变化后，正确比例是 {reversalAccuracy}。 只描述本次记录，不能据此认定稳定能力。",
+          "metricKeys": [
+            "acquisitionAccuracy",
+            "reversalAccuracy"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "reversallearning",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.0",
+    "title": "跟着反馈找规律",
+    "metrics": {
+      "acquisitionAccuracy": {
+        "label": "变化前选到较有利符号的比例",
+        "explanation": "初始学习阶段选择当前优势符号的比例。",
+        "singleExplanation": "初始学习阶段选择当前优势符号的比例。"
+      },
+      "reversalAccuracy": {
+        "label": "变化后选到较有利符号的比例",
+        "explanation": "规则反转后选择新优势符号的比例。",
+        "singleExplanation": "规则反转后选择新优势符号的比例。"
+      },
+      "reversalCost": {
+        "label": "反转准确率变化",
+        "explanation": "初始学习正确率减去反转阶段正确率；需结合两阶段数据阅读。",
+        "singleExplanation": "初始学习正确率减去反转阶段正确率；需结合两阶段数据阅读。"
+      },
+      "perseverativeErrorCount": {
+        "label": "变化后仍选原有利符号的次数",
+        "explanation": "反转后仍选择原优势符号的次数。",
+        "singleExplanation": "反转后仍选择原优势符号的次数。"
+      },
+      "trialsToAcquisitionCriterion": {
+        "label": "变化前达到设定连续正确次数所需题数",
+        "explanation": "达到冻结配置criterionConsecutiveCorrect设定的连续正确次数所需题数；默认6，可设4–10。未达到时保留缺失。",
+        "singleExplanation": "达到本次设定的连续正确次数用了多少题；没达到不填0。"
+      },
+      "trialsToReversalCriterion": {
+        "label": "变化后达到设定连续正确次数所需题数",
+        "explanation": "达到冻结配置criterionConsecutiveCorrect设定的连续正确次数所需题数；默认6，可设4–10。未达到时保留缺失。",
+        "singleExplanation": "达到本次设定的连续正确次数用了多少题；没达到不填0。"
+      },
+      "feedbackWinRate": {
+        "label": "实际得到奖励的比例",
+        "explanation": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。",
+        "singleExplanation": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。"
+      },
+      "omissionRate": {
+        "label": "遗漏比例",
+        "explanation": "遗漏比例：应该响应但没有响应的比例。",
+        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+      },
+      "medianRtMs": {
+        "label": "反应时中位数",
+        "explanation": "典型反应速度：多数有效反应所需的时间。",
+        "singleExplanation": "典型反应速度：多数有效反应所需的时间。"
+      },
+      "validResponseCount": {
+        "label": "有效响应次数",
+        "explanation": "本次两个阶段的有效选择次数。",
+        "singleExplanation": "本次两个阶段的有效选择次数。"
+      }
+    },
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "这份报告描述本次跟着反馈找规律的作答记录。",
+        "reportCaveats": [
+          "40题，前后各20；4题练习中至少3次选到当时较有利的符号；含说明约3–4分钟（配置估计，未实测）。单次固定反转只能描述这一段选择变化。",
+          "体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "正式版",
+        "participantConclusion": "这份报告描述本次跟着反馈找规律的作答记录。",
+        "reportCaveats": [
+          "只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究版",
+        "participantConclusion": "这次记录描述固定一次规则反转前后的选择变化。",
+        "reportCaveats": [
+          "正式240题120/120、每题2秒；先做30题无反转概率练习，练习自定步速。正式反馈500毫秒为调度下限，未作实机显示校准。原文多组、多次且按表现反转，本项目仍为研究变式。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "看看一段时间的反馈，再决定是否换方法。回顾报告时，先对照变化前后各有多少记录；不用一次奖励或一次负反馈评价自己。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "本项目固定一次反转变式。统一负反馈且不显示阶段；研究档30题无反转练习、2秒响应、500毫秒反馈。不代表原研究完整复刻、稳定能力或诊断。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "刚才管用的方法，现在还管用吗？",
+      "introduction": "选一个符号，看看反馈，再决定下一次怎么选。中途较有利的符号会改变，而且偶尔会给出出人意料的反馈。",
+      "summary": {
+        "template": "规则变化前，你答对了 {acquisitionAccuracy}；变化后，正确比例是 {reversalAccuracy}。",
+        "metricKeys": [
+          "acquisitionAccuracy",
+          "reversalAccuracy"
+        ]
+      },
+      "studentMetricKeys": [
+        "acquisitionAccuracy",
+        "reversalAccuracy",
+        "perseverativeErrorCount"
+      ],
+      "processMetricKeys": [
+        "validResponseCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientAcquisitionTrials",
+        "insufficientReversalTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "看看一段时间的反馈，再决定是否换方法。回顾报告时，先对照变化前后各有多少记录；不用一次奖励或一次负反馈评价自己。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "acquisitionAccuracy",
+          "reversalAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "acquisition": "规则变化前阶段",
+        "reversal": "规则变化后阶段",
+        "criterion": "达标规则",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "rules",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "这次记录你在有不确定反馈时怎样逐步调整选择。较有利的符号也可能得到负反馈，所以一次“没奖励”不能直接证明选错了。",
+        "takeaway": "“奖励比例”与“选到当时较有利符号的比例”是两件事。后者按生成规则计分；前者还受概率影响，不能互相替代。",
+        "exampleTitle": "把过程放进一个生活场景",
+        "example": "试一条上学路线，偶尔遇到红灯不代表路线就不好；连续多次的情况才提供更多线索。这只是理解反馈不确定性的比喻，不是现实决策能力评定。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "作一个选择",
+            "text": "选左或右的符号，看看反馈。"
+          },
+          {
+            "title": "多看几次",
+            "text": "较有利符号也可能偶尔没有奖励。"
+          },
+          {
+            "title": "留意变化",
+            "text": "中途规律反转；回看前后两段记录。"
+          }
+        ],
+        "boundary": "体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
+        "metricHelp": {
+          "acquisitionAccuracy": {
+            "label": "变化前选到较有利符号的比例",
+            "explanation": "只看变化前阶段中的正确比例。"
+          },
+          "reversalAccuracy": {
+            "label": "变化后选到较有利符号的比例",
+            "explanation": "只看反馈或规则变化后阶段中的正确比例。"
+          },
+          "perseverativeErrorCount": {
+            "label": "变化后仍选原有利符号的次数",
+            "explanation": "按任务规则统计的这类错误次数，不能据此判断性格。"
+          },
+          "omissionRate": {
+            "label": "需要回应时，没有留下回应",
+            "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+          },
+          "medianRtMs": {
+            "label": "通常一次回应用了多久",
+            "explanation": "把有效用时从短到长排好，取中间的那个；不会只挑最快的一次。"
+          },
+          "validResponseCount": {
+            "label": "留下了多少有效回应",
+            "explanation": "本次按任务要求完成的有效选择数量。"
+          },
+          "feedbackWinRate": {
+            "label": "实际得到奖励的比例",
+            "explanation": "有效选择中获得正向反馈的比例，受到任务的概率反馈机制影响。"
+          },
+          "trialsToAcquisitionCriterion": {
+            "label": "变化前达到设定连续正确次数所需题数",
+            "explanation": "达到本次设定的连续正确次数所需题数（默认6次，可设4–10）；没达到时保留缺失，不填0。"
+          },
+          "trialsToReversalCriterion": {
+            "label": "变化后达到设定连续正确次数所需题数",
+            "explanation": "达到本次设定的连续正确次数所需题数（默认6次，可设4–10）；没达到时保留缺失，不填0。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "反馈驱动选择中的反转学习",
+        "procedure": "本项目正确选择正反馈概率由冻结rewardProbability决定（默认0.8），错误选择正反馈概率0；新版两类负反馈文字相同，正式界面不显示阶段；500毫秒仅为正式反馈调度下限，不是已实机校准的显示时长。研究档30题无反转练习自定步速，正式2秒响应依据Cools et al. 2002 Materials and Methods；不是双选项80/20模型。原文没有指定独立固定0.8概率，不能据此称本参数已复刻原协议。项目正式仍240题固定一次反转，原文三组多次反转/特定误导反馈串未实现。",
         "interpretation": "研究版是本项目的较长配置，不是标准化或信效度认证。体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
         "confounders": [
           "设备与输入方式、显示和响应延迟会影响用时记录。",

@@ -8,6 +8,12 @@
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0",
       "order": 100
+    },
+    {
+      "testType": "numberline",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "order": 9100
     }
   ],
   "backend": {
@@ -20,6 +26,13 @@
       "engineVersion": "1.0.1",
       "file": "server-version/frontend/src/modules/cognitive/tasks/numberline/numberline.registry.ts",
       "export": "numberlineRegistryEntry"
+    },
+    {
+      "testType": "numberline",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/numberline/numberline.registry.ts",
+      "export": "numberlineNpRegistryEntry",
+      "scoringVersion": "1.1.0"
     }
   ],
   "catalog": {
@@ -31,7 +44,23 @@
     "export": "seeds",
     "orders": [
       100,
-      100
+      100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100,
+      9100
     ]
   },
   "presentation": {
@@ -45,7 +74,8 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/numberline/__tests__/NumberlineTask.test.tsx",
-      "src/modules/cognitive/tasks/numberline/__tests__/prng.test.ts"
+      "src/modules/cognitive/tasks/numberline/__tests__/prng.test.ts",
+      "src/modules/cognitive/tasks/numberline/__tests__/NumberlineNpTask.test.tsx"
     ]
   }
 }

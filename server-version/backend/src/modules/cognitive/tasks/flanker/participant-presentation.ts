@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,

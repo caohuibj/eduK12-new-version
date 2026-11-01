@@ -343,6 +343,11 @@
       "scoringVersion": "1.1.0"
     },
     {
+      "testType": "reversallearning",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.0.0"
+    },
+    {
       "testType": "matrix",
       "engineVersion": "1.1.0",
       "scoringVersion": "1.0.0"
@@ -389,6 +394,11 @@
     },
     {
       "testType": "auditorynback",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0"
+    },
+    {
+      "testType": "numberline",
       "engineVersion": "1.1.0",
       "scoringVersion": "1.1.0"
     },
@@ -488,6 +498,10 @@
       "engineVersion": "1.0.0"
     },
     {
+      "testType": "reversallearning",
+      "engineVersion": "1.1.0"
+    },
+    {
       "testType": "bart",
       "engineVersion": "1.0.0"
     },
@@ -506,6 +520,10 @@
     {
       "testType": "numberline",
       "engineVersion": "1.0.1"
+    },
+    {
+      "testType": "numberline",
+      "engineVersion": "1.1.0"
     },
     {
       "testType": "arithverify",

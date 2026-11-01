@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -484,8 +484,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
           },
           "omissionRate": {
-            "definition": "遗漏比例：应该响应但没有响应的比例。",
-            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            "definition": "未在时限内成功完成的计划步骤比例；包含错点后仍未完成，不仅是完全没有响应。",
+            "readingHint": "分母为计划步骤数；与实际完成步数及错点一起阅读。"
           }
         },
         "configFields": [

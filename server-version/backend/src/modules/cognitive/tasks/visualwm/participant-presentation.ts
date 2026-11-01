@@ -557,7 +557,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "testType": "visualwm",
     "engineVersion": "1.1.0",
     "scoringVersion": "1.0.0",
-    "title": "视觉工作记忆",
+    "title": "记住刚才的颜色",
     "metrics": {
       "accuracy": {
         "label": "总体正确率",
@@ -565,12 +565,12 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "总体正确率：判断正确次数占计划正式试次数的比例；中断或缺答不能当成已完成判断。"
       },
       "hitRate": {
-        "label": "变化命中率",
+        "label": "改变时判断对的比例",
         "explanation": "变化命中率：颜色确实变了时，你正确报告“变了”的比例。",
         "singleExplanation": "变化命中率：颜色变了时正确报告“变了”的比例。"
       },
       "falseAlarmRate": {
-        "label": "变化误报率",
+        "label": "没变时误选改变的比例",
         "explanation": "变化误报率：颜色没变时，你错误报告“变了”的比例。",
         "singleExplanation": "变化误报率：颜色没变时错误报告“变了”的比例。"
       },
@@ -595,7 +595,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "disclaimer": "这是颜色变化检测的项目变式，只描述本次表现，不是标准测验复刻、记忆容量或年龄常模。",
     "reportReading": {
       "version": "3.0.0",
-      "title": "颜色变了吗？你如何判断刚才的颜色？",
+      "title": "刚才那一块，颜色变了吗？",
       "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
       "summary": {
         "template": "这一次，你的总体正确率是 {accuracy}；变化命中率是 {hitRate}。",
@@ -677,11 +677,11 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "explanation": "判断正确次数占计划正式试次数的比例；中断或缺答不能当成已完成判断。"
           },
           "hitRate": {
-            "label": "变了的抓到了多少",
+            "label": "改变时判断对的比例",
             "explanation": "颜色确实变了时正确报告“变了”的比例。"
           },
           "falseAlarmRate": {
-            "label": "没变的说变了多少",
+            "label": "没变时误选改变的比例",
             "explanation": "颜色没变时错误报告“变了”的比例。"
           }
         }
