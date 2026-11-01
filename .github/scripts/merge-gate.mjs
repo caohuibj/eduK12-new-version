@@ -356,7 +356,7 @@ export function failedChecks(needs, draft) {
           && ['codeql','frontend_build','ui_required','visual_hosted',...Object.keys(acceptanceJobs).filter(key=>key!=='perf_smoke')]
             .some(key=>scope[key]!=='true'))) failed.push('scope');
   } else if ((scope.training_functional_only !== undefined && scope.training_functional_only !== 'false')
-      || (!adminFunctional && scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
+      || (!adminFunctional && scope.scenario!=='catalog-discovery' && scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
       || trainingPlan !== null) failed.push('scope');
   if (adminFunctional) {
     if (draft || !validAdminFunctionalPlan(adminPlan) || scope.application_route !== 'legacy'

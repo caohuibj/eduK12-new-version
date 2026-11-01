@@ -15,7 +15,7 @@ test('catalog query surfaces remain bounded across entrypoints and reject schema
  assert(!catalogDiscoveryScope([{...entries[0],status:'D',newMode:'000000'}]));
 });
 test('catalog qualification keeps query frontend image and SAST failures blocking without unrelated jobs',()=>{
- const scope={scenario:'catalog-discovery',application_route:'legacy',runner_profile:'hosted',codeql:'true',frontend_affected:'true',media_selection:'[]',media_groups:'[]',...Object.fromEntries(['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content','presentation','frontend','documentation',...Object.keys(acceptanceFor([]))].map(k=>[k,'false']))};
+ const scope={scenario:'catalog-discovery',application_route:'legacy',runner_profile:'hosted',run_performance_tests:'false',training_functional_only:'false',admin_permissions_functional_only:'false',codeql:'true',frontend_affected:'true',media_selection:'[]',media_groups:'[]',...Object.fromEntries(['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content','presentation','frontend','documentation',...Object.keys(acceptanceFor([]))].map(k=>[k,'false']))};
  assert.deepEqual(requiredChecks({scope:{outputs:scope}},false),['scope','catalog-discovery','frontend','docker','codeql']);
  assert.deepEqual(requiredChecks({scope:{outputs:scope}},true),['scope']);
  const needs=Object.fromEntries(requiredChecks({scope:{outputs:scope}},false).map(name=>[name,{result:'success'}]));needs.scope.outputs=scope;
