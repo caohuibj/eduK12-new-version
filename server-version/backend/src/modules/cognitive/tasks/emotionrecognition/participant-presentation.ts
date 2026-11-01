@@ -269,9 +269,9 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "典型反应速度：多数有效反应所需的时间。"
       },
       "omissionRate": {
-        "label": "遗漏比例",
-        "explanation": "遗漏比例：应该响应但没有响应的比例。",
-        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+        "label": "未答或用时无效的比例",
+        "explanation": "分母为计划正式试次数；未选择表情、缺少用时、低于本次有效用时下限或超过截止时间的记录均计入，不只是没有响应。",
+        "singleExplanation": "分母为计划正式试次数；未选择表情、缺少用时、低于本次有效用时下限或超过截止时间的记录均计入，不只是没有响应。"
       },
       "validResponseCount": {
         "label": "有效响应数",
@@ -404,6 +404,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           "validResponseCount": {
             "label": "有效响应数",
             "explanation": "本次有效类别选择的次数。"
+          },
+          "omissionRate": {
+            "label": "未答或用时无效的比例",
+            "explanation": "分母为计划正式试次数；未选择表情、缺少用时、低于本次有效用时下限或超过截止时间的记录均计入，不只是没有响应。"
           }
         }
       },
@@ -440,8 +444,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "readingHint": "与有效记录量、遗漏和提前反应联合阅读；不是最快一次，也不是跨情境速度等级。"
           },
           "omissionRate": {
-            "definition": "遗漏比例：应该响应但没有响应的比例。",
-            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            "definition": "分母为计划正式试次数；未选择表情、缺少用时、低于本次有效用时下限或超过截止时间的记录均计入，不只是没有响应。",
+            "readingHint": "这是本次作答记录的统计条件，不推断分心、猜测或现实情绪理解能力。"
           },
           "validResponseCount": {
             "definition": "本次有效类别选择的次数。",
