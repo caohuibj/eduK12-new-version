@@ -1,3 +1,4 @@
+import {readFrozenBundleProductionDefinition} from '../bundle-product/definition-provider'
 import {buildSurveyCognitiveReportSnapshot} from './cognitive-bundle-report'
 import type {FrozenSurveyCognitive} from './cognitive.definition'
 import {computeSurveyNativeReports} from '../bundle-product/survey-native'
@@ -80,10 +81,22 @@ export function computeGovernedTrial(a:GovernedArtifact,toolId:string,index:numb
    cognitive.set(unit.instrumentKey,cognitiveParentUnit(unit,loaded));rawCognitive[unit.instrumentKey]={synthetic:true,trialCount:trials.length,trials}
   }
  }
+ // Synthetic trial DOB is explicit and within the source-owned population;
+ // production participants never use this generator or receive a default DOB.
+ if(a.nativeBundle){
+  const definition=readFrozenBundleProductionDefinition(a.nativeBundle.definition).bundleSnapshot.bundleDefinition
+  const birthKeys=new Set(definition.slots.flatMap(s=>s.admissionContext?.birthYearMonthContextKey?[s.admissionContext.birthYearMonthContextKey]:[]))
+  const age=definition.population.subjectMinAgeYears??Math.min(18,definition.population.subjectMaxAgeYears??18),at=new Date(frozenAt)
+  const dob=String(at.getUTCFullYear()-age).padStart(4,'0')+'-'+String(at.getUTCMonth()+1).padStart(2,'0')
+  for(const binding of a.nativeBundle.source.context)if(birthKeys.has(binding.contextKey)){
+   const raw=answers[binding.slotKey]
+   if(raw&&typeof raw==='object'&&!Array.isArray(raw))(raw as Record<string,unknown>)[binding.itemKey]=dob
+  }
+ }
  const publication:ResearchFrozenPublication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'isolated-trial',waveId:'isolated-trial',collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,consentDigest:canonicalHash('synthetic'),units,runtimeStatus:'SURVEY_FINAL_V1'}
  if(a.nativeBundle)publication.governedPackages=[{schemaVersion:1,importId:toolId,toolId,hash:canonicalHash(a),title:a.title,family:'BUNDLE',parentGrantId:'trial-only',report:null,nativeBundle:a.nativeBundle,slots:entries.map(c=>({slotKey:c.slotKey,draftId:units.find(u=>u.instrumentKey===c.slotKey)!.draftId,instrumentKey:c.slotKey,kind:c.unit.ref.kind}))}]
  // The same controlled child scorer and parent FINAL closure, without creating a human Attempt.
- const calculated=verifySurveyFinalPublication(publication,canonicalHash(publication))!.compute(answers,null,undefined,'FINAL',Object.keys(timings).length?timings:undefined,cognitive,native)
+ const calculated=verifySurveyFinalPublication(publication,canonicalHash(publication))!.compute(answers,null,undefined,'FINAL',Object.keys(timings).length?timings:undefined,cognitive,native,new Date(frozenAt))
  if(a.nativeBundle){calculated.nativeBundleReports=computeSurveyNativeReports(publication,calculated);if(calculated.nativeBundleReports.some(r=>r.status==='FAILED'))throw new Error('原生整包综合报告试运行失败')}
  for(const unit of calculated.units)if(unit.kind!=='FORM'&&!resultMetrics(unit).some(m=>m.value!==null))throw new Error('试运行没有生成有效评分指标：'+unit.instrumentKey)
  const report=a.unit?renderGovernedUnitReport(a,calculated.units[0]):a.packageReport?renderPackageReport(a.packageReport,a.components,calculated,Object.fromEntries(entries.map(c=>[c.slotKey,c.slotKey]))):null

@@ -1,3 +1,6 @@
+import {decodeSurveyNativeContext} from './survey-native-context'
+export {decodeSurveyNativeContext} from './survey-native-context'
+import {readSurveyNativeAdmission,requiresSurveyNativeAdmission} from './survey-native-admission'
 import { readSurveyBundleCognitiveReport } from '../survey/cognitive-bundle-report'
 import { projectBundleCognitiveSource } from '../assessment-bundle/sources'
 import {z} from 'zod'
@@ -5,7 +8,7 @@ import {isFrozenAdultSelfReport} from './self-report-audience'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compileBundleRuntimeFromFrozenRead} from '../assessment-bundle/compile'
 import {computeReanalysisAggregateInputHash} from '../assessment-reanalysis/reanalysis'
-import {buildBundleContextFactsFromValues,type BundleContextFieldDefinitionV1} from '../assessment-bundle/context'
+import {buildBundleContextFactsFromValues} from '../assessment-bundle/context'
 import {projectDerivedBundleView,type DerivedBundleView} from '../assessment-bundle/onboarding/derived-report'
 import {derivationInputs,type DerivedPackage} from '../assessment-bundle/onboarding/contract'
 import {projectBundleScaleSource} from '../assessment-bundle/sources'
@@ -72,29 +75,14 @@ export function restrictSavedDerivedView(pack:DerivedPackage,view:DerivedBundleV
   theme:view.theme&&permits(themeKeys)?view.theme:view.theme?{...view.theme,state:'WITHHELD',profileId:null}:null,
   conclusions,blocks:view.blocks.map(b=>({...b,ruleIds:b.ruleIds.filter(id=>conclusions.some(c=>c.ruleId===id))}))}
 }
-/** Decode only the frozen declared type. Never infer a string/enum as numeric. */
-export function decodeSurveyNativeContext(field:BundleContextFieldDefinitionV1,raw:unknown):unknown{
- if(raw===undefined||raw===null||raw==='')return raw
- if(field.valueType==='number'){
-  if(typeof raw==='number'&&Number.isFinite(raw))return raw
-  if(typeof raw==='string'&&/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(raw.trim())&&Number.isFinite(Number(raw)))return Number(raw)
-  throw new Error('SURVEY_NATIVE_CONTEXT_TYPE')
- }
- if(field.valueType==='boolean'){
-  if(typeof raw==='boolean')return raw
-  if(raw==='true')return true
-  if(raw==='false')return false
-  throw new Error('SURVEY_NATIVE_CONTEXT_TYPE')
- }
- if(typeof raw!=='string'||field.valueType==='enum'&&!field.enumValues?.includes(raw))throw new Error('SURVEY_NATIVE_CONTEXT_TYPE')
- return raw
-}
 /** Uses this FINAL's already scored units. No scorer, database, current catalog or LLM. */
 export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublication,'governedPackages'|'units'>,calculated:SurveyComputedFinal):SurveyNativeReport[]{
  return (snapshot.governedPackages??[]).filter(p=>p.nativeBundle).map(p=>{
   const native=p.nativeBundle!,out:SurveyNativeReport={importId:p.importId,definitionHash:native.source.definitionHash,status:'FAILED',factsHash:null,views:{student:null,researcher:null},errorCode:null}
   try{
    const {frozen,pack}=nativeProfilePackage(native),scales=[],cognitive=[],cognitivePolicies=new Map<string,import('./cognitive-disclosure').BundleCognitiveDisclosure>()
+   const admission=readSurveyNativeAdmission(p,calculated)
+   if(requiresSurveyNativeAdmission(p)&&!admission){out.status='UNAVAILABLE';out.errorCode='SURVEY_NATIVE_ADMISSION_REQUIRED';return out}
    for(const slot of frozen.bundleSnapshot.slotBindings.filter(s=>s.unitType==='SCALE')){
     const binding=p.slots.find(s=>s.slotKey===slot.slotKey),unit=snapshot.units.find(u=>u.draftId===binding?.draftId&&u.instrumentKey===binding.instrumentKey),result=calculated.units.find(r=>r.instrumentKey===binding?.instrumentKey)
     if(!unit||!result||result.notExecuted)continue
@@ -118,7 +106,7 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
     values[c.contextKey]=pack.schemaVersion===3&&field?decodeSurveyNativeContext(field,value):typeof value==='string'&&value.trim()!==''?Number(value):value
    }
    if(frozen.contextDefinition&&frozen.contextDefinition.fields.some(f=>(pack.schemaVersion===2||f.required)&&(values[f.contextKey]===undefined||values[f.contextKey]===null||values[f.contextKey]===''))){out.status='UNAVAILABLE';out.errorCode='SURVEY_NATIVE_CONTEXT_MISSING';return out}
-   const contextFacts=frozen.contextDefinition?buildBundleContextFactsFromValues({definition:frozen.contextDefinition,values,frozenAt:frozen.frozenAt}):null
+   const contextFacts=admission?.facts??(frozen.contextDefinition?buildBundleContextFactsFromValues({definition:frozen.contextDefinition,values,frozenAt:frozen.frozenAt}):null)
    const compiledRuntime=compileBundleRuntimeFromFrozenRead({family:'ASSESSMENT_BUNDLE',snapshotVersion:3,snapshot:frozen.bundleSnapshot})
    const aggregateInputHash=computeReanalysisAggregateInputHash({snapshotHash:frozen.bundleSnapshot.snapshotHash,compiledBundleRuntimeHash:compiledRuntime.compiledRuntimeHash,scaleSources:scales,cognitiveSources:cognitive,situationalSources:[],contextSnapshotHash:contextFacts?.contextSnapshotHash??null})
    const facts=projectBundleReportFacts({registry:createProductBundleAnalysisEngineRegistry(),engineInput:{snapshot:frozen.bundleSnapshot,compiledRuntime,evidence:[],aggregateInputHash,contextFacts,scaleSources:scales,cognitiveSources:cognitive,declarativePackage:pack}})
@@ -150,7 +138,7 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
 export function savedSurveyNativeFeedback(packages:readonly FrozenGovernedPackage[],result:SurveyComputedFinal,released:ReadonlyMap<string,ReadonlySet<string>>){
  return packages.filter(p=>p.nativeBundle).flatMap(p=>{
   const native=p.nativeBundle!,{pack}=nativeProfilePackage(native),saved=result.nativeBundleReports?.find(r=>r.importId===p.importId)
-  if(!saved||saved.definitionHash!==native.source.definitionHash)return []
+  if(!saved||saved.definitionHash!==native.source.definitionHash||requiresSurveyNativeAdmission(p)&&!readSurveyNativeAdmission(p,result))return []
   if(pack.schemaVersion===3){
    const view=saved.derivedViews?.student
    if(!view)return []

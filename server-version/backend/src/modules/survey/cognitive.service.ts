@@ -1,3 +1,4 @@
+import {prepareSurveyNativeAdmissions,requiresSurveyNativeAdmission} from '../bundle-product/survey-native-admission'
 import {freezeSurveyTaskPrefix} from './task-prefix'
 export {prepareSurveyCognitivePriorAnswers} from './task-prefix'
 import { randomBytes,randomUUID } from 'node:crypto'
@@ -34,6 +35,12 @@ const assertDevice=(input:unknown):AdministrationProvenanceV1=>{
 }
 const lockAccess=(tx:Tx,proof:SurveyCognitiveProof,known:Known,allowCompleted=false)=>
   lockSurveyTaskAccess(tx,proof,known,{kind:'COGNITIVE',allowCompleted,fail:cognitiveFail})
+
+function assertNativeAdmission(snapshot:ResearchFrozenPublication,slotKey:string,session:SurveyCognitiveSession,startedAt:Date){
+  if(!snapshot.governedPackages?.some(requiresSurveyNativeAdmission))return
+  try{prepareSurveyNativeAdmissions(snapshot.governedPackages,decryptUnifiedRuntimePayload<Record<string,unknown>>(session.lockedAnswersCipher),startedAt,slotKey)}
+  catch(error){cognitiveFail(400,error instanceof Error?error.message:'SURVEY_NATIVE_ADMISSION_REQUIRED')}
+}
 
 function frozenUnit(snapshot:ResearchFrozenPublication,slotKey:string):FrozenSurveyCognitive{
   const unit=snapshot.units.find(u=>u.instrumentKey===slotKey&&u.kind==='COGNITIVE')
@@ -78,15 +85,15 @@ export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:st
   const known=await verifiedSurveyAttempt(proof)
   const provenance=assertDevice(input.administrationProvenance)
   return prisma.$transaction(async tx=>{
-    const {snapshot}=await lockAccess(tx,proof,known)
+    const {attempt,snapshot}=await lockAccess(tx,proof,known)
     const frozen=frozenUnit(snapshot,slotKey)
     const existing=await latest(tx,known,slotKey)
-    if(existing)return sessionView(tx,known,slotKey,existing,frozen)
+    if(existing){assertNativeAdmission(snapshot,slotKey,existing,attempt.startedAt);return sessionView(tx,known,slotKey,existing,frozen)}
     const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:frozen.sessionSnapshot.testType,version:frozen.sessionSnapshot.engineVersion,scoringVersion:frozen.sessionSnapshot.scoringVersion})
     if(hold)cognitiveFail(409,'该认知协议暂停新任务，请联系研究者')
     const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
       researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot}):null
-    const locked=await freezeSurveyTaskPrefix(tx,known,snapshot,slotKey,input.priorAnswers,assignment)
+    const locked=await freezeSurveyTaskPrefix(tx,known,snapshot,slotKey,input.priorAnswers,assignment,attempt.startedAt)
     const now=new Date()
     const session=await tx.surveyCognitiveSession.create({data:{id:randomUUID(),...scope(known,slotKey),epoch:1,
       measurementDigest:frozen.measurementDigest,status:'IN_PROGRESS',
@@ -101,8 +108,9 @@ export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:st
 export async function readSurveyCognitive(proof:SurveyCognitiveProof,slotKey:string,sessionId:string){
   const known=await verifiedSurveyAttempt(proof)
   return prisma.$transaction(async tx=>{
-    const {snapshot}=await lockAccess(tx,proof,known,true)
+    const {attempt,snapshot}=await lockAccess(tx,proof,known,true)
     const frozen=frozenUnit(snapshot,slotKey),current=await boundSession(tx,known,slotKey,sessionId)
+    assertNativeAdmission(snapshot,slotKey,current,attempt.startedAt)
     if(current.measurementDigest!==frozen.measurementDigest)cognitiveFail(409,'认知会话测量身份不匹配')
     return sessionView(tx,known,slotKey,current,frozen)
   })
@@ -124,9 +132,10 @@ export async function interruptSurveyCognitive(proof:SurveyCognitiveProof,slotKe
 export async function restartSurveyCognitive(proof:SurveyCognitiveProof,slotKey:string,sessionId:string,epoch:number){
   const known=await verifiedSurveyAttempt(proof)
   return prisma.$transaction(async tx=>{
-    const {snapshot}=await lockAccess(tx,proof,known)
+    const {attempt,snapshot}=await lockAccess(tx,proof,known)
     const frozen=frozenUnit(snapshot,slotKey)
     const replacement=await latest(tx,known,slotKey)
+    if(replacement)assertNativeAdmission(snapshot,slotKey,replacement,attempt.startedAt)
     if(epoch===1&&replacement?.epoch===2){
       const old=await tx.surveyCognitiveSession.findFirst({where:{...scope(known,slotKey),id:sessionId,epoch:1,status:'ABANDONED'}})
       if(old&&old.measurementDigest===frozen.measurementDigest&&replacement.measurementDigest===frozen.measurementDigest)
@@ -170,6 +179,7 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
     const {attempt,snapshot:publication}=await lockAccess(tx,proof,known,true)
     const liveFrozen=frozenUnit(publication,slotKey)
     const current=await boundSession(tx,known,slotKey,sessionId,input.attemptEpoch)
+    assertNativeAdmission(publication,slotKey,current,attempt.startedAt)
     if(current.measurementDigest!==frozen.measurementDigest||liveFrozen.measurementDigest!==frozen.measurementDigest)
       cognitiveFail(409,'认知测量定义发生变化')
     const admitted=decryptUnifiedRuntimePayload<AdministrationProvenanceV1>(current.admissionCipher)

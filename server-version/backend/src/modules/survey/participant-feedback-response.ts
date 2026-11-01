@@ -1,3 +1,4 @@
+import {blockedSurveyNativeInstruments} from '../bundle-product/survey-native-admission'
 import {savedSurveyNativeFeedback} from '../bundle-product/survey-native'
 import type {FrozenGovernedPackage} from './publication.service'
 import type {ResearchFrozenUnit} from './publication.service'
@@ -13,7 +14,8 @@ type FeedbackProjection={kind:'GENERAL_ONLY'}|{kind:'DESCRIPTIVE';measurements:F
  * cache; callers must establish their own current authorization boundary. */
 export function projectSurveyParticipantFeedback(units:readonly ResearchFrozenUnit[],result:SurveyComputedFinal,collectionClosed:boolean,packages:readonly FrozenGovernedPackage[]=[]):FeedbackProjection|null{
   const measurements:Feedback[]=[];let pending=false
-  for(const unit of units.filter(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
+  const blocked=blockedSurveyNativeInstruments(packages,result)
+  for(const unit of units.filter(unit=>!blocked.has(unit.instrumentKey)&&(unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE'))){
     const stored=result.units.find(candidate=>candidate.instrumentKey===unit.instrumentKey)
     if(!stored)return null
     const feedback=unit.kind==='COGNITIVE'?cognitiveParticipantFeedback(unit,stored,collectionClosed):
