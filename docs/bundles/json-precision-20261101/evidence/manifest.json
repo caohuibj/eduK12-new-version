@@ -1,0 +1,27 @@
+[
+  {
+    "name": "migrate.log",
+    "sha256": "143c73bd691544641f8c27b959c9c7d78fb51053fe8209b2a524758926a80b1a",
+    "gzipSha256": "9755ae9f82560d6aabd582b387ba465f6d674e1ff0b6b1a7f0d99f4ffb166f52"
+  },
+  {
+    "name": "before.log",
+    "sha256": "1378f60f112622e69955b22bfd6507a97010c382d88080da24aab57ba8833410",
+    "gzipSha256": "dabfc8d3255f314bbafb65aa470bfab569b08ae2442ff94306c14cd5f7a3a2c2"
+  },
+  {
+    "name": "after.log",
+    "sha256": "6aa8e8d7dd6d60f6cc18e68802206d020cde25ad2e008b61bf99a4246ca4c452",
+    "gzipSha256": "feea05bf96be97c3044a81de37a9d908d526984bb0a2a08ca28eb1ede5aa9a17"
+  },
+  {
+    "name": "types.log",
+    "sha256": "b917bdc7ae45e6844a4cbc5ef2103f6ccffc7dcb721b02becad703e750c7efb1",
+    "gzipSha256": "980e9e0d005c06cd8bcc78fbd01c1e8760b6fd8ca573347a23f4473c505023d0"
+  },
+  {
+    "name": "backend-types.json",
+    "sha256": "b917bdc7ae45e6844a4cbc5ef2103f6ccffc7dcb721b02becad703e750c7efb1",
+    "gzipSha256": "980e9e0d005c06cd8bcc78fbd01c1e8760b6fd8ca573347a23f4473c505023d0"
+  }
+]
