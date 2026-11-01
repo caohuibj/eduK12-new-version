@@ -10,6 +10,9 @@ on:
         type: boolean
         default: true
         description: 'False only for an independently verified functional-only integration; all functional checks remain mandatory'
+      focus:
+        type: string
+        default: full
       admin_permissions_functional:
         type: boolean
         default: false
@@ -27,7 +30,7 @@ env:
 
 jobs:
   backend:
-    name: ${{ inputs.run_performance_tests && 'backend (migrate + build + performance gate)' || 'backend (migrate + build + functional gate; performance not executed)' }}
+    name: ${{ inputs.focus == 'form-intake' && 'backend (affected compile + Form API/authority/PG)' || inputs.run_performance_tests && 'backend (migrate + build + performance gate)' || 'backend (migrate + build + functional gate; performance not executed)' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -134,33 +137,54 @@ jobs:
             fi
           done
           exit 1
+      - name: validate bounded backend API focus
+        if: inputs.focus != 'full'
+        env:
+          BACKEND_FOCUS: ${{ inputs.focus }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {backendApiFocus} from '../../.github/scripts/backend-api-scope.mjs';
+          import {changedEntries} from '../../.github/scripts/content-scope.mjs';
+          const read=ref=>file=>execFileSync('git',['show',ref+':'+file],{encoding:'utf8'});
+          assert.equal(process.env.BACKEND_FOCUS,'form-intake');
+          assert.equal(backendApiFocus(changedEntries(process.env.CI_BASE_SHA),{readHeadFile:read('HEAD'),readBaseFile:read(process.env.CI_BASE_SHA)}),'form-intake');
+          JS
       - name: content routing boundary tests
+        if: inputs.focus != 'form-intake'
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
         run: npx prisma generate
       # Compile before seeding, upgrade rehearsal and long-running data gates.
       # One actual backend build; later jobs consume this exact verified artifact.
       - name: build (tsc) — fail fast on source/type errors
-        run: npm run build
+        run: ${{ inputs.focus == 'form-intake' && 'npx tsc' || 'npm run build' }}
       - name: prisma migrate deploy
         run: npm run db:migrate:guarded
       - name: seed reference and configuration data
+        if: inputs.focus != 'form-intake'
         run: npm run db:seed
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: backfill and validate check-in token protection
+        if: inputs.focus != 'form-intake'
         run: npm run db:backfill:checkin-tokens
       - name: guarded migration idempotency after seeded data
+        if: inputs.focus != 'form-intake'
         run: npm run db:migrate:guarded
       - name: PR3 populated baseline-to-head upgrade rehearsal
+        if: inputs.focus != 'form-intake'
         run: node scripts/pr3-baseline-upgrade-rehearsal.mjs
       - name: prepare release preflight upload directory
         run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
+        if: inputs.focus != 'form-intake'
         run: npm run db:release:preflight
       - name: verify SJT immutable releases and publication authority
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && inputs.focus != 'form-intake'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -168,13 +192,24 @@ jobs:
           git fetch --no-tags origin "$PUBLICATION_BASE_SHA"
           npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
       - name: cognitive task manifests and dependency boundaries
+        if: inputs.focus != 'form-intake'
         run: npm run cognitive:contracts
       - name: Cognitive onboarding with frontend acceptances
+        if: inputs.focus != 'form-intake'
         run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
       - name: Bundle content and immutable history
+        if: inputs.focus != 'form-intake'
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npx tsx scripts/bundle-content-check.ts
+      - name: native Form strict input, real HTTP authority and PostgreSQL save/readback
+        if: inputs.focus == 'form-intake'
+        env:
+          SURVEY_ORIGINAL_FORM_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+        run: npm test -- src/__tests__/survey/original-form-intake.test.ts src/__tests__/survey/original-form-http.postgres.integration.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-functional-vitest.json
+      - name: require both selected Form suites with no skips
+        if: inputs.focus == 'form-intake'
+        run: node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-functional-vitest.json src/__tests__/survey/original-form-intake.test.ts src/__tests__/survey/original-form-http.postgres.integration.test.ts
       - name: bind backend artifact to source and run
         run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write backend
       - name: publish tested backend build
@@ -217,15 +252,16 @@ jobs:
           if-no-files-found: error
           overwrite: true
       - name: prelaunch load and resource contract self-tests
+        if: inputs.focus != 'form-intake'
         run: node --test ../scripts/load/prelaunch-mixed-load.test.mjs ../scripts/prelaunch-resource-preflight.test.mjs
       - name: Wave1 calibration generator contracts
         run: python3 scripts/learning-motivation-wave1/test_reference_generation.py
       - name: 200-completion performance and report integrity gate
-        if: inputs.run_performance_tests
+        if: inputs.run_performance_tests && inputs.focus != 'form-intake'
         # Keep the <10s burst on its own hosted VM and durable PostgreSQL.
         run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-performance-vitest.json
       - name: aggregate encryption, readability and terminal replay functional contracts
-        if: ${{ !inputs.run_performance_tests }}
+        if: ${{ !inputs.run_performance_tests && inputs.focus != 'form-intake' }}
         # Match both functional cases exactly. The 200-completion case remains
         # visibly unexecuted in JSON and is never reported as performance passed.
         run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --testNamePattern='(writes ciphertext only and keeps the report readable through the service|keeps one terminal report and timestamp across concurrent completion and replay)$' --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-functional-vitest.json
@@ -240,10 +276,10 @@ jobs:
             date -u +"timestamp %FT%TZ"
           } > /tmp/eduk12-ci-env.txt
       - name: performance suite must not skip
-        if: inputs.run_performance_tests
+        if: inputs.run_performance_tests && inputs.focus != 'form-intake'
         run: node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-performance-vitest.json src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
       - name: functional aggregate must have exactly two passes and only the named performance nonexecution
-        if: ${{ !inputs.run_performance_tests }}
+        if: ${{ !inputs.run_performance_tests && inputs.focus != 'form-intake' }}
         run: node "$GITHUB_WORKSPACE/.github/scripts/training-functional-report.mjs" /tmp/eduk12-backend-functional-vitest.json
       - name: administrator real PostgreSQL, HTTP, ceremony and migration recovery contracts
         if: inputs.admin_permissions_functional || inputs.training_followup_functional
@@ -337,7 +373,7 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.run_performance_tests && 'backend-performance-vitest-report' || 'backend-functional-vitest-report' }}
+          name: ${{ inputs.focus == 'form-intake' && 'backend-form-intake-vitest-report' || inputs.run_performance_tests && 'backend-performance-vitest-report' || 'backend-functional-vitest-report' }}
           path: |
             /tmp/eduk12-backend-performance-vitest.json
             /tmp/eduk12-backend-functional-vitest.json

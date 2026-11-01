@@ -161,7 +161,7 @@ export function requiredChecks(needs, draft) {
     return ['scope','scoped-release', ...(p.required?.includes('sast') ? ['codeql'] : [])];
   }
   if (scope.scenario === 'release-tooling') return ['scope','release-tools',...(!draft&&scope.image_build==='true'?['docker']:[]),...(!draft?['codeql']:[])];
-  if (scope.scenario === 'backend') return ['scope',...(draft?['pr-light-backend']:['backend','backend-regression','docker','codeql'])];
+  if (scope.scenario === 'backend') return ['scope',...(draft?['pr-light-backend']:['backend',...(scope.backend_focus==='form-intake'?[]:['backend-regression']),'docker','codeql'])];
   if (scope.cognitive_intake_light === 'true') return ['scope','content',...(!draft?['codeql']:[])];
   const dependencies = scope.scenario === 'dependencies';
   let checks = ['scope'];
@@ -826,6 +826,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const p=JSON.parse(needs.scope.outputs.access_efficiency_plan);
     const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
     if(p.head!==head||JSON.stringify(accessEfficiencyPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-access-efficiency-plan');
+  }
+  if(needs.scope?.outputs?.backend_focus==='form-intake'){
+    const {backendApiFocus}=await import('./backend-api-scope.mjs');
+    const {changedEntries}=await import('./content-scope.mjs');
+    const base=process.env.CI_BASE_SHA,head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    const read=ref=>file=>execFileSync('git',['show',ref+':'+file],{encoding:'utf8'});
+    if(backendApiFocus(changedEntries(base,head),{readHeadFile:read(head),readBaseFile:read(base)})!=='form-intake')failed.push('recomputed-backend-api-focus');
   }
   if(needs.scope?.outputs?.application_route==='backend-security-efficiency'){
     const {backendSecurityEfficiencyPlan}=await import('./backend-security-efficiency-scope.mjs');
