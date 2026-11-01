@@ -1,0 +1,150 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "emotion_beliefs_strategies_adult_zh_cn",
+    "bundleVersion": "0.2.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "成人情绪信念与调节策略｜理论试验版",
+    "description": "EBQ16信念与ERSS19四策略的独立原分及EXPERIMENTAL两轴叙事；18+成人自评，不提供情绪能力总分。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18
+    },
+    "slots": [
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "emotion_beliefs_strategies_adult_zh_cn_context",
+        "instrumentVersion": "0.2.0",
+        "respondentType": "SELF"
+      },
+      {
+        "slotKey": "beliefs",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "ebq16_zh_cn_research",
+        "instrumentVersion": "1.0.2",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "neg_controllability",
+          "pos_controllability",
+          "neg_usefulness",
+          "pos_usefulness",
+          "general_controllability",
+          "general_usefulness"
+        ],
+        "admissionContext": {
+          "assessmentContext": "adult_self_reflection",
+          "requirements": [
+            {
+              "contextKey": "adult_18_plus",
+              "allowedValues": [
+                true
+              ]
+            },
+            {
+              "contextKey": "subject_age_years"
+            },
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
+      },
+      {
+        "slotKey": "strategies",
+        "unitType": "SCALE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "erss19_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "admissionContext": {
+          "assessmentContext": "adult_self_reflection",
+          "requirements": [
+            {
+              "contextKey": "adult_18_plus",
+              "allowedValues": [
+                true
+              ]
+            },
+            {
+              "contextKey": "subject_age_years"
+            },
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.2.0"
+    },
+    "contextDefinitionKey": "emotion_beliefs_strategies_adult_zh_cn_context",
+    "contextDefinitionVersion": "0.2.0",
+    "reportDefinitionKey": "emotion_beliefs_strategies_adult_zh_cn_report",
+    "reportDefinitionVersion": "0.2.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "ebq16_zh_cn_research",
+        "erss19_zh_cn_research"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "B08为18岁及以上成人SELF中文工作组合，35题，两个来源各自按原指导语报告通常看法／平时做法；不是学生SEL版。",
+      "EBQ一般不可控制性C是8题SUM、范围8–56，高分表示更认同情绪不易改变；不是情绪控制能力。ERSS重评R是7题均分、范围1–7，高分表示更报告这类做法；无ERSS19题总分，也不形成Bundle总分。",
+      "联合坐标c=(C−8)/48、r=(R−1)/6在共享引擎中计算并冻结；C≤20/≥44和R≤2.5/≥5.5保留为等价四角条件。坐标只是各自理论量尺位置，不是百分位，不使两个构念可相加。",
+      "EM1–EM4只是EXPERIMENTAL理论叙事锚点，不是作者阈值、经验类别、LPA、人群概率、临床诊断或已验证支持方案。其余合法完整结果连续解释，缺任一核心轴不分型，不按当前样本中位数改变阈值。",
+      "认知重评并非所有情境都更好，表达抑制也不能一概判坏；请结合情境、目标和已有其他做法理解。信念、策略使用、情绪能力与心理健康不能互相替代推断。",
+      "原工具中文为项目工作译稿，原文证据不等于本中文或新Bundle已验证；保留原叶工具版权、来源、译审与授权边界，不自动扩大使用或分享。",
+      "缺项只收起依赖它的派生值与叙事，保留获准且独立完整的维度。沿共享引擎读取被选维度的原质量状态与missing-only原标记；其他质量问题仍保留无效或有限状态，不以非空数值绕过质量。无插补、不补零。",
+      "packageSchemaVersion3 / declarative-evidence-v1@1.2.0冻结原分、两条连续量尺位置及EM1–EM4主题状态；其余合法完整结果保留BOUNDARY和连续说明，margin=null。信念和策略按独立面板阅读，不使用Profile V2的匹配几何。",
+      "只描述本次自评。群体培训可讨论策略分布和需要，不用于绩效、招聘、纪律或诊断；纵向须固定两源版本与指导语，分别跟踪，不拼接回忆窗作为项目因果效果。",
+      "这是DRAFT内容声明。共享保存报告和受众投影只在数值、个体解释与全部依赖允许时展示Bundle原创叙事，不打开叶量表推导标签或材料权限。未宣称本包已实际安装、发布或完成生产FINAL旅程。年龄确认使用既有出生年月准入，成年勾选或自报年龄不能替代该准入。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": [],
+  "packageSchemaVersion": 3
+}

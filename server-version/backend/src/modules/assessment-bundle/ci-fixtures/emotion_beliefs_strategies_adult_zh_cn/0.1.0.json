@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {
+    "adult_18_plus": true
+  },
+  "slots": {
+    "beliefs": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "EBQ_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EBQ_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EBQ_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EBQ_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EBQ_07",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_08",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_09",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "EBQ_10",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "EBQ_11",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_12",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_13",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "EBQ_14",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "EBQ_15",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "EBQ_16",
+          "responseValue": "4"
+        }
+      ]
+    },
+    "strategies": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "ERSS_01",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_02",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_05",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "ERSS_07",
+          "responseValue": "7"
+        },
+        {
+          "itemCode": "ERSS_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "ERSS_09",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "ERSS_10",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "ERSS_11",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "ERSS_12",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "ERSS_13",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "ERSS_14",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "ERSS_15",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_16",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_17",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_18",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ERSS_19",
+          "responseValue": "4"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "belief_neg_controllability",
+    "belief_pos_controllability",
+    "belief_neg_usefulness",
+    "belief_pos_usefulness",
+    "belief_general_controllability",
+    "belief_general_usefulness",
+    "strategy_situation_modification",
+    "strategy_attentional_deployment",
+    "strategy_cognitive_reappraisal",
+    "strategy_suppression",
+    "em3"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "key": "emotion_beliefs_strategies_adult_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "beliefs",
+      "kind": "conclusions",
+      "title": "信念｜通常怎样看待情绪（原始合计）",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "belief_neg_controllability",
+        "belief_pos_controllability",
+        "belief_neg_usefulness",
+        "belief_pos_usefulness",
+        "belief_general_controllability",
+        "belief_general_usefulness"
+      ]
+    },
+    {
+      "blockId": "strategies",
+      "kind": "conclusions",
+      "title": "策略｜平时报告的做法（各维均分）",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "strategy_situation_modification",
+        "strategy_attentional_deployment",
+        "strategy_cognitive_reappraisal",
+        "strategy_suppression"
+      ]
+    },
+    {
+      "blockId": "joint",
+      "kind": "conclusions",
+      "title": "这次信念与做法的组合｜EXPERIMENTAL",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "em1",
+        "em2",
+        "em3",
+        "em4",
+        "continuous"
+      ]
+    },
+    {
+      "blockId": "evidence",
+      "kind": "evidence",
+      "title": "固定来源原分｜信念SUM、策略均分，量尺位置不等于百分位",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "scope",
+      "kind": "limitations",
+      "title": "缺失、质量与解释边界",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "missing_axes",
+        "invalid_axes",
+        "not_applicable_axes",
+        "out_of_range"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "本次结果信息不完整，缺轴不分型；保留现有合同允许的独立结果。",
+    "limited": "本次来源质量有限，暂不形成依赖该来源的两轴解释。",
+    "unavailable": "本次无法形成有依据的组合解释；请检查成年适用范围、来源与质量，不将其解释为能力低。"
+  }
+}

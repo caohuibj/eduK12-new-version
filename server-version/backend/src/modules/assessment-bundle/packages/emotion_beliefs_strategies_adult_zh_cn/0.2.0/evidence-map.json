@@ -1,0 +1,145 @@
+[
+  {
+    "evidenceKey": "adult",
+    "slotKey": "context",
+    "selector": "adult_18_plus",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "context.adult",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "beliefs.neg_controllability",
+    "slotKey": "beliefs",
+    "selector": "neg_controllability",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.neg_controllability",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "beliefs.pos_controllability",
+    "slotKey": "beliefs",
+    "selector": "pos_controllability",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.pos_controllability",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "beliefs.neg_usefulness",
+    "slotKey": "beliefs",
+    "selector": "neg_usefulness",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.neg_usefulness",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "beliefs.pos_usefulness",
+    "slotKey": "beliefs",
+    "selector": "pos_usefulness",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.pos_usefulness",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "beliefs.general_controllability",
+    "slotKey": "beliefs",
+    "selector": "general_controllability",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.general_controllability",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "beliefs.general_usefulness",
+    "slotKey": "beliefs",
+    "selector": "general_usefulness",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.general_usefulness",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "strategies.situation_modification",
+    "slotKey": "strategies",
+    "selector": "situation_modification",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.situation_modification",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "strategies.attentional_deployment",
+    "slotKey": "strategies",
+    "selector": "attentional_deployment",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.attentional_deployment",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "strategies.cognitive_reappraisal",
+    "slotKey": "strategies",
+    "selector": "cognitive_reappraisal",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.cognitive_reappraisal",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "strategies.suppression",
+    "slotKey": "strategies",
+    "selector": "suppression",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "emotion.suppression",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "age",
+    "slotKey": "context",
+    "selector": "subject_age_years",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "context.age",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "birth_month",
+    "slotKey": "context",
+    "selector": "birth_year_month",
+    "valueType": "string",
+    "unit": "context",
+    "construct": "context.birth_month",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "18岁及以上一般成人SELF，EBQ16@1.0.2与ERSS19@1.0.0共35题。精确叶身份保留：EBQ C=1.0.2:1.0.0/P=none-v1/基础R=1.1.0/zh-CN localization1.0.1；ERSS C=1.0.0:1.0.0/P=none-v1/基础R=1.1.0/zh-CN localization1.0.0。两源无常模阈值，none-v1是现成参数版本。只消费既有计分结果，不复制题本或修改叶工具。schema3共享引擎冻结c=(C−8)/48与r=(R−1)/6；原SUM、均分、四角和连续中间状态独立保留，不生成能力总分、常模、诊断或人群概率。Bundle原创叙事经过实际来源数值与个体解释权限交集；质量详情单独受限，来源标签或材料权限不扩大。中文工作译稿、本地效度和原工具证据与本组合EXPERIMENTAL设计分开。DRAFT声明与合成保存读回不表示实际安装、发布、作者批准或生产FINAL验证。",
+  "references": [
+    {
+      "id": "ebq_original",
+      "citation": "Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15, e0231395. https://doi.org/10.1371/journal.pone.0231395 . 原叶source明确CC BY 4.0及独立中文工作译稿，译审/本地验证待办沿用；只支持工具来源与原计分，不验证本Bundle阈值。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "erss_original",
+      "citation": "Torrence, B. S., & Connelly, S. (2019). Emotion Regulation Tendencies and Leadership Performance: An Examination of Cognitive and Behavioral Regulation Strategies. Frontiers in Psychology, 10, 1486. https://doi.org/10.3389/fpsyg.2019.01486 . 原叶source保留CC BY 4.0、ERQ源流及独立中文工作译稿边界；不据领导研究标题推断教师胜任力。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "b08_design",
+      "citation": "本项目原创B08组合设计。四角尾区与行动建议属于EXPERIMENTAL理论叙事提案，原工具研究不验证本组合阈值；无专家审批、经验类别、常模或疗效验证声明。",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    }
+  ]
+}
