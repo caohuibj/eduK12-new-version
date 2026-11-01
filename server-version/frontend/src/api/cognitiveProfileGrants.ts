@@ -1,7 +1,8 @@
 import api from './client'
+import {catalogQuery,type CatalogClassificationTag,type CatalogFilters,type CatalogTagFacets} from './catalogDiscovery'
 import type {StandardConfigurationPointer} from './standardConfigurationGrants'
 export type CognitiveProfile='experience'|'standard'|'research'
-export type CognitiveProfileChoice={configId:string;title:string;artifactHash:string;profile:CognitiveProfile;configuration:Record<string,unknown>;available:boolean;unavailableReason:string|null}
+export type CognitiveProfileChoice={configId:string;title:string;artifactHash:string;profile:CognitiveProfile;configuration:Record<string,unknown>;available:boolean;unavailableReason:string|null;classificationTags?:CatalogClassificationTag[]}
 export type CognitiveProfileUse={id:string;version:number;userId:string;issuerId:string;configurationName:string;profile:CognitiveProfile;artifactHash:string;
  selectedBinding:StandardConfigurationPointer;validFrom:string;expiresAt:string;revokedAt:string|null;canManage:boolean}
 export type CognitiveProfileIssue={requestId:string;userId:string;artifactHash:string;configurationName:string;validFrom:string;expiresAt:string;
@@ -33,7 +34,7 @@ export function sameCognitiveProfileOperation(p:CognitiveProfilePending,operatio
   &&(a.replaces?Boolean(b.replaces&&a.replaces.grantId===b.replaces.grantId&&a.replaces.expectedVersion===b.replaces.expectedVersion&&a.replaces.reason===b.replaces.reason):!b.replaces)
 }
 export const cognitiveProfileGrantsApi={
- catalog:(page=1)=>api.get<{page:number;hasMore:boolean;list:CognitiveProfileChoice[]}>(prefix+'/catalog?page='+page),
+ catalog:(page=1,filters?:CatalogFilters)=>api.get<{page:number;hasMore:boolean;list:CognitiveProfileChoice[];tagFacets?:CatalogTagFacets}>(prefix+'/catalog?'+(filters?catalogQuery(page,filters):'page='+page)),
  uses:(configId:string,userId:string)=>api.get<{hasMore:boolean;list:CognitiveProfileUse[]}>(`${prefix}/${encodeURIComponent(configId)}/use-grants?userId=${encodeURIComponent(userId)}`),
  preview:(choice:CognitiveProfileChoice)=>api.get<{artifactHash:string;reportStyle:{title:string;profile:CognitiveProfile;caveats:string[];disclaimer:string;headline:Array<{key:string;label:string}>;detail:Array<{key:string;label:string}>}}>(`${prefix}/${encodeURIComponent(choice.configId)}/${choice.profile}/preview?artifactHash=${choice.artifactHash}`),
  send:(p:CognitiveProfilePending)=>p.kind==='ISSUE'?api.post(`${prefix}/${encodeURIComponent(p.configId)}/${p.profile}/use-grants`,p.body)

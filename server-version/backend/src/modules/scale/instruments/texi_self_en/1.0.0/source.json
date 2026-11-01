@@ -1,0 +1,1133 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "texi_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TEXI 青少年执行功能自评（英文原题）",
+      "abbreviation": "TEXI Self",
+      "instrumentFamily": "Teenage Executive Functioning Inventory"
+    },
+    "construct": {
+      "primaryDomain": "EXECUTIVE_FUNCTION",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "青少年对日常工作记忆及抑制、自我调节困难的自我报告。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "texi",
+        "self_report",
+        "working_memory",
+        "inhibition",
+        "source:public",
+        "norms:not_established",
+        "translation:original_english",
+        "license:author_website_free_use",
+        "license:commercial_scope_unknown"
+      ]
+    },
+    "population": {
+      "minAge": 13,
+      "maxAge": 19,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "13–19岁来自2020塞尔维亚原研究；官网译本的可获取性不等于语言或大陆人群验证。18–19岁与成人版交叉，按研究目的选定并保持版本一致。"
+    },
+    "administration": {
+      "itemCount": 20,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般日常情况；原表未指定固定回顾期",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "题序与1–5选项固定；预计时长为平台估计。",
+        "只报告9题工作记忆均分和11题抑制均分；完整作答为平台保守缺失规则。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原版研究可追溯，本平台数字化版及中文报告未独立验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "texi-original-2020",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "塞尔维亚青少年及家长",
+        "ageRange": "13–19岁",
+        "locale": "sr",
+        "territory": "RS",
+        "sampleSize": 302,
+        "studyDesign": "横断面自评与家长评定；原研究未检验与行为任务的效度关联。",
+        "rating": "MIXED",
+        "citation": "Thorell, L. B., Lazarević, N., Milovanović, I., & Bugarski Ignjatović, V. (2020). Psychometric properties of the Teenage Executive Functioning Inventory (TEXI): A freely available questionnaire for assessing deficits in working memory and inhibition among adolescents. Child Neuropsychology, 26(6), 857–864. https://doi.org/10.1080/09297049.2020.1726885.",
+        "doi": "10.1080/09297049.2020.1726885",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/32090688/",
+        "notes": "原研究自评／家长结构与信度证据，不转移为大陆中文验证或教师验证。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://chexi.se/onewebmedia/English%20TEXI%20self-report.pdf; Lisa B. Thorell, Karolinska Institutet",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "直接转录官网现成语言题本，不是项目自编或自行将他评改成自评；仅合并PDF换行。报告与说明附注由项目编写。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "texi_self_en-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 156,
+        "maxExclusive": 240
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "texi_self_en-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": true
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": true
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": true
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "texi_self_en-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "notes": [
+      "官网允许研究者和临床工作者免费使用已列语言版本，免另行作者许可；商业数字化／再分发授权范围未完整确认，沿用现有InstrumentAuthorization人工记录。",
+      "论文CC BY 4.0由出版商Crossref许可记录核实；不把论文许可自动扩大至Angela Siu独立中文译文。"
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Below are some statements about how you are as a person. Mark your answer by circling one of the numbers to the right of each statement. Perhaps others feel differently, but we want to know what you think about yourself. Try to answer as honestly as possible.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "https://chexi.se/onewebmedia/English%20TEXI%20self-report.pdf; 仅PDF换行与数字化排版处理，不改题文。"
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "executive_function",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      },
+      "respondentType": "SELF",
+      "source": {
+        "title": "TEXI 青少年执行功能自评（英文原题）",
+        "citation": "Thorell, L. B., Lazarević, N., Milovanović, I., & Bugarski Ignjatović, V. (2020). Psychometric properties of the Teenage Executive Functioning Inventory (TEXI): A freely available questionnaire for assessing deficits in working memory and inhibition among adolescents. Child Neuropsychology, 26(6), 857–864. https://doi.org/10.1080/09297049.2020.1726885. English self-report; Lisa B. Thorell.",
+        "url": "https://chexi.se/onewebmedia/English%20TEXI%20self-report.pdf",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Thorell et al. (2020), © The Authors, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); publisher-deposited Crossref record https://api.crossref.org/works/10.1080/09297049.2020.1726885. Self-report from the original instrument, cross-checked against author-hosted English PDF. PDF line wrapping removed; no item rewording. Chinese report and scoring implementation prepared by EduK12. This does not license the separate Angela Siu translation or constitute a durable application grant."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "texi_self_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "Definitely not true",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Not true",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Partially true",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "True",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "Definitely true",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "TEXI-01",
+          "content": "I have difficulty remembering long instructions",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-02",
+          "content": "I have difficulty remembering what I need to do in the middle of an activity",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-03",
+          "content": "I do things without first thinking about what could happen",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-04",
+          "content": "I have difficulty stopping myself from doing things even though I know it’s not allowed",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-05",
+          "content": "When someone asks me to do several things, I cannot remember all of them",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-06",
+          "content": "I cannot stop myself from laughing or smiling even though I know that it is inappropriate at the time",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-07",
+          "content": "I have difficulty coming up with a new way to solve a problem when I get stuck",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-08",
+          "content": "When I am asked to get something, I forget what I was supposed to get",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-09",
+          "content": "I find it difficult to plan things (e.g., remembering to bring everything necessary for school or when going on a trip)",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-10",
+          "content": "I find it difficult to make myself stop an activity that I like (e.g., I sit in front of the computer or mobile device even though it is time to go to bed)",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-11",
+          "content": "I have difficulty understanding instructions unless I am shown how to do something",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-12",
+          "content": "I have difficulty with tasks involving several steps that need to be completed in a certain order",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-13",
+          "content": "I have difficulty learning from my mistakes (I repeat the same mistake over and over again)",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-14",
+          "content": "People that I meet seem to think that I am more lively/wild compared to others my age",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-15",
+          "content": "I have difficulty motivating myself to do things that I do not like to do",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-16",
+          "content": "I find it difficult to start a task if I am distracted by something more fun (e.g., I fail to start doing my homework and instead use my mobile device)",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-17",
+          "content": "I have difficulty stopping an activity when asked to do so",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-18",
+          "content": "I often get more excited compared to others my age if something special happens (e.g., parties, trips, birthdays, winning a game)",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-19",
+          "content": "I fail to finish things that I have started",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TEXI-20",
+          "content": "I put things off until the last minute",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "texi_self_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "TEXI-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TEXI-20",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "working_memory",
+            "type": "dimension",
+            "label": "Working-memory difficulties (mean 1–5)",
+            "description": "Official subscale item mean; higher means more self-reported difficulty.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TEXI-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "inhibition",
+            "type": "dimension",
+            "label": "Inhibition and self-regulation difficulties (mean 1–5)",
+            "description": "Official subscale item mean; higher means more self-reported difficulty.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TEXI-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TEXI-20",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "working_memory",
+          "inhibition"
+        ],
+        "scoreOrder": [
+          "working_memory",
+          "inhibition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "working_memory",
+            "headline": "Working-memory difficulties (mean 1–5)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "These answers describe your experience remembering instructions, arranging steps and planning activities. Higher means indicate more reported difficulties, not lower intelligence.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Think of one recent everyday situation and identify the step that was difficult."
+              },
+              {
+                "category": "strategy",
+                "text": "Try writing a short step-by-step checklist and look at the next step after finishing the current one."
+              }
+            ]
+          },
+          {
+            "scoreKey": "inhibition",
+            "headline": "Inhibition and self-regulation difficulties (mean 1–5)",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "These answers describe stopping preferred activities, starting and finishing tasks, and procrastination. This broad everyday experience is not equivalent to motor inhibition in a task.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Think of one recent everyday situation and identify the step that was difficult."
+              },
+              {
+                "category": "strategy",
+                "text": "Before starting homework, put your phone in a fixed place and choose a small first step."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Self-report for ages13–19, through the day before the20th birthday. Parent/teacher reports are distinct sources and cannot substitute for self-report.",
+          "At ages18–19, choose either the adolescent version or the18+ adult version for the study context. Scores are not interchangeable.",
+          "No age norms or validated diagnostic cutoffs are available from the author. This is not an IQ or ability grade.",
+          "The working-memory factor uses9 items; inhibition uses11 items. Each is a mean from1 to5; higher means more reported difficulties.",
+          "The2020 original sample comprised302 adolescents in Serbia and their parents. It was not a Swedish sample or a mainland Chinese validation.",
+          "The2026 TC-TEXI study concerns a Taiwanese Traditional Chinese version, not validation of the separate Simplified Chinese translation.",
+          "The original form does not specify a7-day or30-day recall window. The platform does not invent one.",
+          "This is the English questionnaire and independent report. The Bundle adds Chinese descriptive text; that does not turn these items into a Chinese translation."
+        ],
+        "disclaimer": "This report supports reflection on everyday experiences. It does not diagnose executive-function deficits or calculate a combined ability score.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all-1",
+        "answers": [
+          {
+            "itemCode": "TEXI-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-20",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "working_memory": 1,
+            "inhibition": 1
+          },
+          "totalScoreKeys": [
+            "working_memory",
+            "inhibition"
+          ]
+        }
+      },
+      {
+        "name": "all-3",
+        "answers": [
+          {
+            "itemCode": "TEXI-01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TEXI-20",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "working_memory": 3,
+            "inhibition": 3
+          },
+          "totalScoreKeys": [
+            "working_memory",
+            "inhibition"
+          ]
+        }
+      },
+      {
+        "name": "all-5",
+        "answers": [
+          {
+            "itemCode": "TEXI-01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-20",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "working_memory": 5,
+            "inhibition": 5
+          },
+          "totalScoreKeys": [
+            "working_memory",
+            "inhibition"
+          ]
+        }
+      },
+      {
+        "name": "item-13-is-working-memory",
+        "answers": [
+          {
+            "itemCode": "TEXI-01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "TEXI-14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TEXI-20",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "working_memory": 1.4444444444444444,
+            "inhibition": 1
+          },
+          "totalScoreKeys": [
+            "working_memory",
+            "inhibition"
+          ]
+        }
+      }
+    ]
+  }
+}

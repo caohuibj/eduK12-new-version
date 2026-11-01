@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "task": "sizecongruity",
+  "order": 102,
+  "identities": [
+    {
+      "testType": "sizecongruity",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 102
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "sizecongruity",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/sizecongruity/sizecongruity.registry.ts",
+      "export": "sizecongruityRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      102,
+      102
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/sizecongruity/__tests__/SizecongruityTask.test.tsx",
+      "src/modules/cognitive/tasks/sizecongruity/__tests__/prng.test.ts"
+    ]
+  }
+}

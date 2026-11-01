@@ -1,0 +1,16 @@
+{
+  "values": {
+    "chexi_working_memory": {
+      "state": "present",
+      "value": 3
+    },
+    "chexi_inhibition": {
+      "state": "present",
+      "value": 3
+    }
+  },
+  "expectedRuleIds": [
+    "daily_observation"
+  ],
+  "expectedKind": "COMPUTED"
+}

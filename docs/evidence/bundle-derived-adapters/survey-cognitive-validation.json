@@ -1,0 +1,62 @@
+{
+  "scope": "Survey Corsi and digit-backward frozen report bridge for declared SELF schema3 Bundles",
+  "dependency": {
+    "helperCommit": "5957fd5f6eeac4290bf3e5b93b2dd2343c172f56",
+    "helperPullRequest": 504,
+    "copiedIntoThisCommit": false
+  },
+  "execution": {
+    "uniquePublicCases": 4,
+    "isolatedActualB15ProjectionCases": 1,
+    "firstReportRun": {
+      "passed": 2,
+      "failed": 2,
+      "cause": "Optional undefined Corsi report presentation fields rejected canonical persistence"
+    },
+    "affectedReportCasesAfterFix": {
+      "passed": 2,
+      "skipped": 2
+    },
+    "sourceAudienceBoundaryIncrement": {
+      "passed": 2,
+      "skipped": 2
+    }
+  },
+  "typecheck": {
+    "diagnostics": 0,
+    "productionClosureFiles": 2062,
+    "withChangedTestClosureFiles": 2111,
+    "originalFailures": [
+      {
+        "diagnostics": 13,
+        "cause": "Initial focused harness omitted existing Express auth/request augmentation roots; corrected harness, no product suppression"
+      },
+      {
+        "diagnostics": 1,
+        "cause": "Synthetic trial array inference; explicit existing envelope type fixed it"
+      }
+    ]
+  },
+  "preserved": [
+    "original scorer and terminal-level validation",
+    "legacy fixed 120-trial Go/No-Go",
+    "GENERAL feedback without new exact package binding",
+    "researcher-only source R restriction",
+    "original task approval and publication requirements",
+    "default legacy ADEXI redaction when no audience contract exists"
+  ],
+  "notExecuted": [
+    "formal CI",
+    "full role journeys",
+    "new browser task execution",
+    "database installation",
+    "production import",
+    "merge",
+    "deployment"
+  ],
+  "remaining": [
+    "compose independent PR504 helper and C adapter with core/admission/content candidates",
+    "union registry generation by main owner",
+    "one installed affected outlet check after integration"
+  ]
+}

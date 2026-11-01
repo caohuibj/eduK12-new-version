@@ -1,7 +1,8 @@
 import api from './client'
+import {catalogQuery,type CatalogClassificationTag,type CatalogFilters,type CatalogTagFacets} from './catalogDiscovery'
 
 export type StandardConfigurationChoice={id:string;title:string;toolKey:string;instrumentVersion:string;combinationHash:string;
-  state:string;versions:{CONTENT:string;PARAMETERS:string;REPORT:string};assignable:boolean;unavailableReason:string|null}
+  state:string;versions:{CONTENT:string;PARAMETERS:string;REPORT:string};assignable:boolean;unavailableReason:string|null;classificationTags?:CatalogClassificationTag[]}
 export type StandardConfigurationPointer={authorizationId:string;authorizationRevision:number;bindingHash:string;configurationHash:string}
 export type StandardConfigurationReplacement={grantId:string;expectedVersion:number;reason:string}
 export type StandardConfigurationLineage={selectedBinding:StandardConfigurationPointer;reason:string}
@@ -73,7 +74,7 @@ export function sameStandardConfigurationOperation(actorId:string,pending:Standa
 }
 const base='/questionnaire-products'
 export const standardConfigurationGrantsApi={
-  catalog:(page=1)=>api.get<{page:number;hasMore:boolean;list:StandardConfigurationChoice[]}>(base+'/standard-combinations/catalog',{params:{page}}),
+  catalog:(page=1,filters?:CatalogFilters)=>api.get<{page:number;hasMore:boolean;list:StandardConfigurationChoice[];tagFacets?:CatalogTagFacets}>(base+'/standard-combinations/catalog',{params:filters?Object.fromEntries(new URLSearchParams(catalogQuery(page,filters))):{page}}),
   grants:(id:string,query:{page?:number;userId?:string}={})=>api.get<{page:number;hasMore:boolean;list:StandardConfigurationUse[]}>(base+'/standard-combinations/'+encodeURIComponent(id)+'/use-grants',{params:{page:1,...query}}),
   issue:(choice:Pick<StandardConfigurationChoice,'id'|'combinationHash'>,input:{requestId:string;userId:string;configurationName?:string;expectedUseVersion?:number;expectedUseId?:string;replaces?:StandardConfigurationReplacement})=>
     api.post<StandardConfigurationIssueResult>(base+'/standard-combinations/'+encodeURIComponent(choice.id)+'/use-grants',{

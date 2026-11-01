@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "sharegame",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0"
+  },
+  "provenance": "Computed from committed v2 scorer on synthetic facts; zero, all-missing and answered-only denominator",
+  "cases": [
+    {
+      "name": "explicit-zero-and-missing",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "endowment": 20,
+              "response": "choice",
+              "given": 0,
+              "rtMs": 250,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "endowment": 50,
+              "response": "timeout",
+              "given": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "endowment": 100,
+              "response": "timeout",
+              "given": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "showProductIndex": false,
+        "metrics": {
+          "plannedRounds": 3,
+          "answeredRounds": 1,
+          "timeoutRounds": 2,
+          "omittedRounds": 0,
+          "responseRate": 0.3333333333333333,
+          "answeredEndowment": 20,
+          "zeroChoiceCount": 1,
+          "givingRate": 0,
+          "equalSplitCount": 0,
+          "generousRate": 0,
+          "givingRateSd": 0,
+          "medianDecisionMs": 250
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "incomplete": true,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "all-timeout",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "endowment": 20,
+              "response": "timeout",
+              "given": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "endowment": 50,
+              "response": "timeout",
+              "given": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "endowment": 100,
+              "response": "timeout",
+              "given": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "showProductIndex": false,
+        "metrics": {
+          "plannedRounds": 3,
+          "answeredRounds": 0,
+          "timeoutRounds": 3,
+          "omittedRounds": 0,
+          "responseRate": 0,
+          "answeredEndowment": 0,
+          "zeroChoiceCount": 0,
+          "givingRate": null,
+          "equalSplitCount": null,
+          "generousRate": null,
+          "givingRateSd": null,
+          "medianDecisionMs": null
+        },
+        "qualityFlags": {
+          "interpretable": false,
+          "incomplete": true,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "answered-denominator",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "endowment": 20,
+              "response": "choice",
+              "given": 0,
+              "rtMs": 250,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "endowment": 50,
+              "response": "choice",
+              "given": 25,
+              "rtMs": 250,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "endowment": 100,
+              "response": "timeout",
+              "given": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "showProductIndex": false,
+        "metrics": {
+          "plannedRounds": 3,
+          "answeredRounds": 2,
+          "timeoutRounds": 1,
+          "omittedRounds": 0,
+          "responseRate": 0.6666666666666666,
+          "answeredEndowment": 70,
+          "zeroChoiceCount": 1,
+          "givingRate": 0.3571,
+          "equalSplitCount": 1,
+          "generousRate": 0.5,
+          "givingRateSd": 0.25,
+          "medianDecisionMs": 250
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "incomplete": true,
+          "interrupted": false
+        }
+      }
+    }
+  ]
+}

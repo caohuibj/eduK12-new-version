@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSources, runtimeRefreshPlan, verifyResolvedPlan } from './ci-image-plan.mjs';
+import { buildSources, runtimeRefreshPlan, verifyResolvedPlan, catalogCompileRecipe } from './ci-image-plan.mjs';
 import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -185,4 +185,39 @@ test('CI image script forces only local Docker export for printed and executed b
   assert.throws(() => verifyResolvedPlan(resolved,true), /Only local Docker image outputs are allowed/);
   resolved.target.frontend.output = [{type:'docker'}];
   verifyResolvedPlan(resolved,true);
+});
+
+test('catalog recipe omits only the unchanged content checks and cannot change runtime bytes',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'catalog-recipe-'));
+ try {
+  const input=fixture(false,true);
+  const context=fileURLToPath(new URL('../../server-version/backend/',import.meta.url));
+  const source=readFileSync(join(context,'Dockerfile'),'utf8');
+  const recipe=join(dir,'Dockerfile');writeFileSync(recipe,catalogCompileRecipe(source));
+  for(const target of Object.values(input.target))target.context=context;
+  const env={CATALOG_DISCOVERY:'true',CATALOG_BACKEND_DOCKERFILE:recipe};
+  const plan=resolved(runtimeRefreshPlan(input,false,true,env));
+  verifyResolvedPlan(plan,false,true,env);
+  assert.equal(plan.target.backend.dockerfile,recipe);assert.equal(plan.target.worker.dockerfile,recipe);
+  assert.equal(readFileSync(recipe,'utf8'),source.replace('RUN npm run build\n','RUN npx tsc\n'));
+  writeFileSync(recipe,readFileSync(recipe,'utf8')+'\nRUN echo unexpected-runtime-change\n');
+  assert.throws(()=>verifyResolvedPlan(plan,false,true,env),/Only unchanged-content onboarding/);
+  assert.throws(()=>catalogCompileRecipe('RUN arbitrary-build\n'));
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('Cognitive uses the existing compile recipe and retains all runtime refresh checks',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'cognitive-recipe-'));
+ try{
+  const context=fileURLToPath(new URL('../../server-version/backend/',import.meta.url)),recipe=join(dir,'Dockerfile');
+  writeFileSync(recipe,catalogCompileRecipe(readFileSync(join(context,'Dockerfile'),'utf8')));
+  const input=fixture(false,false);for(const name of ['backend','worker'])input.target[name].context=context;
+  const env={CATALOG_DISCOVERY:'true',CATALOG_BACKEND_DOCKERFILE:recipe};
+  const plan=resolved(runtimeRefreshPlan(input,false,false,env));verifyResolvedPlan(plan,false,false,env);
+  assert.equal(plan.target.backend.dockerfile,recipe);assert.equal(plan.target.worker.dockerfile,recipe);
+  assert.equal(plan.target.frontend.dockerfile,'Dockerfile');
+  assert.match(readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8'),/CATALOG_DISCOVERY: \$\{\{ inputs.catalog_discovery \|\| inputs.cognitive_product \}\}/);
+  writeFileSync(recipe,readFileSync(recipe,'utf8')+'\nRUN echo unexpected-runtime-change\n');
+  assert.throws(()=>verifyResolvedPlan(plan,false,false,env),/Only unchanged-content onboarding/);
+ }finally{rmSync(dir,{recursive:true,force:true});}
 });

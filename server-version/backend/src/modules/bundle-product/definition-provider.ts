@@ -83,7 +83,15 @@ export class BundleDefinitionProvider {
     if (!entry) return ['BUNDLE_VERSION_UNKNOWN']
     const blockers: string[] = []
     if (entry.definition.status !== 'PUBLISHED') blockers.push('BUNDLE_NOT_PUBLISHED')
-    if (entry.definition.category === 'observer' || entry.definition.respondentTypes.some(value => value !== 'SELF')) {
+    // These code-owned packages have a dedicated episode/assignment product.
+    // Ordinary mixed bundles still cannot be instantiated as one participant.
+    const childObserver = !!entry.declarativePackage && /^child_chexi_(parent|teacher)_zh_cn_v1$/.test(key)
+      && version === '0.1.0' && entry.definition.category === 'observer'
+      && entry.definition.engine.key === 'declarative-evidence-v1'
+    const childIntegrated = !!entry.declarativePackage && /^child_cognitive_control_(parent|teacher|parent_teacher)_zh_cn$/.test(key)
+      && version === '0.1.0' && entry.definition.category === 'integrated'
+      && entry.definition.engine.key === 'declarative-evidence-v1'
+    if (!childObserver && !childIntegrated && (entry.definition.category === 'observer' || entry.definition.respondentTypes.some(value => value !== 'SELF'))) {
       blockers.push('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
     }
     const population = entry.definition.population
@@ -91,8 +99,13 @@ export class BundleDefinitionProvider {
     // It covers exactly 18+ without an upper bound, never arbitrary age ranges.
     const adultSelfDeclared=population.subjectPopulation==='adult' && population.subjectMinAgeYears===18 && population.subjectMaxAgeYears===undefined &&
       entry.declarativePackage?.schemaVersion===2 && 'kind' in entry.declarativePackage.profile.applicability
+    const measurementSlots=entry.definition.slots.filter(slot=>slot.unitType!=='FORM')
+    const birthKey=measurementSlots[0]?.admissionContext?.birthYearMonthContextKey
+    const frozenBirthDeclared=entry.definition.respondentTypes.length===1 && entry.definition.respondentTypes[0]==='SELF'
+      && Boolean(birthKey) && measurementSlots.every(slot=>slot.unitType==='SCALE' && slot.required && slot.admissionContext?.birthYearMonthContextKey===birthKey)
+      && entry.contextDefinition?.fields.some(field=>field.contextKey===birthKey && field.required && field.valueType==='string')
     if ((population.subjectMinAgeYears !== undefined || population.subjectMaxAgeYears !== undefined) &&
-        !adultSelfDeclared &&
+        !adultSelfDeclared && !frozenBirthDeclared && !(childObserver && entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_birth_year_month' && field.required && field.valueType === 'string')) &&
         !entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_age_years' && field.required && field.valueType === 'number')) {
       blockers.push('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
     }
@@ -107,6 +120,9 @@ export class BundleDefinitionProvider {
 }
 
 export interface FrozenBundleProductionDefinitionV1 {
+  /** Exact participant-source linkage. Included in the existing freezeHash;
+   * report/measurement contentHash remains independent of participant identity. */
+  crossMethodSources?: Array<{ slotKey: string; attemptId: string; assignmentId: string; episodeId: string; subjectUserId: string; respondentUserId: string; respondentType: 'SELF' | 'PARENT' | 'TEACHER'; attemptEpoch: number; parentInputHash: string }>
   declarativePackage?: DeclarativePackage
   schemaVersion: 1 | 2
   snapshotFamily: 'ASSESSMENT_BUNDLE'
@@ -148,6 +164,7 @@ export function freezeBundleProductionDefinition(
 }
 
 const frozenSchema = z.object({
+  crossMethodSources: z.array(z.object({ slotKey: z.string().min(1), attemptId: z.string().min(1), assignmentId: z.string().min(1), episodeId: z.string().min(1), subjectUserId: z.string().min(1), respondentUserId: z.string().min(1), respondentType: z.enum(['SELF','PARENT','TEACHER']), attemptEpoch: z.number().int().positive(), parentInputHash: hash }).strict()).min(2).max(3).optional(),
   declarativePackage: z.unknown().optional(),
   schemaVersion: z.union([z.literal(1), z.literal(2)]), snapshotFamily: z.literal('ASSESSMENT_BUNDLE'),
   bundleSnapshot: z.unknown().refine(value => value !== undefined),

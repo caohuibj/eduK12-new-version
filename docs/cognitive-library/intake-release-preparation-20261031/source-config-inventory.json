@@ -1,0 +1,2156 @@
+[
+  {
+    "testType": "reaction",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "simulated",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          1,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "testType": "memory",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "simulated",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "maxLength": 6
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "maxLength": 8
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "maxLength": 9
+        },
+        "estimatedMinutes": [
+          6,
+          8
+        ]
+      }
+    }
+  },
+  {
+    "testType": "stroop",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "simulated",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 16,
+          "congruentRatio": 0.5
+        },
+        "estimatedMinutes": [
+          2,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 24,
+          "congruentRatio": 0.5
+        },
+        "estimatedMinutes": [
+          4,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 48,
+          "congruentRatio": 0.5
+        },
+        "estimatedMinutes": [
+          8,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "testType": "reaction",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "referenceMode": "simulated",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          1,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "testType": "memory",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "referenceMode": "simulated",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "startLength": 3,
+          "maxLength": 6
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "startLength": 3,
+          "maxLength": 8
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "startLength": 3,
+          "maxLength": 9
+        },
+        "estimatedMinutes": [
+          6,
+          8
+        ]
+      }
+    }
+  },
+  {
+    "testType": "stroop",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "referenceMode": "simulated",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 16,
+          "congruentRatio": 0.5
+        },
+        "estimatedMinutes": [
+          2,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 40,
+          "congruentRatio": 0.5
+        },
+        "estimatedMinutes": [
+          4,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 96,
+          "congruentRatio": 0.5
+        },
+        "estimatedMinutes": [
+          8,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "testType": "gonogo",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 40,
+          "nogoRatio": 0.25
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 120,
+          "nogoRatio": 0.25
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 240,
+          "nogoRatio": 0.25
+        },
+        "estimatedMinutes": [
+          10,
+          14
+        ]
+      }
+    }
+  },
+  {
+    "testType": "cpt",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 60,
+          "blockCount": 1,
+          "targetRatio": 0.2
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 180,
+          "blockCount": 3,
+          "targetRatio": 0.2
+        },
+        "estimatedMinutes": [
+          7,
+          10
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 360,
+          "blockCount": 6,
+          "targetRatio": 0.2
+        },
+        "estimatedMinutes": [
+          14,
+          20
+        ]
+      }
+    }
+  },
+  {
+    "testType": "nback",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "nLevels": [
+            1
+          ],
+          "trialCountByN": [
+            30
+          ],
+          "blockCountByN": [
+            1
+          ]
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "nLevels": [
+            1,
+            2
+          ],
+          "trialCountByN": [
+            40,
+            60
+          ],
+          "blockCountByN": [
+            1,
+            1
+          ]
+        },
+        "estimatedMinutes": [
+          6,
+          8
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "nLevels": [
+            1,
+            2,
+            3
+          ],
+          "trialCountByN": [
+            60,
+            60,
+            60
+          ],
+          "blockCountByN": [
+            2,
+            2,
+            2
+          ]
+        },
+        "estimatedMinutes": [
+          12,
+          16
+        ]
+      }
+    }
+  },
+  {
+    "testType": "sst",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 96
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 200
+        },
+        "estimatedMinutes": [
+          7,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "taskswitch",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 48,
+          "blockCount": 2,
+          "includePureBlocks": false
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 128,
+          "blockCount": 4,
+          "includePureBlocks": false
+        },
+        "estimatedMinutes": [
+          6,
+          8
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 256,
+          "blockCount": 8,
+          "includePureBlocks": true
+        },
+        "estimatedMinutes": [
+          12,
+          16
+        ]
+      }
+    }
+  },
+  {
+    "testType": "corsi",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "PUBLISHED",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "startSpan": 3,
+          "maxSpan": 6
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "startSpan": 3,
+          "maxSpan": 8
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "startSpan": 3,
+          "maxSpan": 9
+        },
+        "estimatedMinutes": [
+          7,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "testType": "patterncompare",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "durationSec": 30
+        },
+        "estimatedMinutes": [
+          1,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "durationSec": 60
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "durationSec": 90
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      }
+    }
+  },
+  {
+    "testType": "flanker",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 80
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 160
+        },
+        "estimatedMinutes": [
+          9,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "cardsort",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 24,
+          "blockCount": 2
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 72,
+          "blockCount": 3
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 144,
+          "blockCount": 6
+        },
+        "estimatedMinutes": [
+          9,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "digitbackward",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "startSpan": 2,
+          "maxSpan": 4
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "startSpan": 2,
+          "maxSpan": 7
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "startSpan": 2,
+          "maxSpan": 8
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "picturesequence",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "itemCount": 6,
+          "learningRounds": 2,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "itemCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "estimatedMinutes": [
+          7,
+          10
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "itemCount": 15,
+          "learningRounds": 3,
+          "delayedEnabled": true,
+          "delayedDelayMs": 30000
+        },
+        "estimatedMinutes": [
+          13,
+          17
+        ]
+      }
+    }
+  },
+  {
+    "testType": "pairedassociate",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "pairCount": 6,
+          "learningRounds": 2,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "pairCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "pairCount": 18,
+          "learningRounds": 4,
+          "delayedEnabled": true,
+          "delayedDelayMs": 30000
+        },
+        "estimatedMinutes": [
+          16,
+          21
+        ]
+      }
+    }
+  },
+  {
+    "testType": "matrix",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "itemCount": 6
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "itemCount": 16
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "itemCount": 24
+        },
+        "estimatedMinutes": [
+          12,
+          18
+        ]
+      }
+    }
+  },
+  {
+    "testType": "mentalrotation",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 80
+        },
+        "estimatedMinutes": [
+          11,
+          16
+        ]
+      }
+    }
+  },
+  {
+    "testType": "tower",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "problemCount": 4
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "problemCount": 10
+        },
+        "estimatedMinutes": [
+          8,
+          13
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "problemCount": 18
+        },
+        "estimatedMinutes": [
+          15,
+          22
+        ]
+      }
+    }
+  },
+  {
+    "testType": "trailmaking",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "form": "A",
+          "partAItemCount": 12,
+          "partBItemCount": 0
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "form": "AB",
+          "partAItemCount": 12,
+          "partBItemCount": 12
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "form": "AB",
+          "partAItemCount": 24,
+          "partBItemCount": 24
+        },
+        "estimatedMinutes": [
+          9,
+          13
+        ]
+      }
+    }
+  },
+  {
+    "testType": "reversallearning",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 40,
+          "acquisitionTrials": 20,
+          "reversalTrials": 20
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 120,
+          "acquisitionTrials": 60,
+          "reversalTrials": 60
+        },
+        "estimatedMinutes": [
+          7,
+          9
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 240,
+          "acquisitionTrials": 120,
+          "reversalTrials": 120
+        },
+        "estimatedMinutes": [
+          14,
+          18
+        ]
+      }
+    }
+  },
+  {
+    "testType": "bart",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "balloonCount": 10
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "balloonCount": 30
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "balloonCount": 50
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "wordlist",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "listLength": 8,
+          "learningRounds": 2,
+          "delayedEnabled": false
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "listLength": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false
+        },
+        "estimatedMinutes": [
+          6,
+          8
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "listLength": 15,
+          "learningRounds": 5,
+          "delayedEnabled": true
+        },
+        "estimatedMinutes": [
+          10,
+          14
+        ]
+      }
+    }
+  },
+  {
+    "testType": "lexicaldecision",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 100
+        },
+        "estimatedMinutes": [
+          7,
+          10
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 200
+        },
+        "estimatedMinutes": [
+          14,
+          20
+        ]
+      }
+    }
+  },
+  {
+    "testType": "emotionrecognition",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 120
+        },
+        "estimatedMinutes": [
+          12,
+          18
+        ]
+      }
+    }
+  },
+  {
+    "testType": "numberline",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          2,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "arithverify",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "estimatedMinutes": [
+          2,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          6,
+          8
+        ]
+      }
+    }
+  },
+  {
+    "testType": "sizecongruity",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.1",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "estimatedMinutes": [
+          2,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          4,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 96
+        },
+        "estimatedMinutes": [
+          8,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "testType": "delaydiscount",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "bisectionSteps": 3
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "bisectionSteps": 5
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "bisectionSteps": 7
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "testType": "gamblingdeck",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 100
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "symbolmatch",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "estimatedMinutes": [
+          2,
+          2
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 80
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "runningspan",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "estimatedMinutes": [
+          8,
+          11
+        ]
+      }
+    }
+  },
+  {
+    "testType": "sentencecheck",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "seqlearn",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 40,
+          "randomBlockIndices": [
+            3
+          ]
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 60,
+          "randomBlockIndices": [
+            4
+          ]
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 100,
+          "randomBlockIndices": [
+            6
+          ]
+        },
+        "estimatedMinutes": [
+          7,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "testType": "timecopy",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 6
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 10
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "letternumseries",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 6
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 10
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "estimatedMinutes": [
+          7,
+          10
+        ]
+      }
+    }
+  },
+  {
+    "testType": "semanticfluency",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "cancellation",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 1
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "estimatedMinutes": [
+          5,
+          8
+        ]
+      }
+    }
+  },
+  {
+    "testType": "trustgame",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "offers": [
+            50,
+            20,
+            80,
+            10
+          ]
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "offers": [
+            50,
+            20,
+            80,
+            10,
+            40,
+            30,
+            60,
+            20
+          ]
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "offers": [
+            50,
+            20,
+            80,
+            10,
+            40,
+            30,
+            60,
+            20,
+            50,
+            10,
+            70,
+            30
+          ]
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      }
+    }
+  },
+  {
+    "testType": "ufov",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "pursuitrotor",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "visualwm",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "maze",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.1",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.1",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "estimatedMinutes": [
+          3,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "estimatedMinutes": [
+          5,
+          8
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      }
+    }
+  },
+  {
+    "testType": "auditoryrt",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "estimatedMinutes": [
+          3,
+          5
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 48
+        },
+        "estimatedMinutes": [
+          5,
+          8
+        ]
+      }
+    }
+  },
+  {
+    "testType": "auditorynback",
+    "configVersion": "1.0.1",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": true,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.0.1",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "estimatedMinutes": [
+          2,
+          3
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "estimatedMinutes": [
+          4,
+          6
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "estimatedMinutes": [
+          6,
+          9
+        ]
+      }
+    }
+  },
+  {
+    "testType": "bart",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "sourceRegistered": true,
+    "newCandidate": false,
+    "profileDefinitionVersion": "1.0.0",
+    "metricDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "referenceMode": "none",
+    "profiles": {
+      "experience": {
+        "configPatch": {
+          "balloonCount": 10
+        },
+        "estimatedMinutes": [
+          2,
+          4
+        ]
+      },
+      "standard": {
+        "configPatch": {
+          "balloonCount": 30
+        },
+        "estimatedMinutes": [
+          5,
+          7
+        ]
+      },
+      "research": {
+        "configPatch": {
+          "balloonCount": 50
+        },
+        "estimatedMinutes": [
+          8,
+          12
+        ]
+      }
+    }
+  }
+]

@@ -11,3 +11,6 @@ export const matrixConfigSchema = z.object({
 }).strict()
 
 export type MatrixConfig = z.infer<typeof matrixConfigSchema>
+
+/** New C freezes independent teaching material; formal stimulus/scoring are unchanged. */
+export const matrixConfigV11Schema=matrixConfigSchema.extend({practiceSetVersion:z.literal('matrix-practice-v1.1.0')})

@@ -34,14 +34,22 @@ function sourceArguments(name, sources) {
     ? { NPM_REGISTRY: sources.NPM_REGISTRY, ALPINE_MIRROR: sources.ALPINE_MIRROR }
     : { NPM_REGISTRY: sources.NPM_REGISTRY, DEBIAN_MIRROR: sources.DEBIAN_MIRROR };
 }
-function validateTargets(plan, frontendOnly, backendOnly) {
+export function catalogCompileRecipe(source) {
+  assert.equal(source.split('RUN npm run build\n').length, 2, 'Expected the existing single backend build entry');
+  return source.replace('RUN npm run build\n', 'RUN npx tsc\n');
+}
+function validateTargets(plan, frontendOnly, backendOnly, env = {}) {
   const expected = selectedTargets(frontendOnly, backendOnly);
   assert.deepEqual(Object.keys(plan.target ?? {}).sort(), [...expected].sort(), 'Unexpected Compose build targets');
   for (const name of expected) {
     const target = plan.target[name];
     assert.equal(typeof target.context, 'string');
     assert.equal(typeof target.dockerfile, 'string');
-    assert.equal(path.resolve(target.context, target.dockerfile), path.resolve(target.context, 'Dockerfile'), 'Dockerfile must stay inside its Compose context');
+    const ordinary = path.resolve(target.context, 'Dockerfile');
+    const recipe = env.CATALOG_DISCOVERY === 'true' && name !== 'frontend' ? env.CATALOG_BACKEND_DOCKERFILE : ordinary;
+    assert.ok(recipe && path.isAbsolute(recipe), 'Missing catalog compilation recipe');
+    assert.equal(path.resolve(target.context, target.dockerfile), recipe, 'Unexpected Dockerfile');
+    if (recipe !== ordinary) assert.equal(fs.readFileSync(recipe, 'utf8'), catalogCompileRecipe(fs.readFileSync(ordinary, 'utf8')), 'Only unchanged-content onboarding may be omitted');
     const tag = name === 'frontend' ? 'server-version-frontend' : 'server-version-backend';
     assert.ok(target.tags?.some(value => value === tag || value === `${tag}:latest`), 'Scanned image tag must match build');
     assert.ok(!target.push, 'CI must not publish images');
@@ -52,6 +60,10 @@ export function runtimeRefreshPlan(input, frontendOnly, backendOnly = false, env
   const plan = structuredClone(input);
   const sources = buildSources(env);
   for (const name of validateTargets(plan, frontendOnly, backendOnly)) {
+    if (env.CATALOG_DISCOVERY === 'true' && name !== 'frontend') {
+      assert.ok(env.CATALOG_BACKEND_DOCKERFILE && path.isAbsolute(env.CATALOG_BACKEND_DOCKERFILE));
+      plan.target[name].dockerfile = env.CATALOG_BACKEND_DOCKERFILE;
+    }
     plan.target[name].args = { ...plan.target[name].args, ...sourceArguments(name, sources) };
     plan.target[name]['no-cache-filter'] = ['runtime'];
     plan.target[name]['no-cache'] = false;
@@ -60,7 +72,7 @@ export function runtimeRefreshPlan(input, frontendOnly, backendOnly = false, env
 }
 export function verifyResolvedPlan(plan, frontendOnly, backendOnly = false, env = {}) {
   const sources = buildSources(env);
-  for (const name of validateTargets(plan, frontendOnly, backendOnly)) {
+  for (const name of validateTargets(plan, frontendOnly, backendOnly, env)) {
     const target = plan.target[name];
     for (const [arg, value] of Object.entries(sourceArguments(name, sources)))
       assert.equal(target.args?.[arg], value, `Resolved build source changed: ${arg}`);

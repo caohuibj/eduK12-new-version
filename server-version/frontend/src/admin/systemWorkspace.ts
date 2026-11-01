@@ -1,6 +1,7 @@
 export const SYSTEM_HOME='/admin/system'
+export const SYSTEM_COGNITIVE_INTAKE='/admin/cognitive-intake'
 export const SYSTEM_SURVEY_AUDIT='/admin/system/survey-audit'
-const systemPages=[SYSTEM_HOME,SYSTEM_SURVEY_AUDIT,'/admin/permissions','/admin/reporting-content','/admin/entrances','/admin/scale-library-governance','/admin/survey-system']
+const systemPages=[SYSTEM_HOME,SYSTEM_SURVEY_AUDIT,SYSTEM_COGNITIVE_INTAKE,'/admin/permissions','/admin/reporting-content','/admin/entrances','/admin/scale-library-governance','/admin/survey-system']
 export function isSystemLoginTarget(target:string|null){
  if(!target?.startsWith('/')||target.startsWith('//'))return false
  return systemPages.includes(target.split(/[?#]/)[0])

@@ -4,6 +4,7 @@ import { profileSchema, validateProfileModel, profileStateSchema } from '../prof
 import { parseBundleContextDefinition } from '../context'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { assessmentBundleDefinitionSchema, BUNDLE_KEY, EXACT_VERSION, SLOT_KEY } from '../schema'
+import { parseAssessmentBundleDefinition } from '../definition'
 
 export const PACKAGE_LIMITS = { bytes: 1024 * 1024, depth: 24, conditionDepth: 8, conditions: 256, rules: 64, evidence: 128, blocks: 128 } as const
 const key = z.string().regex(SLOT_KEY).max(100)
@@ -27,7 +28,7 @@ const declaration = z.object({ ...assessmentBundleDefinitionSchema.shape,
   slots: assessmentBundleDefinitionSchema.shape.slots.max(64),
   status: z.literal('DRAFT'),
   engine: z.object({ key: z.literal('declarative-evidence-v1'), version: z.literal('1.0.0') }).strict(),
-  respondentTypes: z.tuple([z.literal('SELF')]),
+  respondentTypes: z.array(z.enum(['SELF', 'PARENT', 'TEACHER'])).min(1).max(3),
   safetyCapability: z.object({ safetyCapable: z.literal(false), productionTriggerEnabled: z.literal(false) }).strict(),
 }).strict()
 const packageV1Schema = z.object({
@@ -98,8 +99,55 @@ const packageV2Schema = packageV1Schema.extend({
     expectedProfile:z.object({state:profileStateSchema,profileId:z.string().nullable()}).strict(),
   }).strict()).refine(value=>Object.keys(value).sort().join('|')===['valid','missing','invalid','not-applicable'].sort().join('|'),'exactly four package fixtures required'),
 }).strict()
-export const packageSchema=z.discriminatedUnion('schemaVersion',[packageV1Schema,packageV2Schema])
+const derivationSchema=z.discriminatedUnion('op',[
+  z.object({key,op:z.literal('RANGE_POSITION'),input:key,min:z.number().finite(),max:z.number().finite(),orientation:z.enum(['DIRECT','REFLECT'])}).strict(),
+  z.object({key,op:z.literal('SCALE'),input:key,factor:z.literal(2)}).strict(),
+  z.object({key,op:z.literal('RATIO'),numerator:key,denominator:key,denominatorMultiplier:z.union([z.literal(1),z.literal(2)]).optional()}).strict(),
+  z.object({key,op:z.literal('EXACT_MAX_SET'),inputs:z.array(key).min(2).max(16)}).strict(),
+])
+const rowRef=z.discriminatedUnion('kind',[
+  z.object({kind:z.literal('evidence'),key}).strict(),
+  z.object({kind:z.literal('derived'),key}).strict(),
+])
+const fixtureV3=z.object({
+  values:packageV1Schema.shape.fixtures.shape.valid.shape.values,
+  expectedRuleIds:z.array(key),expectedKind:z.enum(['COMPUTED','UNAVAILABLE']),
+  expectedDerived:z.object({
+    scalars:z.record(key,z.number().finite().nullable()).optional(),
+    maxSets:z.record(key,z.array(key).nullable()).optional(),
+    theme:z.object({state:profileStateSchema,profileId:key.nullable()}).strict().optional(),
+  }).strict().optional(),
+}).strict()
+const packageV3Schema=packageV1Schema.extend({
+  schemaVersion:z.literal(3),
+  manifest:packageV1Schema.shape.manifest.extend({
+    packageSchemaVersion:z.literal(3),
+    definition:declaration.extend({engine:z.object({key:z.literal('declarative-evidence-v1'),version:z.literal('1.2.0')}).strict()}),
+  }),
+  rules:packageV1Schema.shape.rules.extend({
+    derivations:z.array(derivationSchema).max(32),
+    theme:z.object({axisKeys:z.array(key).length(2),ruleIds:z.array(key).min(1).max(8)}).strict().optional(),
+  }),
+  report:packageV1Schema.shape.report.extend({
+    narrativeContent:z.literal('BUNDLE_OWNED_SELF').optional(),
+    rows:z.array(z.object({
+      rowKey:key,valueRef:rowRef,label:text,unit:z.enum(['sum','mean','count','ratio','position','score']),
+      order:z.number().int().nonnegative().max(127),
+      range:z.object({min:z.number().finite(),max:z.number().finite()}).strict().optional(),
+      itemCount:z.number().int().positive().max(1000).optional(),
+      denominatorRef:rowRef.optional(),timeframe:text.optional(),
+    }).strict()).max(128),
+    blocks:z.array(packageV1Schema.shape.report.shape.blocks.element.extend({
+      rowKeys:z.array(key).max(128).optional(),maxSetKeys:z.array(key).max(16).optional(),
+    })).min(1).max(PACKAGE_LIMITS.blocks),
+  }),
+  fixtures:z.object({valid:fixtureV3,missing:fixtureV3,invalid:fixtureV3,'not-applicable':fixtureV3}).strict(),
+}).strict()
+export const packageSchema=z.discriminatedUnion('schemaVersion',[packageV1Schema,packageV2Schema,packageV3Schema])
 export type DeclarativePackage = z.infer<typeof packageSchema>
+export type DerivedPackage=Extract<DeclarativePackage,{schemaVersion:3}>
+export type BundleDerivation=DerivedPackage['rules']['derivations'][number]
+export const derivationInputs=(d:BundleDerivation):string[]=>d.op==='EXACT_MAX_SET'?d.inputs:d.op==='RATIO'?[d.numerator,d.denominator]:[d.input]
 
 /** Iterative preflight bounds hostile nesting before recursive schema evaluation. */
 function assertJsonBudget(raw: unknown) {
@@ -137,6 +185,7 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
   const fail = (path: string, message: string): never => { throw new Error(`${path}: ${message}`) }
   const unique = (items: string[], path: string) => { if (new Set(items).size !== items.length) fail(path, 'duplicate identity') }
   const definition = value.manifest.definition
+  parseAssessmentBundleDefinition(definition)
   unique(definition.slots.map(s => s.slotKey), 'manifest.definition.slots')
   unique(definition.slots.map(s => String(s.position)), 'manifest.definition.slots.position')
   unique(value.evidence.map(e => e.evidenceKey), 'evidence')
@@ -229,6 +278,36 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
     }
     if(profile.templateVersion!==value.report.version || profile.key!==definition.bundleKey)fail('profile','exact model/template identity required')
     if(value.scientific.maturity!=='EXPERIMENTAL')fail('profile','theory model is experimental')
+  }
+  if(value.schemaVersion===3){
+    if(value.scientific.maturity!=='EXPERIMENTAL')fail('scientific','derived narrative content is experimental')
+    const derived=new Map(value.rules.derivations.map(d=>[d.key,d]))
+    unique(value.rules.derivations.map(d=>d.key),'rules.derivations')
+    for(const d of value.rules.derivations){
+      const inputs=derivationInputs(d);unique(inputs,'rules.derivations.'+d.key)
+      if(inputs.some(k=>!evidence.has(k)||evidence.get(k)!.valueType!=='number'||evidence.get(k)!.role==='CONTEXT'))fail('rules.derivations.'+d.key,'declared numeric source evidence required; no context arithmetic or derivation chains')
+      if(d.op==='EXACT_MAX_SET'&&new Set(inputs.map(k=>evidence.get(k)!.slotKey)).size!==1)fail('rules.derivations.'+d.key,'maximum set compares one declared source scale; supporting tools are not mixed in')
+      if(d.op==='RANGE_POSITION'&&d.max<=d.min)fail('rules.derivations.'+d.key,'positive theoretical range required')
+    }
+    const scalarRef=(ref:z.infer<typeof rowRef>)=>{
+      if(ref.kind==='evidence'){if(!evidence.has(ref.key)||evidence.get(ref.key)!.valueType!=='number'||evidence.get(ref.key)!.role==='CONTEXT')fail('report.rows','declared numeric source required')}
+      else if(!derived.has(ref.key)||derived.get(ref.key)!.op==='EXACT_MAX_SET')fail('report.rows','scalar derivation required')
+    }
+    unique(value.report.rows.map(r=>r.rowKey),'report.rows');unique(value.report.rows.map(r=>String(r.order)),'report.rows.order')
+    for(const row of value.report.rows){
+      scalarRef(row.valueRef);if(row.denominatorRef)scalarRef(row.denominatorRef)
+      if(row.range&&row.range.max<=row.range.min)fail('report.rows','positive display range required')
+    }
+    const rows=new Set(value.report.rows.map(r=>r.rowKey))
+    for(const block of value.report.blocks){
+      unique(block.rowKeys??[],'report.blocks.rowKeys');unique(block.maxSetKeys??[],'report.blocks.maxSetKeys')
+      if(block.rowKeys?.some(k=>!rows.has(k))||block.maxSetKeys?.some(k=>derived.get(k)?.op!=='EXACT_MAX_SET'))fail('report.blocks','unknown row or maximum set')
+    }
+    if(value.rules.theme){
+      unique(value.rules.theme.axisKeys,'rules.theme.axisKeys');unique(value.rules.theme.ruleIds,'rules.theme.ruleIds')
+      if(value.rules.theme.axisKeys.some(k=>derived.get(k)?.op!=='RANGE_POSITION'))fail('rules.theme','two declared range-position axes required')
+      if(value.rules.theme.ruleIds.some(k=>!value.rules.items.some(r=>r.ruleId===k&&r.kind==='cross_source_condition')))fail('rules.theme','declared cross-source theme rules required')
+    }
   }
   if(cacheKey){
     if(profilePackageCache.size>=16)profilePackageCache.delete(profilePackageCache.keys().next().value!)

@@ -1,0 +1,745 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "cogest",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "36 project-authored descriptive reality-estimation items reviewed at 461a5f28 and accepted as a DRAFT at 3b9727d0; synthetic scorer consistency, not live/clinical validation. Existing scored inputs/results retained; empty rejection added for main fixture contract.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 36,
+          "stimulusSetVersion": "cogest-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "ce11-r01",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "ce11-r02",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "ce11-r03",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "ce11-r04",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "itemId": "ce11-r05",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "itemId": "ce11-r06",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "itemId": "ce11-r07",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "itemId": "ce11-r08",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "itemId": "ce11-r09",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "itemId": "ce11-r10",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "itemId": "ce11-r11",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "itemId": "ce11-r12",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "itemId": "ce11-r13",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "itemId": "ce11-r14",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "itemId": "ce11-r15",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "itemId": "ce11-r16",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "itemId": "ce11-r17",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "itemId": "ce11-r18",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "itemId": "ce11-r19",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "itemId": "ce11-r20",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "itemId": "ce11-r21",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "itemId": "ce11-r22",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "itemId": "ce11-r23",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "itemId": "ce11-r24",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "itemId": "ce11-r25",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "itemId": "ce11-r26",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "itemId": "ce11-r27",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "itemId": "ce11-r28",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "itemId": "ce11-r29",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "itemId": "ce11-r30",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "itemId": "ce11-r31",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "itemId": "ce11-r32",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "itemId": "ce11-r33",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "itemId": "ce11-r34",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "itemId": "ce11-r35",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "itemId": "ce11-r36",
+              "responseIndex": 2,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianRtMs": 500,
+          "errorCount": 0,
+          "timeoutCount": 0,
+          "validRtCount": 36
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 36,
+          "stimulusSetVersion": "cogest-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "ce11-r01",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "ce11-r02",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "ce11-r03",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "ce11-r04",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "itemId": "ce11-r05",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "itemId": "ce11-r06",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "itemId": "ce11-r07",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "itemId": "ce11-r08",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "itemId": "ce11-r09",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "itemId": "ce11-r10",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "itemId": "ce11-r11",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "itemId": "ce11-r12",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "itemId": "ce11-r13",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "itemId": "ce11-r14",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "itemId": "ce11-r15",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "itemId": "ce11-r16",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "itemId": "ce11-r17",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "itemId": "ce11-r18",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "itemId": "ce11-r19",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "itemId": "ce11-r20",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "itemId": "ce11-r21",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "itemId": "ce11-r22",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "itemId": "ce11-r23",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "itemId": "ce11-r24",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "itemId": "ce11-r25",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "itemId": "ce11-r26",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "itemId": "ce11-r27",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "itemId": "ce11-r28",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "itemId": "ce11-r29",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "itemId": "ce11-r30",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "itemId": "ce11-r31",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "itemId": "ce11-r32",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "itemId": "ce11-r33",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "itemId": "ce11-r34",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "itemId": "ce11-r35",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "itemId": "ce11-r36",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 0,
+        "metrics": {
+          "accuracy": 0,
+          "medianRtMs": null,
+          "errorCount": 0,
+          "timeoutCount": 36,
+          "validRtCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": true,
+          "lowAccuracy": true,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 36,
+          "stimulusSetVersion": "cogest-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "cogest v1.1 expects exactly 36 trials, got 0"
+    }
+  ]
+}

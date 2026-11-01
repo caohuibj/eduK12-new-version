@@ -1,4 +1,7 @@
 import ApprovedScaleAxes from '../components/scale-governance/ApprovedScaleAxes'
+import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import {EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,catalogQuery} from '../api/catalogDiscovery'
 import {useCallback,useEffect,useRef,useState} from 'react'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import {eligibleGrantTeachers,materialGrantApi} from '../api/materialGrants'
@@ -97,6 +100,7 @@ export default function TrainingStandardConfigurationGrants(){
 }
 export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:string}={}){
  const [rows,setRows]=useState<StandardConfigurationChoice[]>([]),[page,setPage]=useState(1),[hasMore,setMore]=useState(false)
+ const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS}),[applied,setApplied]=useState({...EMPTY_CATALOG_FILTERS}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
  const [loading,setLoading]=useState(false),[error,setError]=useState(''),[revision,setRevision]=useState(0)
  const [choice,setChoice]=useState<StandardConfigurationChoice|null>(null)
  const [replacement,setReplacement]=useState<Replacement|null>(null),[replacementReason,setReplacementReason]=useState('')
@@ -104,16 +108,17 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
  const visibleRows=rows.filter(row=>!replacement||row.toolKey===replacement.source.toolKey&&row.id!==replacement.source.id)
  function finishReplacement(notice:string){setReplacement(null);setReplacementReason('');setChoice(null);setOperationNotice(notice)}
  useEffect(()=>{let active=true;setLoading(true);setError('');setRows([])
-  void api.catalog(page).then(response=>{if(!active)return
+  void api.catalog(page,applied).then(response=>{if(!active)return
    if(response.code!==0||!response.data||response.data.page!==page||typeof response.data.hasMore!=='boolean'
     ||!Array.isArray(response.data.list)||response.data.list.some(row=>!validStandardConfigurationChoice(row)))throw Error(response.message||'固定配置目录不完整')
-   setRows(response.data.list);setMore(response.data.hasMore)
+   setRows(response.data.list);setMore(response.data.hasMore);setFacets(response.data.tagFacets??EMPTY_CATALOG_FACETS)
   }).catch(cause=>{if(active)setError(errorMessage(cause))}).finally(()=>{if(active)setLoading(false)})
   return()=>{active=false}
- },[page,revision])
+ },[page,revision,applied])
  return <section className="training-accounts training-resources-panel training-configuration-workspace" aria-label="固定量表配置授权">
   <header className="training-configuration-heading"><h2>固定量表配置授权</h2><button className="training-accounts-secondary" disabled={loading} onClick={()=>setRevision(v=>v+1)}>刷新固定配置</button></header>
   <p>只分配系统已批准用于 Training 的精确内容、参数和报告组合。工具审批与培训师使用权分别管理。</p>
+  <CatalogDiscoveryFilters label="固定量表配置检索" filters={filters} facets={facets} onChange={setFilters} disabled={loading||issuer.busy} onApply={value=>{setChoice(null);setRows([]);setPage(1);setApplied({...value,keyword:value.keyword.trim()})}}/>
   {replacement&&<section aria-label="明确替换 Training 配置"><p>为 {replacement.recipient.nickname||replacement.recipient.username} 替换 {replacement.grant.configurationName??'原固定配置'}。请选择同一工具的另一份已批准组合；保存时撤销原使用权，旧草稿不会自动换版，已开始作答及历史定义保留。</p>
    <label>Training 配置替换原因<input maxLength={500} value={replacementReason} disabled={issuer.busy||Boolean(issuer.pending)} onChange={event=>setReplacementReason(event.target.value)}/></label>
    <button disabled={issuer.busy||Boolean(issuer.pending)} onClick={()=>{setReplacement(null);setReplacementReason('');setChoice(null)}}>取消替换 Training 配置</button>
@@ -126,10 +131,10 @@ export function TrainingStandardConfigurationWorkspace({actorId}:{actorId?:strin
    {issuer.absent&&<><p role="status">尚未发现原请求，只能按原编号及原完整参数重试。</p><button disabled={issuer.busy} onClick={()=>{setOperationNotice('');void issuer.retry().then(result=>{if(result)finishReplacement(trainingIssueOutcome(result))}).catch(cause=>setOperationNotice(errorMessage(cause)))}}>按原固定配置请求重试</button></>}
   </section>}
   {loading&&<p role="status">正在读取已批准配置…</p>}{error&&<p role="alert">{error}</p>}
-  {!loading&&!error&&!rows.length&&<p>尚无已批准用于 Training 的固定量表配置。未装载、未审批或其他入口的内容不会自动成为可分配配置。</p>}
+  {!loading&&!error&&!rows.length&&<p>{catalogQuery(1,applied)!=='page=1'?'没有匹配的固定量表配置，可调整条件或清除筛选。':'尚无已批准用于 Training 的固定量表配置。未装载、未审批或其他入口的内容不会自动成为可分配配置。'}</p>}
   {replacement&&!loading&&!visibleRows.length&&<p>本页没有同一工具的其他配置，可查看其他页或取消替换。</p>}
   <ApprovedScaleAxes choices={visibleRows.filter(row=>row.assignable)} disabled={loading||issuer.busy} scopeLabel="当前页已读取配置，可用分页查看其他版本" onSelect={id=>{const row=visibleRows.find(value=>value.id===id&&value.assignable);if(row)setChoice(row)}}/>
-  <div className="training-configurations-grid">{visibleRows.map(row=><article key={row.id} className="training-configuration-card"><h3>{row.title}</h3><Versions choice={row}/>
+  <div className="training-configurations-grid">{visibleRows.map(row=><article key={row.id} className="training-configuration-card"><h3>{row.title}</h3><p>量表 · 题本版本 {row.instrumentVersion}</p><CatalogClassificationTags tags={row.classificationTags}/><Versions choice={row}/>
    <p>{row.assignable?'可分配':row.unavailableReason}</p><button type="button" className="training-accounts-secondary" onClick={()=>setChoice(row)}>管理此配置授权</button>
    <details><summary>配置身份详情</summary><p>{row.toolKey} · {row.instrumentVersion}</p><p className="break-all">{row.id} · {row.combinationHash}</p></details>
   </article>)}</div>

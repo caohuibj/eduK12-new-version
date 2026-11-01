@@ -18,6 +18,7 @@ import { ADMIN_ENTRIES, AdminPermissionError, changeEntryGrant } from './service
 import { beginAdminRegistration, finishAdminRegistration, beginAdminLogin, finishAdminAuthentication, adminAuthOrigin } from './security'
 import { beginAdminTotpRegistration, finishAdminTotp, adminTotpAttemptLimiter } from './totp'
 import { requireRecentAdminKey, requireSystemAdmin } from './guards'
+import { cognitiveIntakeAdminRouter } from '../cognitive/onboarding/admin.routes'
 
 const handle = (work: (req: Request, res: Response) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
   try { return success(res, await work(req, res)) }
@@ -92,6 +93,7 @@ adminSecurityRouter.post('/totp/step-up/verify', authenticate, adminTotpAttemptL
 
 export const adminPermissionsRouter = Router()
 adminPermissionsRouter.use(authenticate, originGuard, requireSystemAdmin, limiter)
+adminPermissionsRouter.use('/cognitive-intake', cognitiveIntakeAdminRouter)
 // System administrators act in their existing management entry. This never
 // permits a Training cookie to authenticate School or Teacher product routes.
 adminPermissionsRouter.use('/education/school/organizations/:organizationId/assessment-resource-registrations',requireRecentAdminKey,educationAssessmentResourceRouter('SCHOOL',requireRecentAdminKey))

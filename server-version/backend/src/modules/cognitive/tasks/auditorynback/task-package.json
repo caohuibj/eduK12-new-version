@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "task": "auditorynback",
+  "order": 132,
+  "identities": [
+    {
+      "testType": "auditorynback",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 132
+    },
+    {
+      "testType": "auditorynback",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "order": 1132
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "auditorynback",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/auditorynback/auditorynback.registry.ts",
+      "export": "auditorynbackRegistryEntry"
+    },
+    {
+      "testType": "auditorynback",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/auditorynback/auditorynback-v11.registry.ts",
+      "export": "auditorynbackV11RegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      132,
+      1132,
+      132,
+      1132
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/auditorynback/__tests__/AuditorynbackTask.test.tsx",
+      "src/modules/cognitive/tasks/auditorynback/__tests__/AuditorynbackTaskV11.test.tsx"
+    ]
+  }
+}

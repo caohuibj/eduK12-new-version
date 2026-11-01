@@ -24,7 +24,9 @@ export function dependencyBlockers(raw: unknown): string[] {
       if (!cognitiveSeeds.some(s => s.testType === slot.instrumentKey && s.configVersion === dep.configVersion && s.engineVersion === dep.engineVersion && s.scoringVersion === dep.scoringVersion)) errors.push(`${slot.slotKey}: unknown COGNITIVE config identity`)
       const entry=getCognitiveRegistryEntry(slot.instrumentKey,dep.engineVersion,dep.scoringVersion)
       if(!entry||!hasCognitiveProfile(entry,dep.profile)) {errors.push(`${slot.slotKey}: unknown COGNITIVE identity/profile`);continue}
-      for(const e of mappings) {const metric=entry.metricDefinitions[e.selector];if(!metric||metric.valueType!==e.valueType||metric.unit!==e.unit)errors.push(`${e.evidenceKey}: COGNITIVE selector/type/unit mismatch`)}
+      // JSON numbers also carry the registry's integer-valued counts. Keep all
+      // other types and exact units strict; no coercion or new scorer is added.
+      for(const e of mappings) {const metric=entry.metricDefinitions[e.selector];if(!metric||!(metric.valueType===e.valueType || metric.valueType==='integer' && e.valueType==='number')||metric.unit!==e.unit)errors.push(`${e.evidenceKey}: COGNITIVE selector/type/unit mismatch`)}
     } else {
       const context=p.context?parseBundleContextDefinition(p.context):null
       if(!context||slot.instrumentKey!==context.contextDefinitionKey||slot.instrumentVersion!==context.contextDefinitionVersion)errors.push(`${slot.slotKey}: FORM context mismatch`)
@@ -39,6 +41,30 @@ export function dependencyBlockers(raw: unknown): string[] {
       d.versionAxes?.localizationVersion!==b.source.localizationVersion || d.versionAxes?.subjectKey!==(b.source.subjectKey??p.profile.applicability.domain) ||
       d.scoring.scorerKey || score?.source.type!=='items' || score.source.items.length!==b.source.expectedItems || score.source.aggregation!=='mean')
       errors.push(b.evidenceKey+': PROFILE frozen measurement/scoring/locale/item identity mismatch')
+  }
+  if(p.schemaVersion===3){
+    const scaleScore=(key:string)=>{
+      const e=p.evidence.find(e=>e.evidenceKey===key),slot=p.manifest.definition.slots.find(s=>s.slotKey===e?.slotKey)
+      if(!e||slot?.unitType!=='SCALE')return null
+      const pkg=getExecutableScalePackage(slot.instrumentKey,slot.instrumentVersion)
+      return pkg?{score:pkg.definition.scoring.scores.find(s=>s.key===e.selector),range:calculateScoreRanges(pkg.definition).get(e.selector)}:null
+    }
+    for(const d of p.rules.derivations){
+      if(d.op==='RANGE_POSITION'){
+        const source=scaleScore(d.input)
+        if(source&&(source.range?.min!==d.min||source.range?.max!==d.max))errors.push(d.key+': theoretical range differs from the exact source metric')
+      }
+      if(d.op==='EXACT_MAX_SET'){
+        const metrics=d.inputs.map(scaleScore)
+        if(metrics.some(m=>!m||m.score?.source.type!=='items'||m.score.source.aggregation!=='mean')||metrics.some(m=>m?.range?.min!==metrics[0]?.range?.min||m?.range?.max!==metrics[0]?.range?.max))errors.push(d.key+': maximum set requires same-range means from one exact SCALE source')
+      }
+    }
+    for(const row of p.report.rows)if(row.range){
+      if(row.valueRef.kind==='evidence'){
+        const source=scaleScore(row.valueRef.key)
+        if(source&&(source.range?.min!==row.range.min||source.range?.max!==row.range.max))errors.push(row.rowKey+': display range differs from the exact source metric')
+      }else if(p.rules.derivations.find(d=>d.key===row.valueRef.key)?.op==='RANGE_POSITION'&&(row.range.min!==0||row.range.max!==1))errors.push(row.rowKey+': range-position display must retain 0..1')
+    }
   }
   return errors.sort()
 }

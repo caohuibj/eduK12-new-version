@@ -14,7 +14,7 @@ const input={product:'SCHOOL' as const,organizationId:uuid(9000),actorId:uuid(90
 function db(rows:ReturnType<typeof row>[]){return {$queryRaw:vi.fn(async(query:any)=>{
  if(query.strings.join('').includes('FROM campus_activities'))return [{id:input.workflow.id}]
  const cursor=query.values.find((v:any)=>typeof v==='string'&&(v===''||v.startsWith('library-scale:')))??''
- return rows.filter(r=>r.entry.applicability.resourceKey>cursor).slice(0,50)
+ return [{list:rows.filter(r=>r.entry.applicability.resourceKey>cursor).slice(0,50).map(row=>({...row,classificationTags:[]})),facetTags:[]}]
 })} as any}
 beforeEach(()=>vi.clearAllMocks())
 describe('current education library cursor catalog',()=>{
