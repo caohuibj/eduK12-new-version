@@ -9,7 +9,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
   title: "图形找不同",
   metrics: {
     ...previous.metrics,
-    correctPerMinute: { ...previous.metrics.correctPerMinute, label: "折算每分钟答对数" },
+    accuracy: { ...previous.metrics.accuracy, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
+    correctPerMinute: { ...previous.metrics.correctPerMinute, explanation: "正确有效次数除以冻结配置durationSec，再乘60；按配置时长折算，不是按实测完成时长，也不是同龄人排名。", singleExplanation: "按本次配置的正式秒数折算为每分钟答对数，不是实测一分钟的结果。", label: "折算每分钟答对数" },
     medianCorrectRtMs: { ...previous.metrics.medianCorrectRtMs, label: "答对时通常用多久" },
     lapseRate: { ...previous.metrics.lapseRate, label: "未回应比例" }
   },
@@ -35,7 +36,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
       ...previous.reportReading!.popular!,
       metricHelp: {
         ...previous.reportReading!.popular!.metricHelp,
-        correctPerMinute: { ...previous.reportReading!.popular!.metricHelp.correctPerMinute, label: "折算每分钟答对数", explanation: previous.reportReading!.popular!.metricHelp.correctPerMinute?.explanation ?? previous.metrics.correctPerMinute.explanation ?? "折算每分钟答对数" },
+        accuracy: { label: previous.metrics.accuracy.label, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
+        correctPerMinute: { ...previous.reportReading!.popular!.metricHelp.correctPerMinute, label: "折算每分钟答对数", explanation: "正确有效次数除以配置durationSec，再乘60；体验档按配置30秒折算，不是按实测时长计算。" },
         medianCorrectRtMs: { ...previous.reportReading!.popular!.metricHelp.medianCorrectRtMs, label: "答对时通常用多久", explanation: previous.reportReading!.popular!.metricHelp.medianCorrectRtMs?.explanation ?? previous.metrics.medianCorrectRtMs.explanation ?? "答对时通常用多久" },
         lapseRate: { ...previous.reportReading!.popular!.metricHelp.lapseRate, label: "未回应比例", explanation: previous.reportReading!.popular!.metricHelp.lapseRate?.explanation ?? previous.metrics.lapseRate.explanation ?? "未回应比例" }
       },

@@ -1,6 +1,5 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 import { participantPresentations as previousPresentations } from './participant-presentation.previous'
-
 // Display revision only. Existing assignments keep their frozen previous presentation.
 // Keep the previous source intact; export one current presentation per C/S identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = previousPresentations.map((previous) => ({
@@ -9,9 +8,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
   title: "看中间的箭头",
   metrics: {
     ...previous.metrics,
+    accuracy: { ...previous.metrics.accuracy, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
     flankerEffectMs: { ...previous.metrics.flankerEffectMs, label: "反向比同向多用的时间" },
-    incongruentAccuracy: { ...previous.metrics.incongruentAccuracy, label: "周围反向时答对比例" },
-    congruentAccuracy: { ...previous.metrics.congruentAccuracy, label: "周围同向时答对比例" },
+    incongruentAccuracy: { ...previous.metrics.incongruentAccuracy, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", label: "周围反向时答对比例" },
+    congruentAccuracy: { ...previous.metrics.congruentAccuracy, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", label: "周围同向时答对比例" },
     medianRtCongruent: { ...previous.metrics.medianRtCongruent, label: "同向时答对的通常用时" },
     medianRtIncongruent: { ...previous.metrics.medianRtIncongruent, label: "反向时答对的通常用时" },
     errorCost: { ...previous.metrics.errorCost, label: "两种情况的正确比例差" }
@@ -38,9 +38,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
       ...previous.reportReading!.popular!,
       metricHelp: {
         ...previous.reportReading!.popular!.metricHelp,
+        accuracy: { label: previous.metrics.accuracy.label, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
         flankerEffectMs: { ...previous.reportReading!.popular!.metricHelp.flankerEffectMs, label: "反向比同向多用的时间", explanation: previous.reportReading!.popular!.metricHelp.flankerEffectMs?.explanation ?? previous.metrics.flankerEffectMs.explanation ?? "反向比同向多用的时间" },
-        incongruentAccuracy: { ...previous.reportReading!.popular!.metricHelp.incongruentAccuracy, label: "周围反向时答对比例", explanation: previous.reportReading!.popular!.metricHelp.incongruentAccuracy?.explanation ?? previous.metrics.incongruentAccuracy.explanation ?? "周围反向时答对比例" },
-        congruentAccuracy: { ...previous.reportReading!.popular!.metricHelp.congruentAccuracy, label: "周围同向时答对比例", explanation: previous.reportReading!.popular!.metricHelp.congruentAccuracy?.explanation ?? previous.metrics.congruentAccuracy.explanation ?? "周围同向时答对比例" },
+        incongruentAccuracy: { ...previous.reportReading!.popular!.metricHelp.incongruentAccuracy, label: "周围反向时答对比例", explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
+        congruentAccuracy: { ...previous.reportReading!.popular!.metricHelp.congruentAccuracy, label: "周围同向时答对比例", explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
         medianRtCongruent: { ...previous.reportReading!.popular!.metricHelp.medianRtCongruent, label: "同向时答对的通常用时", explanation: previous.reportReading!.popular!.metricHelp.medianRtCongruent?.explanation ?? previous.metrics.medianRtCongruent.explanation ?? "同向时答对的通常用时" },
         medianRtIncongruent: { ...previous.reportReading!.popular!.metricHelp.medianRtIncongruent, label: "反向时答对的通常用时", explanation: previous.reportReading!.popular!.metricHelp.medianRtIncongruent?.explanation ?? previous.metrics.medianRtIncongruent.explanation ?? "反向时答对的通常用时" },
         errorCost: { ...previous.reportReading!.popular!.metricHelp.errorCost, label: "两种情况的正确比例差", explanation: previous.reportReading!.popular!.metricHelp.errorCost?.explanation ?? previous.metrics.errorCost.explanation ?? "两种情况的正确比例差" }

@@ -33,6 +33,23 @@ describe('R1 display revisions', () => {
     expect(current.reportReading!.professional!.confounders.join(' ')).toContain('未测定') // must not imply reliability
   })
 
+  it('clarifies configurable criteria, numerator exclusions, planned-step omissions and configured duration', () => {
+    for (const name of ['patterncompare', 'flanker', 'cardsort']) {
+      const current = resolveParticipantPresentation(identity(name))!
+      const key = name === 'cardsort' ? 'overallAccuracy' : 'accuracy'
+      expect(current.metrics[key].explanation).toContain('即使选对也不计作正确')
+      expect(current.reportReading!.popular!.metricHelp[key].explanation).toContain('总次数')
+    }
+    const reversal = resolveParticipantPresentation(identity('reversallearning'))!
+    for (const key of ['trialsToAcquisitionCriterion', 'trialsToReversalCriterion']) {
+      expect(reversal.metrics[key].label).toContain('设定连续正确次数')
+      expect(reversal.metrics[key].label).not.toContain('6')
+    }
+    expect(reversal.protocols.experience!.reportCaveats.join(' ')).toContain('至少3次选到当时较有利的符号')
+    expect(resolveParticipantPresentation(identity('patterncompare'))!.metrics.correctPerMinute.explanation).toContain('配置durationSec')
+    expect(resolveParticipantPresentation(identity('trailmaking'))!.metrics.omissionRate.explanation).toContain('未在时限内成功完成的计划步骤比例')
+  })
+
   it('keeps zero distance real and missing direction missing in a synthetic numberline report', () => {
     const report = projection('numberline', 'experience', { paePercent: 0, biasPercent: null, withinTenRate: 1, validTrialCount: 8, timeoutCount: 0, medianRtMs: null })
     const metrics = [...report.headline, ...report.user, ...report.detail]

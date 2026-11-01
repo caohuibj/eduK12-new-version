@@ -13,12 +13,12 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
     reversalAccuracy: { ...previous.metrics.reversalAccuracy, label: "变化后选到较有利符号的比例" },
     feedbackWinRate: { ...previous.metrics.feedbackWinRate, label: "实际得到奖励的比例" },
     perseverativeErrorCount: { ...previous.metrics.perseverativeErrorCount, label: "变化后仍选原有利符号的次数" },
-    trialsToAcquisitionCriterion: { ...previous.metrics.trialsToAcquisitionCriterion, label: "变化前达到连续6次的题数" },
-    trialsToReversalCriterion: { ...previous.metrics.trialsToReversalCriterion, label: "变化后达到连续6次的题数" }
+    trialsToAcquisitionCriterion: { ...previous.metrics.trialsToAcquisitionCriterion, explanation: "达到冻结配置criterionConsecutiveCorrect设定的连续正确次数所需题数；默认6，可设4–10。未达到时保留缺失。", singleExplanation: "达到本次设定的连续正确次数用了多少题；没达到不填0。", label: "变化前达到设定连续正确次数所需题数" },
+    trialsToReversalCriterion: { ...previous.metrics.trialsToReversalCriterion, explanation: "达到冻结配置criterionConsecutiveCorrect设定的连续正确次数所需题数；默认6，可设4–10。未达到时保留缺失。", singleExplanation: "达到本次设定的连续正确次数用了多少题；没达到不填0。", label: "变化后达到设定连续正确次数所需题数" }
   },
   protocols: {
     ...previous.protocols,
-    experience: { ...previous.protocols.experience, tier: 'PILOT', profileLabel: '体验版', participantConclusion: "这份报告描述本次跟着反馈找规律的作答记录。", showProductIndex: false, reportCaveats: ["40题，前后各20，练习4题；含说明约3–4分钟（配置估计，未实测）。单次固定反转只能描述这一段选择变化。", "体验40题，变化前后各20题，只有一次固定位置反转。连续6次选到较有利符号是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。"] },
+    experience: { ...previous.protocols.experience, tier: 'PILOT', profileLabel: '体验版', participantConclusion: "这份报告描述本次跟着反馈找规律的作答记录。", showProductIndex: false, reportCaveats: ["40题，前后各20；4题练习中至少3次选到当时较有利的符号；含说明约3–4分钟（配置估计，未实测）。单次固定反转只能描述这一段选择变化。", "体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。"] },
     standard: { ...previous.protocols.standard, tier: 'PILOT', profileLabel: '正式版', participantConclusion: "这份报告描述本次跟着反馈找规律的作答记录。", showProductIndex: false, reportCaveats: ["只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。"] },
     research: { ...previous.protocols.research, tier: 'PILOT', profileLabel: '研究版', participantConclusion: "这份报告描述本次跟着反馈找规律的作答记录。", showProductIndex: false, reportCaveats: ["研究版是本项目的较长配置；材料、题量或时序与参考研究有差异，详见方法附注。增加题量不等于已经证实可靠性。", "只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。"] },
   },
@@ -42,8 +42,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
         reversalAccuracy: { ...previous.reportReading!.popular!.metricHelp.reversalAccuracy, label: "变化后选到较有利符号的比例", explanation: previous.reportReading!.popular!.metricHelp.reversalAccuracy?.explanation ?? previous.metrics.reversalAccuracy.explanation ?? "变化后选到较有利符号的比例" },
         feedbackWinRate: { ...previous.reportReading!.popular!.metricHelp.feedbackWinRate, label: "实际得到奖励的比例", explanation: previous.reportReading!.popular!.metricHelp.feedbackWinRate?.explanation ?? previous.metrics.feedbackWinRate.explanation ?? "实际得到奖励的比例" },
         perseverativeErrorCount: { ...previous.reportReading!.popular!.metricHelp.perseverativeErrorCount, label: "变化后仍选原有利符号的次数", explanation: previous.reportReading!.popular!.metricHelp.perseverativeErrorCount?.explanation ?? previous.metrics.perseverativeErrorCount.explanation ?? "变化后仍选原有利符号的次数" },
-        trialsToAcquisitionCriterion: { ...previous.reportReading!.popular!.metricHelp.trialsToAcquisitionCriterion, label: "变化前达到连续6次的题数", explanation: previous.reportReading!.popular!.metricHelp.trialsToAcquisitionCriterion?.explanation ?? previous.metrics.trialsToAcquisitionCriterion.explanation ?? "变化前达到连续6次的题数" },
-        trialsToReversalCriterion: { ...previous.reportReading!.popular!.metricHelp.trialsToReversalCriterion, label: "变化后达到连续6次的题数", explanation: previous.reportReading!.popular!.metricHelp.trialsToReversalCriterion?.explanation ?? previous.metrics.trialsToReversalCriterion.explanation ?? "变化后达到连续6次的题数" }
+        trialsToAcquisitionCriterion: { ...previous.reportReading!.popular!.metricHelp.trialsToAcquisitionCriterion, label: "变化前达到设定连续正确次数所需题数", explanation: "达到本次设定的连续正确次数所需题数（默认6次，可设4–10）；没达到时保留缺失，不填0。" },
+        trialsToReversalCriterion: { ...previous.reportReading!.popular!.metricHelp.trialsToReversalCriterion, label: "变化后达到设定连续正确次数所需题数", explanation: "达到本次设定的连续正确次数所需题数（默认6次，可设4–10）；没达到时保留缺失，不填0。" },
       },
       frames: [{"title": "作一个选择", "text": "选左或右的符号，看看反馈。"}, {"title": "多看几次", "text": "较有利符号也可能偶尔没有奖励。"}, {"title": "留意变化", "text": "中途规律反转；回看前后两段记录。"}],
       conceptTitle: '这个小游戏在观察什么',
@@ -51,13 +51,13 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
       takeaway: "“奖励比例”与“选到当时较有利符号的比例”是两件事。后者按生成规则计分；前者还受概率影响，不能互相替代。",
       exampleTitle: '把过程放进一个生活场景',
       example: "试一条上学路线，偶尔遇到红灯不代表路线就不好；连续多次的情况才提供更多线索。这只是理解反馈不确定性的比喻，不是现实决策能力评定。",
-      boundary: "体验40题，变化前后各20题，只有一次固定位置反转。连续6次选到较有利符号是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
+      boundary: "体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
     },
     professional: {
       ...previous.reportReading!.professional!,
       configFields: [{"key": "totalTrials", "label": "计划正式题数/轮数"}, {"key": "acquisitionTrials", "label": "变化前题数"}, {"key": "reversalTrials", "label": "变化后题数"}, {"key": "rewardProbability", "label": "较有利选择的正反馈概率"}, {"key": "trialTimeoutMs", "label": "每题响应上限（毫秒）"}, {"key": "criterionConsecutiveCorrect", "label": "描述性达标连续次数"}],
-      procedure: previous.reportReading!.professional!.procedure + " 方法与文献核对：研究档240题，前120题A符号较有利、后120题B符号较有利；位置逐题随机，反馈种子随机，较有利选择获正反馈概率0.8，另一符号获正反馈概率为0（并非0.2）。响应窗3000毫秒，4题练习至少完成3题。Cools等(2002), DOI 10.1523/JNEUROSCI.22-11-04563.2002，原研究涉及概率反馈与反转；本项目固定一次反转，不以连续6次达标触发反转。原论文全文本轮未取得；另核Millisecond作者实现，其80/20双选项、10–15次连续选择后反转与本项目80/0且固定反转不同，不宣称等同原文或该实现。",
-      interpretation: "研究版是本项目的较长配置，不是标准化或信效度认证。体验40题，变化前后各20题，只有一次固定位置反转。连续6次选到较有利符号是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
+      procedure: previous.reportReading!.professional!.procedure + " 方法与文献核对：研究档240题，前120题A符号较有利、后120题B符号较有利；位置逐题随机，反馈种子随机，较有利选择获正反馈概率由冻结参数决定（默认0.8），另一符号获正反馈概率为0（并非0.2）。默认响应窗3000毫秒，4题练习中至少3次选到当时较有利的符号。Cools等(2002), DOI 10.1523/JNEUROSCI.22-11-04563.2002，原研究涉及概率反馈与反转；已核Cools原文方法：30题无反转训练，每组9次反转，累计10–15次正确选择后反转（含概率错误），每段0–4次误导负反馈，响应2秒、反馈500毫秒。原文不规定错误选项20%正反馈，不能以第三方实现替代原文。本C1.0.0仍固定一次反转，不以设定连续次数触发反转；原协议关键机制尚未对齐完成，新C修复另行交接。",
+      interpretation: "研究版是本项目的较长配置，不是标准化或信效度认证。体验40题，变化前后各20题，只有一次固定位置反转。达到本次设定的连续正确次数（默认6次）是项目描述指标，短段内没达到时保留缺失，不当作0题达标，也不评定人格或冒险倾向。",
       confounders: [...previous.reportReading!.professional!.confounders, '题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。'],
     },
   },

@@ -1,6 +1,5 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 import { participantPresentations as previousPresentations } from './participant-presentation.previous'
-
 // Display revision only. Existing assignments keep their frozen previous presentation.
 // Keep the previous source intact; export one current presentation per C/S identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = previousPresentations.map((previous) => ({
@@ -9,9 +8,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
   title: "跟着提示分卡片",
   metrics: {
     ...previous.metrics,
+    overallAccuracy: { ...previous.metrics.overallAccuracy, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
     switchCostRtMs: { ...previous.metrics.switchCostRtMs, label: "换规则比沿用规则多用的时间" },
-    accuracySwitch: { ...previous.metrics.accuracySwitch, label: "换规则时答对比例" },
-    accuracyRepeat: { ...previous.metrics.accuracyRepeat, label: "沿用规则且卡片有冲突时答对比例" },
+    accuracySwitch: { ...previous.metrics.accuracySwitch, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", label: "换规则时答对比例" },
+    accuracyRepeat: { ...previous.metrics.accuracyRepeat, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", label: "沿用规则且卡片有冲突时答对比例" },
     perseverativeErrorRate: { ...previous.metrics.perseverativeErrorRate, label: "仍按旧规则作答的比例" },
     postSwitchRecovery: { ...previous.metrics.postSwitchRecovery, label: "换规则后的恢复记录" }
   },
@@ -37,9 +37,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
       ...previous.reportReading!.popular!,
       metricHelp: {
         ...previous.reportReading!.popular!.metricHelp,
+        overallAccuracy: { label: previous.metrics.overallAccuracy.label, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
         switchCostRtMs: { ...previous.reportReading!.popular!.metricHelp.switchCostRtMs, label: "换规则比沿用规则多用的时间", explanation: previous.reportReading!.popular!.metricHelp.switchCostRtMs?.explanation ?? previous.metrics.switchCostRtMs.explanation ?? "换规则比沿用规则多用的时间" },
-        accuracySwitch: { ...previous.reportReading!.popular!.metricHelp.accuracySwitch, label: "换规则时答对比例", explanation: previous.reportReading!.popular!.metricHelp.accuracySwitch?.explanation ?? previous.metrics.accuracySwitch.explanation ?? "换规则时答对比例" },
-        accuracyRepeat: { ...previous.reportReading!.popular!.metricHelp.accuracyRepeat, label: "沿用规则且卡片有冲突时答对比例", explanation: previous.reportReading!.popular!.metricHelp.accuracyRepeat?.explanation ?? previous.metrics.accuracyRepeat.explanation ?? "沿用规则时答对比例" },
+        accuracySwitch: { ...previous.reportReading!.popular!.metricHelp.accuracySwitch, label: "换规则时答对比例", explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
+        accuracyRepeat: { ...previous.reportReading!.popular!.metricHelp.accuracyRepeat, label: "沿用规则且卡片有冲突时答对比例", explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。 对照只含两种规则答案相冲突的重复题。" },
         perseverativeErrorRate: { ...previous.reportReading!.popular!.metricHelp.perseverativeErrorRate, label: "仍按旧规则作答的比例", explanation: previous.reportReading!.popular!.metricHelp.perseverativeErrorRate?.explanation ?? previous.metrics.perseverativeErrorRate.explanation ?? "仍按旧规则作答的比例" },
         postSwitchRecovery: { ...previous.reportReading!.popular!.metricHelp.postSwitchRecovery, label: "换规则后的恢复记录", explanation: previous.reportReading!.popular!.metricHelp.postSwitchRecovery?.explanation ?? previous.metrics.postSwitchRecovery.explanation ?? "换规则后的恢复记录" }
       },

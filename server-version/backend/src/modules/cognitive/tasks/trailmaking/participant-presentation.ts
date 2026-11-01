@@ -9,6 +9,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
   title: "按顺序找目标",
   metrics: {
     ...previous.metrics,
+    omissionRate: { ...previous.metrics.omissionRate, explanation: "未在时限内成功完成的计划步骤比例；一直错点而未完成也计入，不仅是完全没点击。", singleExplanation: "未在时限内成功完成的计划步骤比例，包含错点后仍未完成的步骤。" },
     completionTimeMs: { ...previous.metrics.completionTimeMs, label: "完成步骤累计用时" },
     setShiftCostMs: { ...previous.metrics.setShiftCostMs, label: "B、A每步平均用时差" },
     meanCorrectStepTimeMs: { ...previous.metrics.meanCorrectStepTimeMs, label: "找对下一步的平均用时" },
@@ -37,6 +38,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
       ...previous.reportReading!.popular!,
       metricHelp: {
         ...previous.reportReading!.popular!.metricHelp,
+        omissionRate: { label: "未按时完成的步骤比例", explanation: "未在时限内成功完成的计划步骤比例；一直错点而未完成也算。" },
         completionTimeMs: { ...previous.reportReading!.popular!.metricHelp.completionTimeMs, label: "完成步骤累计用时", explanation: '只累计成功完成步骤的用时；超时未完成的步骤不计入此和，不是从开始到结束的挂钟总时长。' },
         setShiftCostMs: { ...previous.reportReading!.popular!.metricHelp.setShiftCostMs, label: "B、A每步平均用时差", explanation: 'B部分已完成步骤的平均用时减A部分已完成步骤的平均用时，并非B总时长减A总时长；缺一部分时不计算，负值照实保留。' },
         meanCorrectStepTimeMs: { ...previous.reportReading!.popular!.metricHelp.meanCorrectStepTimeMs, label: "找对下一步的平均用时", explanation: previous.reportReading!.popular!.metricHelp.meanCorrectStepTimeMs?.explanation ?? previous.metrics.meanCorrectStepTimeMs.explanation ?? "找对下一步的平均用时" },

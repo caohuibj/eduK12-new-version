@@ -53,7 +53,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
     professional: {
       ...previous.reportReading!.professional!,
       configFields: [{"key": "totalTrials", "label": "计划正式题数/轮数"}, {"key": "lineMax", "label": "数轴右端数值"}, {"key": "maxResponseMs", "label": "每题定位上限（毫秒）"}, {"key": "validRtFloorMs", "label": "纳入用时统计的最短时间（毫秒）"}],
-      procedure: previous.reportReading!.professional!.procedure + " 方法与文献核对：研究档40题、0–100线段，每题400毫秒准备、最多10秒定位；各区间随机整数后种子洗牌，练习目标37并有反馈。Siegler与Opfer(2003), DOI 10.1111/1467-9280.02438提供数值估计范式；本项目用点击与分层生成、自定题量，不做原研究年龄组/表征模型检验。原文全文链接失效，本轮仅核摘要与作者书目，不宣称原题量/练习/时序一致。",
+      procedure: previous.reportReading!.professional!.procedure + " 方法与文献核对：研究档40题、0–100线段，每题400毫秒准备、最多10秒定位；各区间随机整数后种子洗牌，练习目标37并有反馈。Siegler与Opfer(2003), DOI 10.1111/1467-9280.02438提供数值估计范式；本项目用点击与分层生成、自定题量，不做原研究年龄组/表征模型检验。本轮已取得作者托管全文（DOI 10.1111/1467-9280.02438）方法：纸面25厘米，数字到位置与位置到数字两任务、0–100及0–1000两范围、A/B每范围六点、4或30秒与间隔1–2天的两session反向平衡。本项目当前只有数字到位置点击、40个分层点位/10秒，不具备该分布、互补任务和跨session设计；文献核对已完成，原协议对齐尚未完成。",
       interpretation: "研究版是本项目的较长配置，不是标准化或信效度认证。体验8题，按线段分层抽取目标再打乱顺序，可能出现相邻或重复整数；1题练习最多2次。只有8个正式点位，不拟合“数感类型”或推断稳定数学能力。",
       confounders: [...previous.reportReading!.professional!.confounders, '题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。'],
     },

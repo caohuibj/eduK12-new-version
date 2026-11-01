@@ -32,7 +32,7 @@
 
 ### patterncompare — 图形找不同
 
-- 实改：介绍为“相似图形小侦探”，报告解释轮廓/填充/方向/标记；每分钟答对数明确为按实际正式时长折算，未回应比例不叫“走神”或“过慢”。例子为辨认相近钥匙，不据此预测现实表现。
+- 实改：介绍为“相似图形小侦探”，报告解释轮廓/填充/方向/标记；每分钟答对数明确为按冻结配置durationSec时长折算，未回应比例不叫“走神”或“过慢”。例子为辨认相近钥匙，不据此预测现实表现。
 - 体验：正式30秒，4题练习至少对3题；题数随响应速度改变。配置估计1–2分钟。单题2500毫秒、题间250毫秒；种子逐题生成，不保证同/异题数量严格平衡。正式/研究为60/90秒。
 - 指标：正确有效反应数 / 已提交正式记录为正确比例，未回应也在分母；每分钟答对数=正确数/配置秒数×60，正确用时仅取正确且≥150毫秒的记录。30秒折算不代表持续1分钟已实测。
 - 一手依据：[NIH Toolbox 官方 Pattern Comparison Processing Speed Test](https://nihtoolbox.org/test/pattern-comparison-processing-speed/)，实际核其同/异判断、iPad/施测者与约4分钟总时长说明。官方公开页没有完整正式轮次、练习和微观时序，不能用总时间认定本项目90秒相等。
@@ -65,9 +65,9 @@
 ### reversallearning — 跟着反馈找规律
 
 - 实改：介绍明确较有利符号也可能负反馈；“奖励率”和按隐藏生成规则计算的正确选择率分开，例子为某路线偶遇红灯，不评人格/风险。
-- 体验：40题，前后20/20，4练习至少3次正确选择；配置估计3–4分钟。正式120（60/60），研究240（120/120）。响应窗3000毫秒，符号左右独立种子随机，段边界固定只反转一次；连续6次达标不触发反转。
-- 评分/缺失：每段正确选择数/计划段长，遗漏留分母；奖励率以有选择记录为分母。达标题数包含段内失败/遗漏打断连续，未达到为null。RT中位数使用有选择记录，不是仅奖励题。特别核实：**现有正反馈概率是较有利符号0.8、另一符号0，非80/20**；本轮没有改变这一评分/反馈契约。
-- 一手依据：Cools et al. (2002), *Defining the neural mechanisms of probabilistic reversal learning using event-related functional magnetic resonance imaging*, [DOI 10.1523/JNEUROSCI.22-11-04563.2002 / 摘要及图注](https://pubmed.ncbi.nlm.nih.gov/12040063/)，核两抽象图案、试错和负反馈区分；原全文本轮不可取得。
+- 体验：40题，前后20/20，4题练习中至少3次选到当时较有利的符号；配置估计3–4分钟。正式120（60/60），研究240（120/120）。响应窗3000毫秒，符号左右独立种子随机，段边界固定只反转一次；连续6次达标不触发反转。
+- 评分/缺失：每段正确选择数/计划段长，遗漏留分母；奖励率以有选择记录为分母。达标次数由冻结criterionConsecutiveCorrect设定（默认6、合法4–10）；题数包含段内失败/遗漏打断连续，未达到为null。RT中位数使用有选择记录，不是仅奖励题。特别核实：**现有正反馈概率是较有利符号0.8、另一符号0，非80/20**；本轮没有改变这一评分/反馈契约。
+- 一手依据：Cools et al. (2002), *Defining the neural mechanisms of probabilistic reversal learning using event-related functional magnetic resonance imaging*, [DOI 10.1523/JNEUROSCI.22-11-04563.2002 / 摘要及图注](https://pubmed.ncbi.nlm.nih.gov/12040063/)，核两抽象图案、试错和负反馈区分；首轮未取得全文，后续已实际读原方法，最新结论见下方限定修订。
 - 另核[Millisecond 作者实现技术说明](https://www.millisecond.com/library/v7/reversallearning/probabilisticreversallearningtask/probabilisticreversallearningtask.manual)：双选项80/20、连续10–15次后反转、三组9分钟、练习至首次反转或5分钟截止、响应最多2秒。它不是原作者原版；只用于明确项目差异，不能当作Cools全文已核。项目80/0、固定边界、短练习属研究变式。参数不变。
 
 ### numberline — 数字在线上哪里
@@ -75,7 +75,7 @@
 - 实改：“平均差多远/整体偏哪边/落在目标附近”解释，保留平均有符号误差可能抵消的提醒。生活例子为刻度与地图位置。
 - 体验：8题、目标37练习1题最多2次（超出15%误差重练，仍不过则结束）；配置估计约2分钟。正式20/研究40；0–100每层抽整数后洗牌，边界取整可能出现相邻/重复数字，不能说无重复题库。
 - 时序/分母：每题准备400毫秒、最多10秒；平均绝对误差及方向均值以**有位置回应**的题为分母、再除线长100。附近比例为误差≤整线10%，不是及格率。超时计数另列；0误差是真0、无回应的均值是null，不补0。RT仅回应且≥300毫秒，空间误差与RT筛选分母不同。
-- 一手依据：Siegler & Opfer (2003), *The development of numerical estimation: evidence for multiple representations of numerical quantity*, [DOI 10.1111/1467-9280.02438](https://pubmed.ncbi.nlm.nih.gov/12741747/)，及[作者实验室书目](https://www.developmentalcognitivescience.org/publications-title)。仅摘要/书目核对，作者PDF旧链接跳转后不可取，未核原精确题量/练习/时序。
+- 一手依据：Siegler & Opfer (2003), *The development of numerical estimation: evidence for multiple representations of numerical quantity*, [DOI 10.1111/1467-9280.02438](https://pubmed.ncbi.nlm.nih.gov/12741747/)，及[作者实验室书目](https://www.developmentalcognitivescience.org/publications-title)。首轮仅核摘要/书目，后续已从作者托管全文实际核方法，最新差异与实施方案见同目录numberline说明。
 - 研究为40个项目分层点位，不做原年龄组或线性/对数表征模型验证；按数轴估计范式试测，不为补文献参数改评分。体验只8点，不能拟合稳定“数感类型”。参数不变。
 
 ### arithverify — 算式对不对
@@ -130,3 +130,13 @@
 - 本组：11个 `backend/.../tasks/<name>/participant-presentation.ts` 和同目录 `.previous.ts`；11个已有前端任务TSX的介绍文字；独立 `r1-report-review.test.ts`；本说明。
 - 共享registry/generated、其它36项、题库与评分器均未修改。上一轮G3数列/估算交接保持不变。
 - 由第四组集成人员取本组提交；不单开PR、不Ready、不merge，不触发手动CI。整合时保留旧展示原件及当前入口，不对旧任务回填新报告；如有其它组版本命名冲突，按实际身份合成，不移动其评分版本或生产状态。
+
+## 独审后限定修订
+
+新R明确：图形/箭头/卡片的正确次数不包括低于RT有效下限的正确反应，但过快与未答仍在相应比例分母；图形每分钟按配置durationSec折算；连线遗漏包括错点后未在时限内成功完成；反转criterion标签不硬写6，练习写明4题中至少3次选到当时较有利符号，默认6/0.8/3000毫秒明确标默认。旧R原件、评分与参数未改。新增一个合并字段核对用例，独立定向执行，不重跑原16例。
+
+Cools 2002及numberline作者全文现已实际取得，旧“全文未取”的早期记录仅代表首轮检索状态；最新方法与研究改动见同目录后续方案说明，不把文献核对当作原协议完整对齐。反转C1.1.0机制修复另有独立分支，不能仅凭本R1旧C报告文字认定已安装新版。
+
+后续结果：限定新R字段用例1 PASS（原16例未重跑）；6个实际修改sidecar的依赖闭包types为0诊断。合计17个局部用例分别取得通过记录，原组件7 PASS按未变renderer证据复用。
+
+集成提醒：反转独立行为修复为 `fix/cognitive-reversal-research-20261101` / `6afe514acc6733fcd610424057d5d794bd05a64a`。它与本组仅在反转Task介绍行及participant-presentation入口有合成点：保留新C1.1.0执行逻辑、旧C和两套冻结身份；把本组易懂文字应用到相应新展示，**新C研究档保留30题训练/2秒正式窗/500毫秒正式反馈及独立练习图形**，不能沿用本组旧C的4题/3秒研究说明。新C报告应基于已修的动态criterion标签，并覆盖其方法附注；共享表由统一集成人员一次生成。
