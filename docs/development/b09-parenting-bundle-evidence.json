@@ -1,0 +1,82 @@
+{
+  "scope": "parenting_burden_efficacy_zh_cn@0.1.0",
+  "base": "74423a1c4b40f65c084797434aaa86271594e687",
+  "node": "v24.21.0",
+  "synthetic": true,
+  "checks": [
+    "28 real synthetic answers score to PBA111/BPSES21",
+    "raw pair 0/25 => pa1",
+    "raw pair 111/21 => pa2",
+    "raw pair 138/5 => pa3",
+    "raw pair 0/5 => pa4",
+    "raw pair 34/20 => pa1",
+    "raw pair 35/20 => middle_continuous",
+    "raw pair 103/20 => middle_continuous",
+    "raw pair 104/20 => pa2",
+    "raw pair 34/10 => pa4",
+    "raw pair 34/11 => middle_continuous",
+    "raw pair 104/19 => middle_continuous",
+    "raw pair 104/20 => pa2",
+    "raw pair 69/15 => middle_continuous",
+    "context adult_age_years inapplicable",
+    "context parent_caregiver_confirmed inapplicable",
+    "context child_lives_with_parent inapplicable",
+    "child age cannot replace adult age",
+    "quality limited cancels joint but retains BPSES summary",
+    "quality invalid cancels joint but retains BPSES summary",
+    "missing PBA cancels joint and preserves other result",
+    "out of range cancels joint",
+    "both leaf scorers preserve complete_required when answers are missing",
+    "source identity mismatch rejected",
+    "existing source policies preserve the report limitation"
+  ],
+  "passed": 25,
+  "reportDisplay": "BLOCKED: V1 reader suppresses themes under unchanged source scoreDerivedLabels=false; no browser/DB lifecycle claimed",
+  "notRun": [
+    "DB installation/publication",
+    "browser report display",
+    "whole-platform tests"
+  ],
+  "failures": [],
+  "finalContentCheck": {
+    "ok": true,
+    "packages": [
+      {
+        "key": "parenting_burden_efficacy_zh_cn",
+        "hash": "d233f0b0a9a6d5bcf39ab56576123f4d97fee422633e0965840ee1800774bc77"
+      }
+    ]
+  },
+  "history": [
+    {
+      "stage": "local synthetic harness",
+      "result": "FAIL",
+      "reason": "Synthetic answer values were numbers; both existing sources require string response codes. Fixture corrected to exact source encodings."
+    },
+    {
+      "stage": "local harness projection adapter",
+      "result": "FAIL",
+      "reason": "Scorer output uses key; Bundle projection uses scoreKey. Corrected the test adapter."
+    },
+    {
+      "stage": "local missing-answer assertion",
+      "result": "FAIL",
+      "reason": "Harness incorrectly expected PBA scorer to throw on omitted answer. Existing scorer returns not_calculable with null total; assertion corrected without changing source policy or scorer."
+    },
+    {
+      "stage": "local bounded checks",
+      "result": "PASS",
+      "reason": "25 assertions passed, including 24 distinct checks (one repeated PA2 boundary). No CI runs have executed."
+    }
+  ],
+  "reuseBoundary": "Only report wording/block grouping changed after bounded score checks; scoring, conditions, evidence identity/type and source inputs unchanged. Selected package validation executed after that report edit; no whole-platform or source golden suites.",
+  "harnessSHA256": "de680b96a756a953089368c6899b70da7ef92d0b544215b0ac34fc436f76b503",
+  "ciStatus": "NOTRUN: precise candidate awaits parent dot independent review before PR opens/CI activation",
+  "ciFailureRounds": 0,
+  "finalFreezeCheck": {
+    "ok": true,
+    "snapshotFamily": "ASSESSMENT_BUNDLE",
+    "snapshotVersion": 3,
+    "snapshotHash": "7dadf4d0e146f61c109db90ccbd9d9b238c4939f68fe30660771181cbd5e459e"
+  }
+}

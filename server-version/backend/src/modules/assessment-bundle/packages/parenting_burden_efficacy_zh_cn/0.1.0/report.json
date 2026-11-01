@@ -1,0 +1,62 @@
+{
+  "key": "parenting_burden_efficacy_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "raw_results",
+      "kind": "evidence",
+      "title": "亲职负担（0–138）、养育信心（5–25）与PBA四个侧面",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pba_summary",
+        "bpses_summary",
+        "pba_exhaustion",
+        "pba_contrast",
+        "pba_fed_up",
+        "pba_distancing"
+      ]
+    },
+    {
+      "blockId": "support_theme",
+      "kind": "conclusions",
+      "title": "可考虑的支持方向（实验性）",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pa1",
+        "pa2",
+        "pa3",
+        "pa4",
+        "middle_continuous"
+      ]
+    },
+    {
+      "blockId": "methods_limits",
+      "kind": "limitations",
+      "title": "适用范围与结果说明",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pba_total_missing",
+        "pba_total_invalid",
+        "pba_total_not_applicable",
+        "pba_total_out_of_range",
+        "bpses_total_missing",
+        "bpses_total_invalid",
+        "bpses_total_not_applicable",
+        "bpses_total_out_of_range",
+        "methods"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "核心结果缺失时，不生成联合支持主题；仍可查看有效的独立结果。",
+    "limited": "有限质量的结果不参与联合支持主题，请结合独立结果的质量说明理解。",
+    "unavailable": "不能生成联合支持主题。请确认受测者是18岁以上家长或主要照顾者本人，至少一名子女同住，且两项结果完整有效；子女年龄不作为受测者年龄。 当前报告披露策略也可能尚不展示规则叙事；不应因此推断个人状态异常。"
+  }
+}

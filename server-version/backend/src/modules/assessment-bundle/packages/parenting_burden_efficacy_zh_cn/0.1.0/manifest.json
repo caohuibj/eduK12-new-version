@@ -1,0 +1,103 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "parenting_burden_efficacy_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "亲职负担、信心与支持",
+    "description": "28题：PBA-23与BPSES-5成人自评。保留两项独立结果，以实验性理论规则组织减负、恢复与信心支持主题。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "ANONYMOUS_SELF"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18
+    },
+    "slots": [
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "parenting_burden_efficacy_zh_cn_context",
+        "instrumentVersion": "0.1.0",
+        "respondentType": "SELF"
+      },
+      {
+        "slotKey": "pba",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.1",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "parental_burnout",
+          "exhaustion",
+          "contrast_previous_self",
+          "fed_up",
+          "emotional_distancing"
+        ]
+      },
+      {
+        "slotKey": "bpses",
+        "unitType": "SCALE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "bpses5_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "total"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "parenting_burden_efficacy_zh_cn_context",
+    "contextDefinitionVersion": "0.1.0",
+    "reportDefinitionKey": "parenting_burden_efficacy_zh_cn_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "pba23_2018_zh_cn",
+        "bpses5_zh_cn_research"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "实验性亲职支持组合，受测者是18岁以上家长或主要照顾者本人；子女年龄不是受测者年龄。PBA适用背景须至少一名子女同住。",
+      "两个原量表均无固定回忆窗口，不擅自改为最近两周。中文版沿用既有工作译稿身份，不声称已验证。",
+      "不计算跨工具总分、百分位、诊断、养育能力或儿童结果；分数仅为本人描述的体验与信心。",
+      "四角是项目理论性支持主题，不是原作者临界值、常模或实证潜在类别；中间、混合、缺失不强行分型。",
+      "两个叶工具当前scoreDerivedLabels均关闭；V1读取器因此收起规则叙事（包括联合支持主题）；许可数值投影仍可保留。本包是可计算规则与待审报告内容，主题展示仍需共享读取能力支持，不改变叶工具许可或披露策略。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": []
+}

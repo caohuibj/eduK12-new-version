@@ -1,0 +1,714 @@
+{
+  "version": "0.1.0",
+  "applicability": {
+    "op": "all",
+    "conditions": [
+      {
+        "op": "gte",
+        "evidenceKey": "adult_age_years",
+        "value": 18
+      },
+      {
+        "op": "eq",
+        "evidenceKey": "parent_caregiver_confirmed",
+        "value": true
+      },
+      {
+        "op": "eq",
+        "evidenceKey": "child_lives_with_parent",
+        "value": true
+      }
+    ]
+  },
+  "items": [
+    {
+      "ruleId": "pba_summary",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "pba_total",
+            "value": 0
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "pba_total",
+            "value": 138
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "亲职负担为PBA-23原始总分，范围0–138；分数较高表示你描述的亲职耗竭体验较多，不是诊断。下列四个侧面用于了解体验，已包含在总分内，不再次加权。",
+      "evidenceKeys": [
+        "pba_total"
+      ],
+      "supportRefs": [
+        "pba2018"
+      ]
+    },
+    {
+      "ruleId": "bpses_summary",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "bpses_total",
+            "value": 5
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "bpses_total",
+            "value": 25
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "养育信心为BPSES-5原始总分，范围5–25；分数较高表示你对养育更有信心。它不是实际养育技能或儿童表现的测验，不拆成三个分量表。",
+      "evidenceKeys": [
+        "bpses_total"
+      ],
+      "supportRefs": [
+        "bpses2023"
+      ]
+    },
+    {
+      "ruleId": "pba_exhaustion",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "pba_exhaustion",
+            "value": 0
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "pba_exhaustion",
+            "value": 54
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "筋疲力尽（9题，0–54）：结合你自己的具体经历理解，不作独立诊断或常模比较。",
+      "evidenceKeys": [
+        "pba_exhaustion"
+      ],
+      "supportRefs": [
+        "pba2018"
+      ]
+    },
+    {
+      "ruleId": "pba_contrast",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "pba_contrast",
+            "value": 0
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "pba_contrast",
+            "value": 36
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "与过去自己的反差（6题，0–36）：结合你自己的具体经历理解，不作独立诊断或常模比较。",
+      "evidenceKeys": [
+        "pba_contrast"
+      ],
+      "supportRefs": [
+        "pba2018"
+      ]
+    },
+    {
+      "ruleId": "pba_fed_up",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "pba_fed_up",
+            "value": 0
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "pba_fed_up",
+            "value": 30
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "厌倦亲职角色（5题，0–30）：结合你自己的具体经历理解，不作独立诊断或常模比较。",
+      "evidenceKeys": [
+        "pba_fed_up"
+      ],
+      "supportRefs": [
+        "pba2018"
+      ]
+    },
+    {
+      "ruleId": "pba_distancing",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "pba_distancing",
+            "value": 0
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "pba_distancing",
+            "value": 18
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "情感疏离（3题，0–18）：结合你自己的具体经历理解，不作独立诊断或常模比较。",
+      "evidenceKeys": [
+        "pba_distancing"
+      ],
+      "supportRefs": [
+        "pba2018"
+      ]
+    },
+    {
+      "ruleId": "pa1",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "pba_total",
+                    "value": 0
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "pba_total",
+                    "value": 138
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "bpses_total",
+                    "value": 5
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "bpses_total",
+                    "value": 25
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "lte",
+                "evidenceKey": "pba_total",
+                "value": 34.5
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "bpses_total",
+                "value": 20
+              }
+            ]
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "负担较少、信心较足：你目前描述的亲职负担较少，信心较足。可以看看哪些分担、休息或日常做法正在帮助你，保留这些支持；这不意味着需要承担更多任务。 这是实验性支持主题，可按你的实际需要调整。",
+      "evidenceKeys": [
+        "pba_total",
+        "bpses_total"
+      ],
+      "supportRefs": [
+        "risks_resources2018",
+        "b09_design"
+      ]
+    },
+    {
+      "ruleId": "pa2",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "pba_total",
+                    "value": 0
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "pba_total",
+                    "value": 138
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "bpses_total",
+                    "value": 5
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "bpses_total",
+                    "value": 25
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "pba_total",
+                "value": 103.5
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "bpses_total",
+                "value": 20
+              }
+            ]
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "负担较多、信心较足：你可能知道怎么做，但承担得太多。先商量一项可分担的任务、一次可落实的休息或恢复安排，不急着增加课程或要求。 这是实验性支持主题，可按你的实际需要调整。",
+      "evidenceKeys": [
+        "pba_total",
+        "bpses_total"
+      ],
+      "supportRefs": [
+        "risks_resources2018",
+        "b09_design"
+      ]
+    },
+    {
+      "ruleId": "pa3",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "pba_total",
+                    "value": 0
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "pba_total",
+                    "value": 138
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "bpses_total",
+                    "value": 5
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "bpses_total",
+                    "value": 25
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "pba_total",
+                "value": 103.5
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "bpses_total",
+                "value": 10
+              }
+            ]
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "负担较多、信心较少：先争取实际分担与恢复，再选一个具体情境练习。把目标缩小到可完成的一步，邀请可信任的人提供帮助与具体反馈，避免把困难归咎于你。 这是实验性支持主题，可按你的实际需要调整。",
+      "evidenceKeys": [
+        "pba_total",
+        "bpses_total"
+      ],
+      "supportRefs": [
+        "risks_resources2018",
+        "b09_design"
+      ]
+    },
+    {
+      "ruleId": "pa4",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "pba_total",
+                    "value": 0
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "pba_total",
+                    "value": 138
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "bpses_total",
+                    "value": 5
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "bpses_total",
+                    "value": 25
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "lte",
+                "evidenceKey": "pba_total",
+                "value": 34.5
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "bpses_total",
+                "value": 10
+              }
+            ]
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "负担较少、信心待积累：不必把不确定感当成问题标签。选一个最近拿不准的亲子情境，尝试一个小方法，观察反馈，逐步积累经验与信心。 这是实验性支持主题，可按你的实际需要调整。",
+      "evidenceKeys": [
+        "pba_total",
+        "bpses_total"
+      ],
+      "supportRefs": [
+        "risks_resources2018",
+        "b09_design"
+      ]
+    },
+    {
+      "ruleId": "middle_continuous",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "pba_total",
+                    "value": 0
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "pba_total",
+                    "value": 138
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "bpses_total",
+                    "value": 5
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "bpses_total",
+                    "value": 25
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "any",
+              "conditions": [
+                {
+                  "op": "all",
+                  "conditions": [
+                    {
+                      "op": "lte",
+                      "evidenceKey": "pba_total",
+                      "value": 34.5
+                    },
+                    {
+                      "op": "gte",
+                      "evidenceKey": "bpses_total",
+                      "value": 20
+                    }
+                  ]
+                },
+                {
+                  "op": "all",
+                  "conditions": [
+                    {
+                      "op": "gte",
+                      "evidenceKey": "pba_total",
+                      "value": 103.5
+                    },
+                    {
+                      "op": "gte",
+                      "evidenceKey": "bpses_total",
+                      "value": 20
+                    }
+                  ]
+                },
+                {
+                  "op": "all",
+                  "conditions": [
+                    {
+                      "op": "gte",
+                      "evidenceKey": "pba_total",
+                      "value": 103.5
+                    },
+                    {
+                      "op": "lte",
+                      "evidenceKey": "bpses_total",
+                      "value": 10
+                    }
+                  ]
+                },
+                {
+                  "op": "all",
+                  "conditions": [
+                    {
+                      "op": "lte",
+                      "evidenceKey": "pba_total",
+                      "value": 34.5
+                    },
+                    {
+                      "op": "lte",
+                      "evidenceKey": "bpses_total",
+                      "value": 10
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "目前的两项结果不落在预设四角。分别查看负担与信心的连续位置即可，不强行分型。可以从分担、休息、具体方法或沟通中选择此刻最需要的一项支持。",
+      "evidenceKeys": [
+        "pba_total",
+        "bpses_total"
+      ],
+      "supportRefs": [
+        "b09_design"
+      ]
+    },
+    {
+      "ruleId": "pba_total_missing",
+      "when": {
+        "op": "missing",
+        "evidenceKey": "pba_total"
+      },
+      "kind": "limitation",
+      "text": "亲职负担缺少可计算结果；不补零、不插补、不按比例推算。仍可单独查看另一项有效结果。",
+      "evidenceKeys": [
+        "pba_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "pba_total_invalid",
+      "when": {
+        "op": "invalid",
+        "evidenceKey": "pba_total"
+      },
+      "kind": "limitation",
+      "text": "亲职负担结果无效；不用于联合主题。仍可单独查看另一项有效结果。",
+      "evidenceKeys": [
+        "pba_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "pba_total_not_applicable",
+      "when": {
+        "op": "not_applicable",
+        "evidenceKey": "pba_total"
+      },
+      "kind": "limitation",
+      "text": "亲职负担结果不适用；不用于联合主题。仍可单独查看另一项有效结果。",
+      "evidenceKeys": [
+        "pba_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "pba_total_out_of_range",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "lt",
+            "evidenceKey": "pba_total",
+            "value": 0
+          },
+          {
+            "op": "gt",
+            "evidenceKey": "pba_total",
+            "value": 138
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "亲职负担超出原始计分范围，不生成联合主题；请核对来源结果。",
+      "evidenceKeys": [
+        "pba_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "bpses_total_missing",
+      "when": {
+        "op": "missing",
+        "evidenceKey": "bpses_total"
+      },
+      "kind": "limitation",
+      "text": "养育信心缺少可计算结果；不补零、不插补、不按比例推算。仍可单独查看另一项有效结果。",
+      "evidenceKeys": [
+        "bpses_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "bpses_total_invalid",
+      "when": {
+        "op": "invalid",
+        "evidenceKey": "bpses_total"
+      },
+      "kind": "limitation",
+      "text": "养育信心结果无效；不用于联合主题。仍可单独查看另一项有效结果。",
+      "evidenceKeys": [
+        "bpses_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "bpses_total_not_applicable",
+      "when": {
+        "op": "not_applicable",
+        "evidenceKey": "bpses_total"
+      },
+      "kind": "limitation",
+      "text": "养育信心结果不适用；不用于联合主题。仍可单独查看另一项有效结果。",
+      "evidenceKeys": [
+        "bpses_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "bpses_total_out_of_range",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "lt",
+            "evidenceKey": "bpses_total",
+            "value": 5
+          },
+          {
+            "op": "gt",
+            "evidenceKey": "bpses_total",
+            "value": 25
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "养育信心超出原始计分范围，不生成联合主题；请核对来源结果。",
+      "evidenceKeys": [
+        "bpses_total"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "methods",
+      "when": {
+        "op": "present",
+        "evidenceKey": "adult_age_years"
+      },
+      "kind": "limitation",
+      "text": "方法说明：b=PBA总分/138；e=(BPSES总分−5)/20。仅用量尺位置≤0.25或≥0.75组织四角支持主题，不是百分位、常模或原作者阈值。只采用完整、有效的原总分；有限质量、缺失、无效或不适用时不生成联合主题。两项总分分别保留，不相加。",
+      "evidenceKeys": [
+        "adult_age_years"
+      ],
+      "supportRefs": [
+        "b09_design"
+      ]
+    }
+  ]
+}

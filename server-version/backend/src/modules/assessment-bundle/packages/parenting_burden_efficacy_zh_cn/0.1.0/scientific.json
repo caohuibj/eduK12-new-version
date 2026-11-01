@@ -1,0 +1,41 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "成人家长本人自评的28题实验性组合。复用现有PBA与BPSES；联合四角只是理论性支持主题，不作诊断、常模、家庭评判或儿童结果预测。两个叶工具当前scoreDerivedLabels均关闭；V1读取器因此收起规则叙事（包括联合支持主题）；许可数值投影仍可保留。本包是可计算规则与待审报告内容，主题展示仍需共享读取能力支持，不改变叶工具许可或披露策略。",
+  "references": [
+    {
+      "id": "pba2018",
+      "citation": "公开原始文献：Roskam, I., Brianda, M.-E., & Mikolajczak, M. (2018). A Step Forward in the Conceptualization and Measurement of Parental Burnout: The Parental Burnout Assessment (PBA). Frontiers in Psychology, 9, 758. https://doi.org/10.3389/fpsyg.2018.00758 。本包仅复用已登记中文工作版本，不引入新题本或常模。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "risks_resources2018",
+      "citation": "公开理论文献：Mikolajczak, M., & Roskam, I. (2018). A Theoretical and Clinical Framework for Parental Burnout: The Balance Between Risks and Resources (BR²). Frontiers in Psychology, 9, 886. https://doi.org/10.3389/fpsyg.2018.00886 。支持风险与资源的理论讨论，不验证本包四角界值。",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "bpses2023",
+      "citation": "公开原始文献：Woolgar, M., Humayun, S., Scott, S., & Dadds, M. (2023 online; 2025 issue). The Brief Parental Self-Efficacy Scale (BPSES) in Child Psychiatry & Human Development, 56, 619–628. https://doi.org/10.1007/s10578-023-01583-0 。精确5题正向主版本；沿用未验证的中文工作译稿，不冒充BPSES-C。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "b09_design",
+      "citation": "非公开项目设计：B09 亲职负担、信心与支持，v1.0（2026-11-01）；项目自编四角规则、报告与支持建议，未经联合实证验证。阈值仅是量尺位置0.25/0.75。共享规范同日版。来源完整设计已读，未将私人设计原文公开。",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "frozen_sources",
+      "citation": "复用现有登记身份：pba23_2018_zh_cn@1.0.1，zh-CN，L1.0.0，C1.0.1:1.0.0/Pnone-v1/R1.1.0；bpses5_zh_cn_research@1.0.0，zh-CN，L1.0.0，C1.0.0:1.0.0/Pnone-v1/R1.1.0。两者referencePolicy.type=none；P版本none-v1仍是实际参数部件，不等于未设参数身份。C/P/R哈希由现有sourceParts与冻结流程处理，不新增身份门禁。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    }
+  ]
+}

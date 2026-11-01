@@ -1,0 +1,41 @@
+{
+  "values": {
+    "adult_age_years": {
+      "state": "present",
+      "value": 35
+    },
+    "parent_caregiver_confirmed": {
+      "state": "present",
+      "value": true
+    },
+    "child_lives_with_parent": {
+      "state": "present",
+      "value": true
+    },
+    "pba_total": {
+      "state": "invalid"
+    },
+    "pba_exhaustion": {
+      "state": "invalid"
+    },
+    "pba_contrast": {
+      "state": "invalid"
+    },
+    "pba_fed_up": {
+      "state": "invalid"
+    },
+    "pba_distancing": {
+      "state": "invalid"
+    },
+    "bpses_total": {
+      "state": "present",
+      "value": 21
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "methods",
+    "bpses_summary",
+    "pba_total_invalid"
+  ]
+}
