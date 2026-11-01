@@ -1,0 +1,134 @@
+[
+  {
+    "evidenceKey": "gonogo.commission_rate",
+    "slotKey": "gonogo",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.omission_rate",
+    "slotKey": "gonogo",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.d_prime",
+    "slotKey": "gonogo",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.d_prime",
+    "slotKey": "cpt",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "sustained_attention",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.omission_rate",
+    "slotKey": "cpt",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "sustained_attention",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.commission_rate",
+    "slotKey": "cpt",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "sustained_attention",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.rt_icv",
+    "slotKey": "cpt",
+    "selector": "rtICV",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "sustained_attention",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker.flanker_effect_ms",
+    "slotKey": "flanker",
+    "selector": "flankerEffectMs",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker.congruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "congruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker.incongruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "incongruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "texi.working_memory",
+    "slotKey": "texi",
+    "selector": "working_memory",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "daily_working_memory_difficulty",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "texi.inhibition",
+    "slotKey": "texi",
+    "selector": "inhibition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "daily_self_regulation_difficulty",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  }
+]
