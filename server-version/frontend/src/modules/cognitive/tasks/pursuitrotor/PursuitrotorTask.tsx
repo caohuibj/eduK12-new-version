@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -142,7 +143,7 @@ export const PursuitrotorTask: React.FC<CognitiveTaskProps> = ({ taskContext, tr
   const targetX = CANVAS_SIZE / 2 + ORBIT_RADIUS * Math.cos(angle)
   const targetY = CANVAS_SIZE / 2 + ORBIT_RADIUS * Math.sin(angle)
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="追踪旋转" description={<p>一个点沿圆轨道匀速转动。把你的指针（鼠标/手指）放在它上面，跟着它一起转——看你能跟多久不离。</p>} hint={<><p>每轮 {Math.round(trackMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "追踪旋转"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>一个点沿圆轨道匀速转动。把你的指针（鼠标/手指）放在它上面，跟着它一起转——看你能跟多久不离。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>每轮 {Math.round(trackMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

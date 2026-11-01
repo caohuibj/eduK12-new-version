@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -103,7 +104,7 @@ export const SemanticfluencyTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     setFormalFeedback(null); setResponses([]); setInput(''); setStep('fixation'); setPhase('formal')
   }, [])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="语义流畅性" description={<p>每轮给一个类别（如“动物”）。限时内把属于这个类别的词尽量多、尽量快地输入，想到就打，不用管顺序。</p>} hint={<><p>每轮限时 {Math.round(durationMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "语义流畅性"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>每轮给一个类别（如“动物”）。限时内把属于这个类别的词尽量多、尽量快地输入，想到就打，不用管顺序。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>每轮限时 {Math.round(durationMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

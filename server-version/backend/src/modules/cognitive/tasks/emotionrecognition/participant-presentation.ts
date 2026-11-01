@@ -233,5 +233,257 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         ]
       }
     }
-  }
+  },
+  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
+{
+  "schemaVersion": 1,
+  "presentationVersion": "3.0.0",
+  "testType": "emotionrecognition",
+  "engineVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "title": "表情分类小游戏",
+  "metrics": {
+    "accuracy": {
+      "label": "总体分类正确率",
+      "explanation": "正确率：正式作答中判断正确的比例。",
+      "singleExplanation": "正确率：正式作答中判断正确的比例。"
+    },
+    "balancedAccuracy": {
+      "label": "各类正确率的平均值",
+      "explanation": "给每类相同权重，不代表文化通用的情绪识别能力。",
+      "singleExplanation": "给每类相同权重，不代表文化通用的情绪识别能力。"
+    },
+    "accuracyByEmotion": {
+      "label": "各类合成表情的正确率",
+      "explanation": "每类体验仅4次；只描述本批材料，不形成稳定子能力结论。",
+      "singleExplanation": "每类体验仅4次；只描述本批材料，不形成稳定子能力结论。"
+    },
+    "confusionMatrix": {
+      "label": "情绪分类混淆矩阵",
+      "explanation": "记录各目标类别被选择成不同类别的次数，只反映本任务合成刺激的分类情况。",
+      "singleExplanation": "记录各目标类别被选择成不同类别的次数，只反映本任务合成刺激的分类情况。"
+    },
+    "medianRtMs": {
+      "label": "反应时中位数",
+      "explanation": "典型反应速度：多数有效反应所需的时间。",
+      "singleExplanation": "典型反应速度：多数有效反应所需的时间。"
+    },
+    "omissionRate": {
+      "label": "遗漏比例",
+      "explanation": "遗漏比例：应该响应但没有响应的比例。",
+      "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+    },
+    "validResponseCount": {
+      "label": "有效响应数",
+      "explanation": "本次有效类别选择的次数。",
+      "singleExplanation": "本次有效类别选择的次数。"
+    }
+  },
+  "hiddenMetrics": [],
+  "suppressTips": false,
+  "protocols": {
+    "experience": {
+      "tier": "PILOT",
+      "profileLabel": "简短体验",
+      "participantConclusion": "从六个标签里，为合成面孔选择最接近的表情。正确指是否符合这张刺激预设的标签。",
+      "reportCaveats": [
+        "本次正式任务共24次表情分类。另有6次练习，至少4次正确后继续。",
+        "体验约2–4分钟；研究约7–13分钟（流程估计，非实测）。",
+        "本任务使用合成图形，不测同理心，也不能断言你能否读懂真实人的感受。体验每类只有4次，分类差异容易受个别题影响。",
+        "六类标签与经典面孔分类研究有关；当前材料是项目合成图形，不是 Ekman 与 Friesen 1971 的照片、故事或跨文化程序，也没有沿用其样本常模。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "standard": {
+      "tier": "PILOT",
+      "profileLabel": "常规任务",
+      "participantConclusion": "从六个标签里，为合成面孔选择最接近的表情。正确指是否符合这张刺激预设的标签。",
+      "reportCaveats": [
+        "本次正式任务共60次表情分类。另有6次练习，至少4次正确后继续。",
+        "体验约2–4分钟；研究约7–13分钟（流程估计，非实测）。",
+        "本任务使用合成图形，不测同理心，也不能断言你能否读懂真实人的感受。体验每类只有4次，分类差异容易受个别题影响。",
+        "六类标签与经典面孔分类研究有关；当前材料是项目合成图形，不是 Ekman 与 Friesen 1971 的照片、故事或跨文化程序，也没有沿用其样本常模。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "research": {
+      "tier": "PILOT",
+      "profileLabel": "研究变式",
+      "participantConclusion": "从六个标签里，为合成面孔选择最接近的表情。正确指是否符合这张刺激预设的标签。",
+      "reportCaveats": [
+        "本次正式任务共120次表情分类。另有6次练习，至少4次正确后继续。",
+        "体验约2–4分钟；研究约7–13分钟（流程估计，非实测）。",
+        "本任务使用合成图形，不测同理心，也不能断言你能否读懂真实人的感受。体验每类只有4次，分类差异容易受个别题影响。",
+        "六类标签与经典面孔分类研究有关；当前材料是项目合成图形，不是 Ekman 与 Friesen 1971 的照片、故事或跨文化程序，也没有沿用其样本常模。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    }
+  },
+  "practicalTips": [
+    "可以回想自己更容易混淆哪些画法；和人交流时，试着用一句“你现在感觉怎样”确认理解。"
+  ],
+  "singleHiddenMetrics": [],
+  "disclaimer": "本任务使用合成图形，不测同理心，也不能断言你能否读懂真实人的感受。体验每类只有4次，分类差异容易受个别题影响。",
+  "reportReading": {
+    "version": "3.0.0",
+    "title": "这张画出来的脸，更像哪种表情？",
+    "introduction": "从六个标签里，为合成面孔选择最接近的表情。正确指是否符合这张刺激预设的标签。",
+    "summary": {
+      "template": "这批合成面孔的分类正确率为 {accuracy}，有效作答 {validResponseCount} 次。",
+      "metricKeys": [
+        "accuracy",
+        "validResponseCount"
+      ]
+    },
+    "studentMetricKeys": [
+      "accuracy",
+      "validResponseCount"
+    ],
+    "processMetricKeys": [
+      "validResponseCount"
+    ],
+    "withholdFlags": [
+      "legacyUninterpretable",
+      "insufficientPerCategory"
+    ],
+    "metricGates": {},
+    "nextStep": "可以回想自己更容易混淆哪些画法；和人交流时，试着用一句“你现在感觉怎样”确认理解。",
+    "chart": {
+      "kind": "metrics",
+      "metricKeys": [
+        "accuracy"
+      ]
+    },
+    "caveatTerms": {
+      "正式版": "标准协议",
+      "体验版": "短程协议",
+      "研究版": "科研协议",
+      "科研版": "科研协议",
+      "科研档": "科研协议",
+      "人口常模": "经过验证的同龄人比较依据",
+      "常模等级": "经过验证的同龄人等级",
+      "年龄等级": "年龄对应的能力等级",
+      "稳定能力等级": "固定的能力水平",
+      "内部配置": "这次任务设置",
+      "正式档": "标准任务",
+      "体验档": "简短体验",
+      "标准协议": "标准任务",
+      "短程协议": "简短体验"
+    },
+    "illustration": "rules",
+    "popular": {
+      "conceptTitle": "这个小游戏在观察什么",
+      "concept": "从六个标签里，为合成面孔选择最接近的表情。正确指是否符合这张刺激预设的标签。",
+      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+      "exampleTitle": "生活里也会遇到",
+      "example": "漫画会用嘴角、眉毛和眼睛传达表情；同一张脸在不同故事里也可能有别的含义，所以现实交流还要听语气、看情境。",
+      "scene": "rules",
+      "frames": [
+        {
+          "title": "任务怎样进行",
+          "text": "24 / 60 / 120 次，每类4 / 10 / 20次；另有6次练习，至少4次正确后进入正式任务。"
+        },
+        {
+          "title": "大概需要多久",
+          "text": "体验约2–4分钟；研究约7–13分钟。这是按流程估计，尚无本轮实测分布。"
+        },
+        {
+          "title": "怎样读这次记录",
+          "text": "可以回想自己更容易混淆哪些画法；和人交流时，试着用一句“你现在感觉怎样”确认理解。"
+        }
+      ],
+      "boundary": "本任务使用合成图形，不测同理心，也不能断言你能否读懂真实人的感受。体验每类只有4次，分类差异容易受个别题影响。",
+      "metricHelp": {
+        "accuracy": {
+          "label": "总体分类正确率",
+          "explanation": "正确率：正式作答中判断正确的比例。"
+        },
+        "validResponseCount": {
+          "label": "有效响应数",
+          "explanation": "本次有效类别选择的次数。"
+        }
+      }
+    },
+    "professional": {
+      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+      "procedure": "24 / 60 / 120 次，每类4 / 10 / 20次；另有6次练习，至少4次正确后进入正式任务。 六类标签与经典面孔分类研究有关；当前材料是项目合成图形，不是 Ekman 与 Friesen 1971 的照片、故事或跨文化程序，也没有沿用其样本常模。",
+      "interpretation": "本任务使用合成图形，不测同理心，也不能断言你能否读懂真实人的感受。体验每类只有4次，分类差异容易受个别题影响。",
+      "confounders": [
+        "设备与输入方式、显示和响应延迟会影响用时记录。",
+        "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+        "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
+        "设备与输入方式",
+        "练习、熟悉和这次有效观察量"
+      ],
+      "metricNotes": {
+        "accuracy": {
+          "definition": "正确率：正式作答中判断正确的比例。",
+          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+        },
+        "balancedAccuracy": {
+          "definition": "给每类相同权重，不代表文化通用的情绪识别能力。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "accuracyByEmotion": {
+          "definition": "每类体验仅4次；只描述本批材料，不形成稳定子能力结论。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "confusionMatrix": {
+          "definition": "记录各目标类别被选择成不同类别的次数，只反映本任务合成刺激的分类情况。",
+          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+        },
+        "medianRtMs": {
+          "definition": "典型反应速度：多数有效反应所需的时间。",
+          "readingHint": "与有效记录量、遗漏和提前反应联合阅读；不是最快一次，也不是跨情境速度等级。"
+        },
+        "omissionRate": {
+          "definition": "遗漏比例：应该响应但没有响应的比例。",
+          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+        },
+        "validResponseCount": {
+          "definition": "本次有效类别选择的次数。",
+          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+        }
+      },
+      "configFields": [
+        {
+          "key": "totalTrials",
+          "label": "计划正式试次数"
+        },
+        {
+          "key": "timeoutMs",
+          "label": "响应时限（毫秒）"
+        },
+        {
+          "key": "blockCount",
+          "label": "区组数"
+        }
+      ]
+    },
+    "summaryByProfile": {
+      "experience": {
+        "template": "这批合成面孔的分类正确率为 {accuracy}，有效作答 {validResponseCount} 次。",
+        "metricKeys": [
+          "accuracy",
+          "validResponseCount"
+        ]
+      }
+    },
+    "hiddenByProfile": {
+      "experience": [
+        "accuracyByEmotion",
+        "confusionMatrix",
+        "balancedAccuracy"
+      ]
+    },
+    "qualityLabels": {
+      "constantResponse": "多次选择同一表情标签",
+      "excessiveOmissions": "未答或用时不在范围内的记录较多"
+    }
+  },
+  "experienceHeadline": "accuracy"
+}
 ]

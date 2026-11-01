@@ -156,4 +156,226 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
+  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
+{
+  "schemaVersion": 1,
+  "presentationVersion": "3.0.0",
+  "testType": "maze",
+  "engineVersion": "1.0.1",
+  "scoringVersion": "1.0.1",
+  "title": "看图走迷宫",
+  "metrics": {
+    "pathEfficiency": {
+      "label": "已完成路线的步数效率",
+      "explanation": "已完成迷宫最短路线步数合计/实际步数合计；未完成迷宫不进入该比例。",
+      "singleExplanation": "已完成迷宫最短路线步数合计/实际步数合计；未完成迷宫不进入该比例。"
+    },
+    "completedCount": {
+      "label": "完成迷宫数",
+      "explanation": "完成迷宫数：成功从起点走到终点的迷宫数量。",
+      "singleExplanation": "完成迷宫数：成功到达终点的迷宫数量。"
+    },
+    "totalDeadEnds": {
+      "label": "重复经过格子次数",
+      "explanation": "沿合法移动轨迹重复访问已到过格子即累计；并非不同死胡同的数量。",
+      "singleExplanation": "沿合法移动轨迹重复访问已到过格子即累计；并非不同死胡同的数量。"
+    },
+    "medianCompletionTimeMs": {
+      "label": "完成用时平均值",
+      "explanation": "历史键名含median，但当前公式是已完成迷宫总用时/完成数；本报告据实标为平均值。",
+      "singleExplanation": "历史键名含median，但当前公式是已完成迷宫总用时/完成数；本报告据实标为平均值。"
+    }
+  },
+  "experienceHeadline": "completedCount",
+  "hiddenMetrics": [],
+  "suppressTips": false,
+  "protocols": {
+    "experience": {
+      "tier": "PILOT",
+      "profileLabel": "简短体验",
+      "participantConclusion": "完整迷宫一直可见，用方向键或屏幕按钮移动。报告记录走到出口的数量、完成路线用了多少步，以及重复经过格子的次数。",
+      "reportCaveats": [
+        "本次正式任务共2张7×7迷宫。另有练习，当前与首张正式迷宫相同。",
+        "体验常规约2–5分钟；研究约5–12分钟；取决于路线与思考时间（流程估计，非实测）。",
+        "体验仅两张，且当前练习与第一张正式迷宫相同，会有熟悉效应。不同轮换新图，不构成同一迷宫的学习曲线，也不是空间记忆或智力测验。",
+        "本版是随机完美网格迷宫、全图可见、离散移动。2015年 Looking Ahead? 研究用落杆迷宫、水平操纵及陷阱/逆行结构；本版也不同于隐藏平台的水迷宫。这里只借助文献说明范式差异，不把它当本版效度依据。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "standard": {
+      "tier": "PILOT",
+      "profileLabel": "常规任务",
+      "participantConclusion": "完整迷宫一直可见，用方向键或屏幕按钮移动。报告记录走到出口的数量、完成路线用了多少步，以及重复经过格子的次数。",
+      "reportCaveats": [
+        "本次正式任务共4张7×7迷宫。另有练习，当前与首张正式迷宫相同。",
+        "体验常规约2–5分钟；研究约5–12分钟；取决于路线与思考时间（流程估计，非实测）。",
+        "体验仅两张，且当前练习与第一张正式迷宫相同，会有熟悉效应。不同轮换新图，不构成同一迷宫的学习曲线，也不是空间记忆或智力测验。",
+        "本版是随机完美网格迷宫、全图可见、离散移动。2015年 Looking Ahead? 研究用落杆迷宫、水平操纵及陷阱/逆行结构；本版也不同于隐藏平台的水迷宫。这里只借助文献说明范式差异，不把它当本版效度依据。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "research": {
+      "tier": "PILOT",
+      "profileLabel": "研究变式",
+      "participantConclusion": "完整迷宫一直可见，用方向键或屏幕按钮移动。报告记录走到出口的数量、完成路线用了多少步，以及重复经过格子的次数。",
+      "reportCaveats": [
+        "本次正式任务共8张7×7迷宫。另有练习，当前与首张正式迷宫相同。",
+        "体验常规约2–5分钟；研究约5–12分钟；取决于路线与思考时间（流程估计，非实测）。",
+        "体验仅两张，且当前练习与第一张正式迷宫相同，会有熟悉效应。不同轮换新图，不构成同一迷宫的学习曲线，也不是空间记忆或智力测验。",
+        "本版是随机完美网格迷宫、全图可见、离散移动。2015年 Looking Ahead? 研究用落杆迷宫、水平操纵及陷阱/逆行结构；本版也不同于隐藏平台的水迷宫。这里只借助文献说明范式差异，不把它当本版效度依据。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    }
+  },
+  "practicalTips": [
+    "可以先在图上找关键岔路，再移动；重复经过格子时，看看自己是否在同一处来回。"
+  ],
+  "singleHiddenMetrics": [],
+  "disclaimer": "体验仅两张，且当前练习与第一张正式迷宫相同，会有熟悉效应。不同轮换新图，不构成同一迷宫的学习曲线，也不是空间记忆或智力测验。",
+  "reportReading": {
+    "version": "3.0.0",
+    "title": "先看清路线，再一步步到出口",
+    "introduction": "完整迷宫一直可见，用方向键或屏幕按钮移动。报告记录走到出口的数量、完成路线用了多少步，以及重复经过格子的次数。",
+    "summary": {
+      "template": "完成 {completedCount} 张；已完成迷宫的最短路线步数占实际步数 {pathEfficiency}，重复经过格子累计 {totalDeadEnds} 次。",
+      "metricKeys": [
+        "completedCount",
+        "pathEfficiency",
+        "totalDeadEnds"
+      ]
+    },
+    "summaryByProfile": {
+      "experience": {
+        "template": "完成 {completedCount} 张；已完成迷宫的最短路线步数占实际步数 {pathEfficiency}，重复经过格子累计 {totalDeadEnds} 次。",
+        "metricKeys": [
+          "completedCount",
+          "pathEfficiency",
+          "totalDeadEnds"
+        ]
+      }
+    },
+    "studentMetricKeys": [
+      "completedCount",
+      "pathEfficiency",
+      "totalDeadEnds"
+    ],
+    "processMetricKeys": [],
+    "withholdFlags": [
+      "legacyUninterpretable",
+      "incompleteMazes"
+    ],
+    "metricGates": {},
+    "nextStep": "可以先在图上找关键岔路，再移动；重复经过格子时，看看自己是否在同一处来回。",
+    "chart": {
+      "kind": "metrics",
+      "metricKeys": [
+        "pathEfficiency"
+      ]
+    },
+    "caveatTerms": {
+      "正式版": "标准协议",
+      "体验版": "短程协议",
+      "研究版": "科研协议",
+      "科研版": "科研协议",
+      "人口常模": "经过验证的同龄人比较依据",
+      "年龄常模": "经过验证的同龄人比较依据",
+      "常模等级": "经过验证的同龄人等级",
+      "年龄等级": "年龄对应的能力等级",
+      "稳定能力等级": "固定的能力水平",
+      "内部配置": "这次任务设置",
+      "正式档": "标准任务",
+      "体验档": "简短体验",
+      "标准协议": "标准任务",
+      "短程协议": "简短体验"
+    },
+    "illustration": "sequence",
+    "popular": {
+      "conceptTitle": "这个小游戏在观察什么",
+      "concept": "完整迷宫一直可见，用方向键或屏幕按钮移动。报告记录走到出口的数量、完成路线用了多少步，以及重复经过格子的次数。",
+      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+      "exampleTitle": "生活里也会遇到",
+      "example": "像看平面图找一条少绕路的路线：先想好下一个转弯，有时比不停试方向更有帮助。这里每按一次只移动一格。",
+      "scene": "sequence",
+      "frames": [
+        {
+          "title": "任务怎样进行",
+          "text": "2 / 4 / 8张7×7可见迷宫，每张最多120秒；另有练习，当前重复首张正式图。"
+        },
+        {
+          "title": "大概需要多久",
+          "text": "体验常规约2–5分钟；研究约5–12分钟；取决于路线与思考时间。这是按流程估计，尚无本轮实测分布。"
+        },
+        {
+          "title": "怎样读这次记录",
+          "text": "可以先在图上找关键岔路，再移动；重复经过格子时，看看自己是否在同一处来回。"
+        }
+      ],
+      "boundary": "体验仅两张，且当前练习与第一张正式迷宫相同，会有熟悉效应。不同轮换新图，不构成同一迷宫的学习曲线，也不是空间记忆或智力测验。",
+      "metricHelp": {
+        "completedCount": {
+          "label": "完成迷宫数",
+          "explanation": "完成迷宫数：成功从起点走到终点的迷宫数量。"
+        },
+        "pathEfficiency": {
+          "label": "已完成路线的步数效率",
+          "explanation": "已完成迷宫最短路线步数合计/实际步数合计；未完成迷宫不进入该比例。"
+        },
+        "totalDeadEnds": {
+          "label": "重复经过格子次数",
+          "explanation": "沿合法移动轨迹重复访问已到过格子即累计；并非不同死胡同的数量。"
+        }
+      }
+    },
+    "professional": {
+      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+      "procedure": "2 / 4 / 8张7×7可见迷宫，每张最多120秒；另有练习，当前重复首张正式图。 本版是随机完美网格迷宫、全图可见、离散移动。2015年 Looking Ahead? 研究用落杆迷宫、水平操纵及陷阱/逆行结构；本版也不同于隐藏平台的水迷宫。这里只借助文献说明范式差异，不把它当本版效度依据。",
+      "interpretation": "体验仅两张，且当前练习与第一张正式迷宫相同，会有熟悉效应。不同轮换新图，不构成同一迷宫的学习曲线，也不是空间记忆或智力测验。",
+      "confounders": [
+        "屏幕尺寸影响迷宫显示和导航体验。",
+        "策略差异（右手法则 vs 目标导向）影响路径效率。",
+        "本报告不提供经过验证的人口常模、诊断、空间能力或智力等级结论。",
+        "设备与输入方式",
+        "练习、熟悉和这次有效观察量"
+      ],
+      "metricNotes": {
+        "pathEfficiency": {
+          "definition": "已完成迷宫最短路线步数合计/实际步数合计；未完成迷宫不进入该比例。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "completedCount": {
+          "definition": "成功到达终点的迷宫数。",
+          "readingHint": "与总迷宫数对照阅读。"
+        },
+        "totalDeadEnds": {
+          "definition": "沿合法移动轨迹重复访问已到过格子即累计；并非不同死胡同的数量。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "medianCompletionTimeMs": {
+          "definition": "历史键名含median，但当前公式是已完成迷宫总用时/完成数；本报告据实标为平均值。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        }
+      },
+      "configFields": [
+        {
+          "key": "totalTrials",
+          "label": "计划迷宫数"
+        },
+        {
+          "key": "mazeCols",
+          "label": "迷宫列数"
+        },
+        {
+          "key": "timeLimitMs",
+          "label": "时间限制（毫秒）"
+        }
+      ]
+    },
+    "hiddenByProfile": {
+      "experience": []
+    }
+  }
+}
 ]

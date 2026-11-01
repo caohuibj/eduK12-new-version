@@ -15,4 +15,22 @@ export const seeds: CognitiveSeed[] = [
     scoringVersion: '1.0.0',
     config: { totalTrials: 10, targetMinMs: 1000, targetMaxMs: 3000, maxResponseMs: 10000, report: NO_REFERENCE_REPORT },
   },
+{
+  "testType": "timecopy",
+  "configVersion": "1.0.1-report3",
+  "name": "把刚才的时长再按一遍 / report 3.0.0",
+  "status": "DRAFT",
+  "engineVersion": "1.0.1",
+  "scoringVersion": "1.0.0",
+  "config": {
+    "totalTrials": 10,
+    "targetMinMs": 1000,
+    "targetMaxMs": 3000,
+    "maxResponseMs": 10000,
+    "report": {
+      "reportVersion": "3.0.0",
+      "referenceMode": "none"
+    }
+  }
+}
 ]

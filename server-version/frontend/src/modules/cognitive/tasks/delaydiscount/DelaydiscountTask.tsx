@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -130,7 +131,7 @@ export const DelaydiscountTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="延迟满足选择" description={<p>每题在两个选项之间做选择：「现在立刻拿一笔较小的」，或「过一段时间拿 {delayedAmount}」。你的选择会让“现在”的金额逐步调整，找到对你来说两边差不多的点。</p>} hint={<><p>没有标准答案，按真实偏好选择；练习不计入成绩。</p></>} onAction={() => { setSubPhase('fixation'); setPhase('practice') }} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "延迟满足选择"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>每题在两个选项之间做选择：「现在立刻拿一笔较小的」，或「过一段时间拿 {delayedAmount}」。你的选择会让“现在”的金额逐步调整，找到对你来说两边差不多的点。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>没有标准答案，按真实偏好选择；练习不计入成绩。</p></>} onAction={() => { setSubPhase('fixation'); setPhase('practice') }} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

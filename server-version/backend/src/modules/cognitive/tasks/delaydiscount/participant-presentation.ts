@@ -166,4 +166,244 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
+  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
+{
+  "schemaVersion": 1,
+  "presentationVersion": "3.0.0",
+  "testType": "delaydiscount",
+  "engineVersion": "1.0.1",
+  "scoringVersion": "1.0.0",
+  "title": "现在拿，还是以后拿",
+  "metrics": {
+    "aucDelayDiscounting": {
+      "label": "等待曲线面积（方法附注）",
+      "explanation": "用7至90天的归一化点做梯形积分；不补0天锚点，不是自控力分数。",
+      "singleExplanation": "用7至90天的归一化点做梯形积分；不补0天锚点，不是自控力分数。"
+    },
+    "meanIndifferenceRate": {
+      "label": "选择转变位置的平均比例",
+      "explanation": "由完整二分轨迹估计；任一等待带缺答时不提供，不是实际货币价值。",
+      "singleExplanation": "由完整二分轨迹估计；任一等待带缺答时不提供，不是实际货币价值。"
+    },
+    "laterChoiceRate": {
+      "label": "选择以后领取的比例",
+      "explanation": "分母只含明确选择现在或以后的轮次，不包含超时。",
+      "singleExplanation": "分母只含明确选择现在或以后的轮次，不包含超时。"
+    },
+    "timeoutCount": {
+      "label": "超时次数"
+    },
+    "validTrialCount": {
+      "label": "有效选择数"
+    }
+  },
+  "experienceHeadline": "laterChoiceRate",
+  "hiddenMetrics": [],
+  "suppressTips": false,
+  "protocols": {
+    "experience": {
+      "tier": "PILOT",
+      "profileLabel": "简短体验",
+      "participantConclusion": "每轮在现在较少点数和以后100点之间选择。后续金额会随选择调整，用来粗略描绘这次选择转变的位置。",
+      "reportCaveats": [
+        "本次正式任务共9次跨期选择。另有1次练习。",
+        "体验约1–3分钟；研究约2–6分钟（流程估计，非实测）。",
+        "这些是虚拟点数，三个等待时间只代表本任务设置。短体验每个时间只有3次选择，不能判断自控力，也不能代替真实消费决定。",
+        "借鉴 Richards 等1999的调整金额方法，改为100虚拟点数、7/30/90天与固定二分步数。曲线面积只在7–90天归一化点间做梯形积分，不补0天锚点，不等同所有文献AUC实现；任一等待带缺答时AUC和无差异点均不提供。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "standard": {
+      "tier": "PILOT",
+      "profileLabel": "常规任务",
+      "participantConclusion": "每轮在现在较少点数和以后100点之间选择。后续金额会随选择调整，用来粗略描绘这次选择转变的位置。",
+      "reportCaveats": [
+        "本次正式任务共15次跨期选择。另有1次练习。",
+        "体验约1–3分钟；研究约2–6分钟（流程估计，非实测）。",
+        "这些是虚拟点数，三个等待时间只代表本任务设置。短体验每个时间只有3次选择，不能判断自控力，也不能代替真实消费决定。",
+        "借鉴 Richards 等1999的调整金额方法，改为100虚拟点数、7/30/90天与固定二分步数。曲线面积只在7–90天归一化点间做梯形积分，不补0天锚点，不等同所有文献AUC实现；任一等待带缺答时AUC和无差异点均不提供。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "research": {
+      "tier": "PILOT",
+      "profileLabel": "研究变式",
+      "participantConclusion": "每轮在现在较少点数和以后100点之间选择。后续金额会随选择调整，用来粗略描绘这次选择转变的位置。",
+      "reportCaveats": [
+        "本次正式任务共21次跨期选择。另有1次练习。",
+        "体验约1–3分钟；研究约2–6分钟（流程估计，非实测）。",
+        "这些是虚拟点数，三个等待时间只代表本任务设置。短体验每个时间只有3次选择，不能判断自控力，也不能代替真实消费决定。",
+        "借鉴 Richards 等1999的调整金额方法，改为100虚拟点数、7/30/90天与固定二分步数。曲线面积只在7–90天归一化点间做梯形积分，不补0天锚点，不等同所有文献AUC实现；任一等待带缺答时AUC和无差异点均不提供。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    }
+  },
+  "practicalTips": [
+    "不必追求某个比例；可以想想自己选择时更在意等待时间、当下用途，还是未来点数是否确定。"
+  ],
+  "singleHiddenMetrics": [],
+  "disclaimer": "这些是虚拟点数，三个等待时间只代表本任务设置。短体验每个时间只有3次选择，不能判断自控力，也不能代替真实消费决定。",
+  "reportReading": {
+    "version": "3.0.0",
+    "title": "现在少一点，还是等几天多一点？",
+    "introduction": "每轮在现在较少点数和以后100点之间选择。后续金额会随选择调整，用来粗略描绘这次选择转变的位置。",
+    "summary": {
+      "template": "已明确作答 {validTrialCount} 次，其中选择以后领取的比例为 {laterChoiceRate}；超时 {timeoutCount} 次。",
+      "metricKeys": [
+        "laterChoiceRate",
+        "validTrialCount",
+        "timeoutCount"
+      ]
+    },
+    "summaryByProfile": {
+      "experience": {
+        "template": "已明确作答 {validTrialCount} 次，其中选择以后领取的比例为 {laterChoiceRate}；超时 {timeoutCount} 次。",
+        "metricKeys": [
+          "laterChoiceRate",
+          "validTrialCount",
+          "timeoutCount"
+        ]
+      }
+    },
+    "studentMetricKeys": [
+      "laterChoiceRate",
+      "validTrialCount",
+      "timeoutCount"
+    ],
+    "processMetricKeys": [],
+    "withholdFlags": [
+      "legacyUninterpretable",
+      "incompleteDelayBand"
+    ],
+    "metricGates": {
+      "aucDelayDiscounting": [
+        "incompleteDelayBand"
+      ],
+      "meanIndifferenceRate": [
+        "incompleteDelayBand"
+      ]
+    },
+    "nextStep": "不必追求某个比例；可以想想自己选择时更在意等待时间、当下用途，还是未来点数是否确定。",
+    "chart": {
+      "kind": "metrics",
+      "metricKeys": [
+        "laterChoiceRate"
+      ]
+    },
+    "caveatTerms": {
+      "正式版": "标准协议",
+      "体验版": "短程协议",
+      "研究版": "科研协议",
+      "科研版": "科研协议",
+      "人口常模": "经过验证的同龄人比较依据",
+      "年龄常模": "经过验证的同龄人比较依据",
+      "常模等级": "经过验证的同龄人等级",
+      "年龄等级": "年龄对应的能力等级",
+      "稳定能力等级": "固定的能力水平",
+      "内部配置": "这次任务设置",
+      "正式档": "标准任务",
+      "体验档": "简短体验",
+      "标准协议": "标准任务",
+      "短程协议": "简短体验"
+    },
+    "illustration": "sequence",
+    "popular": {
+      "conceptTitle": "这个小游戏在观察什么",
+      "concept": "每轮在现在较少点数和以后100点之间选择。后续金额会随选择调整，用来粗略描绘这次选择转变的位置。",
+      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+      "exampleTitle": "生活里也会遇到",
+      "example": "想象立即拿到一张小额游戏券，或过几天拿到更大一张。等待成本、用途和是否相信会兑现，都会改变决定。",
+      "scene": "sequence",
+      "frames": [
+        {
+          "title": "任务怎样进行",
+          "text": "9 / 15 / 21次；7、30、90天各3 / 5 / 7次自适应二分；另有1次练习。"
+        },
+        {
+          "title": "大概需要多久",
+          "text": "体验约1–3分钟；研究约2–6分钟。这是按流程估计，尚无本轮实测分布。"
+        },
+        {
+          "title": "怎样读这次记录",
+          "text": "不必追求某个比例；可以想想自己选择时更在意等待时间、当下用途，还是未来点数是否确定。"
+        }
+      ],
+      "boundary": "这些是虚拟点数，三个等待时间只代表本任务设置。短体验每个时间只有3次选择，不能判断自控力，也不能代替真实消费决定。",
+      "metricHelp": {
+        "laterChoiceRate": {
+          "label": "选择以后领取的比例",
+          "explanation": "分母只含明确选择现在或以后的轮次，不包含超时。"
+        },
+        "validTrialCount": {
+          "label": "有效选择数",
+          "explanation": "只描述本次记录。"
+        },
+        "timeoutCount": {
+          "label": "超时次数",
+          "explanation": "只描述本次记录。"
+        }
+      }
+    },
+    "professional": {
+      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+      "procedure": "9 / 15 / 21次；7、30、90天各3 / 5 / 7次自适应二分；另有1次练习。 借鉴 Richards 等1999的调整金额方法，改为100虚拟点数、7/30/90天与固定二分步数。曲线面积只在7–90天归一化点间做梯形积分，不补0天锚点，不等同所有文献AUC实现；任一等待带缺答时AUC和无差异点均不提供。",
+      "interpretation": "这些是虚拟点数，三个等待时间只代表本任务设置。短体验每个时间只有3次选择，不能判断自控力，也不能代替真实消费决定。",
+      "confounders": [
+        "点数/虚拟奖励与真实激励的折扣率可能不同。",
+        "作答中断、超时和延迟带数量影响 AUC 的可计算性。",
+        "本报告不提供经过验证的人口常模、诊断、稳定性格或自控力等级结论。",
+        "设备与输入方式",
+        "练习、熟悉和这次有效观察量"
+      ],
+      "metricNotes": {
+        "aucDelayDiscounting": {
+          "definition": "用7至90天的归一化点做梯形积分；不补0天锚点，不是自控力分数。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "meanIndifferenceRate": {
+          "definition": "由完整二分轨迹估计；任一等待带缺答时不提供，不是实际货币价值。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "laterChoiceRate": {
+          "definition": "分母只含明确选择现在或以后的轮次，不包含超时。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "timeoutCount": {
+          "definition": "按本次冻结任务定义记录“超时次数”。",
+          "readingHint": "超时带不进入 AUC。"
+        },
+        "validTrialCount": {
+          "definition": "按本次冻结任务定义记录“有效选择数”。",
+          "readingHint": "与计划试次总数对照阅读。"
+        }
+      },
+      "configFields": [
+        {
+          "key": "delayBands",
+          "label": "延迟带（天）"
+        },
+        {
+          "key": "delayedAmount",
+          "label": "延后全额"
+        },
+        {
+          "key": "bisectionSteps",
+          "label": "每带二分步数"
+        }
+      ]
+    },
+    "hiddenByProfile": {
+      "experience": [
+        "aucDelayDiscounting",
+        "meanIndifferenceRate"
+      ]
+    },
+    "qualityLabels": {
+      "incompleteDelayBand": "部分等待时间的选择未答完整"
+    }
+  }
+}
 ]

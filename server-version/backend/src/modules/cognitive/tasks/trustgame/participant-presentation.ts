@@ -163,4 +163,231 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
+  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
+{
+  "schemaVersion": 1,
+  "presentationVersion": "3.0.0",
+  "testType": "trustgame",
+  "engineVersion": "1.0.1",
+  "scoringVersion": "1.0.0",
+  "title": "模拟分配：接受还是拒绝",
+  "metrics": {
+    "acceptanceRate": {
+      "label": "明确作答中的接受比例",
+      "explanation": "接受数/明确接受或拒绝数；超时未答不进分母。",
+      "singleExplanation": "接受数/明确接受或拒绝数；超时未答不进分母。"
+    },
+    "unfairAcceptanceRate": {
+      "label": "少于一半方案的接受比例",
+      "explanation": "接受数/所有分给自己少于一半的方案数；当前分母包含该组未答，不能当作有效回答内的接受率。",
+      "singleExplanation": "接受数/所有分给自己少于一半的方案数；当前分母包含该组未答，不能当作有效回答内的接受率。"
+    },
+    "rejectedUnfairCount": {
+      "label": "少于一半方案的明确拒绝轮数",
+      "explanation": "只计明确拒绝；未答不算拒绝。",
+      "singleExplanation": "只计明确拒绝；未答不算拒绝。"
+    },
+    "fairOfferCount": {
+      "label": "分给自己至少一半的方案数",
+      "explanation": "一半是程序分组界线，不是关于公平的道德界线。",
+      "singleExplanation": "一半是程序分组界线，不是关于公平的道德界线。"
+    },
+    "medianDecisionMs": {
+      "label": "决策用时中位数"
+    }
+  },
+  "experienceHeadline": "acceptanceRate",
+  "hiddenMetrics": [],
+  "suppressTips": false,
+  "protocols": {
+    "experience": {
+      "tier": "PILOT",
+      "profileLabel": "简短体验",
+      "participantConclusion": "屏幕给出100点中分给你的数量。接受就按方案分配，拒绝则双方都没有；这是预设方案下的模拟接受选择。",
+      "reportCaveats": [
+        "本次正式任务共4轮模拟分配。另有1轮练习。",
+        "体验约1–2分钟；研究约2–5分钟（流程估计，非实测）。",
+        "没有真人伙伴或真实金钱。4轮体验只有少量固定方案，不能推断你是否信任别人、是否公平，或作人格和道德评价。",
+        "实际范式接近 Güth 等1982最后通牒博弈的回应方，而非投资信任博弈：只有电脑预设报价，没有真人提议阶段、双人互动或真实报酬。总体接受率排除未答；少于一半方案的接受比例分母却包括该组未答，故两者不可直接比较。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "standard": {
+      "tier": "PILOT",
+      "profileLabel": "常规任务",
+      "participantConclusion": "屏幕给出100点中分给你的数量。接受就按方案分配，拒绝则双方都没有；这是预设方案下的模拟接受选择。",
+      "reportCaveats": [
+        "本次正式任务共8轮模拟分配。另有1轮练习。",
+        "体验约1–2分钟；研究约2–5分钟（流程估计，非实测）。",
+        "没有真人伙伴或真实金钱。4轮体验只有少量固定方案，不能推断你是否信任别人、是否公平，或作人格和道德评价。",
+        "实际范式接近 Güth 等1982最后通牒博弈的回应方，而非投资信任博弈：只有电脑预设报价，没有真人提议阶段、双人互动或真实报酬。总体接受率排除未答；少于一半方案的接受比例分母却包括该组未答，故两者不可直接比较。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "research": {
+      "tier": "PILOT",
+      "profileLabel": "研究变式",
+      "participantConclusion": "屏幕给出100点中分给你的数量。接受就按方案分配，拒绝则双方都没有；这是预设方案下的模拟接受选择。",
+      "reportCaveats": [
+        "本次正式任务共12轮模拟分配。另有1轮练习。",
+        "体验约1–2分钟；研究约2–5分钟（流程估计，非实测）。",
+        "没有真人伙伴或真实金钱。4轮体验只有少量固定方案，不能推断你是否信任别人、是否公平，或作人格和道德评价。",
+        "实际范式接近 Güth 等1982最后通牒博弈的回应方，而非投资信任博弈：只有电脑预设报价，没有真人提议阶段、双人互动或真实报酬。总体接受率排除未答；少于一半方案的接受比例分母却包括该组未答，故两者不可直接比较。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    }
+  },
+  "practicalTips": [
+    "可以回想是“自己拿到多少”还是“双方差多少”更影响选择；没有需要追求的接受率。"
+  ],
+  "singleHiddenMetrics": [],
+  "disclaimer": "没有真人伙伴或真实金钱。4轮体验只有少量固定方案，不能推断你是否信任别人、是否公平，或作人格和道德评价。",
+  "reportReading": {
+    "version": "3.0.0",
+    "title": "这份分配，你会接受吗？",
+    "introduction": "屏幕给出100点中分给你的数量。接受就按方案分配，拒绝则双方都没有；这是预设方案下的模拟接受选择。",
+    "summary": {
+      "template": "在明确接受或拒绝的轮次中，接受占 {acceptanceRate}；自己所得少于一半时，明确拒绝 {rejectedUnfairCount} 轮。",
+      "metricKeys": [
+        "acceptanceRate",
+        "rejectedUnfairCount"
+      ]
+    },
+    "summaryByProfile": {
+      "experience": {
+        "template": "在明确接受或拒绝的轮次中，接受占 {acceptanceRate}；自己所得少于一半时，明确拒绝 {rejectedUnfairCount} 轮。",
+        "metricKeys": [
+          "acceptanceRate",
+          "rejectedUnfairCount"
+        ]
+      }
+    },
+    "studentMetricKeys": [
+      "acceptanceRate",
+      "rejectedUnfairCount"
+    ],
+    "processMetricKeys": [],
+    "withholdFlags": [
+      "legacyUninterpretable",
+      "noResponses"
+    ],
+    "metricGates": {
+      "unfairAcceptanceRate": [
+        "noResponses"
+      ]
+    },
+    "nextStep": "可以回想是“自己拿到多少”还是“双方差多少”更影响选择；没有需要追求的接受率。",
+    "chart": {
+      "kind": "metrics",
+      "metricKeys": [
+        "acceptanceRate",
+        "rejectedUnfairCount"
+      ]
+    },
+    "caveatTerms": {
+      "正式版": "标准协议",
+      "体验版": "短程协议",
+      "研究版": "科研协议",
+      "科研版": "科研协议",
+      "人口常模": "经过验证的同龄人比较依据",
+      "年龄常模": "经过验证的同龄人比较依据",
+      "常模等级": "经过验证的同龄人等级",
+      "年龄等级": "年龄对应的能力等级",
+      "稳定能力等级": "固定的能力水平",
+      "内部配置": "这次任务设置",
+      "正式档": "标准任务",
+      "体验档": "简短体验",
+      "标准协议": "标准任务",
+      "短程协议": "简短体验"
+    },
+    "illustration": "rules",
+    "popular": {
+      "conceptTitle": "这个小游戏在观察什么",
+      "concept": "屏幕给出100点中分给你的数量。接受就按方案分配，拒绝则双方都没有；这是预设方案下的模拟接受选择。",
+      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+      "exampleTitle": "生活里也会遇到",
+      "example": "分一块点心时，有人愿意接受较小一块，也有人选择放弃。现实里还会考虑关系、需要和原因，这些都没有装进这几个按钮。",
+      "scene": "rules",
+      "frames": [
+        {
+          "title": "任务怎样进行",
+          "text": "4 / 8 / 12轮固定方案；每轮100点、最多20秒；另有1轮练习。"
+        },
+        {
+          "title": "大概需要多久",
+          "text": "体验约1–2分钟；研究约2–5分钟。这是按流程估计，尚无本轮实测分布。"
+        },
+        {
+          "title": "怎样读这次记录",
+          "text": "可以回想是“自己拿到多少”还是“双方差多少”更影响选择；没有需要追求的接受率。"
+        }
+      ],
+      "boundary": "没有真人伙伴或真实金钱。4轮体验只有少量固定方案，不能推断你是否信任别人、是否公平，或作人格和道德评价。",
+      "metricHelp": {
+        "acceptanceRate": {
+          "label": "明确作答中的接受比例",
+          "explanation": "接受数/明确接受或拒绝数；超时未答不进分母。"
+        },
+        "rejectedUnfairCount": {
+          "label": "少于一半方案的明确拒绝轮数",
+          "explanation": "只计明确拒绝；未答不算拒绝。"
+        }
+      }
+    },
+    "professional": {
+      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+      "procedure": "4 / 8 / 12轮固定方案；每轮100点、最多20秒；另有1轮练习。 实际范式接近 Güth 等1982最后通牒博弈的回应方，而非投资信任博弈：只有电脑预设报价，没有真人提议阶段、双人互动或真实报酬。总体接受率排除未答；少于一半方案的接受比例分母却包括该组未答，故两者不可直接比较。",
+      "interpretation": "没有真人伙伴或真实金钱。4轮体验只有少量固定方案，不能推断你是否信任别人、是否公平，或作人格和道德评价。",
+      "confounders": [
+        "点数/虚拟资源与真实资源的拒绝意愿可能不同。",
+        "没有真实交互对象时更接近一般公平态度。",
+        "本报告不提供经过验证的人口常模、诊断、品德或人格结论。",
+        "设备与输入方式",
+        "练习、熟悉和这次有效观察量"
+      ],
+      "metricNotes": {
+        "acceptanceRate": {
+          "definition": "接受数/明确接受或拒绝数；超时未答不进分母。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "unfairAcceptanceRate": {
+          "definition": "接受数/所有分给自己少于一半的方案数；当前分母包含该组未答，不能当作有效回答内的接受率。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "rejectedUnfairCount": {
+          "definition": "只计明确拒绝；未答不算拒绝。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "fairOfferCount": {
+          "definition": "一半是程序分组界线，不是关于公平的道德界线。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "medianDecisionMs": {
+          "definition": "有效响应的决策用时中位数。",
+          "readingHint": "仅作描述。"
+        }
+      },
+      "configFields": [
+        {
+          "key": "offers",
+          "label": "各轮提议（分给响应者）"
+        },
+        {
+          "key": "potTotal",
+          "label": "每轮总额"
+        },
+        {
+          "key": "timeoutMs",
+          "label": "单轮时限（毫秒）"
+        }
+      ]
+    },
+    "hiddenByProfile": {
+      "experience": []
+    }
+  }
+}
 ]

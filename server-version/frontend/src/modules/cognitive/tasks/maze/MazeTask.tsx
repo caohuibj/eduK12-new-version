@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -185,7 +186,7 @@ export const MazeTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex
     </div>
   )
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="迷宫学习" description={<p>用方向键（或屏幕按钮）从左上角导航到右下角。墙会挡住你的去路——找到可以通行的路线到达终点。按一次方向键或点一次按钮走一步，按住不连走；进入走过的格子也会留下记录。</p>} hint={<><p>限时 {Math.round(timeLimitMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "迷宫学习"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>用方向键（或屏幕按钮）从左上角导航到右下角。墙会挡住你的去路——找到可以通行的路线到达终点。按一次方向键或点一次按钮走一步，按住不连走；进入走过的格子也会留下记录。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>限时 {Math.round(timeLimitMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -23,6 +24,7 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
   onTaskComplete,
 }) => {
   const config = taskContext.config as {
+    report?: { reportVersion?: string }
     totalTrials?: number
     stimulusMs?: number
     trialTimeoutMs?: number
@@ -188,7 +190,7 @@ export const EmotionrecognitionTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="六类情绪面孔分类" description={<p>请根据当前合成面孔选择最符合的情绪类别。可以点击按钮，也可以按 1–6 使用键盘操作。</p>} hint={<><p>使用内部版本化的合成面孔刺激；结果只描述本次分类响应，不推断情绪能力、共情、人格或文化能力。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "六类情绪面孔分类"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>请根据当前合成面孔选择最符合的情绪类别。可以点击按钮，也可以按 1–6 使用键盘操作。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>使用内部版本化的合成面孔刺激；结果只描述本次分类响应，不推断情绪能力、共情、人格或文化能力。</p></>} onAction={startPractice} />
     )
   }
 

@@ -24,5 +24,26 @@ export const seeds: CognitiveSeed[] = [
     engineVersion: '1.0.0',
     scoringVersion: '1.0.0',
     config: { totalTrials: 60, stimulusMs: 3000, trialTimeoutMs: 5000, isiMs: 300, validRtFloorMs: 200, emotionCategoryVersion: 'basic-emotion-6-v1.0.0', stimulusSetVersion: 'emotion-faces-ai-zh-v1.0.0', report: NO_REFERENCE_REPORT },
+  },
+{
+  "testType": "emotionrecognition",
+  "configVersion": "1.0.0-report3",
+  "name": "表情分类小游戏 / report 3.0.0",
+  "status": "DRAFT",
+  "engineVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "config": {
+    "totalTrials": 60,
+    "stimulusMs": 3000,
+    "trialTimeoutMs": 5000,
+    "isiMs": 300,
+    "validRtFloorMs": 200,
+    "emotionCategoryVersion": "basic-emotion-6-v1.0.0",
+    "stimulusSetVersion": "emotion-faces-ai-zh-v1.0.0",
+    "report": {
+      "reportVersion": "3.0.0",
+      "referenceMode": "none"
+    }
   }
+}
 ]

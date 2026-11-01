@@ -393,5 +393,287 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         ]
       }
     }
+  },
+  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
+{
+  "schemaVersion": 1,
+  "presentationVersion": "3.0.0",
+  "testType": "sharegame",
+  "engineVersion": "2.0.0",
+  "scoringVersion": "2.0.0",
+  "title": "模拟分享：这次你怎么分",
+  "metrics": {
+    "givingRate": {
+      "label": "有效点数中的分出比例",
+      "explanation": "明确选择的分出点数之和/这些轮次总额之和；按点数加权，未答轮均不进分子分母；全未答为缺失。",
+      "singleExplanation": "明确选择的分出点数之和/这些轮次总额之和；按点数加权，未答轮均不进分子分母；全未答为缺失。"
+    },
+    "equalSplitCount": {
+      "label": "对半分轮数",
+      "explanation": "仅依据有效选择轮次计算；未答、超时不进入分母或决策用时。",
+      "singleExplanation": "仅依据有效选择轮次计算；未答不补零。"
+    },
+    "generousRate": {
+      "label": "明确选择中分出至少一半的比例",
+      "explanation": "分母是明确选择轮数，不是计划轮数，也不是道德评价。",
+      "singleExplanation": "分母是明确选择轮数，不是计划轮数，也不是道德评价。"
+    },
+    "givingRateSd": {
+      "label": "给出比例波动",
+      "explanation": "仅依据有效选择轮次计算；未答、超时不进入分母或决策用时。",
+      "singleExplanation": "仅依据有效选择轮次计算；未答不补零。"
+    },
+    "medianDecisionMs": {
+      "label": "决策用时中位数",
+      "explanation": "仅依据有效选择轮次计算；未答、超时不进入分母或决策用时。",
+      "singleExplanation": "仅依据有效选择轮次计算；未答不补零。"
+    },
+    "plannedRounds": {
+      "label": "计划轮数",
+      "explanation": "计划轮数；零选择属于有效回答，未答不属于零选择。"
+    },
+    "answeredRounds": {
+      "label": "有效选择轮数",
+      "explanation": "有效选择轮数；零选择属于有效回答，未答不属于零选择。"
+    },
+    "timeoutRounds": {
+      "label": "超时未答轮数",
+      "explanation": "超时未答轮数；零选择属于有效回答，未答不属于零选择。"
+    },
+    "omittedRounds": {
+      "label": "未响应轮数",
+      "explanation": "未响应轮数；零选择属于有效回答，未答不属于零选择。"
+    },
+    "zeroChoiceCount": {
+      "label": "明确选择分出零的轮数",
+      "explanation": "必须实际点击零方案；与超时、其他未答分别记录。",
+      "singleExplanation": "必须实际点击零方案；与超时、其他未答分别记录。"
+    },
+    "responseRate": {
+      "label": "有效选择覆盖率",
+      "explanation": "有效选择覆盖率；零选择属于有效回答，未答不属于零选择。"
+    },
+    "answeredEndowment": {
+      "label": "有效轮次点数总额",
+      "explanation": "有效轮次点数总额；零选择属于有效回答，未答不属于零选择。"
+    }
+  },
+  "experienceHeadline": "givingRate",
+  "hiddenMetrics": [],
+  "suppressTips": false,
+  "protocols": {
+    "experience": {
+      "tier": "PILOT",
+      "profileLabel": "简短体验",
+      "participantConclusion": "从五个比例中选一个分配方案；对方是模拟对象，没有真人收款。这里记录这一次的选择分布，没有正确答案。",
+      "reportCaveats": [
+        "本次正式任务共3轮模拟分享。另有1轮练习。",
+        "体验约1–2分钟；研究约2–4分钟（流程估计，非实测）。",
+        "体验3轮的比例会随一次选择明显变化。结果不测善良、慷慨人格或社交能力；超时与未答均不是选择分出零。",
+        "与独裁者分配范式有关。Forsythe 等1994比较真实报酬和无报酬条件，其差异提示不能直接外推；本版虚拟点数、无真人伙伴、五档离散比例及重复总额，不是原双人实验复刻。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "standard": {
+      "tier": "PILOT",
+      "profileLabel": "常规任务",
+      "participantConclusion": "从五个比例中选一个分配方案；对方是模拟对象，没有真人收款。这里记录这一次的选择分布，没有正确答案。",
+      "reportCaveats": [
+        "本次正式任务共5轮模拟分享。另有1轮练习。",
+        "体验约1–2分钟；研究约2–4分钟（流程估计，非实测）。",
+        "体验3轮的比例会随一次选择明显变化。结果不测善良、慷慨人格或社交能力；超时与未答均不是选择分出零。",
+        "与独裁者分配范式有关。Forsythe 等1994比较真实报酬和无报酬条件，其差异提示不能直接外推；本版虚拟点数、无真人伙伴、五档离散比例及重复总额，不是原双人实验复刻。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    },
+    "research": {
+      "tier": "PILOT",
+      "profileLabel": "研究变式",
+      "participantConclusion": "从五个比例中选一个分配方案；对方是模拟对象，没有真人收款。这里记录这一次的选择分布，没有正确答案。",
+      "reportCaveats": [
+        "本次正式任务共8轮模拟分享。另有1轮练习。",
+        "体验约1–2分钟；研究约2–4分钟（流程估计，非实测）。",
+        "体验3轮的比例会随一次选择明显变化。结果不测善良、慷慨人格或社交能力；超时与未答均不是选择分出零。",
+        "与独裁者分配范式有关。Forsythe 等1994比较真实报酬和无报酬条件，其差异提示不能直接外推；本版虚拟点数、无真人伙伴、五档离散比例及重复总额，不是原双人实验复刻。",
+        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+      ],
+      "showProductIndex": false
+    }
+  },
+  "practicalTips": [
+    "先看有效作答和未答轮数，再看分出比例；可以回想不同总额是否影响了你的决定，无需追求某个数值。"
+  ],
+  "singleHiddenMetrics": [],
+  "disclaimer": "体验3轮的比例会随一次选择明显变化。结果不测善良、慷慨人格或社交能力；超时与未答均不是选择分出零。",
+  "reportReading": {
+    "version": "3.0.0",
+    "title": "一笔虚拟点数，你想留多少、分多少？",
+    "introduction": "从五个比例中选一个分配方案；对方是模拟对象，没有真人收款。这里记录这一次的选择分布，没有正确答案。",
+    "summary": {
+      "template": "明确选择 {answeredRounds} 轮，其中选择分出零 {zeroChoiceCount} 轮；超时 {timeoutRounds} 轮、其他未答 {omittedRounds} 轮；有效选择点数中的分出比例为 {givingRate}。",
+      "metricKeys": [
+        "givingRate",
+        "answeredRounds",
+        "zeroChoiceCount",
+        "timeoutRounds",
+        "omittedRounds"
+      ]
+    },
+    "summaryByProfile": {
+      "experience": {
+        "template": "明确选择 {answeredRounds} 轮，其中选择分出零 {zeroChoiceCount} 轮；超时 {timeoutRounds} 轮、其他未答 {omittedRounds} 轮；有效选择点数中的分出比例为 {givingRate}。",
+        "metricKeys": [
+          "givingRate",
+          "answeredRounds",
+          "zeroChoiceCount",
+          "timeoutRounds",
+          "omittedRounds"
+        ]
+      }
+    },
+    "studentMetricKeys": [
+      "givingRate",
+      "answeredRounds",
+      "zeroChoiceCount",
+      "timeoutRounds",
+      "omittedRounds"
+    ],
+    "processMetricKeys": [
+      "plannedRounds",
+      "answeredRounds",
+      "timeoutRounds",
+      "omittedRounds",
+      "zeroChoiceCount",
+      "answeredEndowment"
+    ],
+    "withholdFlags": [
+      "legacyUninterpretable"
+    ],
+    "metricGates": {},
+    "nextStep": "先看有效作答和未答轮数，再看分出比例；可以回想不同总额是否影响了你的决定，无需追求某个数值。",
+    "chart": {
+      "kind": "metrics",
+      "metricKeys": [
+        "givingRate"
+      ]
+    },
+    "caveatTerms": {
+      "正式版": "标准协议",
+      "体验版": "短程协议",
+      "研究版": "科研协议",
+      "科研版": "科研协议",
+      "人口常模": "经过验证的同龄人比较依据",
+      "年龄常模": "经过验证的同龄人比较依据",
+      "常模等级": "经过验证的同龄人等级",
+      "年龄等级": "年龄对应的能力等级",
+      "稳定能力等级": "固定的能力水平",
+      "内部配置": "这次任务设置",
+      "正式档": "标准任务",
+      "体验档": "简短体验",
+      "标准协议": "标准任务",
+      "短程协议": "简短体验"
+    },
+    "illustration": "rules",
+    "popular": {
+      "conceptTitle": "这个小游戏在观察什么",
+      "concept": "从五个比例中选一个分配方案；对方是模拟对象，没有真人收款。这里记录这一次的选择分布，没有正确答案。",
+      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+      "exampleTitle": "生活里也会遇到",
+      "example": "分一袋小零食时，可能留着自己吃，也可能拿出一部分。真实分享还受关系、需求和情境影响，虚拟点数不能代替这些因素。",
+      "scene": "rules",
+      "frames": [
+        {
+          "title": "任务怎样进行",
+          "text": "3 / 5 / 8轮；总额20、50或100点，五档比例；每轮最多20秒；另有1轮练习。"
+        },
+        {
+          "title": "大概需要多久",
+          "text": "体验约1–2分钟；研究约2–4分钟。这是按流程估计，尚无本轮实测分布。"
+        },
+        {
+          "title": "怎样读这次记录",
+          "text": "先看有效作答和未答轮数，再看分出比例；可以回想不同总额是否影响了你的决定，无需追求某个数值。"
+        }
+      ],
+      "boundary": "体验3轮的比例会随一次选择明显变化。结果不测善良、慷慨人格或社交能力；超时与未答均不是选择分出零。",
+      "metricHelp": {
+        "givingRate": {
+          "label": "有效点数中的分出比例",
+          "explanation": "明确选择的分出点数之和/这些轮次总额之和；按点数加权，未答轮均不进分子分母；全未答为缺失。"
+        },
+        "answeredRounds": {
+          "label": "有效选择轮数",
+          "explanation": "有效选择轮数；零选择属于有效回答，未答不属于零选择。"
+        },
+        "zeroChoiceCount": {
+          "label": "明确选择分出零的轮数",
+          "explanation": "必须实际点击零方案；与超时、其他未答分别记录。"
+        },
+        "timeoutRounds": {
+          "label": "超时未答轮数",
+          "explanation": "超时未答轮数；零选择属于有效回答，未答不属于零选择。"
+        },
+        "omittedRounds": {
+          "label": "未响应轮数",
+          "explanation": "未响应轮数；零选择属于有效回答，未答不属于零选择。"
+        }
+      }
+    },
+    "professional": {
+      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+      "procedure": "3 / 5 / 8轮；总额20、50或100点，五档比例；每轮最多20秒；另有1轮练习。 与独裁者分配范式有关。Forsythe 等1994比较真实报酬和无报酬条件，其差异提示不能直接外推；本版虚拟点数、无真人伙伴、五档离散比例及重复总额，不是原双人实验复刻。",
+      "interpretation": "体验3轮的比例会随一次选择明显变化。结果不测善良、慷慨人格或社交能力；超时与未答均不是选择分出零。",
+      "confounders": [
+        "点数/虚拟资源与真实资源下的分享偏好可能不同。",
+        "预设档位限制分配粒度。",
+        "本报告不提供经过验证的人口常模、诊断、品德或人格结论。",
+        "设备与输入方式",
+        "练习、熟悉和这次有效观察量"
+      ],
+      "metricNotes": {
+        "givingRate": {
+          "definition": "明确选择的分出点数之和/这些轮次总额之和；按点数加权，未答轮均不进分子分母；全未答为缺失。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "equalSplitCount": {
+          "definition": "给出点数恰好为一半的轮次数。",
+          "readingHint": "对半分是常见的公平规范锚点。"
+        },
+        "generousRate": {
+          "definition": "分母是明确选择轮数，不是计划轮数，也不是道德评价。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        },
+        "givingRateSd": {
+          "definition": "有效choice的各轮给出比例总体标准差；一轮为0，全未答为null。",
+          "readingHint": "有效轮次少时，不据此推断稳定偏好。"
+        },
+        "medianDecisionMs": {
+          "definition": "仅有效choice的rtMs中位数；全未答为null。",
+          "readingHint": "超时与未答不进入决策用时。"
+        },
+        "zeroChoiceCount": {
+          "definition": "必须实际点击零方案；与超时、其他未答分别记录。",
+          "readingHint": "保留原计分；只按此分母与任务条件解释。"
+        }
+      },
+      "configFields": [
+        {
+          "key": "endowments",
+          "label": "各轮禀赋"
+        },
+        {
+          "key": "timeoutMs",
+          "label": "单轮时限（毫秒）"
+        }
+      ]
+    },
+    "hiddenByProfile": {
+      "experience": [
+        "givingRateSd"
+      ]
+    }
   }
+}
 ]
