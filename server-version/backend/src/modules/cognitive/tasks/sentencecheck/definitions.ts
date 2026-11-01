@@ -55,3 +55,31 @@ export const sentencecheckRegistryMeta = {
   } satisfies SingleTaskReportDefinition,
   recommendedForCreate: true,
 }
+
+const withCrossedConditionCaveat = (profile: (typeof sentencecheckRegistryMeta.profiles)[CognitiveProfile]) => ({
+  ...profile,
+  reportCaveats: [...profile.reportCaveats, '本项目变式交叉安排真假与肯定/否定；不要与旧版条件混淆的记录直接比较。'],
+})
+
+/** New identity only: crossed condition generation; legacy definitions remain frozen. */
+export const sentencecheckRegistryMetaV11 = {
+  ...sentencecheckRegistryMeta,
+  randomizationAlgorithmVersion: 'sentencecheck-crossed-v1.1.0',
+  profileDefinitionVersion: '1.1.0',
+  profiles: {
+    experience: withCrossedConditionCaveat(sentencecheckRegistryMeta.profiles.experience),
+    standard: withCrossedConditionCaveat(sentencecheckRegistryMeta.profiles.standard),
+    research: withCrossedConditionCaveat(sentencecheckRegistryMeta.profiles.research),
+  } satisfies Record<CognitiveProfile, CognitiveProfileDefinition>,
+  metricDefinitionVersion: '1.1.0',
+  metricDefinitions: {
+    ...sentencecheckRegistryMeta.metricDefinitions,
+    negationPenaltyMs: metric('negationPenaltyMs', '否定与肯定用时差', 'verbal_reasoning', 'ms', 'signed', 'secondary'),
+  },
+  reportDefinitionVersion: '1.1.0',
+  reportDefinition: {
+    ...sentencecheckRegistryMeta.reportDefinition,
+    practicalTips: ['先弄清句子问的是形状还是颜色，再核对图片。', '肯定和否定句都可能相符或不相符，请逐题核对。'],
+    disclaimer: '结果描述本次自编句图核对；条件安排已纠正，仍没有本项目的信效度或年龄常模依据，也不与旧版记录直接比较。',
+  },
+}

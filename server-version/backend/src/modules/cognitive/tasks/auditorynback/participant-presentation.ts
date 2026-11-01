@@ -181,3 +181,22 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     }
   },
 ]
+
+// A separate new identity; the literal legacy presentation above is unchanged.
+const presentation = structuredClone(participantPresentations[0])
+Object.assign(presentation, {testType: 'auditorynback', engineVersion: '1.1.0', scoringVersion: '1.1.0'}, { presentationVersion: '1.1.0', title: '在声音中跟住隔一个的音' })
+presentation.experienceHeadline = 'matchCount'
+presentation.practicalTips = ['当前音与隔一个的音相同才按；不同不按也是正确反应。', '固定次数保证有比较机会，不代表短版已经可靠；先读机会数与质量限制。']
+const reading = presentation.reportReading!
+Object.assign(reading, { version: '1.1.0', title: presentation.title, introduction: '像听旋律时发现同一个音再次出现，这里只比较隔一个的音。它记录这次音高匹配，不给记忆能力定级。', nextStep: presentation.practicalTips.join(' ') })
+reading.studentMetricKeys = ['matchCount', 'nonmatchCount', 'hitRate']
+reading.processMetricKeys = ['matchCount', 'nonmatchCount']
+reading.summaryByProfile = { experience: { template: '这次共有 {matchCount} 次匹配机会与 {nonmatchCount} 次非匹配机会；短版只描述这次尝试。', metricKeys: ['matchCount', 'nonmatchCount'] } }
+if (reading.popular) {
+  reading.popular.concept = reading.introduction
+  reading.popular.takeaway = '有足够的题目机会，才能开始看记录；次数够也不等于稳定能力。'
+  reading.popular.example = '例如低音→高音→低音，第三个音与第一个相同，就按一次。声音不同则不按；漏按目标与正确不按非目标要分开看。'
+}
+if (reading.professional) reading.professional.procedure = '正式音数包含前n个起始音；其余位置固定round((总音数−n)×targetRatio)次匹配，按冻结seed受约束随机安放，最多连续两个目标。非目标强制不等于n-back音。服务端重建同序列，按命中/误报计算原Hautus修正d′；前n音不进两类分母。'
+if (reading.professional) reading.professional.interpretation = '目标数由可比较音数×targetRatio四舍五入得到，随机安放且最多连续两个。使用服务端同种子序列计分，d′与原版相同采用加0.5修正；少量目标的区分指标不等于个体稳定能力。当前仍无音频物理时序校准或本版本信效度。'
+participantPresentations.push(presentation)

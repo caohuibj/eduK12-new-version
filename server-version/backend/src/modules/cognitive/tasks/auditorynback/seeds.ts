@@ -24,3 +24,6 @@ export const seeds: CognitiveSeed[] = [
     },
   },
 ]
+
+// New draft identity; the old 1.0.1 seed and its profile history remain unchanged.
+seeds.push({ ...structuredClone(seeds[0]), configVersion: '1.1.0', engineVersion: '1.1.0', scoringVersion: '1.1.0', name: 'Auditory 2-back v1.1.0 — fixed target opportunities', config: {...structuredClone(seeds[0].config), report: {reportVersion: '1.1.0', referenceMode: 'none'}} })

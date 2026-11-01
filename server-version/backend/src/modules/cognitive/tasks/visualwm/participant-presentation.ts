@@ -1,4 +1,5 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
+import { participantPresentationsV11 } from './participant-presentation.v11'
 
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
@@ -163,4 +164,5 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
+  ...participantPresentationsV11,
 ]

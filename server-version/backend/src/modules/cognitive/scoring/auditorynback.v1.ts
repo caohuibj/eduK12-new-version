@@ -2,7 +2,7 @@ import { CognitiveScoreResult, CognitiveScoringInputError, ScoringTrial } from '
 import { AuditorynbackConfig } from '../schemas/auditorynback.config'
 import { AuditorynbackTrial } from '../schemas/auditorynback.trial'
 import { dPrime as hautusDPrime, median } from './signal-detection'
-import { generateAuditoryNbackSequence } from '../tasks/auditorynback/generator'
+import { generateAuditoryNbackSequence, generateAuditoryNbackFixedSequence } from '../tasks/auditorynback/generator'
 
 const round = (value: number): number => Number(value.toFixed(4))
 
@@ -12,11 +12,13 @@ const EXCESSIVE_OMISSION_RATE = 0.4
 const SCORE_DPRIME_SPAN = 4
 
 /** Auditorynback v1：纯音 n-back；音序列由服务端按 randomSeed 重建，命中/误报/d′ 服务端换算。 */
-export const scoreAuditorynbackV1 = (input: {
+type AuditorynbackScoringInput = {
   config: AuditorynbackConfig
   trials: ScoringTrial<AuditorynbackTrial>[]
   randomSeed?: string
-}): CognitiveScoreResult => {
+}
+
+const scoreAuditorynback = (input: AuditorynbackScoringInput, generateSequence: typeof generateAuditoryNbackSequence): CognitiveScoreResult => {
   const { config } = input
   const sorted = [...input.trials]
     .filter((trial) => trial.trialIndex >= 0 && trial.trialIndex < config.totalTrials)
@@ -35,7 +37,7 @@ export const scoreAuditorynbackV1 = (input: {
   })
 
   const nLevel = config.nLevel
-  const sequence = generateAuditoryNbackSequence(
+  const sequence = generateSequence(
     input.randomSeed ?? '',
     config.totalTrials,
     nLevel,
@@ -102,3 +104,11 @@ export const scoreAuditorynbackV1 = (input: {
     },
   }
 }
+
+// Old identity retains exactly its original sequence and numerical/quality rules.
+export const scoreAuditorynbackV1 = (input: AuditorynbackScoringInput): CognitiveScoreResult =>
+  scoreAuditorynback(input, generateAuditoryNbackSequence)
+
+/** New scoring identity uses fixed-count stimuli; thresholds and formulas are unchanged. */
+export const scoreAuditorynbackV11 = (input: AuditorynbackScoringInput): CognitiveScoreResult =>
+  scoreAuditorynback(input, generateAuditoryNbackFixedSequence)
