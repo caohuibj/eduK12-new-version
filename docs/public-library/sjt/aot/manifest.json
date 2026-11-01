@@ -1,0 +1,31 @@
+{
+  "status": "GO_FOR_DRAFT_CONTENT",
+  "runtime": "HOLD",
+  "counts": {
+    "stems": 16,
+    "options": 48
+  },
+  "verification": "Three item-level review corrections applied; English unchanged. Draft content independent review passed as relayed by parent. Not runtime or psychometric approval.",
+  "files": [
+    {
+      "name": "aot-bilingual-draft.json",
+      "bytes": 56310,
+      "sha256": "4bafbcc14384e4f1ad2d55a134dc71a84da934d713dfb1c501d400b6f7530fcc"
+    },
+    {
+      "name": "aot-bilingual-draft.md",
+      "bytes": 43777,
+      "sha256": "2c4880c71c7ad633df77c4598f20a54684e727643f0a35c4f9015de612d10728"
+    },
+    {
+      "name": "report-draft.md",
+      "bytes": 4316,
+      "sha256": "5152b3ce7cd0119afc1fedf5b45b9727f460c216fedb18f0e503e65fa4b42202"
+    },
+    {
+      "name": "translation-notes.md",
+      "bytes": 9085,
+      "sha256": "8b060b860a0309d03de4b8d2c2c600d278127c1f9ed3891906a19457f1238b4b"
+    }
+  ]
+}

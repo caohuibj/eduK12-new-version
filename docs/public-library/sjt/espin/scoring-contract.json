@@ -1,0 +1,114 @@
+{
+  "status": "DOCUMENTATION_ONLY_NOT_EXECUTABLE",
+  "selection": "All 19 scenarios require one most and one different least in A–E.",
+  "category_map": {
+    "A": "taking no action",
+    "B": "independent troubleshooting",
+    "C": "accessing personal support",
+    "D": "accessing academic support",
+    "E": "accessing helping professional support"
+  },
+  "formulas": {
+    "most": "M[c] = sum over 19 scenarios of indicator(most selection category == c)",
+    "least": "L[c] = sum over 19 scenarios of indicator(least selection category == c)",
+    "dominant": "all categories tied for max M[c]; report all ties",
+    "least_preferred": "all categories tied for max L[c]",
+    "domain": "same most-selection category count restricted to source-defined domain; report all max ties",
+    "normalization": "none; no reverse scoring, difference score, total ability score, percentile or diagnostic threshold"
+  },
+  "domains": [
+    {
+      "id": "academic_performance",
+      "zh_Hans": "学业表现",
+      "web_ids": [
+        1,
+        7,
+        10
+      ],
+      "appendix_ids": [
+        3,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "faculty_staff",
+      "zh_Hans": "与教师及工作人员的互动",
+      "web_ids": [
+        6,
+        13,
+        15
+      ],
+      "appendix_ids": [
+        5,
+        6,
+        8
+      ]
+    },
+    {
+      "id": "professional_development",
+      "zh_Hans": "职业发展",
+      "web_ids": [
+        5,
+        11,
+        18
+      ],
+      "appendix_ids": [
+        18,
+        19,
+        17
+      ]
+    },
+    {
+      "id": "extracurricular",
+      "zh_Hans": "课外活动参与",
+      "web_ids": [
+        2,
+        8,
+        17
+      ],
+      "appendix_ids": [
+        9,
+        12,
+        10
+      ]
+    },
+    {
+      "id": "peer_group",
+      "zh_Hans": "同伴群体互动",
+      "web_ids": [
+        3,
+        9,
+        14
+      ],
+      "appendix_ids": [
+        16,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "special_circumstances",
+      "zh_Hans": "特殊情况",
+      "web_ids": [
+        4,
+        12,
+        16,
+        19
+      ],
+      "appendix_ids": [
+        22,
+        24,
+        21,
+        23
+      ]
+    }
+  ],
+  "runtime_gate": {
+    "required": "Exactly 19 complete pairs; both selections in A-E; most != least enforced by authoritative submission/scoring layer, plus immediate UI validation. Reject invalid or duplicate scenario IDs, missing pairs and same-option pairs.",
+    "status": "NOT IMPLEMENTED OR TESTED",
+    "ties": "Report every category tied for maximum independently for most and least. Domain summaries use most only.",
+    "prohibited": "No most-minus-least score, total ability score, diagnostic threshold, percentile, benchmark or right-answer key."
+  },
+  "review_scope": "GO_FOR_DRAFT_CONTENT only. Not psychometric validation, runtime approval, or deployment authorization."
+}

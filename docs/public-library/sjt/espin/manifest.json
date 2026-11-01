@@ -1,0 +1,42 @@
+{
+  "status": "DRAFT_UNPUBLISHED_PENDING_INDEPENDENT_REVIEW",
+  "counts": {
+    "scenarios": 19,
+    "options": 95,
+    "category_descriptions": 5
+  },
+  "source_checks": "Frozen source and review-package hashes verified; no independent translation or mathematical approval yet.",
+  "files": [
+    {
+      "name": "english-extraction.json",
+      "bytes": 18512,
+      "sha256": "8b521b965531ed1f5eb6395090d6045a5ae02a2c292df8c00be2fd09cce0a4af"
+    },
+    {
+      "name": "espin-bilingual-draft.json",
+      "bytes": 47202,
+      "sha256": "fd33e8921542c4f78119f511d3d98b10d3a0cdd622bc87ab690fb270c6107802"
+    },
+    {
+      "name": "espin-bilingual-draft.md",
+      "bytes": 27578,
+      "sha256": "c31f776eddcc1711ef8b052921fadcd492f522de95da8e6aa8c2e44c671e711a"
+    },
+    {
+      "name": "report-and-vector-design-spec.md",
+      "bytes": 5801,
+      "sha256": "44c526257878dea728b90ebaf355da9838247c604782d4702eec0a42e0374d9a"
+    },
+    {
+      "name": "review-revisions.diff",
+      "bytes": 8430,
+      "sha256": "5af4998558775f432b01b72d2fda311260c9b99cd4b0d48d3019c99ae87d93ae"
+    },
+    {
+      "name": "translation-notes.md",
+      "bytes": 9023,
+      "sha256": "8667aec2b60c770da9ff3cdeb2ddb35f8942e6df1b5bcdfac321a304e5f8958a"
+    }
+  ],
+  "revision": "2026-10-21 four Chinese-only independent-review corrections; pending re-review"
+}

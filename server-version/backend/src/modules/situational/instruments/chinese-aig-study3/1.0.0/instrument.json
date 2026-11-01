@@ -1,0 +1,4713 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "chinese-aig-study3",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalogOrder": 1000,
+  "definition": {
+    "schemaVersion": 2,
+    "respondentType": "participant_self_report",
+    "source": {
+      "title": "中文LLM人格情境判断 · Study3五侧面（内容草案）",
+      "citation": "Chang-Jin Li, Jiyuan Zhang, Yun Tang, Jian Li (2026). Automatic item generation for personality situational judgment tests with large language models. DOI:10.1016/j.chbr.2026.100964; author version https://arxiv.org/abs/2412.12144v5 . Study3 worksheet and scoring rule of Study 3, row3: sum eight items per facet. Facets: supplement §1.4/TableS1 pp10–11 and article §6.2.1.",
+      "url": "https://osf.io/jbvq7/",
+      "publicationYear": 2026
+    },
+    "license": {
+      "status": "verified",
+      "redistribution": "allowed",
+      "note": "Selected Study3 items/key only, CC BY4.0 https://creativecommons.org/licenses/by/4.0/ ; authors credited in citation. Independent OSF license relationship https://api.osf.io/v2/licenses/563c1cf88c5e4a3877f9e96a/ . Changes: structured extraction, platform prompts/report. Original Chinese unchanged; no endorsement. Entire workbook/supplement/article and third-party Study1 examples excluded."
+    },
+    "sampling": {
+      "strategy": "BRANCH_REACHABLE"
+    },
+    "scenes": [
+      {
+        "sceneKey": "N_01",
+        "title": "N_01",
+        "sortOrder": 0,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在公司团建活动中玩真心话大冒险。轮到你时，你的同事问了一个非常私人的问题，使你感到不舒服。房间里所有人的目光都集中在你身上。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会害羞地红着脸，结结巴巴地尝试回答问题"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会找一个相对安全的回答以避开真正的问题，并快速将问题转移到别人身上"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会坦率地说我不想回答那个问题，并请求换一个问题"
+              },
+              {
+                "optionKey": "D",
+                "label": "我愉快地回答问题，尽管这让我感到有点不舒服"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_02",
+        "title": "N_02",
+        "sortOrder": 1,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "在一次工作会议上，你意外地打破了房间里的一个小装饰品，所有同事的眼光突然都集中到你身上。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会感到很尴尬，赶忙低头道歉，希望可以尽快从这个尴尬的场面逃脱"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会深感难堪并且责怪自己的笨拙，之后会尝试补偿损失"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会保持冷静，向大家道歉，然后询问如何解决这个意外情况"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会笑一笑，开个玩笑来缓解气氛，并询问如何弥补这个小失误"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_03",
+        "title": "N_03",
+        "sortOrder": 2,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "面试结束后，你在等电梯时不小心听到几位面试官在讨论你的表现。他们没有注意到你就在附近。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会紧张地站在原地，担心他们说些负面的事情"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会偷听，并且后面几天内无法摆脱他们的评价"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会走开，以免听到可能会让我不舒服的内容"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会以礼貌的方式插入他们的谈话，询问是否可以给我一些即时反馈"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_04",
+        "title": "N_04",
+        "sortOrder": 3,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "公司组织了一次职员晚宴，而你被邀请在台上分享自己的工作经验。晚宴中你注意到几位新员工在你的演讲中互相耳语。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会感到自己的演讲可能很无聊，开始变得紧张不安"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会在心里反复怀疑自己，觉得自己做得不够好"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会试图与听众建立更积极的联系，并适时加入一点幽默来吸引他们的注意力"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会坦然地继续演讲，并在结束后询问新员工对于我的分享有什么想法或建议"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_05",
+        "title": "N_05",
+        "sortOrder": 4,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在一次非正式的聚会中被介绍给一个你非常尊敬的行业前辈，但在与之交谈时，你不小心说错了一个专业术语。前辈似乎没有注意到，但你意识到了。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会感到非常尴尬，甚至开始规避后续的会面和交流"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会在内心深处感到难以安宁，不断回想这个错误"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会微笑着澄清我的错误，并以此作为学习的机会"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会继续谈话，之后私下里查找相关信息以确保下次不会犯同样的错误"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_06",
+        "title": "N_06",
+        "sortOrder": 5,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的团队正在进行一个重要的项目报告，负责统筹的同事因私人紧急事务无法出席。管理层决定由你临时替代进行报告。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会感到不知所措，担忧我可能做不到最好，影响团队评价"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会紧张害怕，担心如果犯错误会被同事嘲笑"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会迅速熟悉项目报告的内容，并自信地做出最佳表现"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会视为挑战自我，并在报告后向团队征询反馈，看看哪里还可以改进"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_07",
+        "title": "N_07",
+        "sortOrder": 6,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "在团队会议中，有同事提出了一些批评性的意见指向你的工作，虽然这并不完全公正。其他同事开始关注这个争论。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会感觉被冤枉，无法抑制情绪，可能会在会议后对那位同事产生负面看法"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会感到尴尬和失落，很可能在会议期间保持沉默"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会保持专业态度，提出自己的观点，并尝试理解对方的角度"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会使用此机会来澄清事实，并咨询正向反馈以改善我的工作"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "N_08",
+        "title": "N_08",
+        "sortOrder": 7,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在公司休息室准备咖啡时，不经意间听到两位高层正在讨论正在进行的某个公司结构调整，并提到了一些敏感信息。你会怎么做？"
+        },
+        "primaryConstruct": "self-consciousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-consciousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会感到紧张和担心，担心调整可能会影响到我的职位"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会立即离开休息室，并尽量忘记我听到的关于公司的敏感信息"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会继续我的活动，并尽可能表现出对谈话没兴趣的样子"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会在适当的时机以恰当的方式，向高层表达我的关切并咨询我个人的职位情况"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_01",
+        "title": "E_01",
+        "sortOrder": 8,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的朋友正在策划参加马拉松活动，并希望你能一起。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会非常愿意参加，而且也会邀请其他朋友一起去"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会愿意参加，我们可以一起进行训练"
+              },
+              {
+                "optionKey": "C",
+                "label": "我考虑参加，但更喜欢独自训练"
+              },
+              {
+                "optionKey": "D",
+                "label": "我宁愿自己跑步，不希望参加大型的群体活动"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_02",
+        "title": "E_02",
+        "sortOrder": 9,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "一个全新的咖啡厅刚刚在镇上开张。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会在社交媒体上发帖邀请大家一起去尝试新的咖啡厅"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会邀请一个小团队的朋友们一起去尝试新的咖啡厅"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会邀请一两个朋友一起去"
+              },
+              {
+                "optionKey": "D",
+                "label": "我喜欢自己去尝试新的事物"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_03",
+        "title": "E_03",
+        "sortOrder": 10,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "每年的春节你都在考虑您会选择哪种方式来庆祝。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会举办一场大型春节聚会，并邀请所有我认识的人"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会参加由朋友举办的大型派对"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会邀请几个亲密的朋友来家里玩"
+              },
+              {
+                "optionKey": "D",
+                "label": "我喜欢安静地自己过节，也许阅读一本好书或者看一部电影"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_04",
+        "title": "E_04",
+        "sortOrder": 11,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你刚买了一台全新的智能电视机并尝试其许多功能。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会邀请朋友们来我家观看最新的电影，一起享受这款新设备"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会在社交媒体上传播我的新购买，并组织一次在线观影会"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会跟一两个朋友分享这个消息，不过并不会邀请他们来"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会自己享受这款全新的电视机"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_05",
+        "title": "E_05",
+        "sortOrder": 12,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你去旅行，并且你能选择旅行的伴侣。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会报名参加由旅行社组织的大规模旅行团"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会召集一大群朋友一起去旅行"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会带上一两个朋友"
+              },
+              {
+                "optionKey": "D",
+                "label": "我更喜欢单人旅行，可以自己安排行程"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_06",
+        "title": "E_06",
+        "sortOrder": 13,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的朋友邀请你参加一个空中瑜伽课程，但是你从未试过这种运动。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会跃跃欲试，并邀请其他几个朋友一起来尝试"
+              },
+              {
+                "optionKey": "B",
+                "label": "我很高兴尝试新的东西，而且我喜欢在团队中接受新事物"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会打算试试，但我希望能有一个熟悉的朋友陪我一起去"
+              },
+              {
+                "optionKey": "D",
+                "label": "我宁愿自己试试新的东西，而不是在一群人面前尝试新事物"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_07",
+        "title": "E_07",
+        "sortOrder": 14,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "周五晚上，你刚刚结束一周的工作。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会参加当地的社交活动或者派对，与大家一起放松"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会召集朋友一起去看一场体育比赛或者音乐会"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会邀请一两个朋友来家聊聊天，看电影"
+              },
+              {
+                "optionKey": "D",
+                "label": "我喜欢一个人看一部电影或者阅读一本书来放松自己"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "E_08",
+        "title": "E_08",
+        "sortOrder": 15,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你想要重新装修你的房间。你会怎么做？"
+        },
+        "primaryConstruct": "gregariousness",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "gregariousness",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会邀请大家一起参与，与他们共享装修过程"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会组织一次DIY聚会，邀请朋友们一起来帮忙"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会邀请一两位朋友来帮忙"
+              },
+              {
+                "optionKey": "D",
+                "label": "我喜欢自己来完成，这样我可以按照自己的想法来装修"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_01",
+        "title": "O_01",
+        "sortOrder": 16,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在公司会议上，领导提出一个全新的企业管理模式：横向协作管理，这个模式旨在打破固有的上下层级关系，并鼓励员工之间的平等合作。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会仔细倾听并研究这个新模式，尝试理解其背后的理念，并考虑它如何被应用到我们的团队中"
+              },
+              {
+                "optionKey": "B",
+                "label": "我愿意尝试这个新模式，并提出一些可能在实施过程中遇到的问题和解决方案"
+              },
+              {
+                "optionKey": "C",
+                "label": "我对这种管理模式持怀疑态度，因为我觉得现有的层级体系已经很有效"
+              },
+              {
+                "optionKey": "D",
+                "label": "我不认为现在改变管理模式是个好主意，旧的方法已经用了很多年，没必要更改"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_02",
+        "title": "O_02",
+        "sortOrder": 17,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的一个朋友想要开一家店铺，并决定引入一个你从未听说过的外国品牌。他向你征求是否应该在本地市场推广这个品牌的意见。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会进行市场调查，探索这个品牌在本地市场的潜在接受度，并给朋友一个基于数据的建议"
+              },
+              {
+                "optionKey": "B",
+                "label": "我鼓励他探索新品牌，并提出市场推广策略上的创意和建议"
+              },
+              {
+                "optionKey": "C",
+                "label": "我劝他放弃这个创意，毕竟引入新品牌具有很高的风险"
+              },
+              {
+                "optionKey": "D",
+                "label": "我建议他选择一个大家都熟悉的品牌，这样更保险"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_03",
+        "title": "O_03",
+        "sortOrder": 18,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "做为一个市场营销经理，你的团队成员提出一个大胆的提案：使用一种完全不同于行业标准的推广方法来推广一个新产品。这种方法未经验证，但看起来很有新意。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我愿意探索这种新方法，并会安排一项小规模试验，以评估其有效性"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会和团队一起详细讨论这个新方法，并与已知的推广方法比较其优劣"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会拒绝这个提案，它太冒险了，我更愿意坚持已经证明有效的传统方法"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会让团队成员回去重新来过一个基于传统策略的推广方案"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_04",
+        "title": "O_04",
+        "sortOrder": 19,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你是个软件工程师，领导建议尝试一种全新的编程语言来开发即将启动的项目，这种语言你并不熟悉。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会接受这个挑战，开始学习这种新的编程语言，并思考它如何提高我们项目的效率或质量"
+              },
+              {
+                "optionKey": "B",
+                "label": "虽然我对此不熟悉，但我会做一些初步的研究和小型实验，来评估语言的适用性"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会向领导建议坚持使用我已经熟悉的编程语言，以免浪费时间"
+              },
+              {
+                "optionKey": "D",
+                "label": "我会担心新语言会带来很多预期之外的问题，尽量避免使用它"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_05",
+        "title": "O_05",
+        "sortOrder": 20,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你参加一个文化交流的聚会，在这里你遇到了许多来自不同文化背景的人。有的人来自你很少了解或者甚至从未听说过的国家。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会与来自各种文化背景的人交谈，试图了解并欣赏他们的文化特点"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会询问这些人他们的生活习惯和文化背景，并与他们分享我自己的文化经验"
+              },
+              {
+                "optionKey": "C",
+                "label": "我会找到与我有相似文化背景的人，因为与他们交流更为舒适"
+              },
+              {
+                "optionKey": "D",
+                "label": "我对认识新的文化不感兴趣，可能会提早离开聚会"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_06",
+        "title": "O_06",
+        "sortOrder": 21,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "办公室里引入了智能自动化，这些自动化系统可以取代一些你日常工作中重复性的任务。对你而言，这是一个全新的技术。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会学习这项新技术，并思考如何利用它来提高我的工作效率"
+              },
+              {
+                "optionKey": "B",
+                "label": "虽然接触这项技术的开始可能会有点困难，我仍愿意尝试，并在适应后找到最佳的使用方式"
+              },
+              {
+                "optionKey": "C",
+                "label": "我不太愿意改变我的工作模式，宁愿继续做我熟悉的重复性任务"
+              },
+              {
+                "optionKey": "D",
+                "label": "我担心智能自动化会让我的工作变得没必要，所以我不感兴趣去学习它"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_07",
+        "title": "O_07",
+        "sortOrder": 22,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在图书馆中无意中翻到一本关于古代哲学的书籍，书中提出了一些今天看来非常超前的思想。虽然这些观点与现代思想有所冲突，但他们当时的创新性和影响力很大。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我会仔细阅读这本书，试图理解这些思想在当时社会的背景下的创新性"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会与我的朋友或同事讨论这本书的内容，分享我的发现并听听他们的看法"
+              },
+              {
+                "optionKey": "C",
+                "label": "我对这种与现代不符的古老思想不感兴趣，会选择放回书架上"
+              },
+              {
+                "optionKey": "D",
+                "label": "我认为这些古老思想已经过时，不愿意花时间去了解它们"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "O_08",
+        "title": "O_08",
+        "sortOrder": 23,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的企业即将面对一场策略变革，会影响到公司的整体运营。领导层想要听取不同部门关于这个变革的想法。尽管你并不是策略部门的成员，你有一些新颖的想法。你会怎么做？"
+        },
+        "primaryConstruct": "openness-to-ideas",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "openness-to-ideas",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "我将积极准备我的想法，并在会议上表达我的观点，尽管它可能与现行策略不同"
+              },
+              {
+                "optionKey": "B",
+                "label": "我会撰写一份详细的报告，论述我的想法，并解释为什么它对公司变革是有价值的"
+              },
+              {
+                "optionKey": "C",
+                "label": "我认为策略部门的成员更有资格提出意见，我不会分享我的想法"
+              },
+              {
+                "optionKey": "D",
+                "label": "我担心我的想法会被视为不专业，所以选择保持安静"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_01",
+        "title": "A_01",
+        "sortOrder": 24,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你刚到一家新公司工作不久，团队里有位老员工经常给你分配不是你职责范围内的工作。这些额外的工作正在影响你按时完成自己的任务。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会接下这些工作，尽我的能力去完成，希望能体现出我的团队精神和合作态度"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会和这位老员工商量，尽量在不影响我的主要工作的前提下帮助他"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会拒绝这位老员工，告诉他我已经有足够多的工作要做"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会向管理层报告这位老员工的行为，以便让他们处理这一问题"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_02",
+        "title": "A_02",
+        "sortOrder": 25,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你是一个项目的负责人，有一次你的团队成员对项目的方向有不同意见，他们来找你讨论。他们的想法有潜力，但执行起来需要更多的时间和资源，这可能会延误项目进度。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会耐心听取团队成员的意见，并尝试找到一个折中方案，既能引入他们的创新想法又能保持项目进度"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会认真考虑他们的意见，但表明我最关心的是遵守项目的原始截止日期和资源限制"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会直接告诉团队成员，我们没有时间和资源去考虑这些新想法，并坚持按照已有计划执行"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会不予考虑团队成员的意见，强调作为项目负责人我已有明确的方向和计划"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_03",
+        "title": "A_03",
+        "sortOrder": 26,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "在你参加的社区志愿者活动中，组织者临时增加了一项任务，需要志愿者留下来晚些时候进行清理工作。本来你计划之后有其他安排，而且这项清理工作不在最初的任务列表中。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会重新安排我的计划，并留下来帮忙清理，因为帮助社区是我义不容辞的责任"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会根据我的时间安排尽可能地帮助一部分清理工作，然后再去履行我其他的安排"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会告诉组织者，我有其他安排，不能参与新增加的清理任务"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会离开并忽视这个新增加的请求，因为它不在我的原计划之内"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_04",
+        "title": "A_04",
+        "sortOrder": 27,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在公共图书馆学习，一个小孩不断地发出响声，影响了你的集中。他的父母似乎没有采取任何行动。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会尝试忽略噪音，并专注于我的学习"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会轻声地请那个小孩安静一些，同时礼貌地对父母表示理解"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会直接要求那个小孩的父母控制他们的孩子，因为噪音打扰了我的学习"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会向图书馆的工作人员投诉，要求他们处理这个问题"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_05",
+        "title": "A_05",
+        "sortOrder": 28,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "公司决定本季度需要加班以完成一个重要的项目。你的个人计划可能会因此受到影响，你并不喜欢频繁加班。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会不情愿地接受加班，因为我知道项目的成功对公司很重要"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会尽量调整我的个人计划，寻找工作和生活的平衡，同时支持团队完成项目"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会向我的上司表达我的不满，解释为什么我不想加班"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会找机会逃避加班，比如请事假或找其他理由"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_06",
+        "title": "A_06",
+        "sortOrder": 29,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你参加朋友组织的晚宴，餐后主人提议大家轮流分享最近的生活趣事。当轮到你时，你并没有准备好，而且感到害羞。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会努力回想最近的趣事，即使讲得不够完美也愿意与大家分享"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会简短地分享一件小事，哪怕它并不有趣，至少我参与进来了"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会直接说自己没有准备好，不想在大家面前分享"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会找借口离开聚会，以免自己需要分享故事"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_07",
+        "title": "A_07",
+        "sortOrder": 30,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "在一次团队建设活动中，组织者邀请大家参加一个你不太擅长的游戏。你担心自己的表现会让队友失望。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会加入游戏，尽可能地参与，哪怕我并不擅长"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会告诉队友我不太擅长这个游戏，但我会尽自己最大的努力支持团队"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会选择不参加，观看队友玩耍，以避免拖团队后腿"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会建议换一个大家都能够擅长的游戏，这样可以确保每个人都能有好的表现"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "A_08",
+        "title": "A_08",
+        "sortOrder": 31,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "在一次部门会议上，领导提出了一个改革方案，这个方案会给你增加很多工作量。虽然这个方案对团队和公司来说是有益的，但是对你个人来说却是一个挑战。你会怎么做？"
+        },
+        "primaryConstruct": "compliance",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "compliance",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": " 我会表示支持这个方案，并努力找出如何有效应对工作量增加的策略"
+              },
+              {
+                "optionKey": "B",
+                "label": " 我会在仔细研读方案后，提出我的担忧，并寻找可能的缓解方法，同时展现出我对改革的支持态度"
+              },
+              {
+                "optionKey": "C",
+                "label": " 我会表达我的反对意见，因为这加重了我的工作负担，即使它对公司有利"
+              },
+              {
+                "optionKey": "D",
+                "label": " 我会尝试说服其他同事反对这个方案，避免增加工作量"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_01",
+        "title": "C_01",
+        "sortOrder": 32,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你刚刚开始了一个新的健身计划，目标是每周至少三次去健身房锻炼身体。本周你已经去了两次，但是在你计划完成第三次锻炼的那天，同事邀请你参加一个晚上的聚会，那里有你喜欢的美食和活动。你知道如果参加聚会，你可能会错过锻炼。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "拒绝同事的邀请，去健身房完成计划的锻炼"
+              },
+              {
+                "optionKey": "B",
+                "label": "答应同事的邀请，但提前一小时去健身房至少进行缩短的训练"
+              },
+              {
+                "optionKey": "C",
+                "label": "接受同事的邀请，计划改天去健身房补上"
+              },
+              {
+                "optionKey": "D",
+                "label": "没有考虑健身计划，直接去参加聚会"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_02",
+        "title": "C_02",
+        "sortOrder": 33,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上班期间，你正为一个即将到期的项目赶紧工作。突然，你的手机收到一连串社交媒体的通知，看起来是朋友们正在讨论昨晚的聚会。你知道一旦开始查看手机，你可能会分心很久。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "关闭手机的社交媒体通知，继续集中精力工作"
+              },
+              {
+                "optionKey": "B",
+                "label": "决定仅在午餐休息时候简单查看通知"
+              },
+              {
+                "optionKey": "C",
+                "label": "瞄一眼手机以满足好奇心，然后继续工作"
+              },
+              {
+                "optionKey": "D",
+                "label": "立即查看所有的通知和聊天记录，以防错过有趣的事情"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_03",
+        "title": "C_03",
+        "sortOrder": 34,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你正在准备一个重要的考试，此考试对你未来的职业道路至关重要。然而，你的好朋友邀请你参加一个周末的聚会，这是放松和消遣的好机会。你知道如果去参加聚会，你的学习计划会受到影响。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "婉拒朋友的邀请，并解释你需要时间来学习"
+              },
+              {
+                "optionKey": "B",
+                "label": "尝试高效利用工作日的时间学习，如果可能，安排短时间去参加聚会"
+              },
+              {
+                "optionKey": "C",
+                "label": "答应参加聚会，因为你认为社交活动同样重要"
+              },
+              {
+                "optionKey": "D",
+                "label": "决定整个周末都参加聚会，希望可以在接下来的日子更有效地学习"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_04",
+        "title": "C_04",
+        "sortOrder": 35,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "办公室里免费提供了甜点，正好是你最喜欢的类型。尽管如此，你最近正在努力保持健康的饮食，特别是尽量减少糖分的摄入。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "虽然很想吃，但还是决定不吃甜点，坚持你的饮食计划"
+              },
+              {
+                "optionKey": "B",
+                "label": "允许自己吃一小块，作为对自己管控饮食的奖励"
+              },
+              {
+                "optionKey": "C",
+                "label": "决定吃甜点，并说明有时对自己宽容一些是可以的"
+              },
+              {
+                "optionKey": "D",
+                "label": "吃很多甜点，考虑到它是免费的，不想错过这个机会"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_05",
+        "title": "C_05",
+        "sortOrder": 36,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的个人目标是每天至少学习一个小时的外语。今天你下班后感觉特别累，而你的手机上有许多吸引人的视频推荐。你知道一旦开始看视频，很容易不自觉地沉迷其中。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "即使很累，也坚持至少学习半小时，然后再考虑是否观看视频"
+              },
+              {
+                "optionKey": "B",
+                "label": "直接将手机放在一边，专注于完成预定的学习目标"
+              },
+              {
+                "optionKey": "C",
+                "label": "观看一两个视频放松一下，然后学习外语"
+              },
+              {
+                "optionKey": "D",
+                "label": "今天就不学习了，花时间看视频放松"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_06",
+        "title": "C_06",
+        "sortOrder": 37,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "公司最近布置了一份需要自学的新软件培训材料，所有员工都需在本月底前完成学习。尽管你有一些自学的时间，但你更倾向于参加同事们的午餐聚会。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "优先完成软件的学习，只有在学到一定程度后才考虑参加聚会"
+              },
+              {
+                "optionKey": "B",
+                "label": "计划每天留出固定时间来学习软件，余下的时间可以用来社交"
+              },
+              {
+                "optionKey": "C",
+                "label": "参加更多的社交聚会，把学习留到月底完成"
+              },
+              {
+                "optionKey": "D",
+                "label": "只参加聚会，并希望在最后一周集中时间完成学习任务"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_07",
+        "title": "C_07",
+        "sortOrder": 38,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你在家中工作，一个邻居突然来访，带来了一些家庭烘焙的点心。你正处在工作的关键阶段，需要集中精神。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "感谢邻居，但是解释说你现在无法接待他，并提议改天访问"
+              },
+              {
+                "optionKey": "B",
+                "label": "短暂招待邻居，然后礼貌地告诉他你需要工作"
+              },
+              {
+                "optionKey": "C",
+                "label": "花时间享受邻居的到访和点心，然后再工作"
+              },
+              {
+                "optionKey": "D",
+                "label": "接受邻居的拜访，并用这个做为一个休息工作的借口"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "C_08",
+        "title": "C_08",
+        "sortOrder": 39,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你计划在周末完成一份个人发展课程的在线组件。然而，周末的天气预报显示将是晴朗温暖的好天，非常适合户外活动。你的伙伴提议去远足或进行其他的户外活动。你会怎么做？"
+        },
+        "primaryConstruct": "self-discipline",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "self-discipline",
+            "prompt": "平台新编提示（非作者原导语）：请选择最接近你通常会采取的反应的一项；不是选择应该采取或最优秀的行动。",
+            "options": [
+              {
+                "optionKey": "A",
+                "label": "感谢伴侣的提议，但是解释你有先前的学习计划"
+              },
+              {
+                "optionKey": "B",
+                "label": "提出在学习结束后看是否有时间和精力进行户外活动"
+              },
+              {
+                "optionKey": "C",
+                "label": "安排在户外活动中找个时间做学习，虽然你知道这可能很难实现"
+              },
+              {
+                "optionKey": "D",
+                "label": "放弃学习计划，享受周末的美好时光"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "flow": {
+      "strategy": "BRANCHING_DAG_V1",
+      "entryNodeKey": "N_01",
+      "nodes": [
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_01",
+          "sceneKey": "N_01",
+          "motherSceneKey": "N_01",
+          "roundKey": "study3",
+          "stepKey": "1",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_02"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_02",
+          "sceneKey": "N_02",
+          "motherSceneKey": "N_02",
+          "roundKey": "study3",
+          "stepKey": "2",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_03"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_03",
+          "sceneKey": "N_03",
+          "motherSceneKey": "N_03",
+          "roundKey": "study3",
+          "stepKey": "3",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_04"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_04",
+          "sceneKey": "N_04",
+          "motherSceneKey": "N_04",
+          "roundKey": "study3",
+          "stepKey": "4",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_05"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_05",
+          "sceneKey": "N_05",
+          "motherSceneKey": "N_05",
+          "roundKey": "study3",
+          "stepKey": "5",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_06"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_06",
+          "sceneKey": "N_06",
+          "motherSceneKey": "N_06",
+          "roundKey": "study3",
+          "stepKey": "6",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_07"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_07",
+          "sceneKey": "N_07",
+          "motherSceneKey": "N_07",
+          "roundKey": "study3",
+          "stepKey": "7",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "N_08"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "N_08",
+          "sceneKey": "N_08",
+          "motherSceneKey": "N_08",
+          "roundKey": "study3",
+          "stepKey": "8",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_01"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_01",
+          "sceneKey": "E_01",
+          "motherSceneKey": "E_01",
+          "roundKey": "study3",
+          "stepKey": "9",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_02"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_02",
+          "sceneKey": "E_02",
+          "motherSceneKey": "E_02",
+          "roundKey": "study3",
+          "stepKey": "10",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_03"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_03",
+          "sceneKey": "E_03",
+          "motherSceneKey": "E_03",
+          "roundKey": "study3",
+          "stepKey": "11",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_04"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_04",
+          "sceneKey": "E_04",
+          "motherSceneKey": "E_04",
+          "roundKey": "study3",
+          "stepKey": "12",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_05"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_05",
+          "sceneKey": "E_05",
+          "motherSceneKey": "E_05",
+          "roundKey": "study3",
+          "stepKey": "13",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_06"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_06",
+          "sceneKey": "E_06",
+          "motherSceneKey": "E_06",
+          "roundKey": "study3",
+          "stepKey": "14",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_07"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_07",
+          "sceneKey": "E_07",
+          "motherSceneKey": "E_07",
+          "roundKey": "study3",
+          "stepKey": "15",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "E_08"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "E_08",
+          "sceneKey": "E_08",
+          "motherSceneKey": "E_08",
+          "roundKey": "study3",
+          "stepKey": "16",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_01"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_01",
+          "sceneKey": "O_01",
+          "motherSceneKey": "O_01",
+          "roundKey": "study3",
+          "stepKey": "17",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_02"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_02",
+          "sceneKey": "O_02",
+          "motherSceneKey": "O_02",
+          "roundKey": "study3",
+          "stepKey": "18",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_03"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_03",
+          "sceneKey": "O_03",
+          "motherSceneKey": "O_03",
+          "roundKey": "study3",
+          "stepKey": "19",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_04"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_04",
+          "sceneKey": "O_04",
+          "motherSceneKey": "O_04",
+          "roundKey": "study3",
+          "stepKey": "20",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_05"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_05",
+          "sceneKey": "O_05",
+          "motherSceneKey": "O_05",
+          "roundKey": "study3",
+          "stepKey": "21",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_06"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_06",
+          "sceneKey": "O_06",
+          "motherSceneKey": "O_06",
+          "roundKey": "study3",
+          "stepKey": "22",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_07"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_07",
+          "sceneKey": "O_07",
+          "motherSceneKey": "O_07",
+          "roundKey": "study3",
+          "stepKey": "23",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "O_08"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "O_08",
+          "sceneKey": "O_08",
+          "motherSceneKey": "O_08",
+          "roundKey": "study3",
+          "stepKey": "24",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_01"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_01",
+          "sceneKey": "A_01",
+          "motherSceneKey": "A_01",
+          "roundKey": "study3",
+          "stepKey": "25",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_02"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_02",
+          "sceneKey": "A_02",
+          "motherSceneKey": "A_02",
+          "roundKey": "study3",
+          "stepKey": "26",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_03"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_03",
+          "sceneKey": "A_03",
+          "motherSceneKey": "A_03",
+          "roundKey": "study3",
+          "stepKey": "27",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_04"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_04",
+          "sceneKey": "A_04",
+          "motherSceneKey": "A_04",
+          "roundKey": "study3",
+          "stepKey": "28",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_05"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_05",
+          "sceneKey": "A_05",
+          "motherSceneKey": "A_05",
+          "roundKey": "study3",
+          "stepKey": "29",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_06"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_06",
+          "sceneKey": "A_06",
+          "motherSceneKey": "A_06",
+          "roundKey": "study3",
+          "stepKey": "30",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_07"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_07",
+          "sceneKey": "A_07",
+          "motherSceneKey": "A_07",
+          "roundKey": "study3",
+          "stepKey": "31",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "A_08"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "A_08",
+          "sceneKey": "A_08",
+          "motherSceneKey": "A_08",
+          "roundKey": "study3",
+          "stepKey": "32",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_01"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_01",
+          "sceneKey": "C_01",
+          "motherSceneKey": "C_01",
+          "roundKey": "study3",
+          "stepKey": "33",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_02"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_02",
+          "sceneKey": "C_02",
+          "motherSceneKey": "C_02",
+          "roundKey": "study3",
+          "stepKey": "34",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_03"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_03",
+          "sceneKey": "C_03",
+          "motherSceneKey": "C_03",
+          "roundKey": "study3",
+          "stepKey": "35",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_04"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_04",
+          "sceneKey": "C_04",
+          "motherSceneKey": "C_04",
+          "roundKey": "study3",
+          "stepKey": "36",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_05"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_05",
+          "sceneKey": "C_05",
+          "motherSceneKey": "C_05",
+          "roundKey": "study3",
+          "stepKey": "37",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_06"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_06",
+          "sceneKey": "C_06",
+          "motherSceneKey": "C_06",
+          "roundKey": "study3",
+          "stepKey": "38",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_07"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_07",
+          "sceneKey": "C_07",
+          "motherSceneKey": "C_07",
+          "roundKey": "study3",
+          "stepKey": "39",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "C_08"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "C_08",
+          "sceneKey": "C_08",
+          "motherSceneKey": "C_08",
+          "roundKey": "study3",
+          "stepKey": "40",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "terminal"
+          }
+        },
+        {
+          "nodeType": "TERMINAL",
+          "nodeKey": "terminal"
+        }
+      ]
+    },
+    "scoring": {
+      "scoringVersion": "study3-author-key-sum-1",
+      "model": {
+        "contractVersion": "situational-model-v1",
+        "modelKey": "AUTHOR_KEY_SUM",
+        "modelVersion": "1",
+        "expertKey": [
+          {
+            "sceneKey": "N_01",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_01",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_01",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_01",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_02",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_02",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_02",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_02",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_03",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_03",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_03",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_03",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_04",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_04",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_04",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_04",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_05",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_05",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_05",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_05",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_06",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_06",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_06",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_06",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_07",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_07",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_07",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_07",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_08",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_08",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-consciousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "N_08",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "N_08",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-consciousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_01",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_01",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_01",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_01",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_02",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_02",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_02",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_02",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_03",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_03",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_03",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_03",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_04",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_04",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_04",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_04",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_05",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_05",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_05",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_05",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_06",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_06",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_06",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_06",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_07",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_07",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_07",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_07",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_08",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_08",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "gregariousness",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "E_08",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "E_08",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "gregariousness",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_01",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_01",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_01",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_01",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_02",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_02",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_02",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_02",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_03",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_03",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_03",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_03",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_04",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_04",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_04",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_04",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_05",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_05",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_05",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_05",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_06",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_06",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_06",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_06",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_07",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_07",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_07",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_07",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_08",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_08",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "openness-to-ideas",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "O_08",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "O_08",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "openness-to-ideas",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_01",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_01",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_01",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_01",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_02",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_02",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_02",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_02",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_03",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_03",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_03",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_03",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_04",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_04",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_04",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_04",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_05",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_05",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_05",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_05",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_06",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_06",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_06",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_06",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_07",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_07",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_07",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_07",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_08",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_08",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "compliance",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "A_08",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "A_08",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "compliance",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_01",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_01",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_01",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_01",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_02",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_02",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_02",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_02",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_03",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_03",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_03",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_03",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_04",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_04",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_04",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_04",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_05",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_05",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_05",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_05",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_06",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_06",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_06",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_06",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_07",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_07",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_07",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_07",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_08",
+            "channelKey": "choice",
+            "optionKey": "A",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_08",
+            "channelKey": "choice",
+            "optionKey": "B",
+            "metricKey": "self-discipline",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "C_08",
+            "channelKey": "choice",
+            "optionKey": "C",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "C_08",
+            "channelKey": "choice",
+            "optionKey": "D",
+            "metricKey": "self-discipline",
+            "contribution": 0
+          }
+        ]
+      },
+      "choiceScores": [],
+      "publishedMetrics": [
+        {
+          "key": "self-consciousness",
+          "label": "自我意识",
+          "construct": "self-consciousness",
+          "channelKey": "choice",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        },
+        {
+          "key": "gregariousness",
+          "label": "乐群性",
+          "construct": "gregariousness",
+          "channelKey": "choice",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        },
+        {
+          "key": "openness-to-ideas",
+          "label": "观念开放",
+          "construct": "openness-to-ideas",
+          "channelKey": "choice",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        },
+        {
+          "key": "compliance",
+          "label": "依从性",
+          "construct": "compliance",
+          "channelKey": "choice",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        },
+        {
+          "key": "self-discipline",
+          "label": "自律性",
+          "construct": "self-discipline",
+          "channelKey": "choice",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        }
+      ]
+    },
+    "report": {
+      "reportVersion": "study3-descriptive-1",
+      "primaryMetricKeys": [
+        "self-consciousness",
+        "gregariousness",
+        "openness-to-ideas",
+        "compliance",
+        "self-discipline"
+      ],
+      "metricOrder": [
+        "self-consciousness",
+        "gregariousness",
+        "openness-to-ideas",
+        "compliance",
+        "self-discipline"
+      ],
+      "interpretations": [
+        {
+          "metricKey": "self-consciousness",
+          "headline": "自我意识：情境反应倾向",
+          "summary": "该侧面8题中选择作者计为1分的反应次数，范围0–8。更多表示本套情境中更多选择对应特质方向，不表示更正确、更优秀或更健康。各侧面分别解释，不合成总分、不作跨侧面排名。",
+          "bands": [],
+          "guidance": []
+        },
+        {
+          "metricKey": "gregariousness",
+          "headline": "乐群性：情境反应倾向",
+          "summary": "该侧面8题中选择作者计为1分的反应次数，范围0–8。更多表示本套情境中更多选择对应特质方向，不表示更正确、更优秀或更健康。各侧面分别解释，不合成总分、不作跨侧面排名。",
+          "bands": [],
+          "guidance": []
+        },
+        {
+          "metricKey": "openness-to-ideas",
+          "headline": "观念开放：情境反应倾向",
+          "summary": "该侧面8题中选择作者计为1分的反应次数，范围0–8。更多表示本套情境中更多选择对应特质方向，不表示更正确、更优秀或更健康。各侧面分别解释，不合成总分、不作跨侧面排名。",
+          "bands": [],
+          "guidance": []
+        },
+        {
+          "metricKey": "compliance",
+          "headline": "依从性：情境反应倾向",
+          "summary": "该侧面8题中选择作者计为1分的反应次数，范围0–8。更多表示本套情境中更多选择对应特质方向，不表示更正确、更优秀或更健康。各侧面分别解释，不合成总分、不作跨侧面排名。",
+          "bands": [],
+          "guidance": []
+        },
+        {
+          "metricKey": "self-discipline",
+          "headline": "自律性：情境反应倾向",
+          "summary": "该侧面8题中选择作者计为1分的反应次数，范围0–8。更多表示本套情境中更多选择对应特质方向，不表示更正确、更优秀或更健康。各侧面分别解释，不合成总分、不作跨侧面排名。",
+          "bands": [],
+          "guidance": []
+        }
+      ],
+      "limitations": [
+        "仅Study3原中文40题，五个具体侧面，不是完整大五人格；无跨侧面总分、常模、百分位或切点。",
+        "作者原始key的1/0仅表示特质方向，不表示正确、优秀或健康；自我意识不是一般自我觉察能力。",
+        "Study3有效样本443、18–58岁，效标子样本130、两周重测80；高学历样本不能作为人群常模。依从性、自律性及部分效度证据有限。",
+        "作者未提供已核实的独立施测导语及缺失规则；提示语为平台新编typical-behavior说明；未完成侧面不计分、不填0、不插补是平台保守guard。",
+        "保留原文瑕疵，见选定素材notes；不作临床、招聘、录取等高风险决策。"
+      ],
+      "disclaimer": "平台新编描述性报告，非作者原报告。仅Study3原中文40题，五个具体侧面，不是完整大五人格；无跨侧面总分、常模、百分位或切点。作者原始key的1/0仅表示特质方向，不表示正确、优秀或健康；自我意识不是一般自我觉察能力。Study3有效样本443、18–58岁，效标子样本130、两周重测80；高学历样本不能作为人群常模。依从性、自律性及部分效度证据有限。作者未提供已核实的独立施测导语及缺失规则；提示语为平台新编typical-behavior说明；未完成侧面不计分、不填0、不插补是平台保守guard。保留原文瑕疵，见选定素材notes；不作临床、招聘、录取等高风险决策。"
+    },
+    "referencePolicy": {
+      "type": "none"
+    }
+  },
+  "goldenCases": [
+    {
+      "name": "all-A",
+      "responses": [
+        {
+          "sceneKey": "N_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_02",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_04",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_06",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_08",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_02",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_04",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_06",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_08",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_02",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_04",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_06",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_08",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_02",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_04",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_06",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_08",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_02",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_04",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_06",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_08",
+          "channelKey": "choice",
+          "responseValue": "A"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "self-consciousness",
+          "gregariousness",
+          "openness-to-ideas",
+          "compliance",
+          "self-discipline"
+        ],
+        "metrics": {
+          "self-consciousness": 8,
+          "gregariousness": 8,
+          "openness-to-ideas": 8,
+          "compliance": 8,
+          "self-discipline": 8
+        }
+      }
+    },
+    {
+      "name": "all-B",
+      "responses": [
+        {
+          "sceneKey": "N_01",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_02",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_03",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_04",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_05",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_06",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_07",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "N_08",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_01",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_02",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_03",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_04",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_05",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_06",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_07",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "E_08",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_01",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_02",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_03",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_04",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_05",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_06",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_07",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "O_08",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_01",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_02",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_03",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_04",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_05",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_06",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_07",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "A_08",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_01",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_02",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_03",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_04",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_05",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_06",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_07",
+          "channelKey": "choice",
+          "responseValue": "B"
+        },
+        {
+          "sceneKey": "C_08",
+          "channelKey": "choice",
+          "responseValue": "B"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "self-consciousness",
+          "gregariousness",
+          "openness-to-ideas",
+          "compliance",
+          "self-discipline"
+        ],
+        "metrics": {
+          "self-consciousness": 8,
+          "gregariousness": 8,
+          "openness-to-ideas": 8,
+          "compliance": 8,
+          "self-discipline": 8
+        }
+      }
+    },
+    {
+      "name": "all-C",
+      "responses": [
+        {
+          "sceneKey": "N_01",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_02",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_03",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_04",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_05",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_06",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_07",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "N_08",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_01",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_02",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_03",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_04",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_05",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_06",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_07",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "E_08",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_01",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_02",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_03",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_04",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_05",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_06",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_07",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "O_08",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_01",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_02",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_03",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_04",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_05",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_06",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_07",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "A_08",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_01",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_02",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_03",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_04",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_05",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_06",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_07",
+          "channelKey": "choice",
+          "responseValue": "C"
+        },
+        {
+          "sceneKey": "C_08",
+          "channelKey": "choice",
+          "responseValue": "C"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "self-consciousness",
+          "gregariousness",
+          "openness-to-ideas",
+          "compliance",
+          "self-discipline"
+        ],
+        "metrics": {
+          "self-consciousness": 0,
+          "gregariousness": 0,
+          "openness-to-ideas": 0,
+          "compliance": 0,
+          "self-discipline": 0
+        }
+      }
+    },
+    {
+      "name": "all-D",
+      "responses": [
+        {
+          "sceneKey": "N_01",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_03",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_05",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_07",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_01",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_03",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_05",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_07",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_01",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_03",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_05",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_07",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_01",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_03",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_05",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_07",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_01",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_03",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_05",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_07",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "self-consciousness",
+          "gregariousness",
+          "openness-to-ideas",
+          "compliance",
+          "self-discipline"
+        ],
+        "metrics": {
+          "self-consciousness": 0,
+          "gregariousness": 0,
+          "openness-to-ideas": 0,
+          "compliance": 0,
+          "self-discipline": 0
+        }
+      }
+    },
+    {
+      "name": "mixed-half",
+      "responses": [
+        {
+          "sceneKey": "N_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "N_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "N_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "E_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "E_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "O_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "O_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "A_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "A_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_01",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_02",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_03",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_04",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_05",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_06",
+          "channelKey": "choice",
+          "responseValue": "D"
+        },
+        {
+          "sceneKey": "C_07",
+          "channelKey": "choice",
+          "responseValue": "A"
+        },
+        {
+          "sceneKey": "C_08",
+          "channelKey": "choice",
+          "responseValue": "D"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "self-consciousness",
+          "gregariousness",
+          "openness-to-ideas",
+          "compliance",
+          "self-discipline"
+        ],
+        "metrics": {
+          "self-consciousness": 4,
+          "gregariousness": 4,
+          "openness-to-ideas": 4,
+          "compliance": 4,
+          "self-discipline": 4
+        }
+      }
+    }
+  ]
+}

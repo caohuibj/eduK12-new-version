@@ -1,0 +1,648 @@
+[
+  {
+    "appendix_id": 1,
+    "web_id": 7,
+    "stem": {
+      "en": "You are taking a difficult course load and begin feeling overwhelmed"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Push through your challenging courses knowing the semester will eventually end"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Find instructional videos to watch online to support your learning outside of class"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Make and work with a study group of peers from your classes"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Ask your advisor for advice about time management"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Get tutoring for your courses from the student success center"
+      }
+    ]
+  },
+  {
+    "appendix_id": 2,
+    "web_id": 10,
+    "stem": {
+      "en": "You are at the risk of failing a required course and the withdraw/drop deadline is approaching"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait and see how you’re doing in the course once the deadline is closer"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Spend more time studying for the course to try to bring up your grade"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Ask a friend for help on the material you are struggling with to try to bring up your grade"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your academic advisor for advice about dropping the course"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Get tutoring for your courses from the student success center"
+      }
+    ]
+  },
+  {
+    "appendix_id": 3,
+    "web_id": 1,
+    "stem": {
+      "en": "Your first round of tests did not go well and your usual studying habits are not working"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait until the next round of tests to see if you’ll do better"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Review your first round of tests once you get them back to understand your mistakes"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Make and work with a study group with peers in your classes to better understand the material"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Start going to office hours regularly for each of your courses"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Visit the student success center to learn a new study method"
+      }
+    ]
+  },
+  {
+    "appendix_id": 5,
+    "web_id": 6,
+    "stem": {
+      "en": "You need additional assistance in a class, and the instructor is being non-responsive"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait for the instructor to respond to your request"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Find instructional videos or other open access educational resources to support your learning outside of class"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Make a study group with peers who are in the same class"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Reach out to the teaching assistant of the course to get help on the course material"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Get tutoring for the course from the student success center"
+      }
+    ]
+  },
+  {
+    "appendix_id": 6,
+    "web_id": 13,
+    "stem": {
+      "en": "You are performing poorly in a class due to poor teaching by instructor or teaching assistant"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait and see if the instructional quality of the course improves"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Find instructional videos or other open access educational resources to support your learning outside of class"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Make a study group with peers who are in the same class"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Reach out to another instructor of the same course to get help on the course material"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Get tutoring for the course from the student success center"
+      }
+    ]
+  },
+  {
+    "appendix_id": 8,
+    "web_id": 15,
+    "stem": {
+      "en": "You need a letter of recommendation but do not know any faculty well enough to ask them"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Don’t apply for opportunities that require a recommendation letter"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Ask a prior or current employer for a letter of recommendation"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Ask one of your family members (or a friend of the family) for a recommendation letter"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Ask your advisor for a recommendation letter"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to the career services office to get advice"
+      }
+    ]
+  },
+  {
+    "appendix_id": 9,
+    "web_id": 2,
+    "stem": {
+      "en": "You want to get involved on campus but are unsure which activities to select"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait and see what opportunities you stumble across naturally"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Search Instagram or other social media to find organizations around campus that sound interesting to you"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Ask your friends about what organizations they have joined"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Ask you advisor for recommendations based on your major and/or interests"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Attend campus organization fairs to learn about organizations around campus"
+      }
+    ]
+  },
+  {
+    "appendix_id": 10,
+    "web_id": 17,
+    "stem": {
+      "en": "You are active in an organization and the time commitment proves greater than expected"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Stay active in the organization and see if the time commitment changes"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Talk to the leaders of the organization and request to take less responsibilities"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk to friends or family about balancing your organizational commitments and schoolwork"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Ask your academic advisor for advice about whether or not to stay active in the organization"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Talk to a student affairs professional (counselor/mentor/etc.) about how to manage all of your responsibilities effectively"
+      }
+    ]
+  },
+  {
+    "appendix_id": 12,
+    "web_id": 8,
+    "stem": {
+      "en": "You have interest outside of engineering you would like to pursue but find the workload inflexible"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait to pursue your outside interest when you have a less busy semester"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Carve out some time in your schedule to use towards your outside interest by deprioritizing some of your current work"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Ask a friend how they pursue interests outside of engineering"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your academic advisor about how to make time to pursue additional interests"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to career services to get advice about how to prioritize your time spent outside of engineering"
+      }
+    ]
+  },
+  {
+    "appendix_id": 13,
+    "web_id": 9,
+    "stem": {
+      "en": "You feel disconnected from people in general and you are finding yourself too busy to socialize"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Hope that this problem is temporary and will go away once the semester slows down"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Work on campus in a busy area to be surrounded by people"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Start a study group with friends to combine studying and socializing"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your advisor about the possibility of dropping a class to free up more time"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to a mental health professional to discuss your feelings of disconnection"
+      }
+    ]
+  },
+  {
+    "appendix_id": 14,
+    "web_id": 14,
+    "stem": {
+      "en": "Your peers seem to be performing better than you on every assignment and it's stressing you out"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Try not to compare yourself to your peers"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Spend more time on your assignments"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk with your peers about their study habits and methods for success"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Go to office hours regularly to get help on assignments from your instructors"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to a mental health professional to get help with managing your stress"
+      }
+    ]
+  },
+  {
+    "appendix_id": 16,
+    "web_id": 3,
+    "stem": {
+      "en": "You are having trouble finding engineering students with whom you relate and you are starting to feel socially isolated"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Continue to focus on your studies and hope that over time you will naturally encounter peers who share your interests"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Join a student organization outside of engineering"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk to family and friends from home to have familiar social interactions"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Join an engineering student organization"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to a mental health professional to talk about your feelings of isolation"
+      }
+    ]
+  },
+  {
+    "appendix_id": 17,
+    "web_id": 18,
+    "stem": {
+      "en": "You no longer think engineering is the major for you but you are anxious about leaving engineering"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Stay in engineering in hopes that you will become more comfortable"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Sign up for a non engineering class to explore your other interests"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Vent to your friends or family about your discomfort in engineering"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your academic advisor about wanting to leave engineering"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to career services to learn about career opportunities outside of engineering"
+      }
+    ]
+  },
+  {
+    "appendix_id": 18,
+    "web_id": 5,
+    "stem": {
+      "en": "You are having a difficult time finding an internship or co-op opportunity and are unsure why"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Continue your process of finding and applying to internships/co-ops in hopes that more applications will increase your chance of success"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Expand your search by looking on job websites liked Indeed"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk to your friends or family about advice for finding an internship or co-op"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your academic advisor about how to strengthen your resume"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Visit the career services office to get help with updating your resume"
+      }
+    ]
+  },
+  {
+    "appendix_id": 19,
+    "web_id": 11,
+    "stem": {
+      "en": "You are interested in undergraduate research opportunities but unsure where to start"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait and see what opportunities show up in your email or around campus"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Search online for research opportunities"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk to peers who are doing undergraduate research about how they found their positions"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Ask your current instructors if any of them are interested in hiring undergraduate researchers"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to the undergraduate research office to get guidance"
+      }
+    ]
+  },
+  {
+    "appendix_id": 21,
+    "web_id": 16,
+    "stem": {
+      "en": "You are under a high level of stress and concerned about your personal well-being"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Keep working hard knowing that the semester will end eventually"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Make time for self care like going for a walk"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Reach out to a family member or friend to talk about your stress"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your instructors about your situation and ask for flexibility on your assignment deadlines"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to a mental health professional to talk about your high levels of stress"
+      }
+    ]
+  },
+  {
+    "appendix_id": 22,
+    "web_id": 4,
+    "stem": {
+      "en": "Your classes start soon and you don’t have the financial means to purchase the required books"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Wait to think about purchasing books until you know if you need them for your classes"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Look online for a free or low cost pdf versions of your textbooks"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Ask a friend to borrow the books you need"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your instructor about your financial constraints to see if they can help you get access to the course materials at a cheaper rate"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to the financial aid office to see what financial support they can offer you to purchase required books"
+      }
+    ]
+  },
+  {
+    "appendix_id": 23,
+    "web_id": 19,
+    "stem": {
+      "en": "You have family or personal problems that are distracting you from school"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Try to stay focused on your school work and hope that your personal problems will resolve on their own"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Prioritize self care and take a break from school work"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk to friends or family about your personal problems to help you process them"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to your instructors about your situation and ask for flexibility on your assignment deadlines"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Reach out to a mental health professional to talk about personal or family problems"
+      }
+    ]
+  },
+  {
+    "appendix_id": 24,
+    "web_id": 12,
+    "stem": {
+      "en": "You believe you are receiving unfair treatment based on personal identity (e.g., race, gender, etc.)"
+    },
+    "options": [
+      {
+        "id": "A",
+        "category_id": "A",
+        "en": "Ignore the treatment and see if it changes over time"
+      },
+      {
+        "id": "B",
+        "category_id": "B",
+        "en": "Avoid the people treating you unfairly"
+      },
+      {
+        "id": "C",
+        "category_id": "C",
+        "en": "Talk to a trusted friend or family member for assistance or advice"
+      },
+      {
+        "id": "D",
+        "category_id": "D",
+        "en": "Talk to one of your instructors about what you think is happening in their class and ask them to intervene"
+      },
+      {
+        "id": "E",
+        "category_id": "E",
+        "en": "Make an appointment to talk to a university employee such as an ombudsperson or a Title IX employee"
+      }
+    ]
+  }
+]

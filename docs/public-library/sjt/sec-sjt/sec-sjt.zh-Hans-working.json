@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0",
+  "instrument_id": "SEC-SJT",
+  "title_original": "Social-Emotional Competences Situational Judgement Test",
+  "title_zh_Hans": "社会情绪能力情境判断测验（中文工作初译）",
+  "version": "research-draft-2026-10-21-r2",
+  "license": "CC-BY-SA-4.0",
+  "original_citation": "Wolf, D., Schneider, S., & Schütz, A. (2020). Inventar und Situational Judgement Test zur Erfassung sozial-emotionaler Kompetenz(en) (SEC-I und SEC-SJT). Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863",
+  "source_record_url": "https://fis.uni-bamberg.de/entities/publication/b64e469f-1bea-488c-8ac7-186222773827",
+  "source_doi": "https://doi.org/10.20378/irb-48863",
+  "source_language": "de",
+  "translation_language": "zh-Hans",
+  "translation_status": "AI-assisted working translation, not independently human-reviewed or validated",
+  "formal_item_count": 10,
+  "options_per_item": 5,
+  "practice_item_count": 1,
+  "source_pdf_pages_formal_items": [
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "transcription_policy": "German stems and options are verbatim, with PDF line breaks and repeated spaces normalized only. Original punctuation, quotation marks, capitalization, and wording are retained. Source typography is not reproduced. Chinese text is a working derivative, not a validated equivalent.",
+  "administration_mode": "single_best_judgment_not_typical_behavior",
+  "items": [
+    {
+      "id": "SEC-SJT-01",
+      "item_number": 1,
+      "source_pdf_page": 22,
+      "source_sec_sjt_page": 4,
+      "stem_zh_Hans": "Beate 生男朋友的气。她的男朋友不知道为什么。Beate 的男朋友应该怎么做，才能让 Beate 感觉好一些？",
+      "keyed_option_1based": 3,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "逗 Beate 笑。"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "不打扰 Beate。"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "问 Beate：“你为什么生气？”"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "对 Beate 说：“别这么大惊小怪！”"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "对 Beate 说：“你没有理由生气。”"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-02",
+      "item_number": 2,
+      "source_pdf_page": 22,
+      "source_sec_sjt_page": 4,
+      "stem_zh_Hans": "Pascal 告诉 Julian，他和女朋友吵架了。Pascal 因此很难过。Julian 应该怎么做，才能让 Pascal 感觉好一些？",
+      "keyed_option_1based": 4,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "对 Pascal 说：“这是你女朋友的错。告诉她，她让你难过了。”"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "对 Pascal 说：“别这么大惊小怪！”"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "质问 Pascal 的女朋友。"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "和 Pascal 一起做些事情，让他想想别的事。"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "对 Pascal 说：“等等吧。会好起来的！”"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-03",
+      "item_number": 3,
+      "source_pdf_page": 23,
+      "source_sec_sjt_page": 5,
+      "stem_zh_Hans": "Uwe 因为自己的工作受到了表扬。他把一项确实很难的任务完成得很好。Uwe 有什么感受？",
+      "keyed_option_1based": 2,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "满意"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "自豪"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "无所谓"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "惊讶"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "松了一口气"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-04",
+      "item_number": 4,
+      "source_pdf_page": 23,
+      "source_sec_sjt_page": 5,
+      "stem_zh_Hans": "Henrik 约好和 Amelie 见面。他到达见面地点时，Amelie 正耷拉着肩膀坐在长椅上。Henrik 应该怎么做，才能让 Amelie 感觉好一些？",
+      "keyed_option_1based": 1,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "问 Amelie：“一切都好吗？”"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "假装什么也没注意到。如果有什么不对劲，Amelie 自己会说的。"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "问 Amelie：“你怎么这副样子？”"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "问 Amelie：“你是不是更想一个人待着？”"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "向 Amelie 讲述自己这一天有多累。"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-05",
+      "item_number": 5,
+      "source_pdf_page": 24,
+      "source_sec_sjt_page": 6,
+      "stem_zh_Hans": "教练经常批评 Max。Max 觉得这不公平。Max 应该怎么做，才能让自己感觉好一些？",
+      "keyed_option_1based": 4,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "等着。教练总有一天会不再批评 Max。"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "为自己辩护。谁都不该这么频繁地受到批评。"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "找另一支队伍，这样就不用再见到这位教练了。"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "对教练说：“我觉得自己受到了不公平的对待。”"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "对教练说：“如果我继续受到批评，我就去找另一支队伍。”"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-06",
+      "item_number": 6,
+      "source_pdf_page": 24,
+      "source_sec_sjt_page": 6,
+      "stem_zh_Hans": "Ulla 知道，她的同事 Michael 很频繁地感到难过。今天，Michael 看起来特别难过。Ulla 应该怎么做，才能让 Michael 感觉好一些？",
+      "keyed_option_1based": 3,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "什么也不做。Michael 总有一天会自己好起来的。"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "和她的上司谈谈这件事。也许他能帮助 Michael。"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "问 Michael：“一切都好吗？我能为你做点什么吗？”"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "逗 Michael 笑。"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "问 Michael：“你怎么现在又难过了？”"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-07",
+      "item_number": 7,
+      "source_pdf_page": 25,
+      "source_sec_sjt_page": 7,
+      "stem_zh_Hans": "Hanno 的朋友 Sebastian 过生日。Sebastian 过生日这天一定要去电影院。Hanno 不想去电影院。Hanno 应该怎么做，才能让 Sebastian 感觉好一些？",
+      "keyed_option_1based": 3,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "对 Sebastian 说：“我不想去电影院。如果你不想做别的事，那我就待在家里。”"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "一起去，但对 Sebastian 说：“我这么做只是因为今天是你的生日。下次我们要做我想做的事。”"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "一起去，让 Sebastian 高兴。"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "想一个好借口，这样就不用一起去了。"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "说服 Sebastian 做点别的事。"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-08",
+      "item_number": 8,
+      "source_pdf_page": 25,
+      "source_sec_sjt_page": 7,
+      "stem_zh_Hans": "在一场重要的比赛中，Tobias 开始和队里的其他人争吵。Tobias 觉得自己受到了不公平的对待，他很生气，情绪也很激动。Tobias 应该怎么做，才能让自己感觉好一些？",
+      "keyed_option_1based": 3,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "他回家去，让其他人看看，没有他，他们要怎么赢得比赛。"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "对队友说：“你们向我道歉，我才会继续比赛。”"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "他继续比赛。比赛结束后，他找其他人谈谈，对他们说：“我觉得自己受到了不公平的对待。”"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "他故意表现得很差。这样队友就会明白，他们不能这样对待他。"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "他把比赛打完。在接下来的几周里，他去找一支新的队伍。"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-09",
+      "item_number": 9,
+      "source_pdf_page": 26,
+      "source_sec_sjt_page": 8,
+      "stem_zh_Hans": "Lukas 一定要当团队负责人。有些工作任务，Lukas 并不擅长。最后，Felix 当上了团队负责人。Felix 已经在这家公司工作很久了。Lukas 很失望。Lukas 应该怎么做，才能让自己感觉好一些？",
+      "keyed_option_1based": 2,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "心想：“有些任务我并不擅长。所以，由 Felix 当团队负责人更好。”"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "心想：“Felix 值得这个职位。毕竟，他已经在这家公司工作很久了。”"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "试着换个团队。这样他就可以避开 Felix。"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "对上司说：“这不公平。Felix 当上团队负责人，只是因为他在这家公司工作很久了。可是我一定要当团队负责人。”"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "仔细观察 Felix。他总会有做错事的时候。到那时，Lukas 就可以对上司说：“应该由我来当团队负责人！”"
+        }
+      ]
+    },
+    {
+      "id": "SEC-SJT-10",
+      "item_number": 10,
+      "source_pdf_page": 26,
+      "source_sec_sjt_page": 8,
+      "stem_zh_Hans": "上司批评了 Simone 的工作。Simone 已经努力了，而且对结果很满意。她不理解这些批评，感到很难过。Simone 应该怎么做，才能让自己感觉好一些？",
+      "keyed_option_1based": 3,
+      "options": [
+        {
+          "option_number": 1,
+          "text_zh_Hans": "她不让别人看出自己的情绪。"
+        },
+        {
+          "option_number": 2,
+          "text_zh_Hans": "她对上司说：“我真的已经努力了。这不公平！”"
+        },
+        {
+          "option_number": 3,
+          "text_zh_Hans": "她问上司：“下次我可以在哪些方面做得更好？”"
+        },
+        {
+          "option_number": 4,
+          "text_zh_Hans": "她以后不再那么努力了。反正努力也没用。"
+        },
+        {
+          "option_number": 5,
+          "text_zh_Hans": "她和自己的女性朋友们谈论上司有多不公平。"
+        }
+      ]
+    }
+  ]
+}
