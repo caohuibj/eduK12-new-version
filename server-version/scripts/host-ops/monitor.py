@@ -79,22 +79,40 @@ def collect(config):
         # Use inspect's restricted template: never collect Config.Env, logs or health bodies.
         template = '{{.Name}}|{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}|{{.RestartCount}}|{{.Image}}'
         template += '|{{json .NetworkSettings.Ports}}|{{json .HostConfig.Privileged}}|{{.HostConfig.NetworkMode}}'
+        template += '|{{index .Config.Labels "com.docker.compose.service"}}'
+        names = config["containers"]
+        roles = config.get("runtime_container_roles", {})
+        if (not isinstance(names, list) or not all(isinstance(name, str) and name for name in names)
+                or not isinstance(roles, dict) or len(set(names)) != len(names)
+                or any(name not in names or role not in ("backend", "worker") for name, role in roles.items())):
+            raise ValueError("runtime container roles")
         items = {}
-        for name in config["containers"]:
-            raw = command(["/usr/bin/docker", "inspect", "--format", template, name]).strip().split("|")
-            if len(raw) != 8:
-                raise ValueError("container metadata")
-            _, status, health, restarts, image, ports, privileged, network = raw
-            items[name] = {"status": status, "health": health, "restarts": int(restarts), "image": image}
-            bindings = json.loads(ports) or {}
-            exposed = any(b["HostIp"] not in ("127.0.0.1", "::1") for values in bindings.values() for b in (values or []))
-            unsafe = json.loads(privileged) or network == "host" or (name.endswith(("postgres", "redis")) and exposed)
-            checks.append(finding("isolation:" + name, "critical" if unsafe else "ok", {"unsafe": unsafe}))
-            checks.append(finding("container:" + name, "ok" if status == "running" and health in ("healthy", "none") else "critical",
-                                  {"status": status, "health": health}))
+        complete = True
+        legacy_roles = {"eduk12-prod-backend": "backend", "eduk12-prod-worker": "worker"}
+        for name in names:
+            try:
+                raw = command(["/usr/bin/docker", "inspect", "--format", template, name]).strip().split("|")
+                if len(raw) != 9:
+                    raise ValueError("container metadata")
+                _, status, health, restarts, image, ports, privileged, network, service = raw
+                role = roles.get(name, service if service in ("backend", "worker") else legacy_roles.get(name))
+                bindings = json.loads(ports) or {}
+                exposed = any(b["HostIp"] not in ("127.0.0.1", "::1") for values in bindings.values() for b in (values or []))
+                unsafe = json.loads(privileged) or network == "host" or (name.endswith(("postgres", "redis")) and exposed)
+                items[name] = {"status": status, "health": health, "restarts": int(restarts), "image": image, "role": role}
+                checks.append(finding("isolation:" + name, "critical" if unsafe else "ok", {"unsafe": unsafe}))
+                checks.append(finding("container:" + name, "ok" if status == "running" and health in ("healthy", "none") else "critical",
+                                      {"status": status, "health": health}))
+            except Exception as exc:
+                complete = False
+                checks.append(finding("container:" + name, "critical", {"error_type": type(exc).__name__}))
         data["containers"] = items
-        matches = items["eduk12-prod-backend"]["image"] == items["eduk12-prod-worker"]["image"]
+        runtime = [item for item in items.values() if item["role"] in ("backend", "worker")]
+        matches = (complete and {item["role"] for item in runtime} == {"backend", "worker"}
+                   and len({item["image"] for item in runtime}) == 1)
         checks.append(finding("runtime_image_match", "ok" if matches else "critical", {"matches": matches}))
+        if not complete:
+            raise ValueError("incomplete container metadata")
     probe("collector:containers", containers)
 
     data["http"] = {}

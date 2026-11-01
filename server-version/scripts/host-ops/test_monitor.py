@@ -141,7 +141,7 @@ class MonitoringSafetyTests(unittest.TestCase):
             if args[1] == 'inspect':
                 name = args[-1]
                 ports = {'5432/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '5432'}]} if name.endswith('postgres') else {}
-                return name + '|running|healthy|0|sha256:same|' + json.dumps(ports) + '|false|bridge'
+                return name + '|running|healthy|0|sha256:same|' + json.dumps(ports) + '|false|bridge|'
             return ''
         with patch.object(m, 'command', side_effect=docker):
             _, checks = m.collect(config)
@@ -152,6 +152,65 @@ class MonitoringSafetyTests(unittest.TestCase):
         state, _ = m.transitions(old, checks, 2, CONFIG)
         _, events = m.transitions(state, checks, 3, CONFIG)
         self.assertTrue(any(e['key'] == 'collector:containers' and e['event'] == 'recovered' for e in events))
+
+    def replica_checks(self, edit=None, explicit=True):
+        config = copy.deepcopy(CONFIG)
+        names = ['ui', 'api-1', 'api-2', 'job-1', 'job-2']
+        config.update(containers=names, tls_hosts=[], ready_urls=[], backup_roots=[])
+        roles = {'api-1': 'backend', 'api-2': 'backend', 'job-1': 'worker', 'job-2': 'worker'}
+        if explicit:
+            config['runtime_container_roles'] = roles
+        else:
+            config.pop('runtime_container_roles', None)
+        rows = {name: {'image': 'sha256:ui' if name == 'ui' else 'sha256:runtime',
+                       'status': 'running', 'health': 'none', 'service': roles.get(name, 'frontend')} for name in names}
+        if edit:
+            edit(config, rows)
+        visited = []
+        def docker(args, **kwargs):
+            if args[1] != 'inspect':
+                return ''
+            name = args[-1]; visited.append(name)
+            row = rows.get(name)
+            if row is None:
+                raise RuntimeError('must-not-leak-command-error')
+            return '|'.join([name, row['status'], row['health'], '0', row['image'], '{}', 'false', 'bridge', row['service']])
+        with patch.object(m, 'command', side_effect=docker):
+            data, checks = m.collect(config)
+        return data, {check['key']: check['level'] for check in checks}, checks, visited
+
+    def test_every_configured_runtime_replica_is_compared_by_explicit_role_or_compose_service(self):
+        for explicit in [True, False]:
+            _, levels, _, _ = self.replica_checks(explicit=explicit)
+            self.assertEqual(levels['runtime_image_match'], 'ok')
+        for name in ['api-1', 'api-2', 'job-1', 'job-2']:
+            _, levels, _, _ = self.replica_checks(lambda _config, rows: rows[name].update(image='sha256:wrong'))
+            self.assertEqual(levels['runtime_image_match'], 'critical', name)
+
+    def test_missing_replica_keeps_other_observations_and_never_claims_complete_parity(self):
+        data, levels, checks, visited = self.replica_checks(lambda _config, rows: rows.pop('api-2'))
+        self.assertEqual(levels['container:api-2'], 'critical')
+        self.assertEqual(levels['collector:containers'], 'critical')
+        self.assertEqual(levels['runtime_image_match'], 'critical')
+        self.assertEqual(levels['container:job-2'], 'ok')
+        self.assertIn('job-2', visited)
+        self.assertIn('job-2', data['containers'])
+        self.assertNotIn('must-not-leak-command-error', json.dumps(checks))
+
+    def test_unhealthy_or_exited_replica_is_critical(self):
+        for edit in [{'status': 'exited'}, {'health': 'unhealthy'}]:
+            _, levels, _, _ = self.replica_checks(lambda _config, rows: rows['job-2'].update(edit))
+            self.assertEqual(levels['container:job-2'], 'critical')
+
+    def test_missing_runtime_group_or_invalid_explicit_roles_cannot_report_parity(self):
+        for edit in [
+            lambda config, rows: config.update(runtime_container_roles={'api-1': 'backend', 'api-2': 'backend', 'job-1': 'backend', 'job-2': 'backend'}),
+            lambda config, rows: config.update(runtime_container_roles={'unknown': 'worker'}),
+            lambda config, rows: config.update(runtime_container_roles={'job-1': 'typo'}),
+            lambda config, rows: config['containers'].append('api-1'),
+        ]:
+            _, levels, _, _ = self.replica_checks(edit)
+            self.assertNotEqual(levels.get('runtime_image_match'), 'ok')
 
     def test_cos_receipt_is_historical_evidence_and_future_timestamp_is_rejected(self):
         config = copy.deepcopy(CONFIG)
