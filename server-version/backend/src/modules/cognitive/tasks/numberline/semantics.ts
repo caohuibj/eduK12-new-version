@@ -37,3 +37,9 @@ export const executionSemantics: CognitiveExecutionSemanticsV1[] = [
     "legacyStatus": "PUBLISHED"
   }
 ]
+
+executionSemantics.push({
+  ...executionSemantics[0],
+  protocol: { ...executionSemantics[0].protocol, key: 'numberline/1.1.0/1.1.0', version: '1.1.0', randomizationAlgorithmVersion: 'numberline-np-shuffle-v1.0.0' },
+  legacyStatus: 'DRAFT',
+})
