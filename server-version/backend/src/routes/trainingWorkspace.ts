@@ -1,3 +1,5 @@
+import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryJoin,discoverySqlFilter,sjtMetadataTagIds} from '../modules/survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../modules/scale/library/catalog-discovery'
 import {authorizedTrainingMaterial} from '../modules/assessment-media/training-materials'
 import {serveAssessmentMaterial} from '../modules/assessment-media/material-delivery'
 import {materialSchema} from '../modules/assessment-media/material'
@@ -79,21 +81,23 @@ router.patch('/media/:id/name', handle(async req => {
 // Catalog services retain their scientific eligibility checks. Search responses
 // expose only descriptors, never scoring definitions, responses or reports.
 router.get('/tools', handle(async req => {
-  const q=workspaceQuery.parse(req.query), actor=req.user.userId
+  const q=workspaceQuery.extend({tags:catalogDiscoveryQueryFields.tags}).parse(req.query), actor=req.user.userId
   const [cognitive,situational,bundles,library] = await Promise.all([
     listPublishedConfigs(actor,req.user.role), listSituationalResourceSummaries(actor), bundleProductService.catalog(req.user), libraryReadableScaleIds(actor),
   ])
+  const records=catalogDiscoveryRecords()
   const extra = [
-    ...cognitive.map(row=>({id:row.id,kind:'cognitive',name:row.name,version:row.configVersion,href:'/cognitive-assignments'})),
-    ...situational.map(row=>({id:row.id,kind:'situational',name:row.name || row.instrumentKey,version:row.instrumentVersion,href:'/questionnaire-products/new'})),
-    ...bundles.filter(row=>row.canInstantiate).map(row=>({id:row.bundleKey+'@'+row.bundleVersion,kind:'bundle',name:row.name,version:row.bundleVersion,href:'/bundle-products'})),
+    ...cognitive.map(row=>({id:row.id,kind:'cognitive',name:row.name,version:row.configVersion,href:'/cognitive-assignments',classificationTags:row.classificationTags})),
+    ...situational.map(row=>({id:row.id,kind:'situational',name:row.name || row.instrumentKey,version:row.instrumentVersion,href:'/questionnaire-products/new',classificationTags:records.find(record=>record.kind==='SJT'&&record.key===row.instrumentKey&&record.version===row.instrumentVersion)?.tags??[]})),
+    ...bundles.filter(row=>row.canInstantiate).map(row=>({id:row.bundleKey+'@'+row.bundleVersion,kind:'bundle',name:row.name,version:row.bundleVersion,href:'/bundle-products',classificationTags:row.classificationTags})),
   ].map(row=>Prisma.sql`SELECT ${row.id}::text AS id,${row.kind}::text AS kind,${row.name}::text AS name,NULL::text AS description,
-    'PUBLISHED'::text AS status,${row.version}::text AS version,NULL::text AS "ownerId",NULL::timestamptz AS "updatedAt",${row.href}::text AS href,false AS "canUpdateVersion"`)
+    'PUBLISHED'::text AS status,${row.version}::text AS version,NULL::text AS "ownerId",NULL::timestamptz AS "updatedAt",${row.href}::text AS href,false AS "canUpdateVersion",${JSON.stringify(row.classificationTags.map(tag=>tag.id))}::jsonb AS "tagIds"`)
   const rows=Prisma.sql`
     SELECT s.id,'scale'::text AS kind,s.name,s.description,s.status::text AS status,s.instrument_version AS version,
       CASE WHEN s.library_entry_id IS NULL THEN s.creator_id ELSE NULL END AS "ownerId",s.updated_at AS "updatedAt",'/scales/'||s.id AS href,
-      (s.library_entry_id IS NULL AND s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion"
-      FROM scales s JOIN users u ON u.id=s.creator_id WHERE
+      (s.library_entry_id IS NULL AND s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion",COALESCE(to_jsonb(s.tags),'[]'::jsonb)||COALESCE(discovery.ids,'[]'::jsonb) AS "tagIds"
+      FROM scales s JOIN users u ON u.id=s.creator_id
+      ${standardDiscoveryMetadataJoin(Prisma.sql`s.code`,Prisma.sql`s.instrument_version`)} ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE
       -- Approved wrappers are exact immutable versions, independent of the author's
       -- account domain and private source. Only the central reader authorizes them.
       (s.library_entry_id IS NOT NULL AND s.status='PUBLISHED' AND s.id=ANY(${library.ids}::text[]))
@@ -102,16 +106,16 @@ router.get('/tools', handle(async req => {
           SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='SCALE' AND g.resource_id=s.id
           AND (g.legacy_scale_grant OR NOT EXISTS (SELECT 1 FROM scale_library_entries e
             JOIN scale_library_submissions submission ON submission.id=e.submission_id WHERE submission.source_id=s.id))))))
-    UNION ALL SELECT f.id,'form',f.name,f.description,f.status::text,NULL,f.creator_id,f.updated_at,'/general-questionnaires/'||f.id||'/edit',(f.creator_id=${actor} AND f.status='PUBLISHED')
+    UNION ALL SELECT f.id,'form',f.name,f.description,f.status::text,NULL,f.creator_id,f.updated_at,'/general-questionnaires/'||f.id||'/edit',(f.creator_id=${actor} AND f.status='PUBLISHED'),to_jsonb(f.tags)
       FROM questionnaires f JOIN users u ON u.id=f.creator_id WHERE f.type='GENERAL' AND NOT EXISTS(SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=f.id) AND u.account_domain IN ('LEGACY','TRAINING')
       AND (f.creator_id=${actor} OR (${config.materialGrantsEnabled} AND f.status='PUBLISHED'
         AND NOT EXISTS(SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=f.id)
         AND EXISTS(SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='FORM_TEMPLATE' AND g.resource_id=f.id)))
-    UNION ALL SELECT c.id,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN 'form-template' WHEN EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type='FORM') AND NOT EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type<>'FORM') THEN 'form-composition' ELSE 'composition' END,c.name,c.description,c.status::text,c.revision::text,c.created_by,c.updated_at,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN '/toolkit/forms/'||c.id ELSE '/toolkit/compositions/'||c.id END,(c.status='PUBLISHED')
+    UNION ALL SELECT c.id,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN 'form-template' WHEN EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type='FORM') AND NOT EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type<>'FORM') THEN 'form-composition' ELSE 'composition' END,c.name,c.description,c.status::text,c.revision::text,c.created_by,c.updated_at,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN '/toolkit/forms/'||c.id ELSE '/toolkit/compositions/'||c.id END,(c.status='PUBLISHED'),to_jsonb(c.tags)
       FROM composite_assessments c WHERE c.product_kind IN ('QUESTIONNAIRE','FORM_TEMPLATE') AND c.created_by=${actor} AND c.status<>'ARCHIVED'
-    UNION ALL SELECT s.id,'sjt-draft',COALESCE(s.template->>'title','情境判断'),NULL,s.status,s.template->>'instrumentVersion',s.owner_id,s.updated_at,'/sjt-authoring?draftId='||s.id,(s.status='PUBLISHED')
+    UNION ALL SELECT s.id,'sjt-draft',COALESCE(s.template->>'title','情境判断'),NULL,s.status,s.template->>'instrumentVersion',s.owner_id,s.updated_at,'/sjt-authoring?draftId='||s.id,(s.status='PUBLISHED'),'[]'::jsonb
       FROM sjt_author_drafts s WHERE s.owner_id=${actor}
-    UNION ALL SELECT r.id,'situational',COALESCE(r.package #>> '{definition,source,title}',r.instrument_key),NULL,r.status,r.instrument_version,NULL,r.created_at,'/teacher/situational',false
+    UNION ALL SELECT r.id,'situational',COALESCE(r.package #>> '{definition,source,title}',r.instrument_key),NULL,r.status,r.instrument_version,NULL,r.created_at,'/teacher/situational',false,${sjtMetadataTagIds(Prisma.sql`r.package->'definition'`)}
       FROM sjt_author_releases r WHERE r.author_id<>${actor} AND r.status='PUBLISHED'
       AND r.package #>> '{definition,respondentType}'='teacher_self_report'
       AND EXISTS(SELECT 1 FROM sjt_release_grants g JOIN courses c ON c.id=g.course_id
@@ -120,13 +124,14 @@ router.get('/tools', handle(async req => {
           AND g.status='ACTIVE' AND g.valid_from<=CURRENT_TIMESTAMP AND g.expires_at>CURRENT_TIMESTAMP
           AND c.creator_id=g.grantee_teacher_id AND c.course_type='TRAINING_COURSE' AND NOT c.is_library)
     ${extra.length ? Prisma.sql`UNION ALL ${Prisma.join(extra,' UNION ALL ')}`:Prisma.empty}`
-  const where=Prisma.sql`POSITION(LOWER(${q.keyword}) IN LOWER(r.name||' '||COALESCE(r.description,'')))>0
+  const classified=Prisma.sql`SELECT source.*,discovery.tags AS "classificationTags",discovery.ids,discovery.terms FROM (${rows}) source ${discoveryJoin(records,{kind:Prisma.sql`NULL`,key:Prisma.sql`NULL`,version:Prisma.sql`NULL`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`source."tagIds"`)}`
+  const where=Prisma.sql`${discoverySqlFilter([Prisma.sql`r.name`,Prisma.sql`r.description`,Prisma.sql`r.version`],q)}
     AND (${q.kind}='all' OR r.kind=${q.kind} OR (${q.kind}='form' AND r.kind IN ('form-composition','form-template')) OR (${q.kind}='situational' AND r.kind='sjt-draft') OR (${q.kind}='composition' AND r.kind='bundle'))
     AND (${q.source}='all' OR (${q.source}='owned' AND r."ownerId"=${actor}) OR (${q.source}='granted' AND r."ownerId" IS DISTINCT FROM ${actor}))`
   const [list,count]=await prisma.$transaction([
-    prisma.$queryRaw<any[]>(Prisma.sql`WITH r AS (${rows}) SELECT * FROM r WHERE ${where} ORDER BY "updatedAt" DESC NULLS LAST,kind,id LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`),
-    prisma.$queryRaw<{total:bigint}[]>(Prisma.sql`WITH r AS (${rows}) SELECT COUNT(*)::bigint AS total FROM r WHERE ${where}`),
+    prisma.$queryRaw<any[]>(Prisma.sql`WITH r AS (${classified}) SELECT r.* FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where} ORDER BY "updatedAt" DESC NULLS LAST,kind,id LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`),
+    prisma.$queryRaw<Array<{total:bigint;facetTags:CatalogClassificationTag[]}>>(Prisma.sql`WITH r AS (${classified}) SELECT COUNT(*)::bigint AS total,COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM r CROSS JOIN LATERAL jsonb_array_elements("classificationTags") tag),'[]'::jsonb) AS "facetTags" FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where}`),
   ])
-  return { list:list.map(row=>({...row,source:row.ownerId===actor?'owned':'granted'})),total:Number(count[0]?.total||0),page:q.page,pageSize:q.pageSize }
+  return {tagFacets:catalogTagFacets([count[0]?.facetTags??[]]), list:list.map(({tagIds:_tagIds,ids:_ids,terms:_terms,...row})=>({...row,source:row.ownerId===actor?'owned':'granted'})),total:Number(count[0]?.total||0),page:q.page,pageSize:q.pageSize }
 }))
 export default router

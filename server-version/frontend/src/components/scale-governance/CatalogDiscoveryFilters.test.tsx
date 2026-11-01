@@ -9,12 +9,19 @@ function Harness({apply}:{apply:(filters:CatalogFilters)=>void}){const [filters,
 describe('shared eight-axis discovery controls',()=>{
  it('sends exact source IDs for the new axes only on apply, and clears them without an approval action',()=>{
   const apply=vi.fn();render(<Harness apply={apply}/>)
+  const more=screen.getByText('更多筛选').closest('details')!
+  expect(more).not.toHaveAttribute('open')
+  expect(screen.getByLabelText('领域')).toBeVisible()
+  expect(screen.getByLabelText('人群')).toBeVisible()
+  fireEvent.click(screen.getByText('更多筛选'))
   for(const [label,id]of [['理论取向','orientation:ACT'],['作答方式','response:self'],['使用场景','use:research'],['许可说明','license:cc_by_nc_4_0']])fireEvent.change(screen.getByLabelText(label),{target:{value:id}})
   expect(apply).not.toHaveBeenCalled()
+  expect(screen.getByText('更多筛选（4 项已选）')).toBeVisible()
   fireEvent.click(screen.getByRole('button',{name:'检索'}))
   expect(new URLSearchParams(catalogQuery(2,apply.mock.calls[0][0])).get('tags')).toBe('orientation:ACT,response:self,use:research,license:cc_by_nc_4_0')
   fireEvent.click(screen.getByRole('button',{name:'清除筛选'}))
   expect(apply).toHaveBeenLastCalledWith(EMPTY_CATALOG_FILTERS)
+  expect(screen.getByText('更多筛选')).toBeVisible()
   for(const label of ['理论取向','作答方式','使用场景','许可说明'])expect(screen.getByLabelText(label)).toHaveValue('')
   expect(screen.getByText(/分类资料不代表使用许可/)).toBeVisible()
  })

@@ -2,6 +2,9 @@ import {EducationAssessmentRegistrationPanel} from './EducationAssessmentRegistr
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {privateToolBase,privateToolError,type PrivateToolApi,type PrivateDraftState} from './privateToolClient'
 import type {EducationPackageSummary,EducationPackagePreview} from './packageReferenceClient'
+import CatalogDiscoveryFilters from '../scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../scale-governance/CatalogClassificationTags'
+import {catalogQuery,EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogFilters,type CatalogClassificationTag,type CatalogTagFacets} from '../../api/catalogDiscovery'
 
 type Props={api:PrivateToolApi;organizationId:string;entry:'SCHOOL'|'TEACHER';actorId:string;onDraftStateChange?:(state:PrivateDraftState)=>void}
 /** Author-only product parents own navigation; the backend independently
@@ -16,8 +19,9 @@ export function EducationPackageLibrary(props:Props){
 }
 function PackageLibrarySession({api,organizationId,actorId,entry,onDraftStateChange}:Props){
  const base=privateToolBase(organizationId)+'/package-sources'
- const [list,setList]=useState<EducationPackageSummary[]|null>(null),[cursor,setCursor]=useState<string|null>(null)
- const [query,setQuery]=useState(''),[filter,setFilter]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('')
+ const [list,setList]=useState<(EducationPackageSummary&{classificationTags?:CatalogClassificationTag[]})[]|null>(null),[cursor,setCursor]=useState<string|null>(null)
+ const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS}),[filter,setFilter]=useState({...EMPTY_CATALOG_FILTERS}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
+ const [busy,setBusy]=useState(false),[error,setError]=useState('')
  const [preview,setPreview]=useState<EducationPackagePreview|null>(null)
  const [registration,setRegistration]=useState<EducationPackageSummary|null>(null)
  const [registrationState,setRegistrationState]=useState<PrivateDraftState>({dirty:false,writing:false})
@@ -25,18 +29,18 @@ function PackageLibrarySession({api,organizationId,actorId,entry,onDraftStateCha
  const blocked=registrationState.dirty||registrationState.writing
  const blockedRef=useRef(blocked);blockedRef.current=blocked
  const session=useRef({generation:0,pending:false}).current
- const refresh=useCallback(async(q:string,next?:string)=>{
+ const refresh=useCallback(async(applied:CatalogFilters,next?:string)=>{
   if(session.pending||blockedRef.current)return
   session.pending=true;const token=++session.generation;setBusy(true);setError('');setPreview(null);setRegistration(null)
   if(!next){setList(null);setCursor(null)}
-  const params=new URLSearchParams();if(q)params.set('q',q);if(next)params.set('cursor',next)
+  const params=new URLSearchParams();if(applied.keyword.trim())params.set('q',applied.keyword.trim());const tags=new URLSearchParams(catalogQuery(1,applied)).get('tags');if(tags)params.set('tags',tags);if(next)params.set('cursor',next)
   try{
-   const result=await api<{list:EducationPackageSummary[];nextCursor:string|null}>(base+(params.size?'?'+params:''))
-   if(token===session.generation){setList(old=>next?[...new Map([...(old??[]),...result.list].map(row=>[row.catalogKey,row])).values()]:result.list);setCursor(result.nextCursor)}
+   const result=await api<{list:(EducationPackageSummary&{classificationTags?:CatalogClassificationTag[]})[];nextCursor:string|null;tagFacets?:CatalogTagFacets}>(base+(params.size?'?'+params:''))
+   if(token===session.generation){setList(old=>next?[...new Map([...(old??[]),...result.list].map(row=>[row.catalogKey,row])).values()]:result.list);setCursor(result.nextCursor);setFacets(result.tagFacets??EMPTY_CATALOG_FACETS)}
   }catch(cause){if(token===session.generation)setError(privateToolError(cause))}
   finally{if(token===session.generation){session.pending=false;setBusy(false)}}
  },[api,base,session])
- useEffect(()=>{void refresh('');return()=>{session.generation++;session.pending=false}},[refresh,session])
+ useEffect(()=>{void refresh({...EMPTY_CATALOG_FILTERS});return()=>{session.generation++;session.pending=false}},[refresh,session])
  async function open(row:EducationPackageSummary){
   if(session.pending||blocked)return
   session.pending=true;const token=++session.generation;setBusy(true);setError('');setPreview(null);setRegistration(null)
@@ -49,14 +53,13 @@ function PackageLibrarySession({api,organizationId,actorId,entry,onDraftStateCha
  const kindLabel=(kind:string)=>({SCALE:'量表',FORM:'表单',COGNITIVE:'认知任务',SJT:'情境测验',SITUATIONAL:'情境测验'} as Record<string,string>)[kind]??kind
  return <section className="education-private-studio education-package-library">
   <header><h2>正式整包 · 整体引用</h2><p>查看获授权固定包的完整成员、原顺序和整体报告说明。</p></header>
-  <form className="education-private-toolbar" onSubmit={event=>{event.preventDefault();if(!busy){setFilter(query.trim());void refresh(query.trim())}}}>
-   <label>搜索整包<input value={query} maxLength={160} onChange={event=>setQuery(event.target.value)}/></label>
-   <button type="submit" disabled={busy||blocked}>搜索</button><button type="button" disabled={busy||blocked} onClick={()=>void refresh(filter)}>重新读取</button>
-  </form>
+  <CatalogDiscoveryFilters label="获授权正式整包检索" filters={filters} facets={facets} onChange={setFilters} disabled={busy||blocked} onApply={value=>{if(!busy&&!blocked){const applied={...value,keyword:value.keyword.trim()};setFilter(applied);void refresh(applied)}}}/>
+  <button type="button" disabled={busy||blocked} onClick={()=>void refresh(filter)}>重新读取</button>
   {busy&&<p role="status">正在读取整包…</p>}{error&&<p role="alert">{error}</p>}
-  {list?.length===0&&!busy&&<p>当前学校下暂无获授权的正式固定包。</p>}
+  {list?.length===0&&!busy&&!error&&<p>{catalogQuery(1,filter)!=='page=1'?'没有匹配的正式固定包，可调整条件或清除筛选。':'当前学校下暂无获授权的正式固定包。'}</p>}
   <div className="education-private-list" role="list" aria-label="获授权正式整包">{list?.map(row=><article role="listitem" key={row.catalogKey}>
-   <div><h3>{row.title}</h3><p>内容版本 {row.contentVersion} · {row.memberCount} 个固定成员 · 整体报告版本 {row.reportVersion??'原版未配置'}</p>
+   <div><h3>{row.title}</h3><p>组合工具 · 内容版本 {row.contentVersion} · {row.memberCount} 个固定成员 · 整体报告版本 {row.reportVersion??'原版未配置'}</p>
+    <CatalogClassificationTags tags={row.classificationTags}/>
     {row.unavailableReason&&<p>{row.unavailableReason}</p>}</div>
    <button type="button" disabled={busy||blocked||!row.allowedActions.includes('PREVIEW_WHOLE_PACKAGE')} onClick={()=>void open(row)}>查看完整包</button>
   </article>)}</div>

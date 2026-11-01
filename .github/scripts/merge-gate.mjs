@@ -1,3 +1,4 @@
+import {catalogDiscoveryScope} from './catalog-discovery-scope.mjs';
 import {cognitiveMixedProductScope, acceptanceFor} from './content-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
@@ -136,6 +137,7 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='composite-csv-memory')return ['scope','composite-csv-memory','codeql'];
   if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
   if(draft&&scope.personal_tracking_draft==='true')return ['scope','pr-light-backend','pr-light-frontend'];
+  if(scope.scenario === 'catalog-discovery') return draft?['scope']:['scope','catalog-discovery','frontend','docker','codeql'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
@@ -354,7 +356,7 @@ export function failedChecks(needs, draft) {
           && ['codeql','frontend_build','ui_required','visual_hosted',...Object.keys(acceptanceJobs).filter(key=>key!=='perf_smoke')]
             .some(key=>scope[key]!=='true'))) failed.push('scope');
   } else if ((scope.training_functional_only !== undefined && scope.training_functional_only !== 'false')
-      || (!adminFunctional && scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
+      || (!adminFunctional && scope.scenario!=='catalog-discovery' && scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
       || trainingPlan !== null) failed.push('scope');
   if (adminFunctional) {
     if (draft || !validAdminFunctionalPlan(adminPlan) || scope.application_route !== 'legacy'
@@ -494,16 +496,16 @@ export function failedChecks(needs, draft) {
   if(scope.personal_tracking_draft!==undefined&&!['true','false'].includes(scope.personal_tracking_draft))failed.push('scope');
   if(scope.personal_tracking_draft==='true'&&(!draft||scope.application_route!=='legacy'||scope.scenario!=='platform'))failed.push('scope');
   if(scope.frontend_affected!==undefined&&(!['true','false'].includes(scope.frontend_affected)
-    ||scope.frontend_affected==='true'&&(scope.scenario!=='frontend'||scope.frontend!=='true')))failed.push('scope');
+    ||scope.frontend_affected==='true'&&scope.scenario!=='catalog-discovery'&&(scope.scenario!=='frontend'||scope.frontend!=='true')))failed.push('scope');
   if(scope.dependencies_frontend_only!==undefined&&(!['true','false'].includes(scope.dependencies_frontend_only)
     ||scope.dependencies_frontend_only==='true'&&scope.scenario!=='dependencies'))failed.push('scope');
   if(scope.image_build!==undefined&&(!['true','false'].includes(scope.image_build)
     ||scope.image_build==='true'&&scope.scenario!=='release-tooling'))failed.push('scope');
   const flags = ['maintenance','frontend_test','frontend_build','ui_required','visual_hosted','content', 'presentation', 'frontend', 'documentation', 'codeql', ...Object.keys(acceptanceJobs)];
-  const scenarios = {backend:['false','false','false','false'], 'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
+  const scenarios = {'catalog-discovery':['false','false','false','false'],backend:['false','false','false','false'], 'release-tooling':['false','false','false','false'], 'frontend-test': ['false','false','false','false'], dependencies: ['false','false','false','false'], maintenance: ['false','false','false','false'], documentation: ['false','false','false','true'], content: ['true','false','false','false'], 'content-frontend': ['true','false','true','false'],
     presentation: ['false','true','false','false'], frontend: ['false','false','true','false'], platform: ['false','false','false','false']};
   const expected = scenarios[scope.scenario];
-  const requiresCodeql = ['platform','backend','dependencies','frontend','content-frontend','release-tooling'].includes(scope.scenario);
+  const requiresCodeql = ['catalog-discovery','platform','backend','dependencies','frontend','content-frontend','release-tooling'].includes(scope.scenario);
   if ((scope.scenario === 'dependencies' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false'))
       || (scope.maintenance !== String(scope.scenario === 'maintenance'))
       || (scope.scenario === 'maintenance' && (scope.codeql !== 'false' || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
@@ -525,7 +527,7 @@ export function failedChecks(needs, draft) {
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
     || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== ((trainingFunctional || adminFunctional) && key === 'perf_smoke' ? 'false' : 'true')));
   if (scope.scenario === 'release-tooling' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
-  if (scope.scenario === 'backend' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
+  if (['backend','catalog-discovery'].includes(scope.scenario) && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
     if (!failed.includes('scope')) failed.unshift('scope');
@@ -542,6 +544,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.scenario==='catalog-discovery'){const {changedEntries}=await import('./content-scope.mjs');if(!catalogDiscoveryScope(changedEntries(process.env.CI_BASE_SHA)))failed.push('recomputed-catalog-discovery');}
   if(needs.scope?.outputs?.application_route==='personal-tracking'){try{const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(needs.scope.outputs.personal_tracking_plan);const actual=personalTrackingReadyPlan(changedEntries(process.env.CI_BASE_SHA),process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF,draft,forceFull:process.env.CI_FORCE_FULL==='true'});if(JSON.stringify(p)!==JSON.stringify(actual))failed.push('recomputed-personal-tracking-plan');}catch{failed.push('recomputed-personal-tracking-plan');}}
   if(needs.scope?.outputs?.personal_tracking_draft==='true'){
     try{const {changedEntries}=await import('./content-scope.mjs');if(!personalTrackingDraftScope(changedEntries(process.env.CI_BASE_SHA),{event:process.env.CI_EVENT,draft,forceFull:process.env.CI_FORCE_FULL==='true'}))failed.push('recomputed-personal-tracking-draft');}catch{failed.push('recomputed-personal-tracking-draft');}
