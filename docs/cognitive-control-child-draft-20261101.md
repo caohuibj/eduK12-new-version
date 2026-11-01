@@ -1,78 +1,56 @@
-# 儿童认知控制与自我调节 Bundle 草稿
+# 儿童认知控制与日常观察
 
-基线是实际拉取的 main `24061f5e349d1f8df34b0ed5dd99a33e3014da8c`。
-本次准备共享 CHEXI 内容工厂、家长／教师两个观察配置、Go/No-Go＋Flanker
-声明式任务组件和私有全文待审包。**尚未注册、安装、发布或部署，尚无跨尝试联合报告。**
+基线：实际拉取的 main `24061f5e349d1f8df34b0ed5dd99a33e3014da8c`。
+儿童本人完成 Go/No-Go 与 Flanker；家长、教师以各自账号填写 CHEXI。
+一次分配复用同一儿童、同一 episode 和既有关系分配；分别保留三个来源，生成跨方法描述报告。
+不生成综合能力分、IQ、诊断、常模排名或未经验证的能力等级。
 
-官方全文及完整source作为私有管理员包独立交付；公开Git仅保留公开来源链接和可审代码。
+## 家长／教师内容复用
 
-## 家长和教师应共享什么
+[官方译本页](https://chexi.se/translations)、[简体题本](https://chexi.se/onewebmedia/Child%20Executive%20Functioning%20Inventory_SimplifiedChinese.pdf)
+与[计分原件](https://chexi.se/onewebmedia/CHEXI%20subscales.pdf)提供同一份家长／教师题本和计分。
+共享 `chexi_zh_hans@1.0.0` 的24题、1–5选项、指导语与计分，仅保留两个报告者配置及家庭／课堂情境说明。
+官方译者为 Angela Siu（香港中文大学）；原文混用字形保留，仅整理 PDF 排版换行。
+两位观察者的结果不平均，不以题本相同推断跨报告者可互换。
 
-[官方译本页](https://chexi.se/translations)只提供一份 CHEXI parent/teacher report；
-[官方简体 PDF](https://chexi.se/onewebmedia/Child%20Executive%20Functioning%20Inventory_SimplifiedChinese.pdf)
-标题明确为家长及教师适用。英语题本也是同一份 parent/teacher report，
-[计分说明](https://chexi.se/onewebmedia/CHEXI%20subscales.pdf)没有按报告者分叉。
-因此共享同一个 `chexi_zh_hans@1.0.0`、24题、1–5选项、指导语和计分；
-只保留两个观察者配置及入口，不复制两套题本或量表。
-
-家长描述家庭及生活情境，教师描述课堂和学校活动；保留各自真实观察者、关系、同意和报告访问权。
-不能把两个分数平均，也不能把“题目一致”当成家庭和学校观察可互换的证据。
-中文版署名 Angela Siu，The Chinese University of Hong Kong；不是项目自编或项目新译本。
-PDF中的混用字形原样保留，只去掉排版换行和答题数字列。
-
-## 已准备的内容
-
-| 内容 | 当前产物与边界 |
-| --- | --- |
-| CHEXI | `scale/packages/chexi-zh-hans-v1.ts`，用官方原文装配既有 `ScaleInstrumentSourceV1`；不新造计分器。公开 Git 不含题文。 |
-| 家长／教师 | `childChexiObserverDefinition` 返回两个合法 DRAFT observer 配置，同一工具身份和计分选择；未接入 bootstrap。 |
-| 儿童任务 | `assessment-bundle/intake-candidates/child_cognitive_tasks_zh_cn/0.1.0` 使用既有 `declarative-evidence-v1@1.0.0`、精确任务版本和四个合成 fixture；不进入自动目录扫描。 |
-| 私有全文 | 官方中英文题本、彩色计分题本、计分PDF、来源网页、译者身份、24题可执行DRAFT source JSON、验证结果与候选配置。 |
-
-CHEXI四个原始分面的题号为工作记忆1、3、6、7、9、19、21、23、24；计划12、14、17、20；
+工作记忆原分面题号1、3、6、7、9、19、21、23、24；计划12、14、17、20；
 调节2、4、8、11、15；抑制5、10、13、16、18、22。
-两个因子分别合并工作记忆＋计划（13题）及抑制＋调节（11题）。
-均以各自题目直接求均分，范围1–5，高分表示观察到的困难更多；不能平均两个大小不同分面的均分。
-两个因子和四个分面互相重叠，不再求总分。缺失均分为空；完整作答要求是项目保守策略，
-不是作者给出的插补办法。无反向题、无年龄常模、无缺陷阈值。
+两个因子分别合并工作记忆＋计划（13题）和抑制＋调节（11题），直接计算各自题目均分。
+不能平均不等题数的分面均分；无反向题和总分。高分表示成人观察到更多相关困难。
+缺题的相关均分为空，完整作答要求是项目保守策略，未冒充作者的插补规则。
 
-## 年龄和任务
+## 实现
 
-| 年龄 | 本次定位 | 尚需的实际证据 |
-| --- | --- | --- |
-| 4–5 | CHEXI观察资料准备；任务配置不开放为该年龄已适用 | 规则理解、颜色／方向辨识、练习、反应方式、时序与负担 |
-| 6–8 | 拟优先开展有协助的任务试测；不是已验证适用 | 每项任务理解、练习通过与中断、设备和疲劳 |
-| 9–12 | 拟试测同一任务组件；仍无年龄常模 | 同上，并独立核查分龄表现和稳定性 |
+六个 `assessment-bundle/packages/*/0.1.0` 包含儿童任务、两个单观察者组件，以及家长、教师、两者并列三种联合报告配置。
+都使用现有声明式引擎、冻结定义、BundleReportFacts 与 BundleAnalysis，不新增表、计分器、身份或审批系统。
 
-6岁下限是本项目草稿的分阶段选择，不是由CHEXI、NIH Toolbox或其他儿童范式推导的效度结论。
-Go/No-Go复用 `gonogo/config1.0.0/engine1.0.0/scoring1.0.0/standard`（120试次），
-Flanker复用相同三轴版本及standard（80试次）；不改刺激、练习、时序或任务实现。
-两任务各约5–7分钟是现有配置估计，尚无本次儿童实测；CHEXI10分钟也是项目估计。
-保留 `cpt@1.0.0`（180试次）为持续注意扩展，避免首版堆积疲劳。
-SDQ不作为核心依赖；只有明确需要独立情绪／行为背景时再附加并保留自身授权和报告。
+`/api/child-cognitive-control` 提供教师分配、本人待办、家长接受既有分享同意、START、单项报告、汇集和保存报告读取。
+前端入口 `/relational/child-control` 从既有课程名单和已关联家长选择，不按姓名或时间推测配对。
+联合记录复用现有 REANALYSIS purpose 及原因字段；普通单尝试报告接口拒绝跨来源记录，防止绕过观察者同意检查。
+同一请求并发重试保持同一 episode 和来源分配；每份尝试的 subject、respondent、assignment、episode、精确工具版本、epoch 与输入摘要须相符。
+普通单人创建拒绝混合报告者包。成人观察准入仅接受本产品轮次下已同意、身份吻合的单观察者组件，使用儿童的有效课程名单关系；成人不能启动儿童认知任务。
+观察表先用已有出生年月表单收集儿童背景并冻结其 subject 绑定，按 CHEXI 原适用范围检查年龄。
 
-## 当前源码限制和接线方案
+联合报告仅向分配教师提供，保留家长与教师独立均分及任务指标；缺少作答时等待，缺失指标不补零。
+读取保存报告只校验已有身份、epoch、输入摘要、同意及冻结披露策略，不再加载全部任务结果或重新计分。
+家长撤销同意后教师不能读取联合结果。数字、解释、质量信息及 JSON 导出均遵从实际冻结来源的披露能力。
+报告复用现有 BundleReport；增加授权读取回调供跨报告者 JSON 导出。现有报告 audienceContract 的个体解释上限继续生效，缺少教师解读合同不会升级为个体解读权限。
+图表使用成人线 #484 的共享组件；本线提供 `bundle-child-evidence-display.ts` 及已验证可应用的 `docs/child-shared-display-integration.patch`，由共享展示负责人接入两行导入／词汇扩展并改为“问卷来源”，避免将成人观察标成自评。
 
-1. `assessment-bundle/definition.ts` 仅允许 observer 使用PARENT/TEACHER，其他类别只能SELF。
-   `onboarding/contract.ts` 的声明式包也将 `respondentTypes` 固定为 `[SELF]`。
-   因而不能把儿童任务与成人CHEXI声明成一个当前可投放的混合包。
-2. `assessment-relational` 与既有身份表已经保存 `subjectUserId`、`respondentUserId`、
-   `episodeId`、`assignmentRef`、`consentId`，并检查真实亲子关系或课程roster。
-   但 `product.service.ts` 当前每次分配分别创建episode，生产关系产品注册表为空，
-   `MULTI_INFORMANT_SYNTHESIS` 明确保留而未实现。只有字段存在不能证明跨方法关联已可用。
-3. 普通 `bundle-product/service.ts` 把所有槽位投到一个Composite尝试；
-   当前没有为混合报告者分别分发和汇集已冻结结果的接线。不能仅放宽schema或换一个respondent标签。
-4. `onboarding/dependencies.ts` 要求指标valueType完全相同；Go/No-Go计数是 `integer`，
-   声明式证据只有 `number/string/boolean`，因此三个计数分母目前返回selector/type/unit mismatch。
-   候选保留真实指标与分母并明确失败原因，不改成比例来骗过检查。
+## 年龄与任务边界
 
-下一片最小共享工作应复用现有episode／assignment／consent：一次儿童评估下分别分配儿童SELF任务
-及家长或教师观察尝试，持久绑定同一subject和明确评估轮次；对返回的真实冻结结果逐项核对
-subject、respondent、assignment、精确来源、完成与同意／可见范围，再交给既有声明式报告引擎。
-不得只按姓名、时间接近或同一subject自动配对不同轮次；不得让家长或教师执行儿童认知任务。
-逐一保留缺失、有限、无效与不可用状态，不因任务和观察同时有数字就宣称一致或不一致。
-报告继续保存既有BundleReportFacts，历史读取不重新计分，不新建身份表、引擎、哈希或审核体系。
-计数契约可单独研究将现有integer视为number的合法子类，保留单位及实际值检查；本PR未改共享验证器。
+Go/No-Go 复用 config/engine/scoring `1.0.0`、standard120试次；Flanker复用相同三轴版本、standard80试次。
+不改刺激、时序、练习或任务实现。CPT180试次保留为持续注意扩展；SDQ仅在需要独立背景时另附。
+CHEXI 的4–12岁范围不证明任务适合所有4岁儿童。4–5、6–8、9–12岁的规则理解、练习通过、设备、反应稳定性和负担需分别积累证据。
+没有人为增加6岁任务门禁，没有把可运行冒充已验证；目前没有本项目儿童常模或实机效度结论。
+
+## 私有全文导入
+
+公开 Git 只有装配工厂、计分、配置和公开来源链接，不含完整官方题文。
+私有包携带官方中英文题本、计分原件、网站、研究全文取得状态、完整 source 和标准 instrument/source 私有构建叠加目录。
+`tsx src/scripts/import-private-scale-draft.ts --source <private-source.json> --actor <SYSTEM_ADMIN-id> --apply`
+调用既有 materializer，生成隐藏 DRAFT；不激活、授权或发布。正式运行使用私有构建中的同一 source，并沿用现有管理员最终人工审核及发布。
+未知授权范围保留标签，不阻止 DRAFT 内容导入。
 
 ## 来源与授权
 
@@ -89,16 +67,12 @@ subject、respondent、assignment、精确来源、完成与同意／可见范�
 | [Camerota et al. 2018](https://pubmed.ncbi.nlm.nih.gov/27841094/)，doi:10.1080/09297049.2016.1247795，Child Neuropsychology 24(3), 322–337 | 出版元数据和摘要已核实，本次未取得全文；美国3–5岁研究不直接验证本项目6–12岁中文数字施测。 |
 | [官方下载页](https://chexi.se/translations)、[计分页](https://chexi.se/subscales1)、[研究目录](https://chexi.se/research1) | 网页及官方中英文题本／计分PDF已保存。网站研究目录原始论文页码有526的笔误，本记录使用PubMed出版页码536–552。 |
 
-## 验证与交付状态
+## 验证与交付
 
-使用既有通用Scale scorer验证官方私有source：24题，schema与全部golden cases通过，0 issues。
-公开合成内容的6个定向case分别覆盖两观察者共用身份、每道题的两个因子和四分面归属、
-不等题数的加权含义、缺失为空、无总分／常模、精确任务版本、负差值／真零、现有拒绝边界。
-首轮4过2失败（证据key误用camelCase）；改为snake_case后1过1失败（真实integer契约不匹配）；
-保留该缺口并验证明确blocker后最后一项通过。无失败改写，未重跑未受影响的成功case。
-两新增生产TS根及其309文件类型闭包检查通过（TypeScript5.9.3，0诊断）。
+本次真实隔离 PostgreSQL 已完成官方24题 source 的隐藏 DRAFT 导入；无生产入库或部署。
+定向单元、契约、前端与 PostgreSQL 施测结果及失败修复记录保存在私有交付包；最终统计见 [儿童线验证记录](cognitive-control-child-validation-20261101.json)。
+复用预装依赖和重新按当前 schema 生成的 Prisma client；不声称干净锁定安装、全平台 CI、浏览器或儿童实机验证。
 
-验证复用了本机已有依赖；基线lock相较预装目录只变化follow-redirects1.16.1→1.16.2，
-本次消费者不导入它。没有声称干净锁定安装、正式CI、浏览器、儿童实机、PG集成或生产入库通过。
-public generated registries、BundleReport、schema、依赖、CI和生产DB未修改。
-本候选保留DRAFT供主对话独立review；正式CI与共享接线由精确最终候选再定向处理。
+集成依赖 #484 `dd8081a354d40f1149a97d92f00beadd45005f5b` 的 integer→number 合法子类兼容，精确指标、版本和单位继续严格检查。
+本线没有重复修改该验证器，也不覆盖公共 generated/packages.json；最终由主线合并三线 package 清单后统一生成。
+当前为 [PR485](https://github.com/caohuibj/eduK12-new-version/pull/485) 的可审代码及私有全文包；未合并、未部署、未生产发布。

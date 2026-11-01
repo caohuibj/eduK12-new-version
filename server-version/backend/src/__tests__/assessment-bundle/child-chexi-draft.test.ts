@@ -8,7 +8,7 @@ import { childChexiObserverDefinition } from '../../modules/assessment-bundle/bu
 import { parseAssessmentBundleDefinition } from '../../modules/assessment-bundle/definition'
 import { loadPackage } from '../../modules/assessment-bundle/onboarding/loader'
 import { verifyPackageFixtures } from '../../modules/assessment-bundle/onboarding/fixtures'
-import { dependencyBlockers } from '../../modules/assessment-bundle/onboarding/dependencies'
+import { requireCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 
 // Synthetic text exercises the real scorer; official text lives in the private
 // administrator import, whose separate validation does not make it installed.
@@ -16,7 +16,7 @@ const source = () => createChexiZhHansSource({ items: Array.from({ length: 24 },
 const definition = () => source().executable!.definition
 const answers = (value: number) => Array.from({ length: 24 }, (_, i) => ({ itemCode: `CHEXI-${String(i + 1).padStart(2, '0')}`, responseValue: value }))
 const score = (input: ReturnType<typeof answers>) => scoreScale(definition(), input)
-const pack = () => loadPackage(path.resolve(__dirname, '../../modules/assessment-bundle/intake-candidates/child_cognitive_tasks_zh_cn/0.1.0'))
+const pack = () => loadPackage(path.resolve(__dirname, '../../modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0'))
 
 describe('child CHEXI shared content and separate reporters', () => {
   it('assembles a valid private DRAFT with explicit unknown rights and an official translation identity', () => {
@@ -73,28 +73,28 @@ describe('child CHEXI shared content and separate reporters', () => {
     expect(() => createChexiZhHansSource({ items: ['缺少题目'], instruction: '指导语' })).toThrow('CHEXI_OFFICIAL_24_ITEM_MATERIAL_REQUIRED')
   })
 
-  it('keeps exact metrics and exposes the existing integer dependency mismatch before registration', () => {
+  it('keeps exact registered task metrics, count denominators and standard profiles', () => {
     const p = pack()
-    // The authoring contract has number, but registry counts declare integer.
-    // Retain true denominators and report this shared gap; do not rename them
-    // as ratios or weaken the dependency validator just to pass admission.
-    expect(dependencyBlockers(p)).toEqual([
-      'gonogo_commission_errors: COGNITIVE selector/type/unit mismatch',
-      'gonogo_go_trial_count: COGNITIVE selector/type/unit mismatch',
-      'gonogo_nogo_trial_count: COGNITIVE selector/type/unit mismatch',
-    ])
+    // Shared dependency admission's integer/number compatibility lives in #484.
+    for (const e of p.evidence) {
+      const slot = p.manifest.definition.slots.find(s => s.slotKey === e.slotKey)!
+      const dep = p.manifest.cognitiveDependencies.find(d => d.slotKey === e.slotKey)!
+      const metric = requireCognitiveRegistryEntry(slot.instrumentKey, dep.engineVersion, dep.scoringVersion).metricDefinitions[e.selector]
+      expect(metric).toBeDefined(); expect(metric.unit).toBe(e.unit)
+      expect(metric.valueType === e.valueType || metric.valueType === 'integer' && e.valueType === 'number').toBe(true)
+    }
     expect(verifyPackageFixtures(p)).toHaveLength(4)
     expect(p.manifest.cognitiveDependencies.every(d => d.profile === 'standard')).toBe(true)
     expect(p.manifest.definition.slots.filter(s => s.unitType === 'COGNITIVE').map(s => s.respondentType)).toEqual(['SELF', 'SELF'])
     expect(p.fixtures.valid.values.flanker_flanker_effect_ms).toEqual({ state: 'present', value: -12 })
     expect(p.fixtures.valid.values.gonogo_omission_rate).toEqual({ state: 'present', value: 0 })
-    expect(p.fixtures['not-applicable'].expectedKind).toBe('UNAVAILABLE')
+    expect(p.fixtures['not-applicable'].expectedKind).toBe('COMPUTED')
   })
 
-  it('documents rather than bypasses the current mixed-respondent runtime limit', () => {
+  it('preserves true mixed-respondent slots for the separate-attempt orchestrator', () => {
     const p = pack(), observer = childChexiObserverDefinition('PARENT').slots[0]
     const mixed = { ...p.manifest.definition, category: 'integrated', respondentTypes: ['SELF', 'PARENT'], slots: [...p.manifest.definition.slots, { ...observer, position: 3 }] }
-    expect(() => parseAssessmentBundleDefinition(mixed)).toThrow()
+    expect(parseAssessmentBundleDefinition(mixed).respondentTypes).toEqual(['SELF', 'PARENT'])
     // Do not erase PARENT to make a child/adult mixed workflow look executable.
     expect(observer.respondentType).toBe('PARENT')
   })
