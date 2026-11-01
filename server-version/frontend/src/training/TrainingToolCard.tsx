@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Brain, ChevronDown, ClipboardList, FileText, Layers, MessageSquareText, Wrench } from 'lucide-react'
 import './training-toolkit-compact.css'
+import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import type {CatalogClassificationTag} from '../api/catalogDiscovery'
 
 export type TrainingToolRow = {
   id: string; name: string; kind: string; description?: string
   source: 'owned' | 'granted'; status?: string; version?: string; updatedAt?: string; href?: string
   canUpdateVersion?: boolean
+  classificationTags?:CatalogClassificationTag[]
 }
 const labels: Record<string, string> = {
   scale: '量表', form: '表单', 'form-composition': '表单内容', 'form-template': '表单',
@@ -40,6 +43,7 @@ export default function TrainingToolCard({ row, busy, onUpdateVersion }: { row: 
           {row.status && <span className={'training-tool-status is-' + row.status.toLowerCase()}>{statuses[row.status] || row.status}</span>}
           {unavailable && <span>{row.kind === 'sjt-draft' ? '暂不开放编辑' : '仅供组合问卷选用'}</span>}
         </div>
+        <CatalogClassificationTags tags={row.classificationTags}/>
       </div>
       <div className="training-tool-actions">
         {row.kind === 'bundle'
