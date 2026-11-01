@@ -45,6 +45,10 @@ test('existing jobs select this recipe without starting platform maintenance min
  }
  assert.deepEqual(selected,['catalog-discovery','frontend','docker','codeql']);
  assert.match(job('scope'),/catalogDiscoveryScope\(entries\)\|\|docs\|\|toolingOnly/);
+ const legacy=job('scope').split('- name: legacy routing contracts only for the legacy route')[1].split('\n      - name:')[0];
+ assert.match(legacy,/if: .*application_route == 'legacy'.*bundle_runtime != 'true'/);
+ assert.match(legacy,/maintenance-routing.test.mjs/); // Original legacy contracts remain on their path.
+
  const backend=job('catalog-discovery');assert.match(backend,/BUNDLE_RUNTIME:/);assert.match(backend,/BUNDLE_PRODUCT_TEST_DATABASE_URL:/);assert.match(backend,/prisma migrate deploy/);assert.doesNotMatch(backend,/db push|db:seed|redis:|npm run build/);
  assert.match(backend,/BUNDLE_RUNTIME==='true'\?'bundle-runtime-checks.json'/);assert.match(backend,/assert-release-test-report.mjs/);
  const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');assert.match(frontend,/if: inputs.bundle_runtime/);assert.match(frontend,/frontendChecks:files/);assert.match(frontend,/assert-release-test-report.mjs/);

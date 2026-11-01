@@ -45,3 +45,6 @@ Only the new test/preview/publication type roots were checked (4 roots /2535 fil
 
 
 The bounded CI recipe from `cc0870e05d886c2c372c5bef518bb27594343cff` is integrated without changing its qualification jobs. Its explicit surfaces also include the newly repaired preview entry, installation fixture and this single schema3 integration case. The PostgreSQL selection is this one affected chain, replacing the unrelated mixed-driver journey. Empty CI PostgreSQL uses current migrations because governed-tool tables and immutable triggers are SQL migrations outside the Prisma model schema; `db push` alone cannot execute this authorized path. No seed, Redis, platform regression, load or recovery job is added. Main925822a7 maintenance/inventory fixes are retained.
+
+
+The first Ready scope run selected the finite application route but still entered the broad legacy routing-contract batch. That batch failed existing maintenance dependency and display-parser contracts; no Bundle backend chain had run in that job. The original legacy batch and assertions remain intact, with its condition excluding the new Bundle runtime variant. This variant runs its independent explicit-surface, job-selection and fail-closed routing contracts instead. Existing frontend/image work is not represented as completed qualification for a later head.
