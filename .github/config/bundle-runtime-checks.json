@@ -10,6 +10,7 @@
     "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
     "server-version/backend/src/modules/assessment-bundle/schema.ts",
     "server-version/backend/src/modules/assessment-bundle/types.ts",
+    "server-version/backend/src/modules/bundle-product/admin-authoring.ts",
     "server-version/backend/src/modules/bundle-product/analysis.ts",
     "server-version/backend/src/modules/bundle-product/cognitive-disclosure.ts",
     "server-version/backend/src/modules/bundle-product/context-submission.ts",

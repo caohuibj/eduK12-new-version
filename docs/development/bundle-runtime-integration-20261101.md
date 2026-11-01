@@ -1,6 +1,6 @@
 # Shared Bundle runtime integration
 
-This candidate aligns the existing shared adapters with main `d7d43535c8eac445918ae113a43b1cc04032d310`. Original core `ae20aab4`, adapter `f827b65b`, admission-context `d5f10b96`, and Cognitive disclosure `5957fd5f` commits remain ancestors. Only the reviewed ADEXI and age deltas were copied from the separate development work; its cumulative local history was not merged.
+This candidate initially aligned the existing shared adapters with main `d7d43535c8eac445918ae113a43b1cc04032d310` and subsequently retained main `925822a7e15bff3fa62b8ca2da4802fa8ed85e1d`. Original core `ae20aab4`, adapter `f827b65b`, admission-context `d5f10b96`, and Cognitive disclosure `5957fd5f` commits remain ancestors. Only the reviewed ADEXI and age deltas were copied from the separate development work; its cumulative local history was not merged.
 
 ## Behavior and scope
 
@@ -8,7 +8,7 @@ This candidate aligns the existing shared adapters with main `d7d43535c8eac44591
 - Retain the explicitly selected original ADEXI SELF report; do not invent a new R, widen selection, or change leaf scoring.
 - Bind source-owned `admissionContext`, recognize the complete required SELF/SCALE DOB contract, and use the existing frozen `ageMonthsAtFreeze` at Scale START. Survey uses actual mapped DOB with persisted `Attempt.startedAt` before scoring/child admission; saved single, joint and longitudinal feedback use the accepted private FINAL facts. Study Attempt creation has no DOB; ordinary Survey Scale has no separate measurement START API.
 - The saved feedback function now declares the common optional `derivedView` DTO explicitly. Its previous inferred return type omitted that field from consumers; this changes no stored values or release permissions.
-- No production package, generated package index, Scale source, C/P/R, dependency/lock, database schema, or CI workflow is changed. This is shared runtime work, not content-only qualification.
+- No production package, generated package index, Scale source, C/P/R, dependency/lock or database schema is changed. The explicitly bounded CI selection is described below. This is shared runtime work, not content-only qualification.
 
 ## Standalone test inputs
 
@@ -28,9 +28,10 @@ The real existing `manifest-check` passed for all 12 production package declarat
 
 - Real B09 `parenting_burden_efficacy_zh_cn@0.1.0` and B15 `working_memory_everyday_adult_zh_cn@0.1.0` still lack DOB mappings. Content owners must supply the real required context/measurement linkage; typed age is not substituted.
 - Main's existing CHEXI declarations reference `chexi_zh_hans@1.0.0`, which is intentionally absent from the public executable registry. Its private factory is not an installed identity. Both content dependency checking and `package-release.ts` require the actual executable; merely possessing a private import package does not satisfy them. The strict checks remain unchanged, and no restricted item text or fabricated public executable is added.
+- The real B10 optional `shift_work` enum uses Chinese values, while current native FORM option keys require the existing ASCII key format. This synthetic chain uses string/boolean context and does not qualify that separate enum-authoring path or a real B10 release.
 - Six existing child Bundle declarations also lack their required smoke files. No placeholder smoke is claimed as real runtime qualification. The historical failing CI run is `41283656524`; it is not a result for this candidate. Feature inventory and release-tool dependency fixes are owned separately.
 
-Use the existing PR503 rather than opening another runtime PR. Retarget its base to main so the already merged main history is not presented as part of its diff against the older core branch. Core/reader original commits remain visible; the coordinating owner chooses the actual merge order. Keep Draft until the applicable real CI and remaining dependencies are resolved. No APPROVE or merge is performed here.
+Use the existing PR503 rather than opening another runtime PR. Retarget its base to main so the already merged main history is not presented as part of its diff against the older core branch. Core/reader original commits remain visible; the coordinating owner chooses the actual merge order. The parent authorized Ready after the isolated affected chain and finite CI route were in place; only a successful current applicable CI qualifies this runtime candidate. These checks do not release the separately blocked content packages. No APPROVE or merge is performed here.
 
 
 ## Isolated schema3 installed/authorized FINAL checkpoint
@@ -48,3 +49,10 @@ The bounded CI recipe from `cc0870e05d886c2c372c5bef518bb27594343cff` is integra
 
 
 The first Ready scope run selected the finite application route but still entered the broad legacy routing-contract batch. That batch failed existing maintenance dependency and display-parser contracts; no Bundle backend chain had run in that job. The original legacy batch and assertions remain intact, with its condition excluding the new Bundle runtime variant. This variant runs its independent explicit-surface, job-selection and fail-closed routing contracts instead. Existing frontend/image work is not represented as completed qualification for a later head.
+
+
+## Ready CI follow-up
+
+At `b64ae205fbf2b481bbc94df3a7fd9ebf0daa93e5`, run `41312092383` passed scope classification, frontend lint/types/selected tests and all10 backend files/48 cases. The isolated PostgreSQL authorization/FINAL/frozen-feedback case ran and passed in2.258s; the report checks found no missing, skipped or empty selected suite. These are exact-head results, not a successful result for subsequent code changes.
+
+The production image compiler exposed `admin-authoring.ts:48` (`TS7053`): schema3 has fixed fixture keys, while the verified preview results expose a string name. Preview now derives a name-to-rule-list Map from the already parsed fixture entries. Every verified name comes from those same entries; expected rules, order, result checking and output values are preserved. Only that actual newly affected consumer was added to the bounded source list. Its selected type closure passed with Node24.21 (2roots/2467files/0diagnostics); prior type sets, leaf goldens and the installed chain were not rerun locally. The image and SAST must still pass on the corrected candidate.
