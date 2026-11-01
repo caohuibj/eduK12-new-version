@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import { enqueueExportJob } from '../../services/exportJobService'
 import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
@@ -76,6 +77,10 @@ export const cognitiveController = {
   async listConfigs(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
+      if(req.query.view==='training-catalog'){
+        const filters=z.object({...catalogDiscoveryQueryFields,status:z.string().trim().max(24).optional()}).parse(req.query)
+        return success(res,await assignmentService.listPublishedConfigs(req.user.userId,req.user.role,getPaginationParams(req),filters))
+      }
       const data = await assignmentService.listPublishedConfigs(req.user.userId, req.user.role)
       return success(res, { list: data })
     } catch (err) {

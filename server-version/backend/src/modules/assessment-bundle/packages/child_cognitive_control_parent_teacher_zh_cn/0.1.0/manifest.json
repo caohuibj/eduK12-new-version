@@ -1,0 +1,141 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "child_cognitive_control_parent_teacher_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "integrated",
+    "name": "儿童认知控制与日常自我调节",
+    "description": "儿童完成任务，家长或教师分别完成同一CHEXI观察表；同一episode下汇集冻结结果。",
+    "respondentTypes": [
+      "SELF",
+      "PARENT",
+      "TEACHER"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT"
+    ],
+    "population": {
+      "subjectPopulation": "youth"
+    },
+    "slots": [
+      {
+        "slotKey": "gonogo",
+        "unitType": "COGNITIVE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "gonogo",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "commissionRate",
+          "commissionErrors",
+          "nogoTrialCount",
+          "omissionRate",
+          "goTrialCount",
+          "dPrime"
+        ]
+      },
+      {
+        "slotKey": "flanker",
+        "unitType": "COGNITIVE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "flanker",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "flankerEffectMs",
+          "congruentAccuracy",
+          "incongruentAccuracy",
+          "medianRtCongruent",
+          "medianRtIncongruent"
+        ]
+      },
+      {
+        "slotKey": "parent_chexi",
+        "unitType": "SCALE",
+        "position": 3,
+        "required": true,
+        "instrumentKey": "chexi_zh_hans",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "PARENT",
+        "valueSelectors": [
+          "working_memory",
+          "inhibition"
+        ]
+      },
+      {
+        "slotKey": "teacher_chexi",
+        "unitType": "SCALE",
+        "position": 4,
+        "required": true,
+        "instrumentKey": "chexi_zh_hans",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "TEACHER",
+        "valueSelectors": [
+          "working_memory",
+          "inhibition"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": null,
+    "contextDefinitionVersion": null,
+    "reportDefinitionKey": "child_cognitive_control_parent_teacher_zh_cn_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "chexi_zh_hans"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "儿童跨方法家族的独立任务组件；联合报告通过同一episode下的真实儿童与成人观察尝试读取。",
+      "4至5岁、6至8岁、9至12岁分别尚需规则理解、练习、疲劳与设备适配证据；技术可运行不等于心理测量验证，无自造年龄门槛或常模。",
+      "标准任务复用既有Go/No-Go120试次与箭头Flanker80试次，不冒充已标准化的儿童常模测验。",
+      "任务由儿童本人完成，CHEXI由家长或教师单独完成；不在同一个单人尝试中要求成人替孩子跑任务。",
+      "保留各任务指标、真实量尺、条件分母和质量信息；无跨任务总分、IQ、诊断或未验证能力等级。",
+      "CPT-X可作为后续持续注意扩展，不在当前核心包里重复堆叠；SDQ仅有明确独立目的时附加。",
+      "家长与教师共享量表内容但结果分开呈现，不平均两份观察，不生成跨方法总分。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json"
+  },
+  "cognitiveDependencies": [
+    {
+      "slotKey": "gonogo",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    },
+    {
+      "slotKey": "flanker",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    }
+  ]
+}

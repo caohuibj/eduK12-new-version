@@ -1,0 +1,70 @@
+{
+  "values": {
+    "context.age": {
+      "state": "present",
+      "value": 35
+    },
+    "gonogo.commission_rate": {
+      "state": "present",
+      "value": 0.2
+    },
+    "gonogo.d_prime": {
+      "state": "present",
+      "value": 2.1
+    },
+    "gonogo.omission_rate": {
+      "state": "present",
+      "value": 0.1
+    },
+    "gonogo.commission_errors": {
+      "state": "present",
+      "value": 6
+    },
+    "gonogo.go_trial_count": {
+      "state": "present",
+      "value": 90
+    },
+    "gonogo.nogo_trial_count": {
+      "state": "present",
+      "value": 30
+    },
+    "cpt.d_prime": {
+      "state": "present",
+      "value": 2.0
+    },
+    "cpt.omission_rate": {
+      "state": "present",
+      "value": 0.1388888888888889
+    },
+    "cpt.commission_rate": {
+      "state": "present",
+      "value": 0.03
+    },
+    "cpt.rt_icv": {
+      "state": "present",
+      "value": 0.21
+    },
+    "cpt.target_count": {
+      "state": "present",
+      "value": 36
+    },
+    "cpt.hit_count": {
+      "state": "present",
+      "value": 31
+    },
+    "adexi.working_memory_sum": {
+      "state": "present",
+      "value": 23
+    },
+    "adexi.inhibition_sum": {
+      "state": "missing"
+    }
+  },
+  "expectedRuleIds": [
+    "gonogo_observation",
+    "cpt_observation",
+    "cpt_stability",
+    "unavailable_adexi_inhibition_sum"
+  ],
+  "expectedKind": "COMPUTED"
+}

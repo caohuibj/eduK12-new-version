@@ -86,31 +86,74 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
   const resolvedConfig = mergeProfileConfig(input.entry, input.baseConfig, input.profile)
   const profileDefinition = input.entry.profiles[input.profile]
   if (!profileDefinition) throw BAD_REQUEST(`该任务未声明 Profile ${input.profile}`)
+  const reportConfig = (resolvedConfig as { report?: { reportVersion?: string } }).report
+  const reportVersion = reportConfig?.reportVersion
   const protocolPresentation = resolveCognitiveProtocolPresentation({
     testType: input.entry.testType,
     engineVersion: input.entry.engineVersion,
     scoringVersion: input.entry.scoringVersion,
     profile: input.profile,
+    reportVersion,
   })
-  const participantPresentation = resolveParticipantPresentation(input.entry)
+  const participantPresentation = resolveParticipantPresentation({ ...input.entry, reportVersion })
   if (!participantPresentation) throw new Error(`COG_PRESENTATION_MISSING: ${input.entry.testType}/${input.entry.engineVersion}/${input.entry.scoringVersion}`)
   const v2 = buildCognitiveV2TaskDefinition(input.entry as unknown as RegistryEntry<unknown, unknown>)
+  const reading = participantPresentation.reportReading
+  const isReport3 = reading?.version === '3.0.0'
+  // R changes display policy only. C, scoring, profile parameters and historical snapshots stay intact.
+  const reportDefinition = isReport3 ? {
+    ...input.entry.reportDefinition,
+    title: participantPresentation.title,
+    headlineMetric: participantPresentation.experienceHeadline,
+    primaryMetrics: reading.studentMetricKeys,
+    secondaryMetrics: reading.processMetricKeys,
+    showProductIndex: false,
+    practicalTips: participantPresentation.practicalTips,
+    disclaimer: participantPresentation.disclaimer,
+  } : input.entry.reportDefinition
+  const metricDefinitions = isReport3 ? Object.fromEntries(
+    Object.entries(input.entry.metricDefinitions).map(([key, value]) => [key, {
+      ...value,
+      label: participantPresentation.metrics[key]?.label ?? value.label,
+      // A scalar display unit can correct legacy percent formatting without changing its number.
+      unit: (value.valueType === 'number' || value.valueType === 'integer')
+        ? participantPresentation.metrics[key]?.valueUnit ?? value.unit : value.unit,
+    }]),
+  ) : input.entry.metricDefinitions
+  const v2MetricDefinitions = isReport3 ? Object.fromEntries(
+    Object.entries(v2.metrics).map(([key, value]) => [key, {
+      ...value,
+      label: participantPresentation.metrics[key]?.label ?? value.label,
+      unit: (value.valueType === 'number' || value.valueType === 'integer')
+        ? participantPresentation.metrics[key]?.valueUnit ?? value.unit : value.unit,
+    }]),
+  ) : v2.metrics
+  const qualityDefinitions = isReport3 ? Object.fromEntries(
+    Object.entries(input.entry.qualityDefinitions).map(([key, value]) => [key, {
+      ...value, label: reading.qualityLabels?.[key] ?? value.label,
+    }]),
+  ) : input.entry.qualityDefinitions
+  const v2QualityDefinitions = isReport3 ? Object.fromEntries(
+    Object.entries(v2.quality).map(([key, value]) => [key, {
+      ...value, label: reading.qualityLabels?.[key] ?? value.label,
+    }]),
+  ) : v2.quality
   const resolvedReport: FrozenReportSnapshot = {
     presentationVersion: participantPresentation.presentationVersion,
     participantPresentation,
-    v2ReportDefinition: v2.report,
-    v2MetricDefinitions: v2.metrics,
-    v2QualityDefinitions: v2.quality,
+    v2ReportDefinition: isReport3 ? { ...v2.report, version: reading.version } : v2.report,
+    v2MetricDefinitions,
+    v2QualityDefinitions,
     profile: input.profile,
     randomizationAlgorithmVersion: input.entry.randomizationAlgorithmVersion,
     profileDefinitionVersion: input.entry.profileDefinitionVersion,
     metricDefinitionVersion: input.entry.metricDefinitionVersion,
     qualityDefinitionVersion: input.entry.qualityDefinitionVersion,
-    reportDefinitionVersion: input.entry.reportDefinitionVersion,
+    reportDefinitionVersion: isReport3 ? reading.version : input.entry.reportDefinitionVersion,
     reportCaveats: protocolPresentation?.reportCaveats ?? profileDefinition.reportCaveats,
-    metricDefinitions: input.entry.metricDefinitions,
-    qualityDefinitions: input.entry.qualityDefinitions,
-    reportDefinition: input.entry.reportDefinition,
+    metricDefinitions,
+    qualityDefinitions,
+    reportDefinition,
     ...(protocolPresentation ? {
       protocolTier: protocolPresentation.tier,
       profileLabel: protocolPresentation.profileLabel,

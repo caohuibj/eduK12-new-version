@@ -1,0 +1,62 @@
+{
+  "values": {
+    "gonogo.commission_rate": {
+      "state": "present",
+      "value": 0.03333333333333333
+    },
+    "gonogo.omission_rate": {
+      "state": "present",
+      "value": 0
+    },
+    "gonogo.d_prime": {
+      "state": "present",
+      "value": 3
+    },
+    "cpt.d_prime": {
+      "state": "present",
+      "value": 3
+    },
+    "cpt.omission_rate": {
+      "state": "present",
+      "value": 0.027777777777777776
+    },
+    "cpt.commission_rate": {
+      "state": "present",
+      "value": 0
+    },
+    "cpt.rt_icv": {
+      "state": "present",
+      "value": 0.03
+    },
+    "flanker.flanker_effect_ms": {
+      "state": "present",
+      "value": 40
+    },
+    "flanker.congruent_accuracy": {
+      "state": "present",
+      "value": 1
+    },
+    "flanker.incongruent_accuracy": {
+      "state": "present",
+      "value": 1
+    },
+    "texi.working_memory": {
+      "state": "present",
+      "value": 3
+    },
+    "texi.inhibition": {
+      "state": "present",
+      "value": 3
+    }
+  },
+  "expectedRuleIds": [
+    "task_reaction",
+    "task_attention",
+    "task_interference",
+    "daily_self_report",
+    "methods_complement",
+    "action_pause",
+    "action_steps"
+  ],
+  "expectedKind": "COMPUTED"
+}

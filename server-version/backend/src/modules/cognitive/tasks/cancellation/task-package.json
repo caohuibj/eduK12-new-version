@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "task": "cancellation",
+  "order": 118,
+  "identities": [
+    {
+      "testType": "cancellation",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 118
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "cancellation",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/cancellation/cancellation.registry.ts",
+      "export": "cancellationRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      118,
+      118
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/cancellation/__tests__/CancellationTask.test.tsx",
+      "src/modules/cognitive/tasks/cancellation/__tests__/generator.test.ts"
+    ]
+  }
+}

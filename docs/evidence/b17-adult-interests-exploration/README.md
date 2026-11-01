@@ -56,3 +56,8 @@ npm run bundle:manifest:check
 The shared registration file is produced only by the existing generator. At final integration, run that generator once over the union of concurrent new package directories; do not replace other packages with this branch's generated snapshot. The existing #494 routing accepts Bundle JSON, its CI fixture, generated registration, and passive engineering evidence here as pure `content`, domain `bundle`. The selected boundary job checks Bundle history, generated registration, and this package's parser/fixture/dependency checks; no full-platform regression, PG lifecycle, performance or restore run is added.
 
 An initial local smoke-fixture authoring script used the wrong response-set property (`id`); it stopped with KeyError before generating the smoke fixture. It was corrected to the actual `key` / `responseSetKey` / `itemCode` contract. No leaf source or runtime was changed. That local authoring error was not a CI failure.
+
+
+## Current-main index alignment
+
+The only conflict against main7f9b8ec1 was generated/packages.json. Preserve all main source directories and both existing candidate versions0.1.0/0.2.0, then rebuild through the existing main schema3 generator. Generate/check passed14versions; the original12main entries are byte-equivalent after parsing. The previous candidate index omitted0.2.0; both declarations are now registered without rewriting either original report or source. This is source registration only, not installation, professional approval or publication. Subsequent six-package integration must regenerate from the complete source union rather than selecting this single-package index.

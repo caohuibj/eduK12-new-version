@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "lineangle",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0"
+  },
+  "provenance": "Derived from retained v1 golden inputs with an explicit 0/180 equivalent-axis case; v2 expected natural metrics retained.",
+  "cases": [
+    {
+      "name": "golden-equivalent-axis",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "angleStepDeg": 15,
+          "optionCount": 3,
+          "minAngleSepSteps": 2,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetAngle": 0,
+              "optionAngles": [
+                180,
+                60,
+                120
+              ],
+              "responseAngle": 180,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "targetAngle": 90,
+              "optionAngles": [
+                45,
+                90,
+                135
+              ],
+              "responseAngle": 45,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "targetAngle": 30,
+              "optionAngles": [
+                30,
+                90,
+                150
+              ],
+              "responseAngle": 30,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "targetAngle": 120,
+              "optionAngles": [
+                60,
+                105,
+                120
+              ],
+              "responseAngle": 120,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 75,
+        "metrics": {
+          "accuracy": 0.75,
+          "medianRtMs": 500,
+          "errorCount": 1,
+          "timeoutCount": 0,
+          "validRtCount": 3
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "angleStepDeg": 15,
+          "optionCount": 3,
+          "minAngleSepSteps": 2,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "lineangle v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "angleStepDeg": 15,
+          "optionCount": 3,
+          "minAngleSepSteps": 2,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetAngle": 60,
+              "optionAngles": [
+                30,
+                60,
+                120
+              ],
+              "responseAngle": 60,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "lineangle v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

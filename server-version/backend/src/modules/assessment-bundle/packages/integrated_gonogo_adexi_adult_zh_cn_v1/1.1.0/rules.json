@@ -1,0 +1,303 @@
+{
+  "version": "1.0.0",
+  "applicability": {
+    "op": "all",
+    "conditions": [
+      {
+        "op": "gte",
+        "evidenceKey": "context.age",
+        "value": 18
+      },
+      {
+        "op": "lte",
+        "evidenceKey": "context.age",
+        "value": 100
+      }
+    ]
+  },
+  "items": [
+    {
+      "ruleId": "gonogo_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.nogo_trial_count"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.go_trial_count"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "Go/No-Go 像一次“按规则行动和暂停”的快照：误按率以不应按键的 No-Go 试次为分母，遗漏率以应按键的 Go 试次为分母。它描述本次动作克制表现，不等于日常自控力。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "gonogo.nogo_trial_count",
+        "gonogo.omission_rate",
+        "gonogo.go_trial_count"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "cpt_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.target_count"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.commission_rate"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "CPT-X 像一段持续“守住目标”的观察：目标遗漏与非目标误报分别计算。请同时阅读两项，不用单个数字概括注意能力。",
+      "evidenceKeys": [
+        "cpt.omission_rate",
+        "cpt.target_count",
+        "cpt.commission_rate"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "cpt_stability",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "cpt.rt_icv"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.d_prime"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "d′ 描述目标辨别，反应时变异系数描述正确命中时反应速度的波动；变异系数没有 0–1 上限，也不是能力百分比。",
+      "evidenceKeys": [
+        "cpt.rt_icv",
+        "cpt.d_prime"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "daily_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "adexi.working_memory_sum"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "adexi.inhibition_sum"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "ADEXI 描述您对日常记住步骤、先思考再行动以及转换活动的体验。本次显示项目中文适配的分量表合计分：工作记忆 9–45，抑制 5–25；高分表示报告的困难更多，不表示同龄排名。",
+      "evidenceKeys": [
+        "adexi.working_memory_sum",
+        "adexi.inhibition_sum"
+      ],
+      "supportRefs": [
+        "adexi_scoring"
+      ]
+    },
+    {
+      "ruleId": "complementary",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "adexi.working_memory_sum"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "adexi.inhibition_sum"
+          }
+        ]
+      },
+      "kind": "joint_conclusion",
+      "text": "把两类证据看成两扇窗：任务呈现有明确规则时的本次表现，自评呈现日常生活中的体验。两者提供互补线索，不能相加、换算或据此判定一致、分歧或诊断。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "cpt.omission_rate",
+        "adexi.working_memory_sum",
+        "adexi.inhibition_sum"
+      ],
+      "supportRefs": [
+        "toplak2013"
+      ]
+    },
+    {
+      "ruleId": "action_plan",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "adexi.working_memory_sum"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "adexi.inhibition_sum"
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "可以选一项真实活动做小实验：开始前写清“何时行动、何时暂停”，把长任务拆成短步骤，并在转换活动前设置提醒。记录这些支持是否让日常体验更轻松；本报告不能保证某种干预效果。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "cpt.omission_rate",
+        "adexi.working_memory_sum",
+        "adexi.inhibition_sum"
+      ],
+      "supportRefs": [
+        "toplak2013"
+      ]
+    },
+    {
+      "ruleId": "unavailable_gonogo_commission_rate",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "gonogo.commission_rate"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+      "evidenceKeys": [
+        "gonogo.commission_rate"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "unavailable_cpt_omission_rate",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "cpt.omission_rate"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+      "evidenceKeys": [
+        "cpt.omission_rate"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "unavailable_adexi_working_memory_sum",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "adexi.working_memory_sum"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "adexi.working_memory_sum"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "adexi.working_memory_sum"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+      "evidenceKeys": [
+        "adexi.working_memory_sum"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "unavailable_adexi_inhibition_sum",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "adexi.inhibition_sum"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "adexi.inhibition_sum"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "adexi.inhibition_sum"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+      "evidenceKeys": [
+        "adexi.inhibition_sum"
+      ],
+      "supportRefs": []
+    }
+  ]
+}

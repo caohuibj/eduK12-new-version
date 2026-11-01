@@ -3,7 +3,15 @@ import {cleanup,render,screen} from '@testing-library/react'
 import {afterEach} from 'vitest'
 import {EducationAssessmentReport} from './EducationAssessmentReport'
 import type {EducationFeedbackData} from './EducationTaskFeedback'
+import {derivedViewFixture} from '../../modules/reporting/BundleDerivedReport.fixture'
 afterEach(cleanup)
+it('passes the same server-projected numerical DTO to the shared renderer and clears it outside personal disclosure',()=>{
+ const data={schemaVersion:1,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',mode:'INDIVIDUAL_SUMMARY',reports:[],nativeBundle:{schemaVersion:1,kind:'NATIVE_BUNDLE_FEEDBACK',status:'READY',title:'成人探索',profileView:null,derivedView:derivedViewFixture()}} as unknown as EducationFeedbackData
+ const {rerender}=render(<EducationAssessmentReport data={data}/>)
+ expect(screen.getByRole('img',{name:'认知需求，范围 10 到 50，本次结果 38'})).toBeInTheDocument()
+ rerender(<EducationAssessmentReport data={{...data,mode:'COMPLETION_ONLY'}}/>)
+ expect(screen.queryByRole('img')).not.toBeInTheDocument()
+})
 it('reads the optional server-projected native report and removes it when personal disclosure is withheld',()=>{
  const data={schemaVersion:1,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',mode:'INDIVIDUAL_SUMMARY',reports:[],nativeBundle:{schemaVersion:1,kind:'NATIVE_BUNDLE_FEEDBACK',status:'READY',title:'数学学习动机理论试验',profileView:{schemaVersion:'bundle-profile-view-v1',state:'MATCHED',title:'本次暂定画像',explanation:'结合当前获准单项指标。',profileId:'P4',constructs:[],candidates:[],alternatives:[],actions:[],methods:null,limitation:'理论试验；不是诊断或常模。'}}} as unknown as EducationFeedbackData
  const {rerender}=render(<EducationAssessmentReport data={data}/>)

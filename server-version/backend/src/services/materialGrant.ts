@@ -2,7 +2,7 @@ import {libraryReadableScaleIds} from '../modules/scale-library-governance/reade
 import {assertLibraryUseGrantCurrent} from '../modules/scale-library-governance/usage'
 import {ScaleLibraryError} from '../modules/scale-library-governance/contracts'
 import {ContentAuthorityError} from '../modules/measurement-content/content-authority'
-import { MaterialResourceType, UserRole, type Prisma } from '@prisma/client'
+import { MaterialResourceType, UserRole, Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import { config } from '../config'
 import {
@@ -62,25 +62,22 @@ export const grantedResourceIds = async (userId: string, resourceType: MaterialR
   return rows.map((row) => row.resourceId)
 }
 
-export const scaleWhereForViewer = async (
-  userId: string,
-  role: UserRole | string,
-  extra: Record<string, unknown> = {},
-) => {
-  if(role!==UserRole.ADMIN&&role!==UserRole.TEACHER)return extra
+/** SQL mode exposes the same viewer scope for the opt-in header paginator;
+ * source filters stay in the catalog query. Existing ORM callers are unchanged. */
+export function scaleWhereForViewer(userId:string,role:UserRole|string,extra?:Record<string,unknown>):Promise<Prisma.ScaleWhereInput>
+export function scaleWhereForViewer(userId:string,role:UserRole|string,extra:Record<string,unknown>,format:'sql'):Promise<Prisma.Sql>
+export async function scaleWhereForViewer(userId:string,role:UserRole|string,extra:Record<string,unknown>={},format?:'sql'):Promise<Prisma.ScaleWhereInput|Prisma.Sql>{
+  if(role!==UserRole.ADMIN&&role!==UserRole.TEACHER)return format==='sql'?Prisma.sql`TRUE`:extra
   const readable=await libraryReadableScaleIds(userId)
-  if (role === UserRole.ADMIN) return readable.systemAdmin?extra:{...extra,OR:[{libraryEntryId:null},{id:{in:readable.ids}}]}
-  // 学生等非教师角色：GET /scales/tags 只要求登录，保持全量标签，不要按 creatorId 滤成空。
-  if (role !== UserRole.TEACHER) return extra
-  const grantedIds = await grantedResourceIds(userId, MaterialResourceType.SCALE)
-  return {
-    ...extra,
-    OR: [
-      { creatorId: userId, libraryEntryId: null },
-      { id: { in: grantedIds }, status: 'PUBLISHED', libraryEntryId:null },
-      { id:{in:readable.ids},status:'PUBLISHED' },
-    ],
-  }
+  if(role===UserRole.ADMIN)return format==='sql'
+    ?readable.systemAdmin?Prisma.sql`TRUE`:Prisma.sql`(s.library_entry_id IS NULL OR s.id=ANY(${readable.ids}::text[]))`
+    :readable.systemAdmin?extra:{...extra,OR:[{libraryEntryId:null},{id:{in:readable.ids}}]}
+  const grantedIds=await grantedResourceIds(userId,MaterialResourceType.SCALE)
+  if(format==='sql')return Prisma.sql`((s.creator_id=${userId} AND s.library_entry_id IS NULL)
+    OR (s.id=ANY(${grantedIds}::text[]) AND s.status='PUBLISHED' AND s.library_entry_id IS NULL)
+    OR (s.id=ANY(${readable.ids}::text[]) AND s.status='PUBLISHED'))`
+  return {...extra,OR:[{creatorId:userId,libraryEntryId:null},
+    {id:{in:grantedIds},status:'PUBLISHED',libraryEntryId:null},{id:{in:readable.ids},status:'PUBLISHED'}]}
 }
 
 // 撤销 grant 只拦新的 addItem / addScale / 空白 createAssignment。

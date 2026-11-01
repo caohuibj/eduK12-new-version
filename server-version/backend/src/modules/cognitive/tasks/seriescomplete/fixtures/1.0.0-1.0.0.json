@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "seriescomplete",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreSeriescompleteV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "seriescomplete-zh-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "sc-01",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "sc-02",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "sc-03",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "sc-04",
+              "responseIndex": 1,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianRtMs": 500,
+          "errorCount": 0,
+          "timeoutCount": 0,
+          "validRtCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "seriescomplete-zh-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "seriescomplete v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "seriescomplete-zh-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "sc-01",
+              "responseIndex": 0,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "seriescomplete v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "child_observer_subject_context",
+  "contextDefinitionVersion": "1.0.0",
+  "fields": [
+    {
+      "contextKey": "subject_birth_year_month",
+      "required": true,
+      "valueType": "string"
+    }
+  ]
+}

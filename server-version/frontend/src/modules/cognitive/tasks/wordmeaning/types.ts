@@ -1,0 +1,2 @@
+export interface WordmeaningConfig { totalTrials: number; stimulusSetVersion: string; fixationMs: number; timeoutMs: number; validRtFloorMs: number; report: { reportVersion: string; referenceMode: 'none'|'simulated'|'literature'; referenceVersion?: string; referenceBand?: string } }
+export type WordmeaningTrialPayload = { itemId: string; responseIndex: number|null; rtMs: number|null; interrupted: boolean }

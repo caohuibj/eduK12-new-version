@@ -19,6 +19,7 @@ export interface SurveyCognitiveStoredResult {
   testType:string;configVersion:string;engineVersion:string;scoringVersion:string;
   profileArtifactHash?:string;profile?:'experience'|'standard'|'research';maxTrials?:number;
   timingPolicy:'software-frame-v1'|'NATIVE_PROFILE_V1';maturity:'PILOT';referenceMode:'none'|'frozen-profile';
+  reportSnapshot?:import('../cognitive/v2/types').CognitiveResultSnapshot;
   metrics:Record<string,unknown>;quality:CognitiveScoreResult['quality'];audit:CognitiveScoreResult['audit'];
   administrationProvenance:AdministrationProvenanceV1;restartCount:number;rawHash:string;completedAt:string;
 }

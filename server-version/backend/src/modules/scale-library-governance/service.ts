@@ -1,4 +1,5 @@
-import {catalogKeywordTerms} from '../scale/library/catalog-discovery'
+import {catalogTagFacets,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {discoveryJoin,discoverySqlFilter} from '../survey/catalog-discovery'
 import {approveToolEntryPolicies,type ToolEntryProduct,type ToolPolicy} from '../assessment-governance/tool-entry-policy'
 import {assertSurveyLibraryManager} from '../survey/admin-role'
 import {compileEducationApplicability,readFrozenEducationApplicability} from './education-applicability'
@@ -16,7 +17,7 @@ import {submissionInput,transitionInput,reviewInput,entryStatusInput,fail,legacy
 type Tx=Prisma.TransactionClient
 export type SubmissionRow={id:string;release_id:string;product:LibrarySourceProduct;source_id:string;author_id:string;metadata:Prisma.JsonValue;
   dependency_release_ids:string[];snapshot:LibrarySnapshot;snapshot_hash:string;status:string;version:number;reason:string|null;created_at:Date;updated_at:Date}
-export type EntryRow={entry_policies?:Array<ToolPolicy&{product:ToolEntryProduct}>;release_version?:string;content_hash?:string;id:string;submission_id:string;release_id:string;status:string;version:number;reason:string|null;created_at:Date;updated_at:Date}
+export type EntryRow={classification_tags?:CatalogClassificationTag[];entry_policies?:Array<ToolPolicy&{product:ToolEntryProduct}>;release_version?:string;content_hash?:string;id:string;submission_id:string;release_id:string;status:string;version:number;reason:string|null;created_at:Date;updated_at:Date}
 export function sourceMetadataDefaults(snapshot:LibrarySnapshot){
  const d=snapshot.compiledDefinition
  return {title:snapshot.title,author:[d.source.citation??d.source.title,d.source.url].filter(Boolean).join('；').slice(0,500),
@@ -29,7 +30,7 @@ export const submissionView=(row:SubmissionRow)=>({id:row.id,releaseId:row.relea
 // Catalog discovery is not media authorization. Exact manifests remain on
 // owner/reviewer submission detail and the separately authorized media endpoints.
 export const entryView=(row:EntryRow,submission:SubmissionRow)=>({...submissionView(submission),mediaManifest:undefined,id:row.id,submissionId:row.submission_id,
-  entryPolicies:row.entry_policies??[],admittedEntrypoints:(row.entry_policies??[]).filter(p=>p.decision==='APPROVED'&&!p.paused).map(p=>p.product),status:row.status,version:row.version,releaseVersion:row.release_version,contentHash:row.content_hash,reason:row.reason,createdAt:row.created_at})
+  classificationTags:row.classification_tags??[],entryPolicies:row.entry_policies??[],admittedEntrypoints:(row.entry_policies??[]).filter(p=>p.decision==='APPROVED'&&!p.paused).map(p=>p.product),status:row.status,version:row.version,releaseVersion:row.release_version,contentHash:row.content_hash,reason:row.reason,createdAt:row.created_at})
 export async function event(tx:Tx,actorId:string,action:string,reason:string,submissionId:string|null,entryId:string|null,details:unknown={}){
   await tx.$executeRaw(Prisma.sql`INSERT INTO scale_library_events(id,actor_id,action,reason,submission_id,entry_id,details)
     VALUES(${randomUUID()},${actorId},${action},${reason},${submissionId},${entryId},${JSON.stringify(details)}::jsonb)`)
@@ -171,16 +172,18 @@ export async function changeEntryProducts(actorId:string,id:string,raw:unknown){
   return entryView(updated.entry,updated.submission)
  })
 }
-export async function listEntries(actorId:string,entryId?:string,pagination?:{offset:number;limit:number;keyword?:string},product?:LegacyLibraryProduct){
+export async function listEntries(actorId:string,entryId?:string,pagination?:{offset:number;limit:number}&CatalogDiscoveryFilters,product?:LegacyLibraryProduct){
   const limit=pagination?.limit??100,offset=pagination?.offset??0
   if(!Number.isInteger(limit)||limit<0||limit>100||!Number.isSafeInteger(offset)||offset<0)fail('目录分页参数无效',400)
   return prisma.$transaction(async tx=>{
     const capabilities=await libraryCapabilities(tx,actorId)
     const ids=[...capabilities.reviewGrants.flatMap(g=>g.releaseIds),...capabilities.distributionGrants.filter(g=>!product||g.product===product).flatMap(g=>g.releaseIds)]
-    const terms=catalogKeywordTerms(pagination?.keyword),discovery=terms.length?Prisma.sql`AND ${Prisma.join(terms.map(term=>Prisma.sql`strpos(lower(concat_ws(' ',s.metadata->>'title',s.metadata->>'author',s.metadata->>'applicability',e.release_id)),${term})>0`),' AND ')}`:Prisma.empty
     // Filter authoritative visibility before OFFSET/LIMIT, not after a page.
-    const entries=await tx.$queryRaw<EntryRow[]>(Prisma.sql`SELECT e.* FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id
+    const [result]=await tx.$queryRaw<Array<{entries:EntryRow[];tags:CatalogClassificationTag[]}>>(Prisma.sql`WITH visible AS MATERIALIZED (
+      SELECT e.*,s.metadata,discovery.tags AS classification_tags,discovery.ids,discovery.terms FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id
       JOIN measurement_content_releases r ON r.id=e.release_id
+      LEFT JOIN scales source ON s.product='TRAINING' AND source.id=s.source_id AND source.creator_id=s.author_id
+      ${discoveryJoin([],{kind:Prisma.sql`NULL`,key:Prisma.sql`NULL`,version:Prisma.sql`NULL`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(source.tags)`)}
       WHERE (${entryId??null}::text IS NULL OR e.id=${entryId??null}) AND (${capabilities.systemAdmin}
       OR EXISTS(SELECT 1 FROM survey_tool_policies p WHERE p.resource_key='release:'||e.release_id AND p.fingerprint=r.content_hash
         AND p.decision='APPROVED' AND (${product??null}::text IS NULL OR p.product=${product??null})
@@ -188,11 +191,16 @@ export async function listEntries(actorId:string,entryId?:string,pagination?:{of
       OR EXISTS(SELECT 1 FROM scale_library_use_grants g JOIN survey_tool_policies p ON p.resource_key='release:'||e.release_id
         AND p.fingerprint=r.content_hash AND p.product=g.product AND p.decision='APPROVED' AND NOT p.paused
         WHERE g.entry_id=e.id AND g.user_id=${actorId} AND g.status='ACTIVE' AND e.status='ACTIVE'
-          AND (${product??null}::text IS NULL OR g.product=${product??null}))) ${discovery}
-      ORDER BY e.created_at DESC,e.id LIMIT ${limit+1} OFFSET ${offset}`)
+          AND (${product??null}::text IS NULL OR g.product=${product??null})))) , page AS (
+      SELECT e.* FROM visible e CROSS JOIN LATERAL (SELECT e.ids,e.terms) discovery
+      WHERE ${discoverySqlFilter([Prisma.sql`e.metadata->>'title'`,Prisma.sql`e.metadata->>'author'`,Prisma.sql`e.metadata->>'applicability'`,Prisma.sql`e.release_id`],pagination)}
+      ORDER BY e.created_at DESC,e.id LIMIT ${limit+1} OFFSET ${offset})
+      SELECT COALESCE((SELECT jsonb_agg(page) FROM page),'[]'::jsonb) AS entries,
+        COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM visible CROSS JOIN LATERAL jsonb_array_elements(classification_tags) tag),'[]'::jsonb) AS tags`)
+    const entries=result.entries
     const list=[]
-    for(const e of entries.slice(0,limit)){const {entry,submission}=await loadEntry(tx,e.id);list.push(entryView(entry,submission))}
-    return {list,hasMore:entries.length>limit}
+    for(const e of entries.slice(0,limit)){const {entry,submission}=await loadEntry(tx,e.id);list.push(entryView({...entry,classification_tags:e.classification_tags},submission))}
+    return {list,hasMore:entries.length>limit,tagFacets:catalogTagFacets([result.tags])}
   })
 }
 export async function stopCollection(tx:Tx,actorId:string,targetKind:'RELEASE'|'TRAINING_SCALE'|'SURVEY_INSTRUMENT',targetId:string,reason:string,grantId?:string){

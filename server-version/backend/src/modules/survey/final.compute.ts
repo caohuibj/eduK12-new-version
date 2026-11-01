@@ -1,3 +1,4 @@
+import {prepareSurveyNativeAdmissions,type SurveyNativeAdmission} from '../bundle-product/survey-native-admission'
 import type {SurveyNativeReport} from '../bundle-product/survey-native'
 import { SURVEY_NATIVE_SJT_PROTOCOL,surveySituationalExecutionProtocol,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
@@ -42,6 +43,7 @@ export interface FrozenUnitResult {
   notExecuted?:true
 }
 export interface SurveyComputedFinal {
+  nativeBundleAdmissions?:SurveyNativeAdmission[]
   nativeBundleReports?:SurveyNativeReport[]
   interpretation?:SurveyFinalInterpretation
   schemaVersion:1
@@ -174,21 +176,27 @@ export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,
   return Object.freeze({snapshot:frozen,
     compute:(input:Record<string,unknown>,assignment?:SurveyFlowAssignment|null,
       clientObservedBlocks?:readonly string[],mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,
-      cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>)=>
-      computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults,nativeSituationalResults),
+      cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>,contextFrozenAt?:Date)=>
+      computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults,nativeSituationalResults,contextFrozenAt),
   })
 }
 
 export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
   assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
-  mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown):SurveyComputedFinal{
-  return computeSurveyFinalFromSnapshot(snapshot,input,assignment,clientObservedBlocks,mode,itemTimings)
+  mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,contextFrozenAt?:Date):SurveyComputedFinal{
+  return computeSurveyFinalFromSnapshot(snapshot,input,assignment,clientObservedBlocks,mode,itemTimings,undefined,undefined,undefined,contextFrozenAt)
 }
 
 function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
   assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
   mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,verifiedDigest?:string,
-  cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>):SurveyComputedFinal{
+  cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>,contextFrozenAt?:Date):SurveyComputedFinal{
+  const admissions=new Map<string,SurveyNativeAdmission>()
+  const admit=(unit:ResearchFrozenUnit)=>{
+    if(unit.kind==='FORM')return
+    try{for(const admission of prepareSurveyNativeAdmissions(snapshot.governedPackages??[],input,contextFrozenAt,unit.instrumentKey))admissions.set(admission.importId,admission)}
+    catch(error){invalid('answers.'+unit.instrumentKey,error instanceof Error?error.message:'SURVEY_NATIVE_ADMISSION_REQUIRED')}
+  }
   for(const unit of snapshot.units)if(unit.kind==='SJT'||unit.executionProtocol!==undefined)surveySituationalExecutionProtocol(unit)
   const nativeSituationalResult=(unit:ResearchFrozenUnit,raw:AnswerMap):FrozenUnitResult=>{
     if(Object.keys(raw).length)invalid('answers.'+unit.instrumentKey,'原生情境化答案只能通过共享工具协议提交')
@@ -218,6 +226,7 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
         evaluateUnit:(unit,answer)=>{
           const raw=safeObject(answer,'answers.'+unit.instrumentKey)
           try{
+            admit(unit)
             if(unit.kind==='FORM')return formResult(unit,raw)
             if(unit.kind==='SCALE')return scaleResult(unit,raw)
             if(unit.kind==='COGNITIVE')return cognitiveResult(unit,raw)
@@ -240,7 +249,7 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
     const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,mode==='FINAL')
     return {schemaVersion:1,
       definitionDigest:verifiedDigest??canonicalHash(JSON.parse(JSON.stringify(snapshot))),
-      units:result.units,executionTrace:result.trace,
+      units:result.units,executionTrace:result.trace,...(admissions.size?{nativeBundleAdmissions:[...admissions.values()]}:{}),
       ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}
   }
   if(mode==='SCREEN_OUT')invalid('flow','旧研究定义不支持资格筛除')
@@ -258,6 +267,7 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
         throw e
       }
     }
+    admit(unit)
     if(unit.kind==='SCALE')return scaleResult(unit,raw)
     if(unit.kind==='SJT')return unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
       ?nativeSituationalResult(unit,raw):sjtResult(unit,raw)
@@ -266,6 +276,6 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
   })
   const definitionDigest=verifiedDigest??canonicalHash(JSON.parse(JSON.stringify(snapshot)))
   const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,true)
-  return {schemaVersion:1,definitionDigest,units,
+  return {schemaVersion:1,definitionDigest,units,...(admissions.size?{nativeBundleAdmissions:[...admissions.values()]}:{}),
     ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}
 }

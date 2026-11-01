@@ -3,15 +3,16 @@ import { listScaleInstrumentSources } from '../scale/onboarding/instrument-regis
 import { listCognitiveRegistryEntries } from '../cognitive/cognitive.registry'
 import { deriveCatalogDomainSummary } from '../cognitive/library/catalog'
 import { getCognitiveDomainDefinition } from '../cognitive-analysis/domain.registry'
+import {listSituationPackages} from '../situational/situation-package.registry'
 import {
-  catalogKeywordTerms, catalogTagFacets, matchesCatalogDiscovery, scaleSourceClassificationTags,catalogClassificationTags,
+  catalogKeywordTerms, catalogTagFacets, matchesCatalogDiscovery, scaleSourceClassificationTags,catalogTagsFromIds,catalogTagDictionary,catalogClassificationTags,
   type CatalogClassificationTag, type CatalogDiscoveryFilters,
 } from '../scale/library/catalog-discovery'
 
 /** Management discovery only. These labels never enter an executable snapshot,
  * approval hash, rights decision, scientific qualification or participant result. */
 export type DiscoveryRecord = {
-  kind: 'SCALE' | 'COGNITIVE'; key: string; version: string; engine: string; scoring: string
+  kind: 'SCALE' | 'COGNITIVE' | 'SJT'; key: string; version: string; engine: string; scoring: string
   tags: CatalogClassificationTag[]; ids: string[]; terms: string
 }
 
@@ -42,7 +43,11 @@ export function catalogDiscoveryRecords(): DiscoveryRecord[] {
     return { kind: 'COGNITIVE' as const, key: entry.testType, version: '', engine: entry.engineVersion, scoring: entry.scoringVersion, tags,
       ids: tags.map(tag => tag.id), terms: [entry.testType, ...tags.flatMap(tag => [tag.id, tag.label])].join(' ').toLowerCase() }
   })
-  return [...scales, ...cognitive]
+  const sjt=listSituationPackages().map(pkg=>{
+    const tags=sjtClassificationTags(pkg.definition)
+    return {kind:'SJT' as const,key:pkg.key,version:pkg.instrumentVersion,engine:'',scoring:'',tags,ids:tags.map(t=>t.id),terms:[pkg.key,pkg.definition.source.title??'',...tags.flatMap(t=>[t.id,t.label])].join(' ').toLowerCase()}
+  })
+  return [...scales, ...cognitive,...sjt]
 }
 export type ImportedStandardDiscoveryHeader={key:string;version:string;title:string;catalog:{construct?:Parameters<typeof catalogClassificationTags>[0];population?:NonNullable<Parameters<typeof catalogClassificationTags>[1]>['population']}|null;language:string|null}
 /** The source index already carries this exact frozen C header. Reusing it
@@ -62,30 +67,78 @@ export async function importedStandardDiscoveryRecords(db:Pick<Prisma.Transactio
  return rows.filter(row=>typeof row.key==='string'&&typeof row.version==='string').map(importedStandardDiscoveryRecord)
 }
 
+/** Only explicitly published constructs; never infer an audience from a title. */
+export const sjtClassificationTags=(definition:{scoring:{publishedMetrics:readonly {construct:string}[]}})=>catalogTagsFromIds(definition.scoring.publishedMetrics.map(metric=>'sjt-construct:'+metric.construct))
+
+export const jsonTagIds=(value:Prisma.Sql)=>Prisma.sql`CASE WHEN jsonb_typeof(${value})='array' THEN ${value} ELSE '[]'::jsonb END`
+export const respondentTagIds=(value:Prisma.Sql)=>Prisma.sql`COALESCE((SELECT jsonb_agg('respondent:'||respondent) FROM jsonb_array_elements_text(${jsonTagIds(value)}) respondent),'[]'::jsonb)`
+/** Header-only lookup for this exact candidate, never a preload of imported releases. */
+export const standardDiscoveryMetadataJoin=(key:Prisma.Sql,version:Prisma.Sql,kind:Prisma.Sql=Prisma.sql`'SCALE'`)=>Prisma.sql`LEFT JOIN LATERAL (
+ SELECT snapshot#>'{parts,CONTENT,reference,metadata}' AS metadata,snapshot#>>'{definition,versionAxes,locale}' AS locale FROM survey_standard_releases
+ WHERE ${kind}='SCALE' AND tool_key=${key} AND snapshot->>'instrumentVersion'=${version} AND snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,kind}'='DB_IMPORTED'
+ ORDER BY created_at DESC,id DESC LIMIT 1) imported_discovery_source ON TRUE`
+export function metadataTagIds(metadata:Prisma.Sql,locale:Prisma.Sql=Prisma.sql`NULL`){
+ const population=Prisma.sql`COALESCE(${metadata}#>'{catalog,population}',${metadata}->'applicability')`
+ const language=Prisma.sql`COALESCE(${locale},${metadata}#>>'{executable,contentLocale}',${metadata}#>>'{instruction,language}',${metadata}#>>'{localization,targetLocale}')`
+ return Prisma.sql`${jsonTagIds(Prisma.sql`${metadata}#>'{catalog,construct,constructOverlapTags}'`)}
+  ||CASE WHEN ${metadata}#>>'{catalog,construct,primaryDomain}' IS NULL THEN '[]'::jsonb ELSE jsonb_build_array(${metadata}#>>'{catalog,construct,primaryDomain}') END
+  ||${respondentTagIds(Prisma.sql`${population}->'respondentTypes'`)}
+  ||CASE WHEN ${population}->>'minAge' IS NULL AND ${population}->>'maxAge' IS NULL THEN '[]'::jsonb ELSE jsonb_build_array('age:'||COALESCE(${population}->>'minAge','')||'-'||COALESCE(${population}->>'maxAge','')) END
+  ||CASE WHEN ${population}#>>'{gradeRange,minGrade}' IS NULL OR ${population}#>>'{gradeRange,maxGrade}' IS NULL THEN '[]'::jsonb ELSE jsonb_build_array('grades:'||(${population}#>>'{gradeRange,minGrade}')||'-'||(${population}#>>'{gradeRange,maxGrade}')) END
+  ||CASE WHEN ${language} IS NULL OR ${language}='und' THEN '[]'::jsonb ELSE jsonb_build_array('language:'||${language}) END`
+}
+export const sjtMetadataTagIds=(definition:Prisma.Sql)=>Prisma.sql`COALESCE((SELECT jsonb_agg(DISTINCT 'sjt-construct:'||(metric->>'construct')) FROM jsonb_array_elements(${jsonTagIds(Prisma.sql`${definition}#>'{scoring,publishedMetrics}'`)}) metric WHERE jsonb_typeof(metric->'construct')='string'),'[]'::jsonb)`
+
 export const discoveryFacets = (records: readonly DiscoveryRecord[], family?: string) => catalogTagFacets(records.filter(record => !family || record.kind === family).map(record => record.tags))
 
 /** A small source-owned metadata table, not a second persisted catalog. SQL joins
  * exact declared identities; unregistered/private versions retain empty labels. */
-export function discoveryJoin(records: readonly DiscoveryRecord[], identity: { kind: Prisma.Sql; key: Prisma.Sql; version: Prisma.Sql; engine: Prisma.Sql; scoring: Prisma.Sql }) {
+export function discoveryJoin(records: readonly DiscoveryRecord[], identity: { kind: Prisma.Sql; key: Prisma.Sql; version: Prisma.Sql; engine: Prisma.Sql; scoring: Prisma.Sql;metadata?:Prisma.Sql;locale?:Prisma.Sql },tagIds:Prisma.Sql=Prisma.sql`'[]'::jsonb`) {
+  if(identity.metadata)tagIds=Prisma.sql`${tagIds}||${metadataTagIds(identity.metadata,identity.locale)}`
   return Prisma.sql`LEFT JOIN LATERAL (
-    SELECT d.tags, d.ids, d.terms FROM jsonb_to_recordset(${JSON.stringify(records)}::jsonb)
+    WITH registered AS (SELECT d.tags,d.ids,d.terms FROM jsonb_to_recordset(${JSON.stringify(records)}::jsonb)
       AS d(kind text,key text,version text,engine text,scoring text,tags jsonb,ids jsonb,terms text)
     WHERE d.kind=${identity.kind} AND d.key=${identity.key}
-      AND (d.kind='SCALE' AND d.version=${identity.version}
+      AND (d.kind IN ('SCALE','SJT') AND d.version=${identity.version}
         OR d.kind='COGNITIVE' AND d.engine=${identity.engine} AND d.scoring=${identity.scoring})
-    LIMIT 1
+    LIMIT 1), source_tags AS (
+      SELECT DISTINCT value#>>'{}' AS id FROM jsonb_array_elements(${jsonTagIds(tagIds)}) WHERE jsonb_typeof(value)='string'
+    ), labels AS (SELECT ${JSON.stringify({...catalogTagDictionary(),...Object.fromEntries(records.flatMap(record=>record.tags.map(({id,...tag})=>[id,tag])))})}::jsonb AS dictionary), combined AS (
+      SELECT jsonb_array_elements(tags) AS tag,0 AS priority FROM registered
+      ${identity.metadata?Prisma.sql`UNION ALL SELECT jsonb_build_object('id',${identity.metadata}#>>'{catalog,construct,primaryDomain}',
+       'label',COALESCE(dictionary->(${identity.metadata}#>>'{catalog,construct,primaryDomain}')->>'label',${identity.metadata}#>>'{catalog,construct,primaryDomain}'),'facet','domain'),0 FROM labels
+       WHERE ${identity.metadata}#>>'{catalog,construct,primaryDomain}' IS NOT NULL`:Prisma.empty}
+      UNION ALL SELECT jsonb_build_object('id',id,'label',COALESCE(dictionary->id->>'label',CASE WHEN id LIKE 'sjt-construct:%' THEN substring(id FROM 15)
+       WHEN id<>'age:-' AND id~'^age:([0-9]+([.][0-9]+)?)?-([0-9]+([.][0-9]+)?)?$' THEN CASE WHEN split_part(substring(id FROM 5),'-',1)='' THEN split_part(substring(id FROM 5),'-',2)||'岁及以下' WHEN split_part(substring(id FROM 5),'-',2)='' THEN split_part(substring(id FROM 5),'-',1)||'岁及以上' ELSE replace(substring(id FROM 5),'-','–')||'岁' END
+       WHEN id~'^grades:[0-9]+-[0-9]+$' THEN replace(substring(id FROM 8),'-','–')||'年级'
+       WHEN id LIKE 'language:%' THEN substring(id FROM 10) WHEN id LIKE 'respondent:%' THEN substring(id FROM 12) ELSE id END),
+       'facet',COALESCE(dictionary->id->>'facet',CASE WHEN id LIKE 'sjt-construct:%' THEN 'construct' WHEN id LIKE 'respondent:%' OR id~'^grades:[0-9]+-[0-9]+$' OR id<>'age:-' AND id~'^age:([0-9]+([.][0-9]+)?)?-([0-9]+([.][0-9]+)?)?$' THEN 'population' WHEN split_part(id,':',1) IN ('population','construct','subject','domain','language','orientation','response','use','license') THEN split_part(id,':',1) ELSE 'other' END)),1 FROM source_tags CROSS JOIN labels
+    ), unique_tags AS (SELECT DISTINCT ON(tag->>'id') tag FROM combined ORDER BY tag->>'id',priority)
+    SELECT COALESCE(jsonb_agg(tag),'[]'::jsonb) AS tags,COALESCE(jsonb_agg(tag->>'id'),'[]'::jsonb) AS ids,
+      concat_ws(' ',(SELECT terms FROM registered),string_agg(concat_ws(' ',tag->>'id',tag->>'label'),' ')) AS terms FROM unique_tags
   ) AS discovery ON TRUE`
 }
 
 export const governedDiscoveryIdentity = {
   kind: Prisma.sql`t.family`, key: Prisma.sql`CASE WHEN t.family='SCALE' THEN t.snapshot#>>'{unit,provenance,code}' ELSE t.snapshot#>>'{unit,compiledDefinition,sessionSnapshot,testType}' END`,
-  version: Prisma.sql`t.snapshot#>>'{unit,ref,sourceVersion}'`, engine: Prisma.sql`t.snapshot#>>'{unit,compiledDefinition,sessionSnapshot,engineVersion}'`, scoring: Prisma.sql`t.snapshot#>>'{unit,compiledDefinition,sessionSnapshot,scoringVersion}'`,
+  version: Prisma.sql`COALESCE(t.snapshot#>>'{unit,provenance,standardInstrumentVersion}',t.snapshot#>>'{unit,ref,sourceVersion}')`, engine: Prisma.sql`t.snapshot#>>'{unit,compiledDefinition,sessionSnapshot,engineVersion}'`, scoring: Prisma.sql`t.snapshot#>>'{unit,compiledDefinition,sessionSnapshot,scoringVersion}'`,
 }
 
 export function discoverySqlFilter(text: readonly Prisma.Sql[], filters: CatalogDiscoveryFilters = {}) {
   const tags = filters.tags?.length ? Prisma.sql`COALESCE(discovery.ids,'[]'::jsonb) @> ${JSON.stringify(filters.tags)}::jsonb` : Prisma.sql`TRUE`
   const terms = catalogKeywordTerms(filters.keyword).map(term => Prisma.sql`strpos(lower(concat_ws(' ',${Prisma.join([...text, Prisma.sql`discovery.terms`])})),${term})>0`)
   return Prisma.sql`${tags}${terms.length ? Prisma.sql` AND ${Prisma.join(terms, ' AND ')}` : Prisma.empty}`
+}
+
+/** One metadata statement: the caller supplies its original authorized source
+ * query; facet options precede cursor/search/page, without another catalog read. */
+export function discoveryPageSql(input:{source:Prisma.Sql;filters?:CatalogDiscoveryFilters;text:readonly Prisma.Sql[];order:Prisma.Sql;limit?:number;offset?:number;condition?:Prisma.Sql;tagColumn?:Prisma.Sql}){
+ return Prisma.sql`WITH visible AS NOT MATERIALIZED (${input.source}), page AS (
+  SELECT v.* FROM visible v CROSS JOIN LATERAL (SELECT v.ids,v.terms) discovery
+  WHERE ${discoverySqlFilter(input.text,input.filters)} AND ${input.condition??Prisma.sql`TRUE`}
+  ORDER BY ${input.order} ${input.limit===undefined?Prisma.empty:Prisma.sql`LIMIT ${input.limit}`} OFFSET ${input.offset??0})
+  SELECT COALESCE((SELECT jsonb_agg(to_jsonb(page)-'ids'-'terms') FROM page),'[]'::jsonb) AS list,
+   COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM visible v CROSS JOIN LATERAL jsonb_array_elements(${input.tagColumn??Prisma.sql`v."classificationTags"`}) tag),'[]'::jsonb) AS "facetTags"`
 }
 
 /** Prisma-side equivalent for raw published rows. The AND is applied before

@@ -80,7 +80,7 @@ export async function submitResearchFinal(input:FinalInput){
         AND wave_id=${known.waveId} FOR UPDATE`
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:known.projectId,waveId:known.waveId,
-    },select:{id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,
+    },select:{id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,startedAt:true,
       wave:{select:{id:true,consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true,
         publication:{select:{id:true,definitionDigest:true,compiledSnapshot:true}}}}}})
     if(!attempt||!attempt.wave.publication||attempt.participantId!==known.participantId)
@@ -161,7 +161,7 @@ export async function submitResearchFinal(input:FinalInput){
     let calculated
     try{
       calculated=verified.compute(input.answers,assignment,
-        input.presentation?.shownBlocks,'FINAL',input.itemTimings,cognitiveResults,nativeSituationalResults)
+        input.presentation?.shownBlocks,'FINAL',input.itemTimings,cognitiveResults,nativeSituationalResults,attempt.startedAt)
     }catch(e){
       if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)

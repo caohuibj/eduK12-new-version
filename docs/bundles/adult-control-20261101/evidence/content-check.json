@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "base": "24061f5e349d1f8df34b0ed5dd99a33e3014da8c",
+  "head": "24061f5e349d1f8df34b0ed5dd99a33e3014da8c",
+  "dependencyClosure": "all-bundles",
+  "packages": [
+    {
+      "key": "example_descriptive_v1",
+      "version": "1.0.0",
+      "contentHash": "397e6febab7bb4a1ed7120f17993657639b1fb6076c8966dbeffcdc8697e672d",
+      "fixtures": [
+        "valid",
+        "missing",
+        "invalid",
+        "not-applicable"
+      ],
+      "smoke": "required"
+    },
+    {
+      "key": "integrated_gonogo_adexi_adult_zh_cn_v1",
+      "version": "1.1.0",
+      "contentHash": "2f8650e91c86bdaa0dc2753c74c784f29846e085f99c007bff87bc8615f04d6a",
+      "fixtures": [
+        "valid",
+        "missing",
+        "invalid",
+        "not-applicable"
+      ],
+      "smoke": "required"
+    },
+    {
+      "key": "learning_motivation_math_support",
+      "version": "0.1.1",
+      "contentHash": "34625844b7014e409a423e99ee2f31fdf28f3d41f629d6432a928e9a2214a941",
+      "fixtures": [
+        "valid",
+        "missing",
+        "invalid",
+        "not-applicable"
+      ],
+      "smoke": "required"
+    },
+    {
+      "key": "learning_motivation_math_support",
+      "version": "0.1.2",
+      "contentHash": "e89a182bd7a499bbd1d0a23e1b76d28c0d7719145da2f0c50dceb696c7a14e4c",
+      "fixtures": [
+        "valid",
+        "missing",
+        "invalid",
+        "not-applicable"
+      ],
+      "smoke": "required"
+    },
+    {
+      "key": "teacher_jdr_workplace_zh_cn",
+      "version": "0.1.0",
+      "contentHash": "05f3747aef60bfd3314c45fa89f570c4d1102e061f859687752d582a8db7024b",
+      "fixtures": [
+        "valid",
+        "missing",
+        "invalid",
+        "not-applicable"
+      ],
+      "smoke": "required"
+    }
+  ]
+}

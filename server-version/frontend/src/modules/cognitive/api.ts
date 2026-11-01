@@ -1,3 +1,4 @@
+import type {CatalogClassificationTag} from '../../api/catalogDiscovery'
 import type {StandardConfigurationPointer} from '../../api/standardConfigurationGrants'
 import apiClient, { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from '../assessment-media/types'
@@ -68,6 +69,7 @@ export const cognitiveApi = {
       instruction: string | null
       engineVersion?: string
       scoringVersion?: string
+      classificationTags?:CatalogClassificationTag[]
       accessPolicy?: 'OPEN' | 'GRANT'
       authorizationMode?:'PRECISE';available?:boolean;unavailableReason?:string|null;fixedProfile?:'experience'|'standard'|'research'|null
       configurationName?:string|null;selectedBinding?:StandardConfigurationPointer|null

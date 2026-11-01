@@ -1,7 +1,7 @@
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {Prisma,PrismaClient} from '@prisma/client'
-import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity} from '../../modules/survey/catalog-discovery'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
+import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,sjtMetadataTagIds,respondentTagIds} from '../../modules/survey/catalog-discovery'
 
 const databaseUrl=integrationDatabaseUrl('LIBRARY_DISCOVERY_TEST_DATABASE_URL')
 let db:PrismaClient
@@ -13,6 +13,29 @@ beforeAll(async()=>{
 afterAll(async()=>{await db?.$disconnect()})
 
 describe('actual PostgreSQL metadata filtering before pagination',()=>{
+ it('finds existing free tags and source-owned SJT constructs beyond page one; unclassified Form stays visible',async()=>{
+  await db.$transaction(async tx=>{
+   await tx.$executeRaw`CREATE TEMP TABLE source_tags_fixture(id text,kind text,tags jsonb,definition jsonb) ON COMMIT DROP`
+   await tx.$executeRaw`INSERT INTO source_tags_fixture SELECT lpad(i::text,2,'0'),'FORM',CASE WHEN i=31 THEN '["population:teacher","domain:mental_health"]'::jsonb ELSE '[]'::jsonb END,'{}'::jsonb FROM generate_series(1,32) i`
+   await tx.$executeRaw`INSERT INTO source_tags_fixture VALUES('sjt','SJT','[]'::jsonb,'{"scoring":{"publishedMetrics":[{"construct":"协作决策"},{"construct":"协作决策"}]}}'::jsonb)`
+   await tx.$executeRaw`INSERT INTO source_tags_fixture VALUES('bundle','BUNDLE','["age:18-"]'::jsonb,'{"respondentTypes":["SELF"],"components":[{"scoring":{"publishedMetrics":[{"construct":"子构念"}]}}]}'::jsonb)`
+   const select=(filters:{keyword?:string;tags?:string[]},page=1)=>tx.$queryRaw<Array<{id:string;tags:Array<{id:string;label:string;facet:string}>}>>(Prisma.sql`
+    SELECT source.id,discovery.tags FROM source_tags_fixture source
+    ${discoveryJoin([],{kind:Prisma.sql`source.kind`,key:Prisma.sql`source.id`,version:Prisma.sql`NULL`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`source.tags||${sjtMetadataTagIds(Prisma.sql`source.definition`)}||${respondentTagIds(Prisma.sql`source.definition->'respondentTypes'`)}`)}
+    WHERE ${discoverySqlFilter([Prisma.sql`source.id`],filters)} ORDER BY source.id LIMIT 25 OFFSET ${(page-1)*25}`)
+   expect((await select({tags:['population:teacher','domain:mental_health']})).map(row=>row.id)).toEqual(['31'])
+   const sjt=await select({keyword:'协作决策'})
+   expect(sjt).toEqual([{id:'sjt',tags:[{id:'sjt-construct:协作决策',label:'协作决策',facet:'construct'}]}])
+   expect((await select({tags:['not-declared']}))).toEqual([])
+   expect((await select({keyword:'本人自评'}))).toEqual([{id:'bundle',tags:[{id:'age:18-',label:'18岁及以上',facet:'population'},{id:'respondent:SELF',label:'本人自评',facet:'population'}]}])
+   expect((await select({keyword:'18岁及以上'})).map(row=>row.id)).toEqual(['bundle'])
+   expect((await select({keyword:'子构念'}))).toEqual([])
+   const first=await select({}),second=await select({},2)
+   expect(first).toHaveLength(25);expect(second).toHaveLength(9)
+   expect(new Set([...first,...second].map(row=>row.id)).size).toBe(34)
+   expect(first[0].tags).toEqual([])
+  })
+ })
  it('finds cognitive row 31 by Chinese domain, ANDs facets and never labels an unknown engine',async()=>{
   await db.$transaction(async tx=>{
    await tx.$executeRaw`CREATE TEMP TABLE discovery_fixture(id text,title text,tool_key text,snapshot_hash text,family text,state text,snapshot jsonb) ON COMMIT DROP`

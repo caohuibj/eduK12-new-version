@@ -2857,7 +2857,7 @@ const createAttempt = async (
 
     if (userId && !await db.courseStudent.findFirst({ where: {
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
-    } })) throw compositeForbidden('不是问卷投放课程的有效学生')
+    } }) && !await (await import('../bundle-product/child-observer-admission')).isAssignedChildBundleObserver(db, composite, relationalIdentity, userId)) throw compositeForbidden('不是问卷投放课程的有效学生或本轮已同意的成人观察者')
   }
   if(composite.personalTracking&&!composite.personalTrackingInheritedUnits)composite=await inheritTrainingTrackingSources(db as Prisma.TransactionClient,composite)
   const nativeBundleInstance = composite.productKind === 'ASSESSMENT_BUNDLE'

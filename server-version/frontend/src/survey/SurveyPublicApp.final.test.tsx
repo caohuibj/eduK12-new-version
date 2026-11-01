@@ -6,6 +6,7 @@ import * as formVisibility from './form-visibility'
 import * as scaleTiming from './survey-scale-timing'
 import * as cognitiveLocal from './survey-cognitive-local'
 import * as localDraft from './local-answer-draft'
+import {derivedViewFixture} from '../modules/reporting/BundleDerivedReport.fixture'
 
 vi.mock('./SurveySituationalUnit',()=>({SurveySituationalUnit:({onCommitted}:{onCommitted:(receipt:unknown)=>void})=>
   <button type="button" onClick={()=>onCommitted({protocol:'SITUATIONAL_NATIVE_V1',attemptId:'44444444-4444-4444-8444-444444444444',submissionId:'55555555-5555-4555-8555-555555555555',payloadHash:'c'.repeat(64)})}>核实原生情境化保存回执</button>}))
@@ -747,6 +748,17 @@ describe('first committed descriptive feedback receipt',()=>{
   await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
   await screen.findByText('感谢参与');expect(generalCalls()).toHaveLength(1);expect(screen.queryByText(/not-a-number/)).toBeNull()
  })
+})
+
+it('shows saved derived Bundle numerical feedback without recomputing maxima and reauthorizes after reopening',async()=>{
+ const native={importId:'native',title:'成人探索整包',status:'READY',factsHash:'f'.repeat(64),profileView:null,derivedView:derivedViewFixture()}
+ const receipt={...firstSuccess().generalReceipt,kind:'DESCRIPTIVE',pending:false,measurements:[{feedbackKind:'RAW_METRICS',instrumentKey:'scale',title:'原单项报告',measurementReleaseId:'release',quality:'interpretable',metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}]}],nativeBundles:[native]}
+ taskOverrides={reportMode:'DESCRIPTIVE'};finalReply=()=>response(firstSuccess({participantFeedbackReceipt:receipt}))
+ const view=await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+ expect(await screen.findByRole('img',{name:'认知需求，范围 10 到 50，本次结果 38'})).toBeInTheDocument();expect(generalCalls()).toHaveLength(0)
+ expect(screen.getByText(/本次最高方向：组织与安排、艺术与创作/)).toBeInTheDocument()
+ view.unmount();taskValue={...taskValue,status:'COMPLETED'};generalReply=()=>response(null,403,'研究身份已失效')
+ render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}));await screen.findByText('研究身份已失效');expect(screen.queryByRole('img',{name:/认知需求/})).toBeNull()
 })
 
 it('shows saved native Bundle feedback alongside single reports and reauthorizes it after reopening',async()=>{

@@ -1,4 +1,4 @@
-import { runDeclarativeEvidence, runProfileEvidence } from './onboarding/engine'
+import { runDeclarativeEvidence, runProfileEvidence,runDerivedEvidence } from './onboarding/engine'
 import {
   BundleAnalysisEngineRegistry,
   createBundleAnalysisEngineRegistry,
@@ -53,6 +53,7 @@ export const registerProductBundleEngines = (
   )
   registry.register('declarative-evidence-v1', '1.0.0', runDeclarativeEvidence)
   registry.register('declarative-evidence-v1', '1.1.0', runProfileEvidence)
+  registry.register('declarative-evidence-v1', '1.2.0', runDerivedEvidence)
   return registry
 }
 
