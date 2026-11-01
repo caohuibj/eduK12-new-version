@@ -1,0 +1,123 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "child_cognitive_tasks_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "cognitive",
+    "name": "儿童认知控制 任务组件草稿",
+    "description": "复用Go/No-Go与Flanker，分别描述动作克制和干扰控制；儿童本人作答。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "youth",
+      "subjectMinAgeYears": 6,
+      "subjectMaxAgeYears": 12
+    },
+    "slots": [
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "child_cognitive_age_context",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF"
+      },
+      {
+        "slotKey": "gonogo",
+        "unitType": "COGNITIVE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "gonogo",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "commissionRate",
+          "commissionErrors",
+          "nogoTrialCount",
+          "omissionRate",
+          "goTrialCount",
+          "dPrime"
+        ]
+      },
+      {
+        "slotKey": "flanker",
+        "unitType": "COGNITIVE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "flanker",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "flankerEffectMs",
+          "congruentAccuracy",
+          "incongruentAccuracy",
+          "medianRtCongruent",
+          "medianRtIncongruent"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "child_cognitive_age_context",
+    "contextDefinitionVersion": "1.0.0",
+    "reportDefinitionKey": "child_cognitive_tasks_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": false,
+      "instrumentKeys": []
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "这是儿童跨方法家族的任务组件草稿，尚未与CHEXI观察尝试接线，不是完整联合报告。",
+      "6至12岁仅为本项目拟优先试测的年龄范围；6至8岁、9至12岁分别需要理解、练习、疲劳和设备适配证据。4至5岁仅准备CHEXI观察表，当前任务参数尚未验证。",
+      "标准任务复用既有Go/No-Go120试次与箭头Flanker80试次，不冒充已标准化的儿童常模测验。",
+      "任务由儿童本人完成，CHEXI由家长或教师单独完成；不在同一个单人尝试中要求成人替孩子跑任务。",
+      "保留各任务指标、真实量尺、条件分母和质量信息；无跨任务总分、IQ、诊断或未验证能力等级。",
+      "CPT-X可作为后续持续注意扩展，不在当前核心包里重复堆叠；SDQ仅有明确独立目的时附加。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": [
+    {
+      "slotKey": "gonogo",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    },
+    {
+      "slotKey": "flanker",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    }
+  ]
+}

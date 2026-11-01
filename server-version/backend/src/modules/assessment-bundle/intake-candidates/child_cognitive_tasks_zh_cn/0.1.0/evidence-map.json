@@ -1,0 +1,134 @@
+[
+  {
+    "evidenceKey": "gonogo_commission_rate",
+    "slotKey": "gonogo",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_commission_errors",
+    "slotKey": "gonogo",
+    "selector": "commissionErrors",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_nogo_trial_count",
+    "slotKey": "gonogo",
+    "selector": "nogoTrialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_omission_rate",
+    "slotKey": "gonogo",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_go_trial_count",
+    "slotKey": "gonogo",
+    "selector": "goTrialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_d_prime",
+    "slotKey": "gonogo",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "response_inhibition",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_flanker_effect_ms",
+    "slotKey": "flanker",
+    "selector": "flankerEffectMs",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_congruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "congruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_incongruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "incongruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_median_rt_congruent",
+    "slotKey": "flanker",
+    "selector": "medianRtCongruent",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_median_rt_incongruent",
+    "slotKey": "flanker",
+    "selector": "medianRtIncongruent",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "interference_control",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "context_subject_age_years",
+    "slotKey": "context",
+    "selector": "subject_age_years",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "age_context",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "values": {
+    "context_subject_age_years": {
+      "state": "present",
+      "value": 9
+    }
+  },
+  "expectedRuleIds": [
+    "observation_not_linked"
+  ],
+  "expectedKind": "COMPUTED"
+}

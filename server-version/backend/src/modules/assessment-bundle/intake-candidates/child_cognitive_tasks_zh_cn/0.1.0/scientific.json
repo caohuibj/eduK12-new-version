@@ -1,0 +1,22 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "现有项目任务的描述性组件；目标年龄、设备和跨报告者连接尚待核验。不得将CHEXI年龄范围或其他任务研究外推为本实现效度。",
+  "references": [
+    {
+      "id": "chexi_original",
+      "citation": "Thorell LB, Nyberg L. (2008). The Childhood Executive Functioning Inventory (CHEXI): A new rating instrument for parents and teachers. Developmental Neuropsychology, 33(4), 536–552. https://doi.org/10.1080/87565640802101516",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "chexi_cross_cultural",
+      "citation": "Thorell LB, Veleiro A, Siu AFY, Mohammadi H. (2013). Examining the relation between ratings of executive functioning and academic achievement: Findings from a cross-cultural study. Child Neuropsychology, 19(6), 630–638. https://doi.org/10.1080/09297049.2012.727792",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition"
+      ]
+    }
+  ]
+}
