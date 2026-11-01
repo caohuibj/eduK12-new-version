@@ -17,6 +17,11 @@
       "contextKey": "child_lives_with_parent",
       "required": true,
       "valueType": "boolean"
+    },
+    {
+      "contextKey": "birth_year_month",
+      "required": true,
+      "valueType": "string"
     }
   ]
 }

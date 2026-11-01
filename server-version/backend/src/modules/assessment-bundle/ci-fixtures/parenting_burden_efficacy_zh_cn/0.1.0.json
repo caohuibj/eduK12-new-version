@@ -4,7 +4,8 @@
   "context": {
     "subject_age_years": 35,
     "parent_caregiver_confirmed": true,
-    "child_lives_with_parent": true
+    "child_lives_with_parent": true,
+    "birth_year_month": "1991-11"
   },
   "slots": {
     "pba": {

@@ -48,3 +48,10 @@ The selected package's new expected-derived fields and references pass the exist
 The shared generated index addition from the earlier draft is removed from this PR. The integration owner must run the existing generator on the combined tree after shared core integration; no parallel shared-index rewrite is committed here.
 
 Candidate scope is this package's JSON, its response-only smoke fixture, and passive engineering evidence. It remains eligible for content-light when the shared parser/runtime dependency is present. Main does not yet parse schema3, so this dependency update is pushed with `[skip ci]`; no manual workflow is dispatched and no current-main success is claimed. Prior CI run 41281071115 passed only historical head 59674da3d774beea297d09588347ab960b68892a. The PR stays Draft pending core integration and actual report-exit closure. This adds no review qualification, hash mechanism or deployment gate.
+
+
+## 合并准备：冻结出生年月准入
+
+未登记的源码DRAFT0.1.0新增必填 `birth_year_month` string字段，两项Scale均沿正式`admissionContext`绑定既有出生年月冻结链；家长/照顾者与子女同住确认仍引用原必填boolean及true值，和原适用规则一致。现有手填年龄只保留为原报告规则的额外限制，不替代出生年月年龄。C/P/R、原计分、阈值、报告文案与权限未改，不更新任何数据库冻结对象或宣布发布。
+
+Node24.21、共享runtime981a88a7的真实声明解析、4类Bundle规则fixtures、既有依赖检查和START映射检查通过。内存准入覆盖两个叶：冻结2008-11在2026-11恰18岁接受；2010-01或缺出生年月均拒绝，即使手填年龄35；不同住拒绝。未重跑叶量表goldens、数据库、全平台或生产。源码包hash：`cc10a86409b54f80b6cb99d3ef2183ed05133ef045a356ee858fde7dac82585b`。共享索引仍由六包源码并集统一生成，当前单包提交不覆盖它。

@@ -41,7 +41,28 @@
           "contrast_previous_self",
           "fed_up",
           "emotional_distancing"
-        ]
+        ],
+        "admissionContext": {
+          "assessmentContext": "ADULT_PARENTING_SELF_REPORT",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            },
+            {
+              "contextKey": "parent_caregiver_confirmed",
+              "allowedValues": [
+                true
+              ]
+            },
+            {
+              "contextKey": "child_lives_with_parent",
+              "allowedValues": [
+                true
+              ]
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
       },
       {
         "slotKey": "bpses",
@@ -53,7 +74,28 @@
         "respondentType": "SELF",
         "valueSelectors": [
           "total"
-        ]
+        ],
+        "admissionContext": {
+          "assessmentContext": "ADULT_PARENTING_SELF_REPORT",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            },
+            {
+              "contextKey": "parent_caregiver_confirmed",
+              "allowedValues": [
+                true
+              ]
+            },
+            {
+              "contextKey": "child_lives_with_parent",
+              "allowedValues": [
+                true
+              ]
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
       }
     ],
     "engine": {
