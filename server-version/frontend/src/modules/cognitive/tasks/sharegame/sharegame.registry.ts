@@ -28,6 +28,15 @@ export const sharegameRegistryEntry: CognitiveFrontendRegistryEntry = {
 
 export const sharegameRegistryEntryV2:CognitiveFrontendRegistryEntry={
   ...sharegameRegistryEntry,engineVersion:'2.0.0',scoringVersion:'2.0.0',
+  readiness: {
+    category: 'decision',
+    inputs: ['pointer', 'touch'],
+    orientation: 'any',
+    globalKeyboardCapture: false,
+    resumeDisposition: 'restart-required',
+    resumeReason: '练习、当前轮次阶段与题内决策计时状态未独立持久化。',
+    frozenMediaSlots: ['instruction', 'example', 'stimulus'],
+  },
   metricDefinitions:[...sharegameRegistryEntry.metricDefinitions,
     {key:'plannedRounds',label:'计划轮数',displayType:'number'},
     {key:'answeredRounds',label:'有效选择轮数',displayType:'number'},

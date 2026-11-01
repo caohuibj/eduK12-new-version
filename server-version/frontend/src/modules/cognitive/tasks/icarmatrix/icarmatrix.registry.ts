@@ -52,6 +52,15 @@ const IcarmatrixV21Task = deferredCognitiveRunner(() => import('./IcarmatrixV21T
 export const icarmatrixV21RegistryEntry: CognitiveFrontendRegistryEntry = {
   ...icarmatrixV2RegistryEntry,
   testType: 'icarmatrix', engineVersion: '2.1.0', scoringVersion: '1.1.0',
+  readiness: {
+    category: 'fixed-trial',
+    inputs: ['keyboard', 'pointer', 'touch'],
+    orientation: 'any',
+    globalKeyboardCapture: false,
+    resumeDisposition: 'restart-required',
+    resumeReason: '练习、当前图形呈现与题内响应计时状态未独立持久化。',
+    frozenMediaSlots: ['instruction', 'example', 'stimulus'],
+  },
   name: '项目矩阵推理试测版（七题范围）',
   RunnerComponent: IcarmatrixV21Task, prepareRunner: IcarmatrixV21Task.prepare,
   metricDefinitions: [

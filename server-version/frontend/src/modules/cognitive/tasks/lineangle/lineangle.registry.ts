@@ -28,5 +28,14 @@ export const lineangleRegistryEntry: CognitiveFrontendRegistryEntry = {
 
 export const lineangleRegistryEntryV2: CognitiveFrontendRegistryEntry = {
   ...lineangleRegistryEntry, engineVersion: '2.0.0', scoringVersion: '2.0.0',
+  readiness: {
+    category: 'visuospatial',
+    inputs: ['keyboard', 'pointer', 'touch'],
+    orientation: 'any',
+    globalKeyboardCapture: true,
+    resumeDisposition: 'restart-required',
+    resumeReason: '练习、当前刺激与题内响应计时状态未独立持久化。',
+    frozenMediaSlots: ['instruction', 'example', 'stimulus'],
+  },
   reportDefinition: { ...lineangleRegistryEntry.reportDefinition, showProductIndex: false, indexLabel: '本次匹配正确率', disclaimer: '仅描述本次无向线段匹配，不是能力指数、诊断或经过验证的同龄人常模。' },
 }
