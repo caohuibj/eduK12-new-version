@@ -1,0 +1,27 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "18+一般成人SELF。经当前sourceParts实际回读：EBQ16@1.0.2(C=1.0.2:1.0.0/P=none-v1/基础R=1.1.0/zh-CN localization1.0.1)，ERSS19@1.0.0(C=1.0.0:1.0.0/P=none-v1/基础R=1.1.0/zh-CN localization1.0.0)；两源referencePolicy.type=none且references为空，无常模阈值，P是现成已配置的none-v1参数版本，非空版本或NULL。report-variants既有previous/fun只核对不修改、不混用。。精确源码基线74423a1c4b40f65c084797434aaa86271594e687。只复用来源结果，不复制第三方题本、不改叶工具。c=(C−8)/48与r=(R−1)/6仅固定方法说明；V1规则用等价原分阈值，无数值坐标派生字段或Profile V2匹配分。原始工具证据与本包理论设计分开；文档日期不是专家审批日期。具体适用/语言/版权和发布沿现成审核，源码PUBLISHED不表示生产安装。来源整体invalid时本V1不放宽到逐分数quality；该表达缺口不改运行时。没有新科学/权限门禁。 当前交付仅为待接线内容候选：规则层已有输出，不代表受众报告已显示。V1最终报告在叶scoreDerivedLabels=false时可能清空规则叙事，Survey原生入口目前要求V2；数值坐标、连续Profile对象和最终独立结果保留尚待共享补丁。",
+  "references": [
+    {
+      "id": "ebq_original",
+      "citation": "Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15, e0231395. https://doi.org/10.1371/journal.pone.0231395 . 原叶source明确CC BY 4.0及独立中文工作译稿，译审/本地验证待办沿用；只支持工具来源与原计分，不验证本Bundle阈值。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "erss_original",
+      "citation": "Torrence, B. S., & Connelly, S. (2019). Emotion Regulation Tendencies and Leadership Performance: An Examination of Cognitive and Behavioral Regulation Strategies. Frontiers in Psychology, 10, 1486. https://doi.org/10.3389/fpsyg.2019.01486 . 原叶source保留CC BY 4.0、ERQ源流及独立中文工作译稿边界；不据领导研究标题推断教师胜任力。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "b08_design",
+      "citation": "本项目原创B08组合设计。四角尾区与行动建议属于EXPERIMENTAL理论叙事提案，原工具研究不验证本组合阈值；无专家审批、经验类别、常模或疗效验证声明。",
+      "allowedClaims": [
+        "cross_source_condition"
+      ]
+    }
+  ]
+}

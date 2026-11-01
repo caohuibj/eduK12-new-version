@@ -1,0 +1,60 @@
+{
+  "values": {
+    "adult": {
+      "state": "present",
+      "value": true
+    },
+    "beliefs.neg_controllability": {
+      "state": "present",
+      "value": 22
+    },
+    "beliefs.pos_controllability": {
+      "state": "present",
+      "value": 22
+    },
+    "beliefs.neg_usefulness": {
+      "state": "present",
+      "value": 16
+    },
+    "beliefs.pos_usefulness": {
+      "state": "present",
+      "value": 16
+    },
+    "beliefs.general_controllability": {
+      "state": "missing"
+    },
+    "beliefs.general_usefulness": {
+      "state": "present",
+      "value": 32
+    },
+    "strategies.situation_modification": {
+      "state": "present",
+      "value": 4
+    },
+    "strategies.attentional_deployment": {
+      "state": "present",
+      "value": 4
+    },
+    "strategies.cognitive_reappraisal": {
+      "state": "present",
+      "value": 5.571428571428571
+    },
+    "strategies.suppression": {
+      "state": "present",
+      "value": 4
+    }
+  },
+  "expectedRuleIds": [
+    "belief_neg_controllability",
+    "belief_pos_controllability",
+    "belief_neg_usefulness",
+    "belief_pos_usefulness",
+    "belief_general_usefulness",
+    "strategy_situation_modification",
+    "strategy_attentional_deployment",
+    "strategy_cognitive_reappraisal",
+    "strategy_suppression",
+    "missing_axes"
+  ],
+  "expectedKind": "COMPUTED"
+}
