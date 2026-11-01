@@ -15,4 +15,31 @@ export const seeds: CognitiveSeed[] = [
     scoringVersion: '1.0.0',
     config: { offers: [50, 20, 80, 10, 40, 30, 60, 20], potTotal: 100, fixationMs: 400, timeoutMs: 20000, report: NO_REFERENCE_REPORT },
   },
+{
+  "testType": "trustgame",
+  "configVersion": "1.0.1-report3",
+  "name": "模拟分配：接受还是拒绝 / report 3.0.0",
+  "status": "DRAFT",
+  "engineVersion": "1.0.1",
+  "scoringVersion": "1.0.0",
+  "config": {
+    "offers": [
+      50,
+      20,
+      80,
+      10,
+      40,
+      30,
+      60,
+      20
+    ],
+    "potTotal": 100,
+    "fixationMs": 400,
+    "timeoutMs": 20000,
+    "report": {
+      "reportVersion": "3.0.0",
+      "referenceMode": "none"
+    }
+  }
+}
 ]

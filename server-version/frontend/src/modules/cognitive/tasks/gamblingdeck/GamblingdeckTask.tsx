@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -76,7 +77,7 @@ export const GamblingdeckTask: React.FC<CognitiveTaskProps> = ({ taskContext, tr
     setSubPhase('feedback')
   }, [subPhase])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="宝箱决策学习" description={<p>四个宝箱藏着不同的输赢规律。每轮选一个箱子打开，马上看到这一局的输赢。规则不会提前告诉你——边开边琢磨，争取最后赚到更多。</p>} hint={<><p>点击箱子作答；练习不计入成绩。</p></>} onAction={() => { setSubPhase('choice'); setPhase('practice') }} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "宝箱决策学习"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>四个宝箱藏着不同的输赢规律。每轮选一个箱子打开，马上看到这一局的输赢。规则不会提前告诉你——边开边琢磨，争取最后赚到更多。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>点击箱子作答；练习不计入成绩。</p></>} onAction={() => { setSubPhase('choice'); setPhase('practice') }} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   const DeckGrid: React.FC<{ onPick: (deck: 'A' | 'B' | 'C' | 'D') => void; disabled: boolean }> = ({ onPick, disabled }) => (

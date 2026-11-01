@@ -33,5 +33,24 @@ export const seeds: CognitiveSeed[] = [
     engineVersion: '1.0.0',
     scoringVersion: '1.1.0',
     config: { balloonCount: 30, maxPumps: 12, trialTimeoutMs: 15000, pumpAnimationMs: 200, stimulusSetVersion: 'bart-generated-v1.0.0', report: NO_REFERENCE_REPORT },
+  },
+{
+  "testType": "bart",
+  "configVersion": "1.1.0-report3",
+  "name": "气球：继续还是收取 / report 3.0.0",
+  "status": "DRAFT",
+  "engineVersion": "1.0.0",
+  "scoringVersion": "1.1.0",
+  "config": {
+    "balloonCount": 30,
+    "maxPumps": 12,
+    "trialTimeoutMs": 15000,
+    "pumpAnimationMs": 200,
+    "stimulusSetVersion": "bart-generated-v1.0.0",
+    "report": {
+      "reportVersion": "3.0.0",
+      "referenceMode": "none"
+    }
   }
+}
 ]

@@ -15,4 +15,21 @@ export const seeds: CognitiveSeed[] = [
     scoringVersion: '1.0.0',
     config: { totalTrials: 4, trackMs: 20000, revolutionMs: 4000, report: NO_REFERENCE_REPORT },
   },
+{
+  "testType": "pursuitrotor",
+  "configVersion": "1.0.1-report3",
+  "name": "跟着小圆点移动 / report 3.0.0",
+  "status": "DRAFT",
+  "engineVersion": "1.0.1",
+  "scoringVersion": "1.0.0",
+  "config": {
+    "totalTrials": 4,
+    "trackMs": 20000,
+    "revolutionMs": 4000,
+    "report": {
+      "reportVersion": "3.0.0",
+      "referenceMode": "none"
+    }
+  }
+}
 ]
