@@ -45,10 +45,10 @@ export function SurveyLanding({ signedIn = false }: { signedIn?: boolean }) {
     <main className="survey-landing-main" id="survey-intro" tabIndex={-1}>
       <section className="survey-public-hero" aria-labelledby="survey-public-title">
         <div className="survey-landing-copy">
-          <p className="survey-public-eyebrow"><span/>让研究有序发生</p>
+          <p className="survey-public-eyebrow"><span/>心理与教育测量研究平台</p>
           <h1 id="survey-public-title"><span>风过有迹，</span><span>细微可察。</span></h1>
           <p className="survey-public-lead"><span>从问题出发，</span><span>在数据中寻找理解的线索。</span></p>
-          <p className="survey-landing-summary">从独立工具编制、多波次采集，到私有报告与受控导出，连接研究的每一个阶段。</p>
+          <p className="survey-landing-summary">独立编制工具，有序安排采集。让每份回答、每次反馈，都能回到它的研究来源。</p>
           <div className="survey-public-hero-actions">
             <a className="survey-enter" href={signedIn ? '/workspace' : '/login'}>
               {signedIn ? '进入研究工作台' : '研究者登录'}<ArrowRight size={18} aria-hidden="true"/>
@@ -57,12 +57,13 @@ export function SurveyLanding({ signedIn = false }: { signedIn?: boolean }) {
           </div>
           <p className="survey-public-access"><Check size={14} aria-hidden="true"/>研究者邀请开通 · 双因素验证登录</p>
         </div>
+        <div className="survey-hero-caption" aria-hidden="true"><span>RESEARCH / FIELD NOTES</span><p>从细微处观察<br/>在联结中理解</p><i/></div>
       </section>
 
       <section className="survey-public-features" id="survey-features" aria-labelledby="survey-features-title" tabIndex={-1}>
         <div className="survey-public-section-heading">
-          <div><p className="survey-public-eyebrow">围绕研究的四个环节</p><h2 id="survey-features-title">从一个问题，到完整的研究过程。</h2></div>
-          <p>工具、参与和数据，在同一个研究语境里衔接。</p>
+          <div><p className="survey-public-eyebrow">围绕研究的四个环节</p><h2 id="survey-features-title">研究的每个环节，都有清晰的入口。</h2></div>
+          <p>从这里了解各模块的用途、操作流程和实际产出。</p>
         </div>
         <div className="survey-feature-strip">
           {surveyFeatures.map(({ path, title, description, tags, icon: Icon }, index) =>

@@ -4,6 +4,9 @@ import { ClipboardList, FolderOpen, ScanLine, ChartNoAxesCombined } from 'lucide
 export const surveyFeatures = [
   {
     key: 'projects', path: '/features/research-projects', title: '研究项目', icon: FolderOpen,
+    audience: '研究者设计单次采集或需要关联多次观察的研究；参与者从该研究的邀请链接进入，不使用研究工作台。',
+    outputs: ["研究项目说明、知情同意和波次安排。", "固定所选工具修订的发布记录与波次参与入口。"],
+    entryHint: '邀请开通研究者账号后，进入研究工作台建立或选择项目，再在项目内安排波次。',
     description: '以项目组织研究，以波次连接每一次观察。',
     tags: ['独立匿名 / 多波次', '固定发布版本'],
     introduction: '让研究问题、采集安排与回答数据，在同一条清晰的研究路径上衔接。',
@@ -27,6 +30,9 @@ export const surveyFeatures = [
   },
   {
     key: 'tools', path: '/features/research-tools', title: '研究工具', icon: ClipboardList,
+    audience: '需要独立编制工具、管理素材或复用授权内容的研究者；工具先在自己的工具集中准备，再由项目选用。',
+    outputs: ["表单、量表或普通组合问卷的修订与完成编制状态。", "素材引用与版本记录；自建量表申请共享时的固定版本审核材料。"],
+    entryHint: '登录研究工作台，从独立工具集选择表单、量表或普通组合问卷；选入研究需完成编制并符合授权范围。',
     description: '独立编制表单、量表与组合问卷，再选入研究。',
     tags: ['授权使用 / 自主编制', '素材与版本管理'],
     introduction: '把工具认真做好，再带入不同的研究。',
@@ -50,6 +56,9 @@ export const surveyFeatures = [
   },
   {
     key: 'participation', path: '/features/research-participation', title: '发布与参与', icon: ScanLine,
+    audience: '准备招募与采集的研究者，以及收到具体研究邀请的参与者；介绍页不提供通用作答入口。',
+    outputs: ["按波次固定的研究内容与独立参与链接。", "暂存、工具完成、整轮正式提交的状态记录，以及研究已配置并开放的反馈。"],
+    entryHint: '研究者进入项目内的发布与采集。参与者请使用组织者提供的具体研究邀请链接。',
     description: '清楚说明研究，让参与者知情、自愿地作答。',
     tags: ['独立参与链接', '知情同意与提交确认'],
     introduction: '从了解研究开始，让每一步参与都有清楚的指引。',
@@ -73,6 +82,9 @@ export const surveyFeatures = [
   },
   {
     key: 'data', path: '/features/research-data', title: '数据与分析', icon: ChartNoAxesCombined,
+    audience: '需要检查采集范围、复核样本、查看统计和导出数据的项目授权研究者；参与者不会进入研究数据管理页。',
+    outputs: ["完成与分析纳入状态、带原因的质量复核历史。", "回答 CSV、变量编码字典和 Manifest 批次来源清单。"],
+    entryHint: '登录研究工作台，选择对应项目与波次，再进入数据与分析；敏感导出按现有流程再次验证身份。',
     description: '查看采集进度，保留质量复核与数据来源。',
     tags: ['描述统计与复核', 'CSV / 编码字典 / Manifest'],
     introduction: '不只看见结果，也能回到结果的来处。',

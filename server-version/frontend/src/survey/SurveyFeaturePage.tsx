@@ -51,11 +51,12 @@ export function SurveyFeaturePage({ feature, signedIn }: { feature: SurveyFeatur
           <p className="survey-public-eyebrow"><Icon size={17} strokeWidth={1.5} aria-hidden="true"/>{feature.title}</p>
           <h1>{feature.introduction}</h1>
           <p className="survey-feature-intro">{feature.overview}</p>
+          <p className="survey-feature-audience"><strong>适用角色与场景</strong>{feature.audience}</p>
           <ul className="survey-public-tags">{feature.tags.map(tag => <li key={tag}><Check size={14} aria-hidden="true"/>{tag}</li>)}</ul>
         </div>
         <FeatureIllustration feature={feature}/>
       </header>
-      <nav className="survey-feature-contents" aria-label="本页内容"><a href="#feature-capabilities">可以做什么</a><a href="#feature-workflow">如何使用</a><a href="#feature-questions">常见问题</a></nav>
+      <nav className="survey-feature-contents" aria-label="本页内容"><a href="#feature-capabilities">可以做什么</a><a href="#feature-workflow">如何使用</a><a href="#feature-results">产出与边界</a><a href="#feature-questions">常见问题</a></nav>
       <section className="survey-feature-capabilities" id="feature-capabilities" aria-labelledby="feature-capabilities-title">
         <div className="survey-public-section-heading"><div><p className="survey-public-eyebrow">功能与使用场景</p><h2 id="feature-capabilities-title">可以做什么</h2></div></div>
         <div>{feature.capabilities.map((item, index) => <article key={item.title}><span>0{index + 1}</span><h3>{item.title}</h3><p>{item.body}</p></article>)}</div>
@@ -63,6 +64,11 @@ export function SurveyFeaturePage({ feature, signedIn }: { feature: SurveyFeatur
       <section className="survey-feature-workflow" id="feature-workflow" aria-labelledby="feature-workflow-title">
         <div className="survey-public-section-heading"><div><p className="survey-public-eyebrow">从这里开始</p><h2 id="feature-workflow-title">如何使用</h2></div></div>
         <ol>{feature.steps.map((step, index) => <li key={step.title}><span>{index + 1}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>
+      </section>
+      <section className="survey-feature-results" id="feature-results" aria-labelledby="feature-results-title">
+        <p className="survey-public-eyebrow">完成之后</p><h2 id="feature-results-title">留下什么，如何使用</h2>
+        <ul>{feature.outputs.map(text => <li key={text}><Check size={17} aria-hidden="true"/><span>{text}</span></li>)}</ul>
+        <p>{feature.entryHint}</p>
       </section>
       <section className="survey-public-faq" id="feature-questions" aria-labelledby="feature-questions-title">
         <div className="survey-public-section-heading"><div><p className="survey-public-eyebrow">进一步了解</p><h2 id="feature-questions-title">常见问题</h2></div></div>
