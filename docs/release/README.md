@@ -2091,3 +2091,11 @@ JavaScript/TypeScript controls since it; no changed controls means authenticated
 whole selected-extraction reuse. Failed frontend job124044901601 remains failed.
 Its redirected logs returned403; job metadata and check annotations provide the
 independent diagnostic evidence, with no alternative log download.
+
+## 普通公开页面与内容入库的轻量 CI
+
+普通公开介绍页复用 `homepage-copy` 执行器：完整差异按公开组件和内容边界分类，保留既有登录/角色/业务计算；仅增加公开介绍路由的分流可以用静态导航验收。认证、API、共享状态、提交、权限、锁定、施测、评分、依赖或构建配置变化不借公开文件名降级。不按 PR 编号或提交哈希注册例外。
+
+该路线只构建前端一次，运行相关 lint/types/已有受影响测试、实际前端镜像 HIGH/CRITICAL 扫描，以及受影响公开页的桌面/窄屏导航、刷新、资源和错误检查。可执行 TS/TSX 保留前端范围 SAST，纯 CSS/文案不追加后端 SAST；依赖与锁文件不能进入此路线，未变化的依赖不重复执行 npm audit（依赖更新仍走既有依赖检查）。没有后端编译、迁移、seed、三组业务 browser 或恢复演练；所选检查缺失、跳过或失败仍不能通过汇总门。
+
+声明内容复用已有 Scale/Cognitive 定向入库检查；其他纯内容执行 schema、来源引用、真实计分 fixtures 和报告/模板兼容检查。Bundle 按实际变更及反向引用选择目录，复用已有 `check <directory>` 验证器；生成目录变化时保留 `manifest-check`。未发布 DRAFT 的真实依赖缺口仍如实报告，不把无关私有 DRAFT 作为全库执行验收。通用内容作业不启动 PG/Redis、迁移、发布生命周期、全产品回归或全后端编译。导入执行器、权限、数据库、共享计分实现不是声明内容，按对应实际影响增加检查。此修改不改变生产发布、授权规则或分支保护。

@@ -70,11 +70,11 @@ const frontendSrc = 'server-version/frontend/src/';
 export function domainFor(file) {
   if (typeof file !== 'string' || file.split('/').some(part => !part || part === '..' || part === '.')
       || /[\\\x00-\x1f\x7f]/.test(file)) return null;
-  if (new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|scientific|publication|context)\\.json$`).test(file)
+  if (new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/(manifest|evidence-map|rules|report|profile|scientific|publication|context)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/packages/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+/fixtures/(valid|missing|invalid|not-applicable)\\.json$`).test(file)
       || new RegExp(`^${modules}assessment-bundle/ci-fixtures/[a-zA-Z0-9_-]+/\\d+\\.\\d+\\.\\d+\\.json$`).test(file)
       || file === `${modules}assessment-bundle/generated/packages.json`) return 'bundle';
-  if (new RegExp(`^${modules}scale/instruments/[^/]+/[^/]+/`).test(file)
+  if (new RegExp(`^${modules}scale/instruments/[a-zA-Z0-9_-]+/[^/]+/(?:instrument\\.ts|source\\.json|README\\.md|THIRD_PARTY_LICENSE\\.md)$`).test(file)
       || file === `${modules}scale/instruments/learning-motivation-wave1-data.json`
       || file === `${modules}scale/onboarding/instruments.generated.ts`
       || file.startsWith('server-version/backend/src/__tests__/scale/instruments/')
@@ -539,10 +539,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const result = event === 'workflow_dispatch'
     ? { maintenance:false, content:false, presentation:false, frontend:false, documentation:false, domains:[] }
     : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true', {readHeadFile:file=>gitContent('HEAD',file),readBaseFile:file=>gitContent(base,file)});
+  const mixedContent=result.content && result.domains.length>1;
   const cognitiveCandidate=entries.some(e=>/^server-version\/(?:backend\/src\/modules\/cognitive\/(?:tasks|generated|content-candidates)\/|frontend\/src\/modules\/cognitive\/(?:(?:tasks|generated)\/|native-runners\.tsx$))/.test(e.file));
-  const cognitiveMixed = cognitiveCandidate && !result.cognitive_intake_light && cognitiveMixedProductScope(entries, file=>gitContent('HEAD',file),file=>gitContent(base,file));
+  const cognitiveMixed = cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && cognitiveMixedProductScope(entries, file=>gitContent('HEAD',file),file=>gitContent(base,file));
   if (cognitiveMixed) Object.assign(result, {maintenance:false,content:false,presentation:false,documentation:false,frontend:false,frontend_test:false,backend_modules:false,domains:[...new Set([...result.domains,'cognitive'])]});
-  if(cognitiveCandidate && !result.cognitive_intake_light && !cognitiveMixed && process.env.CI_FORCE_FULL!=='true' && event!=='workflow_dispatch') {
+  if(cognitiveCandidate && !mixedContent && !result.cognitive_intake_light && !cognitiveMixed && process.env.CI_FORCE_FULL!=='true' && event!=='workflow_dispatch') {
     const refused=selectCognitiveIntake(entries,file=>gitContent('HEAD',file),{readBaseFile:file=>gitContent(base,file)});
     console.log(JSON.stringify({kind:'cognitive-intake-refusal',base,...refused}));
     throw Error('UNSUPPORTED_COGNITIVE_INTAKE:'+refused.reason+': explicit affected route required; no platform fallback');
@@ -588,7 +589,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   // Local pages are covered by related tests and one frontend build. The broad
   // student/** visual inventory does not require every platform browser fixture.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = result.cognitive_intake_light || surveySelection || performance || affectedFrontend || backendModules || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = result.presentation || result.cognitive_intake_light || surveySelection || performance || affectedFrontend || backendModules || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   // Preserve every platform functional/security/build/recovery check. Only the
@@ -598,7 +599,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
   const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
+  const codeql = Boolean(copy?.sast) || surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   const output = { personal_tracking_draft:personalTrackingDraftScope(entries,{event,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'}), admin_permissions_functional_only:Boolean(adminFunctional), admin_permissions_functional_plan:JSON.stringify(adminFunctional), training_functional_only:Boolean(trainingFunctional), run_performance_tests:!(trainingFunctional || adminFunctional), training_functional_plan:JSON.stringify(trainingFunctional), survey_mac_ui_plan:JSON.stringify(surveyMac), reviewed_candidate_plan:JSON.stringify(reviewedCandidate), survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:trainingFunctional || adminFunctional ? 'legacy' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,

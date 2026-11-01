@@ -151,7 +151,7 @@ export function requiredChecks(needs, draft) {
   if (scope.application_route === 'survey-home') return ['scope','survey-home','codeql'];
   if (scope.application_route === 'homepage-copy') {
     let p; try { p=JSON.parse(scope.homepage_copy_plan); } catch {}
-    return ['scope',...(!draft ? ['homepage-copy',...(p?.toolsChanged ? ['codeql'] : [])] : [])];
+    return ['scope',...(!draft ? ['homepage-copy',...((p?.sast ?? p?.toolsChanged) ? ['codeql'] : [])] : [])];
   }
   if (scope.application_route === 'campus') return ['scope','campus','codeql'];
   if (['A','B'].includes(scope.application_route)) {
@@ -470,7 +470,7 @@ export function failedChecks(needs, draft) {
     if (!p || p.schema!==1 || p.route!=='homepage-copy' || scope.scenario!=='homepage-copy'
       || JSON.stringify(p.changed)!==JSON.stringify(['frontend']) || !Array.isArray(p.pages) || !p.pages.length
       || typeof p.toolsChanged!=='boolean' || !/^[a-f0-9]{40}$/.test(p.base||'') || !/^[a-f0-9]{40}$/.test(p.head||'')
-      || JSON.stringify(p.required)!==JSON.stringify(['copy-boundary','frontend-candidate','runtime-scan','homepage-browser',...(p.toolsChanged?['sast']:[])])
+      || JSON.stringify(p.required)!==JSON.stringify(['copy-boundary','frontend-candidate','runtime-scan','homepage-browser',...((p.sast ?? p.toolsChanged)?['sast']:[])])
       || Object.keys(acceptanceJobs).some(k=>scope[k]!=='false')) failed.push('scope');
     return [...new Set(failed)];
   }

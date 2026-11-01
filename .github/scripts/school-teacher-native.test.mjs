@@ -169,6 +169,6 @@ test('native SAST selects candidate e2e inputs instead of all e2e by filename pr
  assert(!nativeSastConfig(paths,{execution:{},source:{}}).paths.includes('server-version/e2e'));
  // The established separately authenticated continuation is not changed here.
  assert(nativeSastConfig(paths,{execution:{sastContinuation:40980640181},source:{}}).paths.includes('server-version/e2e'));
- assert(ci.includes('ram: ${{ steps.native-bundle-codeql-config.outputs.config && 8000 || 3500 }}'));
- assert(ci.includes('threads: ${{ steps.native-bundle-codeql-config.outputs.config && 4 || 2 }}'));
+ assert(ci.includes('ram: 8000'));
+ assert(ci.includes('threads: 4'));
 });

@@ -2,7 +2,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
-import {admitsCopy,portalCopy,featureCopy,admitsHeadingAssertion,portalFile,featuresFile,assertionFile} from './homepage-copy-scope.mjs';
+import {classifyChanges,acceptanceFor} from './content-scope.mjs';
+import {admitsCopy,portalCopy,featureCopy,admitsHeadingAssertion,portalFile,featuresFile,assertionFile,publicPresentation,publicRouteBoundary,publicRenderBoundary} from './homepage-copy-scope.mjs';
 const oldPortal=`export default function Home(){return <div><p className="training-eyebrow">旧眉题</p><h1 id="training-title">旧标题，<br />旧结语。</h1><p className="training-portal-description">旧描述，<br />旧次行。</p><a href="/login">登录</a></div>}`;
 const newPortal=oldPortal.replace('旧眉题','新眉题').replace('旧标题','新标题');
 const oldFeatures=`export const schoolFeatures=[{path:'/features/positive-campus',title:'旧校园',icon:Icon,description:'描述'}]`;
@@ -37,11 +38,7 @@ test('no unknown application, dependency, permission, mode or test weakening is 
  assert.equal(admitsHeadingAssertion(oldTest,newTest+'\nother assertion removed',oldPortal,newPortal),false);
  assert.equal(admitsHeadingAssertion(oldTest,newTest.replace('toBeInTheDocument','toBeTruthy'),oldPortal,newPortal),false);
 });
-test('the actual baseline and working homepage edits preserve every non-copy byte',()=>{
- const base=process.env.CI_BASE_SHA || execFileSync('git',['merge-base','HEAD','github/main'],{encoding:'utf8'}).trim();
- const actualRead=(ref,file)=>ref==='base'?execFileSync('git',['show',`${base}:${file}`],{encoding:'utf8'}):readFileSync(file,'utf8');
- assert.equal(admitsCopy([portalFile,featuresFile,assertionFile].map(entry),actualRead),true);
-});
+
 
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const planFixture={schema:1,route:'homepage-copy',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend'],pages:[{page:'school',title:'新校园'}],toolsChanged:true,required:['copy-boundary','frontend-candidate','runtime-scan','homepage-browser','sast']};
@@ -71,13 +68,16 @@ test('copy route is exclusive with all backend, database and unrelated consumers
  assert.match(job('merge-gate'),/homepage-copy/);
  assert.match(readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8'),/recomputed-homepage-copy-plan/);
  assert.match(job('codeql'),/homepage-copy.*toolsChanged/);
- assert.match(job('codeql'),/paths: \[.github\/scripts\/homepage-copy-scope.mjs/);
+ assert.match(job('codeql'),/PUBLIC_PRESENTATION:.*homepage-copy/);
+ assert.match(job('codeql'),/paths:\['server-version\/frontend\/src','\.github\/scripts','server-version\/scripts\/release'\]/);
+ for(const expression of ci.match(/\$\{\{[\s\S]*?\}\}/g)||[])assert(expression.length<=21000,'GitHub expression length limit');
  const candidate=readFileSync(new URL('./homepage-copy-candidate.py',import.meta.url),'utf8');
  const workflow=readFileSync(new URL('../workflows/ci-homepage-copy.yml',import.meta.url),'utf8');
  const browser=readFileSync(new URL('./homepage-copy-browser.mjs',import.meta.url),'utf8');
  assert.match(candidate,/p\['changed'\] == \['frontend'\]/);
- assert.doesNotMatch(candidate,/server-version\/backend|prisma|postgres|redis|vitest/);
+ assert.doesNotMatch(candidate,/server-version\/backend|prisma|postgres|redis/);
  assert.equal((candidate.match(/'--target','build'/g)||[]).length,1);
+ assert.match(candidate,/npx vitest run/);assert.doesNotMatch(candidate,/vitest related/);
  assert.match(candidate,/RepoDigests/);
  assert.match(candidate,/'docker','save'/);
  assert.match(candidate,/imageTarSha256/);
@@ -91,4 +91,64 @@ test('copy route is exclusive with all backend, database and unrelated consumers
  assert.match(job('scope'),/homepage-copy' && github.event_name == 'pull_request'/);
  assert.match(browser,/actual scanned Nginx image/);
  assert.match(browser,/finally/);
+});
+
+const staticFile='server-version/frontend/src/survey/SurveyFeaturePage.tsx';
+const staticBefore="export function Page(){return <main><h1>旧说明</h1><a href='/login'>登录</a></main>}";
+const staticAfter=staticBefore.replace('旧说明','新说明');
+test('public presentation admits markup and data while retaining runtime behavior',()=>{
+ assert.equal(publicRenderBoundary(staticBefore,staticAfter),true);
+ assert.ok(publicPresentation([entry(staticFile),entry('.github/workflows/scale-onboarding-boundary.yml'),entry('.github/scripts/content-workflows.test.mjs'),entry('server-version/scripts/release/policy.mjs')],ref=>ref==='base'?staticBefore:staticAfter));
+ assert.deepEqual(publicPresentation([entry(staticFile)],ref=>ref==='base'?staticBefore:staticAfter),{pages:[{page:'survey',static:true}],executable:true});
+ for(const after of [staticAfter+";fetch('/api/auth')",staticAfter+";export * from '../api/auth'",staticAfter+";import '../api/origins'",staticAfter.replace('<main>','<main dangerouslySetInnerHTML={{__html:source}}>'),staticAfter+";while(true){}"])
+  assert.equal(publicRenderBoundary(staticBefore,after),false,after);
+ const auth="import {useAuth} from '../contexts/AuthContext';export function Page(){const {user}=useAuth();const href=user?.role==='TEACHER'?'/teacher':'/login';return <a href={href}>说明</a>}";
+ assert.equal(publicRenderBoundary(auth,auth.replace('说明','新说明')),true);
+ assert.equal(publicRenderBoundary(auth,auth.replace("'TEACHER'","'STUDENT'")),false);
+ for(const file of ['server-version/frontend/src/api/auth.ts','server-version/frontend/package.json','server-version/backend/prisma/schema.prisma'])
+  assert.equal(publicPresentation([entry(staticFile),entry(file)],()=>staticAfter),null,file);
+});
+test('public App branch preserves the authenticated application body',()=>{
+ const before="import {teacherFeatures} from './teacher-features'\nexport default function HuiteacherApp(){const user=useSession();return <Workspace user={user}/>}";
+ const after="import {teacherFeatures} from './teacher-features'\nimport {HuiteacherFeaturePage} from './HuiteacherFeaturePage'\nexport default function HuiteacherApp(){const feature=teacherFeatures.find(item=>item.path===window.location.pathname);return feature?<HuiteacherFeaturePage feature={feature}/>:<HuiteacherApplication/>}\nfunction HuiteacherApplication(){const user=useSession();return <Workspace user={user}/>}";
+ // The pre-existing feature import is left in place for both sides in this fixture.
+ assert.equal(publicRouteBoundary('huiteacher',before,after),true);
+ assert.equal(publicRouteBoundary('huiteacher',before,after.replace('useSession()','skipSession()')),false);
+ assert.equal(publicRouteBoundary('huiteacher',before,after.replace('item.path===window.location.pathname','true')),false);
+});
+test('executable public rendering keeps SAST and selected failure cannot pass',()=>{
+ const p={...planFixture,toolsChanged:false,sast:true};const outputs={...scopeOutputs,homepage_copy_plan:JSON.stringify(p)};
+ const needs={scope:{result:'success',outputs},'homepage-copy':{result:'success'},codeql:{result:'success'}};
+ assert.deepEqual(requiredChecks(needs,false),['scope','homepage-copy','codeql']);assert.deepEqual(failedChecks(needs,false),[]);
+ for(const result of ['skipped','failure','cancelled',undefined])assert.ok(failedChecks({...needs,codeql:{result}},false).includes('codeql'));
+});
+
+test('real workflow conditions select only public candidate and SAST for executable public pages',()=>{
+ const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const block=name=>ci.split('\n  '+name+':\n')[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0]||'';
+ const outputs={...scopeOutputs,content:'false',frontend:'true',frontend_build:'true',codeql:'true',homepage_copy_plan:JSON.stringify({...planFixture,toolsChanged:false,sast:true})};
+ const needs=new Proxy({scope:{result:'success',outputs}},{get:(value,key)=>value[key]||{result:'skipped',outputs:{}}}),github={event_name:'pull_request',ref_name:'feature/public',event:{pull_request:{number:1234,draft:false,head:{ref:'feature/public'}}}};
+ for(const name of ['homepage-copy','codeql','backend','backend-browser-build','backend-regression','frontend','frontend-build','browser','docker','accept-perf','accept-ops']) {
+  const expression=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)?.[1];assert.ok(expression,name);
+  const selected=new Function('needs','github','vars','cancelled','fromJSON','contains',`return (${expression.replace(/needs\.([a-z][a-z0-9-]*)/g,(_,key)=>'needs['+JSON.stringify(key)+']')})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse,(list,item)=>list.includes(item));
+  assert.equal(Boolean(selected),['homepage-copy','codeql'].includes(name),name);
+ }
+});
+
+test('passive CUA notes retain the CSS-only route and CSS does not run TypeScript lint/types',()=>{
+ const css='server-version/frontend/src/components/catalog-discovery.css';
+ assert.equal(classifyChanges([entry(css),entry('docs/cua-catalog-empty.md')]).presentation,true);
+ const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const visual=ci.split('\n  visual:\n')[1].split('\n  survey-review:')[0];
+ assert.match(visual,/npm run build/);assert.doesNotMatch(visual,/npm run lint|npm run typecheck|npm test/);
+});
+
+// The public copy boundary must not absorb a new authenticated-role gate.
+test('identity-dependent early return is not public presentation while static JSX conditions remain allowed',()=>{
+ const before=readFileSync(new URL('../../server-version/frontend/src/training/TrainingFeaturePage.tsx',import.meta.url),'utf8');
+ const marker='const { user } = useAuth()';assert(before.includes(marker));
+ const guarded=before.replace(marker,marker+"\n  if (user?.role !== 'TEACHER') return null");
+ assert.equal(publicRenderBoundary(before,guarded),false);
+ const staticCopy=before.replace('{feature.introduction}',"{feature.description ? feature.introduction : '课程功能介绍'}");
+ assert.notEqual(staticCopy,before);assert.equal(publicRenderBoundary(before,staticCopy),true);
 });

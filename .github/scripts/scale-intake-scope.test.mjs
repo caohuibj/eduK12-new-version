@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,rmSync,readFileSync,statSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {tmpdir} from 'node:os';
 import {join,dirname} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -77,6 +78,11 @@ test('only the two exact Scale CI tools are excluded from application fingerprin
 
  test('release tooling CodeQL includes the exact backend Scale checker and regression source',()=>{
  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
- const paths=ci.split("scenario == 'release-tooling' && 'paths: [")[1]?.split(']')[0].split(',').map(path=>path.trim());
- assert.deepEqual(paths,['.github/scripts','server-version/scripts/release','server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts','server-version/backend/src/scripts/cognitive-onboarding-check.ts','server-version/scripts/cognitive']);
+ const block=ci.split('      - name: select affected component analysis paths\n')[1].split('\n      - name:')[0];
+ const code=block.split('        run: |\n')[1].split('\n').map(line=>line.startsWith('          ')?line.slice(10):line).join('\n');
+ let output='';runInNewContext(code,{require:()=>({appendFileSync:(_,text)=>{output+=text}}),process:{env:{RELEASE_TOOLING:'true',GITHUB_OUTPUT:'unused'}}});
+ const paths=JSON.parse(output.trim().slice('config='.length)).paths;
+ assert.deepEqual(paths,['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']);
+ for(const file of ['.github/scripts','server-version/scripts/release','server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts','server-version/backend/src/scripts/cognitive-onboarding-check.ts','server-version/scripts/cognitive'])assert.ok(paths.some(dir=>file===dir||file.startsWith(dir+'/')),file);
+ for(const dir of paths)assert.ok(statSync(new URL('../../'+dir,import.meta.url)).isDirectory(),'Python SAST root must be a directory: '+dir);
  });

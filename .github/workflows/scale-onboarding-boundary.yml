@@ -118,39 +118,18 @@ jobs:
         working-directory: server-version/backend
         run: node --import tsx scripts/scale-intake-selected-check.ts
   boundary:
+    # Declarations only: schemas, source references, golden scoring cases and
+    # report/template compatibility. No app build, database or lifecycle fixture.
     if: ${{ !inputs.scale_intake_light && !inputs.cognitive_intake_light }}
-    timeout-minutes: 30
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: ptool123
-          POSTGRES_DB: ptool
-        ports: ['5432:5432']
-        options: >-
-          --health-cmd "pg_isready -U ptool -d ptool"
-          --health-interval 5s --health-timeout 5s --health-retries 10
-      redis:
-        image: redis:7.4.11-bookworm
-        ports: ['6379:6379']
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s --health-timeout 5s --health-retries 10
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     env:
       CI: 'true'
       NODE_ENV: test
-      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
-      REDIS_URL: redis://localhost:6379
-      JWT_SECRET: ci-content-jwt-secret-12345678901234567890
       COGNITIVE_MODULE_ENABLED: 'true'
-      BUNDLE_PRODUCTS_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
       BUNDLE_CONTENT_BASE_SHA: ${{ inputs.base }}
       BUNDLE_CONTENT_EVIDENCE: /tmp/bundle-content-evidence.json
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
     defaults:
       run:
         working-directory: server-version/backend
@@ -163,85 +142,65 @@ jobs:
           node-version: '24.21.0'
           cache: npm
           cache-dependency-path: server-version/backend/package-lock.json
-      - name: verify runner capacity and clean application ports
-        run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
-      - run: npm ci --ignore-scripts
-      - run: npx prisma generate
-      - name: Scale content boundaries, registry and scientific qualification
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Scale declaration schemas, registries and reference/report compatibility
         if: inputs.scale
-        # Scope is already checked for all domains by the caller. Do not reject
-        # mixed Scale + Cognitive + SJT content as a Scale platform change.
         run: npm run scale:onboarding:check && npm run scale:instruments:check && npm run scale:qualification:check
-      - name: Scale regression
-        if: inputs.scale
-        run: >-
-          npx vitest run src/__tests__/scale
-          src/__tests__/assessment-governance/product-readiness-inventory.test.ts
-          --exclude 'src/__tests__/scale/**/*.postgres.integration.test.ts'
-          --no-file-parallelism
-      - name: Cognitive cross-tree test dependencies
+      - name: Cognitive cross-tree declaration dependencies
         if: inputs.cognitive
         working-directory: server-version/frontend
-        run: npm ci --ignore-scripts
-      - name: Cognitive declaration-only content boundary
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Cognitive declaration boundary and selected task fixtures
         if: inputs.cognitive
         working-directory: .
         env:
           CI_BASE_SHA: ${{ inputs.base }}
-        run: node --test .github/scripts/cognitive-content.test.mjs && node .github/scripts/cognitive-content.mjs
-      - name: Cognitive contracts and onboarding decisions
-        if: inputs.cognitive
-        run: npm run cognitive:contracts && npm run cognitive:onboarding-check -- --all --json
-      - name: Cognitive regression
-        if: inputs.cognitive
-        run: >-
-          npx vitest run src/__tests__/cognitive
-          --exclude 'src/__tests__/cognitive/**/*.integration.test.ts'
-          --no-file-parallelism
-      - name: Cognitive presentation regression and frontend types
-        if: inputs.cognitive
-        working-directory: server-version/frontend
-        run: npx vitest run src/modules/cognitive --maxWorkers=2 && npm run typecheck
-      - name: SJT manifests and scientific contracts
+        run: |
+          node .github/scripts/cognitive-content.mjs
+          tasks=$(git diff --name-only "$CI_BASE_SHA" HEAD -- server-version/backend/src/modules/cognitive/tasks/ | cut -d/ -f7 | sort -u | paste -sd, -)
+          test -n "$tasks"
+          cd server-version/backend
+          npm run cognitive:onboarding-check -- --tasks "$tasks" --json
+      - name: SJT declaration schemas, references and golden scoring fixtures
         if: inputs.situational
         run: npm run situational:contracts
-      - name: SJT immutable releases and publication authority
+      - name: SJT changed publication retains existing review authority
         if: inputs.situational && github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUBLICATION_BASE_SHA: ${{ inputs.base }}
-        run: npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
-      - name: SJT regression
-        if: inputs.situational
-        run: >-
-          npx vitest run src/__tests__/situational
-          --exclude 'src/__tests__/situational/**/*.integration.test.ts'
-          --no-file-parallelism
-      # Conservatively include every Bundle for changes in any content domain.
-      # This closes reverse dependencies without trusting a stale generated index.
-      - name: Bundle manifests, fixtures, exact dependencies and immutable history
-        run: npx tsx scripts/bundle-content-check.ts
-      - name: Isolated content database migration
-        run: npm run db:migrate:guarded
-      - name: Bundle canonical reports, release governance and actual-package FINAL smoke
-        run: >-
-          npx vitest run src/__tests__/assessment-bundle src/__tests__/assessment-reanalysis
-          src/__tests__/bundle-onboarding src/__tests__/bundle-product
-          --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/bundle-content-tests.json
-      - name: Actual-package and release lifecycle suites must execute
-        run: >-
-          node scripts/assert-release-test-report.mjs /tmp/bundle-content-tests.json
-          src/__tests__/bundle-onboarding/content.postgres.integration.test.ts
-          src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts
-          src/__tests__/bundle-product/product.postgres.integration.test.ts
-      - name: Save Bundle hashes and smoke results
+        run: |
+          if git diff --name-only "$PUBLICATION_BASE_SHA" HEAD -- src/modules/situational/instruments/ | grep -q '/publication.json$'; then
+            npm run situational:onboarding-check -- --all --verify-reviews --base "$PUBLICATION_BASE_SHA"
+          fi
+      - name: Bundle affected schemas, scoring fixtures, templates and source references
+        run: |
+          node --import tsx --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {verifyHistory} from './scripts/bundle-content-check.ts';
+          const base=process.env.BUNDLE_CONTENT_BASE_SHA;
+          const files=execFileSync('git',['diff','--name-only','-z',base,'HEAD'],{encoding:'utf8'}).split('\0').filter(Boolean);
+          const root='src/modules/assessment-bundle/packages';
+          const units=files.map(f=>f.match(/src\/modules\/(?:scale|situational)\/instruments\/([^/]+)\/([^/]+)\//)).filter(Boolean).map(m=>m[1]+'/'+m[2]);
+          const cognitive=files.some(f=>f.includes('/modules/cognitive/tasks/'));
+          const selected=[];
+          for(const key of fs.readdirSync(root))for(const version of fs.readdirSync(root+'/'+key)) {
+            const dir=root+'/'+key+'/'+version, manifest=JSON.parse(fs.readFileSync(dir+'/manifest.json','utf8'));
+            if(files.some(f=>f.includes('/'+dir+'/')) || manifest.definition.slots.some(slot=>units.includes(slot.instrumentKey+'/'+slot.instrumentVersion)||cognitive&&slot.unitType==='COGNITIVE'))selected.push(dir);
+          }
+          const run=args=>execFileSync(process.execPath,['--import','tsx','src/scripts/bundle-onboarding.ts',...args],{stdio:'inherit'});
+          if(files.some(f=>f.includes('/modules/assessment-bundle/'))) {
+            verifyHistory(base);
+            run(['manifest-check']);
+          }
+          for(const dir of selected)run(['check',dir]);
+          fs.writeFileSync(process.env.BUNDLE_CONTENT_EVIDENCE,JSON.stringify({base,selected,status:'success',validation:'existing affected package check; no database or lifecycle'}));
+          JS
+      - name: Save actual declaration validation results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bundle-content-evidence
-          path: |
-            /tmp/bundle-content-evidence.json
-            /tmp/bundle-content-tests.json
+          path: /tmp/bundle-content-evidence.json
           if-no-files-found: error
-      - name: Compile backend TypeScript
-        run: npx tsc --noEmit
