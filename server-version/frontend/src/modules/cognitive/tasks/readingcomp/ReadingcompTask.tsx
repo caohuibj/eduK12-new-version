@@ -93,7 +93,7 @@ export const ReadingcompTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const startPractice = () => { setPracticeChoice(null); setSubPhase('fixation'); setPhase('practice') }
   if (!items) return <div role="alert" className="card p-8">本次题库版本或题量不匹配，请返回任务页联系管理员；正式测验尚未开始。</div>
   if (trialIndex >= totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
-  if (phase === 'instruction') return <CognitiveTaskIntro title="阅读理解" description={<><p>每题同时给出一段短文、一个问题和四个选项。先读短文，再根据原文选出唯一最符合问题的答案；不需要用课外知识作答。</p><p className="mt-3">例如，短文说雨伞在门边的篮子里，问雨伞在哪里，就选择“门边的篮子里”。</p></>} hint={<><p>按键 1–4 或点击选项作答。先求准确，再保持稳定节奏；每题最多 {timeoutMs / 1000} 秒，正式共 {totalTrials} 题。练习无时限且不计分，答对后才能开始；正式不显示正确答案。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="阅读理解" description={<><p>每题同时给出一段短文、一个问题和四个选项。先读短文，再根据原文选出唯一最符合问题的答案；不需要用课外知识作答。</p><p className="mt-3">例如，短文说雨伞在门边的篮子里，问雨伞在哪里，就选择“门边的篮子里”。</p><p>一张活动通知可能同时写了日期、地点和适用对象；把这些条件对应好，才能知道自己要不要参加。 这次任务只记录本次作答表现。</p></>} hint={<><p>按键 1–4 或点击选项作答。先求准确，再保持稳定节奏；每题最多 {timeoutMs / 1000} 秒，正式共 {totalTrials} 题。练习无时限且不计分，答对后才能开始；正式不显示正确答案。</p></>} onAction={startPractice} />
   if (phase === 'formal' && !currentTrial) return <div className="card p-8">作答已记录，正在生成结果…</div>
   const item = phase === 'practice' ? READINGCOMP_PRACTICE_ITEM : currentTrial!
   const content = <div className="card mx-auto max-w-2xl p-5 text-left sm:p-8">

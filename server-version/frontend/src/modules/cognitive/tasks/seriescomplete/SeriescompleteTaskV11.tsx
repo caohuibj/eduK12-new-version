@@ -104,7 +104,7 @@ export const SeriescompleteTaskV11: React.FC<CognitiveTaskProps> = ({ taskContex
 
   const item = phase === 'practice' ? SERIESCOMPLETE_PRACTICE_ITEM : currentTrial
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="数列完成" description={<p>观察数列或字母序列，寻找简洁且贯穿各项的规律，选择接着往下排的一项。英文字母按A到Z排列；题目可能采用等差、等比、递增差值或分组交替等规律。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。本次正式{totalTrials}题，每题最多{timeoutMs / 1000}秒，超时计为漏答；尽量准确，不必追求抢答。完整时长受作答速度和说明练习用时影响。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="数列完成" description={<><p>观察数列或字母序列，寻找简洁且贯穿各项的规律，选择接着往下排的一项。英文字母按A到Z排列；题目可能采用等差、等比、递增差值或分组交替等规律。</p><p>排座位或检查编号时，先看间隔是否固定，再留意是否两组交替出现。 这次任务只记录本次作答表现。</p></>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。本次正式{totalTrials}题，每题最多{timeoutMs / 1000}秒，超时计为漏答；尽量准确，不必追求抢答。完整时长受作答速度和说明练习用时影响。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   const OptionButtons: React.FC<{ show: boolean }> = ({ show }) => show ? (

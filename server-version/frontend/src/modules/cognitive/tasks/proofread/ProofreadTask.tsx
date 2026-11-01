@@ -93,7 +93,7 @@ export const ProofreadTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
   const startPractice = () => { setPracticeChoice(null); setSubPhase('fixation'); setPhase('practice') }
   if (!items) return <div role="alert" className="card p-8">本次题库版本或题量不匹配，请返回任务页联系管理员；正式测验尚未开始。</div>
   if (trialIndex >= totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
-  if (phase === 'instruction') return <CognitiveTaskIntro title="文本校对" description={<><p>每题给出一个句子和四个原句中的字词。句子里恰有一处错别字或“的／地”用法错误，请选出含错的那个字词；不要选择改正后的写法。</p><p className="mt-3">例如，“我先整里好书包”中的“整里”应写为“整理”，应选择原句里的“整里”。</p></>} hint={<><p>按键 1–4 或点击选项作答。先求准确，再保持稳定节奏；每题最多 {timeoutMs / 1000} 秒，正式共 {totalTrials} 题。练习无时限且不计分，答对后才能开始；正式不显示正确答案。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="文本校对" description={<><p>每题给出一个句子和四个原句中的字词。句子里恰有一处错别字或“的／地”用法错误，请选出含错的那个字词；不要选择改正后的写法。</p><p className="mt-3">例如，“我先整里好书包”中的“整里”应写为“整理”，应选择原句里的“整里”。</p><p>发出消息前再看一遍，容易发现“已经”打成了“以经”；这里也要看原句实际写了什么。 这次任务只记录本次作答表现。</p></>} hint={<><p>按键 1–4 或点击选项作答。先求准确，再保持稳定节奏；每题最多 {timeoutMs / 1000} 秒，正式共 {totalTrials} 题。练习无时限且不计分，答对后才能开始；正式不显示正确答案。</p></>} onAction={startPractice} />
   if (phase === 'formal' && !currentTrial) return <div className="card p-8">作答已记录，正在生成结果…</div>
   const item = phase === 'practice' ? PROOFREAD_PRACTICE_ITEM : currentTrial!
   const content = <div className="card mx-auto max-w-2xl p-5 text-left sm:p-8">
