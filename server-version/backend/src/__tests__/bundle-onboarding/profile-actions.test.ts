@@ -62,14 +62,15 @@ describe('Bundle-owned profile actions',()=>{
     const review={...material,signature:createHmac('sha256',secret).update(canonicalJsonString(material)).digest('hex')}
     expect(validateReview(review,hash,secret,Date.parse('2026-10-30T00:00:00Z')).report).toBe(true)
     expect(()=>validateReview(review,hashDeclarativePackage(withoutOwn()),secret,Date.parse('2026-10-30T00:00:00Z'))).toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
-    const db=(role:string)=>({$transaction:async(callback:(tx:unknown)=>Promise<unknown>)=>callback({
-      user:{findUnique:async()=>({role})},$executeRaw:async()=>0,
+    const db=(role:string,platformRole:'STANDARD'|'SYSTEM_ADMIN'='STANDARD')=>({$transaction:async(callback:(tx:unknown)=>Promise<unknown>)=>callback({
+      user:{findUnique:async()=>({role,platformRole,isActive:true,isFrozen:false,expiresAt:null})},$executeRaw:async()=>0,
       bundlePackageRelease:{findUniqueOrThrow:async()=>({status:'DRAFT',installedBy:'synthetic-installer',contentHash:hash,content:current})},
     })}) as unknown as PrismaClient
     vi.stubEnv('BUNDLE_REVIEW_SIGNING_KEY',secret)
     try{
       await expect(publishPackage(db('TEACHER'),'ordinary-allocator',current.profile.key,'0.1.2',review)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
-      await expect(publishPackage(db('ADMIN'),'ordinary-admin-allocator',current.profile.key,'0.1.2',{...review,signature:'0'.repeat(64)})).rejects.toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
+      await expect(publishPackage(db('ADMIN'),'ordinary-admin-allocator',current.profile.key,'0.1.2',review)).rejects.toThrow('BUNDLE_ADMIN_REQUIRED')
+      await expect(publishPackage(db('ADMIN','SYSTEM_ADMIN'),'synthetic-system-publisher',current.profile.key,'0.1.2',{...review,signature:'0'.repeat(64)})).rejects.toThrow('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
     }finally{vi.unstubAllEnvs()}
   })
 })
