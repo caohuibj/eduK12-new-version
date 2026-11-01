@@ -109,3 +109,36 @@ describe('minimal system administrator component workspace',()=>{
   expect(screen.getByRole('button',{name:'从已冻结配置创建新版本'})).toBeEnabled()
  })
 })
+
+describe('draft list recovery',()=>{
+ it('distinguishes a failed first read from an empty list and recovers in place',async()=>{
+  mocks.api.mockRejectedValueOnce(new Error('合成读取失败'))
+  render(<ScaleComponentManager actorId="system"/>);fireEvent.click(screen.getByRole('tab',{name:'草稿与版本'}))
+  expect(await screen.findByRole('heading',{name:'草稿列表未读取成功'})).toBeVisible()
+  expect(screen.queryByText('还没有版本草稿')).not.toBeInTheDocument()
+  expect(screen.getByText('第 1 页 · 尚未读取成功')).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'刷新草稿'}))
+  expect(await screen.findByRole('button',{name:'编辑／查看 仅报告草稿'})).toBeVisible()
+  expect(screen.queryByRole('heading',{name:'草稿列表未读取成功'})).not.toBeInTheDocument()
+ })
+ it('hides stale rows after a failed page change and keeps unsaved edits through retry',async()=>{
+  const previous=mocks.api.getMockImplementation()!,next={...draft,id:'draft2',configurationName:'第二页合成草稿'}
+  let fail=true
+  mocks.api.mockImplementation(async(path:string,body?:unknown)=>{
+   if(path==='/component-drafts?page=1')return {list:[draft],hasMore:true}
+   if(path==='/component-drafts?page=2'){if(fail)throw new Error('第二页合成失败');return {list:[next],hasMore:false}}
+   return previous(path,body)
+  })
+  render(<ScaleComponentManager actorId="system"/>);fireEvent.click(await draftWorkspace())
+  fireEvent.change(await screen.findByLabelText('配置名称'),{target:{value:'未保存的合成修改'}})
+  fireEvent.click(screen.getByRole('button',{name:'下一页草稿'}))
+  await screen.findByRole('heading',{name:'草稿列表未读取成功'})
+  expect(screen.queryByRole('button',{name:'编辑／查看 仅报告草稿'})).not.toBeInTheDocument()
+  expect(screen.getByText('第 2 页 · 尚未读取成功')).toBeVisible()
+  expect(screen.getByRole('button',{name:'下一页草稿'})).toBeDisabled()
+  expect(screen.getByLabelText('配置名称')).toHaveValue('未保存的合成修改')
+  fail=false;fireEvent.click(screen.getByRole('button',{name:'刷新草稿'}))
+  expect(await screen.findByRole('button',{name:'编辑／查看 第二页合成草稿'})).toBeVisible()
+  expect(screen.getByLabelText('配置名称')).toHaveValue('未保存的合成修改')
+ })
+})
