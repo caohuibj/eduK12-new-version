@@ -1,0 +1,152 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "cognitive_self_regulation_adolescent_en_v1",
+    "bundleVersion": "1.0.0",
+    "status": "DRAFT",
+    "category": "integrated",
+    "name": "青少年认知控制与日常自我调节（英文自评／中文报告）",
+    "description": "13–19岁：Go/No-Go＋CPT-X＋Flanker＋真正TEXI自评，分开保留任务指标和日常体验，提供互补解释及小步骤建议。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "youth",
+      "subjectMinAgeYears": 13,
+      "subjectMaxAgeYears": 19
+    },
+    "slots": [
+      {
+        "slotKey": "gonogo",
+        "unitType": "COGNITIVE",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "gonogo",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "commissionRate",
+          "commissionErrors",
+          "nogoTrialCount",
+          "omissionRate",
+          "goTrialCount",
+          "dPrime"
+        ]
+      },
+      {
+        "slotKey": "cpt",
+        "unitType": "COGNITIVE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "cpt",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "dPrime",
+          "omissionRate",
+          "commissionRate",
+          "rtICV",
+          "targetCount",
+          "hitCount"
+        ]
+      },
+      {
+        "slotKey": "flanker",
+        "unitType": "COGNITIVE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "flanker",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "flankerEffectMs",
+          "congruentAccuracy",
+          "incongruentAccuracy"
+        ]
+      },
+      {
+        "slotKey": "texi",
+        "unitType": "SCALE",
+        "position": 3,
+        "required": true,
+        "instrumentKey": "texi_self_en",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "working_memory",
+          "inhibition"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": null,
+    "contextDefinitionVersion": null,
+    "reportDefinitionKey": "cognitive_self_regulation_adolescent_en_v1_report",
+    "reportDefinitionVersion": "1.0.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "texi_self_en"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "13–19岁自评版；18–19岁与成人18+版交叉，按研究情境选定一种版本，不换算或平均。",
+      "本DRAFT使用英文TEXI自评原题和中文报告；施测者须确认青少年理解英文。官网简体自评完整题本另附私有管理员待审包，不是他评转写。",
+      "认知任务分别呈现反应抑制、持续注意与干扰控制；TEXI呈现日常体验，任务与问卷不是等价测量。",
+      "不计算跨量尺总分、IQ、常模排名、能力等级、诊断、聚合或分歧类型。",
+      "任务使用main现有标准参数：Go/No-Go 120、CPT-X 180、Flanker 80试次；不是独立青少年验证，Flanker当前种子仍为DRAFT。",
+      "数据缺失、质量有限或无效时保留单来源及质量信息，跨方法说明只在所需来源均可解释时产生。",
+      "作者未提供TEXI年龄常模；2020原研究是塞尔维亚样本。台湾繁体中文研究不等于大陆简体验证。",
+      "量表与任务各自保留原报告、精确版本、现有授权与发布流程；源码登记不表示生产安装或公开发布。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json"
+  },
+  "cognitiveDependencies": [
+    {
+      "slotKey": "gonogo",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    },
+    {
+      "slotKey": "cpt",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    },
+    {
+      "slotKey": "flanker",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    }
+  ]
+}

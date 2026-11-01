@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run-contract'
 import {listEducationAssessmentResources} from '../education-tools/assessment-resource.catalog'
@@ -69,7 +70,7 @@ const base='/organizations/:organizationId/evaluation-events/:eventId/run'
 router.get(base+'/assessment-resources',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>{
     const scope=keys.parse(req.params)
-    const query=z.object({runId:uuid,expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional()}).strict().parse(req.query)
+    const query=z.object({runId:uuid,expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional(),...catalogDiscoveryQueryFields}).strict().parse(req.query)
     return success(res,await listEducationAssessmentResources({product:'TEACHER',...scope,workflowId:scope.eventId,...query,actor:req.user!}))
   }))
 router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductAdmin,

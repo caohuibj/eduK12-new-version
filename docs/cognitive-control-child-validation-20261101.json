@@ -1,0 +1,221 @@
+{
+  "baseMain": "24061f5e349d1f8df34b0ed5dd99a33e3014da8c",
+  "dependency": {
+    "adultPR": 484,
+    "commit": "dd8081a354d40f1149a97d92f00beadd45005f5b",
+    "compatibilityFile": "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+    "validationOverlayOnly": true,
+    "childDoesNotDuplicateSharedFix": true
+  },
+  "checks": {
+    "contractSuite": {
+      "passed": 43,
+      "log": "child-contracts-final.log",
+      "reuse": "Unchanged definition/authoring contracts; provider changes also covered in runtime suite."
+    },
+    "runtimeSuite": {
+      "passed": 44,
+      "log": "child-runtime-final.log",
+      "covers": "existing report provider, form context including child subject binding, initial cross-method cases"
+    },
+    "finalOrchestrator": {
+      "passed": 11,
+      "log": "child-orchestrator-final.log"
+    },
+    "finalPackageConstructs": {
+      "passed": 1,
+      "skipped": 10,
+      "log": "child-packages-final-exact.log"
+    },
+    "admittedResume": {
+      "passed": 1,
+      "skipped": 11,
+      "log": "child-resume-final.log"
+    },
+    "frontend": {
+      "passed": 6,
+      "log": "child-frontend-first.log"
+    },
+    "frontendChildName": {
+      "passed": 1,
+      "skipped": 2,
+      "log": "child-subject-label-final.log"
+    },
+    "sharedDisplayOverlay": {
+      "passed": 1,
+      "log": "child-shared-panels-final.log",
+      "scope": "actual adult shared panels plus supplied additive integration patch, not a whole app browser test"
+    },
+    "postgres": {
+      "passed": 1,
+      "log": "child-postgres-final-exact.log",
+      "scope": "real existing source installation/publication with synthetic text, real relational repository, consent, concurrent issue, START, 2 cognitive + 2 observer FINAL sources, own reports, separate combined facts, saved read and generic reader denial; only generated source overlay uses synthetic reviewed fixture",
+      "image": "postgres@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67"
+    },
+    "backendTypes": {
+      "roots": [
+        "/workspace/child-bundle-work/server-version/backend/src/modules/bundle-product/child-cross-method.routes.ts",
+        "/workspace/child-bundle-work/server-version/backend/src/modules/bundle-product/child-observer-admission.ts",
+        "/workspace/child-bundle-work/server-version/backend/src/scripts/import-private-scale-draft.ts",
+        "/workspace/child-bundle-work/server-version/backend/src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts",
+        "/workspace/child-bundle-work/server-version/backend/src/__tests__/assessment-bundle/child-chexi-draft.test.ts",
+        "/workspace/child-bundle-work/server-version/backend/src/__tests__/assessment-runtime/form-context.test.ts"
+      ],
+      "typescript": "5.9.3",
+      "configPath": "/workspace/child-bundle-work/server-version/backend/tsconfig.json",
+      "sourceFiles": 2075,
+      "diagnostics": 0,
+      "exitCode": 0
+    },
+    "frontendTypes": {
+      "roots": [
+        "/workspace/child-bundle-work/server-version/frontend/src/vite-env.d.ts",
+        "/workspace/child-bundle-work/server-version/frontend/src/pages/relational/ChildCognitiveControlPage.tsx",
+        "/workspace/child-bundle-work/server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx",
+        "/workspace/child-bundle-work/server-version/frontend/src/pages/bundle/BundleReport.tsx",
+        "/workspace/child-bundle-work/server-version/frontend/src/pages/bundle/bundle-child-evidence-display.ts",
+        "/workspace/child-bundle-work/server-version/frontend/src/pages/bundle/bundle-evidence-display.ts",
+        "/workspace/child-bundle-work/server-version/frontend/src/pages/bundle/BundleEvidencePanels.tsx"
+      ],
+      "configPath": "/workspace/child-bundle-work/server-version/frontend/tsconfig.app.json",
+      "typescript": "5.6.3",
+      "sourceFiles": 309,
+      "diagnostics": 0,
+      "dependency": "adult dd8081a354d40f1149a97d92f00beadd45005f5b plus child shared display integration patch"
+    },
+    "officialPrivateImport": {
+      "status": "PASS",
+      "target": "isolated loopback test database only",
+      "statusAfter": "DRAFT",
+      "visibility": "HIDDEN",
+      "items": 24,
+      "definitionHash": "cbe2628979937f62147d2cba102b4fa6763cb2bf5b805b0260f206a9b0b979a5"
+    }
+  },
+  "history": {
+    "retainedPrivately": true,
+    "initialFailures": "Wrong fixture selectors, pre-generated Prisma client, missing test capability/grant setup, incomplete dedicated observer admission/context handling, canonical parent identity projection, new analysis-purpose assumption, request result order and assertion shape. Fixed or replaced with existing supported contracts; raw logs retained. A package metadata change correctly hit version immutability and used a fresh disposable DB.",
+    "ciRuns": 0,
+    "cleanLockInstall": false
+  },
+  "integrationActions": [
+    "Apply docs/child-shared-display-integration.patch to adult shared UI after #484; child vocabulary module is included here.",
+    "Union the three age package directories and generate common registries once; this line does not overwrite public generated/packages.json.",
+    "Deploy private source overlay only via existing administrator review, grants and publication. Unknown rights tags do not block hidden DRAFT import."
+  ],
+  "notClaimed": [
+    "production import",
+    "production publication/deployment",
+    "formal CI pass",
+    "whole app browser",
+    "child field/age/device validation",
+    "norms or diagnostics"
+  ],
+  "evidenceDigests": {
+    "child-contracts-final.log": "e226fb55de0ae9c9fc59a2ebd128884e871472e85ae05c7ef2e5afed4eb1488e",
+    "child-runtime-final.log": "8fd9e930f28d44c4346007d7051215799a0c059d7eb76473c4dd28b783c09e35",
+    "child-orchestrator-final.log": "d999c123ec7b67f9096795b019815089fbef13b09c0af812cda8970c8cfb4810",
+    "child-packages-final-exact.log": "6aa1e1d095a0bd87cbfb527634771cb8139242c549ac937ae59da8623961407f",
+    "child-resume-final.log": "6bbe6da63d09730fe0ce7759ee0dfbec8984760b74c5bcfdb17f93d74a3b01df",
+    "child-frontend-first.log": "c49112952d0442d803e07a1aed0374cbc12592384774b72456530a0690c49c95",
+    "child-subject-label-final.log": "e339a90ec4d4fdc6cc4b924386b1fa9a774924c199228cb32b0dad834b2545be",
+    "child-shared-panels-final.log": "6bf99af6778f5e203ccaeb9d228ff0a720c674915d1349353932b2713eebb564",
+    "child-postgres-final-exact.log": "5b8863c882f489a8503c88c05b2fcbc5d49aae3a918dc85684b72a87049c36d1",
+    "continuation-types-final-exact.json": "4bea7652028607d4fa3458359d555e1004df88b34b1f10a4170531a8f5f35be4",
+    "child-frontend-final-types.json": "ae2d283dc04deb721914d7b4014cf188fd35c97f9a53e2719b6bac70c5883268",
+    "chexi-real-postgres-import.json": "c1847d4893a1ab6ecb0eacc5fd5771e54e0ae2009f763f888253b0711f06b068"
+  },
+  "sourceBindings": {
+    "server-version/backend/src/__tests__/assessment-bundle/child-chexi-draft.test.ts": "bfd0e1c0744720f37935b042affc2f5a89438f84811d04b88f982f29a0fd11f6",
+    "server-version/backend/src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts": "3c911bb4fc49323b2a5df09d3f88682fe5fb20fc4f59a9cc3e3471a28c1d1441",
+    "server-version/backend/src/__tests__/assessment-bundle/child-cross-method.test.ts": "12711e1468af85c88f3f30d2c9bf79ad2bee3bf6cff7afaddf6061ecf3a2bec9",
+    "server-version/backend/src/__tests__/assessment-runtime/form-context.test.ts": "64d9392ca2f31c16644d0e3dcd137e53ec5d9e55558c57f86d3d67862a8b857d",
+    "server-version/backend/src/index.ts": "b5afe34d0de60d01aa6e9c6283d3bfa31be72ecd9115c3568a28d30416ed72fb",
+    "server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts": "6911d8d27ea4bb3aa1896636dc27053b18e3b9c3b24b9ca19ad8022ae2d7c341",
+    "server-version/backend/src/modules/assessment-bundle/definition.ts": "88f4f42eea82263f740b9d212ba5957693ed0e373f6529ea4b6f89f39fee3e13",
+    "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts": "428f4b5f9e16438ec762ad684e6088e6ef53cc73cb91d2b5a53f338b4530e4a2",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/context.json": "3a6aaee5e19fd760a665a16501c307958f6423e219cda1f3ab864621b3886e4e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/evidence-map.json": "f75b03c052112ed4e7908abfec1ac16c76e4889c92387a5906bcee2eadd3430e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/fixtures/invalid.json": "194b86dc23f1571e778017d6a371e1a383643eb0b17ab7a11ef004e4758fd6b2",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/fixtures/missing.json": "cd632163eb6d2e53d07db93b6d6858cf8b7f7fdaf4b94a6fb37f8573ee0f6887",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/fixtures/not-applicable.json": "433564fc6a119f6dac0d74e6a4f1e74f30f99eb42300d0a327762a98d0e4331e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/fixtures/valid.json": "6a790cb1a1860249340bec9f4cbace88d1d230c4b1e37e18739c3412da00b8f2",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/manifest.json": "57f10be75f2c18b804d437a71a2c8765abdd4f9138bc4c9d1ec47975b8e72c77",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/publication.json": "64215b019461cac26171290f2b865128d029739d785a6ab2003b5c8b8c7f156e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/report.json": "c22cb39f2c685efdd84631850908d65c9165f17422b04cc13df307038ed88a14",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/rules.json": "92deedba120ce53cad8be17b78a794f0600df81233ec7d8c211d164e1ef046b3",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_parent_zh_cn_v1/0.1.0/scientific.json": "df3ffe9b57e1fc856b513f14f315ee2ffdbe2496230d1e33a66f7a2be44453fd",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/context.json": "3a6aaee5e19fd760a665a16501c307958f6423e219cda1f3ab864621b3886e4e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/evidence-map.json": "034ab29547fce3d95c298400c2b7896a5c90e0b0207d92ddb0bcc951c0c53f9c",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/fixtures/invalid.json": "194b86dc23f1571e778017d6a371e1a383643eb0b17ab7a11ef004e4758fd6b2",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/fixtures/missing.json": "cd632163eb6d2e53d07db93b6d6858cf8b7f7fdaf4b94a6fb37f8573ee0f6887",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/fixtures/not-applicable.json": "433564fc6a119f6dac0d74e6a4f1e74f30f99eb42300d0a327762a98d0e4331e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/fixtures/valid.json": "6a790cb1a1860249340bec9f4cbace88d1d230c4b1e37e18739c3412da00b8f2",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/manifest.json": "67ef9cb6456e9bb5d2c141a382428e1d080389473d4d7fa0a22696577a8a2761",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/publication.json": "64215b019461cac26171290f2b865128d029739d785a6ab2003b5c8b8c7f156e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/report.json": "de39bfb18b981acf0320cdfbe7226909b384ae5c0c4edf59f7dadec61cefc676",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/rules.json": "eae2ab358cd6adb1ce63634e2edff24a9b42b83a94fecd3d20d44c2ff87ab135",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_chexi_teacher_zh_cn_v1/0.1.0/scientific.json": "df3ffe9b57e1fc856b513f14f315ee2ffdbe2496230d1e33a66f7a2be44453fd",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/evidence-map.json": "f9ced8948801b889164582c55028607c0e55b06abd7dccc262d735ec6376c295",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/fixtures/invalid.json": "de3664085e80de56cdb0650eec53ba8e1ccc3c27ca07d033e9c9891459cc4148",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/fixtures/missing.json": "dcdf3cf786f738cd060d9cedfe8a31ff02614d5f40db28265750eb2939e7b957",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/fixtures/not-applicable.json": "2cb255d5a6504fbd047f001978f30ff4be093de30443d2a36209cd10292cb10b",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/fixtures/valid.json": "268591515528c52f4118587350b55ec9bf2f4b06db72639bf5a9a9839167023f",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/manifest.json": "818ecc9a02ce697014933c31461e933478f1f09d451275f155b9acd9304ffaa8",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/publication.json": "64215b019461cac26171290f2b865128d029739d785a6ab2003b5c8b8c7f156e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/report.json": "9315def932f2987b2f2424f5e85015270ace11b46e372d90c4b692e6237f7e29",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/rules.json": "2ffa1ab87652291a797c15c6388313221d3eff664b9e9d2f57c009d0d49cb839",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_teacher_zh_cn/0.1.0/scientific.json": "df3ffe9b57e1fc856b513f14f315ee2ffdbe2496230d1e33a66f7a2be44453fd",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/evidence-map.json": "36c5349709085d1249e03da5788e6ea9343a205ba6272ad275f8cdf199792b05",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/fixtures/invalid.json": "cc9867693362eea4d78bdfd8dbe80360adfa43ce28511becbb435b126bbf22aa",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/fixtures/missing.json": "e4e5e150840a982b95a03924c0a93ed41986477544077e3502ade2aebf24af39",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/fixtures/not-applicable.json": "71ec59ea43ec286794d5b40130ba46cc3db000931cec4a5bc4379357d7997faa",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/fixtures/valid.json": "e39794c1d1f8bd42c174aaef153dbc5f5d75ec55d2e5eac79c1e1b49ed03e3cf",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/manifest.json": "131abce00b790bded6410923fe15c458dbf75f7aadf3bed3d10b8ceaaaae921c",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/publication.json": "64215b019461cac26171290f2b865128d029739d785a6ab2003b5c8b8c7f156e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/report.json": "a35291da4d6f05496d02e909dacd3d5a3660d11d87951006cfe66b1217376697",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/rules.json": "aa07491acfdd87b0a12a72fd67b37b0f85a49f8d9a249694b3658bc7e4060554",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_parent_zh_cn/0.1.0/scientific.json": "df3ffe9b57e1fc856b513f14f315ee2ffdbe2496230d1e33a66f7a2be44453fd",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/evidence-map.json": "3f8f671888d5633d89f8fc1b3c731be3c03620f0c3b3c230a28078c1f8399f5b",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/fixtures/invalid.json": "0270808cc0b2bf499365bb83a1618529eebfd6a1a431c39282126c42ad566a1b",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/fixtures/missing.json": "256056fc31cbd58ff3906301605c3e233fee13a67632a4d5d8c78f34e896ac26",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/fixtures/not-applicable.json": "c7c671f3201f07e05257fb2b2b89ed677eace6dbf73e442ac491b66c71554343",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/fixtures/valid.json": "3dacc41c7a52007da1d716e10bd1c5b45679bac67f9cdefcce510e6c7ea4d53c",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/manifest.json": "63a6fe975c1fdf4c77a8c502a074e795c618af63fe0d45e5ea41547f7a713cf7",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/publication.json": "64215b019461cac26171290f2b865128d029739d785a6ab2003b5c8b8c7f156e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/report.json": "0df362bb8bf756538e5e5c650bc1c8bbcf07cd4f1c2c08c9551c0827c51852ba",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/rules.json": "b2d7fd2df980b41c5acea1c0ac32cf2abf935bf5799bb13401b4ff149b5bdbd2",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_control_teacher_zh_cn/0.1.0/scientific.json": "df3ffe9b57e1fc856b513f14f315ee2ffdbe2496230d1e33a66f7a2be44453fd",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/evidence-map.json": "fb6f68b913dfe49212a9254b45c6ad1556d605e250ad3ff1b78036f37f4619a3",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/fixtures/invalid.json": "049cc9cd127edee27b3a89e280753755e767cbde7a825fddb89a22bed94c7678",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/fixtures/missing.json": "cd632163eb6d2e53d07db93b6d6858cf8b7f7fdaf4b94a6fb37f8573ee0f6887",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/fixtures/not-applicable.json": "19f34642dee146a997f6d763f9563330b65749fc6f9d8a71722f02bfa8eb6ba4",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/fixtures/valid.json": "f43cb0baca86d0b477b21f34b3db2d819e80b8311e142291772712026ff439b7",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/manifest.json": "44fba319fd9689490ab89da7568a04e24088a3aca119d61784b1147739b77a3f",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/publication.json": "64215b019461cac26171290f2b865128d029739d785a6ab2003b5c8b8c7f156e",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/report.json": "c4033a65f8055cc88684ae0843243e172ce3a54def479c0d217f69118ad7108f",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/rules.json": "a0d836ea1528fe80fd8c0958df8c069f2e3df07d01d6b624bce97fc01d8de36d",
+    "server-version/backend/src/modules/assessment-bundle/packages/child_cognitive_tasks_zh_cn/0.1.0/scientific.json": "df3ffe9b57e1fc856b513f14f315ee2ffdbe2496230d1e33a66f7a2be44453fd",
+    "server-version/backend/src/modules/assessment-relational/product.service.ts": "d420259e544cea3d68d3fd7319f2a276e0b25acb8b3f43683a088158dcd9b9ae",
+    "server-version/backend/src/modules/assessment-runtime/form-context.ts": "f45fa81f553c3025dcf5626778cf1096a006a6a437b76d926673b56f93fd588d",
+    "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts": "68650e8bfa51857819ea75d5eeca85b70692dc763b2efb1f5e6c3b3912f41ffc",
+    "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": "2191dec5db73e5d0938d8a645927aef1128617c0ef6149fb91d3db3ff6cc74c6",
+    "server-version/backend/src/modules/bundle-product/analysis.ts": "02e81b701dd5d212f7e1eda8a679396f6a3fc5fc7045dff3fdfc3be6c44a5dba",
+    "server-version/backend/src/modules/bundle-product/child-cross-method.routes.ts": "f759fe4d30259527a70ebac3902868cec0bcab1cb392511bef5c09585393ec9a",
+    "server-version/backend/src/modules/bundle-product/child-cross-method.ts": "2ae1f551497f7f1d68865213ad3ef8f950891dc262436aba5066ab2da994def3",
+    "server-version/backend/src/modules/bundle-product/child-observer-admission.ts": "54d300a05f7488b3f7d19f55528d4fdd73867c6bd5987021d813143daf3900ed",
+    "server-version/backend/src/modules/bundle-product/definition-provider.ts": "b8c6dbf9dbe4e7b3575b12650bd8aa963b73ef4aa0230e16433634f9f3188eed",
+    "server-version/backend/src/modules/bundle-product/service.ts": "21500b288c26e63e620e7119f1901bc195d39e7d1bc1b73104916528d7754ef0",
+    "server-version/backend/src/modules/composite/composite.service.ts": "6e99a5b39b56aaf707ec8b397c81352bbe5559fc0aa48700203a39db53fce3a7",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "d0c1df42dab398269f69c09a21ecb3ae1e800f0c10379440094b417e3e23e82a",
+    "server-version/backend/src/scripts/import-private-scale-draft.ts": "f8b0665595478af31773081a30d2b42ae7ace125d34852c9bf5bfe7f0e81ae70",
+    "server-version/frontend/src/App.tsx": "50c5f320506d59597cae0b23139cfab35d0dd2d1988cd8431a472490f3bbc0ac",
+    "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx": "28e0f9b606551cbffe58c08b82199989ad32e86a099f71fa58955e07b7005d02",
+    "server-version/frontend/src/pages/bundle/BundleReport.tsx": "5a38bb9e51bbf54eb7dcab7f03bcc51e37a91b07fb30f04cbdc578fc8322729a",
+    "server-version/frontend/src/pages/bundle/__tests__/BundleReport.test.tsx": "0a21be4e1105694439c2d0abd6c03210be355d43853c353d33eca3c78c58fd85",
+    "server-version/frontend/src/pages/bundle/bundle-child-evidence-display.ts": "3497e650845de5f9f0aaeeb3368ab2c6398af4eea54739424d5aee20edc34abc",
+    "server-version/frontend/src/pages/relational/ChildCognitiveControlPage.tsx": "8bfb52f989af4176023fb00096786d2a23d7fd4c6fb5cc749db9a165bc1fafd4",
+    "server-version/frontend/src/pages/relational/RelationalTasksPage.tsx": "38f602b64ab84675cfdf29977239164a5ef4d8aeb2b80fb34221a8ad0fa0fef0",
+    "server-version/frontend/src/pages/relational/__tests__/ChildCognitiveControlPage.test.tsx": "ca904dca75c57bf455dbb4b81e34c92f7cae421b6ddc63865a46697adc71d7cb"
+  }
+}

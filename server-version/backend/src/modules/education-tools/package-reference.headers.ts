@@ -1,9 +1,10 @@
 import {Prisma} from '@prisma/client'
+import type {CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {createCodeBundleDefinitionProvider} from '../bundle-product/code-catalog'
 import {type EducationPackageReference,educationPackageKey} from './package-reference.contracts'
 
-export type EducationPackageHeader={key:string;provider:EducationPackageReference['provider'];id:string;hash:string;title:string;toolKey:string;toolVersion:string;
+export type EducationPackageHeader={classificationTags?:CatalogClassificationTag[];key:string;provider:EducationPackageReference['provider'];id:string;hash:string;title:string;toolKey:string;toolVersion:string;
  family:'NATIVE_BUNDLE'|'BUNDLE'|'COMBINATION';memberCount:number;reportVersion:string|null;educationApplicability:unknown;
  nativeRespondentTypes:string[]|null;nativeInitiationModes:string[]|null;population:unknown}
 const codeProvider=createCodeBundleDefinitionProvider()

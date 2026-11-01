@@ -9,22 +9,60 @@
   --catalog-accent: var(--system-accent, var(--survey-brand-accent-strong, #344d8d));
   --catalog-focus: var(--system-focus, var(--survey-brand-focus, #5278cb));
 }
+/* Shared discovery controls inherit the active product palette, including dark mode. */
+.hui-training :is(.catalog-discovery, .catalog-classification-tags, .catalog-classification-empty) {
+  --catalog-line: var(--training-border);
+  --catalog-surface: var(--training-surface);
+  --catalog-soft: var(--training-raised);
+  --catalog-ink: var(--training-ink);
+  --catalog-muted: var(--training-muted);
+  --catalog-accent: var(--training-bamboo);
+  --catalog-focus: var(--training-bamboo);
+}
+.hs-app :is(.catalog-discovery, .catalog-classification-tags, .catalog-classification-empty) {
+  --catalog-line: var(--hs-border);
+  --catalog-surface: var(--hs-surface, #fffff5);
+  --catalog-soft: var(--hs-surface-soft, var(--hs-bg));
+  --catalog-ink: var(--hs-ink);
+  --catalog-muted: var(--hs-muted, #526d55);
+  --catalog-accent: var(--hs-brand-ink, var(--hs-primary));
+  --catalog-focus: var(--hs-accent);
+}
+.ht-app :is(.catalog-discovery, .catalog-classification-tags, .catalog-classification-empty) {
+  --catalog-line: var(--ht-line);
+  --catalog-surface: var(--ht-paper);
+  --catalog-soft: var(--ht-surface-soft, var(--ht-bg));
+  --catalog-ink: var(--ht-ink);
+  --catalog-muted: var(--ht-quiet);
+  --catalog-accent: var(--ht-copper);
+  --catalog-focus: var(--ht-copper);
+}
 .catalog-discovery { margin: 18px 0; min-width: 0; }
 .catalog-discovery fieldset { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; border: 0; padding: 0; margin: 0; min-width: 0; }
-.catalog-discovery fieldset > label { display: grid; gap: 6px; flex: 1 1 130px; min-width: 0; margin: 0; color: var(--catalog-muted); font-size: 12px; }
-.catalog-discovery fieldset > .catalog-discovery-keyword { flex-basis: 100%; }
+.catalog-discovery fieldset > label,
+.catalog-discovery-advanced-fields > label { display: grid; gap: 6px; flex: 1 1 130px; min-width: 0; margin: 0; color: var(--catalog-muted); font-size: 12px; }
+.catalog-discovery fieldset > .catalog-discovery-keyword { flex-basis: 260px; }
+.catalog-discovery-advanced { flex-basis: 100%; min-width: 0; color: var(--catalog-muted); font-size: 12px; }
+.catalog-discovery-advanced > summary { width: fit-content; min-height: 44px; align-content: center; cursor: pointer; }
+.catalog-discovery-advanced-fields { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px; }
 .catalog-discovery :is(input, select) { width: 100%; min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid var(--catalog-line); border-radius: 8px; color: var(--catalog-ink); background: var(--catalog-surface); font: inherit; }
 .catalog-discovery-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .catalog-discovery-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 9px 12px; border: 1px solid var(--catalog-line); border-radius: 8px; color: var(--catalog-accent); background: var(--catalog-surface); font-size: 12px; }
 .catalog-discovery-actions button[type=submit] { background: var(--catalog-soft); }
-.catalog-discovery :is(input, select, button):focus-visible { outline: 3px solid var(--catalog-focus); outline-offset: 3px; }
+/* The teacher workspace also themes unclassed buttons; keep this control local. */
+.hui-training.hui-app .catalog-discovery .catalog-discovery-actions button { color: var(--catalog-accent); background: var(--catalog-surface); border-color: var(--catalog-line); }
+.hui-training.hui-app .catalog-discovery .catalog-discovery-actions button[type=submit] { background: var(--catalog-soft); }
+
+.catalog-discovery :is(input, select, button, summary):focus-visible { outline: 3px solid var(--catalog-focus); outline-offset: 3px; }
 .catalog-discovery fieldset:disabled { opacity: .6; }
 .catalog-discovery-hint { margin-top: 9px; color: var(--catalog-muted); font-size: 11px; line-height: 1.7; }
 .catalog-classification-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .catalog-classification-tags > span { display: inline-block; padding: 2px 8px; border: 1px solid var(--catalog-line); border-radius: 20px; color: var(--catalog-accent); background: var(--catalog-soft); font-size: 11px; line-height: 1.7; overflow-wrap: anywhere; }
 .catalog-classification-empty { display: block; margin-top: 8px; color: var(--catalog-muted); font-size: 11px; }
 @media (max-width: 480px) {
-  .catalog-discovery fieldset > label { flex-basis: calc(50% - 6px); }
+  .catalog-discovery fieldset > label,
+  .catalog-discovery-advanced-fields > label { flex-basis: calc(50% - 6px); }
+  .catalog-discovery fieldset > .catalog-discovery-keyword { flex-basis: 100%; }
   .catalog-discovery-actions { width: 100%; }
   .catalog-discovery-actions button { flex: 1; }
 }

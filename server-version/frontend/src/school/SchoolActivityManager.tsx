@@ -11,6 +11,9 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
+import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import {catalogQuery,EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogFilters,type CatalogClassificationTag,type CatalogTagFacets} from '../api/catalogDiscovery'
 
 const resourceFamilyText:Record<string,string>={FORM:'表单',SCALE:'量表',BUNDLE:'组合测评',SITUATIONAL:'情境测评',COGNITIVE:'认知测评'}
 
@@ -38,6 +41,7 @@ type CatalogResource={
   subjectRoles:string[];respondentRoles:string[];relationshipKinds:string[]
   perspectives:string[];analysisMode:string;visibilityPolicyKey:string
   minimumRespondents:number|null;allowedTargetModes?:string[]
+  classificationTags?:CatalogClassificationTag[]
 }
 const selectableRelationships=(resource:CatalogResource)=>resource.key.startsWith('library-scale:')
   ?resource.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'):resource.relationshipKinds
@@ -100,6 +104,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const [resourceLoading,setResourceLoading]=useState(false)
   const [resourceError,setResourceError]=useState('')
   const [resourcesRead,setResourcesRead]=useState(false)
+  const [resourceFilters,setResourceFilters]=useState({...EMPTY_CATALOG_FILTERS}),[appliedResourceFilters,setAppliedResourceFilters]=useState({...EMPTY_CATALOG_FILTERS}),[resourceFacets,setResourceFacets]=useState(EMPTY_CATALOG_FACETS)
   const resourceRequest=useRef(0)
   const runRequest=useRef(0)
   const [activeRun,setActiveRun]=useState<Run|null>(null)
@@ -177,6 +182,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     resourceRequest.current++
     setResources([]);setResourceId('');setResourceCursor(null)
     setResourceLoading(false);setResourceError('');setResourcesRead(false)
+    setResourceFilters({...EMPTY_CATALOG_FILTERS});setAppliedResourceFilters({...EMPTY_CATALOG_FILTERS});setResourceFacets(EMPTY_CATALOG_FACETS)
   },[resourceScope,api])
   const editableCourseId=selected?.organizationId===organizationId&&selected.status==='DRAFT'
     ?selected.courseId:null
@@ -236,20 +242,22 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setActiveRun({...run,tracks:[]})
     setNotice('已创建独立且未发布的测评批次。')
   })
-  const showResources=async(cursor?:string)=>{
+  const showResources=async(cursor?:string,filters:CatalogFilters=appliedResourceFilters)=>{
     if(!selected||!activeRun)return
     const request=++resourceRequest.current
     const current=()=>request===resourceRequest.current&&resourceContext.current.scope===resourceScope&&resourceContext.current.api===api
     setResourceLoading(true);setResourceError('')
     try{
-      const result=await api<{list:CatalogResource[];nextCursor?:string|null}>(
-        path+'/run-resources'+(cursor?'?cursor='+encodeURIComponent(cursor):'?page=1'))
+      const query=new URLSearchParams(catalogQuery(1,filters))
+      if(cursor){query.delete('page');query.set('cursor',cursor)}
+      const result=await api<{list:CatalogResource[];nextCursor?:string|null;tagFacets?:CatalogTagFacets}>(path+'/run-resources?'+query)
       if(!current())return
       // Registered education deliveries use the scoped, authorized adapter below.
       // Do not accept an identity-only resource via the legacy catalog projection.
       const visibleResources=result.list.filter(resource=>!resource.key.startsWith('education-assessment:'))
       setResources(previous=>mergeResources(cursor?previous:[],visibleResources))
       setResourceCursor(result.nextCursor??null);setResourcesRead(true)
+      setResourceFacets(result.tagFacets??EMPTY_CATALOG_FACETS)
       if(!cursor)setResourceId(previous=>visibleResources.some(resource=>resourceIdentity(resource)===previous)?previous:'')
     }catch(error){
       if(current())setResourceError(error instanceof Error?error.message:'授权测评资源读取失败，请重试。')
@@ -491,13 +499,16 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
               if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}</ActivityLayout>
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
+          {(resourcesRead||resourceLoading)&&<CatalogDiscoveryFilters label="已发布测评资源检索" filters={resourceFilters} facets={resourceFacets} onChange={setResourceFilters} disabled={busy||resourceLoading} onApply={value=>{
+            const applied={...value,keyword:value.keyword.trim()};setAppliedResourceFilters(applied);setResources([]);setResourceId('');setResourceCursor(null);void showResources(undefined,applied)
+          }}/>}
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}
           {resourceError&&<div><p role="alert">{resourceError} 已配置的测评项目不受影响。</p>
             <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>重新读取测评目录</button></div>}
           {resourceCursor&&<button disabled={busy||resourceLoading}
             onClick={()=>void showResources(resourceCursor)}>继续加载测评资源</button>}
           {resourcesRead&&!resourceLoading&&!resourceError&&resources.length===0&&<p>
-            {resourceCursor?'当前页暂无可选资源，仍可继续加载。':'当前目录没有可供本活动使用的测评资源。'}</p>}
+            {resourceCursor?'当前页暂无可选资源，仍可继续加载。':catalogQuery(1,appliedResourceFilters)!=='page=1'?'没有匹配的测评资源，可调整条件或清除筛选。':'当前目录没有可供本活动使用的测评资源。'}</p>}
           {resources.length>0&&<>
             <label className="hs-field"><span>测评资源 · 精确版本</span>
               <select value={resourceId} onChange={event=>selectResource(event.target.value)}>
@@ -506,6 +517,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
                   value={r.family+':'+r.key+':'+r.version}>
                   {r.title}{administrationLabel(r)} · {r.family} v{r.version} · {r.scientificMaturity}</option>)}
               </select></label>
+            {resource&&<CatalogClassificationTags tags={resource.classificationTags}/>}
             {resource?.key.startsWith('library-scale:')&&resource.relationshipKinds.some(kind=>['CLASS_TEACHER_STUDENT','COURSE_TEACHER_STUDENT'].includes(kind))&&
               <p>课程师生施测关系暂未接通，请使用班级师生关系；不会改动该版本的适用声明。</p>}
             {resource&&<div className="hs-grid">

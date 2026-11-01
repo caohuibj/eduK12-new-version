@@ -125,7 +125,7 @@ const PROTOCOLS: AnalysisProtocolDefinition[] = [
     version: '1.0.0',
     status: 'DRAFT',
     name: '抑制控制跨来源画像',
-    description: '由 Go/No-Go 行为任务与 ADEXI 学员自评共同呈现抑制控制的描述性证据，不按学员年龄或身份限制作答。',
+    description: '由 Go/No-Go 行为任务与 ADEXI 成人自评共同呈现抑制控制的描述性证据；ADEXI 沿用现有 18 岁以上产品边界，不能据此向未成年人开放。',
     recommendedForCreate: false,
     profiles,
     estimatedMinutes: { standard: [8, 15], research: [10, 20] },
@@ -138,7 +138,7 @@ const PROTOCOLS: AnalysisProtocolDefinition[] = [
     // in-place only while it remains unpublished; bump the protocol/package
     // version before changing status to PUBLISHED.
     recommendationRuleVersion: COGNITIVE_RECOMMENDATION_RULE_VERSION,
-    disabledReason: 'ADEXI 量表已取得使用授权；适用人群与发布材料仍需完成项目审核，PR10 保持 DRAFT。',
+    disabledReason: 'ADEXI 沿用成人自评适用范围；既有授权声明及发布材料由管理员最终复核，本协议保持 DRAFT 且不推荐创建。',
   },
   draftProtocol(
     'working_memory_v1',

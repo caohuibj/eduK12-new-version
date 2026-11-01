@@ -24,9 +24,9 @@ const grant=()=>({id:id(4),subject_id:context.principal.userId,issuer_id:id(5),p
  valid_from:new Date('2026-01-01Z'),expires_at:new Date('2099-01-01Z'),read_at:new Date('2026-10-29Z'),version:1,revoked_at:null,parent_grant_id:null,ancestry:[id(4)],
  capabilities:['material.use'],delegable_capabilities:[],remaining_delegation_depth:0})
 const database=()=>({$queryRaw:vi.fn(async(query:{sql:string})=>{
- if(query.sql.includes('WITH authorized_keys AS'))return [header]
  if(query.sql.includes('FROM content_capability_grants g LEFT JOIN assessment_management_events typed ON typed.id=g.id')
   &&query.sql.includes("g.capabilities=ARRAY['material.use']::text[]"))return [grant()]
+ if(query.sql.includes('WITH authorized_keys AS'))return [{list:[{...header,classificationTags:[]}],facetTags:[]}]
  if(query.sql.includes('FROM bundle_package_releases p WHERE'))return [header]
  throw new Error('Unexpected metadata query')
 }),bundlePackageRelease:{findUnique:vi.fn(async()=>({id:source.versionId,status:'PUBLISHED',contentHash:hash,content:pack}))}})
@@ -67,7 +67,7 @@ describe('exact whole package source authority and metadata',()=>{
   expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
   expect(tx.bundlePackageRelease.findUnique).not.toHaveBeenCalled()
   expect(result.list[0]).toMatchObject({sourceRef:source,kind:'PACKAGE_REFERENCE',canEditOriginal:false,canSplit:false,canMix:false,memberCount:header.memberCount})
-  expect(tx.$queryRaw.mock.calls[0][0].sql).toContain('LIMIT 41')
+  expect(tx.$queryRaw.mock.calls[0][0].sql).toContain('LIMIT ?');expect(tx.$queryRaw.mock.calls[0][0].values).toContain(41)
   expect(tx.$queryRaw.mock.calls[0][0].sql).toContain('g.remaining_delegation_depth=0')
  })
  it('does not materialize, publish or create an editable version during an exact native preview',async()=>{

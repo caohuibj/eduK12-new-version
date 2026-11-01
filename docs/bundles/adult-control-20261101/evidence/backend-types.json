@@ -1,0 +1,11 @@
+{
+  "node": "v24.21.0",
+  "typescript": "5.9.3",
+  "roots": [
+    "/workspace/adult-bundle/server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+    "/workspace/adult-bundle/server-version/backend/src/modules/cognitive-analysis/analysis-protocol.registry.ts",
+    "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts"
+  ],
+  "files": 1197,
+  "diagnostics": []
+}
