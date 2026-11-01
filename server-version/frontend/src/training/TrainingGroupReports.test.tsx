@@ -18,6 +18,16 @@ beforeEach(() => {
   m.get.mockImplementation(async (path: string) => ({code: 0, data: path === base ? {tasks: [{id: 'task', name: '课程任务'}], artifacts: [{taskId: 'task', artifactId: 'old', generatedAt: old.generatedAt}]} : path.includes('/sources/') ? {tools: [tool]} : old}))
   m.post.mockResolvedValue({code: 0, data: {...old, artifactId: 'new'}})
 })
+it('explains an empty task catalog without offering an empty picker or generation action', async () => {
+  m.get.mockResolvedValueOnce({code: 0, data: {tasks: [], artifacts: []}})
+  render(<TrainingGroupReports courseId="course" />)
+  fireEvent.click(screen.getByRole('button', {name: '打开群体报告'}))
+  expect(await screen.findByText(/本课程暂无可统计的测评任务/)).toHaveAttribute('role', 'status')
+  expect(screen.queryByRole('combobox', {name: '群体报告任务'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', {name: '选择工具与版本'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', {name: '生成更新版报告'})).not.toBeInTheDocument()
+  expect(m.post).not.toHaveBeenCalled()
+})
 it('opens stored artifacts without discovery or generation and hides suppressed values in reading and print markup', async () => {
   render(<TrainingCourseAnalysis courseId="course" actorId="teacher" />)
   expect(m.sources).not.toHaveBeenCalled(); expect(m.get).not.toHaveBeenCalled()
