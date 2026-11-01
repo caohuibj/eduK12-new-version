@@ -371,6 +371,65 @@ describe('classroom socket authorization boundary', () => {
     expect(mockPrisma.classroomAnswer.create).toHaveBeenCalledOnce()
   })
 
+  it('revalidates a current authenticated student before an ownership-bound submit', async () => {
+    const handler = new ClassroomSocketHandler()
+    const socket = makeSocket({ authenticated: true, userId: 'student-1', userRole: 'STUDENT',
+      clientRole: 'student', classroomId: 'classroom-1', sessionId: 'session-1', studentId: 'student-1' })
+    mockPrisma.classroom.findUnique.mockResolvedValue({ status: 'ACTIVE' })
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({ id: 'question-1', startedAt: new Date(), endedAt: null, timeLimit: null })
+    mockPrisma.classroomSession.findFirst.mockResolvedValue({ id: 'session-1' })
+    mockPrisma.classroomAnswer.findUnique.mockResolvedValue(null)
+    mockPrisma.classroomAnswer.create.mockResolvedValue({ id: 'answer-1' })
+    await (handler as any).handleStudentSubmit(socket, { questionId: 'question-1', answer: 'A' })
+    expect(mockSocketService.refreshAuthenticatedSocket).toHaveBeenCalledWith(socket)
+    expect(mockPrisma.classroomSession.findFirst).toHaveBeenCalledWith({
+      where: { id: 'session-1', classroomId: 'classroom-1', studentId: 'student-1' }, select: { id: true },
+    })
+    expect(mockPrisma.classroomAnswer.create).toHaveBeenCalledOnce()
+  })
+
+  it.each(['revoked', 'role-changed', 'different-student'])('rejects %s signed identity without downgrading later retries to anonymous', async reason => {
+    const handler = new ClassroomSocketHandler()
+    const socket = makeSocket({ authenticated: true, userId: 'student-1', userRole: 'STUDENT',
+      clientRole: 'student', classroomId: 'classroom-1', sessionId: 'session-1', studentId: 'student-1' })
+    mockSocketService.refreshAuthenticatedSocket.mockImplementation(async () => {
+      if (reason === 'revoked') { socket.data.authenticated = false; socket.data.userId = undefined; return false }
+      if (reason === 'role-changed') socket.data.userRole = 'TEACHER'
+      if (reason === 'different-student') socket.data.userId = 'different-student'
+      return true
+    })
+    await (handler as any).handleStudentSubmit(socket, { questionId: 'question-1', answer: 'A' })
+    await (handler as any).handleStudentSubmit(socket, { questionId: 'question-1', answer: 'A' })
+    // A leave/cleanup can clear classroom context, but cannot turn failed auth into anonymous join.
+    socket.data.clientRole = undefined
+    await (handler as any).handleStudentJoin(socket, { code: '123456' })
+    expect(socket.data.authenticationInvalidated).toBe(reason === 'role-changed' ? undefined : true)
+    expect(socket.disconnect).not.toHaveBeenCalled()
+    expect(mockPrisma.classroom.findUnique).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomAnswer.create).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomSession.upsert).not.toHaveBeenCalled()
+  })
+
+  it('rejects an expired authenticated student before joining a classroom', async () => {
+    const handler = new ClassroomSocketHandler()
+    const socket = makeSocket({ authenticated: true, userId: 'student-1', userRole: 'STUDENT' })
+    mockSocketService.refreshAuthenticatedSocket.mockResolvedValue(false)
+    await (handler as any).handleStudentJoin(socket, { code: '123456' })
+    expect(mockPrisma.classroom.findUnique).not.toHaveBeenCalled()
+    expect(socket.data.authenticationInvalidated).toBe(true)
+    expect(socket.disconnect).not.toHaveBeenCalled()
+  })
+
+  it('rejects a valid teacher on the student page without causing the client to reconnect', async () => {
+    const handler = new ClassroomSocketHandler()
+    const socket = makeSocket({ authenticated: true, userId: 'teacher-1', userRole: 'TEACHER' })
+    await (handler as any).handleStudentJoin(socket, { code: '123456' })
+    expect(socket.emit).toHaveBeenCalledWith('error', { message: '学生连接身份无效' })
+    expect(socket.data.authenticationInvalidated).toBeUndefined()
+    expect(socket.disconnect).not.toHaveBeenCalled()
+    expect(mockPrisma.classroomSession.upsert).not.toHaveBeenCalled()
+  })
+
   it('uses compare-and-set and returns the winning question for a same-question race', async () => {
     const handler = new ClassroomSocketHandler()
     const socket = makeSocket({

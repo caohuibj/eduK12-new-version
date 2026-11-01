@@ -203,11 +203,14 @@ export class SocketService {
     }
 
     try {
-      const principal = await loadCurrentPrincipal(socket.data.userId)
       const token = getSocketToken(socket)
+      const payload = token ? verifyToken(token) : null
+      const principal = await loadCurrentPrincipal(socket.data.userId)
       const revoked = token ? await isSessionRevoked(token) : true
 
       if (
+        !payload || payload.userId !== socket.data.userId ||
+        !Number.isInteger(payload.tokenVersion) || payload.tokenVersion !== socket.data.tokenVersion ||
         !principal ||
         inactiveAccountMessage(principal) ||
         principal.mustChangePassword ||
@@ -215,6 +218,7 @@ export class SocketService {
         || !['LEGACY','TRAINING'].includes(principal.accountDomain)
         || (needsAdminKey(principal) && !validAdminProof(socket.data.adminProof ?? {}))
       ) {
+        socket.data.authenticationInvalidated = true
         socket.data.authenticated = false
         socket.data.userId = undefined
         socket.data.userRole = undefined
@@ -227,6 +231,7 @@ export class SocketService {
       socket.data.platformRole = principal.platformRole
       return true
     } catch {
+      socket.data.authenticationInvalidated = true
       socket.data.authenticated = false
       socket.data.userId = undefined
       socket.data.userRole = undefined
