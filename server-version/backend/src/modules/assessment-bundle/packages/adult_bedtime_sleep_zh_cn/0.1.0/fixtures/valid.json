@@ -1,0 +1,23 @@
+{
+  "values": {
+    "adult": {
+      "state": "present",
+      "value": true
+    },
+    "bps": {
+      "state": "present",
+      "value": 1.7777777777777777
+    },
+    "sci": {
+      "state": "present",
+      "value": 6
+    }
+  },
+  "expectedRuleIds": [
+    "bps_summary",
+    "sci_summary",
+    "sl3",
+    "method_scope"
+  ],
+  "expectedKind": "COMPUTED"
+}

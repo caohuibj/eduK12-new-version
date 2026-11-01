@@ -1,0 +1,71 @@
+{
+  "key": "adult_bedtime_sleep_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "pattern",
+      "kind": "conclusions",
+      "title": "本次作息与睡眠体验｜实验性叙事",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "sl1",
+        "sl2",
+        "sl3",
+        "sl4",
+        "middle_or_mixed"
+      ]
+    },
+    {
+      "blockId": "evidence",
+      "kind": "evidence",
+      "title": "两条原量尺｜BPS一般习惯均分1–5；SCI过去月/持续时间合计0–32",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "independent",
+      "kind": "conclusions",
+      "title": "分别读懂两项结果",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "bps_summary",
+        "sci_summary"
+      ]
+    },
+    {
+      "blockId": "method",
+      "kind": "conclusions",
+      "title": "计划—实际—体验：可选择的反思与方法说明",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "method_scope",
+        "missing_core",
+        "invalid_core",
+        "not_applicable_core"
+      ]
+    },
+    {
+      "blockId": "limits",
+      "kind": "limitations",
+      "title": "来源、时间窗与使用边界",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    }
+  ],
+  "states": {
+    "missing": "本次核心信息还不完整；仅停止依赖缺项的联合叙事，保留允许展示的独立结果。缺SCI不表示睡眠良好。",
+    "limited": "本次来源质量条件有限，暂不形成确定的两工具模式；可查看允许展示的独立结果，不把有限质量解释成健康问题。",
+    "unavailable": "本次缺少适用或有效信息，暂不能形成联合结果；本版本仅供18岁及以上成人非商业研究，不作诊断。"
+  }
+}

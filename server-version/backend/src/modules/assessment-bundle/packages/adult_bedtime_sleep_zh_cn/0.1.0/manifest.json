@@ -1,0 +1,102 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "adult_bedtime_sleep_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "成人作息与睡眠状况｜非商业研究试验版",
+    "description": "18岁及以上成人的17题组合：BPS9一般上床习惯与SCI8过去一个月睡眠体验分列；中文工作译稿、EXPERIMENTAL、非商业研究、非诊断。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18
+    },
+    "slots": [
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "adult_bedtime_sleep_zh_cn_context",
+        "instrumentVersion": "0.1.0",
+        "respondentType": "SELF"
+      },
+      {
+        "slotKey": "bedtime",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "bps9_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "bedtime_procrastination"
+        ]
+      },
+      {
+        "slotKey": "sleep",
+        "unitType": "SCALE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "sci8_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "sleep_condition"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "adult_bedtime_sleep_zh_cn_context",
+    "contextDefinitionVersion": "0.1.0",
+    "reportDefinitionKey": "adult_bedtime_sleep_zh_cn_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": true
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "bps9_zh_cn_research",
+        "sci8_zh_cn_research"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "仅限18岁及以上成人非商业研究。SCI原来源usageRequirements.allowedCommercialNatures仅NON_COMMERCIAL；中文题本是独立工作译稿，译审及本地适用性待完成。代码叶来源PUBLISHED不表示本Bundle已安装、获准或生产发布。",
+      "BPS9：一般平时上床习惯，9题原键反向后均分1–5，高分表示较多上床拖延。SCI8：前七题回顾过去一个月，第8题另问问题持续时间；8项专属0–4映射合计0–32，高分较有利。保持两种时间窗，不合成统一回忆期。",
+      "叙事位置b=(BPS均分−1)/4；s=1−SCI合计/32。b、s只是原量尺范围位置，不是百分位、患病概率或可相加的健康指数；SCI原始展示仍高分较有利。现有v1报告保留原分及公式，不声称另存归一化数字、Profile v2状态或新绘图。",
+      "SL1–SL4采用项目预设≤.25/≥.75尾区，等价BPS≤2/≥4、SCI≥24/≤8；均为EXPERIMENTAL叙事条件，非原作者切点、临床分层、经验聚类或已验证干预。中间结果保持独立描述，不强制归类。",
+      "BPS与SCI是互补自评，不能据此确定睡眠问题原因、归咎自律或诊断失眠。缺失、非法、不适用不记0；仅停止依赖缺项的联合叙事，不把缺SCI解释为睡眠良好。",
+      "可选轮班、典型就寝时间和希望讨论的事情仅作背景，不计分、不修改量表原分；计划—实际—体验卡是反思提示，系统不虚构计划就寝时间、作息日记或未收集的经历。",
+      "纵向比较须保持同一语言、叶工具与C/P/R、BPS一般习惯和SCI月度/持续时间口径；不插补缺波次，不宣称可靠变化或治疗效果。不开放额外分享、自动授权、排名、药物或强制睡眠限制处方。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": []
+}

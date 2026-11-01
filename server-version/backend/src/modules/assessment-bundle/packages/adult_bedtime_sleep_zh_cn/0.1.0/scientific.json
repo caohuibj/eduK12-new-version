@@ -1,0 +1,28 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "18+成人，自评，中文工作译稿，学校/培训/研究情境中的非商业自我了解。仅17题已存量表和不计分背景；不扩展到青少年、家长/教师观察或临床诊断。标签语义保留：domain:sleep_recovery、construct:bedtime_procrastination、construct:sleep_condition、population:adult_research、response:self、use:research、use:not_diagnostic、license:noncommercial、language_validation:working_translation、language_validation:translation_review_pending、language_validation:local_validation_pending。当前Bundle schema没有classificationTags字段，以上是来源/目录说明，不声称已新增可检索facet。叶工具证据与项目新叙事证据分列，不把理论文献当成项目阈值验证。",
+  "references": [
+    {
+      "id": "bps_original",
+      "citation": "Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2014.00611/full 当前项目独立中文工作译稿，非已验证中文版。精确叶来源 bps9_zh_cn_research@1.0.0；CONTENT轴1.0.0:1.0.0，PARAMETERS轴none-v1（referencePolicy=none）；basic REPORT 1.0.0。仅支持该工具的原量尺描述，不支持本项目尾区或新组合效度。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "sci_original",
+      "citation": "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183. https://bmjopen.bmj.com/content/4/3/e004183 当前项目独立中文工作译稿，非已验证中文版。精确叶来源 sci8_zh_cn_research@1.0.0；CONTENT轴1.0.0:1.0.0，PARAMETERS轴none-v1（referencePolicy=none）；basic REPORT 1.1.0。仅支持该工具的原量尺描述，不支持本项目尾区或新组合效度。 SCI量表版权Sleepio Limited；CC BY-NC 4.0 https://creativecommons.org/licenses/by-nc/4.0/，项目翻译/数字排版为改编；只限非商业，未获作者认可。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "project_design",
+      "citation": "项目B10《成人作息与睡眠状况》设计v1.0及共享画像实施规范（2026-11-01）。项目自编联合叙事、≤.25/≥.75锚点与可选反思提示；未获人工专家、作者、中文效度或联合模型批准。此引用只标明设计来源，不作为实证验证。",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition"
+      ]
+    }
+  ]
+}

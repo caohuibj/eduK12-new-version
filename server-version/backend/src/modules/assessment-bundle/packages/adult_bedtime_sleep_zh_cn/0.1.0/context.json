@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "adult_bedtime_sleep_zh_cn_context",
+  "contextDefinitionVersion": "0.1.0",
+  "fields": [
+    {
+      "contextKey": "adult_confirmed",
+      "required": true,
+      "valueType": "boolean"
+    },
+    {
+      "contextKey": "shift_work",
+      "required": false,
+      "valueType": "enum",
+      "enumValues": [
+        "是",
+        "否",
+        "不确定",
+        "不想回答"
+      ]
+    },
+    {
+      "contextKey": "typical_bedtime",
+      "required": false,
+      "valueType": "string"
+    },
+    {
+      "contextKey": "discussion_focus",
+      "required": false,
+      "valueType": "string"
+    }
+  ]
+}
