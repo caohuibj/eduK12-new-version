@@ -1,6 +1,8 @@
+import {buildSurveyCognitiveReportSnapshot} from './cognitive-bundle-report'
+import type {FrozenSurveyCognitive} from './cognitive.definition'
 import {computeSurveyNativeReports} from '../bundle-product/survey-native'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {gonogoSequence} from '../cognitive/randomization'
+import {gonogoSequence,corsiSequence,digitBackwardSequence} from '../cognitive/randomization'
 import {createTrialEnvelope} from '../cognitive/v2/trial-envelope'
 import {runAuthoritativeScorer} from '../cognitive/v2/authoritative-scorer'
 import {verifySurveyFinalPublication,type FrozenUnitResult} from './final.compute'
@@ -38,7 +40,17 @@ export function syntheticFormAnswers(form:FormDraft,index:number){
  }
  return answer
 }
-export function syntheticCognitiveTrials(seed:string,index=1){return gonogoSequence(seed,120,.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1300,endedAtPerfMs:trialIndex*1300+800,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?240+index*80:null,interrupted:false}}))}
+export function syntheticCognitiveTrials(seed:string,index=1,frozen?:FrozenSurveyCognitive){
+ if(frozen?.schemaVersion===2&&['digitbackward','corsi'].includes(frozen.sessionSnapshot.testType)){
+  const c=frozen.sessionSnapshot.config as Record<string,number>,backward=frozen.sessionSnapshot.testType==='digitbackward',start=c.startSpan,maximum=c.maxSpan,stop=Math.min(maximum,start+index+1)
+  const trials:ReturnType<typeof createTrialEnvelope>[]=[]
+  for(let level=start;level<=stop;level++)for(let within=1;within<=c.trialsPerLevel;within++){
+   const trialIndex=trials.length,sequence=backward?digitBackwardSequence(seed,trialIndex,level):corsiSequence(seed,trialIndex,level,c.boardSize),response=level===stop&&stop<maximum?[]:backward?[...sequence].reverse():[...sequence]
+   trials.push(createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*10000,endedAtPerfMs:trialIndex*10000+8000,payload:{spanLength:level,trialWithinLevel:within,sequence,response,responseDurationMs:1500,interrupted:false}}))
+  }
+  return trials
+ }
+ return gonogoSequence(seed,120,.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1300,endedAtPerfMs:trialIndex*1300+800,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?240+index*80:null,interrupted:false}}))}
 export function syntheticUnitAnswers(unit:ResearchFrozenUnit,index:number):Record<string,unknown>{
  if(unit.kind==='FORM')return syntheticFormAnswers(unit.displayDefinition as FormDraft,index)
  if(unit.kind==='COGNITIVE')return {}
@@ -58,10 +70,13 @@ export function computeGovernedTrial(a:GovernedArtifact,toolId:string,index:numb
   if(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){const trial=computeGovernedNativeTrial(unit,index);native.set(unit.instrumentKey,trial.unitResult);rawNative[unit.instrumentKey]=trial.evidence}
   if(unit.kind==='SCALE'&&(unit.displayDefinition as {presentationMode?:string}).presentationMode==='ONE_BY_ONE')timings[unit.instrumentKey]=Object.fromEntries(readSurveyScalePresentation(unit.displayDefinition).items.map(i=>[i.itemKey,{schemaVersion:1,firstResponseMs:1000,activeTimeMs:1500,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))
   if(unit.kind==='COGNITIVE'){
-   const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition),seed='survey-governance-synthetic:'+toolId+':'+index,trials=syntheticCognitiveTrials(seed,index)
-   const scored=runAuthoritativeScorer({definition:surveyCognitiveTaskDefinition(),session:frozen.sessionSnapshot,trials,randomSeed:seed})
+   const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition),seed='survey-governance-synthetic:'+toolId+':'+index,trials=syntheticCognitiveTrials(seed,index,frozen)
+   const scored=runAuthoritativeScorer({definition:surveyCognitiveTaskDefinition(frozen),session:frozen.sessionSnapshot,trials,randomSeed:seed})
+   const reportSnapshot=frozen.schemaVersion===2?buildSurveyCognitiveReportSnapshot(frozen,scored,new Date('2026-11-01T00:00:00Z'),trials):undefined
+   const binding=a.nativeBundle?.cognitiveReports?.[unit.instrumentKey]
+   if(binding&&a.nativeBundle)unit.nativeBundleCognitiveReport={definitionHash:a.nativeBundle.source.definitionHash,...binding}
    const reference={slotKey:unit.instrumentKey,epoch:1,resultId:'00000000-0000-4000-8000-000000000001',resultHash:canonicalHash(scored),measurementDigest:frozen.measurementDigest}
-   const loaded={reference,result:{...scored,engineVersion:frozen.sessionSnapshot.engineVersion,scoringVersion:frozen.sessionSnapshot.scoringVersion,protocolSignature:frozen.sessionSnapshot.protocolSignature}} as unknown as LoadedSurveyCognitiveResult
+   const loaded={reference,result:{...scored,...(reportSnapshot?{reportSnapshot,profileArtifactHash:frozen.schemaVersion===2?frozen.artifactHash:undefined,profile:reportSnapshot.profile,configHash:frozen.sessionSnapshot.configHash}:{}),engineVersion:frozen.sessionSnapshot.engineVersion,scoringVersion:frozen.sessionSnapshot.scoringVersion,protocolSignature:frozen.sessionSnapshot.protocolSignature}} as unknown as LoadedSurveyCognitiveResult
    cognitive.set(unit.instrumentKey,cognitiveParentUnit(unit,loaded));rawCognitive[unit.instrumentKey]={synthetic:true,trialCount:trials.length,trials}
   }
  }

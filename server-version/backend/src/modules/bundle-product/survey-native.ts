@@ -1,3 +1,5 @@
+import { readSurveyBundleCognitiveReport } from '../survey/cognitive-bundle-report'
+import { projectBundleCognitiveSource } from '../assessment-bundle/sources'
 import {z} from 'zod'
 import {isFrozenAdultSelfReport} from './self-report-audience'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -24,6 +26,7 @@ export const surveyNativeSourceSchema=z.object({compositeId:z.string().guid(),de
 export type SurveyNativeSource=z.infer<typeof surveyNativeSourceSchema>
 /** Shared once in the existing immutable governed artifact/publication. No grant. */
 export type SurveyNativeBundle={schemaVersion:1;source:SurveyNativeSource;ownerId:string;definition:FrozenBundleProductionDefinitionV1;
+ cognitiveReports?:Record<string,Omit<import('../survey/cognitive-bundle-report').FrozenSurveyBundleCognitiveReport,'definitionHash'>>;
  policies:Record<string,EffectiveScaleDisclosureSnapshot>;reportAudiences:Record<string,'student'|'researcher'|'parent'|'teacher'|null>}
 export type SurveyNativeReport={importId:string;definitionHash:string;status:'READY'|'UNAVAILABLE'|'FAILED';factsHash:string|null;
  views:{student:ProfileView|null;researcher:ProfileView|null};errorCode:string|null;
@@ -32,7 +35,7 @@ export type SurveyNativeReport={importId:string;definitionHash:string;status:'RE
 export function nativeProfilePackage(native:SurveyNativeBundle){
  const frozen=readFrozenBundleProductionDefinition(native.definition),pack=frozen.declarativePackage
  if(frozen.contentHash!==native.source.definitionHash||(pack?.schemaVersion!==2&&pack?.schemaVersion!==3))throw new Error('SURVEY_NATIVE_PROFILE_IDENTITY')
- if(pack.schemaVersion===3&&frozen.bundleSnapshot.slotBindings.some(s=>!['SCALE','FORM'].includes(s.unitType)))throw new Error('SURVEY_NATIVE_UNIT_UNSUPPORTED')
+ if(pack.schemaVersion===3&&frozen.bundleSnapshot.slotBindings.some(s=>!['SCALE','FORM'].includes(s.unitType)&&!(s.unitType==='COGNITIVE'&&['digitbackward','corsi'].includes(s.instrumentKey)&&pack.manifest.definition.respondentTypes.length===1&&pack.manifest.definition.respondentTypes[0]==='SELF'&&s.respondentType==='SELF'&&pack.report.narrativeContent==='BUNDLE_OWNED_SELF')))throw new Error('SURVEY_NATIVE_UNIT_UNSUPPORTED')
  return {frozen,pack}
 }
 /** Normalize only the consumer's participant lane; retain the actual source R
@@ -79,7 +82,7 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
  return (snapshot.governedPackages??[]).filter(p=>p.nativeBundle).map(p=>{
   const native=p.nativeBundle!,out:SurveyNativeReport={importId:p.importId,definitionHash:native.source.definitionHash,status:'FAILED',factsHash:null,views:{student:null,researcher:null},errorCode:null}
   try{
-   const {frozen,pack}=nativeProfilePackage(native),scales=[]
+   const {frozen,pack}=nativeProfilePackage(native),scales=[],cognitive=[],cognitivePolicies=new Map<string,import('./cognitive-disclosure').BundleCognitiveDisclosure>()
    for(const slot of frozen.bundleSnapshot.slotBindings.filter(s=>s.unitType==='SCALE')){
     const binding=p.slots.find(s=>s.slotKey===slot.slotKey),unit=snapshot.units.find(u=>u.draftId===binding?.draftId&&u.instrumentKey===binding.instrumentKey),result=calculated.units.find(r=>r.instrumentKey===binding?.instrumentKey)
     if(!unit||!result||result.notExecuted)continue
@@ -87,6 +90,14 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
     const definition=unit.compiledDefinition as ScaleDefinitionV2,scored=result.privateScoring as import('../scale/scale-scoring').ScaleScoringOutput
     const source=projectBundleScaleSource({slotKey:slot.slotKey,expectedInstrumentKey:slot.instrumentKey,expectedInstrumentVersion:slot.instrumentVersion,result:{schemaVersion:2,instrument:{scaleId:unit.draftId,code:slot.instrumentKey,name:unit.title,instrumentVersion:slot.instrumentVersion},method:{scaleId:unit.draftId,instrumentVersion:slot.instrumentVersion,scoringVersion:definition.scoring.scoringVersion,reportVersion:definition.report.reportVersion,definitionHash:hashScaleDefinition(definition),referenceVersions:[],assessmentContext:null},quality:scored.quality,itemScores:scored.itemScores,scores:scored.scores,references:[],interpretations:[],caveats:[],disclaimer:'Frozen Survey FINAL score projection'}})
     scales.push({...source,profileIdentity:{runtimeDefinitionHash:canonicalHash(unit.compiledDefinition),scoringVersion:(unit.compiledDefinition as ScaleDefinitionV2).scoring.scoringVersion,sourceResultId:unit.instrumentKey,qualityFlags:[...scored.quality.flags]}})
+   }
+   for(const slot of frozen.bundleSnapshot.slotBindings.filter(s=>s.unitType==='COGNITIVE')){
+    const binding=p.slots.find(s=>s.slotKey===slot.slotKey),unit=snapshot.units.find(u=>u.draftId===binding?.draftId&&u.instrumentKey===binding.instrumentKey),result=calculated.units.find(r=>r.instrumentKey===binding?.instrumentKey)
+    if(!unit||!result||result.notExecuted)continue
+    const report=readSurveyBundleCognitiveReport(unit,result)
+    if(!report||unit.nativeBundleCognitiveReport?.definitionHash!==native.source.definitionHash)continue
+    cognitive.push(projectBundleCognitiveSource({slotKey:slot.slotKey,expectedInstrumentKey:slot.instrumentKey,expectedInstrumentVersion:slot.instrumentVersion,result:report.result,sourceResultHash:canonicalHash(report.result)}))
+    cognitivePolicies.set(slot.slotKey,report.disclosure)
    }
    const values:Record<string,unknown>={}
    for(const c of native.source.context){
@@ -97,8 +108,8 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
    if(frozen.contextDefinition&&frozen.contextDefinition.fields.some(f=>(pack.schemaVersion===2||f.required)&&(values[f.contextKey]===undefined||values[f.contextKey]===null||values[f.contextKey]===''))){out.status='UNAVAILABLE';out.errorCode='SURVEY_NATIVE_CONTEXT_MISSING';return out}
    const contextFacts=frozen.contextDefinition?buildBundleContextFactsFromValues({definition:frozen.contextDefinition,values,frozenAt:frozen.frozenAt}):null
    const compiledRuntime=compileBundleRuntimeFromFrozenRead({family:'ASSESSMENT_BUNDLE',snapshotVersion:3,snapshot:frozen.bundleSnapshot})
-   const aggregateInputHash=computeReanalysisAggregateInputHash({snapshotHash:frozen.bundleSnapshot.snapshotHash,compiledBundleRuntimeHash:compiledRuntime.compiledRuntimeHash,scaleSources:scales,cognitiveSources:[],situationalSources:[],contextSnapshotHash:contextFacts?.contextSnapshotHash??null})
-   const facts=projectBundleReportFacts({registry:createProductBundleAnalysisEngineRegistry(),engineInput:{snapshot:frozen.bundleSnapshot,compiledRuntime,evidence:[],aggregateInputHash,contextFacts,scaleSources:scales,declarativePackage:pack}})
+   const aggregateInputHash=computeReanalysisAggregateInputHash({snapshotHash:frozen.bundleSnapshot.snapshotHash,compiledBundleRuntimeHash:compiledRuntime.compiledRuntimeHash,scaleSources:scales,cognitiveSources:cognitive,situationalSources:[],contextSnapshotHash:contextFacts?.contextSnapshotHash??null})
+   const facts=projectBundleReportFacts({registry:createProductBundleAnalysisEngineRegistry(),engineInput:{snapshot:frozen.bundleSnapshot,compiledRuntime,evidence:[],aggregateInputHash,contextFacts,scaleSources:scales,cognitiveSources:cognitive,declarativePackage:pack}})
    out.factsHash=canonicalHash(facts)
    if(facts.enginePayload.kind==='UNAVAILABLE'){out.status='UNAVAILABLE';return out}
    const profile=pack.schemaVersion===2?(facts.enginePayload.payload as {profile:ProfileResult}).profile:null
@@ -112,9 +123,10 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
      if(policy.disposition==='UNKNOWN'||selected!==audience)for(const key of Object.keys(capabilities) as Array<keyof typeof capabilities>)capabilities[key]=false
      return [slot,capabilities] as const
     }))
+    if(audience==='student')for(const [slot,disclosure]of cognitivePolicies)policies.set(slot,disclosure.capabilities)
     if(pack.schemaVersion===2&&profile)out.views[audience]=projectProfileView(profile,pack,policies,audience==='researcher',audience==='student'?'student':'admin')
     else if(pack.schemaVersion===3)out.derivedViews![audience]=projectDerivedBundleView({pack,payload:facts.enginePayload.payload,evidence:facts.evidence,
-      policies,availableEvidenceKeys:new Set(pack.evidence.map(e=>e.evidenceKey)),audience:audience==='student'?'student':'admin'})
+      policies,availableEvidenceKeys:new Set(pack.evidence.filter(e=>!pack.manifest.definition.slots.some(s=>s.slotKey===e.slotKey&&s.unitType==='COGNITIVE')||audience==='student'&&cognitivePolicies.get(e.slotKey)?.metricKeys.has(e.selector)).map(e=>e.evidenceKey)),audience:audience==='student'?'student':'admin'})
    }
    out.status=profile&&['INVALID','INSUFFICIENT','NOT_APPLICABLE'].includes(profile.state)?'UNAVAILABLE':'READY'
   }catch{out.errorCode='SURVEY_NATIVE_ANALYSIS_FAILED'}

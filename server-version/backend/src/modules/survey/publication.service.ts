@@ -44,6 +44,7 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
 export interface ResearchFrozenUnit {
   trackingIdentity?:{measurementHash:string;metrics:Array<{key:string;label:string;unit:string}>}
   longitudinalMetricKeys?:string[]
+  nativeBundleCognitiveReport?:import('./cognitive-bundle-report').FrozenSurveyBundleCognitiveReport
   nativeBundleReport?:{definitionHash:string;audience:'student'|'researcher'|null;policy:import('../scale/projection/types').EffectiveScaleDisclosureSnapshot}
   executionProtocol?:'SITUATIONAL_NATIVE_V1'
   /** Catalog previews carry an unbound header; persisted publication adds time/epoch.

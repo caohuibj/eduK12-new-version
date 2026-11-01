@@ -7,6 +7,7 @@ import { withFinalOnlyCompletionTransaction } from '../../services/questionnaire
 import { prepareCanonicalSubmission,assertCanonicalSubmissionPayloadSize,validateSubmissionId } from '../../services/instrumentFinalSubmit'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { buildSurveyCognitiveReportSnapshot,assertSurveyCognitiveTrialBudget } from './cognitive-bundle-report'
 import { administrationProvenanceV1Schema,type AdministrationProvenanceV1 } from '../cognitive/administration-provenance'
 import { validateAndNormalizeTrials } from '../cognitive/v2/trial-normalizer'
 import { prepareAuthoritativeScorerContext,runPreparedAuthoritativeScorer } from '../cognitive/v2/authoritative-scorer'
@@ -155,8 +156,7 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
   if(input.definitionHash!==snapshot.configHash||(input.contextSnapshotHash??null)!==null)
     cognitiveFail(409,'认知提交配置身份不匹配')
   const provenance=assertDevice(input.administrationProvenance)
-  const expectedTrials=frozen.schemaVersion===2?frozen.maxTrials:120
-  if(input.trials.length!==expectedTrials)cognitiveFail(400,'认知试次数与原冻结配置不一致')
+  try{assertSurveyCognitiveTrialBudget(frozen,input.trials.length)}catch{cognitiveFail(400,'认知试次数与原冻结配置不一致')}
   let trials
   try{trials=validateAndNormalizeTrials({definition,values:input.trials,maxTrials:frozen.schemaVersion===2?frozen.maxTrials:120})}
   catch{ return cognitiveFail(400,'认知试次结构或试次数不合法') }
@@ -192,10 +192,12 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
       randomSeed:decryptUnifiedRuntimePayload<string>(current.randomSeedCipher)}))}
     catch{ return cognitiveFail(400,'认知试次缺失、重复、顺序或刺激序列与冻结任务不一致') }
     const completedAt=new Date(),rawHash=canonicalHash(raw)
+    const reportSnapshot=frozen.schemaVersion===2?buildSurveyCognitiveReportSnapshot(frozen,scored,completedAt,trials):undefined
     const result:SurveyCognitiveStoredResult={schemaVersion:1,sessionId:current.id,...scope(known,slotKey),
       epoch:current.epoch,measurementDigest:frozen.measurementDigest,configHash:snapshot.configHash,
       protocolSignature:snapshot.protocolSignature,testType:snapshot.testType,configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,scoringVersion:snapshot.scoringVersion,
       ...(frozen.schemaVersion===2?{profileArtifactHash:frozen.artifactHash,profile:frozen.artifact.identity.profile,maxTrials:frozen.maxTrials}:{}),
+      ...(reportSnapshot?{reportSnapshot}:{}),
       timingPolicy:frozen.timingPolicy,maturity:frozen.maturity,referenceMode:frozen.referenceMode,metrics:scored.metrics,
       quality:scored.quality,audit:scored.audit,administrationProvenance:provenance,restartCount:current.epoch-1,
       rawHash,completedAt:completedAt.toISOString(),
