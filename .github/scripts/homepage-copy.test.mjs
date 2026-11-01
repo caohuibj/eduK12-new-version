@@ -69,7 +69,7 @@ test('copy route is exclusive with all backend, database and unrelated consumers
  assert.match(readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8'),/recomputed-homepage-copy-plan/);
  assert.match(job('codeql'),/homepage-copy.*toolsChanged/);
  assert.match(job('codeql'),/PUBLIC_PRESENTATION:.*homepage-copy/);
- assert.match(job('codeql'),/paths:\['server-version\/scripts\/release\/policy.mjs','server-version\/frontend\/src','\.github\/scripts\/homepage-copy-scope.mjs'/);
+ assert.match(job('codeql'),/paths:\['server-version\/frontend\/src','\.github\/scripts','server-version\/scripts\/release'\]/);
  for(const expression of ci.match(/\$\{\{[\s\S]*?\}\}/g)||[])assert(expression.length<=21000,'GitHub expression length limit');
  const candidate=readFileSync(new URL('./homepage-copy-candidate.py',import.meta.url),'utf8');
  const workflow=readFileSync(new URL('../workflows/ci-homepage-copy.yml',import.meta.url),'utf8');
