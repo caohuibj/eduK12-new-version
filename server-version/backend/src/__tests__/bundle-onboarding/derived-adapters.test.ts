@@ -1,12 +1,29 @@
 import {beforeAll,afterAll,it,expect,vi} from 'vitest'
 import {derivedAdapterFixture} from './derived-adapter.fixture'
-import {computeSurveyNativeReports,savedSurveyNativeFeedback,decodeSurveyNativeContext} from '../../modules/bundle-product/survey-native'
+import {computeSurveyNativeReports,savedSurveyNativeFeedback,decodeSurveyNativeContext,surveyNativeFeedbackAudience} from '../../modules/bundle-product/survey-native'
+import {parseDeclarativePackage} from '../../modules/assessment-bundle/onboarding/contract'
+import {freezeBundleProductionDefinition} from '../../modules/bundle-product/definition-provider'
+import {packageEntry} from '../../modules/assessment-bundle/onboarding/catalog'
+import type {ScaleDefinitionV2} from '../../modules/scale/scale-definition'
 import {persistGovernedPackageReports} from '../../modules/survey/governed-package.reports'
 import {decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 beforeAll(()=>vi.stubEnv('DATA_ENCRYPTION_KEY','1'.repeat(64)))
 afterAll(()=>vi.unstubAllEnvs())
 const release=()=>new Map([['ase',new Set(['academic_self_efficacy'])],['vc',new Set(['value','cost'])]])
+it('normalizes the adult SELF Survey consumer lane while preserving source audience and rejecting observers',()=>{
+ const {native,pack,snapshot}=derivedAdapterFixture(),raw=structuredClone(pack)
+ raw.manifest.definition.population={subjectPopulation:'adult',subjectMinAgeYears:18}
+ native.definition=freezeBundleProductionDefinition(packageEntry(parseDeclarativePackage(raw)),{frozenAt:native.definition.frozenAt,sourceReference:'synthetic-adult-survey'})
+ native.source.definitionHash=native.definition.contentHash;native.reportAudiences.ase='parent'
+ const definition=structuredClone(snapshot.units[0].compiledDefinition) as ScaleDefinitionV2
+ definition.respondentType='participant_self_report'
+ definition.report.audienceContract={...definition.report.audienceContract!,audience:'parent',respondent:'ADULT_SELF'}
+ expect(surveyNativeFeedbackAudience(native,'ase',definition)).toBe('student')
+ expect(native.reportAudiences.ase).toBe('parent');expect(definition.report.audienceContract.audience).toBe('parent')
+ definition.respondentType='parent_report'
+ expect(surveyNativeFeedbackAudience(native,'ase',definition)).toBeNull()
+})
 it('decodes only the declared context type, retaining numeric-looking strings and false',()=>{
  const field={contextKey:'example',required:true}
  expect(decodeSurveyNativeContext({...field,valueType:'string'},'00123')).toBe('00123')

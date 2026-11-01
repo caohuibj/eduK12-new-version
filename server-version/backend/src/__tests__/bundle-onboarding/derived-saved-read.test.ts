@@ -11,10 +11,19 @@ import {createProductBundleAnalysisEngineRegistry} from '../../modules/assessmen
 import {encryptCognitivePayload} from '../../modules/cognitive/cognitive.security'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import * as derivations from '../../modules/assessment-bundle/onboarding/derivations'
+import {parseDeclarativePackage,type DerivedPackage} from '../../modules/assessment-bundle/onboarding/contract'
+import {packageEntry} from '../../modules/assessment-bundle/onboarding/catalog'
+import {freezeBundleProductionDefinition} from '../../modules/bundle-product/definition-provider'
 beforeAll(()=>vi.stubEnv('DATA_ENCRYPTION_KEY','1'.repeat(64)))
 afterAll(()=>vi.unstubAllEnvs())
-function fixture(){
- const {frozen,pack,result,native}=derivedAdapterFixture()
+function fixture(adultRelationship?:'SELF'|'PARENT'){
+ let {frozen,pack,result,native}=derivedAdapterFixture()
+ if(adultRelationship){
+  const raw=structuredClone(pack);raw.manifest.definition.population={subjectPopulation:'adult',subjectMinAgeYears:18}
+  pack=parseDeclarativePackage(raw) as DerivedPackage
+  frozen=freezeBundleProductionDefinition(packageEntry(pack),{frozenAt:frozen.frozenAt,sourceReference:'synthetic-adult-reader'})
+  native.definition=frozen;native.source.definitionHash=frozen.contentHash
+ }
  const bindings={schemaVersion:1,slots:pack.manifest.definition.slots.filter(s=>s.unitType==='SCALE').map(s=>({slotKey:s.slotKey,unitType:s.unitType,itemId:'item-'+s.slotKey,scaleDisclosure:native.policies[s.slotKey]})),context:[]}
  const instance={definitionHash:frozen.contentHash,definitionEncrypted:encryptCognitivePayload(frozen),bindingsHash:canonicalHash(bindings),bindingsEncrypted:encryptCognitivePayload(bindings)}
  const scaleSources=bindings.slots.map(s=>{const slot=pack.manifest.definition.slots.find(x=>x.slotKey===s.slotKey)!,scored=result.units.find(u=>u.instrumentKey===s.slotKey)!.privateScoring as any
@@ -22,8 +31,8 @@ function fixture(){
  const contextFacts=buildBundleContextFactsFromValues({definition:frozen.contextDefinition!,values:{grade_level:9,course_code:'00123',adult_confirmed:true},frozenAt:frozen.frozenAt})
  const compiledRuntime=compileBundleRuntimeFromFrozenRead({family:'ASSESSMENT_BUNDLE',snapshotVersion:3,snapshot:frozen.bundleSnapshot})
  const facts=projectBundleReportFacts({registry:createProductBundleAnalysisEngineRegistry(),engineInput:{snapshot:frozen.bundleSnapshot,compiledRuntime,aggregateInputHash:null,evidence:[],contextFacts,scaleSources:scaleSources as any,declarativePackage:pack}})
- runtime.mockImplementation(async(key:string)=>({schemaVersion:2,definition:{report:{audienceContract:{audience:'student',respondent:'STUDENT_SELF'}}},compiledPolicy:{disclosure:native.policies[key].disclosure,runtimePolicyHash:'3'.repeat(64)}}))
- const db={compositeAssessmentAttempt:{findUnique:vi.fn().mockResolvedValue({attemptEpoch:1,compositeAssessment:{bundleInstance:instance}})},bundleAnalysis:{findUnique:vi.fn().mockResolvedValue({id:'saved',status:'READY',purpose:'INITIAL',targetDefinitionEncrypted:instance.definitionEncrypted,targetDefinitionHash:frozen.contentHash,payloadEncrypted:encryptCognitivePayload(facts),factsHash:canonicalHash(facts)})},assessment:{findMany:vi.fn().mockResolvedValue(bindings.slots.map(s=>({compositeItemId:s.itemId,runtimeSnapshotEncrypted:s.slotKey})))}}
+ runtime.mockImplementation(async(key:string)=>({schemaVersion:2,definition:{respondentType:adultRelationship?'participant_self_report':'student_self_report',report:{audienceContract:{audience:adultRelationship?'parent':'student',respondent:adultRelationship?'ADULT_SELF':'STUDENT_SELF'}}},compiledPolicy:{disclosure:native.policies[key].disclosure,runtimePolicyHash:'3'.repeat(64)}}))
+ const db={compositeAssessmentAttempt:{findUnique:vi.fn().mockResolvedValue({attemptEpoch:1,compositeAssessment:{bundleInstance:instance}})},bundleAnalysis:{findUnique:vi.fn().mockResolvedValue({id:'saved',status:'READY',purpose:'INITIAL',targetDefinitionEncrypted:instance.definitionEncrypted,targetDefinitionHash:frozen.contentHash,payloadEncrypted:encryptCognitivePayload(facts),factsHash:canonicalHash(facts)})},assessment:{findMany:vi.fn().mockResolvedValue(bindings.slots.map(s=>({compositeItemId:s.itemId,runtimeSnapshotEncrypted:s.slotKey,...(adultRelationship?{respondentType:adultRelationship,subjectUserId:'synthetic-self',respondentUserId:adultRelationship==='SELF'?'synthetic-self':'synthetic-proxy'}:{})})))}}
  return {instance,db,native,facts,identity:{definitionHash:instance.definitionHash,bindingsHash:instance.bindingsHash,sourceBindingsHash:instance.bindingsHash}}
 }
 it('reads validated saved schema3 facts through the shared projector without recomputing or exposing context',async()=>{
@@ -54,4 +63,18 @@ it('masks legacy summary quality when a frozen admission policy forbids its deta
  expect(report.view?.evidence.find(e=>e.evidenceKey==='ase.efficacy')?.quality).toBe('unavailable')
  expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')?.value).toBe(2.2)
  expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')).not.toHaveProperty('quality')
+})
+it('reads adult SELF source reports in the parent display lane without releasing protected quality',async()=>{
+ const {db,native}=fixture('SELF')
+ native.policies.ase=structuredClone(native.policies.ase);native.policies.ase.disclosure.audiences.subject!.resultQualityDetails=false
+ const report=await readReport('attempt','student',undefined,db as any)
+ expect(report.view?.derivedView?.conclusions.map(c=>c.ruleId)).toContain('independent_ase')
+ expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')).toMatchObject({value:2.2,state:'present'})
+ expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')).not.toHaveProperty('quality')
+})
+it('does not promote an adult parent proxy to SELF narrative while retaining authorized numbers',async()=>{
+ const {db}=fixture('PARENT'),report=await readReport('attempt','student',undefined,db as any)
+ expect(report.view?.derivedView?.conclusions).toEqual([])
+ expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')?.value).toBe(2.2)
+ expect(report.view?.derivedView?.maxSets[0]).toMatchObject({state:'redacted',maxKeys:null})
 })
