@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "visualwm",
+  "order": 127,
+  "identities": [
+    {
+      "testType": "visualwm",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 127
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "visualwm",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/visualwm/visualwm.registry.ts",
+      "export": "visualwmRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      127
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/visualwm/__tests__/VisualwmTask.test.tsx",
+      "src/modules/cognitive/tasks/visualwm/__tests__/generator.test.ts"
+    ]
+  }
+}

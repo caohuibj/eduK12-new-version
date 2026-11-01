@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "arithverify",
+  "order": 101,
+  "identities": [
+    {
+      "testType": "arithverify",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 101
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "arithverify",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/arithverify/arithverify.registry.ts",
+      "export": "arithverifyRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      101
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/arithverify/__tests__/ArithverifyTask.test.tsx",
+      "src/modules/cognitive/tasks/arithverify/__tests__/prng.test.ts"
+    ]
+  }
+}

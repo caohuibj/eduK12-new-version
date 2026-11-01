@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "auditoryrt",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreAuditoryrtV1 at task authoring time (2026-10-31); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "foreperiodMinMs": 1000,
+          "foreperiodMaxMs": 4000,
+          "toneFrequencyHz": 880,
+          "toneDurationMs": 120,
+          "maxRtWindowMs": 1500,
+          "interTrialIntervalMs": 800,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "foreperiodMs": 2100,
+              "rtMs": 250,
+              "interrupted": false,
+              "audioLatencyMs": 12
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "foreperiodMs": 3400,
+              "rtMs": 310,
+              "interrupted": false,
+              "audioLatencyMs": 12
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "foreperiodMs": 1500,
+              "rtMs": 280,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "foreperiodMs": 2600,
+              "rtMs": 0,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialIndex": 4,
+              "foreperiodMs": 3900,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "trialIndex": 5,
+              "foreperiodMs": 1200,
+              "rtMs": 520,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 84,
+        "metrics": {
+          "medianRtMs": 295,
+          "meanRtMs": 340,
+          "rtSdMs": 106.066,
+          "rtCv": 0.312,
+          "validCount": 4,
+          "anticipationCount": 1,
+          "lapseCount": 1
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidTrials": false,
+          "excessiveAnticipations": false,
+          "highVariability": false,
+          "audioEnvironmentUnverified": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "foreperiodMinMs": 1000,
+          "foreperiodMaxMs": 4000,
+          "toneFrequencyHz": 880,
+          "toneDurationMs": 120,
+          "maxRtWindowMs": 1500,
+          "interTrialIntervalMs": 800,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "auditoryrt v1 expects exactly 6 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 6,
+          "foreperiodMinMs": 1000,
+          "foreperiodMaxMs": 4000,
+          "toneFrequencyHz": 880,
+          "toneDurationMs": 120,
+          "maxRtWindowMs": 1500,
+          "interTrialIntervalMs": 800,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "foreperiodMs": 2100,
+              "rtMs": 250,
+              "interrupted": false,
+              "audioLatencyMs": 12
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "foreperiodMs": 3400,
+              "rtMs": 310,
+              "interrupted": false,
+              "audioLatencyMs": 12
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "foreperiodMs": 1500,
+              "rtMs": 280,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "foreperiodMs": 2600,
+              "rtMs": 0,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialIndex": 4,
+              "foreperiodMs": 3900,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          }
+        ]
+      },
+      "expectedError": "auditoryrt v1 expects exactly 6 trials, got 5"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "gamblingdeck",
+  "order": 104,
+  "identities": [
+    {
+      "testType": "gamblingdeck",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 104
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "gamblingdeck",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/gamblingdeck/gamblingdeck.registry.ts",
+      "export": "gamblingdeckRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      104
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/gamblingdeck/__tests__/GamblingdeckTask.test.tsx",
+      "src/modules/cognitive/tasks/gamblingdeck/__tests__/prng.test.ts"
+    ]
+  }
+}
