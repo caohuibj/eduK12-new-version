@@ -42,6 +42,7 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
+      120,
       120
     ]
   },

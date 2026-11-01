@@ -27,3 +27,11 @@ export const numberlineRegistryEntry: CognitiveFrontendRegistryEntry = {
     disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
   },
 }
+
+const NumberlineNpTask = deferredCognitiveRunner(() => import('./NumberlineNpTask').then(module => module.NumberlineNpTask))
+export const numberlineNpRegistryEntry: CognitiveFrontendRegistryEntry = {
+  ...numberlineRegistryEntry, engineVersion: '1.1.0',
+  readiness: { category: 'visuospatial', inputs: ['keyboard', 'pointer', 'touch'], orientation: 'any', globalKeyboardCapture: false, resumeDisposition: 'restart-required', resumeReason: '当前版本没有持久化练习或题内阶段；中断后按既有规则重新开始。', frozenMediaSlots: ['instruction', 'example', 'stimulus'] }, scoringVersion: '1.1.0', name: '数字到位置估计（NP数字适配）',
+  RunnerComponent: NumberlineNpTask, prepareRunner: NumberlineNpTask.prepare,
+  reportDefinition: { ...numberlineRegistryEntry.reportDefinition, title: '数字到位置估计（NP数字适配）', disclaimer: '单范围六点、冻结A/B及预定4/30秒；不是完整原研究或年龄常模。' },
+}

@@ -19,12 +19,13 @@ const positionFromEvent = (event: { clientX: number }, track: HTMLElement | null
   return Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width))
 }
 
-const NumberlineTrack: React.FC<{
+export const NumberlineTrack: React.FC<{
   lineMax: number
+  showReferenceTicks?: boolean
   onPick: (position: number) => void
   disabled?: boolean
   marker?: { position: number; kind: 'response' | 'target' } | null
-}> = ({ lineMax, onPick, disabled, marker }) => {
+}> = ({ lineMax, onPick, disabled, marker, showReferenceTicks = true }) => {
   const trackRef = useRef<HTMLDivElement>(null)
   const pointerHandledRef = useRef(false)
   const [keyboardPosition, setKeyboardPosition] = useState<number | null>(null)
@@ -49,7 +50,7 @@ const NumberlineTrack: React.FC<{
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault()
       const delta = event.key === 'ArrowLeft' ? -step : step
-      setKeyboardPosition((current) => Math.min(1, Math.max(0, (current ?? 0.5) + delta)))
+      setKeyboardPosition((current) => Math.min(1, Math.max(0, (current ?? (showReferenceTicks ? 0.5 : 0)) + delta)))
       return
     }
     if (event.key === 'Home') { event.preventDefault(); setKeyboardPosition(0); return }
@@ -77,7 +78,7 @@ const NumberlineTrack: React.FC<{
         className="relative h-16 cursor-pointer"
       >
         <div className="absolute left-0 right-0 top-8 h-1.5 rounded bg-gray-300" />
-        {[0, 0.25, 0.5, 0.75, 1].map((tick) => (
+        {(showReferenceTicks ? [0, 0.25, 0.5, 0.75, 1] : [0, 1]).map((tick) => (
           <div key={tick} className="absolute top-6 h-5 w-px bg-gray-400" style={{ left: `calc(${tick * 100}% - 0.5px)` }} />
         ))}
         {shownMarker && (
@@ -88,7 +89,7 @@ const NumberlineTrack: React.FC<{
         )}
       </div>
       <div className="flex justify-between text-sm text-gray-500 mt-1" aria-hidden="true">
-        <span>0</span><span>{Math.round(lineMax / 2)}</span><span>{lineMax}</span>
+        <span>0</span>{showReferenceTicks && <span>{Math.round(lineMax / 2)}</span>}<span>{lineMax}</span>
       </div>
     </div>
   )
@@ -173,7 +174,7 @@ export const NumberlineTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
     setFormalFeedback(null); setSubPhase('fixation'); setPhase('formal')
   }, [practiceAttempt, practiceMarker, lineMax])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="数字线估计" description={<p>屏幕上会出现一个 0 到 {lineMax} 的数字线和一个目标数。请在数字线上点击，点出这个数应该在的位置。</p>} hint={<>{practiceAttempt > 1 && <p>请重新阅读完整说明和例子，再开始下一轮练习。</p>}<p>例子：数字线中点对应{lineMax / 2}；可先找中点，再判断目标在它的哪一边。</p><p>每题限时 {Math.round(maxResponseMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="数字线估计" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>给数字找个位置：屏幕上会出现一个 0 到 {lineMax} 的数字线和一个目标数。请在数字线上点击，点出这个数应该在的位置。</p>) : (<p>屏幕上会出现一个 0 到 {lineMax} 的数字线和一个目标数。请在数字线上点击，点出这个数应该在的位置。</p>)} hint={<>{practiceAttempt > 1 && <p>请重新阅读完整说明和例子，再开始下一轮练习。</p>}<p>例子：数字线中点对应{lineMax / 2}；可先找中点，再判断目标在它的哪一边。</p><p>每题限时 {Math.round(maxResponseMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

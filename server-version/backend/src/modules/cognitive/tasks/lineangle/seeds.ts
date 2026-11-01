@@ -1,6 +1,6 @@
 import type { CognitiveSeed } from '../../task-seed.types'
 
-// Materialized declaration: existing exported values are preserved.
+// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const seeds: CognitiveSeed[] = [
   {
     "testType": "lineangle",
@@ -42,6 +42,27 @@ export const seeds: CognitiveSeed[] = [
       "validRtFloorMs": 300,
       "report": {
         "reportVersion": "2.0.0",
+        "referenceMode": "none"
+      }
+    }
+  },
+  {
+    "testType": "lineangle",
+    "configVersion": "2.0.0-report3",
+    "name": "线条方向判断 / report 3.0.0",
+    "status": "DRAFT",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "config": {
+      "totalTrials": 30,
+      "angleStepDeg": 15,
+      "optionCount": 4,
+      "minAngleSepSteps": 2,
+      "fixationMs": 500,
+      "timeoutMs": 8000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "3.0.0",
         "referenceMode": "none"
       }
     }

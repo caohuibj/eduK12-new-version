@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Materialized declaration: existing exported values are preserved.
+// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -363,6 +363,225 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "label": "选项数量"
           }
         ]
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "lineangle",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "title": "线条方向判断",
+    "metrics": {
+      "accuracy": {
+        "label": "总体正确率",
+        "explanation": "总体正确率：正式作答中选中与目标方向一致选项的比例。",
+        "singleExplanation": "总体正确率：正式作答中选中与目标方向一致选项的比例。"
+      },
+      "medianRtMs": {
+        "label": "答对时的典型用时（中位数）",
+        "explanation": "正确作答中位用时：判断正确的试次中，从出现线段到选择的典型时间。",
+        "singleExplanation": "正确作答中位用时：判断正确的试次中，从出现线段到选择的典型时间。"
+      },
+      "errorCount": {
+        "label": "错误次数"
+      },
+      "timeoutCount": {
+        "label": "超时次数"
+      },
+      "validRtCount": {
+        "label": "可用于用时统计的作答数"
+      }
+    },
+    "experienceHeadline": "accuracy",
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "回看这次完成的12题；只描述本次表现。",
+        "reportCaveats": [
+          "体验目录估计3–4分钟；研究8–12分钟，非实测。正式按8秒时限+0.5秒注视估算，12/60题最多约1.7/8.5分钟，另计说明练习。",
+          "自编无向线段匹配任务；屏幕大小、视力和操作方式会影响本次记录。",
+          "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "标准任务",
+        "participantConclusion": "回看这次完成的30题；只描述本次表现。",
+        "reportCaveats": [
+          "体验目录估计3–4分钟；研究8–12分钟，非实测。正式按8秒时限+0.5秒注视估算，12/60题最多约1.7/8.5分钟，另计说明练习。",
+          "自编无向线段匹配任务；屏幕大小、视力和操作方式会影响本次记录。",
+          "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究变式",
+        "participantConclusion": "Benton等（1978）原文评估线条方向辨别；本项目为单目标四选一、无向轴角规则与电脑计时变式，题面、反应方式和计分均不能冒称Benton标准JLO。原文摘要未给出可复刻的完整逐题时序，不补造。",
+        "reportCaveats": [
+          "体验目录估计3–4分钟；研究8–12分钟，非实测。正式按8秒时限+0.5秒注视估算，12/60题最多约1.7/8.5分钟，另计说明练习。",
+          "自编无向线段匹配任务；屏幕大小、视力和操作方式会影响本次记录。",
+          "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "先判断向哪边倾斜，再细看夹角；不要把线段朝向反转误当成新方向。",
+      "把本次记录与当时环境、完成情况一起阅读；再次体验会有熟悉效应。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "自编无向线段匹配任务；屏幕大小、视力和操作方式会影响本次记录。 只描述本次记录，不换算IQ、同龄排名或诊断。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "哪条线，朝着同一个方向？",
+      "introduction": "先看目标线朝哪边倾斜，再从选项中找出平行的一条。线没有箭头，反向但平行仍算相同方向。",
+      "summary": {
+        "template": "这一次，你选中正确方向的比例是 {accuracy}；正确判断的典型用时是 {medianRtMs}。",
+        "metricKeys": [
+          "accuracy",
+          "medianRtMs"
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次简短体验中，答对比例是 {accuracy}。题目较少，只描述这一次选择，不推断稳定能力。",
+          "metricKeys": [
+            "accuracy"
+          ]
+        }
+      },
+      "studentMetricKeys": [
+        "accuracy",
+        "medianRtMs",
+        "errorCount"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientValidRt",
+        "lowAccuracy"
+      ],
+      "metricGates": {
+        "medianRtMs": [
+          "insufficientValidRt"
+        ]
+      },
+      "nextStep": "先判断向哪边倾斜，再细看夹角；不要把线段朝向反转误当成新方向。",
+      "chart": {
+        "kind": "reaction_trials",
+        "metricKeys": [
+          "medianRtMs"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "signal",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "先看目标线朝哪边倾斜，再从选项中找出平行的一条。线没有箭头，反向但平行仍算相同方向。",
+        "takeaway": "先判断向哪边倾斜，再细看夹角；不要把线段朝向反转误当成新方向。",
+        "exampleTitle": "生活里，也会用到这样的思路",
+        "example": "给墙上挂画时，可以对照画框边缘与门框是否平行；这里也要看方向，而不只看端点位置。",
+        "scene": "signal",
+        "frames": [
+          {
+            "title": "看清任务",
+            "text": "先看清本题给出的信息和需要完成的目标。"
+          },
+          {
+            "title": "核对线索",
+            "text": "把一个可能的办法与完整条件逐一核对。"
+          },
+          {
+            "title": "留下记录",
+            "text": "按本任务规则作答；报告回看这一次的选择与过程。"
+          }
+        ],
+        "boundary": "自编无向线段匹配任务；屏幕大小、视力和操作方式会影响本次记录。",
+        "metricHelp": {
+          "accuracy": {
+            "label": "选对了多少",
+            "explanation": "正式作答中选中与目标一致选项的比例。"
+          },
+          "medianRtMs": {
+            "label": "典型用时",
+            "explanation": "判断正确的试次中从出现线段到选择的典型时间。"
+          },
+          "errorCount": {
+            "label": "选错了几次",
+            "explanation": "选中其他方向的次数；与用时一起看。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "线段朝向的知觉匹配",
+        "procedure": "12/30/60道四选一无向线段匹配，固定seed序列；500ms注视、每题8秒上限。0度与180度等价；所有正式题进入正确率分母，正确有效RT入中位用时。V2不与旧有向角度版本直接比较。 Benton, Varney & Hamsher, Visuospatial judgment: A clinical test (1978), DOI 10.1001/archneur.1978.00500300038006: https://pubmed.ncbi.nlm.nih.gov/655909/",
+        "interpretation": "Benton等（1978）原文评估线条方向辨别；本项目为单目标四选一、无向轴角规则与电脑计时变式，题面、反应方式和计分均不能冒称Benton标准JLO。原文摘要未给出可复刻的完整逐题时序，不补造。",
+        "confounders": [
+          "自编无向线段匹配任务；屏幕大小、视力和操作方式会影响本次记录。",
+          "体验目录估计3–4分钟；研究8–12分钟，非实测。正式按8秒时限+0.5秒注视估算，12/60题最多约1.7/8.5分钟，另计说明练习。",
+          "模式名称不代表已完成心理测量验证；次数增加不自动保证可靠性。"
+        ],
+        "metricNotes": {
+          "accuracy": {
+            "definition": "正确率：正式作答中选中目标角度的比例。",
+            "readingHint": "低于 0.5 时用时指标需谨慎解释。"
+          },
+          "medianRtMs": {
+            "definition": "正确有效反应（rtMs ≥ validRtFloorMs）的中位时间。",
+            "readingHint": "与正确率同读。"
+          },
+          "errorCount": {
+            "definition": "按本次冻结任务定义记录“错误次数”。",
+            "readingHint": "与正确率互补阅读。"
+          },
+          "timeoutCount": {
+            "definition": "按本次冻结任务定义记录“超时次数”。",
+            "readingHint": "超时过多时解释需谨慎。"
+          },
+          "validRtCount": {
+            "definition": "进入用时统计的正确有效反应数。",
+            "readingHint": "与计划试次总数对照阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式试次数"
+          },
+          {
+            "key": "angleStepDeg",
+            "label": "角度步长（度）"
+          },
+          {
+            "key": "optionCount",
+            "label": "选项数量"
+          }
+        ]
+      },
+      "hiddenByProfile": {
+        "experience": []
       }
     }
   }

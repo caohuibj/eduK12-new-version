@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -109,7 +110,7 @@ export const TrustgameTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="信任与公平博弈" description={<p>每轮会显示一个预设的模拟方案，把 {potTotal} 点分成两份：一份给你、一份留给对方。这里没有实时同伴或真实点数交易。你可以接受（按方案分），也可以拒绝（双方都得零）。你的选择不会被评判对错。</p>} hint={<><p>按 1 接受、按 2 拒绝，或点击按钮；练习不计入成绩。</p></>} onAction={() => { setSubPhase('fixation'); setPhase('practice') }} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "信任与公平博弈"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>每轮会显示一个预设的模拟方案，把 {potTotal} 点分成两份：一份给你、一份留给对方。这里没有实时同伴或真实点数交易。你可以接受（按方案分），也可以拒绝（双方都得零）。你的选择不会被评判对错。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {offers.length}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>按 1 接受、按 2 拒绝，或点击按钮；练习不计入成绩。</p></>} onAction={() => { setSubPhase('fixation'); setPhase('practice') }} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

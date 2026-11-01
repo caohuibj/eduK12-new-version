@@ -30,7 +30,8 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
-      13
+      10,
+      10
     ]
   },
   "presentation": {

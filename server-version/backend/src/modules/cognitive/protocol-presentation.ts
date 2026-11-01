@@ -6,6 +6,7 @@ export const resolveCognitiveProtocolPresentation = (input: {
   testType: string
   engineVersion: string
   scoringVersion: string
+  reportVersion?: string
   profile: CognitiveProfile | null
 }): CognitiveProtocolPresentationV1 | null => input.profile
   ? resolveParticipantPresentation(input)?.protocols[input.profile] ?? null

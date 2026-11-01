@@ -131,7 +131,7 @@ export const CancellationTask: React.FC<CognitiveTaskProps> = ({ taskContext, tr
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="视觉划消" description={<p>每轮出现一墙符号。限时内找到所有目标符号并点亮它们：点一下选中，再点一下取消。全部轮次共用同一个目标符号。</p>} hint={<><p>每轮限时 {Math.round(durationMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="视觉划消" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>每轮出现一墙符号。限时内找到所有目标符号并点亮它们：点一下选中，再点一下取消。每轮开始先看清本轮的目标符号；不同轮次的目标可能改变。</p>) : (<p>每轮出现一墙符号。限时内找到所有目标符号并点亮它们：点一下选中，再点一下取消。全部轮次共用同一个目标符号。</p>)} hint={<><p>每轮限时 {Math.round(durationMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

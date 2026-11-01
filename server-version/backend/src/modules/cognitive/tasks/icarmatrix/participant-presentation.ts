@@ -1,6 +1,5 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Materialized declaration: existing exported values are preserved.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -543,6 +542,237 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "qualityLabels": {
         "rapidGuessing": "低于用时下限的作答较多",
         "excessiveTimeouts": "未作答较多"
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "icarmatrix",
+    "engineVersion": "2.1.0",
+    "scoringVersion": "1.1.0",
+    "title": "项目矩阵推理试测版（七题范围）",
+    "metrics": {
+      "accuracy": {
+        "label": "总体正确率",
+        "explanation": "总体正确率：答对的图形矩阵题占全部题目的比例。",
+        "singleExplanation": "总体正确率：你答对的比例。"
+      },
+      "medianRtMs": {
+        "label": "有效作答的典型用时（含答错）",
+        "explanation": "未中断且达到用时下限的已作答题用时，包含正确与错误答案；缺失不补零。"
+      },
+      "correctCount": {
+        "label": "答对题数"
+      },
+      "accuracyByRuleTag": {
+        "label": "规则维度正确率"
+      },
+      "answeredCount": {
+        "label": "已作答题数",
+        "explanation": "实际选择过选项的题数。"
+      },
+      "timeoutCount": {
+        "label": "未作答题数",
+        "explanation": "限时内未选择选项的题数，不等于错误选择。"
+      },
+      "validRtCount": {
+        "label": "可用于用时统计的作答数",
+        "explanation": "进入用时统计的未中断、达到用时下限的作答题数。"
+      }
+    },
+    "experienceHeadline": "accuracy",
+    "hiddenMetrics": [
+      "accuracyByRuleTag"
+    ],
+    "suppressTips": false,
+    "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "回看这次完成的4题；只描述本次表现。",
+        "reportCaveats": [
+          "体验约2–3分钟；研究约4–6分钟，非实测。每题30秒+0.4秒注视，4/7题正式上界约2.0/3.6分钟，另计说明练习。",
+          "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
+          "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "标准任务",
+        "participantConclusion": "回看这次完成的6题；只描述本次表现。",
+        "reportCaveats": [
+          "体验约2–3分钟；研究约4–6分钟，非实测。每题30秒+0.4秒注视，4/7题正式上界约2.0/3.6分钟，另计说明练习。",
+          "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
+          "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究变式",
+        "participantConclusion": "matRiks作者官方实现可生成2×2或3×3规则矩阵及10个干扰项；本项目保留审订七题和五个干扰项，并固定009参与。ICAR项目官方明确不应据分数推算个人IQ；本素材的直接来源是MIT许可matRiks生成器，不声称使用ICAR标准题或继承其测量属性。",
+        "reportCaveats": [
+          "体验约2–3分钟；研究约4–6分钟，非实测。每题30秒+0.4秒注视，4/7题正式上界约2.0/3.6分钟，另计说明练习。",
+          "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
+          "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "把形状、方向、填充分别看，再验证它们怎样一起变化。重复体验会熟悉题目，不能把记住答案当作稳定进步。",
+      "把本次记录与当时环境、完成情况一起阅读；再次体验会有熟悉效应。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。 只描述本次记录，不换算IQ、同龄排名或诊断。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "七题范围的小小规律探索",
+      "introduction": "观察方格里形状怎样改变，再找出缺的一块。这是一组范围很小的项目矩阵试题，回看的是你对这些题的判断。",
+      "summary": {
+        "template": "这一次，你作答了 {answeredCount} 题，答对 {correctCount} 题，另有 {timeoutCount} 题未作答。",
+        "metricKeys": [
+          "answeredCount",
+          "correctCount",
+          "timeoutCount"
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次4题体验中，作答 {answeredCount} 题、答对 {correctCount} 题；另有 {timeoutCount} 题未作答。次数少，只描述本次记录。",
+          "metricKeys": [
+            "answeredCount",
+            "correctCount",
+            "timeoutCount"
+          ]
+        }
+      },
+      "studentMetricKeys": [
+        "accuracy",
+        "correctCount",
+        "answeredCount",
+        "timeoutCount"
+      ],
+      "processMetricKeys": [
+        "medianRtMs",
+        "validRtCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "interrupted",
+        "excessiveTimeouts",
+        "rapidGuessing"
+      ],
+      "metricGates": {},
+      "nextStep": "把形状、方向、填充分别看，再验证它们怎样一起变化。重复体验会熟悉题目，不能把记住答案当作稳定进步。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "rules",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "观察方格里形状怎样改变，再找出缺的一块。这是一组范围很小的项目矩阵试题，回看的是你对这些题的判断。",
+        "takeaway": "把形状、方向、填充分别看，再验证它们怎样一起变化。重复体验会熟悉题目，不能把记住答案当作稳定进步。",
+        "exampleTitle": "生活里，也会用到这样的思路",
+        "example": "整理图案贴纸时，先找一行中的变化，再用另一列检查规律；一个解释要能同时说通多个位置。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "看清任务",
+            "text": "先看清本题给出的信息和需要完成的目标。"
+          },
+          {
+            "title": "核对线索",
+            "text": "把一个可能的办法与完整条件逐一核对。"
+          },
+          {
+            "title": "留下记录",
+            "text": "按本任务规则作答；报告回看这一次的选择与过程。"
+          }
+        ],
+        "boundary": "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
+        "metricHelp": {
+          "accuracy": {
+            "label": "答对的比例",
+            "explanation": "答对的图形矩阵题占全部题目的比例。"
+          },
+          "medianRtMs": {
+            "label": "用了多久",
+            "explanation": "每道题作答时间的代表值；想得久不等于能力弱。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "流体推理（图形规则归纳）",
+        "procedure": "C2.1.0/S1.1.0，七道审订3×3素材，4/6/7题；按seed选题并重排六个选项，约束题009必出，题内规则标签可重叠。400ms注视、30秒响应；全部正式题入准确率分母，已答/答对/未答分别记数，合法0与缺失分开。 Brancaccio等 matRiks 0.1.5，官方DOI 10.32614/CRAN.package.matRiks: https://cran.r-project.org/package=matRiks ; 官方ICAR边界: https://icar-project.com/",
+        "interpretation": "matRiks作者官方实现可生成2×2或3×3规则矩阵及10个干扰项；本项目保留审订七题和五个干扰项，并固定009参与。ICAR项目官方明确不应据分数推算个人IQ；本素材的直接来源是MIT许可matRiks生成器，不声称使用ICAR标准题或继承其测量属性。",
+        "confounders": [
+          "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
+          "体验约2–3分钟；研究约4–6分钟，非实测。每题30秒+0.4秒注视，4/7题正式上界约2.0/3.6分钟，另计说明练习。",
+          "模式名称不代表已完成心理测量验证；次数增加不自动保证可靠性。"
+        ],
+        "metricNotes": {
+          "accuracy": {
+            "definition": "答对题数 / 本次计划正式题数。未作答计入分母，练习不计入。",
+            "readingHint": "只描述本次题目；不同配置不视为等值或年龄常模。"
+          },
+          "medianRtMs": {
+            "definition": "所有未中断、validRtFloorMs≤rtMs≤timeoutMs的已作答题用时中位数（含错答）；无有效用时为null。",
+            "readingHint": "结合有效用时题数阅读；不判断能力高低。"
+          },
+          "correctCount": {
+            "definition": "服务端判定的正确试次数。",
+            "readingHint": "受总题数影响，跨 profile 不可比。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划试次数"
+          },
+          {
+            "key": "matrixType",
+            "label": "矩阵规格（本版仅3×3）"
+          },
+          {
+            "key": "stimulusSetVersion",
+            "label": "题库版本"
+          },
+          {
+            "key": "timeoutMs",
+            "label": "每题限时（毫秒）"
+          }
+        ]
+      },
+      "qualityLabels": {
+        "rapidGuessing": "低于用时下限的作答较多",
+        "excessiveTimeouts": "未作答较多"
+      },
+      "hiddenByProfile": {
+        "experience": [
+          "accuracyByRuleTag"
+        ]
       }
     }
   }

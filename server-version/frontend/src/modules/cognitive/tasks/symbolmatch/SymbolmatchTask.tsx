@@ -125,7 +125,7 @@ export const SymbolmatchTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="符号数字配对" description={<p>上方图例显示五个“符号 = 数字”的配对。每题出现一个符号，请尽快按它对应的数字（按键 1–5 或点击按钮）。</p>} hint={<>{practiceAttempt > 1 && <p>上一轮练习未通过，请重新阅读完整说明和例子，再开始下一轮。</p>}<p>例子：若图例显示「● = 1」，出现●时就选1；以本次图例为准。</p><p>图例全程可见；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="符号数字配对" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>先看懂小密码：上方图例显示五个“符号 = 数字”的配对。每题出现一个符号，请尽快按它对应的数字（按键 1–5 或点击按钮）。</p>) : (<p>上方图例显示五个“符号 = 数字”的配对。每题出现一个符号，请尽快按它对应的数字（按键 1–5 或点击按钮）。</p>)} hint={<>{practiceAttempt > 1 && <p>上一轮练习未通过，请重新阅读完整说明和例子，再开始下一轮。</p>}<p>例子：若图例显示「● = 1」，出现●时就选1；以本次图例为准。</p><p>图例全程可见；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

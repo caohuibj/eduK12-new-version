@@ -135,7 +135,7 @@ export const LineangleTask: React.FC<CognitiveTaskProps> = ({ taskContext, trial
     else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt, practiceTrials.length])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="线条方向判断" description={<p>上方会出现一条目标线段，下方有几条方向不同的选项线段。请选出与目标方向完全一样（平行）的那一条。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p>{revised && <p>线段没有箭头，反向但平行仍是同一个方向。每题只有一个平行选项。</p>}</>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="线条方向判断" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>上方会出现一条目标线段，下方有几条方向不同的选项线段。请选出与目标方向完全一样（平行）的那一条。</p><p>给墙上挂画时，可以对照画框边缘与门框是否平行；这里也要看方向，而不只看端点位置。 这次任务只记录本次作答表现。</p></>) : (<p>上方会出现一条目标线段，下方有几条方向不同的选项线段。请选出与目标方向完全一样（平行）的那一条。</p>)} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p>{revised && <p>线段没有箭头，反向但平行仍是同一个方向。每题只有一个平行选项。</p>}</>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

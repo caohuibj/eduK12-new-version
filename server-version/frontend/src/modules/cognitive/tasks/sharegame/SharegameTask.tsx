@@ -1,8 +1,9 @@
+import { reportIntroV3 } from './report-intro-v3'
 import {SharegameTaskV1} from './SharegameTaskV1'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
-type SharegameConfig={endowments:number[];fixationMs:number;timeoutMs:number}
+type SharegameConfig={report?:{reportVersion?:string};endowments:number[];fixationMs:number;timeoutMs:number}
 type SharegameTrialPayload={endowment:number;given:number|null;rtMs:number|null;interrupted:boolean;response:'choice'|'timeout'}
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { givenForFraction, SHAREGAME_OPTIONS, SHAREGAME_PRACTICE_ENDOWMENT } from './prng'
@@ -98,7 +99,7 @@ export const SharegameTaskV2: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="分享决策" description={<p>每轮你都会拿到一笔点数。你可以全部自留，也可以分一部分给一位看不到名字、无法回报你的同伴。你的选择不会被评判对错。</p>} hint={<><p>点击档位作答；练习不计入成绩。超时记录为未答，不会替你选择零。</p></>} onAction={() => { setSubPhase('fixation'); setPhase('practice') }} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "分享决策"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>每轮你都会拿到一笔点数。你可以全部自留，也可以分一部分给一位看不到名字、无法回报你的同伴。你的选择不会被评判对错。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {endowments.length}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>点击档位作答；练习不计入成绩。超时记录为未答，不会替你选择零。</p></>} onAction={() => { setSubPhase('fixation'); setPhase('practice') }} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

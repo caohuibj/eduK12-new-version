@@ -8,6 +8,12 @@
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.1",
       "order": 130
+    },
+    {
+      "testType": "maze",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.0.1",
+      "order": 130
     }
   ],
   "backend": {
@@ -20,6 +26,12 @@
       "engineVersion": "1.0.1",
       "file": "server-version/frontend/src/modules/cognitive/tasks/maze/maze.registry.ts",
       "export": "mazeRegistryEntry"
+    },
+    {
+      "testType": "maze",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/maze/maze.registry.ts",
+      "export": "mazeRegistryEntryV11"
     }
   ],
   "catalog": {
@@ -30,6 +42,9 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
+      130,
+      130,
+      130,
       130
     ]
   },
@@ -44,7 +59,8 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/maze/__tests__/MazeTask.test.tsx",
-      "src/modules/cognitive/tasks/maze/__tests__/generator.test.ts"
+      "src/modules/cognitive/tasks/maze/__tests__/generator.test.ts",
+      "src/modules/cognitive/tasks/maze/__tests__/independent-practice.test.tsx"
     ]
   }
 }

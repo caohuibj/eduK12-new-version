@@ -66,7 +66,7 @@ export const EmbeddedfiguresTask=({taskContext,trialIndex,onTrialComplete,onTask
   return()=>{window.clearTimeout(timer);window.clearInterval(interval)}
  },[phase,step,config.timeoutMs,pick])
  const beginPractice=()=>{setFeedback('');setPracticeCorrect(false);setStep('target');setPhase('practice')}
- if(phase==='instruction')return <CognitiveTaskIntro title="嵌入图形" description={<><p>先看目标轮廓，再从七个复杂图块中，选择包含它的那个。三条边会与背景线相交或延伸。</p><p>目标的形状、大小和方向保持不变，只会平移。请确认整条轮廓，不需要旋转或缩放。</p></>} hint={<p>每题只记录第一次选择；限时 {config.timeoutMs/1000} 秒。先完成一次练习，练习回答后有教学高亮，正式题没有答案提示。</p>} onAction={beginPractice}/>
+ if(phase==='instruction')return <CognitiveTaskIntro title="嵌入图形" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>先看目标轮廓，再从七个复杂图块中，选择包含它的那个。三条边会与背景线相交或延伸。</p><p>目标的形状、大小和方向保持不变，只会平移。请确认整条轮廓，不需要旋转或缩放。</p><p>看一张复杂地图时，先记住一小段路线的转角，再去找完整走向；局部像还不够，要连起来核对。 这次任务只记录本次作答表现。</p></>) : (<><p>先看目标轮廓，再从七个复杂图块中，选择包含它的那个。三条边会与背景线相交或延伸。</p><p>目标的形状、大小和方向保持不变，只会平移。请确认整条轮廓，不需要旋转或缩放。</p></>)} hint={<p>每题只记录第一次选择；限时 {config.timeoutMs/1000} 秒。先完成一次练习，练习回答后有教学高亮，正式题没有答案提示。</p>} onAction={beginPractice}/>
  if(phase==='completed')return <><p role="status">{feedback}</p>{!completionSent.current&&<button type="button" className="btn-primary" onClick={()=>void finish()}>重试完成确认</button>}</>
  const content=<section className="card embedded-task" aria-label={practice?'嵌入图形练习':'嵌入图形正式作答'}>
   <p>{practice?'练习 · 不计入成绩':`第 ${trialIndex+1} / ${config.totalTrials} 题`}</p>

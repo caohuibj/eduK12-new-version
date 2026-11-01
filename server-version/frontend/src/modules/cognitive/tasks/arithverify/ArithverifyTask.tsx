@@ -108,7 +108,7 @@ export const ArithverifyTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="算术验证" description={<p>屏幕上会出现一个加法算式。心算两个数相加的结果，判断算式是否正确：正确按「对」，错误按「错」。</p>} hint={<>{practiceAttempt > 1 && <p>上一轮练习未通过，请重新阅读完整说明和例子，再开始下一轮。</p>}<p>例子：3 + 2 = 5 应选「对」，3 + 2 = 6 应选「错」。</p><p>按键 1 = 对、2 = 错，或点击按钮作答；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="算术验证" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>给加法算式当一次小检查员：屏幕上会出现一个加法算式。心算两个数相加的结果，判断算式是否正确：正确按「对」，错误按「错」。</p>) : (<p>屏幕上会出现一个加法算式。心算两个数相加的结果，判断算式是否正确：正确按「对」，错误按「错」。</p>)} hint={<>{practiceAttempt > 1 && <p>上一轮练习未通过，请重新阅读完整说明和例子，再开始下一轮。</p>}<p>例子：3 + 2 = 5 应选「对」，3 + 2 = 6 应选「错」。</p><p>按键 1 = 对、2 = 错，或点击按钮作答；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

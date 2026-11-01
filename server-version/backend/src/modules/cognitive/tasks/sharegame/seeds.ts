@@ -1,6 +1,6 @@
 import type { CognitiveSeed } from '../../task-seed.types'
 
-// Materialized declaration: existing exported values are preserved.
+// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const seeds: CognitiveSeed[] = [
   {
     "testType": "sharegame",
@@ -46,6 +46,29 @@ export const seeds: CognitiveSeed[] = [
       "timeoutMs": 20000,
       "report": {
         "reportVersion": "2.0.0",
+        "referenceMode": "none"
+      }
+    }
+  },
+  {
+    "testType": "sharegame",
+    "configVersion": "2.0.0-report3",
+    "name": "模拟分享：这次你怎么分 / report 3.0.0",
+    "status": "DRAFT",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "config": {
+      "endowments": [
+        20,
+        50,
+        100,
+        50,
+        100
+      ],
+      "fixationMs": 400,
+      "timeoutMs": 20000,
+      "report": {
+        "reportVersion": "3.0.0",
         "referenceMode": "none"
       }
     }
