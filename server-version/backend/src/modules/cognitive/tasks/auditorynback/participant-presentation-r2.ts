@@ -1,6 +1,8 @@
 import { participantPresentations as previous } from './participant-presentation';
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types';
 export const participantPresentations: CognitiveParticipantPresentationV1[] = previous.map(old => {
+    // Corrected/new core identities retain their own versioned interpretation.
+    if (old.engineVersion !== '1.0.1') return structuredClone(old);
     const next = structuredClone(old);
     next.presentationVersion = '2.0.0';
     next.title = "在声音流中跟踪前面的音";
