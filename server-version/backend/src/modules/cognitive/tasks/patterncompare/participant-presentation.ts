@@ -231,13 +231,13 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "metrics": {
       "correctPerMinute": {
         "label": "折算每分钟答对数",
-        "explanation": "单位时间内正确完成图形比较的数量，应与准确率一起阅读，避免把快速猜测理解为更快的加工速度。",
-        "singleExplanation": "单位时间内正确完成图形比较的数量，应与准确率一起阅读，避免把快速猜测理解为更快的加工速度。"
+        "explanation": "正确有效次数除以冻结配置durationSec，再乘60；按配置时长折算，不是按实测完成时长，也不是同龄人排名。",
+        "singleExplanation": "按本次配置的正式秒数折算为每分钟答对数，不是实测一分钟的结果。"
       },
       "accuracy": {
         "label": "准确率",
-        "explanation": "正确率：正式作答中判断正确的比例。",
-        "singleExplanation": "正确率：正式作答中判断正确的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "medianCorrectRtMs": {
         "label": "答对时通常用多久",
@@ -371,11 +371,11 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "metricHelp": {
           "correctPerMinute": {
             "label": "折算每分钟答对数",
-            "explanation": "把本次正确判断数量和实际用时一起看。"
+            "explanation": "正确有效次数除以配置durationSec，再乘60；体验档按配置30秒折算，不是按实测时长计算。"
           },
           "accuracy": {
-            "label": "这次判断正确的比例",
-            "explanation": "正确作答占本次正式尝试的比例；只描述这次任务。"
+            "label": "准确率",
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
           },
           "medianCorrectRtMs": {
             "label": "答对时通常用多久",

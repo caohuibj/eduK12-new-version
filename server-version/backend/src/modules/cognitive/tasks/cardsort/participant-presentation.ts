@@ -304,13 +304,13 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "accuracySwitch": {
         "label": "换规则时答对比例",
-        "explanation": "规则发生转换时正确作答的比例。",
-        "singleExplanation": "规则发生转换时正确作答的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "accuracyRepeat": {
         "label": "沿用规则且卡片有冲突时答对比例",
-        "explanation": "规则重复且两种规则答案冲突时正确作答的比例。",
-        "singleExplanation": "规则重复且两种规则答案冲突时正确作答的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "medianRtSwitch": {
         "label": "转换条件典型反应时间",
@@ -324,8 +324,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "overallAccuracy": {
         "label": "总体准确率",
-        "explanation": "所有正式试次中正确且反应时间有效的比例。",
-        "singleExplanation": "所有正式试次中正确且反应时间有效的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "omissionRate": {
         "label": "未反应比例",
@@ -457,11 +457,11 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           },
           "accuracySwitch": {
             "label": "换规则时答对比例",
-            "explanation": "只看需要换一条规则的那些尝试。"
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
           },
           "accuracyRepeat": {
             "label": "沿用规则且卡片有冲突时答对比例",
-            "explanation": "只看继续使用同一条规则的那些尝试。"
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。 对照只含两种规则答案相冲突的重复题。"
           },
           "omissionRate": {
             "label": "需要回应时，没有留下回应",
@@ -470,6 +470,10 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           "perseverativeErrorCount": {
             "label": "继续沿用旧规则的记录",
             "explanation": "按任务规则统计的这类错误次数，不能据此判断性格。"
+          },
+          "overallAccuracy": {
+            "label": "总体准确率",
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
           },
           "perseverativeErrorRate": {
             "label": "仍按旧规则作答的比例",

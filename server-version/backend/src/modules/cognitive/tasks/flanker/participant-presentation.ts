@@ -258,13 +258,13 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "incongruentAccuracy": {
         "label": "周围反向时答对比例",
-        "explanation": "不一致条件正确率：干扰信息与目标信息方向或含义不一致时，仍按目标规则正确作答的比例。",
-        "singleExplanation": "不一致条件正确率：干扰信息与目标信息方向或含义不一致时，仍按目标规则正确作答的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "congruentAccuracy": {
         "label": "周围同向时答对比例",
-        "explanation": "一致条件正确率：干扰信息与目标信息一致时正确作答的比例。",
-        "singleExplanation": "一致条件正确率：干扰信息与目标信息一致时正确作答的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "errorCost": {
         "label": "两种情况的正确比例差",
@@ -273,8 +273,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "accuracy": {
         "label": "总体准确率",
-        "explanation": "正确率：正式作答中判断正确的比例。",
-        "singleExplanation": "正确率：正式作答中判断正确的比例。"
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
       },
       "medianRtCongruent": {
         "label": "同向时答对的通常用时",
@@ -407,15 +407,15 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           },
           "incongruentAccuracy": {
             "label": "周围反向时答对比例",
-            "explanation": "当周围线索或字义与目标冲突时，判断正确的比例。"
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
           },
           "congruentAccuracy": {
             "label": "周围同向时答对比例",
-            "explanation": "当线索与目标一致时，判断正确的比例。"
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
           },
           "accuracy": {
-            "label": "这次判断正确的比例",
-            "explanation": "正确作答占本次正式尝试的比例；只描述这次任务。"
+            "label": "总体准确率",
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
           },
           "omissionRate": {
             "label": "需要回应时，没有留下回应",

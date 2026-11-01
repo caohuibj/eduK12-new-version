@@ -299,8 +299,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       },
       "omissionRate": {
         "label": "遗漏步骤比例",
-        "explanation": "遗漏比例：应该响应但没有响应的比例。",
-        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+        "explanation": "未在时限内成功完成的计划步骤比例；一直错点而未完成也计入，不仅是完全没点击。",
+        "singleExplanation": "未在时限内成功完成的计划步骤比例，包含错点后仍未完成的步骤。"
       }
     },
     "hiddenMetrics": [],
@@ -427,8 +427,8 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "explanation": "本次实际完成的有效步骤数量。"
           },
           "omissionRate": {
-            "label": "需要回应时，没有留下回应",
-            "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+            "label": "未按时完成的步骤比例",
+            "explanation": "未在时限内成功完成的计划步骤比例；一直错点而未完成也算。"
           },
           "setShiftCostMs": {
             "label": "B、A每步平均用时差",

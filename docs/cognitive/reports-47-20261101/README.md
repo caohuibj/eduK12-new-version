@@ -8,14 +8,16 @@
 - 四项修订 #480：`b42393cffe1c4364c1fc5568b656ed612fc60849`。
 - 八题库 #481：`4e003a24c51c50bfd8abbfd123cc8c02b9575745`。#478实际是管理员入库界面，不属于本报告基线。
 - Timecopy首次payload保存修复：`7c4718a379c9d00622adf1de42c6bb1fca5b7277`；迷宫独立练习核心修订：`7332a07b21952007e9ed7d661a136916dde855d5`。
-- 上述已有核心差异组合成审阅基线 `reports/cognitive-47-base-20261101`，head `4b0a0661d9742341b45687678dd58996d085bc59`。这个分支仅供区分报告差异，没有修改原PR分支，也不代表生产/CI/发布通过；核心PR进入main后应重定位报告PR基线。
-- R1交接：`b08fd18add73da2be6ac55d5afc7110964417f24`；R2：`7fc8405a11ced478a0326cb069c5c9f504d0f6d0`；R3只取报告增量：`42ad96c5ab5f96568d3e0edf2cbe17e8b13fb947`；R4：`b39d66b9f1166429d0007e165a7d52e15cf6c5fc`。
+- 原候选内容和原477的timecopy/cancellation修复组合成审阅基线 `reports/cognitive-47-source-base-20261101`，head `c879482f23bb8069b25ed22cbdb57f9cc6a74cf0`。本轮新增的maze/matrix独立练习及其readiness直接包含在报告/模式PR差异中。没有修改原PR分支；核心PR进入main后应重定位本PR基线。
+- R1交接：`b08fd18add73da2be6ac55d5afc7110964417f24`，限定文字续修`e62bae38fb170e15ab76a635c59c2bdf3654dabd`；R2：`7fc8405a11ced478a0326cb069c5c9f504d0f6d0`，`dfd39d67caa06ac8a29de352ac92e17a5bce6dce`的中性序列开场已采纳；三新C的报告待对应核心独审/接线后选择其自身版本；R3只取报告增量：`42ad96c5ab5f96568d3e0edf2cbe17e8b13fb947`；R4：`b39d66b9f1166429d0007e165a7d52e15cf6c5fc`。
 
 ## 本次实际改动
 
 所有当前推荐C/S身份各新增一个 `*-report3` DRAFT配置，reportVersion、presentationVersion与reportReading.version均为3.0.0，referenceMode=none。原配置、原呈现值与冻结报告保留；无reportVersion或旧配置继续使用原呈现，新配置显式选择R3。旧迷宫C1.0.1与旧matrix C1.0.0的先前未发布R3草稿也保留为兼容地址，不增加工具种数。
 
 各组工厂式报告文案已在原task-owned声明中物化，按既有manifest生成机制注册。旧呈现排在前面，R3按报告版本选择；兼容文件仅转出这些声明，不再作为注册入口。无需数据库迁移、重算历史或新报告平台。新开场文案也只由R3配置选择；timecopy保存修复与迷宫C1.1行为均保留。
+
+本轮另有必要模式修订：maze C1.1独立3×3练习、matrix C/P1.1独立4练习，旧版保留，正式序列及scorer不变。两个新C1.1补齐既有task-owned readiness声明，保留restart-required及未知版本拒绝；不是新增门禁。
 
 冻结时新R的标题、显示单位、质量标签和正文指标单独保存；scorer与正式参数不变。两项原schema（readingcomp/proofread）将reportVersion锁死1.1.0，因此只把允许集合改为1.1.0/3.0.0；题库、参考模式none、时序、试次数与评分限制均未放宽。
 
@@ -91,9 +93,9 @@
 
 后续R3增量：`fd35f4ad194f078c51ce61939a79c3d2784c8e10`修订tower合法移动/首次尝试和ICAR解释；`bf869a8007c9ed1911e9a4c1776ad6fa831694f6`隔离matrix练习，已纳入。相同正式题池/评分复用原作者有界证据，仅复核matrix新身份绑定及这三项报告，未重跑全14或47项。
 
-- Node24.21.0：47种当前任务、体验/研究共94个配置冻结通过；逐值核对全部旧呈现与旧seed均保留；剥离report元数据后两模式参数与原配置一致。
+- Node24.21.0：47种当前任务、体验/研究共94个配置冻结通过；逐值核对全部旧呈现与旧seed均保留；剥离report元数据后，R3与**同C/P基础草稿**两模式参数一致；这不表示跨旧C和独立练习新C的训练条件相同。
 - 对每份冻结报告检查普通合成值、真实数值零与全null三种投影，共282份；无缺失补零、未解析占位符或缺失图表补值，单任务报告不生成0–100产品指数。语义流畅性每轮词数按count显示。此为报告投影契约检查，未重复执行47套scorer，也不是施测结果或可靠性验证。
-- 前端认知闭包与后端profile-freeze依赖闭包类型检查；manifest、94个注册data声明与依赖检查见本次验证结果。
+- 前端认知闭包与后端profile-freeze依赖闭包类型检查；manifest与依赖检查通过（639模块）。初始94个注册声明符合data-only；保留77429c的cancellation生成器常量引用后，该seed文件本身属于可执行依赖模块，不称全部最终94个都纯数据，也没有放宽data-only检查。这个含C执行/schema/冻结逻辑的PR不走纯内容路线。
 - 不重跑全47浏览器呈现。仅抽查flanker、auditorynback、wordmeaning、icarmatrix、lexicaldecision、semanticfluency、sharegame、maze的两模式新配置，经实际registry runner开场和CognitiveV2ReportCard共32个视图：生活例子可见，无页面异常或390px横向溢出。数字为明确标注的合成示例。既有各组同输入局部证据继续保留，未转述为整体验收。
 - 迷宫独立核心修订已另有4个定向DOM用例、两模式预算冻结与真实练习→首题浏览器证据。Timecopy保存修复复用原作者精确提交证据，合并仅添加R3介绍，不覆盖其保存路径。
 - 没有运行全CI、安装/发布、数据库写入、生产、实际被试研究、完整47次施测HTTP持久化或原生设备验收。
@@ -104,11 +106,22 @@
 
 | 项目 | 当前状态与影响 |
 |---|---|
-| cancellation | 原seed刺激版本与scorer允许版本不一致，会实际拒绝；R1在独立修复，不能用报告润色掩盖。 |
-| reversallearning | 当前80/0与参考80/20的设计差异，R1正在论证或修订，不能只凭披露宣称原协议对齐。 |
+| cancellation | 已纳入`77429c347f3e338bc04058d7bda35bcec5ac2b27`精确修复；基础草稿与新R3均引用同一生成器刺激常量，未放宽scorer白名单。R3两模式绑定/零/null投影增量通过，原生成→评分证据复用该提交。 |
+| reversallearning | 独立修订6afe514已提供，尚待独审结论后纳入；当前仍按旧C的80/0、一处固定反转描述，不宣称Cools原协议复刻。 |
+| numberline | 极简研究机制方案仍未实施，只有一手文献与差异方案记录；不将方案当已完成协议对齐。 |
 | sentencecheck / visualwm / auditorynback | 真假否定、练习复用与短体验目标机会，由R2独立核修。 |
-| seqlearn | 施测前介绍可能提示规律，R2正在最小处理；报告与开场须保留其最终修复。 |
+| seqlearn | 已按dfd39d6移除新R开场中的序列/随机区组暗示，保留中性四按钮操作说明；报告作为作答后解读，不把例子移到施测前提示规律。 |
 | matrix / mentalrotation / tower | matrix已有确证反例，已纳入独立4练习的新C/P1.1、S1.0；正式6/16/24与scorer不变。mentalrotation原协议允许重复刺激，不因重复判缺陷；tower四个一步练习与正式无重合，撤回先前误判。tower用时明确为首次移动尝试（可能违规），不称纯计划时长。 |
 | maze | 已在独立C1.1修订隔离3×3练习；旧C1.0.1保留重复首图的历史条件，不改写旧报告。短体验2图仍不足以给稳定能力结论。 |
 
 后续只接收对应增量、检查受影响接线与文案，不据此重跑各组全测试或新增平台门禁。
+
+## 后续限定增量证据
+
+- R3：当前matrix/tower/icarmatrix共6个冻结、18个零/null/普通值投影通过；仅8个新增视图，已实际显示matrix C1.1独立练习。旧14组及全47渲染未重跑。
+- R1 e62：仅6个修改过的报告共12冻结/36投影通过；新增合并字段用例1 PASS，原16例未重跑。
+- cancellation：仅2冻结/6投影通过；生成器常量依赖原样保留，未为纯数据检查改回容易漂移的标签。
+- 新matrix/maze readiness：两个精确版本先失败于undefined，补声明后2 PASS；未来1.1.1仍拒绝。未放开续答或其它身份。
+- 新matrix并入最终477/480/481上下文后，两侧相关类型闭包实际0诊断；未修改pr13-stimuli.ts，不把早期R3上下文的TS2322当作当前失败，也不声称全后端Prisma/业务类型验收通过。
+
+三新R2核心9aab433由D纳入原20收口，当前仍待其独审/接线；待接收时只按新C/S声明选择新R，不把旧缺陷描述套到新身份。以上待办保持具体，不新增常模或临床门禁。
