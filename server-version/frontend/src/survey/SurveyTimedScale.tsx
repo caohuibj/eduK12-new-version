@@ -128,5 +128,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
     </fieldset>
     {selected&&nextUnanswered!==undefined&&!readOnly&&<button type="button" className="survey-scale-resume"
       disabled={paused||!imagesReady||!autoAdvanceReady} onClick={continueUnanswered}>继续未答题 <span aria-hidden="true">→</span></button>}
+    {!current.required&&index+1<unit.items.length&&!readOnly&&<button type="button" className="survey-scale-resume"
+      disabled={paused||!imagesReady||!autoAdvanceReady} onClick={()=>{setFeedback(null);moveTo(index+1)}}>跳过此题</button>}
   </section>
 }

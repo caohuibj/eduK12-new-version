@@ -22,6 +22,15 @@ function Harness({initialAnswers={},questions=unit,initialIndex=0}:{initialAnswe
 }
 afterEach(()=>vi.restoreAllMocks())
 describe('Survey Scale participant one-by-one delivery',()=>{
+  it('keeps frozen support visible while skipping an optional question without fabricating an answer',()=>{
+    render(<Harness questions={{...unit,instruction:'独立支持说明，不依赖总分。',items:[{...unit.items[0],required:false},{...unit.items[1],required:false}]} as typeof unit}/> )
+    expect(screen.getByRole('note')).toHaveTextContent('独立支持说明，不依赖总分。')
+    expect(screen.getByRole('note').closest('details')).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'跳过此题'}))
+    expect(screen.getByText('第二题')).toBeInTheDocument()
+    expect(screen.getByRole('note')).toHaveTextContent('独立支持说明，不依赖总分。')
+    expect(screen.getByTestId('answers')).toHaveTextContent('{}')
+  })
   it('keeps mouse and keyboard answering available without persistent timing or keyboard explanations',()=>{
     render(<Harness/>)
     expect(screen.queryByText('关于作答计时')).toBeNull()
