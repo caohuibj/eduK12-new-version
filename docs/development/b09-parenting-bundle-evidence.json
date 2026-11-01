@@ -38,15 +38,6 @@
     "whole-platform tests"
   ],
   "failures": [],
-  "finalContentCheck": {
-    "ok": true,
-    "packages": [
-      {
-        "key": "parenting_burden_efficacy_zh_cn",
-        "hash": "d233f0b0a9a6d5bcf39ab56576123f4d97fee422633e0965840ee1800774bc77"
-      }
-    ]
-  },
   "history": [
     {
       "stage": "local synthetic harness",
@@ -71,12 +62,23 @@
   ],
   "reuseBoundary": "Only report wording/block grouping changed after bounded score checks; scoring, conditions, evidence identity/type and source inputs unchanged. Selected package validation executed after that report edit; no whole-platform or source golden suites.",
   "harnessSHA256": "de680b96a756a953089368c6899b70da7ef92d0b544215b0ac34fc436f76b503",
-  "ciStatus": "NOTRUN: precise candidate awaits parent dot independent review before PR opens/CI activation",
+  "ciStatus": "NOTRUN at record creation; parent received prior candidate and user explicitly authorized public Draft submission; existing PR-triggered content-light route only, no manual dispatch",
   "ciFailureRounds": 0,
   "finalFreezeCheck": {
     "ok": true,
     "snapshotFamily": "ASSESSMENT_BUNDLE",
     "snapshotVersion": 3,
     "snapshotHash": "7dadf4d0e146f61c109db90ccbd9d9b238c4939f68fe30660771181cbd5e459e"
-  }
+  },
+  "previousSelectedPackageCheck": {
+    "ok": true,
+    "packages": [
+      {
+        "key": "parenting_burden_efficacy_zh_cn",
+        "hash": "d233f0b0a9a6d5bcf39ab56576123f4d97fee422633e0965840ee1800774bc77"
+      }
+    ]
+  },
+  "currentContentHash": "a914e52a1fd227efd8f875db446b487d45d641b48667ce708a053842cd583205",
+  "referenceCleanup": "Removed private design file version/date metadata from project-authored citation and narrative documentation. No scoring, applicability, selectors, rules, report, fixtures, source policies or runtime changes. Existing generator reparsed content and regenerated index; score/boundary checks not repeated."
 }
