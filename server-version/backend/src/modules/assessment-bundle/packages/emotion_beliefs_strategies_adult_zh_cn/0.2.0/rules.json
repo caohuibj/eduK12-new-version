@@ -1,0 +1,749 @@
+{
+  "version": "0.2.0",
+  "applicability": {
+    "op": "all",
+    "conditions": [
+      {
+        "op": "eq",
+        "evidenceKey": "adult",
+        "value": true
+      },
+      {
+        "op": "gte",
+        "evidenceKey": "age",
+        "value": 18
+      }
+    ]
+  },
+  "items": [
+    {
+      "ruleId": "belief_neg_controllability",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.neg_controllability",
+            "value": 4
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.neg_controllability",
+            "value": 28
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "信念依据｜不舒服情绪的不易改变信念：原工具4题合计4–28分，保留SUM。分数较大表示更认同情绪不易改变的陈述，不表示控制能力较强，也不意味着应该消除所有不舒服情绪。这是通常看法的本次自评，仍受情境和题意理解影响。",
+      "evidenceKeys": [
+        "beliefs.neg_controllability"
+      ],
+      "supportRefs": [
+        "ebq_original"
+      ]
+    },
+    {
+      "ruleId": "belief_pos_controllability",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.pos_controllability",
+            "value": 4
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.pos_controllability",
+            "value": 28
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "信念依据｜愉快情绪的不易改变信念：原工具4题合计4–28分，保留SUM。分数较大表示更认同情绪不易改变的陈述，不表示控制能力较强，也不意味着应该消除所有不舒服情绪。这是通常看法的本次自评，仍受情境和题意理解影响。",
+      "evidenceKeys": [
+        "beliefs.pos_controllability"
+      ],
+      "supportRefs": [
+        "ebq_original"
+      ]
+    },
+    {
+      "ruleId": "belief_neg_usefulness",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.neg_usefulness",
+            "value": 4
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.neg_usefulness",
+            "value": 28
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "信念依据｜不舒服情绪的无用信念：原工具4题合计4–28分，保留SUM。分数较大表示更认同情绪没有用处的陈述，不表示情绪真的没有价值。这是通常看法的本次自评，仍受情境和题意理解影响。",
+      "evidenceKeys": [
+        "beliefs.neg_usefulness"
+      ],
+      "supportRefs": [
+        "ebq_original"
+      ]
+    },
+    {
+      "ruleId": "belief_pos_usefulness",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.pos_usefulness",
+            "value": 4
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.pos_usefulness",
+            "value": 28
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "信念依据｜愉快情绪的无用信念：原工具4题合计4–28分，保留SUM。分数较大表示更认同情绪没有用处的陈述，不表示情绪真的没有价值。这是通常看法的本次自评，仍受情境和题意理解影响。",
+      "evidenceKeys": [
+        "beliefs.pos_usefulness"
+      ],
+      "supportRefs": [
+        "ebq_original"
+      ]
+    },
+    {
+      "ruleId": "belief_general_controllability",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 8
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 56
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "信念依据｜整体情绪的不易改变信念C：原工具8题合计8–56分，保留SUM。分数较大表示更认同情绪不易改变的陈述，不表示控制能力较强，也不意味着应该消除所有不舒服情绪。这是通常看法的本次自评，仍受情境和题意理解影响。",
+      "evidenceKeys": [
+        "beliefs.general_controllability"
+      ],
+      "supportRefs": [
+        "ebq_original"
+      ]
+    },
+    {
+      "ruleId": "belief_general_usefulness",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.general_usefulness",
+            "value": 8
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.general_usefulness",
+            "value": 56
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "信念依据｜整体情绪的无用信念：原工具8题合计8–56分，保留SUM。分数较大表示更认同情绪没有用处的陈述，不表示情绪真的没有价值。这是通常看法的本次自评，仍受情境和题意理解影响。",
+      "evidenceKeys": [
+        "beliefs.general_usefulness"
+      ],
+      "supportRefs": [
+        "ebq_original"
+      ]
+    },
+    {
+      "ruleId": "strategy_situation_modification",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "strategies.situation_modification",
+            "value": 1
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "strategies.situation_modification",
+            "value": 7
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "策略依据｜调整处境：原工具3题均分1–7，分数较大仅表示平时更报告这种做法。可结合自己能改变哪些情境条件理解。",
+      "evidenceKeys": [
+        "strategies.situation_modification"
+      ],
+      "supportRefs": [
+        "erss_original"
+      ]
+    },
+    {
+      "ruleId": "strategy_attentional_deployment",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "strategies.attentional_deployment",
+            "value": 1
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "strategies.attentional_deployment",
+            "value": 7
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "策略依据｜转移注意：原工具4题均分1–7，分数较大仅表示平时更报告这种做法。沿原叶工具反向键处理第6、7题，不把注意转移一概视作逃避。",
+      "evidenceKeys": [
+        "strategies.attentional_deployment"
+      ],
+      "supportRefs": [
+        "erss_original"
+      ]
+    },
+    {
+      "ruleId": "strategy_cognitive_reappraisal",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 1
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 7
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "策略依据｜换角度理解R：原工具7题均分1–7，分数较大仅表示平时更报告这种做法。是否适合要看具体情境和个人目标，不假定越多越好。",
+      "evidenceKeys": [
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": [
+        "erss_original"
+      ]
+    },
+    {
+      "ruleId": "strategy_suppression",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "strategies.suppression",
+            "value": 1
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "strategies.suppression",
+            "value": 7
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "策略依据｜暂不表达情绪：原工具5题均分1–7，分数较大仅表示平时更报告这种做法。暂时不表达的用途与代价随关系、时机和目标变化，不一概判坏。",
+      "evidenceKeys": [
+        "strategies.suppression"
+      ],
+      "supportRefs": [
+        "erss_original"
+      ]
+    },
+    {
+      "ruleId": "em1",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 8
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 56
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 7
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 20
+          },
+          {
+            "op": "gte",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 5.5
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "EM1｜相信可改变，也报告重评做法。这次回答较相信情绪可以改变，也较报告换角度理解的做法。它不保证每次都有效。最近哪一次换角度确实有帮助？可以记录一个有效情境和一个仍困难的情境，比较差别。 此组合仅为EXPERIMENTAL理论叙事，不是固定人格类别、常模或诊断。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": [
+        "b08_design"
+      ]
+    },
+    {
+      "ruleId": "em2",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 8
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 56
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 7
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 20
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 2.5
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "EM2｜相信可改变，但较少报告重评。这次回答较相信情绪可以改变，但较少报告换角度理解。也许您已使用其他合适做法，不能据此判为策略不足。您当时用过什么方式？先记录一项已有做法及其效果，不急着要求自己增加重评。 此组合仅为EXPERIMENTAL理论叙事，不是固定人格类别、常模或诊断。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": [
+        "b08_design"
+      ]
+    },
+    {
+      "ruleId": "em3",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 8
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 56
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 7
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 44
+          },
+          {
+            "op": "gte",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 5.5
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "EM3｜不易改变信念与重评做法并存。这次回答已报告一些换角度理解的做法，同时仍觉得情绪不容易改变。两者可以并存，不能据此判断能力好坏。哪些情境有效，哪些目标可能过高？可以选择一次具体经历，把目标改成一个较小、可观察的变化。 此组合仅为EXPERIMENTAL理论叙事，不是固定人格类别、常模或诊断。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": [
+        "b08_design"
+      ]
+    },
+    {
+      "ruleId": "em4",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 8
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 56
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 7
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "gte",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 44
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 2.5
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "EM4｜不易改变信念较强，重评较少。这次回答更觉得情绪不易改变，也较少报告换角度理解。这不代表不能调节或心理健康较差。您最希望理解哪一种情境？可以先记录一次情绪、发生情境和当时需要，再选一个愿意尝试的小行动。 此组合仅为EXPERIMENTAL理论叙事，不是固定人格类别、常模或诊断。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": [
+        "b08_design"
+      ]
+    },
+    {
+      "ruleId": "continuous",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 8
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 56
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 7
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gt",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 20
+                  },
+                  {
+                    "op": "lt",
+                    "evidenceKey": "beliefs.general_controllability",
+                    "value": 44
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gt",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 2.5
+                  },
+                  {
+                    "op": "lt",
+                    "evidenceKey": "strategies.cognitive_reappraisal",
+                    "value": 5.5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "本次两轴至少一项处在尾区之间，保留连续结果，不指定EM1–EM4。信念C和重评R可分别理解，不相加。最近有哪些情境让信念和实际做法不同步？可以记录一个具体例子，再决定是否需要调整。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": [
+        "b08_design"
+      ]
+    },
+    {
+      "ruleId": "missing_axes",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "beliefs.general_controllability"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "strategies.cognitive_reappraisal"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "核心轴信息尚不完整，暂不形成两轴叙事。不补零、不用中点替代；仍可查看另一来源获准展示的独立结果。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "invalid_axes",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "invalid",
+            "evidenceKey": "beliefs.general_controllability"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "strategies.cognitive_reappraisal"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "部分核心轴未满足原来源质量要求，暂不形成两轴叙事。这不是低能力判断；请先核对该来源的完整性和质量说明。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "not_applicable_axes",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "not_applicable",
+            "evidenceKey": "beliefs.general_controllability"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "strategies.cognitive_reappraisal"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "有核心轴被标记为不适用，本次不形成两轴叙事；不把不适用编码当成数值。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "out_of_range",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "lt",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 8
+          },
+          {
+            "op": "gt",
+            "evidenceKey": "beliefs.general_controllability",
+            "value": 56
+          },
+          {
+            "op": "lt",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 1
+          },
+          {
+            "op": "gt",
+            "evidenceKey": "strategies.cognitive_reappraisal",
+            "value": 7
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "核心结果超出精确来源的合法范围，不能形成两轴解释；请核对来源、单位和版本，不截断到边界。",
+      "evidenceKeys": [
+        "beliefs.general_controllability",
+        "strategies.cognitive_reappraisal"
+      ],
+      "supportRefs": []
+    }
+  ],
+  "derivations": [
+    {
+      "key": "c",
+      "op": "RANGE_POSITION",
+      "input": "beliefs.general_controllability",
+      "min": 8,
+      "max": 56,
+      "orientation": "DIRECT"
+    },
+    {
+      "key": "r",
+      "op": "RANGE_POSITION",
+      "input": "strategies.cognitive_reappraisal",
+      "min": 1,
+      "max": 7,
+      "orientation": "DIRECT"
+    }
+  ],
+  "theme": {
+    "axisKeys": [
+      "c",
+      "r"
+    ],
+    "ruleIds": [
+      "em1",
+      "em2",
+      "em3",
+      "em4"
+    ]
+  }
+}
