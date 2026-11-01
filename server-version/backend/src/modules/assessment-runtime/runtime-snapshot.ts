@@ -15,6 +15,7 @@ import {
   parseFrozenScaleRuntimeSnapshotV2,
   type FrozenScaleRuntimeSnapshotV2,
 } from './runtime-snapshot-v2'
+import { frozenScaleInstructionSchema, type FrozenScaleInstruction } from './frozen-scale-instruction'
 import { z } from 'zod'
 
 export interface FrozenScaleRuntimeSnapshotV1 {
