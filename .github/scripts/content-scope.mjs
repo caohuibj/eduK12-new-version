@@ -268,6 +268,7 @@ const maintenanceRoutingFiles = new Set([
   '.github/scripts/merge-gate.mjs','.github/scripts/maintenance-routing.test.mjs',
   '.github/scripts/content-workflows.test.mjs',
   '.github/scripts/maintenance-merge.py','.github/scripts/test_maintenance_merge.py',
+  '.github/scripts/post356-scope.mjs','.github/scripts/post356-scope.test.mjs',
 ]);
 const monitorRoot = 'server-version/scripts/host-ops/';
 const cleanupRoot = 'server-version/scripts/cos-cleanup/';
