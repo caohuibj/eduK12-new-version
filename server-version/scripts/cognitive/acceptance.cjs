@@ -1,6 +1,26 @@
 const fs = require('node:fs'),
   path = require('node:path'),
+  os = require('node:os'),
   { spawnSync } = require('node:child_process')
+function declaredFrontendSuites(root) {
+  const tasks = path.join(root, 'server-version/backend/src/modules/cognitive/tasks')
+  const suites = fs.readdirSync(tasks, {withFileTypes:true}).filter(entry=>entry.isDirectory()).flatMap(entry=>{
+    const pkg=JSON.parse(fs.readFileSync(path.join(tasks,entry.name,'task-package.json'),'utf8'))
+    if(!Array.isArray(pkg.acceptance?.frontendSuites)||!pkg.acceptance.frontendSuites.length)
+      throw Error('COG_RUNNER_EVIDENCE_MISSING: '+entry.name)
+    return pkg.acceptance.frontendSuites
+  })
+  return [...new Set(suites)].sort()
+}
+function assertAcceptanceReport(report, cwd, suites) {
+  if(report?.success!==true || !Array.isArray(report.testResults))throw Error('COG_RUNNER_ACCEPTANCE_FAILED: incomplete report')
+  for(const suite of suites){
+    const matches=report.testResults.filter(result=>typeof result.name==='string'&&path.resolve(result.name)===path.resolve(cwd,suite))
+    if(matches.length!==1 || matches[0].status!=='passed' || !Array.isArray(matches[0].assertionResults)
+      || !matches[0].assertionResults.length || matches[0].assertionResults.some(result=>result.status!=='passed'))
+      throw Error('COG_RUNNER_ACCEPTANCE_FAILED: missing, failed or skipped suite '+suite)
+  }
+}
 /** Runs task-declared deterministic DOM/runner/stimulus suites; real-browser checks remain a CI job. */
 function runAcceptance(root, pkg) {
   const suites = pkg.acceptance?.frontendSuites
@@ -19,6 +39,9 @@ function runAcceptance(root, pkg) {
     )
       throw new Error('COG_RUNNER_EVIDENCE_INVALID: ' + suite)
   }
+  const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'cognitive-acceptance-'))
+  const reportFile=path.join(temporary,'vitest.json')
+  try {
   const result = spawnSync(
     process.execPath,
     [
@@ -26,6 +49,7 @@ function runAcceptance(root, pkg) {
       'run',
       ...suites,
       '--maxWorkers=2',
+      '--reporter=default', '--reporter=json', '--outputFile.json='+reportFile,
     ],
     {
       cwd,
@@ -45,6 +69,8 @@ function runAcceptance(root, pkg) {
         '; rerun frontend vitest for ' +
         suites.join(', '),
     )
+  assertAcceptanceReport(JSON.parse(fs.readFileSync(reportFile,'utf8')),cwd,suites)
   return suites.length
+  } finally { fs.rmSync(temporary,{recursive:true,force:true}) }
 }
-module.exports = { runAcceptance }
+module.exports = { runAcceptance, declaredFrontendSuites, assertAcceptanceReport }

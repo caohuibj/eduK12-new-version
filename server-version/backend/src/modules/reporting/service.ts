@@ -18,8 +18,7 @@ import { reportingFail, type ReportingArtifactRecord, type ReportingCohortSelect
 
 const publicArtifact = async (artifact: ReportingArtifactRecord, principal: ReportingPrincipal) => {
   await assertFixedPopulationArtifactDisclosure({ principal, artifact })
-  const allowed=artifact.analysisKind==='GROUP'&&artifact.artifactPayload.schemaVersion===2
-    ?await governedArtifactMetrics({principal,artifact}):null
+  const allowed = await governedArtifactMetrics({ principal, artifact })
   return {
     artifactId: artifact.id,
     generatedAt: artifact.generatedAt.toISOString(),

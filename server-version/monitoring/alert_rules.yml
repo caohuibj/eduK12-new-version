@@ -14,7 +14,7 @@ groups:
         expr: |
           sum(rate(ptool_api_requests_total{status=~"5.."}[5m]))
           /
-          clamp_min(sum(rate(ptool_api_requests_total[5m])), 1)
+          (sum(rate(ptool_api_requests_total[5m])) > 0)
           > 0.05
         for: 5m
         labels:

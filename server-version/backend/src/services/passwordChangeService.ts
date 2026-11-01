@@ -2,7 +2,7 @@ import { prisma } from '../config/database'
 import { comparePassword, hashPassword, isValidPassword } from '../utils/password'
 
 export class PasswordChangeError extends Error {
-  constructor(message: string, readonly unauthenticated = false) { super(message) }
+  constructor(message: string, readonly unauthenticated = false, readonly statusCode = 400) { super(message) }
 }
 
 /** One validation and credential mutation contract for both public URL aliases. */
@@ -17,8 +17,10 @@ export async function changeOwnPassword(userId: string | undefined, oldPassword:
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) throw new PasswordChangeError('请先登录', true)
   if (!(await comparePassword(oldPassword, user.passwordHash))) throw new PasswordChangeError('旧密码错误')
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash: await hashPassword(newPassword), tokenVersion: { increment: 1 }, mustChangePassword: false },
+  const passwordHash = await hashPassword(newPassword)
+  const updated = await prisma.user.updateMany({
+    where: { id: userId, tokenVersion: user.tokenVersion },
+    data: { passwordHash, tokenVersion: { increment: 1 }, mustChangePassword: false },
   })
+  if (updated.count !== 1) throw new PasswordChangeError('账号状态已改变，请重新登录', false, 409)
 }

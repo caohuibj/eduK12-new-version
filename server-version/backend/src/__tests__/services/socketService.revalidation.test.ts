@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '../../types'
+import jwt from 'jsonwebtoken'
+import { config } from '../../config'
 
 const { mockPrisma, revoked } = vi.hoisted(() => ({
   revoked: vi.fn(),
@@ -13,9 +15,13 @@ vi.mock('../../utils/sessionRevocation', () => ({ isSessionRevoked: revoked }))
 
 import { SocketService } from '../../services/socketService'
 
-const makeRemoteSocket = (data: Record<string, unknown>) => ({
+const signedSession = (overrides: Record<string, unknown> = {}) => jwt.sign({
+  userId: 'teacher-1', tokenVersion: 0, exp: Math.floor(Date.now() / 1000) + 3600, ...overrides,
+}, config.jwtSecret)
+
+const makeRemoteSocket = (data: Record<string, unknown>, token = signedSession()) => ({
   data,
-  handshake: { headers: { cookie: 'ptool_session=synthetic-session-verified-at-handshake' } },
+  handshake: { headers: { cookie: `ptool_session=${token}` } },
   disconnect: vi.fn(),
 })
 
@@ -39,6 +45,26 @@ describe('SocketService manager room revalidation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     revoked.mockResolvedValue(false)
+  })
+
+  it.each([
+    { exp: Math.floor(Date.now() / 1000) - 1 },
+    { userId: 'different-user' },
+    { tokenVersion: 1 },
+  ])('invalidates a connected signed session that no longer verifies its identity (%j)', async claims => {
+    const socket = makeRemoteSocket({ authenticated: true, userId: 'teacher-1', tokenVersion: 0 }, signedSession(claims))
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow())
+    await expect(new SocketService().refreshAuthenticatedSocket(socket as any)).resolves.toBe(false)
+    expect(socket.data).toMatchObject({ authenticated: false, authenticationInvalidated: true })
+    expect(socket.data.userId).toBeUndefined()
+  })
+
+  it('invalidates a revoked signed session', async () => {
+    const socket = makeRemoteSocket({ authenticated: true, userId: 'teacher-1', tokenVersion: 0 })
+    mockPrisma.$queryRaw.mockResolvedValue(principalRow())
+    revoked.mockResolvedValue(true)
+    await expect(new SocketService().refreshAuthenticatedSocket(socket as any)).resolves.toBe(false)
+    expect(socket.data.authenticationInvalidated).toBe(true)
   })
 
   it('disconnects a manager whose account is no longer active', async () => {

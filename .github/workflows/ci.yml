@@ -822,6 +822,101 @@ jobs:
       - name: Parse candidate and exercise both upstream routes
         run: bash .github/scripts/edge-config-smoke.sh
 
+  maintenance-repair:
+    name: targeted security and maintenance repairs
+    needs: scope
+    if: ${{ github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'maintenance-repair' }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ci-isolated-only
+          POSTGRES_DB: eduk12_ci_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d eduk12_ci_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ci-isolated-only@localhost:5432/eduk12_ci_test?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ci-isolated-only@localhost:5432/eduk12_ci_test?schema=public
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+      - name: Install the unchanged locked dependencies once
+        run: |
+          npm ci --prefix .github/release-tools --ignore-scripts --no-audit --no-fund
+          npm ci --prefix server-version/backend --ignore-scripts --no-audit --no-fund
+          mkdir -p server-version/frontend/node_modules
+          ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/frontend/node_modules/typescript
+      - name: Check routing, receipt ownership and inventory semantics
+        run: |
+          node --test .github/scripts/maintenance-repair.test.mjs .github/scripts/post356-scope.test.mjs .github/scripts/local-validation.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/merge-gate.test.mjs
+          node --test server-version/miniprogram-v2/tests/feature-inventory.test.cjs
+          node server-version/frontend/scripts/product-route-inventory.mjs --check
+      - name: Prepare only the isolated database and generated client
+        working-directory: server-version/backend
+        run: |
+          node node_modules/prisma/build/index.js generate
+          node node_modules/prisma/build/index.js migrate deploy
+      - name: Compile production TypeScript without installing or publishing content
+        working-directory: server-version/backend
+        run: node --max-old-space-size=4096 node_modules/typescript/bin/tsc --noEmit
+      - name: Verify the actual affected security transitions and draft boundary
+        working-directory: server-version/backend
+        shell: bash
+        run: |
+          files=(
+            src/__tests__/reporting/group-service-disclosure.test.ts
+            src/__tests__/reporting/reporting-leaf-source.test.ts
+            src/__tests__/reporting/campus-absent-disclosure.test.ts
+            src/__tests__/services/classroomSocketHandler.security.test.ts
+            src/__tests__/services/socketService.revalidation.test.ts
+            src/__tests__/controllers/password-change-canonical.test.ts
+            src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts
+            src/__tests__/integration/huiteacherConsensus.postgres.integration.test.ts
+            src/__tests__/assessment-bundle/public-declarations.test.ts
+            src/__tests__/cognitive/acceptance-execution.test.ts
+          )
+          node node_modules/vitest/vitest.mjs run "${files[@]}" --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/maintenance-repair-tests.json
+          node scripts/assert-release-test-report.mjs /tmp/maintenance-repair-tests.json "${files[@]}"
+          node --import tsx src/scripts/bundle-onboarding.ts manifest-check
+          node --import tsx src/scripts/bundle-onboarding.ts check-public
+      - name: Verify monitoring behavior and the actual Prometheus expressions
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p test_monitor.py -v
+          docker run --rm --entrypoint /bin/promtool -v "$PWD/server-version/monitoring:/rules:ro" -w /rules prom/prometheus:v2.54.1 check rules alert_rules.yml
+          docker run --rm --entrypoint /bin/promtool -v "$PWD/server-version/monitoring:/rules:ro" -w /rules prom/prometheus:v2.54.1 test rules alert_rules.test.yml
+      - name: Select the changed runtime and check-control sources for SAST
+        run: node .github/scripts/maintenance-repair-scope.mjs --codeql-config > ./.maintenance-repair-codeql.json
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript,python
+          build-mode: none
+          config-file: ./.maintenance-repair-codeql.json
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: maintenance-repair
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: maintenance-repair-test-results
+          path: /tmp/maintenance-repair-tests.json
+          if-no-files-found: ignore
+
   maintenance:
     needs: scope
     if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (needs.scope.outputs.personal_tracking_draft != 'true' && needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && ((needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
@@ -1287,6 +1382,7 @@ jobs:
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
       catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
+      cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend == 'true' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && needs.scope.outputs.scenario != 'dependencies' }}
       base_sha: ${{ needs.scope.outputs.diff_base }}
 
   browser:
@@ -3849,6 +3945,7 @@ jobs:
       && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
+    - maintenance-repair
     - edge-config
     - cognitive-product
     - catalog-discovery

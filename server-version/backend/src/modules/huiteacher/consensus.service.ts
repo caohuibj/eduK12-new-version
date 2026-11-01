@@ -5,6 +5,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import { fieldEventAccessAllowed } from './fieldEventAccess'
 
 type Tx=Prisma.TransactionClient
 export class HuiteacherConsensusError extends Error{
@@ -178,6 +179,7 @@ async function eligibleReviewer(tx:Tx,record:Awaited<ReturnType<typeof load>>,
       AND actor."teacher_approved"=TRUE AND actor."is_active"=TRUE
       AND actor."is_frozen"=FALSE AND actor."must_change_password"=FALSE
       AND (actor."expires_at" IS NULL OR actor."expires_at">statement_timestamp())
+      AND ${fieldEventAccessAllowed(record.organizationId,userId)}
     FOR SHARE OF actor,grant_row
   `
   if(!rows.length)deny('HUITEACHER_CONSENSUS_REVIEW_AUTH_REVOKED',403)
@@ -301,6 +303,7 @@ export async function myHuiteacherConsensusReviews(actorUserId:string){
       JOIN "users" actor ON actor."id"=${actorUserId}
         AND actor."account_domain"='SCHOOL'
         AND actor."is_active"=TRUE AND actor."is_frozen"=FALSE
+      WHERE ${fieldEventAccessAllowed(Prisma.sql`consensus."organization_id"`,actorUserId)}
       ORDER BY consensus."id" DESC LIMIT 51
     `
     const list=[]
