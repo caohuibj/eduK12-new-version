@@ -1,0 +1,89 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "child_chexi_parent_zh_cn_v1",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "observer",
+    "name": "儿童执行功能 家长观察",
+    "description": "家长描述家庭及日常生活中所见的儿童行为；共用官方CHEXI题本。",
+    "respondentTypes": [
+      "PARENT"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "PARENT_SELF_SERVE"
+    ],
+    "population": {
+      "subjectPopulation": "youth",
+      "subjectMinAgeYears": 4,
+      "subjectMaxAgeYears": 12
+    },
+    "slots": [
+      {
+        "slotKey": "chexi",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "chexi_zh_hans",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "PARENT",
+        "valueSelectors": [
+          "working_memory",
+          "inhibition"
+        ]
+      },
+      {
+        "slotKey": "subject_context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "child_observer_subject_context",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "PARENT"
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "child_observer_subject_context",
+    "contextDefinitionVersion": "1.0.0",
+    "reportDefinitionKey": "child_chexi_parent_zh_cn_v1_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "chexi_zh_hans"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "量表内容与计分共享；观察者角色、情境、同意和报告访问权限不能合并。",
+      "儿童本人完成认知任务，家长或教师完成本表；不把观察者的认知表现当成儿童表现。",
+      "保留同一儿童的subjectUserId及各自真实respondentUserId；出生年月描述儿童本人。",
+      "4至12岁是CHEXI观察表范围，不是所选认知任务各年龄均已验证的证据。",
+      "只报告原量尺均分，不提供诊断、IQ、能力等级或跨方法总分。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": []
+}

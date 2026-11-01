@@ -351,6 +351,8 @@ jobs:
       survey_experience_plan: ${{ steps.scope.outputs.survey_experience_plan }}
       composite_csv_memory_plan: ${{ steps.scope.outputs.composite_csv_memory_plan }}
       scale_library_governance_plan: ${{ steps.scope.outputs.scale_library_governance_plan }}
+      bundle_family: ${{ steps.scope.outputs.bundle_family }}
+      diff_base: ${{ steps.scope.outputs.diff_base }}
       application_route: ${{ steps.scope.outputs.application_route }}
       release_plan: ${{ steps.scope.outputs.release_plan }}
       campus_plan: ${{ steps.scope.outputs.campus_plan }}
@@ -370,6 +372,7 @@ jobs:
       image_build: ${{ steps.scope.outputs.image_build }}
       dependencies_frontend_only: ${{ steps.scope.outputs.dependencies_frontend_only }}
       frontend_affected: ${{ steps.scope.outputs.frontend_affected }}
+      backend_focus: ${{ steps.scope.outputs.backend_focus }}
       documentation: ${{ steps.scope.outputs.documentation }}
       codeql: ${{ steps.scope.outputs.codeql }}
       heavy_runner: ${{ steps.scope.outputs.heavy_runner }}
@@ -394,6 +397,7 @@ jobs:
       scale_intake_light: ${{ steps.scope.outputs.scale_intake_light }}
       cognitive_intake_light: ${{ steps.scope.outputs.cognitive_intake_light }}
       cognitive_intake_plan: ${{ steps.scope.outputs.cognitive_intake_plan }}
+      cognitive_product_plan: ${{ steps.scope.outputs.cognitive_product_plan }}
       cognitive: ${{ steps.scope.outputs.cognitive }}
       situational: ${{ steps.scope.outputs.situational }}
       bundle: ${{ steps.scope.outputs.bundle }}
@@ -416,6 +420,8 @@ jobs:
           JS
       - name: fetch the exact diff base without full history
         env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           node .github/scripts/runner-preflight.mjs --control
@@ -625,9 +631,11 @@ jobs:
           import {personalTrackingReadyPlan} from './.github/scripts/personal-tracking-ready.mjs';
           import {onboardingPlan} from './.github/scripts/onboarding-scope.mjs';
           import {groupReportDraftPlan,groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';
+          import {catalogDiffBase} from './.github/scripts/catalog-discovery-scope.mjs';
           import {execFileSync} from 'node:child_process';
           import {toolingOnly} from './server-version/scripts/release/policy.mjs';
-          const actualBase=groupReportDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const checkout=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          const actualBase=catalogDiffBase(groupReportDiffBase(process.env.CI_BASE_SHA,checkout),checkout,changedEntries);
           const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(actualBase);
           const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
           const followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
@@ -682,6 +690,9 @@ jobs:
           path: ${{ runner.temp }}/pr356/source/
           if-no-files-found: warn
           retention-days: 7
+      - name: bounded backend API route and actual job selection contracts
+        if: steps.scope.outputs.backend_focus == 'form-intake'
+        run: node --test .github/scripts/backend-api-scope.test.mjs
       - name: Survey Mac exact scope, refusal and aggregate contracts
         if: steps.scope.outputs.application_route == 'survey-mac-ui' && github.event_name == 'pull_request'
         run: |
@@ -792,7 +803,7 @@ jobs:
 
   maintenance:
     needs: scope
-    if: ${{ needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (needs.scope.outputs.personal_tracking_draft != 'true' && needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && ((needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
+    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (needs.scope.outputs.personal_tracking_draft != 'true' && needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && ((needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -820,6 +831,78 @@ jobs:
         run: |
           node .github/scripts/fetch-ci-base.mjs
           node .github/scripts/local-validation.mjs ci documentation
+
+  cognitive-product:
+    name: Cognitive product / compile and registration
+    needs: scope
+    if: ${{ needs.scope.outputs.application_route == 'cognitive-product' && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      COGNITIVE_PRODUCT_PLAN: ${{ needs.scope.outputs.cognitive_product_plan }}
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TZ: UTC
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:cognitive-ci-fixture-only@127.0.0.1:5432/cognitive_product_ci_test
+      COGNITIVE_INSTALL_TEST_DATABASE_URL: postgresql://postgres:cognitive-ci-fixture-only@127.0.0.1:5432/cognitive_product_ci_test
+      REDIS_URL: redis://127.0.0.1:6379
+      JWT_SECRET: synthetic-cognitive-ci-session-only
+      CORS_ORIGIN: http://localhost:5174
+      ADMIN_WEBAUTHN_ORIGIN: http://localhost:5174
+      ADMIN_WEBAUTHN_RP_ID: localhost
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: cognitive-ci-fixture-only
+          POSTGRES_DB: cognitive_product_ci_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cognitive_product_ci_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: directed route and missing-check contract tests
+        run: node --test .github/scripts/cognitive-product.test.mjs
+      - name: install locked compiler and declaration dependencies without application hooks
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
+      - name: prepare the isolated empty database for real intake HTTP
+        working-directory: server-version/backend
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+      - name: real runner scorer freeze and isolated intake boundaries
+        run: node .github/scripts/cognitive-product-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cognitive-product-${{ github.sha }}
+          path: cognitive-product-evidence/
+          if-no-files-found: error
 
   content:
     name: assessment content
@@ -986,7 +1069,7 @@ jobs:
   pr-light-backend:
     needs: scope
     name: PR light / backend compile
-    if: ${{ !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true')) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')) }}
+    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && github.event_name == 'pull_request' && github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true')) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     defaults:
@@ -1140,18 +1223,19 @@ jobs:
   backend:
     needs: scope
     name: ${{ (needs.scope.outputs.training_functional_only == 'true' || needs.scope.outputs.admin_permissions_functional_only == 'true') && 'backend (migrate + build + functional gate; performance not executed)' || 'backend (migrate + build + performance gate)' }}
-    if: ${{ needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
+    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
       run_performance_tests: ${{ needs.scope.outputs.run_performance_tests != 'false' }}
       admin_permissions_functional: ${{ needs.scope.outputs.admin_permissions_functional_only == 'true' }}
+      focus: ${{ needs.scope.outputs.backend_focus || 'full' }}
       training_followup_functional: ${{ needs.scope.outputs.training_functional_only == 'true' && fromJSON(needs.scope.outputs.training_functional_plan).mode == 'training-followup-functional-only' }}
 
   backend-regression:
     needs: scope
     name: backend regression (isolated job database)
-    if: ${{ needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
+    if: ${{ needs.scope.outputs.backend_focus != 'form-intake' && needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1173,12 +1257,15 @@ jobs:
     # Run independently; the aggregate still requires both successful jobs.
     needs: scope
     name: frontend (lint + types + selected tests)
-    if: ${{ needs.scope.outputs.scenario != 'backend' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
+    if: ${{ (needs.scope.outputs.scenario != 'catalog-discovery' || github.event.pull_request.draft == false) && (needs.scope.outputs.scenario != 'backend' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
+      bundle_family: ${{ needs.scope.outputs.bundle_family == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
+      catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
+      base_sha: ${{ needs.scope.outputs.diff_base }}
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
@@ -1197,18 +1284,22 @@ jobs:
     # artifacts. Start it with scope; the merge gate independently requires
     # backend, production image scans and all other selected checks.
     needs: scope
-    if: ${{ (needs.scope.outputs.scenario == 'release-tooling' && needs.scope.outputs.image_build == 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || ((needs.scope.outputs.application_route == 'personal-tracking' && !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').imageReuse && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
+    if: ${{ (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'cognitive-product' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || ((needs.scope.outputs.scenario == 'release-tooling' && needs.scope.outputs.image_build == 'true' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || ((needs.scope.outputs.application_route == 'personal-tracking' && !fromJSON(needs.scope.outputs.personal_tracking_plan || '{}').imageReuse && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) }}
     uses: ./.github/workflows/ci-images.yml
     with:
+      cognitive_product: ${{ needs.scope.outputs.application_route == 'cognitive-product' }}
+      cognitive_product_plan: ${{ needs.scope.outputs.cognitive_product_plan || '' }}
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' || needs.scope.outputs.dependencies_frontend_only == 'true' }}
       backend_only: ${{ needs.scope.outputs.scenario == 'backend' }}
+      # Reuse the existing compile/runtime scan recipe for unchanged content.
+      catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' || needs.scope.outputs.backend_focus == 'form-intake' }}
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
 
   codeql:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ (needs.scope.outputs.application_route == 'personal-tracking' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && (fromJSON(needs.scope.outputs.homepage_copy_plan).sast || fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged)) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || ((needs.scope.outputs.application_route == 'post356' || needs.scope.outputs.application_route == 'report-planning') || needs.scope.outputs.application_route == 'pr357')) || needs.scope.outputs.application_route == 'survey-governance'))))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'pr363' || needs.scope.outputs.application_route == 'pr364' || needs.scope.outputs.application_route == 'onboarding-structure'))) }}
+    if: ${{ (!cancelled() && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'cognitive-product' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || ((needs.scope.outputs.application_route == 'personal-tracking' && github.event_name == 'pull_request' && github.event.pull_request.draft == false) || (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && (fromJSON(needs.scope.outputs.homepage_copy_plan).sast || fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged)) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || ((needs.scope.outputs.application_route == 'post356' || needs.scope.outputs.application_route == 'report-planning') || needs.scope.outputs.application_route == 'pr357')) || needs.scope.outputs.application_route == 'survey-governance'))))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'pr363' || needs.scope.outputs.application_route == 'pr364' || needs.scope.outputs.application_route == 'onboarding-structure')))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -1226,14 +1317,18 @@ jobs:
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: select affected component analysis paths
         id: deps-codeql
-        if: needs.scope.outputs.dependencies_frontend_only == 'true' || needs.scope.outputs.scenario == 'backend' || needs.scope.outputs.scenario == 'frontend' || needs.scope.outputs.application_route == 'homepage-copy' || needs.scope.outputs.scenario == 'release-tooling'
+        if: needs.scope.outputs.dependencies_frontend_only == 'true' || needs.scope.outputs.scenario == 'catalog-discovery' || needs.scope.outputs.scenario == 'backend' || needs.scope.outputs.scenario == 'frontend' || needs.scope.outputs.application_route == 'homepage-copy' || needs.scope.outputs.scenario == 'release-tooling' || needs.scope.outputs.application_route == 'cognitive-product'
         env:
+          COGNITIVE_PRODUCT: ${{ needs.scope.outputs.application_route == 'cognitive-product' }}
+          CATALOG_DISCOVERY: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
           BACKEND_MODULES: ${{ needs.scope.outputs.scenario == 'backend' }}
+          BACKEND_API_FOCUS: ${{ needs.scope.outputs.backend_focus }}
           PUBLIC_PRESENTATION: ${{ needs.scope.outputs.application_route == 'homepage-copy' }}
           RELEASE_TOOLING: ${{ needs.scope.outputs.scenario == 'release-tooling' }}
         shell: node {0}
         run: |
-          const config=process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src']}:{paths:['server-version/frontend/src']};
+          const config=process.env.COGNITIVE_PRODUCT==='true'?{paths:['server-version/backend/src','server-version/frontend/src','.github/scripts','server-version/scripts/cognitive']}:process.env.CATALOG_DISCOVERY==='true'?{paths:['server-version/backend/src','server-version/frontend/src','.github/scripts']}:process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src']}:{paths:['server-version/frontend/src']};
+          if(process.env.BACKEND_MODULES==='true'&&process.env.BACKEND_API_FOCUS==='form-intake')config.paths.push('.github/scripts/backend-api-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs');
           require('node:fs').appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\n`);
       - name: bound selected cognitive analysis to task inputs and checker controls
         id: cognitive-codeql-config
@@ -1661,7 +1756,7 @@ jobs:
   miniprogram:
     name: mini program / foundation contract and page smoke
     needs: scope
-    if: ${{ needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.personal_tracking_draft != 'true' && !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))) }}
+    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.personal_tracking_draft != 'true' && !(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && needs.scope.outputs.scenario != 'survey-wave-selection' && (needs.scope.outputs.scenario != 'dependencies' && (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (github.event_name != 'push' || vars.CI_FORCE_FULL == 'true'))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -3654,12 +3749,80 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+  catalog-discovery:
+    name: bounded application contracts
+    needs: scope
+    if: ${{ needs.scope.outputs.scenario == 'catalog-discovery' && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CI: 'true'
+      BUNDLE_FAMILY: ${{ needs.scope.outputs.bundle_family }}
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      LIBRARY_DISCOVERY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      UPLOAD_DIR: /tmp/catalog-ci-uploads
+      COGNITIVE_MODULE_ENABLED: 'true'
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: canvas dependency prerequisites
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: locked test dependencies and Prisma client
+        working-directory: server-version/backend
+        run: |
+          npm ci
+          npx prisma generate
+      - name: changed image build controls
+        if: needs.scope.outputs.bundle_family != 'true'
+        run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs
+      - name: existing catalog unit and temporary-table PostgreSQL contracts
+        working-directory: server-version/backend
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const recipe=process.env.BUNDLE_FAMILY==='true'?'bundle-family-checks.json':'catalog-discovery-checks.json';
+          const {backendChecks}=JSON.parse(readFileSync('../../.github/config/'+recipe,'utf8'));
+          const files=[...backendChecks.unitFiles,...backendChecks.postgresFiles];
+          execFileSync('npm',['test','--',...files,'--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/tmp/catalog-backend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['scripts/assert-release-test-report.mjs','/tmp/catalog-backend.json',...files],{stdio:'inherit'});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: catalog-query-${{ github.sha }}
+          path: /tmp/catalog-backend.json
+          if-no-files-found: error
+          retention-days: 3
+
   merge-gate:
     name: ${{ (((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
       || github.ref_name == 'fix/runtime-time-and-validation-20261025') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
       && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
+    - cognitive-product
+    - catalog-discovery
     - personal-tracking
     - survey-governance
     - post356
@@ -3742,7 +3905,7 @@ jobs:
     env:
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
       CI_EVENT: ${{ github.event_name }}
-      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      CI_BASE_SHA: ${{ needs.scope.outputs.diff_base || github.event.pull_request.base.sha || github.event.before }}
       CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
       CI_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
       CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}

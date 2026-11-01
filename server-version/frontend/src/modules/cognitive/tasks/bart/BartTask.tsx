@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -20,6 +21,7 @@ export const BartTask: React.FC<CognitiveTaskProps> = ({
   onTaskComplete,
 }) => {
   const config = taskContext.config as {
+    report?: { reportVersion?: string }
     balloonCount?: number
     maxPumps?: number
     trialTimeoutMs?: number
@@ -168,7 +170,7 @@ export const BartTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="气球泵压行为任务" description={<p>每次可以继续泵压，也可以现金化当前虚拟计数。爆破只表示本次气球达到内部阈值。</p>} hint={<><p>练习至少完成 3 / 4；不产生真实货币或奖励，也不输出风险高低判断。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "气球泵压行为任务"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>每次可以继续泵压，也可以现金化当前虚拟计数。爆破只表示本次气球达到内部阈值。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {balloonCount}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>练习至少完成 3 / 4；不产生真实货币或奖励，也不输出风险高低判断。</p></>} onAction={startPractice} />
     )
   }
 

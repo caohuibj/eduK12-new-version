@@ -1,0 +1,33 @@
+import {describe,it,expect} from 'vitest'
+import { SERIESCOMPLETE_BANK as bank } from '../../modules/cognitive/tasks/seriescomplete/bank-v1.1'
+import { scoreSeriescompleteV11 as score } from '../../modules/cognitive/scoring/seriescomplete.v1.1'
+import { seriescompleteConfigV11Schema as schema } from '../../modules/cognitive/tasks/seriescomplete/config-v1.1'
+import {buildSeriescompleteItems as build,SERIESCOMPLETE_PRACTICE_ITEM as practice} from '../../../../frontend/src/modules/cognitive/tasks/seriescomplete/prng-v1.1'
+import { SERIESCOMPLETE_BANK as front } from '../../../../frontend/src/modules/cognitive/tasks/seriescomplete/bank-v1.1'
+const config=(n:number)=>({totalTrials:n,stimulusSetVersion:'seriescomplete-zh-v1.1.0',fixationMs:400,timeoutMs:15000,validRtFloorMs:300,report:{reportVersion:'1.1.0',referenceMode:'none' as const}})
+const trials=bank.map((x,i)=>({trialIndex:i,payload:{itemId:x.id,responseIndex:x.answer as number|null,rtMs:500 as number|null,interrupted:false}}))
+describe('seriescomplete 1.1.0 frozen form',()=>{
+ it('has 36 distinct explained items, identical client material and disjoint practice',()=>{
+  expect(bank).toHaveLength(36);expect(new Set(bank.map(x=>x.id)).size).toBe(36);expect(front).toEqual(bank)
+  expect(bank.some(x=>x.id===practice.id||x.stem===practice.stem)).toBe(false)
+  for(const x of bank){expect(new Set(x.options).size).toBe(4);expect(x.options[x.answer]).toBeTruthy();expect(x.explanation.length).toBeGreaterThan(5)}
+ })
+ it('presents exactly 18/30/36 unique deterministic items and refuses silent truncation',()=>{
+  for(const n of [18,30,36]){expect(schema.parse(config(n)).totalTrials).toBe(n);expect(build('seed',n)).toHaveLength(n);expect(new Set(build('seed',n).map(x=>x.itemId)).size).toBe(n);expect(build('seed',n)).toEqual(build('seed',n));expect(build('seed',n).some(x=>x.itemId===practice.id)).toBe(false)}
+  expect(()=>build('seed',37)).toThrow();expect(()=>schema.parse(config(37))).toThrow()
+ })
+ it('scores all 36 authored answers and preserves meaningful zero vs no valid RT',()=>{
+  expect(score({config:config(36),trials}).metrics.accuracy).toBe(1)
+  const wrong=trials.map(x=>({...x,payload:{...x.payload,responseIndex:(x.payload.responseIndex!+1)%4}}))
+  const r=score({config:config(36),trials:wrong});expect(r.metrics.accuracy).toBe(0);expect(r.metrics.medianRtMs).toBe(null);expect(r.metrics.timeoutCount).toBe(0);expect(r.qualityFlags.interpretable).toBe(true)
+  const omitted=trials.map(x=>({...x,payload:{...x.payload,responseIndex:null,rtMs:null}}));expect(score({config:config(36),trials:omitted}).metrics.timeoutCount).toBe(36)
+ })
+ it('rejects incomplete duplicate unknown and historical-bank submissions; excludes interrupted/late RT',()=>{
+  expect(()=>score({config:config(36),trials:trials.slice(1)})).toThrow()
+  expect(()=>score({config:config(36),trials:trials.map(x=>({...x,payload:trials[0].payload}))})).toThrow()
+  expect(()=>score({config:{...config(36),stimulusSetVersion:'seriescomplete-zh-v1.0.0'},trials})).toThrow()
+  expect(()=>score({config:config(1),trials:[{trialIndex:0,payload:{...trials[0].payload,itemId:'unknown'}}]})).toThrow()
+  expect(()=>score({config:config(1),trials:[{...trials[0],payload:{...trials[0].payload,rtMs:16000}}]})).toThrow()
+  const r=score({config:config(1),trials:[{...trials[0],payload:{...trials[0].payload,interrupted:true,rtMs:500}}]});expect(r.metrics.medianRtMs).toBe(null);expect(r.qualityFlags.interrupted).toBe(true)
+ })
+})

@@ -134,7 +134,7 @@ export const DigitbackwardTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     setPracticeIndex((value) => value + 1); resetResponse(); setPhase('practice')
   }
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="数字倒背" description={<p>记住依次出现的数字，然后从最后一个开始倒着输入。</p>} hint={<><p>可使用数字键输入，Enter 提交。正式测验不会回显已输入数字，也不提供退格修改。</p><p>练习至少答对 3 / 4；练习不计分。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="数字倒背" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>记住依次出现的数字，然后从最后一个开始倒着输入。像记下取件码后换个顺序复述，这里观察短暂记住并调整顺序的过程，不是给记忆力打总分。</p>) : (<p>记住依次出现的数字，然后从最后一个开始倒着输入。</p>)} hint={<><p>可使用数字键输入，Enter 提交。正式测验不会回显已输入数字，也不提供退格修改。</p><p>练习至少答对 3 / 4；练习不计分。</p></>} onAction={startPractice} />
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习正确 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-5">{practiceFeedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
 

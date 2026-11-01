@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "delaydiscount",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreDelaydiscountV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "delayBands": [
+            7,
+            30
+          ],
+          "delayedAmount": 100,
+          "bisectionSteps": 2,
+          "fixationMs": 500,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "delayDays": 7,
+              "delayedAmount": 100,
+              "immediateAmount": 50,
+              "choice": "later",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "delayDays": 7,
+              "delayedAmount": 100,
+              "immediateAmount": 75,
+              "choice": "later",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "delayDays": 30,
+              "delayedAmount": 100,
+              "immediateAmount": 50,
+              "choice": "now",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "delayDays": 30,
+              "delayedAmount": 100,
+              "immediateAmount": 25,
+              "choice": "later",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 48,
+        "metrics": {
+          "aucDelayDiscounting": 0.4792,
+          "meanIndifferenceRate": 0.625,
+          "laterChoiceRate": 0.75,
+          "timeoutCount": 0,
+          "validTrialCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "incompleteDelayBand": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "delayBands": [
+            7,
+            30
+          ],
+          "delayedAmount": 100,
+          "bisectionSteps": 2,
+          "fixationMs": 500,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "delaydiscount v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "delayBands": [
+            7,
+            30
+          ],
+          "delayedAmount": 100,
+          "bisectionSteps": 2,
+          "fixationMs": 500,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "delayDays": 7,
+              "delayedAmount": 100,
+              "immediateAmount": 50,
+              "choice": "later",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "delaydiscount v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

@@ -138,7 +138,7 @@ const assertStudentTeacherExperience = (entry: RelationalProductEntryV1): void =
   }
 }
 
-const parentRelationshipRecord = (relationship: {
+export const parentRelationshipRecord = (relationship: {
   id: string
   parentUserId: string
   studentUserId: string
@@ -166,7 +166,7 @@ const parentRelationshipRecord = (relationship: {
   consentHash: relationship.consentHash,
 })
 
-const persistConsent = async (tx: any, consent: AssessmentAttemptConsentRecordV1) => (
+export const persistConsent = async (tx: any, consent: AssessmentAttemptConsentRecordV1) => (
   tx.assessmentAttemptConsent.create({
     data: {
       id: consent.consentId,

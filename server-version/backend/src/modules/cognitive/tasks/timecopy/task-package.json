@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "task": "timecopy",
+  "order": 110,
+  "identities": [
+    {
+      "testType": "timecopy",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 110
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "timecopy",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/timecopy/timecopy.registry.ts",
+      "export": "timecopyRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      110,
+      110
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/timecopy/__tests__/TimecopyTask.test.tsx",
+      "src/modules/cognitive/tasks/timecopy/__tests__/prng.test.ts"
+    ]
+  }
+}

@@ -3,6 +3,15 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      bundle_family:
+        type: boolean
+        default: false
+      base_sha:
+        type: string
+        default: ''
+      catalog_discovery:
+        type: boolean
+        default: false
       survey_selection:
         type: boolean
         default: false
@@ -30,7 +39,7 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       NODE_OPTIONS: --max-old-space-size=3072
       TZ: UTC
-      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      CI_BASE_SHA: ${{ inputs.base_sha || github.event.pull_request.base.sha || github.event.before }}
     defaults:
       run:
         working-directory: server-version/frontend
@@ -83,7 +92,7 @@ jobs:
       - name: integrated application types without duplicate cognitive subset
         if: inputs.survey_selection || inputs.affected_only
         run: |
-          npm run pretypecheck
+          if [ "${{ inputs.bundle_family }}" != "true" ]; then npm run pretypecheck; fi
           npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
         if: inputs.survey_selection != true && inputs.affected_only != true
@@ -102,7 +111,7 @@ jobs:
         if: inputs.survey_selection != true && inputs.affected_only != true
         run: npm test
       - name: dependency-related frontend tests
-        if: inputs.affected_only
+        if: inputs.affected_only && inputs.catalog_discovery != true
         run: |
           node --input-type=module <<'JS'
           import {execFileSync} from 'node:child_process';
@@ -118,6 +127,17 @@ jobs:
           import {readFileSync} from 'node:fs';
           const report=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/frontend-affected.json','utf8'));
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
+          JS
+      - name: affected catalog selectors and paging contracts
+        if: inputs.catalog_discovery && !inputs.bundle_family
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const checks=JSON.parse(readFileSync('../../.github/config/catalog-discovery-checks.json','utf8'));
+          const files=checks.tests.filter(f=>f.startsWith('server-version/frontend/')).map(f=>f.slice('server-version/frontend/'.length));
+          execFileSync('npm',['test','--',...files,'--reporter=default','--reporter=json','--outputFile=/tmp/catalog-frontend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/catalog-frontend.json',...files],{stdio:'inherit'});
           JS
       - name: affected Wave selector and direct consumers
         if: inputs.survey_selection

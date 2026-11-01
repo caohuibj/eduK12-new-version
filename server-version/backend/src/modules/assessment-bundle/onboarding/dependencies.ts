@@ -24,7 +24,9 @@ export function dependencyBlockers(raw: unknown): string[] {
       if (!cognitiveSeeds.some(s => s.testType === slot.instrumentKey && s.configVersion === dep.configVersion && s.engineVersion === dep.engineVersion && s.scoringVersion === dep.scoringVersion)) errors.push(`${slot.slotKey}: unknown COGNITIVE config identity`)
       const entry=getCognitiveRegistryEntry(slot.instrumentKey,dep.engineVersion,dep.scoringVersion)
       if(!entry||!hasCognitiveProfile(entry,dep.profile)) {errors.push(`${slot.slotKey}: unknown COGNITIVE identity/profile`);continue}
-      for(const e of mappings) {const metric=entry.metricDefinitions[e.selector];if(!metric||metric.valueType!==e.valueType||metric.unit!==e.unit)errors.push(`${e.evidenceKey}: COGNITIVE selector/type/unit mismatch`)}
+      // JSON numbers also carry the registry's integer-valued counts. Keep all
+      // other types and exact units strict; no coercion or new scorer is added.
+      for(const e of mappings) {const metric=entry.metricDefinitions[e.selector];if(!metric||!(metric.valueType===e.valueType || metric.valueType==='integer' && e.valueType==='number')||metric.unit!==e.unit)errors.push(`${e.evidenceKey}: COGNITIVE selector/type/unit mismatch`)}
     } else {
       const context=p.context?parseBundleContextDefinition(p.context):null
       if(!context||slot.instrumentKey!==context.contextDefinitionKey||slot.instrumentVersion!==context.contextDefinitionVersion)errors.push(`${slot.slotKey}: FORM context mismatch`)

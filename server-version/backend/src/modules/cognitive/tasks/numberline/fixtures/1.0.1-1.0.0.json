@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "numberline",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreNumberlineV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "lineMax": 100,
+          "maxResponseMs": 10000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetNumber": 20,
+              "responsePosition": 0.35,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "targetNumber": 60,
+              "responsePosition": 0.5,
+              "rtMs": 800,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "targetNumber": 45,
+              "responsePosition": 0.5,
+              "rtMs": 300,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "targetNumber": 90,
+              "responsePosition": 1,
+              "rtMs": 850,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 90,
+        "metrics": {
+          "paePercent": 0.1,
+          "biasPercent": 0.05,
+          "withinTenRate": 0.75,
+          "medianRtMs": 825,
+          "validTrialCount": 4,
+          "timeoutCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidTrials": false,
+          "excessiveTimeouts": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "lineMax": 100,
+          "maxResponseMs": 10000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "numberline v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "lineMax": 100,
+          "maxResponseMs": 10000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "targetNumber": 20,
+              "responsePosition": 0.35,
+              "rtMs": 900,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "numberline v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

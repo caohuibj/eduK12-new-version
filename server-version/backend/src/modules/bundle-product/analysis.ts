@@ -25,7 +25,7 @@ import type { BundleReportAudienceV1 } from '../assessment-bundle/types'
 import { computeReanalysisAggregateInputHash, runExplicitBundleReanalysis } from '../assessment-reanalysis/reanalysis'
 import { readFrozenBundleProductionDefinition, freezeBundleProductionDefinition, type BundleDefinitionProvider } from './definition-provider'
 import { readInstance, owner, type BundleActor } from './service'
-import { compositeBadRequest, compositeConflict, compositeNotFound } from '../composite/composite.errors'
+import { compositeBadRequest, compositeConflict, compositeNotFound, compositeForbidden } from '../composite/composite.errors'
 
 const terminal = (status: string) => status === 'READY' || status === 'UNAVAILABLE'
 async function inputs(attemptId: string) {
@@ -134,6 +134,9 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
   if (!row) throw compositeNotFound('分析记录不存在')
   const target = readFrozenBundleProductionDefinition(decryptCognitivePayload(row.targetDefinitionEncrypted))
   if (target.contentHash !== row.targetDefinitionHash) throw compositeConflict('报告定义校验失败')
+  // A child cross-source reanalysis must check every observer's current consent
+  // and frozen disclosure, which this single-attempt reader does not possess.
+  if (target.crossMethodSources) throw compositeForbidden('请从所属儿童评估轮次读取跨报告者报告')
   let view: (ReturnType<typeof projectBundleAudienceView> & {derivedView?:DerivedBundleView|null}) | null = null
   if (terminal(row.status)) {
     const facts = validateBundleReportFacts(decryptCognitivePayload(row.payloadEncrypted!))

@@ -1,0 +1,51 @@
+{
+  "values": {
+    "gonogo_commission_rate": {
+      "state": "missing"
+    },
+    "gonogo_commission_errors": {
+      "state": "missing"
+    },
+    "gonogo_nogo_trial_count": {
+      "state": "missing"
+    },
+    "gonogo_omission_rate": {
+      "state": "missing"
+    },
+    "gonogo_go_trial_count": {
+      "state": "missing"
+    },
+    "gonogo_d_prime": {
+      "state": "missing"
+    },
+    "flanker_flanker_effect_ms": {
+      "state": "missing"
+    },
+    "flanker_congruent_accuracy": {
+      "state": "missing"
+    },
+    "flanker_incongruent_accuracy": {
+      "state": "missing"
+    },
+    "flanker_median_rt_congruent": {
+      "state": "missing"
+    },
+    "flanker_median_rt_incongruent": {
+      "state": "missing"
+    },
+    "parent_chexi_working_memory": {
+      "state": "missing"
+    },
+    "parent_chexi_inhibition": {
+      "state": "missing"
+    },
+    "teacher_chexi_working_memory": {
+      "state": "missing"
+    },
+    "teacher_chexi_inhibition": {
+      "state": "missing"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED"
+}

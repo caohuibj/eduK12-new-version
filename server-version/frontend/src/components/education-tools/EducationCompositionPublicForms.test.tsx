@@ -68,12 +68,21 @@ describe('ordinary questionnaire public fixed Form adapter',()=>{
 
  it('deduplicates pages and searches before selecting; repeating the same search preserves loaded rows',async()=>{
   const next=`education-source:FORM:${id(4)}:${hash('b')}`
-  const api=vi.fn(async(path:string)=>{const query=new URLSearchParams(path.split('?')[1]);return query.get('q')?{list:[source(6,'查询结果')],nextCursor:null}:query.get('cursor')?{list:[source(),source(5,'第二页表单')],nextCursor:null}:{list:[source()],nextCursor:next}})
-  render(<EducationPublicFormChooser api={api as PrivateToolApi} entry="TEACHER" organizationId={org} actorId={id(2)} onChoose={vi.fn()}/>)
+  const tagFacets={domain:[{id:'domain:health',label:'心理健康'}],population:[],construct:[],subject:[],language:[]}
+  const api=vi.fn(async(path:string)=>{const query=new URLSearchParams(path.split('?')[1]);return {...(query.get('q')?{list:[source(6,'查询结果')],nextCursor:null}:query.get('cursor')?{list:[source(),source(5,'第二页表单')],nextCursor:null}:{list:[source()],nextCursor:next}),tagFacets}})
+  const choose=vi.fn()
+  render(<EducationPublicFormChooser api={api as PrivateToolApi} entry="TEACHER" organizationId={org} actorId={id(2)} onChoose={choose}/>)
   fireEvent.click(await screen.findByRole('button',{name:'加载更多公共表单'}));await screen.findByText('第二页表单')
   expect(screen.getAllByText('已授权参考表单')).toHaveLength(1)
-  fireEvent.change(screen.getByLabelText('搜索公共表单'),{target:{value:'查询'}});fireEvent.click(screen.getByRole('button',{name:'搜索'}));await screen.findByText('查询结果')
-  expect(new URLSearchParams(api.mock.calls[api.mock.calls.length-1][0].split('?')[1]).get('cursor')).toBeNull()
-  fireEvent.click(screen.getByRole('button',{name:'搜索'}));expect(screen.getByText('查询结果')).toBeInTheDocument();expect(api).toHaveBeenCalledTimes(3)
+  fireEvent.change(screen.getByRole('searchbox',{name:'关键词'}),{target:{value:'查询'}})
+  fireEvent.change(screen.getByLabelText('领域'),{target:{value:'domain:health'}})
+  fireEvent.click(screen.getByRole('button',{name:'检索'}));await screen.findByText('查询结果')
+  const applied=new URLSearchParams(api.mock.calls[api.mock.calls.length-1][0].split('?')[1])
+  expect(applied.get('cursor')).toBeNull();expect(applied.get('tags')).toBe('domain:health')
+  fireEvent.click(screen.getByRole('button',{name:'加入公共表单'}));expect(choose).toHaveBeenCalledWith(source(6,'查询结果'))
+  fireEvent.click(screen.getByRole('button',{name:'检索'}));expect(screen.getByText('查询结果')).toBeInTheDocument();expect(api).toHaveBeenCalledTimes(3)
+  fireEvent.click(screen.getByRole('button',{name:'清除筛选'}));await screen.findByText('已授权参考表单')
+  const cleared=new URLSearchParams(api.mock.calls[api.mock.calls.length-1][0].split('?')[1])
+  expect(cleared.get('q')).toBe('');expect(cleared.has('tags')).toBe(false);expect(cleared.has('cursor')).toBe(false)
  })
 })

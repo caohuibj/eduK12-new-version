@@ -1,0 +1,36 @@
+{
+  "key": "child_chexi_teacher_zh_cn_v1_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "observations",
+      "kind": "evidence",
+      "title": "日常行为观察",
+      "audience": [
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "reading",
+      "kind": "conclusions",
+      "title": "怎样理解这次观察",
+      "audience": [
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "daily_observation"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "缺少观察结果。",
+    "limited": "本次观察信息有限。",
+    "unavailable": "本次不能形成有依据的观察解释。"
+  }
+}
