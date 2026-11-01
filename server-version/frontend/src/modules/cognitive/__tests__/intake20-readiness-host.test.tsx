@@ -6,6 +6,8 @@ import CognitiveRunner from '../pages/CognitiveRunner'
 import { initialRunnerState, runnerReducer } from '../core/runner.state'
 import type { RunnerState } from '../core/runner.types'
 import type { CognitiveSession } from '../types'
+import { resolveRunner } from '../registry'
+import { resolveCognitiveReadinessProfile } from '../core/readiness'
 
 const harness = vi.hoisted(() => ({ controller: {
   state: {} as RunnerState,
@@ -16,13 +18,14 @@ vi.mock('../core/useCognitiveSession', () => ({ useCognitiveSession: () => harne
 const tree = () => <MemoryRouter initialEntries={['/student/cognitive/sessions/readiness20']}>
   <Routes><Route path="/student/cognitive/sessions/:sessionId" element={<CognitiveRunner />} /></Routes>
 </MemoryRouter>
-const readyState = (testType: string, trialIndex = 0) => runnerReducer(initialRunnerState, {
+const readyState = (testType: string, trialIndex = 0, engineVersion = '1.0.1') => runnerReducer(initialRunnerState, {
   type: 'SESSION_LOADED', trialIndex,
   session: {
-    sessionId: 'readiness20', assignmentId: 'synthetic-assignment', testType, engineVersion: '1.0.1',
-    scoringVersion: '1.0.0', configVersion: '1.0.1', attemptNo: 1,
+    sessionId: 'readiness20', assignmentId: 'synthetic-assignment', testType, engineVersion,
+    scoringVersion: resolveRunner(testType, engineVersion)?.scoringVersion ?? '1.0.0', configVersion: engineVersion, attemptNo: 1,
     deliveryMode: 'FINAL_ONLY', status: 'IN_PROGRESS', randomSeed: 'synthetic-readiness',
-    config: { totalTrials: 18 },
+    // The v1.1 fixed-count auditory short profile has 22 tones (6 targets).
+    config: { totalTrials: testType === 'auditorynback' && engineVersion === '1.1.0' ? 22 : 18 },
   } as CognitiveSession,
 })
 beforeEach(() => vi.clearAllMocks())
@@ -45,6 +48,31 @@ describe('intake20 exact readiness through the existing host', () => {
       await waitFor(() => expect(screen.getByRole('button', { name: '开始练习' })).toBeEnabled())
       expect(harness.controller.start).toHaveBeenCalledTimes(1)
       expect(harness.controller.state.status).toBe('RUNNING')
+      expect(harness.controller.appendTrial).not.toHaveBeenCalled()
+      expect(harness.controller.complete).not.toHaveBeenCalled()
+    },
+  )
+
+  it.each(['sentencecheck', 'visualwm', 'auditorynback'])(
+    '%s 1.1.0 keeps exact readiness and enters its actual introduction', async testType => {
+      expect(resolveRunner(testType, '1.1.0')).toBeDefined()
+      expect(resolveCognitiveReadinessProfile(testType, '1.1.0')).toMatchObject({
+        testType, engineVersion: '1.1.0', inputs: ['keyboard', 'pointer', 'touch'],
+        globalKeyboardCapture: true, resumeDisposition: 'restart-required',
+      })
+      expect(resolveCognitiveReadinessProfile(testType, '1.1.1')).toBeUndefined()
+      harness.controller.state = readyState(testType, 0, '1.1.0')
+      const view = render(tree())
+      harness.controller.start.mockImplementation(() => {
+        harness.controller.state = runnerReducer(harness.controller.state, { type: 'START_RUN' })
+        view.rerender(tree())
+      })
+      const start = await screen.findByRole('button', { name: '开始测评' })
+      await waitFor(() => expect(start).toBeEnabled())
+      fireEvent.click(start)
+      expect(await screen.findByRole('button', { name: '开始练习' })).toBeEnabled()
+      expect(harness.controller.state.status).toBe('RUNNING')
+      expect(harness.controller.start).toHaveBeenCalledTimes(1)
       expect(harness.controller.appendTrial).not.toHaveBeenCalled()
       expect(harness.controller.complete).not.toHaveBeenCalled()
     },

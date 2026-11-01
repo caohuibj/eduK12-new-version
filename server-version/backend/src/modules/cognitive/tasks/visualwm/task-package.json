@@ -8,6 +8,12 @@
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0",
       "order": 127
+    },
+    {
+      "testType": "visualwm",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.0.0",
+      "order": 1127
     }
   ],
   "backend": {
@@ -20,6 +26,12 @@
       "engineVersion": "1.0.1",
       "file": "server-version/frontend/src/modules/cognitive/tasks/visualwm/visualwm.registry.ts",
       "export": "visualwmRegistryEntry"
+    },
+    {
+      "testType": "visualwm",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/visualwm/visualwm.registry.ts",
+      "export": "visualwmRegistryEntryV11"
     }
   ],
   "catalog": {
@@ -30,7 +42,8 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
-      127
+      127,
+      1127
     ]
   },
   "presentation": {
@@ -44,7 +57,9 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/visualwm/__tests__/VisualwmTask.test.tsx",
-      "src/modules/cognitive/tasks/visualwm/__tests__/generator.test.ts"
+      "src/modules/cognitive/tasks/visualwm/__tests__/generator.test.ts",
+      "src/modules/cognitive/tasks/visualwm/__tests__/VisualwmTask.legacy-reproduction.test.tsx",
+      "src/modules/cognitive/tasks/visualwm/__tests__/VisualwmTaskV11.test.tsx"
     ]
   }
 }

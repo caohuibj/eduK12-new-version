@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import type { Mock } from 'vitest'
 import { fireEvent, render, screen, act } from '@testing-library/react'
 import { SentencecheckTask } from '../SentencecheckTask'
+import { buildSentencecheckTrialsV11 } from '../generator-v1.1'
 
 const config = {
   totalTrials: 2,
@@ -38,8 +39,8 @@ const respondWith = (name: RegExp) => {
   fireEvent.pointerDown(screen.getByRole('button', { name }), { pointerType: 'mouse', button: 0 })
 }
 
-const enterFormal = async (onTrialComplete: Mock<(payload: Record<string, unknown>) => Promise<boolean | void>>) => {
-  render(<SentencecheckTask taskContext={context} trialIndex={0} onTrialComplete={onTrialComplete} />)
+const enterFormal = async (onTrialComplete: Mock<(payload: Record<string, unknown>) => Promise<boolean | void>>, taskContext = context) => {
+  render(<SentencecheckTask taskContext={taskContext} trialIndex={0} onTrialComplete={onTrialComplete} />)
   fireEvent.click(screen.getByText('开始练习'))
   act(() => vi.advanceTimersByTime(400))
   respondWith(/1 · 相符/)
@@ -51,6 +52,20 @@ const enterFormal = async (onTrialComplete: Mock<(payload: Record<string, unknow
 }
 
 describe('SentencecheckTask', () => {
+  it('uses crossed stimuli only for engine 1.1.0 without changing practice or response timing', async () => {
+    const onTrialComplete = vi.fn().mockResolvedValue(undefined)
+    const current = { ...context, engineVersion: '1.1.0', scoringVersion: '1.1.0', configVersion: '1.1.0', config: { ...config, totalTrials: 12 } }
+    await enterFormal(onTrialComplete, current)
+    act(() => vi.advanceTimersByTime(499))
+    expect(screen.queryByRole('button', { name: /1 · 相符/ })).toBeNull()
+    act(() => vi.advanceTimersByTime(1))
+    respondWith(/1 · 相符/)
+    await act(async () => {})
+    const { sentence: _sentence, ...expected } = buildSentencecheckTrialsV11(current.randomSeed, 12, 0.5, 0.5)[0]
+    expect(onTrialComplete).toHaveBeenCalledTimes(1)
+    expect(onTrialComplete.mock.calls[0][0]).toMatchObject({ ...expected, response: true })
+  })
+
   it('requires both practice trials and submits structured observable facts', async () => {
     const onTrialComplete = vi.fn().mockResolvedValue(undefined)
     await enterFormal(onTrialComplete)

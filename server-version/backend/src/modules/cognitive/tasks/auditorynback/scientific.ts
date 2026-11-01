@@ -13,3 +13,5 @@ export const scientificGovernance: CognitiveGovernanceV1[] = [
     "evidence": []
   }
 ]
+
+scientificGovernance.push({...structuredClone(scientificGovernance[0]), engineVersion: '1.1.0', scoringVersion: '1.1.0', knownLimitations: ['固定目标数仅修复结构性机会不足；没有验证信效度、常模或训练效果。', '五频音集、500毫秒声音和2秒名义节奏，不是Gao等2020原协议复刻。']})

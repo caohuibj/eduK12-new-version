@@ -1,5 +1,6 @@
 import { deferredCognitiveRunner } from '../../core/deferred-runner'
 const VisualwmTask = deferredCognitiveRunner(() => import('./VisualwmTask').then(module => module.VisualwmTask))
+const VisualwmTaskV11 = deferredCognitiveRunner(() => import('./VisualwmTaskV11').then(module => module.VisualwmTaskV11))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const visualwmRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -32,5 +33,22 @@ export const visualwmRegistryEntry: CognitiveFrontendRegistryEntry = {
     indexLabel: '视觉记忆指数',
     practicalTips: ['不要用言语描述颜色，直接记住颜色本身。', '保持眼睛不动，用余光覆盖所有方块。'],
     disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
+  },
+}
+
+export const visualwmRegistryEntryV11: CognitiveFrontendRegistryEntry = {
+  ...visualwmRegistryEntry,
+  engineVersion: '1.1.0',
+  RunnerComponent: VisualwmTaskV11,
+  prepareRunner: VisualwmTaskV11.prepare,
+  metricDefinitions: visualwmRegistryEntry.metricDefinitions.map((metric) => metric.key === 'medianRtMs'
+    ? { ...metric, label: '已答反应中位用时' }
+    : { ...metric }),
+  reportDefinition: {
+    ...visualwmRegistryEntry.reportDefinition,
+    showProductIndex: false,
+    title: '颜色变化判断表现',
+    practicalTips: ['先看正式记录是否完整，再结合总体正确率、命中率与误报率阅读。', '反应用时包括符合条件的正确和错误作答，不代表记忆容量。'],
+    disclaimer: '这是颜色变化检测的项目变式，只描述本次表现，不是标准测验复刻、记忆容量或年龄常模。',
   },
 }

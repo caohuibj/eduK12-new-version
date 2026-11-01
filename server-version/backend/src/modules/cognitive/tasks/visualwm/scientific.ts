@@ -1,4 +1,5 @@
 import type { CognitiveGovernanceV1 } from '../../onboarding/governance'
+import { scientificGovernanceV11 } from './scientific.v11'
 
 export const scientificGovernance: CognitiveGovernanceV1[] = [
   {
@@ -11,5 +12,6 @@ export const scientificGovernance: CognitiveGovernanceV1[] = [
     "protocolApplicability": "",
     "knownLimitations": [],
     "evidence": []
-  }
+  },
+  ...scientificGovernanceV11,
 ]
