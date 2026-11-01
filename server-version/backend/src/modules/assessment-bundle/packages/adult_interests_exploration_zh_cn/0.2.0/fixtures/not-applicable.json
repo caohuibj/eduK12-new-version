@@ -1,0 +1,44 @@
+{
+  "values": {
+    "orvis.leadership": {
+      "state": "not_applicable"
+    },
+    "orvis.organization": {
+      "state": "not_applicable"
+    },
+    "orvis.altruism": {
+      "state": "not_applicable"
+    },
+    "orvis.creativity": {
+      "state": "not_applicable"
+    },
+    "orvis.analysis": {
+      "state": "not_applicable"
+    },
+    "orvis.production": {
+      "state": "not_applicable"
+    },
+    "orvis.adventure": {
+      "state": "not_applicable"
+    },
+    "orvis.erudition": {
+      "state": "not_applicable"
+    },
+    "nfc.need_for_cognition": {
+      "state": "not_applicable"
+    },
+    "context.birth_year_month": {
+      "state": "present",
+      "value": "1990-01"
+    }
+  },
+  "expectedRuleIds": [
+    "state_not_applicable"
+  ],
+  "expectedKind": "COMPUTED",
+  "expectedDerived": {
+    "maxSets": {
+      "interest_max": null
+    }
+  }
+}

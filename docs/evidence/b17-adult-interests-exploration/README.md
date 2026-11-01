@@ -1,5 +1,7 @@
 # B17 成人兴趣与探索方式
 
+The new schema3 content candidate is described in [schema3.md](schema3.md). The record below describes the preserved0.1.0 implementation and its historical limitations.
+
 `adult_interests_exploration_zh_cn@0.1.0` is a new DRAFT declaration, based on main `74423a1c4b40f65c084797434aaa86271594e687`. It reuses two registered adult self-report instruments and adds no leaf questions, scorers, runtime code, UI, tables or publication mechanisms. The exact key was absent from source and generated Bundle registration; the open-PR search for B17 returned no match at preparation time. Nearby constructs do not count as this Bundle.
 
 ## Design and sources

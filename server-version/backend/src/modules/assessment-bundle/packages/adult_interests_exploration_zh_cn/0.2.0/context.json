@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "adult_interests_exploration_zh_cn_context",
+  "contextDefinitionVersion": "1.0.0",
+  "fields": [
+    {
+      "contextKey": "birth_year_month",
+      "valueType": "string",
+      "required": true
+    }
+  ]
+}
