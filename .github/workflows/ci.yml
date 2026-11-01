@@ -901,12 +901,12 @@ jobs:
           docker run --rm --entrypoint /bin/promtool -v "$PWD/server-version/monitoring:/rules:ro" -w /rules prom/prometheus:v2.54.1 check rules alert_rules.yml
           docker run --rm --entrypoint /bin/promtool -v "$PWD/server-version/monitoring:/rules:ro" -w /rules prom/prometheus:v2.54.1 test rules alert_rules.test.yml
       - name: Select the changed runtime and check-control sources for SAST
-        run: node .github/scripts/maintenance-repair-scope.mjs --codeql-config > /tmp/maintenance-repair-codeql.json
+        run: node .github/scripts/maintenance-repair-scope.mjs --codeql-config > ./.maintenance-repair-codeql.json
       - uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript,python
           build-mode: none
-          config-file: /tmp/maintenance-repair-codeql.json
+          config-file: ./.maintenance-repair-codeql.json
       - uses: github/codeql-action/analyze@v3
         with:
           category: maintenance-repair
