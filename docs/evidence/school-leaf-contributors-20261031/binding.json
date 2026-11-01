@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "local-synthetic-review-evidence-not-ci-qualification",
+  "baseMain": "25cad994ec20b32b53ed8735c732143376536da0",
+  "originalBase": "63f849c5bb3dfd7c215d719fc9b75e233664dca8",
+  "localProductCheckpoint": "958343bb46a5a310aead82d0199234b91913c554",
+  "productTree": "15ad5db2cb61ca0c60c0e200429c8246194cf84c",
+  "backendTree": "50d75db5ce24c52a5de90ed59dd61f7e53e50aa9",
+  "applicationFiles": [
+    {
+      "path": "server-version/backend/src/__tests__/campus/group-contributor-differencing.test.ts",
+      "blob": "70434378fe61a5d59e150f172e938062a2b9be86",
+      "sha256": "2c634ac6cd4881f9997e02d343967da6f60d4d221969e86d5c85935f73868c0a"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/campus/group-reports.test.ts",
+      "blob": "a8b7c171d1f21879b1e2e7e1afc69774504e5fa7",
+      "sha256": "ac028b8d35c64535d121307f78634039abbf9c6eb2a569900160952b6eab6ebe"
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/group-contributor-differencing.ts",
+      "blob": "b7179cbeac196506f5a7d10d0da39f1fe0ae6d75",
+      "sha256": "7a56ed1365e014f36c4c97e3f7f4c860cbce5ef090eab54ef84ac0fc3eeef4ad"
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/group-reports.ts",
+      "blob": "c18935ce89a65a2af43919a42b1bdcb2ea87ffd2",
+      "sha256": "d8855904a178c236d962304e6183458ec5f10a26dd8ebdcc74c82108d92ca5f3"
+    }
+  ],
+  "formalCiQualified": false,
+  "draftOnly": true,
+  "productionTouched": false,
+  "newFinals": 0,
+  "reuse": {
+    "directCases": "native15PASS; the different-source case was replaced by a fully constructed valid-source fixture and only that case rechecked1PASS14filtered. Other14cases consumed default sourceMetricKey=score; no runtime behavior/input change for those cases.",
+    "nearestCases": "21distinct existing cases:20PASS1FAIL, then failed canonical expectation case1PASS16filtered; setup/source/policy for the retained20cases unchanged. Both first fixture issues reproduced on untouched63 baseline.",
+    "sql": "final native-fixture capture/probe27rows20+7PASS; original PG stages retained as historical query-shape evidence. No migration/lifecycle replay.",
+    "types": "r5 exit0 on integrated25 product source. Subsequent commit changed only the excluded src/__tests__ file; compiler-consumed source delta from dddc4d3a317b50b07631d789397910e1100f1c62 to product checkpoint is empty."
+  },
+  "limitations": [
+    "Mocks at storage/authorization boundaries; not HTTP/full-schema/native FINAL proof.",
+    "PostgreSQL16.15 query proof uses isolated temporary tables and owner role, not271schema/runtime-role validation.",
+    "20row batches bound application materialization; total CPU/database work still depends on comparable history and is not a4C4G latency/capacity certificate.",
+    "Installed dependencies reused, not a fresh lock-bound environment; follow-redirects installed1.16.1 versus lock1.16.2, optional package gaps retained.",
+    "Historical raw reporter source/environment hashes were not contemporaneously captured; metadata/source equivalence reconstructed from retained checkpoints. No retrospective signature or full environment binding.",
+    "Independent review found2problems in initial candidate; targeted revisions/self-check completed, mother DOT review and formal qualification remain pending.",
+    "School leaf generate/read only; no new global privacy framework or change to general-V2 independent optional publication/read policy."
+  ],
+  "ciChecklist": {
+    "url": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+    "readAttempt": "Hui link fetch returned404NOT_FOUND; not claimed read",
+    "qualification": "No Ready, manual workflow, shared CI registration or formal activation requested. Draft creation only; automatic repository checks retain their ordinary behavior."
+  }
+}
