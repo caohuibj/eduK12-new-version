@@ -1,9 +1,11 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { MazeConfig, MazeTrialPayload } from '../../types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { generateMaze, isMoveLegal } from './generator'
+import { generateMazePracticeV11 } from './practice'
 
 type Phase = 'instruction' | 'practice' | 'formal' | 'completed'
 type PhaseStep = 'brief' | 'navigating' | 'feedback'
@@ -14,6 +16,7 @@ const CELL_SIZE = 40
 
 export const MazeTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
   const config = taskContext.config as unknown as MazeConfig
+  const independentPractice = taskContext.engineVersion === '1.1.0'
   const totalTrials = config?.totalTrials ?? 4
   const mazeCols = config?.mazeCols ?? 7
   const mazeRows = config?.mazeRows ?? 7
@@ -32,7 +35,10 @@ export const MazeTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex
   const submittingRef = useRef(false)
   const pendingPayloadRef = useRef<MazeTrialPayload | null>(null)
   const stateRef = useRef({ row: 0, col: 0, moves: [] as number[] })
-  const maze = useMemo(() => generateMaze(taskContext.randomSeed, trialIndex, mazeCols, mazeRows), [taskContext.randomSeed, trialIndex, mazeCols, mazeRows])
+  const maze = useMemo(() => phase === 'practice' && independentPractice
+    ? generateMazePracticeV11(taskContext.randomSeed)
+    : generateMaze(taskContext.randomSeed, trialIndex, mazeCols, mazeRows),
+  [phase, independentPractice, taskContext.randomSeed, trialIndex, mazeCols, mazeRows])
 
   useEffect(() => {
     if (phase !== 'formal') return
@@ -89,7 +95,7 @@ export const MazeTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex
     setCurrentRow(state.row)
     setCurrentCol(state.col)
     setMoves([...state.moves])
-    if (state.row === mazeRows - 1 && state.col === mazeCols - 1) {
+    if (state.row === maze.rows - 1 && state.col === maze.cols - 1) {
       setReachedGoal(true)
       if (phase === 'practice') {
         setPracticeFeedback('到达终点！正式测验不再提示。')
@@ -155,15 +161,15 @@ export const MazeTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex
 
   const renderMaze = () => (
     <div className="inline-block mx-auto">
-      {Array.from({ length: mazeRows }, (_, r) => (
+      {Array.from({ length: maze.rows }, (_, r) => (
         <div key={r} className="flex">
-          {Array.from({ length: mazeCols }, (_, c) => {
+          {Array.from({ length: maze.cols }, (_, c) => {
             const isWallUp = (maze.walls[r][c] & 1) !== 0
             const isWallRight = (maze.walls[r][c] & 2) !== 0
             const isWallDown = (maze.walls[r][c] & 4) !== 0
             const isWallLeft = (maze.walls[r][c] & 8) !== 0
             const isCurrent = r === currentRow && c === currentCol
-            const isGoal = r === mazeRows - 1 && c === mazeCols - 1
+            const isGoal = r === maze.rows - 1 && c === maze.cols - 1
             const isStart = r === 0 && c === 0
             return (
               <div key={c} className="relative flex items-center justify-center" style={{
@@ -185,7 +191,7 @@ export const MazeTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex
     </div>
   )
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="迷宫学习" description={<p>用方向键（或屏幕按钮）从左上角导航到右下角。墙会挡住你的去路——找到可以通行的路线到达终点。按一次方向键或点一次按钮走一步，按住不连走；进入走过的格子也会留下记录。</p>} hint={<><p>限时 {Math.round(timeLimitMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "迷宫学习"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>用方向键（或屏幕按钮）从左上角导航到右下角。墙会挡住你的去路——找到可以通行的路线到达终点。按一次方向键或点一次按钮走一步，按住不连走；进入走过的格子也会留下记录。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{independentPractice ? reportIntroV3.independentHint : reportIntroV3.hint}</p> : <><p>限时 {Math.round(timeLimitMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

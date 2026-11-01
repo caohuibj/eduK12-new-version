@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -128,7 +129,7 @@ export const TimecopyTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     setFormalFeedback(null); setBarFill(false); setStep('watch'); setPhase('formal')
   }, [])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="时间间隔复制" description={<p>每题先看一段光条从空到满——记住它亮了多久。然后点击「开始」，凭感觉觉得到了同样的时长，再点击「结束」。</p>} hint={<><p>复制阶段不限时但会自动封顶；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "时间间隔复制"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>每题先看一段光条从空到满——记住它亮了多久。然后点击「开始」，凭感觉觉得到了同样的时长，再点击「结束」。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>复制阶段不限时但会自动封顶；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

@@ -124,7 +124,7 @@ export const SeqlearnTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     </div>
   )
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="序列反应学习" description={<p>信号会随机出现在四个格子之一，请尽快按它对应的按键（按键 1–4 或点击格子）。位置规律不会提前告知——只管快速反应。</p>} hint={<><p>信号出现后限时作答；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="序列反应学习" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>信号会出现在四个格子之一。看到信号后，请尽快按对应的按键（按键 1–4 或点击格子），同时尽量按准。像熟悉四个按钮的位置一样，先通过练习掌握操作。</p>) : (<p>信号会随机出现在四个格子之一，请尽快按它对应的按键（按键 1–4 或点击格子）。位置规律不会提前告知——只管快速反应。</p>)} hint={<><p>信号出现后限时作答；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

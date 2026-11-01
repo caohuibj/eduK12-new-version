@@ -833,3 +833,28 @@ export type AuditorynbackTrialPayload = {
   interrupted: boolean
   audioLatencyMs: number | null
 }
+
+
+export interface LineangleConfig {
+  totalTrials: number
+  angleStepDeg: number
+  optionCount: number
+  minAngleSepSteps: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type LineangleTrialPayload = {
+  targetAngle: number
+  optionAngles: number[]
+  responseAngle: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

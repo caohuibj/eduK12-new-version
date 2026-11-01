@@ -1,5 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
+// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -284,6 +285,292 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           }
         ]
       }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "wordlist",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "title": "读过一组词后，能想起哪些",
+    "metrics": {
+      "immediateAccuracy": {
+        "label": "最后即时轮回忆正确比例",
+        "explanation": "最后即时学习轮的不同正确目标词数 / 本轮目标词数。 不是所有即时轮平均正确率。",
+        "singleExplanation": "最后即时学习轮的不同正确目标词数 / 本轮目标词数。 不是所有即时轮平均正确率。"
+      },
+      "learningGain": {
+        "label": "首末即时轮正确比例的变化",
+        "explanation": "最后一轮与第一轮即时回忆正确率的差值。",
+        "singleExplanation": "最后一轮与第一轮即时回忆正确率的差值。"
+      },
+      "delayedRecallAccuracy": {
+        "label": "短延迟轮回忆正确比例",
+        "explanation": "延迟轮不同正确目标词数 / 目标词数；空回忆或中断（含60秒自动提交）时为 null。 研究档60秒短等待，不解释为长期记忆。",
+        "singleExplanation": "延迟轮不同正确目标词数 / 目标词数；空回忆或中断（含60秒自动提交）时为 null。 研究档60秒短等待，不解释为长期记忆。"
+      },
+      "totalImmediateCorrect": {
+        "label": "各即时轮正确个数之和",
+        "explanation": "各即时回忆轮次正确词数之和，同一个词在不同轮次可重复计入。",
+        "singleExplanation": "各即时回忆轮次正确词数之和，同一个词在不同轮次可重复计入。"
+      },
+      "recallByRound": {
+        "label": "各轮回忆正确率",
+        "explanation": "按学习轮次列出即时回忆正确率。",
+        "singleExplanation": "按学习轮次列出即时回忆正确率。"
+      },
+      "intrusionCount": {
+        "label": "非目标词记录数",
+        "explanation": "回答中不属于所呈现词表的词语数量。",
+        "singleExplanation": "回答中不属于所呈现词表的词语数量。"
+      },
+      "duplicateResponseCount": {
+        "label": "同一轮重复输入的词数",
+        "explanation": "同一轮内重复输入词语的数量。",
+        "singleExplanation": "同一轮内重复输入词语的数量。"
+      },
+      "omissionRate": {
+        "label": "遗漏比例",
+        "explanation": "遗漏比例：应该响应但没有响应的比例。",
+        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+      },
+      "medianResponseDurationMs": {
+        "label": "回忆作答时长中位数",
+        "explanation": "各回忆阶段作答时长的中位数。",
+        "singleExplanation": "各回忆阶段作答时长的中位数。"
+      }
+    },
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "这里描述本次任务记录，不代表稳定能力。",
+        "reportCaveats": [
+          "体验版采用8 个词、2 轮即时回忆。短程结果用于了解本次任务表现，条件内观察较少，不进入综合分析；数据质量不足时不作能力解释。本档没有延迟回忆指标。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "正式版",
+        "participantConclusion": "这里描述本次任务记录，不代表稳定能力。",
+        "reportCaveats": [
+          "正式版采用12 个词、3 轮即时回忆。结果应结合完成量、正确率和质量提示阅读，仅作为初步任务表现参考。本档没有延迟回忆指标。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究版",
+        "participantConclusion": "这里描述本次任务记录，不代表稳定能力。",
+        "reportCaveats": [
+          "研究版采用15 个词、5 轮学习及延迟回忆。增加观察量用于检验指标稳定性；研究版是轮次配置名称，不代表已通过研究级科学验证。",
+          "结果不代表人口常模、年龄等级或诊断结论；三档沿用同一任务逻辑，但题量和部分阶段覆盖不同。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "可以比较每轮是否想起更多词。识字、词语熟悉度和输入方式都会影响结果，不能据此判断记忆障碍。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只描述本次中文词表的键盘自由回忆表现，不是记忆能力、临床状态或人口常模判断。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "读过一组词后，能想起哪些",
+      "introduction": "像过一会儿回想购物清单，这里记录每轮实际回忆出的目标词，不判断你是否健忘。",
+      "summary": {
+        "template": "最后一轮即时回忆的正确比例为 {immediateAccuracy}；各即时轮累计正确记录为 {totalImmediateCorrect} 个（跨轮可重复）。",
+        "metricKeys": [
+          "immediateAccuracy",
+          "totalImmediateCorrect"
+        ]
+      },
+      "studentMetricKeys": [
+        "immediateAccuracy",
+        "totalImmediateCorrect",
+        "intrusionCount"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "emptyImmediateRecall"
+      ],
+      "metricGates": {
+        "delayedRecallAccuracy": [
+          "delayedStageIncomplete"
+        ]
+      },
+      "nextStep": "可以比较每轮是否想起更多词。识字、词语熟悉度和输入方式都会影响结果，不能据此判断记忆障碍。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "immediateAccuracy",
+          "delayedRecallAccuracy"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "sequence",
+      "popular": {
+        "conceptTitle": "先弄懂，这个任务在看什么",
+        "concept": "像过一会儿回想购物清单，这里记录每轮实际回忆出的目标词，不判断你是否健忘。",
+        "takeaway": "一轮里同一个词只计一次；多轮记录可以重复计入。",
+        "exampleTitle": "走出任务：生活与工作中的一个例子",
+        "example": "同一个词在一轮只计一次；跨多轮可以再次计入，所以累计个数不是不同词的总量。",
+        "scene": "sequence",
+        "frames": [
+          {
+            "title": "接收信息",
+            "text": "看到一组内容与它的先后。"
+          },
+          {
+            "title": "保留与整理",
+            "text": "在脑中留下线索，按要求处理。"
+          },
+          {
+            "title": "复现与核对",
+            "text": "比较本次答案与任务规则。"
+          }
+        ],
+        "boundary": "生活例子只帮助理解任务，不代表已验证的日常能力预测、常模或诊断。",
+        "metricHelp": {
+          "immediateAccuracy": {
+            "label": "最后即时轮回忆正确比例",
+            "explanation": "最后即时学习轮的不同正确目标词数 / 本轮目标词数。 不是所有即时轮平均正确率。"
+          },
+          "learningGain": {
+            "label": "首末即时轮正确比例的变化",
+            "explanation": "最后一轮与第一轮即时回忆正确率的差值。"
+          },
+          "totalImmediateCorrect": {
+            "label": "各即时轮正确个数之和",
+            "explanation": "各即时回忆轮次正确词数之和，同一个词在不同轮次可重复计入。"
+          },
+          "intrusionCount": {
+            "label": "非目标词记录数",
+            "explanation": "回答中不属于所呈现词表的词语数量。"
+          },
+          "omissionRate": {
+            "label": "遗漏比例",
+            "explanation": "遗漏比例：应该响应但没有响应的比例。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "自编中文视觉词表的键盘自由回忆",
+        "procedure": "自编中文词语逐个视觉呈现，多轮键盘自由回忆；无再认或干扰表。研究档五轮学习后等待60秒再回忆，服务端按冻结词表归一化精确匹配。",
+        "interpretation": "当前没有再认或干扰词表。即时正确率取最后即时轮；累计正确数可跨轮重复。研究档只等60秒；延迟未完成为 null，不是零分。识字和输入同样影响记录。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。"
+        ],
+        "metricNotes": {
+          "immediateAccuracy": {
+            "definition": "最后即时学习轮的不同正确目标词数 / 本轮目标词数。",
+            "readingHint": "不是所有即时轮平均正确率。"
+          },
+          "learningGain": {
+            "definition": "最后一轮与第一轮即时回忆正确率的差值。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "delayedRecallAccuracy": {
+            "definition": "延迟轮不同正确目标词数 / 目标词数；空回忆或中断（含60秒自动提交）时为 null。",
+            "readingHint": "研究档60秒短等待，不解释为长期记忆。"
+          },
+          "totalImmediateCorrect": {
+            "definition": "各即时回忆轮次正确词数之和，同一个词在不同轮次可重复计入。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "recallByRound": {
+            "definition": "按学习轮次列出即时回忆正确率。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "intrusionCount": {
+            "definition": "回答中不属于所呈现词表的词语数量。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "duplicateResponseCount": {
+            "definition": "同一轮内重复输入词语的数量。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "medianResponseDurationMs": {
+            "definition": "各回忆阶段作答时长的中位数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式试次数"
+          },
+          {
+            "key": "timeoutMs",
+            "label": "响应时限（毫秒）"
+          },
+          {
+            "key": "blockCount",
+            "label": "区组数"
+          },
+          {
+            "key": "startLength",
+            "label": "起始序列长度"
+          },
+          {
+            "key": "maxLength",
+            "label": "配置长度上限"
+          },
+          {
+            "key": "trialsPerLevel",
+            "label": "每长度尝试数"
+          },
+          {
+            "key": "nLevels",
+            "label": "N-back 难度"
+          },
+          {
+            "key": "trialCountByN",
+            "label": "各 N 计划试次数"
+          },
+          {
+            "key": "learningRounds",
+            "label": "即时学习轮数"
+          },
+          {
+            "key": "pairCount",
+            "label": "配对数量"
+          },
+          {
+            "key": "delayedEnabled",
+            "label": "是否包含延迟阶段"
+          }
+        ]
+      },
+      "summaryByProfile": {}
     }
   }
 ]

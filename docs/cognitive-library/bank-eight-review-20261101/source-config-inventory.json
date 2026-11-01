@@ -1,0 +1,506 @@
+[
+  {
+    "testType": "wordanalogy",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.0.0",
+    "qualityDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.1.0",
+    "config": {
+      "totalTrials": 30,
+      "stimulusSetVersion": "wordanalogy-zh-v1.1.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版使用18道正式题；本次比例不代表稳定能力或同龄排名。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次言语类比推理的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研参数档使用36道已审题目；未建立常模、信效度或新旧题库等值证据。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "wordmeaning",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.0.0",
+    "qualityDefinitionVersion": "1.0.0",
+    "reportDefinitionVersion": "1.1.0",
+    "config": {
+      "totalTrials": 30,
+      "stimulusSetVersion": "wordmeaning-zh-v1.1.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版使用18道正式题；本次比例不代表稳定能力或同龄排名。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次词汇理解的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研参数档使用36道已审题目；未建立常模、信效度或新旧题库等值证据。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "cogest",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "qualityDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "config": {
+      "totalTrials": 18,
+      "stimulusSetVersion": "cogest-zh-v1.1.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "标准档30题；项目自编描述性数量级估算试测草稿，不提供临床或人群常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研档36题；共用同一自编题池，不重复抽题；科研档命名不代表已完成心理测量验证。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "logicdeduce",
+    "configVersion": "2.0.0",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "2.0.0",
+    "metricDefinitionVersion": "2.0.0",
+    "qualityDefinitionVersion": "2.0.0",
+    "reportDefinitionVersion": "2.0.0",
+    "config": {
+      "totalTrials": 18,
+      "stimulusSetVersion": "logicdeduce-zh-v2.0.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "2.0.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18题简短体验；不与长版或其他人排名比较。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30题；记录本次表现，无同龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36道独立正式题；时长为估计，尚无信效度或常模研究。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "proofread",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "qualityDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "config": {
+      "totalTrials": 30,
+      "stimulusSetVersion": "proofread-zh-v1.1.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18 道正式题；短程结果稳定性未验证。时长为估计，非实测。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30 道正式题；只描述本次表现，无同龄常模。时长为估计，非实测。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36 道正式题；与短程协议使用同一原创题池，不宣称等值或验证效度。时长为估计，非实测。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "readingcomp",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "qualityDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "config": {
+      "totalTrials": 30,
+      "stimulusSetVersion": "readingcomp-zh-v1.1.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18 道正式题；短程结果稳定性未验证。时长为估计，非实测。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30 道正式题；只描述本次表现，无同龄常模。时长为估计，非实测。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36 道正式题；与短程协议使用同一原创题池，不宣称等值或验证效度。时长为估计，非实测。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "seriescomplete",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "1.1.0",
+    "metricDefinitionVersion": "1.1.0",
+    "qualityDefinitionVersion": "1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "config": {
+      "totalTrials": 18,
+      "stimulusSetVersion": "seriescomplete-zh-v1.1.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "1.1.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次数列完成的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研档使用全部 36 题；与标准档共用同一内部题池；难度未经过标定；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "testType": "wordproblem",
+    "configVersion": "2.0.0",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "declaredSeedStatus": "DRAFT",
+    "profileDefinitionVersion": "2.0.0",
+    "metricDefinitionVersion": "2.0.0",
+    "qualityDefinitionVersion": "2.0.0",
+    "reportDefinitionVersion": "2.0.0",
+    "config": {
+      "totalTrials": 18,
+      "stimulusSetVersion": "wordproblem-zh-v2.0.0",
+      "fixationMs": 400,
+      "timeoutMs": 15000,
+      "validRtFloorMs": 300,
+      "report": {
+        "reportVersion": "2.0.0",
+        "referenceMode": "none"
+      }
+    },
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18题简短体验；不与长版或其他人排名比较。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30题；记录本次表现，无同龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36道独立正式题；时长为估计，尚无信效度或常模研究。"
+        ]
+      }
+    }
+  }
+]

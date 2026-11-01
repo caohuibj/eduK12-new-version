@@ -32,18 +32,30 @@ import { seeds as task29 } from '../tasks/gamblingdeck/seeds'
 import { seeds as task30 } from '../tasks/symbolmatch/seeds'
 import { seeds as task31 } from '../tasks/runningspan/seeds'
 import { seeds as task32 } from '../tasks/sentencecheck/seeds'
-import { seeds as task33 } from '../tasks/seqlearn/seeds'
-import { seeds as task34 } from '../tasks/timecopy/seeds'
-import { seeds as task35 } from '../tasks/letternumseries/seeds'
-import { seeds as task36 } from '../tasks/semanticfluency/seeds'
-import { seeds as task37 } from '../tasks/cancellation/seeds'
-import { seeds as task38 } from '../tasks/trustgame/seeds'
-import { seeds as task39 } from '../tasks/ufov/seeds'
-import { seeds as task40 } from '../tasks/pursuitrotor/seeds'
-import { seeds as task41 } from '../tasks/visualwm/seeds'
-import { seeds as task42 } from '../tasks/maze/seeds'
-import { seeds as task43 } from '../tasks/auditoryrt/seeds'
-import { seeds as task44 } from '../tasks/auditorynback/seeds'
+import { seeds as task33 } from '../tasks/lineangle/seeds'
+import { seeds as task34 } from '../tasks/seqlearn/seeds'
+import { seeds as task35 } from '../tasks/timecopy/seeds'
+import { seeds as task36 } from '../tasks/sharegame/seeds'
+import { seeds as task37 } from '../tasks/letternumseries/seeds'
+import { seeds as task38 } from '../tasks/wordanalogy/seeds'
+import { seeds as task39 } from '../tasks/wordmeaning/seeds'
+import { seeds as task40 } from '../tasks/semanticfluency/seeds'
+import { seeds as task41 } from '../tasks/wordproblem/seeds'
+import { seeds as task42 } from '../tasks/icarmatrix/seeds'
+import { seeds as task43 } from '../tasks/cancellation/seeds'
+import { seeds as task44 } from '../tasks/trustgame/seeds'
+import { seeds as task45 } from '../tasks/embeddedfigures/seeds'
+import { seeds as task46 } from '../tasks/ufov/seeds'
+import { seeds as task47 } from '../tasks/logicdeduce/seeds'
+import { seeds as task48 } from '../tasks/seriescomplete/seeds'
+import { seeds as task49 } from '../tasks/pursuitrotor/seeds'
+import { seeds as task50 } from '../tasks/readingcomp/seeds'
+import { seeds as task51 } from '../tasks/proofread/seeds'
+import { seeds as task52 } from '../tasks/visualwm/seeds'
+import { seeds as task53 } from '../tasks/cogest/seeds'
+import { seeds as task54 } from '../tasks/maze/seeds'
+import { seeds as task55 } from '../tasks/auditoryrt/seeds'
+import { seeds as task56 } from '../tasks/auditorynback/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -55,46 +67,144 @@ export const cognitiveSeeds = [
   task4[0],
   task5[0],
   task6[0],
-  task8[0],
-  task9[0],
-  task7[0],
   task10[0],
+  task10[1],
+  task8[0],
   task11[0],
+  task11[1],
+  task9[0],
   task12[0],
+  task12[1],
+  task7[0],
   task13[0],
+  task13[1],
   task14[0],
+  task14[1],
   task15[0],
-  task16[0],
+  task15[1],
   task17[0],
+  task17[1],
   task18[0],
+  task18[1],
+  task16[0],
+  task16[2],
   task19[0],
-  task20[0],
+  task19[1],
   task21[0],
-  task22[0],
-  task23[0],
-  task24[0],
-  task25[0],
-  task26[0],
-  task27[0],
-  task28[0],
-  task29[0],
-  task30[0],
-  task31[0],
-  task32[0],
-  task33[0],
-  task34[0],
-  task35[0],
-  task36[0],
-  task37[0],
-  task38[0],
-  task39[0],
-  task40[0],
-  task41[0],
-  task42[0],
-  task43[0],
-  task44[0],
-  task32[1],
-  task41[1],
-  task44[1],
   task21[1],
+  task21[2],
+  task22[0],
+  task22[1],
+  task23[0],
+  task23[1],
+  task20[0],
+  task20[1],
+  task24[0],
+  task24[1],
+  task25[0],
+  task25[1],
+  task26[0],
+  task26[1],
+  task27[0],
+  task27[1],
+  task28[0],
+  task28[1],
+  task29[0],
+  task29[1],
+  task30[0],
+  task30[1],
+  task31[0],
+  task31[1],
+  task32[0],
+  task32[2],
+  task33[0],
+  task33[1],
+  task33[2],
+  task34[0],
+  task34[1],
+  task35[0],
+  task35[1],
+  task36[0],
+  task36[1],
+  task36[2],
+  task37[0],
+  task37[1],
+  task38[0],
+  task38[1],
+  task38[2],
+  task39[0],
+  task39[1],
+  task39[2],
+  task40[0],
+  task40[1],
+  task41[0],
+  task41[1],
+  task41[2],
+  task42[0],
+  task42[1],
+  task42[2],
+  task42[3],
+  task42[4],
+  task42[5],
+  task43[0],
+  task43[1],
+  task44[0],
+  task44[1],
+  task45[0],
+  task45[1],
+  task46[0],
+  task46[1],
+  task47[0],
+  task47[1],
+  task47[2],
+  task48[0],
+  task48[1],
+  task48[2],
+  task49[0],
+  task49[1],
+  task50[0],
+  task50[1],
+  task50[2],
+  task51[0],
+  task51[1],
+  task51[2],
+  task52[0],
+  task52[2],
+  task53[0],
+  task53[1],
+  task53[2],
+  task54[0],
+  task54[1],
+  task54[2],
+  task54[3],
+  task55[0],
+  task55[1],
+  task56[0],
+  task56[2],
+  task20[2],
+  task20[3],
+  task16[1],
+  task16[3],
+  task32[1],
+  task32[3],
+  task52[1],
+  task52[3],
+  task56[1],
+  task56[3],
+  task25[2],
+  task25[3],
+  task25[4],
+  task25[5],
+  task25[6],
+  task25[7],
+  task25[8],
+  task25[9],
+  task25[10],
+  task25[11],
+  task25[12],
+  task25[13],
+  task25[14],
+  task25[15],
+  task25[16],
+  task25[17],
 ]
