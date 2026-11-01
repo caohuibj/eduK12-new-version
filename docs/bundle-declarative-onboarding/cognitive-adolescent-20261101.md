@@ -47,3 +47,10 @@
 中文覆盖包在本地临时接入现有source registry后，完整量表结构校验通过、4个golden向量通过、独立Bundle四态fixtures及精确依赖校验通过；随后已移除临时中文接线，未上传公开仓库。两份交付都保留DRAFT。没有连接生产库、写库、安装、发布、合并或部署；没有执行真实数据库生命周期或浏览器用例。
 
 本候选只新增内容、来源适用性与定向测试；无引擎、表、依赖、workflow或审核门禁修改。主干历史包未改；两份generated文件由原工具生成。后续三线集成时应重生成它们，不将本分支的整份生成物覆盖成人／儿童新增内容。Draft PR只用于审阅，正式CI选路以真实完整差异决定，不把本地结果冒充正式应用资格。
+
+
+## 成人共享组件对齐
+
+已核对成人Draft PR484的`dd8081a354d40f1149a97d92f00beadd45005f5b`。本年龄包的construct改为精确指标身份，以直接复用共享展示词表：`gonogo.commission_rate`、`gonogo.d_prime`、`gonogo.omission_rate`及CPT对应指标。TEXI明确命名`texi.working_memory_mean`、`texi.inhibition_mean`，避免把1–5均分误标成ADEXI项目合计分。
+
+共享组件当前只注册ADEXI合计分，尚不识别TEXI与Flanker。本线未修改成人负责的共享组件。最终整合应在原`bundle-evidence-display.ts`词表补入TEXI两个1–5均分与Flanker三个指标（有符号毫秒效应、两条件0–1准确率）；否则`hasCrossMethodEvidence`不会开启双来源图表。成人PR484也已补上integer→JSON number的原依赖兼容，但此兼容尚非本分支基线。任务整数证据及分母图形可在三线统一整合时使用该共享增量，不复制依赖代码或整份生成清单。

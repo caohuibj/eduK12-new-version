@@ -5,7 +5,7 @@
     "selector": "commissionRate",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "response_inhibition",
+    "construct": "gonogo.commission_rate",
     "role": "PRIMARY",
     "direction": "lower",
     "qualityPolicy": "interpretable_only"
@@ -16,7 +16,7 @@
     "selector": "omissionRate",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "response_inhibition",
+    "construct": "gonogo.omission_rate",
     "role": "PRIMARY",
     "direction": "lower",
     "qualityPolicy": "interpretable_only"
@@ -27,7 +27,7 @@
     "selector": "dPrime",
     "valueType": "number",
     "unit": "d-prime",
-    "construct": "response_inhibition",
+    "construct": "gonogo.d_prime",
     "role": "PRIMARY",
     "direction": "higher",
     "qualityPolicy": "interpretable_only"
@@ -38,7 +38,7 @@
     "selector": "dPrime",
     "valueType": "number",
     "unit": "d-prime",
-    "construct": "sustained_attention",
+    "construct": "cpt.d_prime",
     "role": "PRIMARY",
     "direction": "higher",
     "qualityPolicy": "interpretable_only"
@@ -49,7 +49,7 @@
     "selector": "omissionRate",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "sustained_attention",
+    "construct": "cpt.omission_rate",
     "role": "PRIMARY",
     "direction": "lower",
     "qualityPolicy": "interpretable_only"
@@ -60,7 +60,7 @@
     "selector": "commissionRate",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "sustained_attention",
+    "construct": "cpt.commission_rate",
     "role": "PRIMARY",
     "direction": "lower",
     "qualityPolicy": "interpretable_only"
@@ -71,7 +71,7 @@
     "selector": "rtICV",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "sustained_attention",
+    "construct": "cpt.rt_icv",
     "role": "PRIMARY",
     "direction": "lower",
     "qualityPolicy": "interpretable_only"
@@ -82,7 +82,7 @@
     "selector": "flankerEffectMs",
     "valueType": "number",
     "unit": "ms",
-    "construct": "interference_control",
+    "construct": "flanker.flanker_effect_ms",
     "role": "PRIMARY",
     "direction": "neutral",
     "qualityPolicy": "interpretable_only"
@@ -93,7 +93,7 @@
     "selector": "congruentAccuracy",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "interference_control",
+    "construct": "flanker.congruent_accuracy",
     "role": "PRIMARY",
     "direction": "higher",
     "qualityPolicy": "interpretable_only"
@@ -104,7 +104,7 @@
     "selector": "incongruentAccuracy",
     "valueType": "number",
     "unit": "ratio",
-    "construct": "interference_control",
+    "construct": "flanker.incongruent_accuracy",
     "role": "PRIMARY",
     "direction": "higher",
     "qualityPolicy": "interpretable_only"
@@ -115,7 +115,7 @@
     "selector": "working_memory",
     "valueType": "number",
     "unit": "points",
-    "construct": "daily_working_memory_difficulty",
+    "construct": "texi.working_memory_mean",
     "role": "PRIMARY",
     "direction": "higher",
     "qualityPolicy": "interpretable_only"
@@ -126,7 +126,7 @@
     "selector": "inhibition",
     "valueType": "number",
     "unit": "points",
-    "construct": "daily_self_regulation_difficulty",
+    "construct": "texi.inhibition_mean",
     "role": "PRIMARY",
     "direction": "higher",
     "qualityPolicy": "interpretable_only"
