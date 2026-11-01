@@ -12,7 +12,6 @@ const files=new Set([
   ".github/scripts/post356-scope.mjs",
   ".github/scripts/post356-scope.test.mjs",
   ".github/workflows/ci-frontend.yml",
-  ".github/workflows/ci-maintenance-repair.yml",
   ".github/workflows/ci.yml",
   "server-version/backend/package.json",
   "server-version/backend/src/__tests__/assessment-bundle/public-declarations.test.ts",

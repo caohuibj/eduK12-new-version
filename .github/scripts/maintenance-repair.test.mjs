@@ -22,6 +22,6 @@ test('required real checks cannot be absent, skipped, failed or cancelled',()=>{
  assert.deepEqual(failedChecks(needs,false),[]);
  for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...needs,'maintenance-repair':{result}},false).includes('maintenance-repair'));
  assert(failedChecks(needs,true).includes('scope'));
- const job=readFileSync('.github/workflows/ci-maintenance-repair.yml','utf8');
+ const job=readFileSync('.github/workflows/ci.yml','utf8');
  for(const expected of ['assert-release-test-report.mjs','huiteacherFieldObservation.postgres.integration.test.ts','promtool','codeql-action/analyze'])assert(job.includes(expected));
 });
