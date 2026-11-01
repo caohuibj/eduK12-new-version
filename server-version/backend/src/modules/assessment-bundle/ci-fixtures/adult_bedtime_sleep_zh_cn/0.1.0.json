@@ -2,7 +2,9 @@
   "schemaVersion": 1,
   "synthetic": true,
   "context": {
-    "adult_confirmed": true
+    "adult_confirmed": true,
+    "birth_year_month": "1996-01",
+    "shift_work": "no"
   },
   "slots": {
     "bedtime": {

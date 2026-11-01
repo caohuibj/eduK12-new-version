@@ -13,10 +13,10 @@
       "required": false,
       "valueType": "enum",
       "enumValues": [
-        "是",
-        "否",
-        "不确定",
-        "不想回答"
+        "yes",
+        "no",
+        "unsure",
+        "prefer_not_to_answer"
       ]
     },
     {

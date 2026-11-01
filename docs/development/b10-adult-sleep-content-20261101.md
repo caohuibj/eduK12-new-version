@@ -77,3 +77,10 @@ SCI来源的 `allowedCommercialNatures` 仅 `NON_COMMERCIAL`；本包 `nonCommer
 **共享索引由集成线统一生成。** 当前Draft不单独覆盖共享注册产物；它尚未作为代码目录条目激活。共享核心与各内容目录汇合后，沿现有生成器执行一次 `npm run bundle:manifest:generate` / `npm run bundle:manifest:check`。当前#494内容CI在Bundle变化时会执行manifest-check，因此核心和索引汇合前不能把本Draft说成CI就绪或已注册。没有手工拼接generated JSON。
 
 正式验证计划为#494现有content路线：`scale-onboarding-boundary.yml` 选定本目录 `check <directory>`、history和注册manifest-check；不启动PG/Redis、迁移、产品回归、性能或恢复。输入相同的实际通过记录不重复执行；本地结果未被正式CI接纳时如实保持待审，不伪造成功状态。当前PR保持Draft，未激活正式CI；集成线在统一索引和最终冻结身份后接续。
+
+
+## 合并准备：可选轮班字段的稳定键
+
+保持DRAFT0.1.0及原叶C/P/R，仅将未被规则或计分引用的shift_work枚举值接到既有FORM optionKey格式：`yes`→是、`no`→否、`unsure`→不确定、`prefer_not_to_answer`→不想回答。管理员编制Survey FORM时使用这些稳定键及对应中文label；不在context严格schema内添加新label字段。现有自动生成Bundle背景表单按枚举键显示，未在本次改动共享runtime增加中文选项标签机制。smoke新增真实格式合成DOB和no，未改其叶答案或预期结果。
+
+Node24.21及共享runtime981a88a7：实际声明、4类Bundle规则fixtures、依赖检查、现有FORM解析和冻结enum解码通过；原中文optionKey被FORM校验拒绝，新键可配中文label，选项键集与context枚举精确一致；省略可选项保持省略，非法值仍拒绝。初轮本地断言误写错误名称CONTEXT_ENUM，真实错误为SURVEY_NATIVE_CONTEXT_TYPE，纠正该断言后仅重跑本项通过；原失败保留，不改产品断言。未重跑原15项叶计分检查。源码包hash：`0de17716e4ce29995a65b53cb194d2938babf2206be54ea6ab1076ff266b661a`。共享索引仍待六包并集统一生成。
