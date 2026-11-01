@@ -141,7 +141,7 @@ class MonitoringSafetyTests(unittest.TestCase):
             if args[1] == 'inspect':
                 name = args[-1]
                 ports = {'5432/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '5432'}]} if name.endswith('postgres') else {}
-                return name + '|running|healthy|0|sha256:same|' + json.dumps(ports) + '|false|bridge|'
+                return name + '|running|healthy|0|sha256:same|' + json.dumps(ports) + '|false|bridge||id-' + name
             return ''
         with patch.object(m, 'command', side_effect=docker):
             _, checks = m.collect(config)
@@ -174,7 +174,7 @@ class MonitoringSafetyTests(unittest.TestCase):
             row = rows.get(name)
             if row is None:
                 raise RuntimeError('must-not-leak-command-error')
-            return '|'.join([name, row['status'], row['health'], '0', row['image'], '{}', 'false', 'bridge', row['service']])
+            return '|'.join([name, row['status'], row['health'], '0', row['image'], '{}', 'false', 'bridge', row['service'], 'id-' + name])
         with patch.object(m, 'command', side_effect=docker):
             data, checks = m.collect(config)
         return data, {check['key']: check['level'] for check in checks}, checks, visited
@@ -196,6 +196,35 @@ class MonitoringSafetyTests(unittest.TestCase):
         self.assertIn('job-2', visited)
         self.assertIn('job-2', data['containers'])
         self.assertNotIn('must-not-leak-command-error', json.dumps(checks))
+
+    def test_each_single_restart_opens_once_then_uses_existing_reminder_and_recovery(self):
+        previous, alerts, all_events = {}, {}, []
+        def sample(count):
+            return {'worker': {'id': 'same-container', 'image': 'same-image', 'restarts': count}}
+        for count, now in [(0, 100), (1, 400), (2, 700), (3, 1000), (4, 400 + CONFIG['repeat_seconds'])]:
+            current = sample(count)
+            checks = m.restart_findings(current, previous)
+            self.assertEqual(checks[0]['level'], 'ok' if count == 0 else 'warning')
+            alerts, events = m.transitions(alerts, checks, now, CONFIG)
+            all_events.extend(events); previous = current
+        self.assertEqual([event['event'] for event in all_events], ['opened', 'reminder'])
+        _, events = m.transitions(alerts, m.restart_findings(sample(4), previous), 23000, CONFIG)
+        self.assertEqual([event['event'] for event in events], ['recovered'])
+
+    def test_unchanged_counters_and_replacement_or_legacy_baselines_do_not_alert(self):
+        old = {'worker': {'id': 'old-id', 'image': 'old-image', 'restarts': 1}}
+        for item in [
+            {'id': 'old-id', 'image': 'old-image', 'restarts': 1},
+            {'id': 'old-id', 'image': 'old-image', 'restarts': 0},
+            {'id': 'new-id', 'image': 'old-image', 'restarts': 5},
+            {'id': 'old-id', 'image': 'new-image', 'restarts': 5},
+        ]:
+            checks = m.restart_findings({'worker': item}, old)
+            self.assertEqual(checks[0]['details']['delta'], 0)
+            self.assertEqual(m.transitions({}, checks, 100, CONFIG)[1], [])
+        checks = m.restart_findings({'worker': {'id': 'current-id', 'image': 'old-image', 'restarts': 5}},
+                                   {'worker': {'image': 'old-image', 'restarts': 0}})
+        self.assertEqual(checks[0]['level'], 'ok')
 
     def test_unhealthy_or_exited_replica_is_critical(self):
         for edit in [{'status': 'exited'}, {'health': 'unhealthy'}]:
