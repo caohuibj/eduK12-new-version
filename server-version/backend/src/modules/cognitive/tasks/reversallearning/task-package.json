@@ -8,6 +8,12 @@
       "engineVersion": "1.0.0",
       "scoringVersion": "1.0.0",
       "order": 23
+    },
+    {
+      "testType": "reversallearning",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.0.0",
+      "order": 923
     }
   ],
   "backend": {
@@ -20,6 +26,12 @@
       "engineVersion": "1.0.0",
       "file": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts",
       "export": "reversallearningRegistryEntry"
+    },
+    {
+      "testType": "reversallearning",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts",
+      "export": "reversallearningV11RegistryEntry"
     }
   ],
   "catalog": {
@@ -30,7 +42,8 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
-      23
+      23,
+      923
     ]
   },
   "presentation": {
@@ -43,7 +56,8 @@
   },
   "acceptance": {
     "frontendSuites": [
-      "src/modules/cognitive/__tests__/Pr12Tasks.test.tsx"
+      "src/modules/cognitive/__tests__/Pr12Tasks.test.tsx",
+      "src/modules/cognitive/tasks/reversallearning/__tests__/ReversallearningV11Task.test.tsx"
     ]
   }
 }

@@ -28,3 +28,8 @@ export const reversallearningRegistryEntry: CognitiveFrontendRegistryEntry = {
     disclaimer: '结果只描述本次固定阶段概率学习任务中的选择、反馈和反转表现，不代表人格、风险偏好或诊断。',
   },
 }
+
+export const reversallearningV11RegistryEntry: CognitiveFrontendRegistryEntry = {
+  ...reversallearningRegistryEntry, engineVersion: '1.1.0',
+  reportDefinition: { ...reversallearningRegistryEntry.reportDefinition, disclaimer: '本项目固定一次反转变式，统一负反馈且不展示阶段；研究档30题练习、2秒响应。不用于人格、风险或诊断。' },
+}

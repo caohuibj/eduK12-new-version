@@ -10,10 +10,10 @@ const PRACTICE = reversallearningSequence('reversallearning-practice-v1.0.0', 4,
 
 const responseLabel = (choice: Choice) => choice === 'left' ? '左侧符号' : '右侧符号'
 
-const feedbackFor = (spec: ReversallearningTrialSpec, choice: Choice, rewardProbability: number): string => {
+const feedbackFor = (spec: ReversallearningTrialSpec, choice: Choice, rewardProbability: number, uniformNegative = false): string => {
   const correct = choice === spec.correctResponse
   const rewarded = correct && spec.rewardRoll < rewardProbability
-  return rewarded ? '获得反馈' : correct ? '本次未获得反馈' : '未获得反馈'
+  return rewarded ? '获得反馈' : uniformNegative ? '未获得反馈' : correct ? '本次未获得反馈' : '未获得反馈'
 }
 
 export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
@@ -28,7 +28,15 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
     reversalTrials?: number
     rewardProbability?: number
     trialTimeoutMs?: number
+    practiceTrialCount?: number
+    practiceAcquisitionOnly?: boolean
   }
+  const revised = taskContext.engineVersion === '1.1.0'
+  const practiceCount = revised ? (config.practiceTrialCount ?? 4) : 4
+  const acquisitionOnlyPractice = revised && config.practiceAcquisitionOnly === true
+  const practice = useMemo(() => revised ? reversallearningSequence('reversallearning-practice-v1.1.0', practiceCount, acquisitionOnlyPractice ? practiceCount : Math.ceil(practiceCount / 2), acquisitionOnlyPractice ? 0 : Math.floor(practiceCount / 2), config.rewardProbability ?? 0.8) : PRACTICE, [revised, practiceCount, acquisitionOnlyPractice, config.rewardProbability])
+  const feedbackTimerRef = useRef<number | null>(null)
+  useEffect(() => () => { if (feedbackTimerRef.current !== null) window.clearTimeout(feedbackTimerRef.current) }, [])
   const totalTrials = config.totalTrials ?? 120
   const acquisitionTrials = config.acquisitionTrials ?? Math.floor(totalTrials / 2)
   const reversalTrials = config.reversalTrials ?? totalTrials - acquisitionTrials
@@ -49,7 +57,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
   const respondedRef = useRef(false)
   const completionRequestedRef = useRef(false)
   const formalSpec = sequence[trialIndex]
-  const practiceSpec = PRACTICE[practiceIndex]
+  const practiceSpec = practice[practiceIndex]
   const spec = phase === 'practice' ? practiceSpec : formalSpec
 
   useEffect(() => {
@@ -74,6 +82,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
     respondedRef.current = true
     setSubmitting(true)
     try {
+      if (revised) await new Promise<void>(resolve => { feedbackTimerRef.current = window.setTimeout(resolve, 500) })
       const accepted = await onTrialComplete({ choice, rtMs, interrupted: interrupted || timedOut })
       if (accepted === false) {
         respondedRef.current = false
@@ -93,15 +102,16 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
       setSubmitting(false)
       setFeedback('网络暂时不可用，请重试本题。')
     }
-  }, [interrupted, onTaskComplete, onTrialComplete, phase, sequence.length, submitting, trialIndex])
+  }, [interrupted, onTaskComplete, onTrialComplete, phase, sequence.length, submitting, trialIndex, revised])
 
   useEffect(() => {
     if (phase !== 'formal') return
     const timer = window.setTimeout(() => {
+      if (revised && !respondedRef.current) setFeedback('超时未选择')
       void submitFormal(null, null, true)
     }, trialTimeoutMs)
     return () => window.clearTimeout(timer)
-  }, [phase, submitFormal, trialIndex, trialTimeoutMs])
+  }, [phase, submitFormal, trialIndex, trialTimeoutMs, revised])
 
   const startPractice = () => {
     setPracticeIndex(0)
@@ -125,19 +135,19 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
   const handlePracticeChoice = (choice: Choice) => {
     const isCorrect = choice === practiceSpec.correctResponse
     setPracticeCorrect((value) => value + (isCorrect ? 1 : 0))
-    setFeedback(isCorrect ? feedbackFor(practiceSpec, choice, rewardProbability) : '未获得反馈')
+    setFeedback(isCorrect ? feedbackFor(practiceSpec, choice, rewardProbability, revised) : '未获得反馈')
     setPhase('practice-feedback')
   }
 
   const handleFormalChoice = (choice: Choice) => {
     if (!formalSpec || submitting || respondedRef.current) return
     const rtMs = Math.max(0, Math.round(performance.now() - startedAtRef.current))
-    setFeedback(feedbackFor(formalSpec, choice, rewardProbability))
+    setFeedback(feedbackFor(formalSpec, choice, rewardProbability, revised))
     void submitFormal(choice, rtMs)
   }
 
   const nextPractice = () => {
-    if (practiceIndex + 1 >= PRACTICE.length) {
+    if (practiceIndex + 1 >= practice.length) {
       setPhase('practice-result')
       return
     }
@@ -148,15 +158,15 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="概率反馈与规则反转" description={<p>每题请选择左侧或右侧符号，根据多次反馈找出当前较有利的符号。较有利的符号也可能偶尔得到负反馈；规则会在中途反转。</p>} hint={<><p>练习至少完成 3 / 4；练习不计入正式结果。结果不用于人格或风险判断。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro title="概率反馈与规则反转" description={<p>每题请选择左侧或右侧符号，根据多次反馈找出当前较有利的符号。较有利的符号也可能偶尔得到负反馈；规则会在中途反转。</p>} hint={<><p>{acquisitionOnlyPractice ? `先完成 ${practice.length} 题无反转练习，熟悉偶尔没有奖励的情况；练习不设正确率通过线。` : revised ? '4题练习中至少3次选到当时较有利的符号；' : '练习至少完成 3 / 4；'}练习不计入正式结果。结果不用于人格或风险判断。</p></>} onAction={startPractice} />
     )
   }
 
   if (phase === 'practice-result') {
-    const passed = practiceCorrect >= 3
+    const passed = acquisitionOnlyPractice || practiceCorrect >= 3
     return (
       <div className="card p-8 text-center">
-        <p className="mb-4 text-gray-700">练习完成 {practiceCorrect} / {PRACTICE.length}</p>
+        <p className="mb-4 text-gray-700">{revised ? `练习已完成 ${practice.length} 题` : `练习完成 ${practiceCorrect} / ${practice.length}`}</p>
         <button type="button" onClick={passed ? startFormal : startPractice} className={passed ? 'btn-primary' : 'btn-secondary'}>
           {passed ? '开始正式测验' : '重新练习'}
         </button>
@@ -169,7 +179,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
       <div className="card p-8 text-center">
         <p className="mb-5 text-gray-700">{feedback}</p>
         <button type="button" onClick={nextPractice} className="btn-primary">
-          {practiceIndex + 1 >= PRACTICE.length ? '查看练习结果' : '下一题'}
+          {practiceIndex + 1 >= practice.length ? '查看练习结果' : '下一题'}
         </button>
       </div>
     )
@@ -179,7 +189,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
   return (
     <div className="card p-8 text-center">
       <p className="mb-4 text-sm text-gray-500">
-        {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${PRACTICE.length}` : `正式试次 ${trialIndex + 1} / ${sequence.length} · ${segmentLabel}`}
+        {phase === 'practice' ? `练习 ${practiceIndex + 1} / ${practice.length}` : `正式试次 ${trialIndex + 1} / ${sequence.length}${revised ? '' : ` · ${segmentLabel}`}`}
       </p>
       <p className="mb-5 text-gray-600">请选择一个符号</p>
       <div className="mx-auto grid max-w-md grid-cols-2 gap-4">
@@ -194,7 +204,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
               className="rounded-2xl border-2 border-sky-200 bg-white px-8 py-8 text-5xl text-sky-700 shadow-sm hover:bg-sky-50 focus:outline-hidden focus:ring-2 focus:ring-sky-500 disabled:opacity-50"
               aria-label={responseLabel(choice)}
             >
-              {symbol === 'A' ? '○' : '△'}
+              {revised && phase === 'practice' ? (symbol === 'A' ? '◇' : '□') : (symbol === 'A' ? '○' : '△')}
             </button>
           )
         })}

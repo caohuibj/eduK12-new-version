@@ -24,5 +24,10 @@ export const seeds: CognitiveSeed[] = [
     engineVersion: '1.0.0',
     scoringVersion: '1.0.0',
     config: { totalTrials: 120, acquisitionTrials: 60, reversalTrials: 60, criterionConsecutiveCorrect: 6, rewardProbability: 0.8, trialTimeoutMs: 3000, stimulusSetVersion: 'reversal-symbols-v1.0.0', report: NO_REFERENCE_REPORT },
+  },
+  {
+    testType: 'reversallearning', configVersion: '1.1.0', name: 'Probabilistic Reversal Project Variant v1.1.0',
+    status: 'DRAFT', engineVersion: '1.1.0', scoringVersion: '1.0.0',
+    config: { totalTrials: 120, acquisitionTrials: 60, reversalTrials: 60, criterionConsecutiveCorrect: 6, rewardProbability: 0.8, trialTimeoutMs: 3000, stimulusSetVersion: 'reversal-symbols-v1.0.0', practiceTrialCount: 4, practiceAcquisitionOnly: false, report: { reportVersion: '1.1.0', referenceMode: 'none' } },
   }
 ]
