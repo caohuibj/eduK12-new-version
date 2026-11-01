@@ -90,3 +90,34 @@ export const generateAuditoryNbackPracticeSequence = (
   }
   return sequence
 }
+
+/** v1.1: fixed rounded target count, with at most two adjacent targets.
+ * Placement is seed-randomized subject to the remaining-count constraint;
+ * it is not claimed uniform over all possible constrained sequences.
+ */
+export const generateAuditoryNbackFixedSequence = (
+  seed: string, totalTrials: number, nLevel: number, targetRatio: number, toneCount: number,
+): number[] => {
+  const opportunities = totalTrials - nLevel
+  let targets = Math.round(opportunities * targetRatio)
+  let nonTargets = opportunities - targets
+  if (nLevel < 1 || toneCount < 2 || targets < 6 || nonTargets < 1 || targets > 2 * (nonTargets + 1)) {
+    throw new RangeError('auditorynback fixed-count configuration cannot supply the required opportunities')
+  }
+  const random = mulberry32(xmur3(`${seed}:auditorynback-fixed-count-v1.1.0`)())
+  const sequence = Array.from({ length: nLevel }, () => pickTone(random, toneCount))
+  let run = 0
+  for (let index = nLevel; index < totalTrials; index += 1) {
+    const canTarget = targets > 0 && run < 2 && targets - 1 <= 1 - run + 2 * nonTargets
+    const canNonTarget = nonTargets > 0 && targets <= 2 * nonTargets
+    const target = canTarget && (!canNonTarget || random() < targets / (targets + nonTargets))
+    const previous = sequence[index - nLevel]
+    if (target) { sequence.push(previous); targets -= 1; run += 1 }
+    else {
+      let tone = pickTone(random, toneCount)
+      if (tone === previous) tone = (tone + 1 + Math.floor(random() * (toneCount - 1))) % toneCount
+      sequence.push(tone); nonTargets -= 1; run = 0
+    }
+  }
+  return sequence
+}

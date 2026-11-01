@@ -567,10 +567,10 @@
   {
     "group": "R2",
     "task": "auditorynback",
-    "engineVersion": "1.0.1",
-    "scoringVersion": "1.0.0",
-    "previousConfigVersion": "1.0.1",
-    "configVersion": "1.0.1-report3",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
     "reportVersion": "3.0.0",
     "profiles": {
       "experience": {
@@ -580,10 +580,10 @@
           3
         ],
         "configPatch": {
-          "totalTrials": 12
+          "totalTrials": 22
         },
         "reportCaveats": [
-          "体验版只有12个音；若匹配音不足6次，结果按受限记录阅读，不作稳定能力判断。"
+          "短版共22音，前2音只建立比较；20次比较固定6次匹配、14次非匹配。名义声音时长44秒，另加练习/反馈/保存。只描述本次记录，不代表稳定能力。"
         ]
       },
       "standard": {
@@ -596,7 +596,7 @@
           "totalTrials": 40
         },
         "reportCaveats": [
-          "结果反映本次听觉工作记忆更新表现，不是人口常模。"
+          "40音含前2音，固定11次匹配、27次非匹配。项目变式，无人口常模。"
         ]
       },
       "research": {
@@ -609,7 +609,7 @@
           "totalTrials": 60
         },
         "reportCaveats": [
-          "科研版增加试次；n水平、音集与节奏和标准档一致。重复次数不保证个体估计稳定，仍不是人口常模。"
+          "60音含前2音，固定17次匹配、41次非匹配。保留五音集与500+1500毫秒节奏；与Gao等2020的40+n音、12目标、100毫秒/2.5秒协议不同，属于项目研究变式，尚无本版本信效度实测。"
         ]
       }
     }
@@ -938,10 +938,10 @@
   {
     "group": "R2",
     "task": "sentencecheck",
-    "engineVersion": "1.0.1",
-    "scoringVersion": "1.0.0",
-    "previousConfigVersion": "1.0.1",
-    "configVersion": "1.0.1-report3",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
     "reportVersion": "3.0.0",
     "profiles": {
       "experience": {
@@ -954,7 +954,8 @@
           "totalTrials": 12
         },
         "reportCaveats": [
-          "体验版，结果仅供体验。"
+          "体验版，结果仅供体验。",
+          "本项目变式交叉安排真假与肯定/否定；不要与旧版条件混淆的记录直接比较。"
         ]
       },
       "standard": {
@@ -967,7 +968,8 @@
           "totalTrials": 30
         },
         "reportCaveats": [
-          "结果描述本次句图相符判断的表现，不是语言能力诊断或年龄常模。"
+          "结果描述本次句图相符判断的表现，不是语言能力诊断或年龄常模。",
+          "本项目变式交叉安排真假与肯定/否定；不要与旧版条件混淆的记录直接比较。"
         ]
       },
       "research": {
@@ -980,7 +982,8 @@
           "totalTrials": 60
         },
         "reportCaveats": [
-          "科研档仅增加试次，模板与难度和标准档一致；仍不是年龄常模。"
+          "科研档仅增加试次，模板与难度和标准档一致；仍不是年龄常模。",
+          "本项目变式交叉安排真假与肯定/否定；不要与旧版条件混淆的记录直接比较。"
         ]
       }
     }
@@ -1047,10 +1050,10 @@
   {
     "group": "R2",
     "task": "visualwm",
-    "engineVersion": "1.0.1",
+    "engineVersion": "1.1.0",
     "scoringVersion": "1.0.0",
-    "previousConfigVersion": "1.0.1",
-    "configVersion": "1.0.1-report3",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
     "reportVersion": "3.0.0",
     "profiles": {
       "experience": {

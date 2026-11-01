@@ -8,6 +8,12 @@
       "engineVersion": "1.0.1",
       "scoringVersion": "1.0.0",
       "order": 107
+    },
+    {
+      "testType": "sentencecheck",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "order": 1107
     }
   ],
   "backend": {
@@ -20,6 +26,12 @@
       "engineVersion": "1.0.1",
       "file": "server-version/frontend/src/modules/cognitive/tasks/sentencecheck/sentencecheck.registry.ts",
       "export": "sentencecheckRegistryEntry"
+    },
+    {
+      "testType": "sentencecheck",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/sentencecheck/sentencecheck.registry.ts",
+      "export": "sentencecheckRegistryEntryV11"
     }
   ],
   "catalog": {
@@ -31,7 +43,9 @@
     "export": "seeds",
     "orders": [
       107,
-      107
+      1107,
+      107,
+      1107
     ]
   },
   "presentation": {
@@ -45,7 +59,8 @@
   "acceptance": {
     "frontendSuites": [
       "src/modules/cognitive/tasks/sentencecheck/__tests__/SentencecheckTask.test.tsx",
-      "src/modules/cognitive/tasks/sentencecheck/__tests__/prng.test.ts"
+      "src/modules/cognitive/tasks/sentencecheck/__tests__/prng.test.ts",
+      "src/modules/cognitive/tasks/sentencecheck/__tests__/balanced-v1.1.test.ts"
     ]
   }
 }

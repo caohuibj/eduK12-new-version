@@ -1,6 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -143,6 +143,209 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "construct": "听觉信息的滑动窗口保持与更新（工作记忆更新）",
         "procedure": "纯音序列（toneFrequenciesHz）以 stimulusMs/isiMs 节奏播放；位置 i（i≥nLevel）按 targetRatio 决定是否与第 i−n 音相同；参与者在匹配音出现时按键（响应窗口覆盖音符与静默期）。音序列由服务端按 randomSeed 重建；d′ 采用 Hautus 校正。",
         "interpretation": "d′ 综合命中率与误报率，是主要指标；漏按率高提示注意脱离，误报率高提示反应标准偏松（criterion shift）；命中反应时可作为次要参考。",
+        "confounders": [
+          "音高辨别困难（听力或设备问题）会被误判为记忆失败；施测前需完成音量自检。",
+          "音频输出延迟影响 rt 对齐但不影响命中/误报判定。",
+          "本报告不提供经过验证的人口常模、诊断或学习障碍结论。"
+        ],
+        "metricNotes": {
+          "dPrime": {
+            "definition": "Hautus 校正 d′ = Φ⁻¹((hits+0.5)/(matchN+1)) − Φ⁻¹((FA+0.5)/(nonmatchN+1))。",
+            "readingHint": "0 附近为随机水平；分数锚点 d′ 0→0、4→100。"
+          },
+          "hitRate": {
+            "definition": "hits / matchCount。",
+            "readingHint": "与 falseAlarmRate 联合阅读。"
+          },
+          "falseAlarmRate": {
+            "definition": "falseAlarms / nonmatchCount。",
+            "readingHint": "偏高提示反应标准偏松。"
+          },
+          "medianHitRtMs": {
+            "definition": "命中试次（rtMs 非空）反应时中位数。",
+            "readingHint": "描述性指标，不进入主结论。"
+          },
+          "matchCount": {
+            "definition": "服务端序列中 seq[i]==seq[i−n] 的位置数（i≥n）。",
+            "readingHint": "由设计决定；低于 6 触发 insufficientTargets。"
+          },
+          "nonmatchCount": {
+            "definition": "服务端序列中非匹配位置数。",
+            "readingHint": "与 matchCount 对照阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "nLevel",
+            "label": "n 水平"
+          },
+          {
+            "key": "totalTrials",
+            "label": "计划试次数"
+          },
+          {
+            "key": "targetRatio",
+            "label": "目标比例"
+          },
+          {
+            "key": "stimulusMs",
+            "label": "音符时长（毫秒）"
+          },
+          {
+            "key": "isiMs",
+            "label": "静默间隔（毫秒）"
+          },
+          {
+            "key": "toneFrequenciesHz",
+            "label": "纯音频率集（Hz）"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "1.1.0",
+    "testType": "auditorynback",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "title": "在声音中跟住隔一个的音",
+    "metrics": {
+      "dPrime": {
+        "label": "d′",
+        "explanation": "d′：由命中率与误报率共同计算的区分指标，描述本次区分匹配与非匹配音的情况；不是容量、智力或能力等级。",
+        "singleExplanation": "d′：你分辨匹配音的敏锐程度。"
+      },
+      "hitRate": {
+        "label": "命中率",
+        "explanation": "命中率：出现匹配音时你按键的比例。"
+      },
+      "falseAlarmRate": {
+        "label": "误报率",
+        "explanation": "误报率：不是匹配音时你按了键的比例。"
+      },
+      "medianHitRtMs": {
+        "label": "命中中位反应时"
+      },
+      "matchCount": {
+        "label": "匹配试次数"
+      },
+      "nonmatchCount": {
+        "label": "非匹配试次数"
+      }
+    },
+    "experienceHeadline": "matchCount",
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {},
+    "practicalTips": [
+      "当前音与隔一个的音相同才按；不同不按也是正确反应。",
+      "固定次数保证有比较机会，不代表短版已经可靠；先读机会数与质量限制。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只描述本次听觉工作记忆更新表现，不是诊断或人口常模判断。",
+    "reportReading": {
+      "version": "1.1.0",
+      "title": "在声音中跟住隔一个的音",
+      "introduction": "像听旋律时发现同一个音再次出现，这里只比较隔一个的音。它记录这次音高匹配，不给记忆能力定级。",
+      "summary": {
+        "template": "这一次，本次匹配区分指标 d′ 为 {dPrime}。",
+        "metricKeys": [
+          "dPrime"
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次共有 {matchCount} 次匹配机会与 {nonmatchCount} 次非匹配机会；短版只描述这次尝试。",
+          "metricKeys": [
+            "matchCount",
+            "nonmatchCount"
+          ]
+        }
+      },
+      "studentMetricKeys": [
+        "matchCount",
+        "nonmatchCount",
+        "hitRate"
+      ],
+      "processMetricKeys": [
+        "matchCount",
+        "nonmatchCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientTargets",
+        "excessiveOmissions",
+        "floorPerformance",
+        "stimulusEchoMismatch"
+      ],
+      "metricGates": {},
+      "nextStep": "当前音与隔一个的音相同才按；不同不按也是正确反应。 固定次数保证有比较机会，不代表短版已经可靠；先读机会数与质量限制。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "hitRate",
+          "falseAlarmRate"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "signal",
+      "popular": {
+        "conceptTitle": "先弄懂，这个任务在看什么",
+        "concept": "像听旋律时发现同一个音再次出现，这里只比较隔一个的音。它记录这次音高匹配，不给记忆能力定级。",
+        "takeaway": "有足够的题目机会，才能开始看记录；次数够也不等于稳定能力。",
+        "exampleTitle": "走出任务：生活里的一个例子",
+        "example": "例如低音→高音→低音，第三个音与第一个相同，就按一次。声音不同则不按；漏按目标与正确不按非目标要分开看。",
+        "scene": "signal",
+        "frames": [
+          {
+            "title": "听新音",
+            "text": "每个音只响很短的时间。"
+          },
+          {
+            "title": "和往前第二个比",
+            "text": "一样就按键，不一样就等下一个。"
+          },
+          {
+            "title": "随时更新",
+            "text": "脑中的「便签」永远只留最近两个音。"
+          }
+        ],
+        "boundary": "这是理解概念的场景示例，不是职业资格、考试排名或同龄人比较。",
+        "metricHelp": {
+          "dPrime": {
+            "label": "分得有多准",
+            "explanation": "结合本次命中和误报情况的区分指标，不直接判断猜测或能力等级。"
+          },
+          "hitRate": {
+            "label": "抓住了多少",
+            "explanation": "出现匹配音时你按键的比例。"
+          },
+          "falseAlarmRate": {
+            "label": "非匹配音的按键比例",
+            "explanation": "不是匹配音时你按了键的比例。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "听觉信息的滑动窗口保持与更新（工作记忆更新）",
+        "procedure": "正式音数包含前n个起始音；其余位置固定round((总音数−n)×targetRatio)次匹配，按冻结seed受约束随机安放，最多连续两个目标。非目标强制不等于n-back音。服务端重建同序列，按命中/误报计算原Hautus修正d′；前n音不进两类分母。",
+        "interpretation": "目标数由可比较音数×targetRatio四舍五入得到，随机安放且最多连续两个。使用服务端同种子序列计分，d′与原版相同采用加0.5修正；少量目标的区分指标不等于个体稳定能力。当前仍无音频物理时序校准或本版本信效度。",
         "confounders": [
           "音高辨别困难（听力或设备问题）会被误判为记忆失败；施测前需完成音量自检。",
           "音频输出延迟影响 rt 对齐但不影响命中/误报判定。",
@@ -411,6 +614,209 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "experience": [
           "dPrime",
           "medianHitRtMs"
+        ]
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "auditorynback",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "title": "在声音中跟住隔一个的音",
+    "metrics": {
+      "dPrime": {
+        "label": "d′",
+        "explanation": "d′：由命中率与误报率共同计算的区分指标，描述本次区分匹配与非匹配音的情况；不是容量、智力或能力等级。",
+        "singleExplanation": "d′：你分辨匹配音的敏锐程度。"
+      },
+      "hitRate": {
+        "label": "命中率",
+        "explanation": "命中率：出现匹配音时你按键的比例。"
+      },
+      "falseAlarmRate": {
+        "label": "误报率",
+        "explanation": "误报率：不是匹配音时你按了键的比例。"
+      },
+      "medianHitRtMs": {
+        "label": "命中中位反应时"
+      },
+      "matchCount": {
+        "label": "匹配试次数"
+      },
+      "nonmatchCount": {
+        "label": "非匹配试次数"
+      }
+    },
+    "experienceHeadline": "matchCount",
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {},
+    "practicalTips": [
+      "当前音与隔一个的音相同才按；不同不按也是正确反应。",
+      "固定次数保证有比较机会，不代表短版已经可靠；先读机会数与质量限制。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "结果只描述本次听觉工作记忆更新表现，不是诊断或人口常模判断。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "在声音中跟住隔一个的音",
+      "introduction": "像听旋律时发现同一个音再次出现，这里只比较隔一个的音。它记录这次音高匹配，不给记忆能力定级。",
+      "summary": {
+        "template": "这一次，本次匹配区分指标 d′ 为 {dPrime}。",
+        "metricKeys": [
+          "dPrime"
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次共有 {matchCount} 次匹配机会与 {nonmatchCount} 次非匹配机会；短版只描述这次尝试。",
+          "metricKeys": [
+            "matchCount",
+            "nonmatchCount"
+          ]
+        }
+      },
+      "studentMetricKeys": [
+        "matchCount",
+        "nonmatchCount",
+        "hitRate"
+      ],
+      "processMetricKeys": [
+        "matchCount",
+        "nonmatchCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientTargets",
+        "excessiveOmissions",
+        "floorPerformance",
+        "stimulusEchoMismatch"
+      ],
+      "metricGates": {},
+      "nextStep": "当前音与隔一个的音相同才按；不同不按也是正确反应。 固定次数保证有比较机会，不代表短版已经可靠；先读机会数与质量限制。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "hitRate",
+          "falseAlarmRate"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "年龄常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "signal",
+      "popular": {
+        "conceptTitle": "先弄懂，这个任务在看什么",
+        "concept": "像听旋律时发现同一个音再次出现，这里只比较隔一个的音。它记录这次音高匹配，不给记忆能力定级。",
+        "takeaway": "有足够的题目机会，才能开始看记录；次数够也不等于稳定能力。",
+        "exampleTitle": "走出任务：生活里的一个例子",
+        "example": "例如低音→高音→低音，第三个音与第一个相同，就按一次。声音不同则不按；漏按目标与正确不按非目标要分开看。",
+        "scene": "signal",
+        "frames": [
+          {
+            "title": "听新音",
+            "text": "每个音只响很短的时间。"
+          },
+          {
+            "title": "和往前第二个比",
+            "text": "一样就按键，不一样就等下一个。"
+          },
+          {
+            "title": "随时更新",
+            "text": "脑中的「便签」永远只留最近两个音。"
+          }
+        ],
+        "boundary": "这是理解概念的场景示例，不是职业资格、考试排名或同龄人比较。",
+        "metricHelp": {
+          "dPrime": {
+            "label": "分得有多准",
+            "explanation": "结合本次命中和误报情况的区分指标，不直接判断猜测或能力等级。"
+          },
+          "hitRate": {
+            "label": "抓住了多少",
+            "explanation": "出现匹配音时你按键的比例。"
+          },
+          "falseAlarmRate": {
+            "label": "非匹配音的按键比例",
+            "explanation": "不是匹配音时你按了键的比例。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "听觉信息的滑动窗口保持与更新（工作记忆更新）",
+        "procedure": "正式音数包含前n个起始音；其余位置固定round((总音数−n)×targetRatio)次匹配，按冻结seed受约束随机安放，最多连续两个目标。非目标强制不等于n-back音。服务端重建同序列，按命中/误报计算原Hautus修正d′；前n音不进两类分母。",
+        "interpretation": "目标数由可比较音数×targetRatio四舍五入得到，随机安放且最多连续两个。使用服务端同种子序列计分，d′与原版相同采用加0.5修正；少量目标的区分指标不等于个体稳定能力。当前仍无音频物理时序校准或本版本信效度。",
+        "confounders": [
+          "音高辨别困难（听力或设备问题）会被误判为记忆失败；施测前需完成音量自检。",
+          "音频输出延迟影响 rt 对齐但不影响命中/误报判定。",
+          "本报告不提供经过验证的人口常模、诊断或学习障碍结论。"
+        ],
+        "metricNotes": {
+          "dPrime": {
+            "definition": "Hautus 校正 d′ = Φ⁻¹((hits+0.5)/(matchN+1)) − Φ⁻¹((FA+0.5)/(nonmatchN+1))。",
+            "readingHint": "0 附近为随机水平；分数锚点 d′ 0→0、4→100。"
+          },
+          "hitRate": {
+            "definition": "hits / matchCount。",
+            "readingHint": "与 falseAlarmRate 联合阅读。"
+          },
+          "falseAlarmRate": {
+            "definition": "falseAlarms / nonmatchCount。",
+            "readingHint": "偏高提示反应标准偏松。"
+          },
+          "medianHitRtMs": {
+            "definition": "命中试次（rtMs 非空）反应时中位数。",
+            "readingHint": "描述性指标，不进入主结论。"
+          },
+          "matchCount": {
+            "definition": "服务端序列中 seq[i]==seq[i−n] 的位置数（i≥n）。",
+            "readingHint": "由设计决定；低于 6 触发 insufficientTargets。"
+          },
+          "nonmatchCount": {
+            "definition": "服务端序列中非匹配位置数。",
+            "readingHint": "与 matchCount 对照阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "nLevel",
+            "label": "n 水平"
+          },
+          {
+            "key": "totalTrials",
+            "label": "计划试次数"
+          },
+          {
+            "key": "targetRatio",
+            "label": "目标比例"
+          },
+          {
+            "key": "stimulusMs",
+            "label": "音符时长（毫秒）"
+          },
+          {
+            "key": "isiMs",
+            "label": "静默间隔（毫秒）"
+          },
+          {
+            "key": "toneFrequenciesHz",
+            "label": "纯音频率集（Hz）"
+          }
         ]
       }
     }

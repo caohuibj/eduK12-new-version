@@ -4,14 +4,14 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { AuditorynbackConfig, AuditorynbackTrialPayload } from '../../types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { prepareAudioContext, playTone, type CognitiveAudio } from '../shared/audio'
-import { generateAuditoryNbackPracticeSequence, generateAuditoryNbackSequence, PRACTICE_SEQUENCE_LENGTH } from './generator'
+import { generateAuditoryNbackPracticeSequence, generateAuditoryNbackSequence, generateAuditoryNbackFixedSequence, PRACTICE_SEQUENCE_LENGTH } from './generator'
 
 const MAX_PRACTICE_ATTEMPTS = 3
 
 type Phase = 'instruction' | 'practice-instruction' | 'practice' | 'formal' | 'blocked'
 type SubPhase = 'sound' | 'isi' | 'feedback'
 
-export const AuditorynbackTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
+export const AuditorynbackTask: React.FC<CognitiveTaskProps & { fixedTargetCount?: boolean }> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete, fixedTargetCount = false }) => {
   const config = taskContext.config as unknown as AuditorynbackConfig
   const nLevel = config?.nLevel ?? 2
   const totalTrials = config?.totalTrials ?? 40
@@ -34,8 +34,8 @@ export const AuditorynbackTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   const submittingRef = useRef(false)
   const pendingPayloadRef = useRef<AuditorynbackTrialPayload | null>(null)
   const formalSequence = useMemo(
-    () => generateAuditoryNbackSequence(taskContext.randomSeed, totalTrials, nLevel, targetRatio, toneFrequenciesHz.length),
-    [taskContext.randomSeed, totalTrials, nLevel, targetRatio, toneFrequenciesHz.length],
+    () => (fixedTargetCount ? generateAuditoryNbackFixedSequence : generateAuditoryNbackSequence)(taskContext.randomSeed, totalTrials, nLevel, targetRatio, toneFrequenciesHz.length),
+    [taskContext.randomSeed, totalTrials, nLevel, targetRatio, toneFrequenciesHz.length, fixedTargetCount],
   )
   const practiceSequence = useMemo(
     () => generateAuditoryNbackPracticeSequence(taskContext.randomSeed, nLevel, toneFrequenciesHz.length),
@@ -168,7 +168,7 @@ export const AuditorynbackTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     } else setPhase('blocked')
   }, [practiceIndex, practiceCorrect, practiceAttempt])
 
-  if (phase === 'instruction' || phase === 'practice-instruction') return <CognitiveTaskIntro title="听觉 n-back 工作记忆" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>你会听到一串高低不同的音。规则：新音和「往前第 {nLevel} 个」相同时，立刻按空格键（或点击按钮）。请在安静环境、戴耳机或调好音量后进行。像在一串提示音中跟踪刚才出现过的音，这里观察本次音高匹配，不给记忆能力定级。</p>) : (<p>你会听到一串高低不同的音。规则：新音和「往前第 {nLevel} 个」相同时，立刻按空格键（或点击按钮）。请在安静环境、戴耳机或调好音量后进行。</p>)} hint={<><p>点「开始练习」后开始播放练习音。请先调好舒适音量；前 {nLevel} 个音只听不按。</p><p>例如二音比较时，低音→高音→低音，第三个音与第一个相同，此时按一次。不同则不按；声音后的空档仍可回答，下一声开始后不要补答。每题只记首按，按住不连答。练习共8个音，全部正确才继续；失败重呈完整说明，最多3轮。练习不计入成绩。</p></>} onAction={() => { if (phase === 'practice-instruction') setPhase('practice'); else void startPractice() }} />
+  if (phase === 'instruction' || phase === 'practice-instruction') return <CognitiveTaskIntro title="听觉 n-back 工作记忆" description={taskContext.engineVersion === '1.0.1' && (taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? ((<p>你会听到一串高低不同的音。规则：新音和「往前第 {nLevel} 个」相同时，立刻按空格键（或点击按钮）。请在安静环境、戴耳机或调好音量后进行。像在一串提示音中跟踪刚才出现过的音，这里观察本次音高匹配，不给记忆能力定级。</p>)) : (<p>你会听到一串高低不同的音。规则：新音和「往前第 {nLevel} 个」相同时，立刻按空格键（或点击按钮）。请在安静环境、戴耳机或调好音量后进行。{fixedTargetCount && <>本次有 {totalTrials} 个正式音，前 {nLevel} 音只听；其后逐音比较，相同才按，不同不按；每个音都要听清。短版只描述本次记录。</>}</p>)} hint={<><p>点「开始练习」后开始播放练习音。请先调好舒适音量；前 {nLevel} 个音只听不按。</p><p>例如二音比较时，低音→高音→低音，第三个音与第一个相同，此时按一次。不同则不按；声音后的空档仍可回答，下一声开始后不要补答。每题只记首按，按住不连答。练习共8个音，全部正确才继续；失败重呈完整说明，最多3轮。练习不计入成绩。</p></>} onAction={() => { if (phase === 'practice-instruction') setPhase('practice'); else void startPractice() }} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">{practiceCorrect.length > 0 ? '练习尚未通过，本次正式测评未开始。' : '当前设备无法播放音频，本次测评未开始。请检查设备音量与浏览器音频权限。'}</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
