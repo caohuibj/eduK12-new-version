@@ -54,9 +54,10 @@ test('empty filtered wrong-title and failed registration output cannot pass the 
  assert.throws(()=>verifyRegistrationReport({numFailedTests:1,testResults:[{assertionResults:[{title:registrationTitle,status:'passed'}]}]}));
 });
 test('workflow wires normal compile evidence and independent SAST into the stable gate',()=>{
- const ci=fs.readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8'),workflow=fs.readFileSync(new URL('../workflows/ci-cognitive-product.yml',import.meta.url),'utf8');
+ const ci=fs.readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8'),workflow=ci.slice(ci.indexOf('  cognitive-product:'),ci.indexOf('  content:',ci.indexOf('  cognitive-product:')));
  assert.match(ci,/cognitive_product_plan: \$\{\{ steps.scope.outputs.cognitive_product_plan \}\}/);
- assert.match(ci,/uses: \.\/\.github\/workflows\/ci-cognitive-product.yml/);
+ assert.doesNotMatch(workflow,/uses: \.\/\.github\/workflows\//);
+ assert.match(workflow,/COGNITIVE_PRODUCT_PLAN: \$\{\{ needs.scope.outputs.cognitive_product_plan \}\}/);
  assert.match(ci.slice(ci.indexOf('  merge-gate:')),/    - cognitive-product/);
  assert.match(workflow,/run: node \.github\/scripts\/cognitive-product-check.mjs/);
  assert.match(workflow,/prisma migrate deploy/);assert.match(workflow,/COGNITIVE_INSTALL_TEST_DATABASE_URL/);

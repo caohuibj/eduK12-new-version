@@ -32,7 +32,7 @@ export function cognitiveMixedProductScope(entries, readHeadFile, readBaseFile) 
 
 const controls=new Set(['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml',
  '.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml',
- '.github/scripts/cognitive-product-scope.mjs','.github/scripts/cognitive-product.test.mjs','.github/scripts/cognitive-product-check.mjs','.github/workflows/ci-cognitive-product.yml']);
+ '.github/scripts/cognitive-product-scope.mjs','.github/scripts/cognitive-product.test.mjs','.github/scripts/cognitive-product-check.mjs']);
 const front='server-version/frontend/src/', back='server-version/backend/src/';
 const carriers=new Set([back+'modules/admin-permissions/routes.ts',front+'App.tsx',...['SystemAdminShell.tsx','navigation.ts','systemWorkspace.ts'].map(f=>front+'admin/'+f)]);
 function unchangedOutsideIntake(file,before,after){
