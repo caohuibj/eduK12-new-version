@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import {canonicalHash} from '../assessment-runtime/canonical'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
@@ -10,7 +11,7 @@ import { readReportingArtifactRecord } from '../reporting/artifact'
 import { listAuthoritativeRunLeafSources } from '../reporting/resultSource'
 import { educationGroupSelector, educationGroupPresentation, listEducationGroupSelections, type EducationGroupSelection } from '../reporting/education-group-selection'
 import { generateOrganizationGroupAnalysis } from '../reporting/service'
-import { reportingAudienceForContext, reportingLeafDisclosureContract } from '../reporting/governedDisclosure'
+import { governedArtifactMetrics, narrowGovernedProjection, reportingAudienceForContext, reportingLeafDisclosureContract } from '../reporting/governedDisclosure'
 import { readOrganizationReportingArtifact } from '../reporting/pr4Service'
 import { reportingFail, type ReportingCohortSnapshotRecord, type ReportingLeafSourceV2 } from '../reporting/types'
 import { withCampusReportReleaseLock } from './report-release-lock'
@@ -19,6 +20,8 @@ import {readFrozenPrivacyForRun} from '../report-privacy/snapshot.service'
 import {ENHANCED} from '../report-privacy/registry'
 import {parseFrozenSchoolOptions} from './privacyV2'
 import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
+import type {TaskArtifactCursor,TaskArtifactPointer} from '../reporting/task-artifact'
+import {assertCampusMetricDifferencing} from './group-contributor-differencing'
 
 /** PR5 first tranche: INTERNAL school-only, whole frozen SELF/STUDENT Run.
  * This route never publishes peer/teacher ratings or longitudinal comparisons.
@@ -316,7 +319,7 @@ async function reviewedSpec(specId:string){
     return reportingFail('CAMPUS_GROUP_REVIEW_REQUIRED','not an approved campus GROUP analysis',409)
   }
   assertReviewedCampusGroupSpec(spec.definition)
-  return spec
+  return {...spec,definition:spec.definition}
 }
 
 export async function listCampusGroupReportSources(actor:AuthenticatedPrincipal,organizationId:string,page=1){
@@ -355,20 +358,33 @@ export async function listCampusGroupReportCatalog(actor:AuthenticatedPrincipal,
   })),artifacts,nextSourcePage:sources.nextPage,truncated:!!sources.truncated||specs.total>50}
 }
 
+async function campusGroupHistoryPage(input:{organizationId:string;runId:string;trackId:string;before?:TaskArtifactCursor}){
+  const rows=await prisma.$queryRaw<TaskArtifactPointer[]>(Prisma.sql`
+    SELECT a.id AS "artifactId",to_char(a.generated_at,'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "generatedAt"
+    FROM reporting_analysis_artifacts a
+    WHERE a.organization_id=${input.organizationId} AND a.analysis_kind='GROUP'
+      AND a.artifact_payload->'source'->>'runId'=${input.runId}
+      AND a.artifact_payload->'source'->>'trackId'=${input.trackId}
+      AND a.artifact_payload->>'schemaVersion'='2'
+      AND EXISTS(SELECT 1 FROM campus_activity_runs ar WHERE ar.organization_id=a.organization_id AND ar.run_id=${input.runId})
+      ${input.before?Prisma.sql`AND (a.generated_at,a.id)<(${input.before.generatedAt}::timestamp,${input.before.artifactId})`:Prisma.empty}
+    ORDER BY a.generated_at DESC,a.id DESC LIMIT 26`)
+  const artifacts=rows.slice(0,25)
+  return {artifacts,nextCursor:rows.length>25?artifacts[24]:null}
+}
+export async function listCampusGroupReportHistory(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string;before?:TaskArtifactCursor}){
+  await requireCampusGroupManager(input.actor,input.organizationId)
+  return campusGroupHistoryPage(input)
+}
 export async function listCampusGroupReportTools(input:{actor:AuthenticatedPrincipal;organizationId:string;runId:string;trackId:string}){
   const principal=await requireCampusGroupManager(input.actor,input.organizationId)
   await assertCampusWholeRunSource(input)
-  const [tools,groups,artifacts]=await Promise.all([
+  const [tools,groups,history]=await Promise.all([
     listAuthoritativeRunLeafSources({...input,groupAudience:principal.groupAudience}),listEducationGroupSelections({...input,product:'SCHOOL'}),
-    prisma.$queryRaw<Array<{artifactId:string;generatedAt:Date}>>`
-      SELECT id AS "artifactId",generated_at AS "generatedAt" FROM reporting_analysis_artifacts
-      WHERE organization_id=${input.organizationId} AND analysis_kind='GROUP'
-        AND artifact_payload->'source'->>'runId'=${input.runId} AND artifact_payload->'source'->>'trackId'=${input.trackId}
-        AND artifact_payload->>'schemaVersion'='2' ORDER BY generated_at DESC,id DESC LIMIT 100
-    `,
+    campusGroupHistoryPage(input),
   ])
   await requireCampusGroupManager(input.actor,input.organizationId)
-  return {tools,groups,artifacts}
+  return {tools,groups,...history}
 }
 
 export async function generateCampusGroupReport(input:{
@@ -391,6 +407,20 @@ export async function generateCampusGroupReport(input:{
       leaf:input.leaf,cohortSelector,
       presentation,
       beforeCompute:input.leaf?async cohort=>{await assertCampusLeafGroupDifferencing({organizationId:input.organizationId,cohort,leaf:input.leaf!,minimumN:spec.definition.analysisKind==='GROUP'?Math.max(spec.definition.minimumCohortN,spec.definition.minimumContributorN,...spec.definition.metricRules.map(rule=>rule.minimumMetricN)):CAMPUS_GROUP_MIN_N})}:undefined,
+      beforePersist:input.leaf?async({cohort,payload})=>{
+        const allowed=await governedArtifactMetrics({principal,artifact:{id:payload.artifactId,organizationId:input.organizationId,
+          specId:spec.id,analysisKind:'GROUP',policyDomain:'ORG_GROUP_REPORT_V1',cohortSnapshotId:cohort.id,
+          seriesId:null,sourceRunId:null,sourceTrackId:null,subjectActorSnapshotId:null,relationshipKind:null,perspective:null,
+          analysisIdentityHash:payload.analysisIdentityHash,snapshotHash:canonicalHash(payload),generatedByUserId:payload.generatedByUserId,
+          generatedAt:new Date(payload.generatedAt),artifactPayload:payload}})
+        const view=await projectCampusLeafGroupWithPolicy({artifactId:payload.artifactId,generatedAt:payload.generatedAt,
+          organizationId:input.organizationId,runId:input.runId,projection:narrowGovernedProjection(payload.projection,allowed),
+          metricMetadata:payload.schemaVersion===2?payload.metricMetadata:{}},input.leaf!)
+        const contract=await reportingLeafDisclosureContract(input.leaf!,{organizationId:input.organizationId,runId:input.runId,trackId:input.trackId})
+        await assertCampusMetricDifferencing({organizationId:input.organizationId,cohort,payload,metricRules:spec.definition.metricRules,
+          visibleMetricIds:view.projection.metrics.filter(metric=>metric.state==='present').map(metric=>metric.key),
+          minimumN:Math.max(CAMPUS_GROUP_MIN_N,contract.minimumRespondents??0,spec.definition.minimumCohortN,spec.definition.minimumContributorN)})
+      }:undefined,
     })
     const authorized=await readOrganizationReportingArtifact({
       principal,organizationId:input.organizationId,artifactId:result.artifactId,
@@ -448,7 +478,14 @@ export async function readCampusGroupReport(input:{
       organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId,
     })
     await requireCampusGroupManager(input.actor,input.organizationId)
-    if(leaf)return projectCampusLeafGroupWithPolicy({...report,organizationId:input.organizationId,runId:target[0].runId},leaf)
+    if(leaf&&artifact.analysisKind==='GROUP'){
+      const view=await projectCampusLeafGroupWithPolicy({...report,organizationId:input.organizationId,runId:target[0].runId},leaf)
+      const contract=await reportingLeafDisclosureContract(leaf,{organizationId:input.organizationId,runId:target[0].runId,trackId:target[0].trackId})
+      await assertCampusMetricDifferencing({organizationId:input.organizationId,cohort,payload:artifact.artifactPayload,metricRules:spec.definition.metricRules,
+        visibleMetricIds:view.projection.metrics.filter(metric=>metric.state==='present').map(metric=>metric.key),
+        minimumN:Math.max(CAMPUS_GROUP_MIN_N,contract.minimumRespondents??0,spec.definition.minimumCohortN,spec.definition.minimumContributorN)})
+      return view
+    }
     return projectCampusGroupReport(report)
   })
 }

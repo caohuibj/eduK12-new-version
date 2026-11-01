@@ -39,3 +39,16 @@ it('explicitly loads the selected tool, generates one new version and reopens th
   await waitFor(() => expect(screen.getByLabelText('群体报告版本')).toHaveValue('old'))
   expect(m.post).toHaveBeenCalledTimes(1)
 })
+it('continues a typed standalone cursor and appends sources without resetting the selection',async()=>{
+ const cursor='cognitive-assignment:10000000-0000-4000-8000-000000000001'
+ const original=m.get.getMockImplementation()!
+ m.get.mockImplementation(async(path:string)=>path===base?{code:0,data:{tasks:[{id:'task',name:'当前任务'}],taskId:'task',artifacts:[],nextTaskId:cursor}}
+  :path.startsWith(base+'?')?{code:0,data:{tasks:[{id:'task',name:'当前任务'},{id:'scale-course:older',name:'更早独立量表'}],artifacts:[],nextTaskId:null}}:original(path))
+ render(<TrainingGroupReports courseId="course"/>);fireEvent.click(screen.getByRole('button',{name:'打开群体报告'}))
+ fireEvent.click(await screen.findByRole('button',{name:'加载更早的任务'}))
+ await screen.findByRole('option',{name:'更早独立量表'})
+ expect(screen.getByLabelText('群体报告任务')).toHaveValue('task')
+ expect(screen.getAllByRole('option',{name:'当前任务'})).toHaveLength(1)
+ expect(m.get).toHaveBeenCalledWith(base+'?'+new URLSearchParams({beforeTaskId:cursor}))
+ expect(m.post).not.toHaveBeenCalled()
+})

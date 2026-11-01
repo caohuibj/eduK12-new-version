@@ -764,17 +764,31 @@ export function trainingGroupSnapshotHash(row: any) {
 
 /** Task history authorizes the actual fixed task, independently of this menu. */
 export async function listTrainingGroupTasksPage(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string,beforeTaskId?:string){
- await assertTrainingGroupAccess(tx,actor,courseId,beforeTaskId)
- const rows=await tx.compositeAssessment.findMany({where:{...authorizedTaskWhere(actor,courseId,true),publishedAt:{not:null}},
-  select:{id:true,name:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:101,
-  ...(beforeTaskId?{cursor:{id:beforeTaskId},skip:1}:{})})
- const [cognitive,scales]=beforeTaskId?[[],[]]:await Promise.all([
-    tx.cognitiveAssignment.findMany({where:{courseId,listedStandalone:true,status:{in:['PUBLISHED','ARCHIVED']},publishedAt:{not:null},resolvedConfigHash:{not:null},resolvedReportSnapshotEncrypted:{not:null},courseSnapshot:{path:['id'],equals:courseId},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})},select:{id:true,title:true,status:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:100}),
-    tx.$queryRaw<Array<{id:string;name:string}>>`SELECT DISTINCT s.id,s.name FROM assessments a JOIN assessment_episodes e ON e.id=a.episode_id JOIN scales s ON s.id=a.scale_id
-      WHERE ${standaloneScaleCourseWhere(courseId)} ORDER BY s.id LIMIT 100`,
- ])
- const tasks=[...rows.slice(0,100),...cognitive.map(row=>({id:trainingCognitiveGroupTaskKey(row.id),name:row.title+' · 独立认知'+(row.status==='ARCHIVED'?'（已归档，只读）':'')})),...scales.map(row=>({id:trainingScaleGroupTaskKey(row.id),name:row.name+' · 独立量表'}))]
- return {tasks,nextTaskId:rows.length>100?rows[99].id:null}
+ const cognitiveBefore=beforeTaskId?trainingCognitiveGroupAssignmentId(beforeTaskId):null
+ const scaleBefore=beforeTaskId?trainingScaleGroupId(beforeTaskId):null
+ // Existing task keys also identify the cursor's source family. Each family
+ // keeps its original stable order; a bounded lookahead spans family edges.
+ await assertTrainingGroupAccess(tx,actor,courseId,cognitiveBefore===null&&scaleBefore===null?beforeTaskId:undefined)
+ const tasks:Array<{id:string;name:string}>=[]
+ if(cognitiveBefore===null&&scaleBefore===null){
+  const rows=await tx.compositeAssessment.findMany({where:{...authorizedTaskWhere(actor,courseId,true),publishedAt:{not:null}},
+   select:{id:true,name:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:101,
+   ...(beforeTaskId?{cursor:{id:beforeTaskId},skip:1}:{})})
+  tasks.push(...rows)
+ }
+ if(scaleBefore===null&&tasks.length<=100){
+  const rows=await tx.cognitiveAssignment.findMany({where:{courseId,listedStandalone:true,status:{in:['PUBLISHED','ARCHIVED']},publishedAt:{not:null},resolvedConfigHash:{not:null},resolvedReportSnapshotEncrypted:{not:null},courseSnapshot:{path:['id'],equals:courseId},...(actor.role===UserRole.ADMIN?{}:{createdBy:actor.userId})},
+   select:{id:true,title:true,status:true},orderBy:[{publishedAt:'desc'},{id:'desc'}],take:101-tasks.length,
+   ...(cognitiveBefore!==null?{cursor:{id:cognitiveBefore},skip:1}:{})})
+  tasks.push(...rows.map(row=>({id:trainingCognitiveGroupTaskKey(row.id),name:row.title+' · 独立认知'+(row.status==='ARCHIVED'?'（已归档，只读）':'')})))
+ }
+ if(tasks.length<=100){
+  const rows=await tx.$queryRaw<Array<{id:string;name:string}>>(Prisma.sql`SELECT DISTINCT s.id,s.name FROM assessments a JOIN assessment_episodes e ON e.id=a.episode_id JOIN scales s ON s.id=a.scale_id
+   WHERE ${standaloneScaleCourseWhere(courseId)} ${scaleBefore!==null?Prisma.sql`AND s.id>${scaleBefore}`:Prisma.empty}
+   ORDER BY s.id LIMIT ${101-tasks.length}`)
+  tasks.push(...rows.map(row=>({id:trainingScaleGroupTaskKey(row.id),name:row.name+' · 独立量表'})))
+ }
+ return {tasks:tasks.slice(0,100),nextTaskId:tasks.length>100?tasks[99].id:null}
 }
 export async function listTrainingGroupTasks(tx:Prisma.TransactionClient,actor:TrainingAnalysisActor,courseId:string){return (await listTrainingGroupTasksPage(tx,actor,courseId)).tasks}
 /** Scope every wave by the original course/task authority, without a recent menu cutoff. */
