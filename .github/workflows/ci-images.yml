@@ -142,10 +142,9 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.monitoring.yml config > /tmp/eduk12-monitoring-compose-config.yml
       - name: build production images
         env:
-          COGNITIVE_PRODUCT: ${{ inputs.cognitive_product }}
           FRONTEND_ONLY: ${{ inputs.frontend_only }}
           BACKEND_ONLY: ${{ inputs.backend_only }}
-          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery }}
+          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery || inputs.cognitive_product }}
         run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
       - name: verify production Nginx static asset MIME and security headers
         if: inputs.backend_only != true

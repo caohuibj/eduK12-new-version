@@ -27,7 +27,6 @@ export function buildSources(env = {}) {
     if (name === 'ALPINE_MIRROR')
       assert.ok(/^https:\/\/[a-z0-9.-]+(?::\d+)?(?:\/[a-z0-9._~-]+)*\/?$/i.test(sources[name]), 'ALPINE_MIRROR must be a repository prefix');
   }
-  assert.ok([undefined, 'true', 'false'].includes(env.COGNITIVE_PRODUCT), 'Invalid Cognitive image mode');
   return sources;
 }
 function sourceArguments(name, sources) {
@@ -47,7 +46,7 @@ function validateTargets(plan, frontendOnly, backendOnly, env = {}) {
     assert.equal(typeof target.context, 'string');
     assert.equal(typeof target.dockerfile, 'string');
     const ordinary = path.resolve(target.context, 'Dockerfile');
-    const recipe = (env.CATALOG_DISCOVERY === 'true' || env.COGNITIVE_PRODUCT === 'true') && name !== 'frontend' ? env.CATALOG_BACKEND_DOCKERFILE : ordinary;
+    const recipe = env.CATALOG_DISCOVERY === 'true' && name !== 'frontend' ? env.CATALOG_BACKEND_DOCKERFILE : ordinary;
     assert.ok(recipe && path.isAbsolute(recipe), 'Missing catalog compilation recipe');
     assert.equal(path.resolve(target.context, target.dockerfile), recipe, 'Unexpected Dockerfile');
     if (recipe !== ordinary) assert.equal(fs.readFileSync(recipe, 'utf8'), catalogCompileRecipe(fs.readFileSync(ordinary, 'utf8')), 'Only unchanged-content onboarding may be omitted');
@@ -61,7 +60,7 @@ export function runtimeRefreshPlan(input, frontendOnly, backendOnly = false, env
   const plan = structuredClone(input);
   const sources = buildSources(env);
   for (const name of validateTargets(plan, frontendOnly, backendOnly)) {
-    if ((env.CATALOG_DISCOVERY === 'true' || env.COGNITIVE_PRODUCT === 'true') && name !== 'frontend') {
+    if (env.CATALOG_DISCOVERY === 'true' && name !== 'frontend') {
       assert.ok(env.CATALOG_BACKEND_DOCKERFILE && path.isAbsolute(env.CATALOG_BACKEND_DOCKERFILE));
       plan.target[name].dockerfile = env.CATALOG_BACKEND_DOCKERFILE;
     }

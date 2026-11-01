@@ -23,7 +23,7 @@ trap cleanup EXIT
 # Keep the resolved-plan guard fail-closed: no image/registry pushes or extra outputs.
 docker compose --env-file /dev/null build --print "${images[@]}" > "$ci_task_bake_dir/compose.json"
 docker buildx bake --file "$ci_task_bake_dir/compose.json" --print "${images[@]}" > "$ci_task_bake_dir/plan.json"
-if [ "${CATALOG_DISCOVERY:-false}" = true ] || [ "${COGNITIVE_PRODUCT:-false}" = true ]; then
+if [ "${CATALOG_DISCOVERY:-false}" = true ]; then
   ci_task_catalog_recipe="$(mktemp "$ci_task_repo/server-version/backend/.catalog-ci.Dockerfile.XXXXXX")"
   export CATALOG_BACKEND_DOCKERFILE="$ci_task_catalog_recipe"
   node --input-type=module <<'JS'
