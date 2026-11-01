@@ -121,18 +121,36 @@ C/P/R 必须精确匹配，改阈值 P 要配匹配的报告 R；旧授权、问
 `runtime-role-defaults.sql` 和 `runtime-table-policy.json`，沿已有 psql/凭据入口执行；
 它不是 migration 重试器。SQL 使用 psql 变量，不能改成 `prisma db execute`。
 
+full 还须明确沿用原 Compose 的数据兼容步骤，不能用 runtime-role-contract 代替 token/旧附件检查。
+`--data-action` 只选择已有步骤，不创建新验证体系：
+
+- `preflight`（默认）：不跑回填，仅运行现有 `release-preflight` 一次。
+- `reuse`：已有适用的完成记录、对应数据/输入未变时复用，不再运行回填/preflight；
+  schema/角色仍由原 post-migrate 检查。不能仅凭应用“正在运行”选择此项。
+- `backfill`：确有遗留明文 token 或未完成约束验证时，先运行原 `checkin-token-backfill`
+  （覆盖四类 public token），然后运行原 `release-preflight`。缺失保护字段不是凭空生成新 token 的理由。
+
+适用性可先复用既有 preflight 回执；四表的八个 CHECK 约束定义正确且全部 `convalidated=true`，
+可证明 token 明文为空且保护字段齐全，不必再读 token 值或重复回填。旧附件/磁盘遗留文件须有其自己的
+既有记录，不能由 token 或 runtime-role 结果推断。未能证明对应数据不变时，只运行原必要 preflight，
+不是重跑业务测试。`OPS` 要提供或继承选中的原 ops 服务及相同镜像/凭据；release-preflight 保留
+现有 `UPLOAD_DIR` 与上传卷只读挂载，不能拿没有该挂载的 migrate 容器假装检查旧附件。
+
 ```bash
 ROLE_SYNC=/path/to/prepared-private-role-sync.sh
 bash "$U" full --entry "$ENTRY" --live-profile "$LIVE" \
   --next-profile "$NEXT" --rollback-profile "$ROLLBACK" \
   --ops-overlay "$OPS" --role-sync "$ROLE_SYNC" \
+  --data-action preflight \
   -- frontend backend worker
 # 换成现场完整业务 writer/consumer 服务列表，保留实际副本。
 ```
 
 唯一窗口顺序：停选中业务/worker并有界排空 → 原 migration preflight →
-`prisma migrate deploy` **一次** → 现有角色协调 → runtime-role post-migrate →
-原子激活预备 profile → 启动选中服务。DB、Redis、COS和无关宿主服务不停止、不清理。
+`prisma migrate deploy` **一次** → 现有角色协调 →
+按上述选择复用记录或执行原数据兼容/角色检查 → 原子激活预备 profile → 启动选中服务。
+运行 release-preflight 时由它一并验证 runtime/schema，不额外重复 post-migrate。
+DB、Redis、COS和无关宿主服务不停止、不清理。
 迁移或角色协调失败时脚本立即停止，留在停写状态；先看实际失败和迁移账本，不盲重跑。
 部署窗口仅保留必要迁移/权限结果、readiness 和一条关键入口；全角色、全量报告、压测和恢复演练后移。
 本次资源/耗时预算在私有交接维护，不把生产元数据写进公共 runbook。

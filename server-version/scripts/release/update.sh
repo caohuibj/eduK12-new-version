@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Small dispatcher over the operator's existing Compose entry. Default: plan only.
 set -euo pipefail
-apply=false; entry=; live=; next=; rollback=; ops=; roles=; grace=60
+apply=false; entry=; live=; next=; rollback=; ops=; roles=; grace=60; data_action=preflight
 usage() {
   cat <<'EOF'
 update.sh [--apply] frontend|service|content|full --entry COMPOSE_ENTRY
   [--live-profile JSON --next-profile JSON --rollback-profile UNUSED_PATH]
   [--ops-overlay FILE] [--role-sync EXECUTABLE] [--stop-timeout SECONDS]
+  [--data-action reuse|preflight|backfill] # full only; default: preflight
   -- [application service names | existing npm script and its arguments]
 Default is a non-mutating command plan. Images must already be qualified/preloaded.
 frontend: frontend only; service: explicit application services, no migration.
@@ -20,11 +21,11 @@ while (($#)); do
   case "$1" in
     frontend|service|content|full) [[ -z "$mode" ]] || die 'One mode required'; mode=$1; shift ;;
     --apply) apply=true; shift ;;
-    --entry|--live-profile|--next-profile|--rollback-profile|--ops-overlay|--role-sync|--stop-timeout)
+    --entry|--live-profile|--next-profile|--rollback-profile|--ops-overlay|--role-sync|--stop-timeout|--data-action)
       (($# >= 2)) || die "Missing value for $1"
       case "$1" in
         --entry) entry=$2;; --live-profile) live=$2;; --next-profile) next=$2;;
-        --rollback-profile) rollback=$2;; --ops-overlay) ops=$2;; --role-sync) roles=$2;; --stop-timeout) grace=$2;;
+        --rollback-profile) rollback=$2;; --ops-overlay) ops=$2;; --role-sync) roles=$2;; --stop-timeout) grace=$2;; --data-action) data_action=$2;;
       esac; shift 2 ;;
     --) shift; break;;
     -h|--help) usage; exit 0;;
@@ -33,6 +34,7 @@ while (($#)); do
 done
 [[ -n "$mode" && -n "$entry" && "$entry" = /* ]] || { usage >&2; exit 2; }
 [[ "$grace" =~ ^[1-9][0-9]*$ ]] || die 'Positive stop timeout required'
+case "$data_action" in reuse|preflight|backfill) ;; *) die 'Invalid full data action';; esac
 run() { printf '+ '; printf '%q ' "$@"; printf '\n'; if "$apply"; then "$@"; fi; }
 if [[ "$mode" = content ]]; then
   [[ -n "$ops" && $# -gt 0 ]] || die 'Content requires --ops-overlay and an existing npm script after --'
@@ -86,7 +88,16 @@ if [[ "$mode" = full ]]; then
   run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/pr24-migration-preflight.mjs
   run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate ./node_modules/.bin/prisma migrate deploy
   run "$roles"
-  run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/runtime-role-contract.mjs post-migrate
+  if [[ "$data_action" = backfill ]]; then
+    run "$entry" -f "$ops" --profile ops run --rm --no-deps checkin-token-backfill
+  fi
+  if [[ "$data_action" = reuse ]]; then
+    printf '%s\n' 'Reuse applicable recorded token/asset data evidence; do not rerun conversion.'
+    run "$entry" -f "$ops" --profile ops run --rm --no-deps migrate node scripts/runtime-role-contract.mjs post-migrate
+  else
+    # Existing preflight also verifies runtime role/schema; do not repeat it above.
+    run "$entry" -f "$ops" --profile ops run --rm --no-deps release-preflight
+  fi
 fi
 printf '+ preserve live profile at %q; atomically activate %q\n' "$rollback" "$next"
 if "$apply"; then
