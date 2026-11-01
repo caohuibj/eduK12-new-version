@@ -111,7 +111,7 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   }
   const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
   assert.match(block('frontend'),/affected_only:.*frontend_affected/);
-  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src\]'/);
+  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src, .github\/scripts\/content-scope.mjs/);
   assert.match(frontend,/\['related','--run',\.\.\.files\]/);
   assert.doesNotMatch(frontend,/npm test -- --changed/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
@@ -794,6 +794,9 @@ test('report empty-state display uses affected frontend while requests, handlers
  const entries=[file,file.replace('.tsx','.test.tsx'),css,'docs/development/cua-report-theme.md'].map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
  const readers={readBaseFile:()=>old,readHeadFile:()=>next};
  assert.equal(classifyChanges(entries,false,readers).frontend_affected,true);
+ const controls=['.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/homepage-copy-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci-frontend.yml','.github/workflows/ci.yml'].map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+ const combined=classifyChanges([...entries,...controls],false,readers);assert.equal(combined.frontend,true);assert.equal(combined.frontend_affected,true);
+ assert.equal(classifyChanges([...entries,{file:'.github/workflows/ci-backend.yml',status:'M',oldMode:'100644',newMode:'100644'}],false,readers).frontend_affected,false);
  for(const text of [next.replace("'/courses/report'","'/admin/report'"),next.replace('api.post(base)','api.get(base)'),next.replace('useState(null)','useState({admin:true})'),next+";fetch('/api')",next.replace("'../api/client'","'../api/admin'")])
   assert.equal(classifyChanges(entries,false,{...readers,readHeadFile:()=>text}).frontend_affected,false,text);
  assert.equal(classifyChanges([...entries,{file:'server-version/frontend/package.json',status:'M',oldMode:'100644',newMode:'100644'}],false,readers).frontend_affected,false);

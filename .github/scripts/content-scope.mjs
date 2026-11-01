@@ -214,8 +214,11 @@ export function frontendAffected(files,{readBaseFile,readHeadFile}={}) {
   // rendering only. Imports, request paths, handlers and all non-JSX code stay
   // unchanged; this is not an exemption for the Training directory.
   const component=frontendSrc+'training/TrainingGroupReports.tsx';
+  const controls=new Set(['.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',
+    '.github/scripts/homepage-copy-scope.mjs','.github/scripts/merge-gate.mjs',
+    '.github/workflows/ci-frontend.yml','.github/workflows/ci.yml']);
   const reportDisplay=files.includes(component)&&typeof readBaseFile==='function'&&typeof readHeadFile==='function'
-    &&files.every(file=>engineeringEvidenceFile(file)||file===component||file===component.replace('.tsx','.test.tsx')
+    &&files.every(file=>engineeringEvidenceFile(file)||controls.has(file)||file===component||file===component.replace('.tsx','.test.tsx')
       ||frontendFile(file)&&/\.(?:css|scss)$/.test(file))
     &&publicRenderBoundary(readBaseFile(component),readHeadFile(component),{sameNonRendering:true});
   return (localPages||reportDisplay)
@@ -365,6 +368,7 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
     return modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && modes.includes(oldMode)));
   });
+  const affectedFrontend=!forceFull&&regularChanges&&frontendAffected(entries.map(entry=>entry.file),readers);
   return {
     ...result,
     maintenance: !forceFull && result.maintenance && maintenanceChanges,
@@ -374,8 +378,8 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
     cognitive_intake_plan: cognitiveIntake?.selected ? cognitiveIntake : null,
     scale_intake_light: !forceFull && result.content && regularChanges && Boolean(selectScaleIntake(entries)),
     presentation: !forceFull && result.presentation && regularChanges,
-    frontend: !forceFull && result.frontend && regularChanges,
-    frontend_affected: !forceFull && result.frontend && regularChanges && frontendAffected(entries.map(entry=>entry.file),readers),
+    frontend: !forceFull && (result.frontend||affectedFrontend) && regularChanges,
+    frontend_affected: affectedFrontend,
     backend_modules: !forceFull && regularChanges && backendModuleFilesOnly(entries.map(entry=>entry.file)),
     frontend_test: !forceFull && frontendTestOnly(entries.map(entry => entry.file)) && regularChanges,
   };
