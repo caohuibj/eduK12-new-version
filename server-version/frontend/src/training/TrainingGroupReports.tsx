@@ -43,7 +43,8 @@ export function TrainingGroupReports({courseId}: {courseId: string}) {
       if (result.artifacts[0]) {const pointer = result.artifacts[0]; const report = await request<TaskGroupArtifact>(`${base}/${pointer.taskId}/${pointer.artifactId}`); if (current()) setArtifact(report)}
     })}>打开群体报告</button>
     {busy && <p role="status">正在读取或生成报告…</p>}{error && <p role="alert">{error}</p>}
-    {index && <><label>任务<select aria-label="群体报告任务" value={taskId} disabled={busy} onChange={event => {const selected=event.target.value;setTaskId(selected);setTools([]);setSelectedTool('');setArtifact(null);setIndex(previous=>previous?{...previous,artifacts:[],nextCursor:null}:previous);void run(async current=>{
+    {index && index.tasks.length === 0 && <p role="status">本课程暂无可统计的测评任务，请在“测评”中查看任务发布情况。</p>}
+    {index && index.tasks.length > 0 && <><label>任务<select aria-label="群体报告任务" value={taskId} disabled={busy} onChange={event => {const selected=event.target.value;setTaskId(selected);setTools([]);setSelectedTool('');setArtifact(null);setIndex(previous=>previous?{...previous,artifacts:[],nextCursor:null}:previous);void run(async current=>{
         const page=await request<{artifacts:Omit<Pointer,'taskId'>[];nextCursor:GroupHistoryCursor|null}>(base+'/history/'+encodeURIComponent(selected))
         if(current())setIndex(previous=>previous?{...previous,nextCursor:page.nextCursor,artifacts:page.artifacts.map(pointer=>({...pointer,taskId:selected}))}:previous)
       })}}>
