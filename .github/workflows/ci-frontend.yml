@@ -92,7 +92,7 @@ jobs:
       - name: integrated application types without duplicate cognitive subset
         if: inputs.survey_selection || inputs.affected_only
         run: |
-          npm run pretypecheck
+          if [ "${{ inputs.bundle_family }}" != "true" ]; then npm run pretypecheck; fi
           npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
         if: inputs.survey_selection != true && inputs.affected_only != true

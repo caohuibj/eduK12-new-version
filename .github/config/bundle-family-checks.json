@@ -118,7 +118,8 @@
     "server-version/frontend/src/pages/bundle/bundle-child-evidence-display.ts",
     "server-version/frontend/src/pages/bundle/bundle-evidence-display.ts",
     "server-version/frontend/src/pages/relational/ChildCognitiveControlPage.tsx",
-    "server-version/frontend/src/pages/relational/RelationalTasksPage.tsx"
+    "server-version/frontend/src/pages/relational/RelationalTasksPage.tsx",
+    "server-version/docs/frontend-convergence/routes.md"
   ],
   "tests": [
     "server-version/backend/src/__tests__/assessment-bundle/child-chexi-draft.test.ts",
