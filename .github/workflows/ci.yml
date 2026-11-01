@@ -372,6 +372,7 @@ jobs:
       image_build: ${{ steps.scope.outputs.image_build }}
       dependencies_frontend_only: ${{ steps.scope.outputs.dependencies_frontend_only }}
       frontend_affected: ${{ steps.scope.outputs.frontend_affected }}
+      backend_focus: ${{ steps.scope.outputs.backend_focus }}
       documentation: ${{ steps.scope.outputs.documentation }}
       codeql: ${{ steps.scope.outputs.codeql }}
       heavy_runner: ${{ steps.scope.outputs.heavy_runner }}
@@ -689,6 +690,9 @@ jobs:
           path: ${{ runner.temp }}/pr356/source/
           if-no-files-found: warn
           retention-days: 7
+      - name: bounded backend API route and actual job selection contracts
+        if: steps.scope.outputs.backend_focus == 'form-intake'
+        run: node --test .github/scripts/backend-api-scope.test.mjs
       - name: Survey Mac exact scope, refusal and aggregate contracts
         if: steps.scope.outputs.application_route == 'survey-mac-ui' && github.event_name == 'pull_request'
         run: |
@@ -1161,12 +1165,13 @@ jobs:
       runner_labels: '["ubuntu-24.04"]'
       run_performance_tests: ${{ needs.scope.outputs.run_performance_tests != 'false' }}
       admin_permissions_functional: ${{ needs.scope.outputs.admin_permissions_functional_only == 'true' }}
+      focus: ${{ needs.scope.outputs.backend_focus || 'full' }}
       training_followup_functional: ${{ needs.scope.outputs.training_functional_only == 'true' && fromJSON(needs.scope.outputs.training_functional_plan).mode == 'training-followup-functional-only' }}
 
   backend-regression:
     needs: scope
     name: backend regression (isolated job database)
-    if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
+    if: ${{ needs.scope.outputs.backend_focus != 'form-intake' && needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -1222,7 +1227,8 @@ jobs:
       cognitive_product_plan: ${{ needs.scope.outputs.cognitive_product_plan || '' }}
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' || needs.scope.outputs.dependencies_frontend_only == 'true' }}
       backend_only: ${{ needs.scope.outputs.scenario == 'backend' }}
-      catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
+      # Reuse the existing compile/runtime scan recipe for unchanged content.
+      catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' || needs.scope.outputs.backend_focus == 'form-intake' }}
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
 
   codeql:
@@ -1252,11 +1258,13 @@ jobs:
           COGNITIVE_PRODUCT: ${{ needs.scope.outputs.application_route == 'cognitive-product' }}
           CATALOG_DISCOVERY: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
           BACKEND_MODULES: ${{ needs.scope.outputs.scenario == 'backend' }}
+          BACKEND_API_FOCUS: ${{ needs.scope.outputs.backend_focus }}
           PUBLIC_PRESENTATION: ${{ needs.scope.outputs.application_route == 'homepage-copy' }}
           RELEASE_TOOLING: ${{ needs.scope.outputs.scenario == 'release-tooling' }}
         shell: node {0}
         run: |
           const config=process.env.COGNITIVE_PRODUCT==='true'?{paths:['server-version/backend/src','server-version/frontend/src','.github/scripts','server-version/scripts/cognitive']}:process.env.CATALOG_DISCOVERY==='true'?{paths:['server-version/backend/src','server-version/frontend/src','.github/scripts']}:process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src']}:{paths:['server-version/frontend/src']};
+          if(process.env.BACKEND_MODULES==='true'&&process.env.BACKEND_API_FOCUS==='form-intake')config.paths.push('.github/scripts/backend-api-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs');
           require('node:fs').appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\n`);
       - name: bound selected cognitive analysis to task inputs and checker controls
         id: cognitive-codeql-config
