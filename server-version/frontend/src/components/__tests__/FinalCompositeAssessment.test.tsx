@@ -156,6 +156,14 @@ const sharedProps = {
 }
 
 describe('ordinary questionnaire block instructions',()=>{
+ it('keeps scale support outside collapsed campus instructions with an unanswered optional supplement',async()=>{
+  const instruction='独立支持说明始终可见，不按总分判断个人风险。'
+  const scale={...scaleItem.scale!,instruction,definition:{...scaleItem.scale!.definition!,items:[{...scaleItem.scale!.definition!.items[0],required:false}]}}
+  render(<FinalCompositeAssessment state={makeState({...scaleItem,scale})} campusMode instructionsSummary="作答说明" submitFormSection={vi.fn()} submitScale={vi.fn()} {...sharedProps}/>)
+  const notice=await screen.findByRole('region',{name:'本量表作答说明'})
+  expect(notice).toHaveTextContent(instruction);expect(notice.closest('details')).toBeNull()
+  expect(screen.getByText('综合量表第一题')).toBeInTheDocument()
+ })
  it('shows the current frozen transition alongside native tool text without inserting a unit',async()=>{
   const state=makeState({...scaleItem,questionnaireInstruction:'本段固定衔接说明',scale:{...scaleItem.scale!,instruction:'原量表作答说明'}})
   const view=render(<FinalCompositeAssessment state={state} campusMode submitFormSection={vi.fn()} submitScale={vi.fn()} {...sharedProps}/>)
