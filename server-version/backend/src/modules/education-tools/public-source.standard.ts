@@ -9,6 +9,7 @@ import {assertExactStandardCombinationFacts,type ExactStandardCombination} from 
 import {prepareRelease} from '../measurement-content/release'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
+import {databaseContentSource,matchesStandardNativeScale} from '../scale/component-import/native-source'
 import {privateToolFail} from './private-tool.contracts'
 import {educationStandardSourceSchema,type PrivateCompositionDefinition} from './private-tool.composition-contracts'
 import {supportsExpertSource,isNativeExpertObserver} from './expert-observation.contract'
@@ -22,7 +23,7 @@ export async function readEducationStandardSources(tx:Prisma.TransactionClient,s
  const rows=await tx.$queryRaw<ExactStandardCombination[]>(Prisma.sql`SELECT * FROM survey_standard_releases
   WHERE id IN (${Prisma.join(ids)}) AND state='ONLINE' ORDER BY id FOR SHARE`)
  const measurements=await getContentReleaseBatch(tx,rows.flatMap(row=>row.measurement_release?[row.measurement_release.releaseId]:[]),true)
- const scales=await tx.scale.findMany({where:{code:{in:[...new Set(rows.map(row=>row.snapshot.toolKey))]}}})
+ const scales=await tx.scale.findMany({where:{OR:[{code:{in:[...new Set(rows.filter(r=>!databaseContentSource(r.snapshot.parts.CONTENT)).map(row=>row.snapshot.toolKey))]}},{id:{in:rows.flatMap(r=>{const p=databaseContentSource(r.snapshot.parts.CONTENT);return p?[p.scaleId]:[]})}}]}})
  const result=new Map<string,EducationStandardLeaf>()
  for(const source of sources){
   const row=rows.find(row=>row.id===source.versionId&&row.combination_hash===source.contentHash)
@@ -32,7 +33,7 @@ export async function readEducationStandardSources(tx:Prisma.TransactionClient,s
   assertExactStandardCombinationFacts(row,measurement)
   frozenTripletInstruction(row.snapshot)
   if(!measurement||measurement.layer!=='MEASUREMENT')privateToolFail('PUBLIC_STANDARD_MEASUREMENT_INVALID')
-  const scale=scales.find(scale=>scale.code===row.snapshot.toolKey&&scale.instrumentVersion===row.snapshot.instrumentVersion)
+  const scale=scales.find(scale=>matchesStandardNativeScale(scale,row.snapshot))
   if(!scale||scale.status!=='PUBLISHED'||scale.instrumentClass!=='STANDARD'||scale.libraryEntryId)privateToolFail('PUBLIC_STANDARD_NATIVE_UNAVAILABLE')
   // Installed C and selected P/R are distinct identities. The existing native
   // freezer receives the approved definition, rather than installed/default P/R.
@@ -64,24 +65,25 @@ export type EducationStandardLeaf={row:ExactStandardCombination;measurement:Extr
  * reread installed C or a full M body, rebuild P/R, or accept a caller receipt. */
 export async function readEducationStandardStartSources(tx:Prisma.TransactionClient,units:TrainingContentSnapshot['units'],scales:readonly Scale[]){
  const ids=[...new Set(units.map(unit=>unit.source.educationStandard?.releaseId).filter((id):id is string=>!!id))]
- const result=new Map<string,Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null}>()
+ const result=new Map<string,Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null;importedScaleId?:string}>()
  if(!ids.length)return result
  type Row={id:string;hash:string;toolKey:string;instrumentVersion:string;definition:import('../scale/scale-definition').ScaleDefinitionV2;
-  references:import('../survey/standard-triplet.model').Triplet['references'];instruction:unknown;measurement:{releaseId:string;contentHash:string}}
+  references:import('../survey/standard-triplet.model').Triplet['references'];instruction:unknown;nativeScaleId:string|null;measurement:{releaseId:string;contentHash:string}}
  const rows=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT id,combination_hash AS hash,snapshot->>'toolKey' AS "toolKey",snapshot->>'instrumentVersion' AS "instrumentVersion",
   snapshot->'definition' AS definition,snapshot->'references' AS references,snapshot#>'{parts,CONTENT,reference,metadata,instruction}' AS instruction,
+  snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,scaleId}' AS "nativeScaleId",
   measurement_release AS measurement FROM survey_standard_releases WHERE id IN (${Prisma.join(ids)}) AND state='ONLINE' ORDER BY id`)
  for(const unit of units){
   const source=unit.source.educationStandard;if(!source)continue
   const row=rows.find(row=>row.id===source.releaseId),scale=scales.find(scale=>scale.id===unit.source.id)
   if(!row||row.hash!==source.combinationHash||row.toolKey!==source.toolKey||row.instrumentVersion!==source.instrumentVersion
    ||!row.measurement||row.measurement.releaseId!==unit.measurement.releaseId||row.measurement.contentHash!==unit.measurement.contentHash
-   ||!scale||scale.code!==source.toolKey||scale.instrumentVersion!==source.instrumentVersion||scale.creatorId!==unit.source.ownerId
+   ||!scale||(row.nativeScaleId?scale.id!==row.nativeScaleId||scale.standardSourceKind!=='DB_IMPORTED'||scale.standardToolKey!==source.toolKey:scale.code!==source.toolKey||scale.standardSourceKind==='DB_IMPORTED')||scale.instrumentVersion!==source.instrumentVersion||scale.creatorId!==unit.source.ownerId
    ||scale.instrumentClass!=='STANDARD'||scale.libraryEntryId)privateToolFail('PUBLIC_STANDARD_FROZEN_SOURCE_INVALID')
   if(result.has(row.id))continue
   const instructionValue=row.instruction as {text?:unknown;language?:unknown;version?:unknown}|null
   const instruction=instructionValue===null?null:frozenScaleInstructionSchema.parse({text:instructionValue.text,language:instructionValue.language,version:instructionValue.version,origin:'INSTRUMENT_SOURCE'})
-  result.set(row.id,{toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,definition:row.definition,references:row.references,instruction})
+  result.set(row.id,{toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,definition:row.definition,references:row.references,instruction,...(row.nativeScaleId?{importedScaleId:row.nativeScaleId}:{})})
  }
  return result
 }

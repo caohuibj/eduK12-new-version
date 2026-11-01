@@ -1,3 +1,4 @@
+import {databaseContentSource,matchesStandardNativeScale} from '../scale/component-import/native-source'
 import {Prisma} from '@prisma/client'
 import {randomUUID} from 'node:crypto'
 import {z} from 'zod'
@@ -68,8 +69,9 @@ export async function grantEducationStandardConfigurationUse(actorId:string,scop
   await tx.$queryRaw(Prisma.sql`SELECT id FROM organizations WHERE id=${scope.organizationId} FOR SHARE`)
   const recipient=await resolveEducationToolAuthoringContext({principal:{userId:input.userId,accountDomain:'SCHOOL'},entry:scope.product,organizationId:scope.organizationId},tx)
   if(!recipient)deny(scope.product==='SCHOOL'?'接收者需要本校当前心理教师资格':'接收者需要本校当前 Teacher 产品管理员资格')
-  const scale=await tx.scale.findUnique({where:{code:header.tool_key}})
-  if(!scale||scale.status!=='PUBLISHED'||scale.instrumentClass!=='STANDARD'||scale.libraryEntryId||scale.instrumentVersion!==header.instrument_version)
+  const imported=databaseContentSource(source.row.snapshot.parts.CONTENT)
+  const scale=await tx.scale.findUnique({where:imported?{id:imported.scaleId}:{code:header.tool_key}})
+  if(!scale||scale.status!=='PUBLISHED'||scale.instrumentClass!=='STANDARD'||scale.libraryEntryId||scale.instrumentVersion!==header.instrument_version||!matchesStandardNativeScale(scale,source.row.snapshot))
    conflict('精确原生量表尚未装载或发布')
   const installed=prepareRelease(scaleMeasurementRelease({localId:scale.code,version:source.measurement.version,instrumentVersion:scale.instrumentVersion,
    definition:frozenDatabaseScaleDefinition(scale),instrumentClass:'STANDARD',scope:source.measurement.scope}))

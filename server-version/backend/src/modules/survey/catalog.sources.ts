@@ -1,6 +1,6 @@
 import {isSurveyCognitiveProfileRef,readSurveyCognitiveProfileSource,SURVEY_PROFILE_ADAPTER} from './cognitive-profile.source'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
-import {catalogDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
+import {catalogDiscoveryRecords,importedStandardDiscoveryRecord,type ImportedStandardDiscoveryHeader,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
 import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
@@ -364,10 +364,25 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
     offset=Math.max(0,offset-governed.length)
   }
   if(kind==='SCALE'){
-    const online=input.includeGoverned===false?[]:await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string};classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,combination_hash,snapshot,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_standard_releases t ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`t.tool_key`,version:Prisma.sql`t.snapshot->>'instrumentVersion'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE state='ONLINE' AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.tool_key`,Prisma.sql`t.snapshot->>'title'`,Prisma.sql`t.combination_hash`],filters)} ORDER BY tool_key,created_at,id`)
+    const candidates=input.includeGoverned===false?[]:await db.$queryRaw<Array<ImportedStandardDiscoveryHeader&{id:string;combination_hash:string;snapshot:{title:string;toolKey:string};sourceKind:string|null}>>(Prisma.sql`
+      SELECT id,combination_hash,jsonb_build_object('title',snapshot->>'title','toolKey',tool_key) AS snapshot,
+       tool_key AS key,snapshot->>'instrumentVersion' AS version,snapshot->>'title' AS title,
+       snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,kind}' AS "sourceKind",
+       snapshot#>'{parts,CONTENT,reference,metadata,catalog}' AS catalog,
+       COALESCE(snapshot#>>'{definition,versionAxes,locale}',snapshot#>>'{parts,CONTENT,reference,metadata,instruction,language}') AS language
+      FROM survey_standard_releases WHERE state='ONLINE'
+       AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern})
+      ORDER BY tool_key,created_at,id`)
+    // The existing ONLINE index is already read before cross-source pagination.
+    // Project its own frozen metadata and filter here, never load an unrelated C.
+    const online=candidates.map(row=>{
+      const record=row.sourceKind==='DB_IMPORTED'?importedStandardDiscoveryRecord(row):records.find(record=>record.kind==='SCALE'&&record.key===row.key&&record.version===row.version)
+      if(row.sourceKind==='DB_IMPORTED'&&record)records.push(record)
+      return {...row,classification_tags:record?.tags??[],discoveryTerms:record?.terms??''}
+    }).filter(row=>matchesCatalogDiscovery([row.title,row.key,row.combination_hash,row.discoveryTerms],row.classification_tags,filters))
     for(const row of online)sourceTags.set('survey-standard:'+row.id,row.classification_tags??[])
     for(const r of online.slice(offset,offset+take))refs.push({ref:{kind:'SCALE',sourceId:'survey-standard:'+r.id,sourceVersion:r.combination_hash},title:r.snapshot.title})
-    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',...scaleDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
+    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',standardSourceKind:'CODE_PACKAGE',...scaleDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
     for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='SCALE'&&record.key===row.code&&record.version===row.instrumentVersion)?.tags??[])
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))

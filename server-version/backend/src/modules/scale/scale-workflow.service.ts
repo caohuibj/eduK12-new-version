@@ -46,10 +46,17 @@ type ScaleRecordForDefinition = {
   definition?: unknown
   definitionHash?: string | null
   instrumentClass?: 'STANDARD' | 'CUSTOM_DESCRIPTIVE' | null
+  standardSourceKind?: string
 }
 
 export const scaleDefinitionFromRecord = (scale: ScaleRecordForDefinition): ScaleDefinitionV2 => {
   if (scale.instrumentClass === 'STANDARD') {
+    if(scale.standardSourceKind==='DB_IMPORTED'){
+      const checked=validateScaleDefinition(scale.definition,{instrumentClass:'STANDARD'})
+      if(!checked.definition||checked.issues.some(i=>i.severity==='error')||!scale.definitionHash||hashScaleDefinition(checked.definition)!==scale.definitionHash)
+        throw new ScaleDefinitionUnavailableError('数据库标准量表冻结定义摘要不匹配')
+      return checked.definition
+    }
     const scalePackage = scale.code && scale.instrumentVersion
       ? getScalePackage(scale.code, scale.instrumentVersion)
       : undefined
@@ -74,11 +81,11 @@ export const scaleDefinitionFromRecord = (scale: ScaleRecordForDefinition): Scal
 const databaseDefinitions = new BoundedArtifactCache<ScaleDefinitionV2>(64, 4 * 1024 * 1024)
 export const frozenDatabaseScaleDefinition = (scale: ScaleRecordForDefinition): ScaleDefinitionV2 => {
   if (!sharedControlWritesEnabled()) return scaleDefinitionFromRecord(scale)
-  const actual = scale.instrumentClass === 'STANDARD' && scale.code && scale.instrumentVersion
+  const actual = scale.instrumentClass === 'STANDARD' && scale.standardSourceKind!=='DB_IMPORTED' && scale.code && scale.instrumentVersion
     ? getScalePackage(scale.code, scale.instrumentVersion)?.definition : scale.definition
   if (actual === undefined || 'toJSON' in Object.prototype || 'toJSON' in Array.prototype) return scaleDefinitionFromRecord(scale)
   const serialized = JSON.stringify({ code: scale.code ?? null, instrumentVersion: scale.instrumentVersion ?? null,
-    instrumentClass: scale.instrumentClass ?? null, declaredDefinitionHash: scale.definitionHash ?? null, definition: actual })
+    instrumentClass: scale.instrumentClass ?? null, standardSourceKind:scale.standardSourceKind??'CODE_PACKAGE', declaredDefinitionHash: scale.definitionHash ?? null, definition: actual })
   const bytes = Buffer.from(serialized)
   if (bytes.length > 2 * 1024 * 1024) return scaleDefinitionFromRecord(scale)
   const key = artifactContentKey(bytes), known = databaseDefinitions.get(key)

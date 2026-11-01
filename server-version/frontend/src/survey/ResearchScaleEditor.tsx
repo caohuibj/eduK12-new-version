@@ -98,7 +98,7 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
             const purpose=e.target.value as NonNullable<typeof q.purpose>
             onChange({...value,items:value.items.map((x,k)=>k===i?{...x,purpose,attentionTarget:undefined,...(purpose!=='CONTENT'?{reverse:false,dimensionKeys:[]}: {})}:x),
               totalScore:value.totalScore&&purpose!=='CONTENT'?{...value.totalScore,itemKeys:value.totalScore.itemKeys.filter(key=>key!==q.itemKey)}:value.totalScore})
-          }}><option value="CONTENT">内容题（计分）</option><option value="ATTENTION_CHECK">注意力题（仅采集）</option><option value="SOCIAL_DESIRABILITY">社会赞许题／测谎题（仅采集）</option></select>
+          }}><option value="CONTENT">内容题（计分）</option><option value="UNSCORED">不计分附加题</option><option value="ATTENTION_CHECK">注意力题（仅采集）</option><option value="SOCIAL_DESIRABILITY">社会赞许题／测谎题（仅采集）</option></select>
         </label>
         {q.purpose==='ATTENTION_CHECK'&&<label className="block text-sm">作者设定的目标选项
           <select className="input block w-full" aria-label={'目标选项 '+(i+1)} value={q.attentionTarget??''} onChange={e=>setItem(i,x=>({...x,attentionTarget:e.target.value||undefined}))}>
@@ -106,7 +106,7 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
           </select></label>}
         {q.purpose&&q.purpose!=='CONTENT'&&<p className="text-xs text-slate-600">沿用共享 Likert 选项；不计入维度或总分，不反向计分。仅导出作答供研究者分析，不在系统内判定通过、失败或说谎。</p>}</>;return <article className={studio?'survey-scale-item-card':'border bg-slate-50 rounded-lg p-3 space-y-3 scroll-mt-4'}
           id={'survey-scale-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
-        <div className={studio?'survey-scale-item-heading':'flex gap-2 items-center'}><strong className="text-sm">{studio?'第 '+(i+1)+' 题':'题 '+(i+1)}</strong>{studio&&<span>{q.required?'必答':'选答'} · {q.purpose==='ATTENTION_CHECK'?'注意力题':q.purpose==='SOCIAL_DESIRABILITY'?'社会赞许性题':'内容题'}</span>}<div className={studio?'survey-scale-item-actions':'contents'}>
+        <div className={studio?'survey-scale-item-heading':'flex gap-2 items-center'}><strong className="text-sm">{studio?'第 '+(i+1)+' 题':'题 '+(i+1)}</strong>{studio&&<span>{q.required?'必答':'选答'} · {q.purpose==='ATTENTION_CHECK'?'注意力题':q.purpose==='SOCIAL_DESIRABILITY'?'社会赞许性题':q.purpose==='UNSCORED'?'不计分附加题':'内容题'}</span>}<div className={studio?'survey-scale-item-actions':'contents'}>
           <button type="button" className="btn-secondary" aria-label={'上移第 '+(i+1)+' 题'} disabled={i===0}
             onClick={()=>{const items=value.items.slice();[items[i],items[i-1]]=[items[i-1],items[i]];onChange({...value,items})}}>{studio?<ArrowUp size={16}/>: '↑'}</button>
           <button type="button" className="btn-secondary" aria-label={'下移第 '+(i+1)+' 题'} disabled={i===value.items.length-1}
