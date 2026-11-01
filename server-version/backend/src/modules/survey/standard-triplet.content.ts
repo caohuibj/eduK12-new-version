@@ -8,6 +8,7 @@ import type {FrozenSurveyContentSelection} from './content-selection'
 import type {Triplet} from './standard-triplet.model'
 import type {ResearchFrozenUnit} from './publication.service'
 import {standardReleaseRow} from './standard-triplet.service'
+import {selectedStandardReport} from '../measurement-content/standard-combination'
 /** Private exact copies are mechanically derived from the approved triplet, never a new grant. */
 export async function copyTripletContent(tx:Prisma.TransactionClient,triplet:Triplet,measurement:Extract<StoredRelease,{layer:'MEASUREMENT'}>,actorId:string):Promise<FrozenSurveyContentSelection>{
  const pointer={releaseId:measurement.releaseId,contentHash:measurement.contentHash}
@@ -21,7 +22,7 @@ export async function copyTripletContent(tx:Prisma.TransactionClient,triplet:Tri
   for(const entry of entries)if(policy.type==='declared'&&policy.selections.some(s=>s.referenceVersion===set.referenceVersion&&s.scoreKey===entry.scoreKey&&s.referenceKind===entry.referenceKind))binding.referencePolicy.choices.push({releaseId:release.releaseId,contentHash:release.contentHash,entryKey:referenceEntryKey(entry),priority:0,metricKey:entry.scoreKey,referenceKind:entry.referenceKind})
  }
  if(!triplet.template)return binding
- const report=await publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'standard-report:'+measurement.releaseId,version:canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash}),scope:measurement.scope,sourceReleaseId:null,assetRefs:[],provenance,
+ const report=await publishContentRelease(tx,{layer:'REPORT',family:'SCALE',key:'standard-report:'+measurement.releaseId,version:canonicalHash({parameters:triplet.parts.PARAMETERS.hash,report:triplet.parts.REPORT.hash}),scope:measurement.scope,sourceReleaseId:null,assetRefs:selectedStandardReport(triplet.parts.REPORT.payload).assetRefs,provenance,
   content:{projectionVersion:1,measurements:[pointer],metricKeys:triplet.definition.scoring.scores.map(s=>s.key),audience:'researcher',language:triplet.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:triplet.template}},actorId)
  binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
  return binding

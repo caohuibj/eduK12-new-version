@@ -11,6 +11,7 @@ import {assertTrainingStandardUse,standardCombinationPointerSchema,trainingStand
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {frozenTripletInstruction} from '../survey/standard-triplet.model'
+import {databaseContentSource,matchesStandardNativeScale} from '../scale/component-import/native-source'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {assertCurrentTrainingContentOwner} from './training-report-selection'
 import {resolveScaleStartDeployment} from '../scale/deployment/service'
@@ -44,19 +45,20 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
  if(composite.productKind!=='QUESTIONNAIRE'||!['COURSE','GENERAL'].includes(composite.questionnaireType)
   ||composite.questionnaireType==='GENERAL'&&(composite.courseId!=null||(composite.questionnaireCourses??[]).length>0)
   ||purpose==='NEW_REFERENCE'&&!['DRAFT','PUBLISHED'].includes(composite.status))fail('COMPOSITE_UNAVAILABLE')
- const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
-  SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,measurement_release FROM survey_standard_releases WHERE id=${pointer.releaseId}`)
+ const [header]=await tx.$queryRaw<Array<{tool_key:string;instrument_version:string;native_scale_id:string|null;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
+  SELECT tool_key,snapshot->>'instrumentVersion' AS instrument_version,snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,scaleId}' AS native_scale_id,measurement_release FROM survey_standard_releases WHERE id=${pointer.releaseId}`)
  if(!header?.measurement_release)fail('MEASUREMENT_REQUIRED')
  await lockInstrumentSourceIdentity(tx,{instrumentKey:header.tool_key,instrumentVersion:header.instrument_version},'READ')
  const expiry=await assertCurrentTrainingContentOwner(tx,{userId:actorId},composite)
  await tx.$queryRaw(Prisma.sql`SELECT id FROM scales WHERE id=${item.scaleId} FOR SHARE`)
  const scale=await tx.scale.findUnique({where:{id:item.scaleId}})
  if(!scale||purpose==='NEW_REFERENCE'&&(scale.instrumentClass!=='STANDARD'||scale.libraryEntryId||scale.status!=='PUBLISHED'))fail('SCALE_SOURCE_REQUIRED')
- if(purpose==='NEW_REFERENCE'&&(scale.code!==header.tool_key||scale.instrumentVersion!==header.instrument_version))fail('SCALE_SOURCE_CHANGED')
+ if(purpose==='NEW_REFERENCE'&&(scale.instrumentVersion!==header.instrument_version||(header.native_scale_id?scale.id!==header.native_scale_id||scale.standardSourceKind!=='DB_IMPORTED'||scale.standardToolKey!==header.tool_key:scale.code!==header.tool_key||scale.standardSourceKind==='DB_IMPORTED')))fail('SCALE_SOURCE_CHANGED')
  const authority=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:header.measurement_release.releaseId,
   useGrantId:useGrantId??expected?.authorizationId,useGrantVersion:useGrantVersion??expected?.authorizationRevision})
  if(purpose==='NEW_REFERENCE')await tx.$queryRaw(Prisma.sql`SELECT id FROM scale_deployment_policies WHERE scale_id=${scale.id} AND status='ACTIVE' FOR SHARE`)
  const resolved=await readCurrentStandardCombination(tx,pointer,purpose),t=resolved.row.snapshot
+ if(purpose==='NEW_REFERENCE'&&!matchesStandardNativeScale(scale,t))fail('SCALE_SOURCE_CHANGED')
  const selected=await readTrainingStandardUseConfigurationReceipt(tx,resolved,actorId,authority),selectedBinding=selected?.selectedBinding
  if(expected&&(!selectedBinding||canonicalHash(selectedConfigurationPointer(selectedBinding))!==canonicalHash(expected)))fail('SELECTED_BINDING_MISMATCH')
  await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+pointer.releaseId,fingerprint:pointer.combinationHash},'TRAINING')
@@ -155,13 +157,13 @@ export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionCl
 export async function freezeExactStandardScaleRuntime(tx:Prisma.TransactionClient,t:import('../survey/standard-triplet.model').Triplet){
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
- return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t)})
+ return freezeExactStandardScaleDefinition(tx,{...t,instruction:frozenTripletInstruction(t),importedScaleId:databaseContentSource(t.parts.CONTENT)?.scaleId})
 }
 
 /** Pure native seam for an independently authorized immutable source. Instruction
  * provenance is validated by that source's seal, not reconstructed on resume. */
-export async function freezeExactStandardScaleDefinition(tx:Prisma.TransactionClient,t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null}){
- const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction})
+export async function freezeExactStandardScaleDefinition(tx:Prisma.TransactionClient,t:Pick<import('../survey/standard-triplet.model').Triplet,'toolKey'|'instrumentVersion'|'definition'|'references'>&{instruction:import('../assessment-runtime/frozen-scale-instruction').FrozenScaleInstruction|null;importedScaleId?:string}){
+ const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',instruction:t.instruction,importedScaleId:t.importedScaleId})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }

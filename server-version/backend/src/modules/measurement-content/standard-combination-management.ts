@@ -5,6 +5,7 @@ import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/servic
 import {libraryActor,assertExactTrainingDistributionDelegation} from '../scale-library-governance/authority'
 import {trainingStandardIssueReceiptSchema,trainingReplacementIntent} from './standard-combination-use'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {standardNativeScaleJoin} from '../scale/component-import/native-source'
 import {readSelectedConfigurationBinding} from '../assessment-authorization/selected-configuration'
 import {selectedConfigurationPointer} from '../assessment-authorization/standard-configuration-binding'
 
@@ -36,7 +37,7 @@ export async function trainingStandardManagementCatalog(actorId:string,rawPage:u
       FROM survey_standard_releases r
       JOIN survey_tool_policies p ON p.resource_key='standard-release:'||r.id
         AND p.fingerprint=r.combination_hash AND p.product='TRAINING'
-      LEFT JOIN scales native ON native.code=r.tool_key AND native.instrument_version=r.snapshot->>'instrumentVersion'
+      LEFT JOIN scales native ON ${standardNativeScaleJoin('native')}
         AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
       WHERE p.decision='APPROVED' OR EXISTS(SELECT 1 FROM material_grants g
         WHERE g.resource_type='STANDARD_COMBINATION' AND g.resource_id=r.id)

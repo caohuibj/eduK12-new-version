@@ -1,5 +1,5 @@
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {prepareRelease} from './release'
+import {prepareRelease,assetReference} from './release'
 import type {StoredRelease} from './repository'
 import {scaleMeasurementRelease} from './scale'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
@@ -17,6 +17,13 @@ export type StandardCombinationSnapshot={
 export type StandardCombinationRecord={
   id:string;tool_key:string;combination_hash:string;state:string;approved_by:string;snapshot:StandardCombinationSnapshot
   measurement_release:{releaseId:string;contentHash:string}|null
+}
+export function selectedStandardReport(payload:unknown){
+ if(payload&&typeof payload==='object'&&'definition'in payload&&'template'in payload){
+  const p=payload as {definition:ScaleDefinitionV2['report'];template:unknown;assetRefs?:unknown}
+  return {definition:p.definition,template:reportTemplateSchema.parse(p.template),assetRefs:z.array(assetReference).parse(p.assetRefs??[])}
+ }
+ return {definition:payload as ScaleDefinitionV2['report']|null,template:null,assetRefs:[]}
 }
 
 /** One mechanical R adapter for both entries. Titles/text come from the stored

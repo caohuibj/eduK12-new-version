@@ -1,3 +1,4 @@
+import {standardNativeScaleJoin} from '../scale/component-import/native-source'
 import {requiredScaleContextKeys} from '../scale/policy/context-preflight'
 import {Prisma} from '@prisma/client'
 import type {EducationPublicSource} from './public-source.identity'
@@ -8,7 +9,7 @@ export type EducationPublicSourceHeader={
  versions:{content:string;parameters:string|null;report:string|null;profiles?:Array<'experience'|'standard'|'research'>;profile?:'experience'|'standard'|'research';measurementHash?:string};applicability:unknown;educationApplicability?:unknown;expertApplicability?:unknown;nativeRespondentType?:string|null;referenceContextKeys:string[];nativeAvailable:boolean
 }
 export const educationStandardHeaderColumns=Prisma.sql`'education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash AS key,'STANDARD_SCALE' AS kind,s.id,s.combination_hash AS hash,s.snapshot->>'title' AS title,
- s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}' AS language,s.snapshot#>'{parts,CONTENT,reference,metadata,applicability}' AS applicability,
+ COALESCE(s.snapshot#>>'{parts,CONTENT,reference,metadata,executable,contentLocale}',s.snapshot#>>'{definition,versionAxes,locale}',s.snapshot#>>'{parts,CONTENT,reference,metadata,instruction,language}') AS language,s.snapshot#>'{parts,CONTENT,reference,metadata,applicability}' AS applicability,
  s.snapshot#>'{parts,CONTENT,reference,metadata,educationExpertApplicability}' AS "expertApplicability",
  s.snapshot#>'{parts,CONTENT,reference,metadata,educationApplicability}' AS "educationApplicability",
  s.snapshot#>>'{definition,respondentType}' AS "nativeRespondentType",
@@ -65,7 +66,7 @@ export async function readEducationPublicSourceHeaders(tx:Prisma.TransactionClie
  if(standard.length)rows.push(...await tx.$queryRaw<EducationPublicSourceHeader[]>(Prisma.sql`
   SELECT ${educationStandardHeaderColumns}
   FROM survey_standard_releases s JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
-  LEFT JOIN scales native ON native.code=s.snapshot->>'toolKey' AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+  LEFT JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
   WHERE (s.id,s.combination_hash) IN (${Prisma.join(standard.map(s=>Prisma.sql`(${s.id},${s.hash})`))})
    AND s.state='ONLINE' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    AND m.content_hash=s.measurement_release->>'contentHash' ORDER BY s.id ${lock?Prisma.sql`FOR SHARE OF s,m`:Prisma.empty}`))
