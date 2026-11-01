@@ -14,6 +14,7 @@ export async function changeOwnPassword(userId: string | undefined, oldPassword:
   if (typeof newPassword !== 'string' || !isValidPassword(newPassword)) {
     throw new PasswordChangeError('密码必须包含字母和数字，长度为8-128个字符')
   }
+  if (oldPassword === newPassword) throw new PasswordChangeError('新密码不能与旧密码相同')
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) throw new PasswordChangeError('请先登录', true)
   if (!(await comparePassword(oldPassword, user.passwordHash))) throw new PasswordChangeError('旧密码错误')
