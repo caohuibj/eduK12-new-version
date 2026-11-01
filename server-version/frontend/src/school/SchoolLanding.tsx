@@ -37,7 +37,7 @@ export function SchoolPublicHeader({ onHome, onLogin, onRegister, onExplore, hom
     <button className="hs-home-link" type="button" onClick={() => act(onHome)} aria-label="School 首页"><SchoolMark /></button>
     <nav className={`hs-public-nav${open ? ' hs-public-nav-open' : ''}`} id="hs-public-navigation" aria-label="校园导航">
       <button type="button" onClick={() => act(onHome)} aria-current={home ? 'page' : undefined}>首页</button>
-      <a href="#hs-features" onClick={event => { event.preventDefault(); act(() => onExplore('hs-features')) }}>产品功能</a>
+      <a href={home ? '#hs-features' : '/#hs-features'} onClick={event => { event.preventDefault(); act(() => onExplore('hs-features')) }}>产品功能</a>
     </nav>
     <div className="hs-navigation-toggle">
       <button type="button" className="hs-menu-toggle" ref={menuButton} aria-expanded={open} aria-controls="hs-public-navigation"

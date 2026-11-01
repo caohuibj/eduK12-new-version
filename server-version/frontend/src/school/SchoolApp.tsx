@@ -18,6 +18,7 @@ import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspa
 import {SchoolReportHeader} from './SchoolReportPresentation'
 import {canManageSchoolActivities,canReadSchoolClasses,schoolNavigation,workspaceHref,workspacePage,workspacePath} from './school-navigation'
 import {schoolFeatures} from './school-features'
+import {SchoolFeaturePage} from './SchoolFeaturePage'
 import {SchoolLanding,SchoolPublicHeader,SchoolCodeRegistration,type SchoolRegistrationEntry} from './SchoolLanding'
 
 
@@ -123,6 +124,11 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
   </label>
 )
 export default function SchoolApp(){
+  const feature=schoolFeatures.find(item=>item.path===window.location.pathname)
+  return feature?<SchoolFeaturePage feature={feature}/>:<SchoolApplication/>
+}
+
+function SchoolApplication(){
   const [page,setPage]=useState(()=>workspacePage(window.location.pathname))
   const [activityId,setActivityId]=useState(()=>new URLSearchParams(window.location.search).get('activityId')??undefined)
   const [user,setUser]=useState<CampusUser|null>(null)
@@ -132,8 +138,7 @@ export default function SchoolApp(){
     ['/register','/staff/register','/parent/register'].includes(window.location.pathname)?'code':
       window.location.pathname==='/login'?'login':
       window.location.pathname==='/recover'?'recover':
-      schoolFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'home')
-  const activeFeature=schoolFeatures.find(feature=>feature.path===window.location.pathname)
+      'home')
   const [focusPublic,setFocusPublic]=useState(false)
   const [staffRole,setStaffRole]=useState<'TEACHER'|'COUNSELOR'|'ADMIN'>('TEACHER')
   const [landingSection,setLandingSection]=useState<string|null>(null)
@@ -216,7 +221,7 @@ export default function SchoolApp(){
     setPage(id);setActivityId(id==='tasks'?nextActivityId:undefined);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
   }
 
-  useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | School`:'School';return()=>{document.title=previous}},[screen,activeFeature])
+  useEffect(()=>{const previous=document.title;document.title='School';return()=>{document.title=previous}},[screen])
   useEffect(()=>{
     if(!user||user.mustChangePassword){setCampusParentReportEnabled(false);return}
     let live=true
@@ -475,9 +480,6 @@ export default function SchoolApp(){
       {loading&&!publicHome?<p>正在核对校园会话…</p>:null}
       {publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
       {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
-      {!loading&&!user&&screen==='feature'&&activeFeature&&<section className="hs-feature-blank" aria-label={`${activeFeature.title}介绍页面`}>
-        <h1 className="hs-visually-hidden">{activeFeature.title}</h1>
-      </section>}
       {!loading&&!user&&screen==='recruit'&&<section className="hs-recruit-blank" aria-label="学校招募页面"><h1 className="hs-visually-hidden">学校招募</h1></section>}
       {!loading&&!user&&['register','staff','parent'].includes(screen)&&<button className="hs-auth-back" type="button" onClick={()=>goPublic('code')}>← 更换注册码</button>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">

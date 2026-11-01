@@ -1,3 +1,4 @@
+import {copyTools} from '../../../.github/scripts/homepage-copy-scope.mjs';
 import {cognitiveIntakeToolingInputs} from '../../../.github/scripts/cognitive-intake-scope.mjs';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -84,7 +85,7 @@ export function classify(changes,read){
 export function engineeringEvidenceFile(file) {
  return typeof file==='string' && !/[\\\x00-\x1f\x7f]/.test(file)
   && file.split('/').every(p=>p&&p!=='.'&&p!=='..')
-  && /^docs\/(?:development|performance|evidence)\/[a-zA-Z0-9_./-]+\.(?:md|json|json\.gz|txt|log|exit)$/.test(file);
+  && (/^docs\/cua-[a-zA-Z0-9_-]+\.md$/.test(file) || /^docs\/(?:development|performance|evidence)\/[a-zA-Z0-9_./-]+\.(?:md|json|json\.gz|txt|log|exit)$/.test(file));
 }
 export const backendTestFile=file=>typeof file==='string'&&/^server-version\/backend\/src\/__tests__\/[a-zA-Z0-9_/-]+(?:\.[a-zA-Z0-9_-]+)*\.test\.ts$/.test(file)&&file.split('/').every(p=>p&&p!=='.'&&p!=='..');
 // Tooling-only C is not an application release. Registered development tools
@@ -109,6 +110,7 @@ export function imageBuildOnly(entries){
   &&e.oldMode===(e.file==='.github/scripts/build-ci-images.sh'?'100755':'100644')&&e.newMode===e.oldMode);
 }
 const releaseToolFiles=new Set([
+ ...copyTools,
  '.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs',
  'docs/development/ci-gate-cleanup-20261031.md',
  ".github/scripts/school-teacher-native.mjs", ".github/scripts/school-teacher-native.test.mjs",

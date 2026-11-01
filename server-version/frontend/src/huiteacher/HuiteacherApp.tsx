@@ -26,6 +26,8 @@ import {createEducationAssessmentResourceAdapter} from '../api/educationAssessme
 
 
 import {HuiteacherLanding} from './HuiteacherLanding'
+import {HuiteacherFeaturePage} from './HuiteacherFeaturePage'
+import {teacherFeatures} from './teacher-features'
 import './huiteacher-landing.css'
 import TeacherBrand from './TeacherBrand'
 import {useProductTheme} from '../components/product-theme/useProductTheme'
@@ -163,6 +165,11 @@ function PersonalSpaceInfo(){
 
 
 export default function HuiteacherApp(){
+  const feature=teacherFeatures.find(item=>item.path===window.location.pathname)
+  return feature?<HuiteacherFeaturePage feature={feature}/>:<HuiteacherApplication/>
+}
+
+function HuiteacherApplication(){
   const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
   const [personalSection,setPersonalSection]=useState('ht-personal-tasks')
