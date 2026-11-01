@@ -351,6 +351,7 @@ jobs:
       survey_experience_plan: ${{ steps.scope.outputs.survey_experience_plan }}
       composite_csv_memory_plan: ${{ steps.scope.outputs.composite_csv_memory_plan }}
       scale_library_governance_plan: ${{ steps.scope.outputs.scale_library_governance_plan }}
+      diff_base: ${{ steps.scope.outputs.diff_base }}
       application_route: ${{ steps.scope.outputs.application_route }}
       release_plan: ${{ steps.scope.outputs.release_plan }}
       campus_plan: ${{ steps.scope.outputs.campus_plan }}
@@ -416,6 +417,8 @@ jobs:
           JS
       - name: fetch the exact diff base without full history
         env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           node .github/scripts/runner-preflight.mjs --control
@@ -625,9 +628,11 @@ jobs:
           import {personalTrackingReadyPlan} from './.github/scripts/personal-tracking-ready.mjs';
           import {onboardingPlan} from './.github/scripts/onboarding-scope.mjs';
           import {groupReportDraftPlan,groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';
+          import {catalogDiffBase} from './.github/scripts/catalog-discovery-scope.mjs';
           import {execFileSync} from 'node:child_process';
           import {toolingOnly} from './server-version/scripts/release/policy.mjs';
-          const actualBase=groupReportDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const checkout=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          const actualBase=catalogDiffBase(groupReportDiffBase(process.env.CI_BASE_SHA,checkout),checkout,changedEntries);
           const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(actualBase);
           const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
           const followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
@@ -1180,6 +1185,7 @@ jobs:
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
       catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
+      base_sha: ${{ needs.scope.outputs.diff_base }}
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
@@ -3809,7 +3815,7 @@ jobs:
     env:
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
       CI_EVENT: ${{ github.event_name }}
-      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      CI_BASE_SHA: ${{ needs.scope.outputs.diff_base || github.event.pull_request.base.sha || github.event.before }}
       CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
       CI_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
       CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}

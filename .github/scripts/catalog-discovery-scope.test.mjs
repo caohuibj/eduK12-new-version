@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {catalogDiscoveryScope,catalogChecks} from './catalog-discovery-scope.mjs';
+import {catalogDiscoveryScope,catalogChecks,catalogDiffBase} from './catalog-discovery-scope.mjs';
 import {acceptanceFor} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const change=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
@@ -29,4 +29,15 @@ test('temporary compilation recipe never edits the production Dockerfile or star
  assert.doesNotMatch(job,/migrate|seed|redis:|npm run build/);
  const images=readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8');
  assert.match(images,/CATALOG_DISCOVERY: \$\{\{ inputs.catalog_discovery \}\}/);
+});
+
+test('stale event base uses the actual matching merge parent only for a bounded catalog diff',()=>{
+ const eventBase='a'.repeat(40),actual='b'.repeat(40),source='c'.repeat(40),head='d'.repeat(40);
+ const read=()=>`parent ${actual}\nparent ${source}\n`;
+ const env={CI_EVENT:'pull_request',CI_SOURCE_HEAD:source};
+ const entries=()=>catalogChecks.sources.map(change);
+ assert.equal(catalogDiffBase(eventBase,head,entries,env,read),actual);
+ assert.equal(catalogDiffBase(eventBase,head,()=>[change('unknown-runtime.ts')],env,read),eventBase);
+ assert.equal(catalogDiffBase(eventBase,head,entries,{...env,CI_SOURCE_HEAD:'other'},read),eventBase);
+ assert.equal(catalogDiffBase(eventBase,head,entries,{CI_EVENT:'push'},read),eventBase);
 });

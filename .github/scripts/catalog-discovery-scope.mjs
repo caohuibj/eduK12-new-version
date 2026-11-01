@@ -1,11 +1,21 @@
+import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 export const catalogChecks=JSON.parse(readFileSync(new URL('../config/catalog-discovery-checks.json',import.meta.url)));
 const files=new Set([...catalogChecks.sources,...catalogChecks.tests]);
-const controls=new Set(['.github/scripts/catalog-discovery-scope.test.mjs','.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci.yml','.github/config/catalog-discovery-checks.json','.github/scripts/catalog-discovery-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs']);
+const controls=new Set(['.github/scripts/fetch-ci-base.mjs','.github/scripts/catalog-discovery-scope.test.mjs','.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci.yml','.github/config/catalog-discovery-checks.json','.github/scripts/catalog-discovery-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs']);
 // Query selection only: no commit/PR identities, new persisted catalog or permission exception.
 export function catalogDiscoveryScope(entries){
  return entries.some(e=>catalogChecks.sources.includes(e.file))&&entries.every(e=>
   (files.has(e.file)||controls.has(e.file))&&((e.newMode==='100644'
   &&(e.status==='M'&&e.oldMode==='100644'||e.status==='A'&&e.oldMode==='000000'))
   ||e.file==='.github/scripts/build-ci-images.sh'&&e.status==='M'&&e.oldMode==='100755'&&e.newMode==='100755'));
+}
+
+// The event can retain the PR's creation-time base while refs/pull/N/merge
+// already uses current main. Select that parent only for this bounded diff.
+export function catalogDiffBase(eventBase,head,entriesFor,env=process.env,read=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim()){
+ if(env.CI_EVENT!=='pull_request'||!env.CI_SOURCE_HEAD)return eventBase;
+ const parents=read('cat-file','-p',head).split('\n').filter(line=>line.startsWith('parent ')).map(line=>line.slice(7));
+ if(parents.length!==2||parents[1]!==env.CI_SOURCE_HEAD)return eventBase;
+ return catalogDiscoveryScope(entriesFor(parents[0]))?parents[0]:eventBase;
 }

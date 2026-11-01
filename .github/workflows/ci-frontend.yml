@@ -3,6 +3,9 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      base_sha:
+        type: string
+        default: ''
       catalog_discovery:
         type: boolean
         default: false
@@ -33,7 +36,7 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       NODE_OPTIONS: --max-old-space-size=3072
       TZ: UTC
-      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      CI_BASE_SHA: ${{ inputs.base_sha || github.event.pull_request.base.sha || github.event.before }}
     defaults:
       run:
         working-directory: server-version/frontend
