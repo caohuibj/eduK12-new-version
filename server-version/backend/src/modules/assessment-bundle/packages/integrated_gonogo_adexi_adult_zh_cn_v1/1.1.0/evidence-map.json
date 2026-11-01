@@ -1,0 +1,167 @@
+[
+  {
+    "evidenceKey": "gonogo.commission_rate",
+    "slotKey": "gonogo",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "gonogo.commission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.d_prime",
+    "slotKey": "gonogo",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "gonogo.d_prime",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.omission_rate",
+    "slotKey": "gonogo",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "gonogo.omission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.commission_errors",
+    "slotKey": "gonogo",
+    "selector": "commissionErrors",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "gonogo.commission_errors",
+    "role": "SUPPORTING",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.go_trial_count",
+    "slotKey": "gonogo",
+    "selector": "goTrialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "gonogo.go_trial_count",
+    "role": "SUPPORTING",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.nogo_trial_count",
+    "slotKey": "gonogo",
+    "selector": "nogoTrialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "gonogo.nogo_trial_count",
+    "role": "SUPPORTING",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.d_prime",
+    "slotKey": "cpt",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "cpt.d_prime",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.omission_rate",
+    "slotKey": "cpt",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "cpt.omission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.commission_rate",
+    "slotKey": "cpt",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "cpt.commission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.rt_icv",
+    "slotKey": "cpt",
+    "selector": "rtICV",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "cpt.rt_icv",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.target_count",
+    "slotKey": "cpt",
+    "selector": "targetCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "cpt.target_count",
+    "role": "SUPPORTING",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.hit_count",
+    "slotKey": "cpt",
+    "selector": "hitCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "cpt.hit_count",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "adexi.working_memory_sum",
+    "slotKey": "adexi",
+    "selector": "working_memory",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "adexi_v1.working_memory_sum",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "adexi.inhibition_sum",
+    "slotKey": "adexi",
+    "selector": "inhibition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "adexi_v1.inhibition_sum",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "context.age",
+    "slotKey": "context",
+    "selector": "subject_age_years",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "context.age",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

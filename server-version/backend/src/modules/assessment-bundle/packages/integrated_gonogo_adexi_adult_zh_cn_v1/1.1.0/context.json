@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "integrated-adult-age-v1",
+  "contextDefinitionVersion": "1.0.0",
+  "fields": [
+    {
+      "contextKey": "subject_age_years",
+      "required": true,
+      "valueType": "number"
+    }
+  ]
+}

@@ -178,6 +178,1039 @@
     }
   },
   {
+    "schemaVersion": 1,
+    "manifest": {
+      "definition": {
+        "schemaVersion": 1,
+        "bundleKey": "integrated_gonogo_adexi_adult_zh_cn_v1",
+        "bundleVersion": "1.1.0",
+        "status": "DRAFT",
+        "category": "integrated",
+        "name": "成人认知控制与日常自我调节",
+        "description": "Go/No-Go＋CPT-X＋ADEXI 项目中文自评：并列呈现反应抑制、持续注意与日常体验的描述性证据。",
+        "respondentTypes": [
+          "SELF"
+        ],
+        "initiationModes": [
+          "TEACHER_ASSIGNMENT",
+          "ANONYMOUS_SELF"
+        ],
+        "population": {
+          "subjectPopulation": "adult",
+          "subjectMinAgeYears": 18,
+          "subjectMaxAgeYears": 100
+        },
+        "slots": [
+          {
+            "slotKey": "gonogo",
+            "unitType": "COGNITIVE",
+            "position": 0,
+            "required": true,
+            "instrumentKey": "gonogo",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "commissionRate",
+              "dPrime",
+              "omissionRate",
+              "commissionErrors",
+              "goTrialCount",
+              "nogoTrialCount"
+            ]
+          },
+          {
+            "slotKey": "cpt",
+            "unitType": "COGNITIVE",
+            "position": 1,
+            "required": true,
+            "instrumentKey": "cpt",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "dPrime",
+              "omissionRate",
+              "commissionRate",
+              "rtICV",
+              "targetCount",
+              "hitCount"
+            ]
+          },
+          {
+            "slotKey": "adexi",
+            "unitType": "SCALE",
+            "position": 2,
+            "required": true,
+            "instrumentKey": "adexi_v1",
+            "instrumentVersion": "2.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "working_memory",
+              "inhibition"
+            ]
+          },
+          {
+            "slotKey": "context",
+            "unitType": "FORM",
+            "position": 3,
+            "required": true,
+            "instrumentKey": "integrated-adult-age-v1",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF"
+          }
+        ],
+        "engine": {
+          "key": "declarative-evidence-v1",
+          "version": "1.0.0"
+        },
+        "contextDefinitionKey": "integrated-adult-age-v1",
+        "contextDefinitionVersion": "1.0.0",
+        "reportDefinitionKey": "integrated_adult_control_report",
+        "reportDefinitionVersion": "1.0.0",
+        "publicationRequirements": {
+          "scientificGate": true,
+          "rightsGate": true,
+          "languageGate": true,
+          "reportGate": true,
+          "safetyGate": false,
+          "nonCommercialOnly": false
+        },
+        "rightsRequirements": {
+          "required": true,
+          "instrumentKeys": [
+            "adexi_v1"
+          ]
+        },
+        "safetyCapability": {
+          "safetyCapable": false,
+          "productionTriggerEnabled": false
+        },
+        "limitations": [
+          "仅适用于 18–100 岁成人自评；上限对齐当前 ADEXI 产品适用范围，不代表年龄常模。",
+          "任务与自评保留各自量尺，不计算跨方法总分、IQ、能力等级、同龄排名或诊断。",
+          "Go/No-Go 与 CPT-X 使用本项目 standard 精确版本，分别为 120 与 180 个正式试次；任务表现受设备、疲劳、理解和本次环境影响。",
+          "ADEXI 使用现有 adexi_v1@2.0.0 项目中文适配，工作记忆 9–45、抑制 5–25 为合计分，高分表示报告的日常困难更多；官网原计分为分量表均分，两者不可混写。",
+          "现有项目题文与官网 Angela Siu 简体中文题本不完全一致；既有源码的授权声明尚需管理员核验原凭证、商业使用及再分发范围，本 DRAFT 不新增授权声称。",
+          "目前无适用于本组合的年龄常模或联合效度；任务和自评不能互换，分数差异不等于矛盾或异常。",
+          "缺失、无效或未获披露授权的证据不按零分处理，不生成相应跨方法解释；独立工具报告仍需分别阅读。",
+          "CPT-X 的非目标计数未进入当前公开指标，保留误报率，不从比率反推误报次数。"
+        ]
+      },
+      "files": {
+        "evidence": "evidence-map.json",
+        "rules": "rules.json",
+        "report": "report.json",
+        "scientific": "scientific.json",
+        "publication": "publication.json",
+        "context": "context.json"
+      },
+      "cognitiveDependencies": [
+        {
+          "slotKey": "gonogo",
+          "configVersion": "1.0.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "profile": "standard"
+        },
+        {
+          "slotKey": "cpt",
+          "configVersion": "1.0.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "profile": "standard"
+        }
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceKey": "gonogo.commission_rate",
+        "slotKey": "gonogo",
+        "selector": "commissionRate",
+        "valueType": "number",
+        "unit": "ratio",
+        "construct": "gonogo.commission_rate",
+        "role": "PRIMARY",
+        "direction": "lower",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "gonogo.d_prime",
+        "slotKey": "gonogo",
+        "selector": "dPrime",
+        "valueType": "number",
+        "unit": "d-prime",
+        "construct": "gonogo.d_prime",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "gonogo.omission_rate",
+        "slotKey": "gonogo",
+        "selector": "omissionRate",
+        "valueType": "number",
+        "unit": "ratio",
+        "construct": "gonogo.omission_rate",
+        "role": "PRIMARY",
+        "direction": "lower",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "gonogo.commission_errors",
+        "slotKey": "gonogo",
+        "selector": "commissionErrors",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "gonogo.commission_errors",
+        "role": "SUPPORTING",
+        "direction": "lower",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "gonogo.go_trial_count",
+        "slotKey": "gonogo",
+        "selector": "goTrialCount",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "gonogo.go_trial_count",
+        "role": "SUPPORTING",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "gonogo.nogo_trial_count",
+        "slotKey": "gonogo",
+        "selector": "nogoTrialCount",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "gonogo.nogo_trial_count",
+        "role": "SUPPORTING",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "cpt.d_prime",
+        "slotKey": "cpt",
+        "selector": "dPrime",
+        "valueType": "number",
+        "unit": "d-prime",
+        "construct": "cpt.d_prime",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "cpt.omission_rate",
+        "slotKey": "cpt",
+        "selector": "omissionRate",
+        "valueType": "number",
+        "unit": "ratio",
+        "construct": "cpt.omission_rate",
+        "role": "PRIMARY",
+        "direction": "lower",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "cpt.commission_rate",
+        "slotKey": "cpt",
+        "selector": "commissionRate",
+        "valueType": "number",
+        "unit": "ratio",
+        "construct": "cpt.commission_rate",
+        "role": "PRIMARY",
+        "direction": "lower",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "cpt.rt_icv",
+        "slotKey": "cpt",
+        "selector": "rtICV",
+        "valueType": "number",
+        "unit": "ratio",
+        "construct": "cpt.rt_icv",
+        "role": "PRIMARY",
+        "direction": "lower",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "cpt.target_count",
+        "slotKey": "cpt",
+        "selector": "targetCount",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "cpt.target_count",
+        "role": "SUPPORTING",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "cpt.hit_count",
+        "slotKey": "cpt",
+        "selector": "hitCount",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "cpt.hit_count",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "adexi.working_memory_sum",
+        "slotKey": "adexi",
+        "selector": "working_memory",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "adexi_v1.working_memory_sum",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "adexi.inhibition_sum",
+        "slotKey": "adexi",
+        "selector": "inhibition",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "adexi_v1.inhibition_sum",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "context.age",
+        "slotKey": "context",
+        "selector": "subject_age_years",
+        "valueType": "number",
+        "unit": "context",
+        "construct": "context.age",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      }
+    ],
+    "rules": {
+      "version": "1.0.0",
+      "applicability": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "context.age",
+            "value": 18
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "context.age",
+            "value": 100
+          }
+        ]
+      },
+      "items": [
+        {
+          "ruleId": "gonogo_observation",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "gonogo.commission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "gonogo.nogo_trial_count"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "gonogo.omission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "gonogo.go_trial_count"
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "Go/No-Go 像一次“按规则行动和暂停”的快照：误按率以不应按键的 No-Go 试次为分母，遗漏率以应按键的 Go 试次为分母。它描述本次动作克制表现，不等于日常自控力。",
+          "evidenceKeys": [
+            "gonogo.commission_rate",
+            "gonogo.nogo_trial_count",
+            "gonogo.omission_rate",
+            "gonogo.go_trial_count"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "cpt_observation",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "cpt.omission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "cpt.target_count"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "cpt.commission_rate"
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "CPT-X 像一段持续“守住目标”的观察：目标遗漏与非目标误报分别计算。请同时阅读两项，不用单个数字概括注意能力。",
+          "evidenceKeys": [
+            "cpt.omission_rate",
+            "cpt.target_count",
+            "cpt.commission_rate"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "cpt_stability",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "cpt.rt_icv"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "cpt.d_prime"
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "d′ 描述目标辨别，反应时变异系数描述正确命中时反应速度的波动；变异系数没有 0–1 上限，也不是能力百分比。",
+          "evidenceKeys": [
+            "cpt.rt_icv",
+            "cpt.d_prime"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "daily_observation",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "adexi.working_memory_sum"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "adexi.inhibition_sum"
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "ADEXI 描述您对日常记住步骤、先思考再行动以及转换活动的体验。本次显示项目中文适配的分量表合计分：工作记忆 9–45，抑制 5–25；高分表示报告的困难更多，不表示同龄排名。",
+          "evidenceKeys": [
+            "adexi.working_memory_sum",
+            "adexi.inhibition_sum"
+          ],
+          "supportRefs": [
+            "adexi_scoring"
+          ]
+        },
+        {
+          "ruleId": "complementary",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "gonogo.commission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "cpt.omission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "adexi.working_memory_sum"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "adexi.inhibition_sum"
+              }
+            ]
+          },
+          "kind": "joint_conclusion",
+          "text": "把两类证据看成两扇窗：任务呈现有明确规则时的本次表现，自评呈现日常生活中的体验。两者提供互补线索，不能相加、换算或据此判定一致、分歧或诊断。",
+          "evidenceKeys": [
+            "gonogo.commission_rate",
+            "cpt.omission_rate",
+            "adexi.working_memory_sum",
+            "adexi.inhibition_sum"
+          ],
+          "supportRefs": [
+            "toplak2013"
+          ]
+        },
+        {
+          "ruleId": "action_plan",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "gonogo.commission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "cpt.omission_rate"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "adexi.working_memory_sum"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "adexi.inhibition_sum"
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "可以选一项真实活动做小实验：开始前写清“何时行动、何时暂停”，把长任务拆成短步骤，并在转换活动前设置提醒。记录这些支持是否让日常体验更轻松；本报告不能保证某种干预效果。",
+          "evidenceKeys": [
+            "gonogo.commission_rate",
+            "cpt.omission_rate",
+            "adexi.working_memory_sum",
+            "adexi.inhibition_sum"
+          ],
+          "supportRefs": [
+            "toplak2013"
+          ]
+        },
+        {
+          "ruleId": "unavailable_gonogo_commission_rate",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "missing",
+                "evidenceKey": "gonogo.commission_rate"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "gonogo.commission_rate"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "gonogo.commission_rate"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+          "evidenceKeys": [
+            "gonogo.commission_rate"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "unavailable_cpt_omission_rate",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "missing",
+                "evidenceKey": "cpt.omission_rate"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "cpt.omission_rate"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "cpt.omission_rate"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+          "evidenceKeys": [
+            "cpt.omission_rate"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "unavailable_adexi_working_memory_sum",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "missing",
+                "evidenceKey": "adexi.working_memory_sum"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "adexi.working_memory_sum"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "adexi.working_memory_sum"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+          "evidenceKeys": [
+            "adexi.working_memory_sum"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "unavailable_adexi_inhibition_sum",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "missing",
+                "evidenceKey": "adexi.inhibition_sum"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "adexi.inhibition_sum"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "adexi.inhibition_sum"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "某项核心证据缺失或无效，本次不生成完整跨方法解释；这不表示该项为零分。",
+          "evidenceKeys": [
+            "adexi.inhibition_sum"
+          ],
+          "supportRefs": []
+        }
+      ]
+    },
+    "report": {
+      "key": "integrated_adult_control_report",
+      "version": "1.0.0",
+      "locale": "zh-CN",
+      "blocks": [
+        {
+          "blockId": "task_notes",
+          "kind": "conclusions",
+          "title": "任务告诉我们的事",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": [
+            "gonogo_observation",
+            "cpt_observation",
+            "cpt_stability"
+          ]
+        },
+        {
+          "blockId": "daily_notes",
+          "kind": "conclusions",
+          "title": "日常体验告诉我们的事",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": [
+            "daily_observation"
+          ]
+        },
+        {
+          "blockId": "cross_method",
+          "kind": "conclusions",
+          "title": "两扇窗，共同观察",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": [
+            "complementary"
+          ]
+        },
+        {
+          "blockId": "actions",
+          "kind": "conclusions",
+          "title": "可以尝试的小改变",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": [
+            "action_plan"
+          ]
+        },
+        {
+          "blockId": "quality_notes",
+          "kind": "conclusions",
+          "title": "缺失与解释边界",
+          "audience": [
+            "student",
+            "parent",
+            "teacher",
+            "admin"
+          ],
+          "ruleIds": [
+            "unavailable_gonogo_commission_rate",
+            "unavailable_cpt_omission_rate",
+            "unavailable_adexi_working_memory_sum",
+            "unavailable_adexi_inhibition_sum"
+          ]
+        }
+      ],
+      "states": {
+        "missing": "部分来源缺少结果，请分别阅读可用的单项证据。",
+        "limited": "部分证据仅支持有限解释，本次不据此形成完整跨方法结论。",
+        "unavailable": "结果质量不足或未获披露授权，不能形成完整跨方法结论。"
+      }
+    },
+    "scientific": {
+      "maturity": "EXPERIMENTAL",
+      "scope": "18–100 岁成人的描述性跨方法试测；任务精确版本复用主干，ADEXI 为现有项目中文适配合计分。组合效度、本土等值及年龄常模未建立。公开原来源可访问不等于项目改写译本和商业再分发已获许可；保留 DRAFT 待管理员最终审核。",
+      "references": [
+        {
+          "id": "toplak2013",
+          "citation": "Toplak, M. E., West, R. F., & Stanovich, K. E. (2013). Practitioner Review: Do performance-based measures and ratings of executive function assess the same construct? Journal of Child Psychology and Psychiatry, 54, 131–143. https://doi.org/10.1111/jcpp.12001 （公开出版来源；综述支持两方法不互换，不验证本 Bundle。）",
+          "allowedClaims": [
+            "independent_summary",
+            "cross_source_condition",
+            "joint_conclusion"
+          ]
+        },
+        {
+          "id": "adexi2018",
+          "citation": "Holst, Y., & Thorell, L. B. (2018). Adult executive functioning inventory (ADEXI): Validity, reliability, and relations to ADHD. International Journal of Methods in Psychiatric Research, 27, e1567. https://doi.org/10.1002/mpr.1567 （公开原研究，非本项目中文适配的验证。）",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        },
+        {
+          "id": "adexi_scoring",
+          "citation": "作者公开计分说明：https://chexi.se/onewebmedia/ADEXI%20subscales.pdf 。工作记忆题号 1,2,5,7,8,9,11,12,13；抑制 3,4,6,10,14；原计分采用均分。本包保留既有 2.0.0 合计分，不修改或冒称原始计分。核验 2026-11-01。",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        },
+        {
+          "id": "adexi_translation",
+          "citation": "作者公开简体中文自评题本，Angela Siu, CUHK：https://chexi.se/onewebmedia/Adult%20Self%20Report%20Executive%20Functioning%20Inventory_SimplifiedChinese.pdf 。现有项目措辞并非该译本逐字复刻。使用声明 https://chexi.se/translations ：网站已有语言版本无需另获作者使用许可；商业数字化与改写再分发范围未在该声明中明确。核验 2026-11-01。",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        }
+      ]
+    },
+    "fixtures": {
+      "valid": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 35
+          },
+          "gonogo.commission_rate": {
+            "state": "present",
+            "value": 0.2
+          },
+          "gonogo.d_prime": {
+            "state": "present",
+            "value": 2.1
+          },
+          "gonogo.omission_rate": {
+            "state": "present",
+            "value": 0.1
+          },
+          "gonogo.commission_errors": {
+            "state": "present",
+            "value": 6
+          },
+          "gonogo.go_trial_count": {
+            "state": "present",
+            "value": 90
+          },
+          "gonogo.nogo_trial_count": {
+            "state": "present",
+            "value": 30
+          },
+          "cpt.d_prime": {
+            "state": "present",
+            "value": 2
+          },
+          "cpt.omission_rate": {
+            "state": "present",
+            "value": 0.1388888888888889
+          },
+          "cpt.commission_rate": {
+            "state": "present",
+            "value": 0.03
+          },
+          "cpt.rt_icv": {
+            "state": "present",
+            "value": 0.21
+          },
+          "cpt.target_count": {
+            "state": "present",
+            "value": 36
+          },
+          "cpt.hit_count": {
+            "state": "present",
+            "value": 31
+          },
+          "adexi.working_memory_sum": {
+            "state": "present",
+            "value": 23
+          },
+          "adexi.inhibition_sum": {
+            "state": "present",
+            "value": 17
+          }
+        },
+        "expectedRuleIds": [
+          "gonogo_observation",
+          "cpt_observation",
+          "cpt_stability",
+          "daily_observation",
+          "complementary",
+          "action_plan"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "missing": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 35
+          },
+          "gonogo.commission_rate": {
+            "state": "present",
+            "value": 0.2
+          },
+          "gonogo.d_prime": {
+            "state": "present",
+            "value": 2.1
+          },
+          "gonogo.omission_rate": {
+            "state": "present",
+            "value": 0.1
+          },
+          "gonogo.commission_errors": {
+            "state": "present",
+            "value": 6
+          },
+          "gonogo.go_trial_count": {
+            "state": "present",
+            "value": 90
+          },
+          "gonogo.nogo_trial_count": {
+            "state": "present",
+            "value": 30
+          },
+          "cpt.d_prime": {
+            "state": "present",
+            "value": 2
+          },
+          "cpt.omission_rate": {
+            "state": "present",
+            "value": 0.1388888888888889
+          },
+          "cpt.commission_rate": {
+            "state": "present",
+            "value": 0.03
+          },
+          "cpt.rt_icv": {
+            "state": "present",
+            "value": 0.21
+          },
+          "cpt.target_count": {
+            "state": "present",
+            "value": 36
+          },
+          "cpt.hit_count": {
+            "state": "present",
+            "value": 31
+          },
+          "adexi.working_memory_sum": {
+            "state": "present",
+            "value": 23
+          },
+          "adexi.inhibition_sum": {
+            "state": "missing"
+          }
+        },
+        "expectedRuleIds": [
+          "gonogo_observation",
+          "cpt_observation",
+          "cpt_stability",
+          "unavailable_adexi_inhibition_sum"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "invalid": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 35
+          },
+          "gonogo.commission_rate": {
+            "state": "present",
+            "value": 0.2
+          },
+          "gonogo.d_prime": {
+            "state": "present",
+            "value": 2.1
+          },
+          "gonogo.omission_rate": {
+            "state": "present",
+            "value": 0.1
+          },
+          "gonogo.commission_errors": {
+            "state": "present",
+            "value": 6
+          },
+          "gonogo.go_trial_count": {
+            "state": "present",
+            "value": 90
+          },
+          "gonogo.nogo_trial_count": {
+            "state": "present",
+            "value": 30
+          },
+          "cpt.d_prime": {
+            "state": "present",
+            "value": 2
+          },
+          "cpt.omission_rate": {
+            "state": "present",
+            "value": 0.1388888888888889
+          },
+          "cpt.commission_rate": {
+            "state": "present",
+            "value": 0.03
+          },
+          "cpt.rt_icv": {
+            "state": "present",
+            "value": 0.21
+          },
+          "cpt.target_count": {
+            "state": "present",
+            "value": 36
+          },
+          "cpt.hit_count": {
+            "state": "present",
+            "value": 31
+          },
+          "adexi.working_memory_sum": {
+            "state": "present",
+            "value": 23
+          },
+          "adexi.inhibition_sum": {
+            "state": "invalid"
+          }
+        },
+        "expectedRuleIds": [
+          "gonogo_observation",
+          "cpt_observation",
+          "cpt_stability",
+          "unavailable_adexi_inhibition_sum"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "not-applicable": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 17
+          },
+          "gonogo.commission_rate": {
+            "state": "present",
+            "value": 0.2
+          },
+          "gonogo.d_prime": {
+            "state": "present",
+            "value": 2.1
+          },
+          "gonogo.omission_rate": {
+            "state": "present",
+            "value": 0.1
+          },
+          "gonogo.commission_errors": {
+            "state": "present",
+            "value": 6
+          },
+          "gonogo.go_trial_count": {
+            "state": "present",
+            "value": 90
+          },
+          "gonogo.nogo_trial_count": {
+            "state": "present",
+            "value": 30
+          },
+          "cpt.d_prime": {
+            "state": "present",
+            "value": 2
+          },
+          "cpt.omission_rate": {
+            "state": "present",
+            "value": 0.1388888888888889
+          },
+          "cpt.commission_rate": {
+            "state": "present",
+            "value": 0.03
+          },
+          "cpt.rt_icv": {
+            "state": "present",
+            "value": 0.21
+          },
+          "cpt.target_count": {
+            "state": "present",
+            "value": 36
+          },
+          "cpt.hit_count": {
+            "state": "present",
+            "value": 31
+          },
+          "adexi.working_memory_sum": {
+            "state": "present",
+            "value": 23
+          },
+          "adexi.inhibition_sum": {
+            "state": "present",
+            "value": 17
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "UNAVAILABLE"
+      }
+    },
+    "publication": {
+      "requestedStatus": "DRAFT"
+    },
+    "context": {
+      "schemaVersion": 1,
+      "contextDefinitionKey": "integrated-adult-age-v1",
+      "contextDefinitionVersion": "1.0.0",
+      "fields": [
+        {
+          "contextKey": "subject_age_years",
+          "required": true,
+          "valueType": "number"
+        }
+      ]
+    }
+  },
+  {
     "schemaVersion": 2,
     "manifest": {
       "definition": {
