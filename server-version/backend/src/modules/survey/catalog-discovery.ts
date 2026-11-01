@@ -49,13 +49,17 @@ export const discoveryFacets = (records: readonly DiscoveryRecord[], family?: st
 
 /** A small source-owned metadata table, not a second persisted catalog. SQL joins
  * exact declared identities; unregistered/private versions retain empty labels. */
-export function discoveryJoin(records: readonly DiscoveryRecord[], identity: { kind: Prisma.Sql; key: Prisma.Sql; version: Prisma.Sql; engine: Prisma.Sql; scoring: Prisma.Sql }) {
+export function discoveryJoin(records: readonly DiscoveryRecord[], identity: { kind: Prisma.Sql; key: Prisma.Sql; version: Prisma.Sql; engine: Prisma.Sql; scoring: Prisma.Sql }, nativeFormTags?: Prisma.Sql) {
   return Prisma.sql`LEFT JOIN LATERAL (
     SELECT d.tags, d.ids, d.terms FROM jsonb_to_recordset(${JSON.stringify(records)}::jsonb)
       AS d(kind text,key text,version text,engine text,scoring text,tags jsonb,ids jsonb,terms text)
     WHERE d.kind=${identity.kind} AND d.key=${identity.key}
       AND (d.kind='SCALE' AND d.version=${identity.version}
         OR d.kind='COGNITIVE' AND d.engine=${identity.engine} AND d.scoring=${identity.scoring})
+    ${nativeFormTags?Prisma.sql`UNION ALL
+    SELECT f.tags,COALESCE((SELECT jsonb_agg(tag->>'id') FROM jsonb_array_elements(f.tags) tag),'[]'::jsonb),
+      (SELECT string_agg(lower(concat_ws(' ',tag->>'id',tag->>'label')),' ') FROM jsonb_array_elements(f.tags) tag)
+    FROM (SELECT CASE WHEN jsonb_typeof(${nativeFormTags})='array' THEN ${nativeFormTags} ELSE '[]'::jsonb END AS tags) f WHERE ${identity.kind}='FORM'`:Prisma.empty}
     LIMIT 1
   ) AS discovery ON TRUE`
 }
