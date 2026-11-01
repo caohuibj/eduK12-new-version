@@ -126,7 +126,7 @@ export const SentencecheckTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="句图验证推理" description={<p>每题会给一句话和一张图形。请判断句子与图片是否相符：相符按「相符」，不符按「不相符」。注意“不是”这样的否定说法。</p>} hint={<><p>按键 1/2 或点击按钮作答；练习不计入成绩。</p></>} actionLabel={practiceAttempt > 1 ? '重新开始练习' : '开始练习'} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="句图验证推理" description={<p>每题会给一句话和一张图形。请判断句子与图片是否相符：相符按「相符」，不符按「不相符」。注意“不是”这样的否定说法。这是自编的句图核对小游戏，记录本次判断与作答过程，不是标准语言或智力测验。</p>} hint={<><p>按键 1/2 或点击按钮作答；练习不计入成绩。</p></>} actionLabel={practiceAttempt > 1 ? '重新开始练习' : '开始练习'} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
