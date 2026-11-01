@@ -23,3 +23,5 @@ export const matrixRegistryEntry: CognitiveFrontendRegistryEntry = {
     disclaimer: '结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。设计难度层级仅保留为研究描述字段，不作为参与者能力等级展示。',
   },
 }
+
+export const matrixRegistryEntryV11:CognitiveFrontendRegistryEntry={...matrixRegistryEntry,engineVersion:'1.1.0',scoringVersion:'1.0.0',readiness:{ category: 'fixed-trial', inputs: ['keyboard', 'pointer', 'touch'], orientation: 'any', globalKeyboardCapture: false, resumeDisposition: 'restart-required', resumeReason: '当前版本没有持久化练习或题内阶段；中断后按既有规则重新开始。', frozenMediaSlots: ['instruction', 'example', 'stimulus'] },reportDefinition:{...matrixRegistryEntry.reportDefinition,showProductIndex:false}}

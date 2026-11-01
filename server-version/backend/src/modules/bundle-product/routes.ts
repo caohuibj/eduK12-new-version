@@ -1,3 +1,5 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
+import {getPaginationParams} from '../../utils/pagination'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { authenticate, requireTeacher, requireAdmin } from '../../middleware/auth'
@@ -22,7 +24,7 @@ router.post('/admin/definitions', requireAdmin, handle(req => authoring.savePack
 router.get('/admin/definitions/:key/:version', requireAdmin, handle(req => authoring.getPackageDraft(prisma, req.user!, req.params.key, req.params.version)))
 router.post('/admin/definitions/:key/:version/approve', requireAdmin, handle(req => authoring.approvePackage(prisma, req.user!, req.params.key, req.params.version, req.body)))
 const refreshCatalog = async (_req: Request, _res: Response, next: NextFunction) => { try { await authoring.refreshPublishedPackages(prisma, bundleDefinitionProvider); next() } catch (error) { next(error) } }
-router.get('/catalog', refreshCatalog, handle(req => bundleProductService.catalog(req.user!)))
+router.get('/catalog', refreshCatalog, handle(req => req.query.view==='training-catalog'?bundleProductService.catalog(req.user!,{pagination:getPaginationParams(req),filters:z.object({...catalogDiscoveryQueryFields,status:z.string().trim().max(24).optional()}).parse(req.query)}):bundleProductService.catalog(req.user!)))
 router.get('/', handle(req => bundleProductService.list(req.user!)))
 router.post('/', refreshCatalog, handle(req => bundleProductService.create(req.user!, req.body)))
 router.get('/attempts/:attemptId/history', handle(req => analysis.history(req.user!, req.params.attemptId)))

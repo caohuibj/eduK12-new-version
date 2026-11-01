@@ -1,3 +1,4 @@
+import {blockedSurveyNativeInstruments} from '../bundle-product/survey-native-admission'
 import {randomUUID} from 'node:crypto'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -68,6 +69,7 @@ export function freezeSurveyTracking(input:{projectId:string;waveId:string;ordin
 export function surveyPersonalLeaf(input:{scopedSubjectId:string;waveId:string;ordinal:number;attemptId:string;resultId:string;
   completedAt:string;sourceHash:string;snapshot:ResearchFrozenPublication;result:SurveyComputedFinal;collectionClosed:boolean}):PersonalLeafResult{
   const metrics:PersonalLeafResult['metrics']={}
+  const blocked=blockedSurveyNativeInstruments(input.snapshot.governedPackages??[],input.result)
   const publicByUnit=new Map<string,{values:Map<string,number|null>;keys:readonly string[];pending:boolean}>()
   for(const binding of input.snapshot.longitudinal?.metrics??[]){
     const unit=input.snapshot.units.find(u=>u.draftId===binding.draftId&&u.instrumentKey===binding.instrumentKey)
@@ -82,9 +84,9 @@ export function surveyPersonalLeaf(input:{scopedSubjectId:string;waveId:string;o
       publicByUnit.set(unit!.instrumentKey,{keys,pending:disclosure?.pending??false,values:new Map(feedback&&!feedback.pending?feedback.metrics.map(m=>[m.key,feedback.quality==='interpretable'?m.value:null]):[])})
     }
     const disclosed=publicByUnit.get(unit!.instrumentKey)!
-    const visible=unit!.longitudinalMetricKeys?.includes(binding.scoreKey)===true&&disclosed.keys.includes(binding.scoreKey)
+    const visible=!blocked.has(unit!.instrumentKey)&&unit!.longitudinalMetricKeys?.includes(binding.scoreKey)===true&&disclosed.keys.includes(binding.scoreKey)
     const privateResult=result.privateScoring as {scores?:Array<{key:string;value:number|null;status:string}>;metrics?:Array<{key:string;value:number|null;status:string}>;quality?:{status:string}}|null
-    const internal=result.notExecuted?null:unit!.kind==='FORM'?result.rawAnswers[binding.scoreKey]:unit!.kind==='COGNITIVE'?
+    const internal=result.notExecuted||blocked.has(unit!.instrumentKey)?null:unit!.kind==='FORM'?result.rawAnswers[binding.scoreKey]:unit!.kind==='COGNITIVE'?
       result.measurement?.quality.status==='interpretable'?result.measurement.metrics.find(m=>m.key===binding.scoreKey&&m.status==='OK')?.value:null:
       privateResult?.quality?.status==='interpretable'?(privateResult.scores??privateResult.metrics??[]).find(m=>m.key===binding.scoreKey&&m.status==='calculated')?.value:null
     metrics[binding.metricId]={visible,pending:disclosed.pending,...(result.notExecuted?{missingReason:'NOT_EXECUTED' as const}:{}),value:visible&&!disclosed.pending?disclosed.values.get(binding.scoreKey)??null:typeof internal==='number'&&Number.isFinite(internal)?internal:null,

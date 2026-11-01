@@ -90,7 +90,7 @@ export const TowerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInde
     return () => window.clearTimeout(timer)
   }, [phase, trialIndex, moves, inactivityGuardMs, submitFormal])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="塔式规划" description={<p>把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p>} hint={<><p>尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="塔式规划" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p><p>搬书时，目标书被压在下面，可能要先把上面的书临时挪开，再一步步整理好；多挪几次不等于“不会规划”。 这次任务只记录本次作答表现。</p></>) : (<p>把当前圆盘状态变成目标状态。每次只移动每根柱最上方的一个圆盘，大盘不能放在小盘上方。先选择圆盘所在的柱，再选择目标柱。</p>)} hint={<><p>尽量规划后再操作；系统不会提示最优步数。练习至少完成 3 / 4，练习不计分。</p></>} onAction={startPractice} />
   if (phase === 'practice-result') { const passed = practiceCorrect >= 3; return <div className="p-8 text-center"><p className="mb-4">练习完成 {practiceCorrect} / 4</p><button className={passed ? 'btn-primary' : 'btn-secondary'} onClick={passed ? startFormal : startPractice}>{passed ? '开始正式测验' : '重新练习'}</button></div> }
   if (phase === 'practice-feedback') return <div className="p-8 text-center"><p className="mb-4">{feedback}</p><button className="btn-primary" onClick={nextPractice}>{practiceIndex + 1 >= 4 ? '查看练习结果' : '下一题'}</button></div>
 

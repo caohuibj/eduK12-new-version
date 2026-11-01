@@ -1,4 +1,7 @@
+import type {PaginationParams} from '../../utils/pagination'
+import {catalogTagFacets,type CatalogClassificationTag,type CatalogTagFacets,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from './product-eligibility'
+import {cognitiveClassificationTags,catalogDiscoveryRecords,discoveryPageSql,discoveryJoin,discoveryFacets} from '../survey/catalog-discovery'
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { readCognitiveQuota } from './attempt-quota'
@@ -165,21 +168,38 @@ export const createAssignment = async (
 }
 
 /** 教师创建任务时可选的已发布配置（不含运行 config JSON）。 */
-export const listPublishedConfigs = async (userId: string, role: UserRole) => {
+type PublishedConfigRow=Pick<Prisma.CognitiveTestConfigGetPayload<{}>,'id'|'testType'|'configVersion'|'name'|'instruction'|'engineVersion'|'scoringVersion'|'status'|'accessPolicy'|'config'>
+type ProfileHeader=Awaited<ReturnType<typeof listTrainingCognitiveProfileHeaders>> extends Map<string,infer H>?H:never
+type PublishedConfigSummary=Omit<PublishedConfigRow,'config'>&{classificationTags:CatalogClassificationTag[]}&Partial<ProfileHeader>
+type ConfigCatalogPage={list:PublishedConfigSummary[];page:number;pageSize:number;hasMore:boolean;tagFacets:CatalogTagFacets}
+export function listPublishedConfigs(userId:string,role:UserRole):Promise<PublishedConfigSummary[]>
+export function listPublishedConfigs(userId:string,role:UserRole,pagination:PaginationParams,filters:CatalogDiscoveryFilters&{status?:string}):Promise<ConfigCatalogPage>
+export async function listPublishedConfigs(userId:string,role:UserRole,pagination?:PaginationParams,filters:CatalogDiscoveryFilters&{status?:string}={}){
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
-  if (!isCognitiveNewAdmissionEnabled()) return []
+  if (!isCognitiveNewAdmissionEnabled()) return pagination?{list:[],page:pagination.page,pageSize:pagination.pageSize,hasMore:false,tagFacets:discoveryFacets([])}:[]
   const profileHeaders=await listTrainingCognitiveProfileHeaders(prisma,userId)
   const where: Record<string, unknown> = { status: 'PUBLISHED' }
+  let visibleGrantIds:string[]|null=null
   if (role !== UserRole.ADMIN && appConfig.materialGrantsEnabled) {
     const grantedIds = await grantedResourceIds(userId, MaterialResourceType.COGNITIVE_CONFIG)
+    visibleGrantIds=[...new Set([...grantedIds,...profileHeaders.keys()])]
     where.OR = [
       { accessPolicy: { not: 'GRANT' } },
-      { id: { in: [...new Set([...grantedIds,...profileHeaders.keys()])] } },
+      { id: { in: visibleGrantIds } },
     ]
   }
 
-  const configs = await prisma.cognitiveTestConfig.findMany({
+  const records=pagination?catalogDiscoveryRecords():[]
+  const [catalog]=pagination?await prisma.$queryRaw<Array<{list:PublishedConfigRow[];facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`
+    SELECT discovery.ids,discovery.terms,discovery.tags AS "classificationTags",c.id,c.test_type AS "testType",c.config_version AS "configVersion",c.name,c.instruction,c.engine_version AS "engineVersion",c.scoring_version AS "scoringVersion",c.status,c.access_policy AS "accessPolicy",c.config
+    FROM cognitive_test_configs c ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
+    WHERE c.status='PUBLISHED' AND (${isCognitiveProductEligible('fake')} OR c.test_type<>'fake')
+      ${visibleGrantIds===null?Prisma.empty:Prisma.sql`AND (c.access_policy<>'GRANT' OR c.id=ANY(${visibleGrantIds}::text[]))`}
+      ${filters.status&&filters.status!=='all'?Prisma.sql`AND c.status::text=${filters.status}`:Prisma.empty}
+
+`,filters,text:[Prisma.sql`v.name`,Prisma.sql`v."testType"`,Prisma.sql`v.instruction`,Prisma.sql`v."configVersion"`],order:Prisma.sql`v."testType",v."configVersion",v.id`,limit:pagination.take+1,offset:pagination.skip})):[]
+  const configs:PublishedConfigRow[] = catalog?catalog.list:await prisma.cognitiveTestConfig.findMany({
     where,
     orderBy: [{ testType: 'asc' }, { configVersion: 'asc' }],
     select: {
@@ -196,11 +216,12 @@ export const listPublishedConfigs = async (userId: string, role: UserRole) => {
     },
   })
 
-  return configs.filter(row => isCognitiveProductEligible(row.testType)).map(row => {
+  const list=(pagination?configs.slice(0,pagination.take):configs).filter(row => isCognitiveProductEligible(row.testType)).map(row => {
     assertCognitiveCatalogConfiguration(row)
     const { config: _privateConfig, ...catalog } = row
-    return {...catalog,...(profileHeaders.get(row.id)??{})}
+    return {...catalog,classificationTags:cognitiveClassificationTags(row.testType,row.engineVersion,row.scoringVersion),...(profileHeaders.get(row.id)??{})}
   })
+  return pagination?{list,page:pagination.page,pageSize:pagination.pageSize,hasMore:configs.length>pagination.take,tagFacets:catalogTagFacets([catalog?.facetTags??[]])}:list
 }
 
 export const updateConfigAccessPolicy = async (

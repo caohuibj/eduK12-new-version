@@ -1,3 +1,4 @@
+import type {PaginationParams} from '../../utils/pagination'
 import {readInstance,type BundleBindings} from './instance'
 export {readInstance} from './instance'
 export type {BundleBindings} from './instance'
@@ -21,6 +22,8 @@ import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
+import {catalogClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import { bundleBirthYearMonthForm, validateBundleStartContextMappings } from './start-context'
 
 export type BundleActor = { userId: string; role: UserRole }
 export const author = (actor: BundleActor) => {
@@ -82,6 +85,8 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       if(trackingSourceId&&(!trackingSource||trackingSource.status!=='PUBLISHED'||!trackingSource.personalTrackingBaselineId||!readTrainingTracking(trackingSource.personalTracking)))throw compositeConflict('纵向包来源不可用')
       if(trackingSource)owner(actor,trackingSource)
       const definition = entry.definition
+      if (definition.respondentTypes.length > 1) throw compositeBadRequest('跨报告者测评包必须分别分配真实作答者，不能作为单人测评投放')
+      validateBundleStartContextMappings(definition, entry.contextDefinition)
       if (input.publicEnabled && !definition.initiationModes.includes('ANONYMOUS_SELF')) throw compositeForbidden('此包不支持匿名投放')
       if (input.courseId && !definition.initiationModes.includes('TEACHER_ASSIGNMENT')) throw compositeForbidden('此包不支持课程投放')
       if (input.courseId) {
@@ -101,15 +106,17 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       let position = 0
       for (const field of entry.contextDefinition?.fields ?? []) {
         const profileForm=profileContextForm(entry.declarativePackage,field)
+        const birthForm = bundleBirthYearMonthForm(definition, field.contextKey)
         const boolean = field.valueType === 'boolean'
         const choices = boolean ? ['true', 'false'] : field.enumValues
-        const form=profileForm??{
-          formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey,
+        const form=birthForm ? { ...birthForm, formOptions: Prisma.JsonNull } : profileForm??{
+          formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey === 'subject_birth_year_month' ? '儿童出生年月（YYYY-MM）' : field.contextKey,
           formOptions: choices ? choices.map(value => ({ label: value, value })) : Prisma.JsonNull,
         }
         const item = await tx.compositeAssessmentItem.create({ data: {
           compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
           ...form,
+          ...(field.contextKey === 'subject_birth_year_month' && field.valueType === 'string' ? { contextKey: 'birthYearMonth', formType: 'year_month' } : {}),
         } })
         bindings.context.push({ contextKey: field.contextKey, valueType: field.valueType, itemId: item.id })
       }
@@ -214,16 +221,27 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
     })
     return detail(actor,id)
   }
-  async function catalog(actor: BundleActor) {
+  const ownTags=(entry:ReturnType<BundleDefinitionProvider['list']>[number])=>catalogClassificationTags({}, {population:{respondentTypes:entry.definition.respondentTypes,minAge:entry.definition.population.subjectMinAgeYears,maxAge:entry.definition.population.subjectMaxAgeYears}})
+  async function catalogRow(actor:BundleActor,entry:ReturnType<BundleDefinitionProvider['list']>[number]){
+    const definition=entry.definition
+    let allowed=true,publicationBlockers:string[]=[]
+    try{await eligible(actor,definition.bundleKey,definition.bundleVersion)}catch(error:any){allowed=false;publicationBlockers=[error.message]}
+    return {...definition,classificationTags:ownTags(entry),...(allowed&&entry.declarativePackage?{status:'PUBLISHED' as const}:{}),canInstantiate:allowed&&process.env.BUNDLE_PRODUCTS_ENABLED==='true',publicationBlockers}
+  }
+  function catalog(actor:BundleActor):Promise<Array<Awaited<ReturnType<typeof catalogRow>>>>
+  function catalog(actor:BundleActor,options:{pagination:PaginationParams;filters:CatalogDiscoveryFilters&{status?:string}}):Promise<{list:Array<Awaited<ReturnType<typeof catalogRow>>>;page:number;pageSize:number;hasMore:boolean;tagFacets:ReturnType<typeof catalogTagFacets>}>
+  async function catalog(actor:BundleActor,options?:{pagination:PaginationParams;filters:CatalogDiscoveryFilters&{status?:string}}){
     author(actor)
-    return Promise.all(provider.list().map(async entry => {
-      const definition = entry.definition
-      let allowed = true
-      let publicationBlockers: string[] = []
-      try { await eligible(actor, definition.bundleKey, definition.bundleVersion) } catch (error: any) { allowed = false; publicationBlockers = [error.message] }
-      return { ...definition, ...(allowed && entry.declarativePackage ? { status: 'PUBLISHED' } : {}), canInstantiate: allowed && process.env.BUNDLE_PRODUCTS_ENABLED === 'true',
-        publicationBlockers }
-    }))
+    const all=provider.list()
+    if(!options)return Promise.all(all.map(entry=>catalogRow(actor,entry)))
+    const {pagination,filters}=options
+    const matches=all.filter(entry=>matchesCatalogDiscovery([entry.definition.name,entry.definition.bundleKey,entry.definition.bundleVersion,entry.definition.description],ownTags(entry),filters))
+      .sort((a,b)=>a.definition.bundleKey.localeCompare(b.definition.bundleKey)||a.definition.bundleVersion.localeCompare(b.definition.bundleVersion))
+    // Effective publication status still comes from the original admission rule.
+    // For the default status only the selected page needs source checks.
+    const filtered=filters.status&&filters.status!=='all'?(await Promise.all(matches.map(entry=>catalogRow(actor,entry)))).filter(row=>row.status===filters.status):null
+    const list=filtered?filtered.slice(pagination.skip,pagination.skip+pagination.take):await Promise.all(matches.slice(pagination.skip,pagination.skip+pagination.take).map(entry=>catalogRow(actor,entry)))
+    return {list,page:pagination.page,pageSize:pagination.pageSize,hasMore:pagination.skip+pagination.take<(filtered?.length??matches.length),tagFacets:catalogTagFacets(all.map(ownTags))}
   }
   async function list(actor: BundleActor) {
     author(actor)

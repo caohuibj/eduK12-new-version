@@ -41,6 +41,7 @@ import { cleanupStalePublicUploadAssets } from './services/checkinUploadCleanup'
 import { resolveCheckinUploadCleanupConfig } from './config/checkinUploadCleanup'
 import { startCheckinUploadCleanupScheduler } from './services/checkinUploadCleanupScheduler'
 import bundleProductRoutes from './modules/bundle-product/routes'
+import childCrossMethodRoutes from './modules/bundle-product/child-cross-method.routes'
 import express from 'express'
 import { publicAssessmentRateLimiters } from './middleware/publicAssessmentRateLimit'
 import cors from 'cors'
@@ -418,6 +419,7 @@ app.use('/api/situational', situationalRoutes)
 app.use('/api/questionnaires', questionnaireRoutes)
 app.use('/api/questionnaire-products', questionnaireProductRoutes)
 app.use('/api/bundle-products', bundleProductRoutes)
+app.use('/api/child-cognitive-control', childCrossMethodRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/assets', assetRoutes)
 app.use('/api/public/assets', publicAssetRouter)

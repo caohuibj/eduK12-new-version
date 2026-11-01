@@ -1,3 +1,4 @@
+import {prepareSurveyNativeAdmissions} from '../bundle-product/survey-native-admission'
 import {assertSurveyFlowAssignment,type SurveyFlowAssignment} from './flow.assignment'
 import {surveyAssignedFlowBlocks} from './flow.definition'
 import type { Prisma } from '@prisma/client'
@@ -37,7 +38,7 @@ export function prepareSurveyCognitivePriorAnswers(input:unknown){
   assertCanonicalSubmissionPayloadSize(canonical,900000,'认知前置答案')
   return {answers,canonical}
 }
-export async function freezeSurveyTaskPrefix(tx:Tx,known:Known,snapshot:ResearchFrozenPublication,slotKey:string,input:unknown,assignment?:SurveyFlowAssignment|null){
+export async function freezeSurveyTaskPrefix(tx:Tx,known:Known,snapshot:ResearchFrozenPublication,slotKey:string,input:unknown,assignment?:SurveyFlowAssignment|null,contextFrozenAt?:Date){
   const {answers}=prepareSurveyCognitivePriorAnswers(input)
   const verified:Record<string,Record<string,unknown>>={},locked:Record<string,unknown>={}
   const units=new Map(snapshot.units.map(u=>[u.instrumentKey,u]))
@@ -63,6 +64,8 @@ export async function freezeSurveyTaskPrefix(tx:Tx,known:Known,snapshot:Research
         surveyPublicationId:known.publicationId,snapshot,slotKeys:priorSituational})}
       catch(error){if(error instanceof SurveySituationalProtocolError)cognitiveFail(409,error.code);throw error}
       await assertSurveyCognitiveLockedAnswers(tx,known.attemptId,answers)
+      try{prepareSurveyNativeAdmissions(snapshot.governedPackages??[],verified,contextFrozenAt,slotKey)}
+      catch(error){cognitiveFail(400,error instanceof Error?error.message:'SURVEY_NATIVE_ADMISSION_REQUIRED')}
       return jsonCopy(locked)
     }
     if(unit!.kind==='COGNITIVE'){

@@ -1,0 +1,47 @@
+{
+  "values": {
+    "gonogo.commission_rate": {
+      "state": "missing"
+    },
+    "gonogo.omission_rate": {
+      "state": "missing"
+    },
+    "gonogo.d_prime": {
+      "state": "missing"
+    },
+    "cpt.d_prime": {
+      "state": "missing"
+    },
+    "cpt.omission_rate": {
+      "state": "missing"
+    },
+    "cpt.commission_rate": {
+      "state": "missing"
+    },
+    "cpt.rt_icv": {
+      "state": "missing"
+    },
+    "flanker.flanker_effect_ms": {
+      "state": "missing"
+    },
+    "flanker.congruent_accuracy": {
+      "state": "missing"
+    },
+    "flanker.incongruent_accuracy": {
+      "state": "missing"
+    },
+    "texi.working_memory": {
+      "state": "missing"
+    },
+    "texi.inhibition": {
+      "state": "missing"
+    }
+  },
+  "expectedRuleIds": [
+    "gonogo_missing",
+    "cpt_missing",
+    "flanker_missing",
+    "texi_missing"
+  ],
+  "expectedKind": "COMPUTED"
+}

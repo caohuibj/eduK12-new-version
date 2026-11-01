@@ -1,0 +1,36 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "18–100 岁成人的描述性跨方法试测；任务精确版本复用主干，ADEXI 为现有项目中文适配合计分。组合效度、本土等值及年龄常模未建立。公开原来源可访问不等于项目改写译本和商业再分发已获许可；保留 DRAFT 待管理员最终审核。",
+  "references": [
+    {
+      "id": "toplak2013",
+      "citation": "Toplak, M. E., West, R. F., & Stanovich, K. E. (2013). Practitioner Review: Do performance-based measures and ratings of executive function assess the same construct? Journal of Child Psychology and Psychiatry, 54, 131–143. https://doi.org/10.1111/jcpp.12001 （公开出版来源；综述支持两方法不互换，不验证本 Bundle。）",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition",
+        "joint_conclusion"
+      ]
+    },
+    {
+      "id": "adexi2018",
+      "citation": "Holst, Y., & Thorell, L. B. (2018). Adult executive functioning inventory (ADEXI): Validity, reliability, and relations to ADHD. International Journal of Methods in Psychiatric Research, 27, e1567. https://doi.org/10.1002/mpr.1567 （公开原研究，非本项目中文适配的验证。）",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "adexi_scoring",
+      "citation": "作者公开计分说明：https://chexi.se/onewebmedia/ADEXI%20subscales.pdf 。工作记忆题号 1,2,5,7,8,9,11,12,13；抑制 3,4,6,10,14；原计分采用均分。本包保留既有 2.0.0 合计分，不修改或冒称原始计分。核验 2026-11-01。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "adexi_translation",
+      "citation": "作者公开简体中文自评题本，Angela Siu, CUHK：https://chexi.se/onewebmedia/Adult%20Self%20Report%20Executive%20Functioning%20Inventory_SimplifiedChinese.pdf 。现有项目措辞并非该译本逐字复刻。使用声明 https://chexi.se/translations ：网站已有语言版本无需另获作者使用许可；商业数字化与改写再分发范围未在该声明中明确。核验 2026-11-01。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    }
+  ]
+}

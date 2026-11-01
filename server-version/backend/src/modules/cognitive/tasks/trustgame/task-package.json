@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "task": "trustgame",
+  "order": 119,
+  "identities": [
+    {
+      "testType": "trustgame",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 119
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "trustgame",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/trustgame/trustgame.registry.ts",
+      "export": "trustgameRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      119,
+      119
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/trustgame/__tests__/TrustgameTask.test.tsx",
+      "src/modules/cognitive/tasks/trustgame/__tests__/prng.test.ts"
+    ]
+  }
+}

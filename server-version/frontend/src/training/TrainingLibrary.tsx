@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Plus, Upload, FileText, Image, Video, Wrench, ArrowRight, Pencil, X } from 'lucide-react'
 import apiClient from '../api/client'
@@ -7,6 +7,8 @@ import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import { useAuth } from '../contexts/AuthContext'
 import TrainingCardDescription from './TrainingCardDescription'
 import TrainingToolCard, { type TrainingToolRow } from './TrainingToolCard'
+import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
+import {CATALOG_FACETS,catalogQuery,EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogFilters,type CatalogTagFacets} from '../api/catalogDiscovery'
 import './training-workspace.css'
 import './training-workspace-heading.css'
 import './training-workspace-cards.css'
@@ -26,6 +28,10 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
   const media=area==='media', navigate=useNavigate(), {user}=useAuth()
   const [params,setParams]=useSearchParams()
   const keyword=params.get('keyword')||'', kind=params.get('kind')||'all', source=params.get('source')||'all'
+  const classificationKey=CATALOG_FACETS.map(facet=>params.get(facet)||'').join(',')
+  const classification=useMemo(()=>({...EMPTY_CATALOG_FILTERS,keyword,...Object.fromEntries(CATALOG_FACETS.map((facet,index)=>[facet,classificationKey.split(',')[index]]))}),[keyword,classificationKey])
+  const tags=new URLSearchParams(catalogQuery(1,classification)).get('tags')||''
+  const [filters,setFilters]=useState(classification),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
   const page=Math.max(1,Number(params.get('page'))||1)
   const [search,setSearch]=useState(keyword),[rows,setRows]=useState<Row[]>([]),[total,setTotal]=useState(0)
   const [governanceOpen,setGovernanceOpen]=useState(false)
@@ -40,13 +46,20 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
     return()=>window.clearTimeout(timer)
   },[notice])
   useEffect(()=>{setSearch(keyword)},[keyword])
+  useEffect(()=>{setFilters(classification)},[classification])
+  const applyClassification=(value:CatalogFilters)=>{
+    const next=new URLSearchParams(params)
+    for(const facet of CATALOG_FACETS){if(value[facet])next.set(facet,value[facet]!);else next.delete(facet)}
+    if(value.keyword.trim())next.set('keyword',value.keyword.trim());else next.delete('keyword')
+    next.delete('page');setParams(next,{replace:true})
+  }
   useEffect(()=>{
     let active=true;setLoading(true);setError('')
-    void apiClient.get<{list:Row[];total:number}>(`/training-workspace/${media?'media':'tools'}`,{params:{keyword,kind,source,page,pageSize:LIBRARY_PAGE_SIZE}})
-      .then(result=>{if(!active)return;if(result.code!==0)throw new Error(result.message);const last=Math.max(1,Math.ceil(result.data.total/LIBRARY_PAGE_SIZE));if(page>last){setParams(previous=>{const next=new URLSearchParams(previous);next.set('page',String(last));return next},{replace:true});return}setRows(result.data.list);setTotal(result.data.total)})
+    void apiClient.get<{list:Row[];total:number;tagFacets?:CatalogTagFacets}>(`/training-workspace/${media?'media':'tools'}`,{params:{keyword,kind,source,page,pageSize:LIBRARY_PAGE_SIZE,...(!media&&tags?{tags}:{})}})
+      .then(result=>{if(!active)return;if(result.code!==0)throw new Error(result.message);const last=Math.max(1,Math.ceil(result.data.total/LIBRARY_PAGE_SIZE));if(page>last){setParams(previous=>{const next=new URLSearchParams(previous);next.set('page',String(last));return next},{replace:true});return}setRows(result.data.list);setTotal(result.data.total);setFacets(result.data.tagFacets??EMPTY_CATALOG_FACETS)})
       .catch(cause=>{if(active)setError(cause.message||'读取失败，请重试')}).finally(()=>{if(active)setLoading(false)})
     return()=>{active=false}
-  },[media,keyword,kind,source,page,revision,setParams])
+  },[media,keyword,kind,source,page,revision,setParams,tags])
   async function saveName(){
     if(!rename||!name.trim())return;setBusy(true);setError('');setNotice('')
     try{const result=await apiClient.patch(`/training-workspace/media/${rename.id}/name`,{name:name.trim()});if(result.code!==0)throw new Error(result.message);setRename(null);setNotice('名称已更新，已有引用保持有效。');setRevision(value=>value+1)}catch(cause){setError(cause instanceof Error?cause.message:'改名失败')}finally{setBusy(false)}
@@ -66,10 +79,11 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
   const pages=Math.max(1,Math.ceil(total/LIBRARY_PAGE_SIZE))
   return <div className={'training-library'+(media?'':' training-tools-library')}>
     <header className="training-library-heading training-workspace-heading"><div><h1>{media?'媒体':'工具'}</h1><p>{media?'统一管理上传的素材，查找已获授权的教学资源。':'创建与编辑表单、量表和普通组合问卷，按授权使用固定测评包。'}</p></div>
-      <form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={18} aria-hidden="true"/><input aria-label={media?'检索媒体':'检索工具'} placeholder={media?'搜索媒体名称':'搜索工具名称或介绍'} value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>
+      {media&&<form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={18} aria-hidden="true"/><input aria-label="检索媒体" placeholder="搜索媒体名称" value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>}
       <details className="training-library-create"><summary><Plus size={18}/>{media?'上传媒体':'编制工具'}</summary><div>{media?(['video','image','document'] as const).map(type=><button key={type} onClick={()=>{setUpload(type);document.querySelector<HTMLDetailsElement>('.training-library-create')?.removeAttribute('open')}}><Upload size={16}/>上传{labels[type]}</button>):<><Link to="/scales/new">编制量表</Link><Link to="/toolkit/forms/new">编制表单</Link><Link to="/questionnaire-products/new">创建普通组合问卷</Link></>}</div></details>
     </header>
     <div className="training-library-filter training-workspace-filter-bar"><div className="training-workspace-filters" role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><div className="training-library-filter-meta"><label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label><span>{loading?'正在读取…':`共 ${total} 项`}</span></div></div>
+    {!media&&<CatalogDiscoveryFilters label="工具分类筛选" filters={filters} facets={facets} onChange={setFilters} onApply={applyClassification} disabled={busy||loading}/>}
     {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<div role="status" className="training-library-notice"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
     {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid training-workspace-grid">{rows.map(row=>{
       if(!media)return <TrainingToolCard key={row.kind+':'+row.id} row={row} busy={busy} onUpdateVersion={()=>void updateVersion(row)}/>

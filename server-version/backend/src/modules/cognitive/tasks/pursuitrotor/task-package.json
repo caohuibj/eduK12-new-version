@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "pursuitrotor",
+  "order": 124,
+  "identities": [
+    {
+      "testType": "pursuitrotor",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 124
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "pursuitrotor",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/pursuitrotor/pursuitrotor.registry.ts",
+      "export": "pursuitrotorRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      124,
+      124
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/pursuitrotor/__tests__/PursuitrotorTask.test.tsx"
+    ]
+  }
+}

@@ -8,7 +8,7 @@ function scopeOutputs(content='false', presentation='false', frontend='false', e
   const selected=['media2','video_core','media7','situational_video','situational_branching'].filter(key=>output[key] === 'true');
   const groups=Object.entries({'images-video':['media2','video_core'],'cognitive-situational':['media7','situational_video','situational_branching']}).filter(([,keys])=>keys.some(key=>selected.includes(key))).map(([group])=>group);
   const ui=output.app_shell === 'true' || output.canonical_visual === 'true';
-  return {...output,frontend_build:String(frontend === 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(output.runner_profile === 'hosted' && scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
+  return {...output,frontend_build:String(frontend === 'true' && output.frontend_affected !== 'true' || scenario === 'platform' || ui || selected.length>0),ui_required:String(ui),visual_hosted:String(output.runner_profile === 'hosted' && scenario === 'platform'),media_selection:JSON.stringify(selected),media_groups:JSON.stringify(groups)};
 }
 
 const root = 'server-version/backend/src/modules/';
@@ -89,7 +89,7 @@ test('local page selection keeps shared runtime, explicit media and mixed change
 test('affected frontend uses existing jobs and every selected failure remains blocking',()=>{
   for(const draft of [true,false]){
     const needs={scope:{result:'success',outputs:scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true'})}};
-    const expected=draft?['scope','frontend']:['scope','frontend','docker','frontend-build','codeql'];
+    const expected=draft?['scope','frontend']:['scope','frontend','docker','codeql'];
     assert.deepEqual(requiredChecks(needs,draft),expected);
     for(const job of expected)needs[job]={...needs[job],result:'success'};
     assert.deepEqual(failedChecks(needs,draft),[]);
@@ -106,13 +106,14 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
     for(const name of ['frontend','frontend-build','pr-light-frontend','backend-browser-build','browser','docker','post-merge-smoke']){
       const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
       const selected=new Function('needs','github','vars','cancelled',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false);
-      assert.equal(Boolean(selected),name==='frontend'||['frontend-build','docker'].includes(name)&&!draft,name+' draft='+draft);
+      assert.equal(Boolean(selected),name==='frontend'||name==='docker'&&!draft,name+' draft='+draft);
     }
   }
   const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
   assert.match(block('frontend'),/affected_only:.*frontend_affected/);
-  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src\]'/);
-  assert.match(frontend,/npm test -- --changed "\$CI_BASE_SHA"/);
+  assert.match(block('codeql'),/frontend_affected == 'true' && 'paths: \[server-version\/frontend\/src, .github\/scripts\/content-scope.mjs/);
+  assert.match(frontend,/\['related','--run',\.\.\.files\]/);
+  assert.doesNotMatch(frontend,/npm test -- --changed/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
   assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true\n        run: npm test/);
 });
@@ -784,4 +785,33 @@ test('Cognitive mixed with image inputs selects full route and gate recomputes i
     assert(recheckCognitiveIntake({...needs,backend:{result:'failure'}},{base,head,cwd:dir}).includes('backend'));
     assert(recheckCognitiveIntake({...needs,scope:{...needs.scope,outputs:{...needs.scope.outputs,frontend:'true'}}},{base,head,cwd:dir}).includes('recomputed-cognitive-product-scope'));
   } finally {rmSync(dir,{recursive:true,force:true});}
+});
+
+test('report empty-state display uses affected frontend while requests, handlers and non-rendering code stay exact',()=>{
+ const file='server-version/frontend/src/training/TrainingGroupReports.tsx',css='server-version/frontend/src/components/scale-governance/catalog-discovery.css';
+ const old="import api from '../api/client';export function Report(){const [index,setIndex]=useState(null);const base='/courses/report';return <main>{index&&<button onClick={()=>api.post(base)}>生成</button>}</main>}";
+ const next=old.replace('{index&&','{index&&index.tasks.length===0&&<p role="status">暂无任务</p>}{index&&index.tasks.length>0&&');
+ const entries=[file,file.replace('.tsx','.test.tsx'),css,'docs/development/cua-report-theme.md'].map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+ const readers={readBaseFile:()=>old,readHeadFile:()=>next};
+ assert.equal(classifyChanges(entries,false,readers).frontend_affected,true);
+ const controls=['.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/homepage-copy-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci-frontend.yml','.github/workflows/ci.yml'].map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+ const combined=classifyChanges([...entries,...controls],false,readers);assert.equal(combined.frontend,true);assert.equal(combined.frontend_affected,true);
+ assert.equal(classifyChanges([...entries,{file:'.github/workflows/ci-backend.yml',status:'M',oldMode:'100644',newMode:'100644'}],false,readers).frontend_affected,false);
+ for(const text of [next.replace("'/courses/report'","'/admin/report'"),next.replace('api.post(base)','api.get(base)'),next.replace('useState(null)','useState({admin:true})'),next+";fetch('/api')",next.replace("'../api/client'","'../api/admin'")])
+  assert.equal(classifyChanges(entries,false,{...readers,readHeadFile:()=>text}).frontend_affected,false,text);
+ assert.equal(classifyChanges([...entries,{file:'server-version/frontend/package.json',status:'M',oldMode:'100644',newMode:'100644'}],false,readers).frontend_affected,false);
+ assert.equal(classifyChanges(entries.map(e=>e.file===file?{...e,newMode:'120000'}:e),false,readers).frontend_affected,false);
+ assert.equal(classifyChanges(entries,true,readers).frontend_affected,false);
+});
+
+test('affected display selects its existing report suite once without following CSS imports',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
+ const script=frontend.split('      - name: dependency-related frontend tests')[1].split("node --input-type=module <<'JS'\n")[1].split('\n          JS')[0].replace(/^          /gm,'').replace(/^import .*;\n/gm,'');
+ const calls=[];
+ runInNewContext(script,{process:{env:{CI_BASE_SHA:'a'.repeat(40),RUNNER_TEMP:'/tmp/fixture'}},execFileSync:(exe,args)=>{
+  if(exe==='git')return ['server-version/frontend/src/training/TrainingGroupReports.tsx','server-version/frontend/src/training/TrainingGroupReports.test.tsx','server-version/frontend/src/components/scale-governance/catalog-discovery.css','docs/development/cua-report.md'].join('\0');
+  calls.push([exe,...args]);
+ }});
+ assert.equal(calls.length,1);assert.equal(calls[0][4],'run');assert.equal(calls[0][5],'src/training/TrainingGroupReports.test.tsx');assert.equal(calls[0].includes('related'),false);
 });

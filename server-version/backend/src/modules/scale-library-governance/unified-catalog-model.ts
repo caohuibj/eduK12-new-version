@@ -70,7 +70,7 @@ export function authoredCatalogRecord(entry: AuthoredCatalogEntry, product: Libr
   if (!entry.supportedEntrypoints.includes(product)) reasons.push(entry.compatibilityReasons[product] ?? 'ENTRYPOINT_NOT_SUPPORTED')
   reasons.push('EXACT_USE_GRANT_AND_RUNTIME_CHECK_REQUIRED')
   return {
-    catalogId: `authored:${entry.id}`, origin: 'AUTHORED', instrumentClass: 'CUSTOM_DESCRIPTIVE',
+    classificationTags:entry.classificationTags??[],catalogId: `authored:${entry.id}`, origin: 'AUTHORED', instrumentClass: 'CUSTOM_DESCRIPTIVE',
     title: metadata?.title ?? entry.id,
     exactVersion: { origin: 'AUTHORED', entryId: entry.id, releaseId: entry.releaseId, releaseVersion: entry.releaseVersion, contentHash: entry.contentHash },
     availability: { status: entry.status === 'ACTIVE' && entry.supportedEntrypoints.includes(product) ? 'RESTRICTED' : 'NOT_AVAILABLE', reasons },

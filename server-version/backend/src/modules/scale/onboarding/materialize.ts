@@ -3,7 +3,7 @@ import { allowsScaleAxisRevision, freezeScaleAxisSnapshot } from './axis-snapsho
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
-import { getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
+import { SCALE_INSTRUMENT_REGISTRY, type ScaleInstrumentRegistry } from './instrument-registry'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -20,10 +20,10 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
   instrumentKey: string
   instrumentVersion: string
   actorUserId: string
-}) => {
-  const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
+}, registry: Pick<ScaleInstrumentRegistry, 'getSource' | 'getValidation'> = SCALE_INSTRUMENT_REGISTRY) => {
+  const source = registry.getSource(input.instrumentKey, input.instrumentVersion)
   if (!source?.executable) throw new Error('Scale instrument source is not executable')
-  const errors = getScaleInstrumentValidation(input.instrumentKey, input.instrumentVersion)!.issues.filter(issue => issue.severity === 'error')
+  const errors = registry.getValidation(input.instrumentKey, input.instrumentVersion)!.issues.filter(issue => issue.severity === 'error')
   if (errors.length) throw new Error(`Scale materialization blocked: ${errors.map(issue => `${issue.path}:${issue.message}`).join('; ')}`)
   const executable = source.executable
   const definitionHash = hashScaleDefinition(executable.definition)

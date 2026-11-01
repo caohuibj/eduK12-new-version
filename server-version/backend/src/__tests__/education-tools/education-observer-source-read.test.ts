@@ -1,6 +1,9 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 const m=vi.hoisted(()=>({query:vi.fn(),authorize:vi.fn(),publicUse:vi.fn(),libraryUse:vi.fn(),authority:vi.fn()}))
-vi.mock('../../config/database',()=>({prisma:{$transaction:async(fn:any)=>fn({$queryRaw:m.query})}}))
+vi.mock('../../config/database',()=>({prisma:{$transaction:async(fn:any)=>fn({$queryRaw:async(query:any)=>{
+ const rows=await m.query(query)
+ return query.sql.includes('AS "facetTags"')?[{list:rows.map((row:any)=>({...row,classificationTags:row.classificationTags??[]})),facetTags:[]}]:rows
+}})}}))
 vi.mock('../../modules/education-tools/private-tool.access',()=>({authorizePrivateTool:m.authorize}))
 vi.mock('../../modules/scale-library-governance/authority',()=>({assertLibraryResourcesAuthority:m.authority}))
 vi.mock('../../modules/education-tools/public-source.catalog',async original=>({...await original<object>(),readEducationPublicUse:m.publicUse}))

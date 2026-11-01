@@ -1,0 +1,28 @@
+{
+  "version": "0.1.0",
+  "items": [
+    {
+      "ruleId": "daily_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "chexi_working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "chexi_inhibition"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "这是家长在家庭及日常生活中的观察。分数在1至5原量尺上表示观察到的困难，不是认知任务成绩。",
+      "evidenceKeys": [
+        "chexi_working_memory",
+        "chexi_inhibition"
+      ],
+      "supportRefs": []
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "values": {
+    "chexi_working_memory": {
+      "state": "invalid"
+    },
+    "chexi_inhibition": {
+      "state": "invalid"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED"
+}

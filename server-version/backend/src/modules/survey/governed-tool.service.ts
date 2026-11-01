@@ -1,8 +1,12 @@
+import {z} from 'zod'
+import sourceTagLabels from '../scale/library/catalog-tag-labels.json'
+import {catalogClassificationTags} from '../scale/library/catalog-discovery'
+import {formDraftSchema} from '../assessment-core/form/definition'
 import {readInstance as readNativeInstance} from '../bundle-product/instance'
 import {freezeSurveyNativeSource,assertSurveyNativeAdmission} from '../bundle-product/survey-source'
 import type {SurveyNativeSource} from '../bundle-product/survey-native'
-import {catalogDiscoveryRecords,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity} from './catalog-discovery'
-import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryPageSql,jsonTagIds,sjtMetadataTagIds,discoveryJoin,governedDiscoveryIdentity} from './catalog-discovery'
+import {catalogTagFacets,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
 import {randomUUID} from 'node:crypto'
@@ -103,7 +107,7 @@ export async function previewSurveyNativeSource(actor:string,id:string){
  const row=await prisma.compositeAssessment.findFirst({where:{id,createdBy:actor,status:'PUBLISHED',productKind:'ASSESSMENT_BUNDLE'},include:{bundleInstance:true}})
  if(!row?.bundleInstance)governedFail(404,'原生整包必须是本人已发布版本')
  const {frozen}=readNativeInstance(row.bundleInstance)
- if(frozen.declarativePackage?.schemaVersion!==2)governedFail(409,'此来源尚无理论画像适配')
+ if(frozen.declarativePackage?.schemaVersion!==2&&frozen.declarativePackage?.schemaVersion!==3)governedFail(409,'此来源尚无原生整包报告适配')
  return {title:row.name,compositeId:row.id,definitionHash:row.bundleInstance.definitionHash,bindingsHash:row.bundleInstance.bindingsHash,slots:frozen.bundleSnapshot.slotBindings.map(s=>({slotKey:s.slotKey,kind:s.unitType})),context:frozen.contextDefinition?.fields.map(f=>({contextKey:f.contextKey,valueType:f.valueType}))??[]}
 }
 export async function submitGovernedPackage(actor:string,input:{requestId:string;family:'COMBINATION'|'BUNDLE';toolKey:string;version:string;title:string;components:Array<{slotKey:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string}}> ;report:PackageReport|null;nativeBundle?:SurveyNativeSource;reference:Record<string,unknown>},proof:AdminSessionProof){return prisma.$transaction(async tx=>{
@@ -119,14 +123,15 @@ export async function governedSources(actor:string,kind:'SCALE'|'COGNITIVE'|'SJT
 export async function governedCatalog(actor:string,input:{family?:GovernedFamily;page:number;query?:string}&CatalogDiscoveryFilters,system=true){
  if(system)await assertStandardSystem(prisma,actor);else await prisma.$transaction(tx=>assertSurveyLibraryManager(tx,actor))
  const records=catalogDiscoveryRecords(),filters={...input,keyword:input.keyword||input.query}
- const rows=await prisma.$queryRaw<Array<GovernedSummaryRow&{classification_tags?:import('../scale/library/catalog-discovery').CatalogClassificationTag[]}>>(Prisma.sql`SELECT ${governedSummaryColumns},COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity)} WHERE (${input.family??null}::text IS NULL OR t.family=${input.family??null}) AND ${discoverySqlFilter([Prisma.sql`t.title`,Prisma.sql`t.tool_key`,Prisma.sql`t.snapshot_hash`],filters)} ${system?Prisma.empty:Prisma.sql`AND t.state IN ('ONLINE','WITHDRAWN')`} ORDER BY t.submitted_at DESC,t.id LIMIT 26 OFFSET ${(input.page-1)*25}`)
+ const [catalog]=await prisma.$queryRaw<Array<{list:Array<GovernedSummaryRow&{classification_tags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`SELECT discovery.ids,discovery.terms,${governedSummaryColumns},COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${standardDiscoveryMetadataJoin(governedDiscoveryIdentity.key,governedDiscoveryIdentity.version,governedDiscoveryIdentity.kind)} ${discoveryJoin(records,{...governedDiscoveryIdentity,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`},Prisma.sql`${jsonTagIds(Prisma.sql`t.reference#>'{metadata,tags}'`)} || CASE WHEN t.family='FORM' THEN COALESCE((SELECT jsonb_agg(tag->>'id') FROM jsonb_array_elements(${jsonTagIds(Prisma.sql`t.reference#>'{metadata,classificationTags}'`)}) tag WHERE jsonb_typeof(tag->'id')='string'),'[]'::jsonb) ELSE '[]'::jsonb END || CASE WHEN t.family='SJT' THEN ${sjtMetadataTagIds(Prisma.sql`t.snapshot#>'{unit,compiledDefinition}'`)} ELSE '[]'::jsonb END`)} WHERE (${input.family??null}::text IS NULL OR t.family=${input.family??null}) ${system?Prisma.empty:Prisma.sql`AND t.state IN ('ONLINE','WITHDRAWN')`}`,filters,text:[Prisma.sql`v.title`,Prisma.sql`v.tool_key`,Prisma.sql`v.snapshot_hash`],order:Prisma.sql`v.submitted_at DESC,v.id`,limit:26,offset:(input.page-1)*25,tagColumn:Prisma.sql`v.classification_tags`}))
+ const rows=catalog.list
  const selected=rows.slice(0,25),policies=await readToolPolicies(prisma,selected.map(governedPolicyIdentity)),list=[]
  for(const r of selected){
   const policy=policies.get('governed-release:'+r.id+':'+r.snapshot_hash)!,contentReasons=r.blockers,approvalReasons=r.state==='ONLINE'?[]:[r.state==='TRIAL_FAILED'?'自动试运行未通过':r.state==='WITHDRAWN'?'已停止新增使用':'尚未通过系统批准及自动试运行',...r.blockers]
   const assignmentReasons=[...approvalReasons,...contentReasons,...(policy.decision==='APPROVED'?[]:['尚未批准 Survey 使用范围']),...(policy.paused?['Survey 新增使用已暂停：'+policy.reason]:[])]
   list.push({...summaryView(r),classificationTags:r.classification_tags??[],policy,states:{content:{ready:!contentReasons.length,reasons:contentReasons},assignment:{ready:!assignmentReasons.length,reasons:assignmentReasons},deployment:{ready:false,reasons:[...assignmentReasons,'投放时还需核对研究者的精确版本授权和冻结绑定']}}})
  }
- return {list,page:input.page,hasMore:rows.length>25,tagFacets:discoveryFacets(records,input.family)}
+ return {list,page:input.page,hasMore:rows.length>25,tagFacets:catalogTagFacets([catalog.facetTags])}
 }
 export async function governedDetail(actor:string,id:string){await assertStandardSystem(prisma,actor);const row=await governedRow(prisma,id);const trials=await prisma.$queryRaw<Array<{id:string;run_id:string;case_index:number;result_hash:string;created_at:Date;report:unknown}>>`SELECT id,run_id,case_index,result_hash,created_at,result->'report' AS report FROM survey_governed_trials WHERE tool_id=${id} ORDER BY created_at DESC LIMIT 60`;return {...governedView(row),snapshot:row.snapshot,reference:{...row.reference,applications:[...row.reference.applications,{submittedBy:row.submitted_by,submittedAt:row.submitted_at}],approvals:[...row.reference.approvals,...(row.approved_by?[{approvedBy:row.approved_by,approvedAt:row.approved_at,reason:row.approval_reason}]:[])]},trials}}
 export async function governedComponentOptions(actor:string,page=1,query=''){
@@ -225,3 +230,29 @@ export function originalSjtArtifact(actor:string,input:OriginalSjtSubmission):Go
 }
 export async function previewOriginalSjt(actor:string,input:OriginalSjtSubmission,proof:AdminSessionProof){await assertStandardSystem(prisma,actor,proof);const a=originalSjtArtifact(actor,input);const measurement=(await import('../measurement-content/release')).prepareRelease(governedMeasurementInput(snapshotUnit(a.unit!),{kind:'PLATFORM'},input.toolKey,input.version));const parameters=measurement.layer==='MEASUREMENT'?await prisma.$queryRaw<Array<{id:string;key:string;version:string}>>`SELECT r.id,r.content_key AS key,r.version FROM measurement_content_releases r JOIN measurement_content_releases m ON m.id=r.content#>>'{measurement,releaseId}' WHERE r.layer='REFERENCE' AND r.family='SJT' AND r.status='PUBLISHED' AND r.scope->>'kind'='PLATFORM' AND m.content->>'measurementHash'=${measurement.content.measurementHash} ORDER BY r.published_at DESC,r.id LIMIT 100`:[];return {blockers:artifactBlockers(a),metrics:artifactMetrics(a),parameters}}
 export async function submitOriginalSjt(actor:string,input:OriginalSjtSubmission,proof:AdminSessionProof){return prisma.$transaction(async tx=>{await assertStandardSystem(tx,actor,proof);const a=originalSjtArtifact(actor,input);a.parameters=await selectedParameters(tx,input.parameterReleaseId);a.unit!.provenance.governedMedia=await ownGovernedMedia(tx,actor,input.requestId,a.unit!);return insertSubmission(tx,actor,input.requestId,a)})}
+
+/** Save complete native Form content for system review; no business author,
+ * organization, measurement release, use grant or trial is created. */
+export const originalFormSubmission=z.object({
+ requestId:z.string().uuid(),toolKey:z.string().regex(/^[a-z][a-z0-9_-]{0,100}$/),
+ version:z.string().trim().min(1).max(120),title:z.string().trim().min(1).max(200),
+ definition:formDraftSchema,statement:z.string().trim().min(1).max(2000),
+ classificationTags:z.array(z.string().refine(id=>Object.prototype.hasOwnProperty.call(sourceTagLabels,id),'请选择已有分类标签')).max(50).default([]),
+ reference:z.record(z.string(),z.unknown()).refine(value=>Buffer.byteLength(JSON.stringify(value),'utf8')<=65536,'Reference 超过保存预算'),
+}).strict()
+export function originalFormArtifact(actor:string,raw:unknown):GovernedArtifact{
+ const input=originalFormSubmission.parse(raw)
+ const compiled=compileFrozenResearchUnit({id:input.requestId,instrumentKey:input.toolKey,kind:'FORM',title:input.title,revision:1,definition:input.definition})
+ const classificationTags=catalogClassificationTags({constructOverlapTags:input.classificationTags})
+ const unit={ref:{kind:'FORM' as const,sourceId:'original-form:'+input.toolKey,sourceVersion:input.version},title:input.title,
+  displayDefinition:compiled.displayDefinition,compiledDefinition:compiled.compiledDefinition,definitionDigest:compiled.sourceDigest,scoringDigest:null,
+  adapterVersion:'survey-catalog-v1' as const,provenance:{instrumentKey:input.toolKey,submittedBy:actor,originalContent:true}}
+ return {schemaVersion:1,family:'FORM',toolKey:'FORM:original:'+input.toolKey,version:input.version,title:input.title,unit,
+  parameters:null,report:null,components:[],packageReport:null,
+  reference:artifactReference('FORM',input.toolKey,{annotations:clone(input.reference),classificationTags,submissionStatement:input.statement,originalContent:true})}
+}
+export async function submitOriginalForm(actor:string,raw:unknown){return prisma.$transaction(async tx=>{
+ await assertStandardSystem(tx,actor)
+ const a=originalFormArtifact(actor,raw)
+ return {...await insertSubmission(tx,actor,(raw as {requestId:string}).requestId,a),classificationTags:a.reference.metadata.classificationTags}
+})}

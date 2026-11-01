@@ -1,4 +1,6 @@
 import type {RunRequestedPolicy} from './runs'
+import type {CatalogClassificationTag,CatalogTagFacets} from './catalogDiscovery'
+export type EducationAssessmentDiscovery={keyword?:string;tags?:readonly string[]}
 
 export type EducationAssessmentProduct='SCHOOL'|'TEACHER'
 export type EducationAssessmentFamily='COGNITIVE'|'SITUATIONAL'|'BUNDLE'
@@ -17,6 +19,7 @@ export type EducationAssessmentUnit={
  * These fields control presentation; addTrack must independently recheck them.
  */
 export type EducationAssessmentResource={
+  classificationTags?:CatalogClassificationTag[]
   title:string;family:EducationAssessmentFamily;key:string;version:'1.0.0'
   product:EducationAssessmentProduct;organizationId:string
   releaseStatus:'DRAFT'|'PUBLISHED'|'HOLD'|'DEPRECATED'|'ARCHIVED'
@@ -25,6 +28,7 @@ export type EducationAssessmentResource={
   requestedPolicy:RunRequestedPolicy
 }
 export type EducationAssessmentDirectory={
+  tagFacets?:CatalogTagFacets
   scope:Omit<EducationAssessmentScope,'actorKey'>
   list:EducationAssessmentResource[];nextCursor:string|null
 }
@@ -39,7 +43,7 @@ export type EducationAssessmentTrackInput={
  * session id or browser capability flag can substitute for this service.
  */
 export interface EducationAssessmentResourceAdapter{
-  list(scope:EducationAssessmentScope,cursor?:string):Promise<EducationAssessmentDirectory>
+  list(scope:EducationAssessmentScope,cursor?:string,filters?:EducationAssessmentDiscovery):Promise<EducationAssessmentDirectory>
   addTrack(scope:EducationAssessmentScope,input:EducationAssessmentTrackInput):Promise<void>
 }
 

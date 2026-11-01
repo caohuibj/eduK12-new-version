@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "task": "auditoryrt",
+  "order": 131,
+  "identities": [
+    {
+      "testType": "auditoryrt",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "order": 131
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "auditoryrt",
+      "engineVersion": "1.0.1",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/auditoryrt/auditoryrt.registry.ts",
+      "export": "auditoryrtRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      131,
+      131
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/auditoryrt/__tests__/AuditoryrtTask.test.tsx"
+    ]
+  }
+}

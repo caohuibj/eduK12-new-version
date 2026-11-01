@@ -1,4 +1,4 @@
-import { readInstance } from './service'
+import { readInstance } from './instance'
 import { buildBundleContextFactsFromValues } from '../assessment-bundle/context'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 

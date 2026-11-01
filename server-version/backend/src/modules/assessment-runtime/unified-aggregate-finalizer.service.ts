@@ -1584,7 +1584,10 @@ export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: s
 // The same frozen-source validator used by FINAL is reused by explicit recovery.
 // Reads only canonical snapshots / declared Form facts; never raw child answers.
 export async function readCompletedCompositeBundleInputs(attemptId: string) {
-  const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: compositeParentGraphSelect as any }) as any
+  const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: {
+    ...compositeParentGraphSelect, userId: true, subjectUserId: true, respondentUserId: true,
+    respondentType: true, episodeId: true, consentId: true,
+  } as any }) as any
   if (!parent || parent.status !== 'COMPLETED' || !isNativeBundleComposite(parent.compositeAssessment)) throw aggregateInputError('Bundle 尚未完成')
   const frozenSlots = await readFrozenSlotSet(parent)
   const headers = await loadSnapshotHeaders({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true })

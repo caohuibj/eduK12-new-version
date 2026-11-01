@@ -3,6 +3,18 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      bundle_runtime:
+        type: boolean
+        default: false
+      bundle_family:
+        type: boolean
+        default: false
+      base_sha:
+        type: string
+        default: ''
+      catalog_discovery:
+        type: boolean
+        default: false
       survey_selection:
         type: boolean
         default: false
@@ -30,7 +42,7 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       NODE_OPTIONS: --max-old-space-size=3072
       TZ: UTC
-      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      CI_BASE_SHA: ${{ inputs.base_sha || github.event.pull_request.base.sha || github.event.before }}
     defaults:
       run:
         working-directory: server-version/frontend
@@ -83,10 +95,10 @@ jobs:
       - name: integrated application types without duplicate cognitive subset
         if: inputs.survey_selection || inputs.affected_only
         run: |
-          npm run pretypecheck
+          if [ "${{ inputs.bundle_family }}" != "true" ] && [ "${{ inputs.bundle_runtime }}" != "true" ]; then npm run pretypecheck; fi
           npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
-        if: inputs.survey_selection != true
+        if: inputs.survey_selection != true && inputs.affected_only != true
         run: |
           for attempt in 1 2 3; do
             if npm audit --audit-level=high; then
@@ -102,13 +114,43 @@ jobs:
         if: inputs.survey_selection != true && inputs.affected_only != true
         run: npm test
       - name: dependency-related frontend tests
-        if: inputs.affected_only
+        if: inputs.affected_only && inputs.catalog_discovery != true
         run: |
-          npm test -- --changed "$CI_BASE_SHA" --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/frontend-affected.json"
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          // CSS has no TypeScript behavior. Do not use its reverse import graph
+          // to select every consumer of a shared stylesheet.
+          const files=execFileSync('git',['diff','--name-only','-z','--no-renames',process.env.CI_BASE_SHA,'HEAD'],{encoding:'utf8'}).split('\0').filter(file=>/^server-version\/frontend\/src\/.*\.tsx?$/.test(file)).map(file=>file.slice('server-version/frontend/'.length));
+          if(!files.length)throw Error('Missing affected TypeScript source');
+          const report='src/training/TrainingGroupReports.tsx', suite=report.replace('.tsx','.test.tsx');
+          const selection=files.includes(report)&&files.every(file=>[report,suite].includes(file))?['run',suite]:['related','--run',...files];
+          execFileSync('npm',['exec','--','vitest',...selection,'--reporter=default','--reporter=json','--outputFile='+process.env.RUNNER_TEMP+'/frontend-affected.json'],{stdio:'inherit'});
+          JS
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
           const report=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/frontend-affected.json','utf8'));
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
+          JS
+      - name: affected catalog selectors and paging contracts
+        if: inputs.catalog_discovery && !inputs.bundle_family && !inputs.bundle_runtime
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const checks=JSON.parse(readFileSync('../../.github/config/catalog-discovery-checks.json','utf8'));
+          const files=checks.tests.filter(f=>f.startsWith('server-version/frontend/')).map(f=>f.slice('server-version/frontend/'.length));
+          execFileSync('npm',['test','--',...files,'--reporter=default','--reporter=json','--outputFile=/tmp/catalog-frontend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/catalog-frontend.json',...files],{stdio:'inherit'});
+          JS
+      - name: affected frozen Bundle report components
+        if: inputs.bundle_runtime
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const {frontendChecks:files}=JSON.parse(readFileSync('../../.github/config/bundle-runtime-checks.json','utf8'));
+          execFileSync('npm',['test','--',...files,'--reporter=default','--reporter=json','--outputFile=/tmp/bundle-runtime-frontend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/bundle-runtime-frontend.json',...files],{stdio:'inherit'});
           JS
       - name: affected Wave selector and direct consumers
         if: inputs.survey_selection

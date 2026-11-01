@@ -1,0 +1,134 @@
+[
+  {
+    "evidenceKey": "gonogo.commission_rate",
+    "slotKey": "gonogo",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "gonogo.commission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.omission_rate",
+    "slotKey": "gonogo",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "gonogo.omission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo.d_prime",
+    "slotKey": "gonogo",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "gonogo.d_prime",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.d_prime",
+    "slotKey": "cpt",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "cpt.d_prime",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.omission_rate",
+    "slotKey": "cpt",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "cpt.omission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.commission_rate",
+    "slotKey": "cpt",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "cpt.commission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "cpt.rt_icv",
+    "slotKey": "cpt",
+    "selector": "rtICV",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "cpt.rt_icv",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker.flanker_effect_ms",
+    "slotKey": "flanker",
+    "selector": "flankerEffectMs",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "flanker.flanker_effect_ms",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker.congruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "congruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "flanker.congruent_accuracy",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker.incongruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "incongruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "flanker.incongruent_accuracy",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "texi.working_memory",
+    "slotKey": "texi",
+    "selector": "working_memory",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "texi.working_memory_mean",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "texi.inhibition",
+    "slotKey": "texi",
+    "selector": "inhibition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "texi.inhibition_mean",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  }
+]
