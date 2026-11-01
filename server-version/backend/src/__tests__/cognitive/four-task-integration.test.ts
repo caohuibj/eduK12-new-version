@@ -51,7 +51,10 @@ describe('four-task generated registration and frozen report integration', () =>
       expect(resolveRunner(id.testType, '1.0.0')).toBeTruthy()
       expect(resolveRunner(id.testType, '999.0.0')).toBeUndefined()
       expect(getCognitiveRegistryEntry(id.testType, '999.0.0', id.scoringVersion)).toBeUndefined()
-      expect(cognitiveSeeds.filter(seed => seed.testType === id.testType && seed.engineVersion === id.engineVersion && seed.scoringVersion === id.scoringVersion)).toHaveLength(1)
+      const configs = cognitiveSeeds.filter(seed => seed.testType === id.testType && seed.engineVersion === id.engineVersion && seed.scoringVersion === id.scoringVersion)
+      expect(new Set(configs.map(seed => seed.configVersion)).size).toBe(configs.length)
+      expect(configs.some(seed => !seed.configVersion.endsWith('-report3'))).toBe(true)
+      expect(configs.some(seed => seed.configVersion.endsWith('-report3'))).toBe(true)
     }
     expect(getCognitiveRegistryEntry('icarmatrix', '2.0.0', '1.0.0')?.recommendedForCreate).toBe(false)
   })

@@ -186,3 +186,14 @@ test('CI image script forces only local Docker export for printed and executed b
   resolved.target.frontend.output = [{type:'docker'}];
   verifyResolvedPlan(resolved,true);
 });
+
+test('directed Cognitive compilation preserves normal defaults and runtime security refresh',()=>{
+ const env={COGNITIVE_PRODUCT:'true'};
+ const p=resolved(runtimeRefreshPlan(fixture(false,false),false,false,env));
+ for(const name of ['backend','worker'])assert.equal(p.target[name].args.COGNITIVE_PRODUCT_BUILD,'true');
+ assert.equal(p.target.frontend.args.COGNITIVE_PRODUCT_BUILD,undefined);
+ verifyResolvedPlan(p,false,false,env);
+ const changed=structuredClone(p);changed.target.backend.args.COGNITIVE_PRODUCT_BUILD='false';
+ assert.throws(()=>verifyResolvedPlan(changed,false,false,env));
+ assert.throws(()=>verifyResolvedPlan(p,false,false,{}),/Cognitive compile mode changed/);
+});

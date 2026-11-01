@@ -34,14 +34,14 @@ it('the combined current identities keep exact C/S/R seeds, execution, runners a
 })
 
 // Synthetic transport; real host, registry, deferred runner and task introduction.
-it.each(['lineangle', 'sharegame', 'embeddedfigures', 'icarmatrix'])(
+it.each(['lineangle', 'sharegame', 'embeddedfigures', 'icarmatrix', 'sentencecheck', 'visualwm', 'auditorynback'])(
   '%s current report seed enters its actual introduction through the host', async task => {
     const identity = identities.find(row => row.task === task)!
     const seed = cognitiveSeeds.find(row => row.testType === task && row.configVersion === identity.configVersion)!
     const readiness = resolveCognitiveReadinessProfile(task, seed.engineVersion)!
     expect(readiness.resumeDisposition).toBe('restart-required')
     expect(readiness.inputs).toEqual(task === 'sharegame' ? ['pointer', 'touch'] : ['keyboard', 'pointer', 'touch'])
-    expect(readiness.globalKeyboardCapture).toBe(task === 'lineangle')
+    expect(readiness.globalKeyboardCapture).toBe(['lineangle', 'sentencecheck', 'visualwm', 'auditorynback'].includes(task))
     expect(resolveCognitiveReadinessProfile(task, 'unregistered-version')).toBeUndefined()
     harness.controller.state = runnerReducer(initialRunnerState, { type: 'SESSION_LOADED', trialIndex: 0,
       session: { sessionId: 'synthetic-union', assignmentId: 'synthetic-assignment', testType: task,

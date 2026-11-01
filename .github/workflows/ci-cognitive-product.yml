@@ -20,6 +20,31 @@ jobs:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       BACKGROUND_WORKERS_ENABLED: 'false'
       TZ: UTC
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:cognitive-ci-fixture-only@127.0.0.1:5432/cognitive_product_ci_test
+      COGNITIVE_INSTALL_TEST_DATABASE_URL: postgresql://postgres:cognitive-ci-fixture-only@127.0.0.1:5432/cognitive_product_ci_test
+      REDIS_URL: redis://127.0.0.1:6379
+      JWT_SECRET: synthetic-cognitive-ci-session-only
+      CORS_ORIGIN: http://localhost:5174
+      ADMIN_WEBAUTHN_ORIGIN: http://localhost:5174
+      ADMIN_WEBAUTHN_RP_ID: localhost
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: cognitive-ci-fixture-only
+          POSTGRES_DB: cognitive_product_ci_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cognitive_product_ci_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,30 +62,16 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
           npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
-      - name: generate current Prisma types without accessing a database
+      - name: prepare the isolated empty database for real intake HTTP
         working-directory: server-version/backend
-        env:
-          DATABASE_URL: postgresql://type_only:synthetic@127.0.0.1:1/no_database
-        run: npx prisma generate
-      - name: combined contract projection and one compile per application
-        run: node .github/scripts/cognitive-product-check.mjs
-      - name: bind compiled components with the existing artifact contract
         run: |
-          node .github/scripts/ci-artifact.mjs write backend
-          node .github/scripts/ci-artifact.mjs write frontend
+          npx prisma generate
+          npx prisma migrate deploy
+      - name: real runner scorer freeze and isolated intake boundaries
+        run: node .github/scripts/cognitive-product-check.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cognitive-product-${{ github.sha }}
           path: cognitive-product-evidence/
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist/
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist/
           if-no-files-found: error

@@ -27,12 +27,14 @@ export function buildSources(env = {}) {
     if (name === 'ALPINE_MIRROR')
       assert.ok(/^https:\/\/[a-z0-9.-]+(?::\d+)?(?:\/[a-z0-9._~-]+)*\/?$/i.test(sources[name]), 'ALPINE_MIRROR must be a repository prefix');
   }
+  assert.ok([undefined, 'true', 'false'].includes(env.COGNITIVE_PRODUCT), 'Invalid Cognitive image mode');
+  if (env.COGNITIVE_PRODUCT === 'true') sources.COGNITIVE_PRODUCT_BUILD = 'true';
   return sources;
 }
 function sourceArguments(name, sources) {
   return name === 'frontend'
     ? { NPM_REGISTRY: sources.NPM_REGISTRY, ALPINE_MIRROR: sources.ALPINE_MIRROR }
-    : { NPM_REGISTRY: sources.NPM_REGISTRY, DEBIAN_MIRROR: sources.DEBIAN_MIRROR };
+    : { NPM_REGISTRY: sources.NPM_REGISTRY, DEBIAN_MIRROR: sources.DEBIAN_MIRROR, ...(sources.COGNITIVE_PRODUCT_BUILD ? {COGNITIVE_PRODUCT_BUILD:sources.COGNITIVE_PRODUCT_BUILD}: {}) };
 }
 function validateTargets(plan, frontendOnly, backendOnly) {
   const expected = selectedTargets(frontendOnly, backendOnly);
@@ -64,6 +66,7 @@ export function verifyResolvedPlan(plan, frontendOnly, backendOnly = false, env 
     const target = plan.target[name];
     for (const [arg, value] of Object.entries(sourceArguments(name, sources)))
       assert.equal(target.args?.[arg], value, `Resolved build source changed: ${arg}`);
+    if (name !== 'frontend') assert.equal(target.args?.COGNITIVE_PRODUCT_BUILD ?? 'false', env.COGNITIVE_PRODUCT === 'true' ? 'true' : 'false', 'Cognitive compile mode changed');
     assert.deepEqual(target['no-cache-filter'], ['runtime'], 'Runtime security refresh was lost');
     assert.ok(!target['no-cache'], 'Dependency/build caches must remain reusable');
     assert.equal(target.pull, true, 'Base image refresh must be enabled');

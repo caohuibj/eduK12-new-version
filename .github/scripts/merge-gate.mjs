@@ -105,7 +105,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
-  if(scope.application_route==='cognitive-product')return draft?['scope']:['scope','cognitive-product','codeql'];
+  if(scope.application_route==='cognitive-product')return draft?['scope']:['scope','cognitive-product','docker','codeql'];
   if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
   if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
@@ -204,7 +204,7 @@ export function failedChecks(needs, draft) {
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
   if(scope.application_route==='cognitive-product'){
     try{const p=JSON.parse(scope.cognitive_product_plan);
-      if(p.schema!==1||p.route!=='cognitive-product'||!Array.isArray(p.files)||!p.files.length||!Array.isArray(p.required)||JSON.stringify(p.required)!==JSON.stringify(['cognitive-contracts','registration-boundary','backend-compile','frontend-compile','sast'])||Object.entries(cognitiveProductOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');
+      if(p.schema!==1||p.route!=='cognitive-product'||!Array.isArray(p.files)||!p.files.length||!Array.isArray(p.required)||JSON.stringify(p.required)!==JSON.stringify(['cognitive-contracts','runner-scorer-freeze-intake','production-images','runtime-scans','sast'])||Object.entries(cognitiveProductOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');
     }catch{failed.push('scope');}
     return [...new Set(failed)];
   }

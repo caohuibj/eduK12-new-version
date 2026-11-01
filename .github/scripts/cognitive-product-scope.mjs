@@ -31,13 +31,15 @@ export function cognitiveMixedProductScope(entries, readHeadFile, readBaseFile) 
 }
 
 const controls=new Set(['.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml',
+ '.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml',
  '.github/scripts/cognitive-product-scope.mjs','.github/scripts/cognitive-product.test.mjs','.github/scripts/cognitive-product-check.mjs','.github/workflows/ci-cognitive-product.yml']);
 const front='server-version/frontend/src/', back='server-version/backend/src/';
-const carriers=new Set([back+'modules/admin-permissions/routes.ts',front+'App.tsx',...['SystemAdminShell.tsx','navigation.ts','systemWorkspace.ts'].map(f=>front+'admin/'+f)]);
+const carriers=new Set(['server-version/backend/Dockerfile',back+'modules/admin-permissions/routes.ts',front+'App.tsx',...['SystemAdminShell.tsx','navigation.ts','systemWorkspace.ts'].map(f=>front+'admin/'+f)]);
 function unchangedOutsideIntake(file,before,after){
  if(typeof before!=='string'||typeof after!=='string')return false;
  let normalized=after;
- if(file===back+'modules/admin-permissions/routes.ts') normalized=normalized
+ if(file==='server-version/backend/Dockerfile') normalized=normalized.replace('ARG COGNITIVE_PRODUCT_BUILD=false\n# The directed product job already checks Cognitive manifests and dependencies.\nRUN if [ \"$COGNITIVE_PRODUCT_BUILD\" = true ]; then npx tsc; else npm run build; fi', 'RUN npm run build');
+ else if(file===back+'modules/admin-permissions/routes.ts') normalized=normalized
   .replace("import { cognitiveIntakeAdminRouter } from '../cognitive/onboarding/admin.routes'\n",'')
   .replace("adminPermissionsRouter.use('/cognitive-intake', cognitiveIntakeAdminRouter)\n",'');
  else if(file===front+'App.tsx') normalized=normalized
@@ -60,7 +62,7 @@ export function cognitiveProductPlan(entries,base,head,readHead,readBase){
   return null;
  }
  return {schema:1,route:'cognitive-product',base,head,files:entries.map(e=>e.file).sort(),
-  required:['cognitive-contracts','registration-boundary','backend-compile','frontend-compile','sast']};
+  required:['cognitive-contracts','runner-scorer-freeze-intake','production-images','runtime-scans','sast']};
 }
 export function cognitiveProductOutputs(p){
  const flags=['maintenance','content','presentation','frontend','frontend_test','documentation','frontend_build','ui_required','visual_hosted','scale','scale_intake_light','cognitive_intake_light','situational','bundle',
