@@ -1,0 +1,40 @@
+{
+  "key": "child_cognitive_tasks_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "task_evidence",
+      "kind": "evidence",
+      "title": "这次任务留下的记录",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "observations",
+      "kind": "conclusions",
+      "title": "理解规则与行动",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "gonogo_observation",
+        "flanker_observation",
+        "task_reflection"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "缺少任务结果，保留已完成工具的独立报告。",
+    "limited": "部分记录质量有限，仅解释有依据的部分。",
+    "unavailable": "缺少年龄或超出本草稿年龄范围，不能生成本任务组件解释。"
+  }
+}

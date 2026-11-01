@@ -114,6 +114,7 @@ const ClassroomAnswer = React.lazy(() => import('./pages/student/ClassroomAnswer
 const ClassroomEnter = React.lazy(() => import('./pages/student/ClassroomEnter'))
 const AnonymousStudyPage = React.lazy(() => import('./pages/public/AnonymousStudyPage'))
 const CompositeAssessmentPage = React.lazy(() => import('./modules/composite/CompositeAssessmentPage'))
+const ChildCognitiveControlPage = React.lazy(() => import('./pages/relational/ChildCognitiveControlPage'))
 const CompositeReportPage = React.lazy(() => import('./modules/composite/CompositeReportPage'))
 const ParentHome = React.lazy(() => import('./pages/parent/ParentHome'))
 const ParentLinksPage = React.lazy(() => import('./pages/parent/ParentLinksPage'))
@@ -283,6 +284,7 @@ function AppRoutes() {
           <Route path="/organization-invitations" element={<RelationalProtectedRoute><OrganizationInvitationPage /></RelationalProtectedRoute>} />
 
           {/* Relational product routes reuse the same Composite/Cognitive/Situational runners. */}
+          <Route path="/relational/child-control" element={<RelationalProtectedRoute><ChildCognitiveControlPage /></RelationalProtectedRoute>} />
           <Route
             path="/relational/tasks"
             element={<LegacyRelationalTasksRoute><RelationalTasksPage /></LegacyRelationalTasksRoute>}

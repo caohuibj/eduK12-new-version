@@ -1,0 +1,141 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "integrated_gonogo_adexi_adult_zh_cn_v1",
+    "bundleVersion": "1.1.0",
+    "status": "DRAFT",
+    "category": "integrated",
+    "name": "成人认知控制与日常自我调节",
+    "description": "Go/No-Go＋CPT-X＋ADEXI 项目中文自评：并列呈现反应抑制、持续注意与日常体验的描述性证据。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "ANONYMOUS_SELF"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18,
+      "subjectMaxAgeYears": 100
+    },
+    "slots": [
+      {
+        "slotKey": "gonogo",
+        "unitType": "COGNITIVE",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "gonogo",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "commissionRate",
+          "dPrime",
+          "omissionRate",
+          "commissionErrors",
+          "goTrialCount",
+          "nogoTrialCount"
+        ]
+      },
+      {
+        "slotKey": "cpt",
+        "unitType": "COGNITIVE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "cpt",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "dPrime",
+          "omissionRate",
+          "commissionRate",
+          "rtICV",
+          "targetCount",
+          "hitCount"
+        ]
+      },
+      {
+        "slotKey": "adexi",
+        "unitType": "SCALE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "adexi_v1",
+        "instrumentVersion": "2.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "working_memory",
+          "inhibition"
+        ]
+      },
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 3,
+        "required": true,
+        "instrumentKey": "integrated-adult-age-v1",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF"
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "integrated-adult-age-v1",
+    "contextDefinitionVersion": "1.0.0",
+    "reportDefinitionKey": "integrated_adult_control_report",
+    "reportDefinitionVersion": "1.0.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "adexi_v1"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "仅适用于 18–100 岁成人自评；上限对齐当前 ADEXI 产品适用范围，不代表年龄常模。",
+      "任务与自评保留各自量尺，不计算跨方法总分、IQ、能力等级、同龄排名或诊断。",
+      "Go/No-Go 与 CPT-X 使用本项目 standard 精确版本，分别为 120 与 180 个正式试次；任务表现受设备、疲劳、理解和本次环境影响。",
+      "ADEXI 使用现有 adexi_v1@2.0.0 项目中文适配，工作记忆 9–45、抑制 5–25 为合计分，高分表示报告的日常困难更多；官网原计分为分量表均分，两者不可混写。",
+      "现有项目题文与官网 Angela Siu 简体中文题本不完全一致；既有源码的授权声明尚需管理员核验原凭证、商业使用及再分发范围，本 DRAFT 不新增授权声称。",
+      "目前无适用于本组合的年龄常模或联合效度；任务和自评不能互换，分数差异不等于矛盾或异常。",
+      "缺失、无效或未获披露授权的证据不按零分处理，不生成相应跨方法解释；独立工具报告仍需分别阅读。",
+      "CPT-X 的非目标计数未进入当前公开指标，保留误报率，不从比率反推误报次数。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": [
+    {
+      "slotKey": "gonogo",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    },
+    {
+      "slotKey": "cpt",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    }
+  ]
+}

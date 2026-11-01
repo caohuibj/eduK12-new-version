@@ -1,0 +1,62 @@
+{
+  "node": "v24.21.0",
+  "typescript": "5.9.3",
+  "roots": [
+    "/workspace/adult-bundle/server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+    "/workspace/adult-bundle/server-version/backend/src/modules/cognitive-analysis/analysis-protocol.registry.ts",
+    "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts"
+  ],
+  "files": 1197,
+  "diagnostics": [
+    {
+      "code": 2554,
+      "path": "/workspace/adult-bundle/server-version/backend/scripts/bundle-content-check.ts",
+      "message": "Expected 2-3 arguments, but got 1."
+    },
+    {
+      "code": 2554,
+      "path": "/workspace/adult-bundle/server-version/backend/scripts/bundle-content-check.ts",
+      "message": "Expected 2-3 arguments, but got 1."
+    },
+    {
+      "code": 2339,
+      "path": "/workspace/adult-bundle/server-version/backend/scripts/bundle-content-check.ts",
+      "message": "Property 'type' does not exist on type '{}'."
+    },
+    {
+      "code": 2339,
+      "path": "/workspace/adult-bundle/server-version/backend/scripts/bundle-content-check.ts",
+      "message": "Property 'fields' does not exist on type '{}'."
+    },
+    {
+      "code": 7006,
+      "path": "/workspace/adult-bundle/server-version/backend/scripts/bundle-content-check.ts",
+      "message": "Parameter 'f' implicitly has an 'any' type."
+    },
+    {
+      "code": 6059,
+      "path": "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts",
+      "message": "File '/workspace/adult-bundle/server-version/backend/scripts/bundle-content-check.ts' is not under 'rootDir' '/workspace/adult-bundle/server-version/backend/src'. 'rootDir' is expected to contain all source files."
+    },
+    {
+      "code": 18046,
+      "path": "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts",
+      "message": "'fixture' is of type 'unknown'."
+    },
+    {
+      "code": 18046,
+      "path": "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts",
+      "message": "'fixture' is of type 'unknown'."
+    },
+    {
+      "code": 18046,
+      "path": "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts",
+      "message": "'adexi' is of type 'unknown'."
+    },
+    {
+      "code": 18046,
+      "path": "/workspace/adult-bundle/server-version/backend/src/__tests__/bundle-onboarding/adult-control.test.ts",
+      "message": "'adexi' is of type 'unknown'."
+    }
+  ]
+}

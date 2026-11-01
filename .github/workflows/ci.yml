@@ -351,6 +351,7 @@ jobs:
       survey_experience_plan: ${{ steps.scope.outputs.survey_experience_plan }}
       composite_csv_memory_plan: ${{ steps.scope.outputs.composite_csv_memory_plan }}
       scale_library_governance_plan: ${{ steps.scope.outputs.scale_library_governance_plan }}
+      bundle_family: ${{ steps.scope.outputs.bundle_family }}
       diff_base: ${{ steps.scope.outputs.diff_base }}
       application_route: ${{ steps.scope.outputs.application_route }}
       release_plan: ${{ steps.scope.outputs.release_plan }}
@@ -1190,6 +1191,7 @@ jobs:
     if: ${{ (needs.scope.outputs.scenario != 'catalog-discovery' || github.event.pull_request.draft == false) && (needs.scope.outputs.scenario != 'backend' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
+      bundle_family: ${{ needs.scope.outputs.bundle_family == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
@@ -3676,13 +3678,14 @@ jobs:
           retention-days: 7
 
   catalog-discovery:
-    name: catalog query and permission contracts
+    name: bounded application contracts
     needs: scope
     if: ${{ needs.scope.outputs.scenario == 'catalog-discovery' && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       CI: 'true'
+      BUNDLE_FAMILY: ${{ needs.scope.outputs.bundle_family }}
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       LIBRARY_DISCOVERY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -3718,6 +3721,7 @@ jobs:
           npm ci
           npx prisma generate
       - name: changed image build controls
+        if: needs.scope.outputs.bundle_family != 'true'
         run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs
       - name: existing catalog unit and temporary-table PostgreSQL contracts
         working-directory: server-version/backend
@@ -3725,7 +3729,8 @@ jobs:
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
           import {execFileSync} from 'node:child_process';
-          const {backendChecks}=JSON.parse(readFileSync('../../.github/config/catalog-discovery-checks.json','utf8'));
+          const recipe=process.env.BUNDLE_FAMILY==='true'?'bundle-family-checks.json':'catalog-discovery-checks.json';
+          const {backendChecks}=JSON.parse(readFileSync('../../.github/config/'+recipe,'utf8'));
           const files=[...backendChecks.unitFiles,...backendChecks.postgresFiles];
           execFileSync('npm',['test','--',...files,'--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/tmp/catalog-backend.json'],{stdio:'inherit'});
           execFileSync(process.execPath,['scripts/assert-release-test-report.mjs','/tmp/catalog-backend.json',...files],{stdio:'inherit'});

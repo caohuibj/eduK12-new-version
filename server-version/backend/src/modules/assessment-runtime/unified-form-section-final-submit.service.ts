@@ -84,7 +84,7 @@ const contextForEntries = (entries: NormalizedSectionEntry[], input: {
   required: boolean
   options?: unknown
   contextKey?: string | null
-}[]): { encrypted: string; hash: string } => {
+}[], subjectUserId?: string | null): { encrypted: string; hash: string } => {
   const items: ContextFormItem[] = input.map((item) => ({
     id: item.id,
     type: item.type ?? 'single_choice',
@@ -93,7 +93,7 @@ const contextForEntries = (entries: NormalizedSectionEntry[], input: {
     options: item.options,
     contextKey: item.contextKey ?? null,
   }))
-  return contextForNormalizedFormEntries(entries, items)
+  return contextForNormalizedFormEntries(entries, items, subjectUserId)
 }
 
 export const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => {
@@ -348,8 +348,13 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   const canonical = canonicalSubmission({ answers: normalized.payloadAnswers })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.formSection, '综合测评区段提交数据')
   const payloadHash = canonical.hash
+  // The unified path owns the context write. Bind observer demographics to the
+  // persisted child identity before hashing, just as the legacy context writer
+  // already does; never infer the subject from the adult principal or request.
+  const contextSubject = mappedSection.contextSection && !admission.contextSnapshotHash
+    ? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: input.attemptId }, select: { subjectUserId: true } }) : null
   const context = mappedSection.contextSection && !admission.contextSnapshotHash
-    ? contextForEntries(normalized.normalized as NormalizedSectionEntry[], compositeContextItems(mappedSection))
+    ? contextForEntries(normalized.normalized as NormalizedSectionEntry[], compositeContextItems(mappedSection), contextSubject?.subjectUserId)
     : null
   const factsEncrypted = encryptUnifiedRuntimePayload(formFactsFor(mappedSection.id, normalized.normalized as NormalizedSectionEntry[]))
   const slotKey = admission.parent?.slotKey ?? formSectionSlotKey(mappedSection.id)
