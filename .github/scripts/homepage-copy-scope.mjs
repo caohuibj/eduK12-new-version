@@ -11,6 +11,8 @@ export const copyTools = new Set([
   '.github/scripts/homepage-copy-candidate.py', '.github/scripts/homepage-copy-browser.mjs',
   '.github/workflows/ci-homepage-copy.yml', '.github/scripts/content-scope.mjs',
   '.github/scripts/merge-gate.mjs', '.github/workflows/ci.yml', 'docs/release/README.md',
+  '.github/workflows/scale-onboarding-boundary.yml', '.github/scripts/content-workflows.test.mjs',
+  'server-version/scripts/release/policy.mjs', 'docs/ci-runner-policy.md',
 ]);
 const git = (...args) => execFileSync('git', args, {encoding:'utf8'}).trim();
 const source = (ref, file) => execFileSync('git', ['show', `${ref}:${file}`], {encoding:'utf8'});
