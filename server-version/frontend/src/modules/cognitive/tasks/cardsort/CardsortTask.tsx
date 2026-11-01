@@ -139,7 +139,7 @@ export const CardsortTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     return (
       <CognitiveTaskIntro
         title="规则卡片分类"
-        description="按屏幕提示的“颜色”或“形状”规则，把中间卡片分到左侧或右侧目标卡。"
+        description="同一张卡片，换个规则就可能去另一边。每题先看“颜色”或“形状”提示，再把中间卡片分到左侧或右侧目标卡。"
         hint="左侧目标：红色圆形；右侧目标：蓝色星形。键盘可用 ← / →。颜色同时用文字标注。练习不计入成绩，至少答对 3 题才能开始。"
         onAction={startPractice}
       />

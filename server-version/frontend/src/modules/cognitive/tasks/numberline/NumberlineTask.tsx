@@ -173,7 +173,7 @@ export const NumberlineTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
     setFormalFeedback(null); setSubPhase('fixation'); setPhase('formal')
   }, [practiceAttempt, practiceMarker, lineMax])
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="数字线估计" description={<p>屏幕上会出现一个 0 到 {lineMax} 的数字线和一个目标数。请在数字线上点击，点出这个数应该在的位置。</p>} hint={<>{practiceAttempt > 1 && <p>请重新阅读完整说明和例子，再开始下一轮练习。</p>}<p>例子：数字线中点对应{lineMax / 2}；可先找中点，再判断目标在它的哪一边。</p><p>每题限时 {Math.round(maxResponseMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="数字线估计" description={<p>给数字找个位置：屏幕上会出现一个 0 到 {lineMax} 的数字线和一个目标数。请在数字线上点击，点出这个数应该在的位置。</p>} hint={<>{practiceAttempt > 1 && <p>请重新阅读完整说明和例子，再开始下一轮练习。</p>}<p>例子：数字线中点对应{lineMax / 2}；可先找中点，再判断目标在它的哪一边。</p><p>每题限时 {Math.round(maxResponseMs / 1000)} 秒；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

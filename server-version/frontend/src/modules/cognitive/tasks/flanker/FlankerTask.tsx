@@ -145,7 +145,7 @@ export const FlankerTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIn
     return (
       <CognitiveTaskIntro
         title="Flanker 箭头干扰"
-        description={<>每次会出现 5 个箭头。只判断正中央箭头指向左还是右，忽略两侧箭头。正式阶段共 {total} 个试次，请在保证准确的前提下尽快回答。</>}
+        description={<>两边箭头有时顺路、有时唱反调。每次会出现 5 个箭头。只判断正中央箭头指向左还是右，忽略两侧箭头。正式阶段共 {total} 个试次，请在保证准确的前提下尽快回答。</>}
         hint={<>键盘可使用 ← / →；触控或鼠标可使用下方左右按钮。练习共 {PRACTICE_TRIAL_COUNT} 题，至少答对 {PRACTICE_PASS_CORRECT} 题才能开始。若无法清楚辨认中央箭头方向，请不要进入正式测验，并联系测验组织者。</>}
         onAction={startPractice}
       />
