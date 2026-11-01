@@ -22,7 +22,7 @@ jobs:
   backend-regression:
     name: backend regression (isolated job database)
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public

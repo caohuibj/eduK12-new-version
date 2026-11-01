@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classify, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, backendModuleFilesOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
+import { classify, cognitiveMixedProductScope, frontendFile, frontendTestFile, frontendTestOnly, frontendAffected, backendModuleFilesOnly, acceptanceFor, documentationFile, runnerPlan } from './content-scope.mjs';
 function scopeOutputs(content='false', presentation='false', frontend='false', extra={}) {
   const scenario = extra.scenario ?? (content === 'true' ? (frontend === 'true' ? 'content-frontend' : 'content') : presentation === 'true' ? 'presentation' : frontend === 'true' ? 'frontend' : 'platform');
   const output = {...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,scenario === 'platform' ? 'true' : 'false'])),
@@ -132,7 +132,7 @@ test('empty, core, executable additions and mixed changes require full checks', 
   }
 });
 
-import { requiredChecks, failedChecks } from './merge-gate.mjs';
+import { recheckCognitiveIntake, requiredChecks, failedChecks } from './merge-gate.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 test('personal tracking Draft reuses existing producers without qualifying Ready or unrelated maintenance',()=>{
   const marker={file:'server-version/backend/src/modules/reporting/personal-tracking.ts',status:'A',oldMode:'000000',newMode:'100644'};
@@ -193,7 +193,7 @@ test('aggregate checks only selected jobs, and fails closed for every selected j
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, renameSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { changedFiles } from './content-scope.mjs';
 test('real git diff retains both rename sides and all files beyond API path limits', () => {
   const root = mkdtempSync(join(tmpdir(), 'content-scope-'));
@@ -666,4 +666,122 @@ test('Teacher personal tracking stays in the same bounded Draft route with no Re
  assert.equal(personalTrackingDraftScope(entries,{...draft,draft:false}),false);
  assert.throws(()=>personalTrackingDraftScope([...entries,entry('server-version/backend/src/modules/huiteacher/authority.ts')],draft),/no broad fallback/);
  assert.throws(()=>personalTrackingDraftScope(entries,{...draft,forceFull:true}),/does not authorize/);
+});
+
+test('image build tooling gate requires real Docker success only on Ready and rejects malformed flags',()=>{
+  for(const draft of [true,false]){
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:'true'})}};
+    const expected=draft?['scope','release-tools']:['scope','release-tools','docker','codeql'];
+    assert.deepEqual(requiredChecks(needs,draft),expected);
+    for(const name of expected)needs[name]={...needs[name],result:'success'};
+    assert.deepEqual(failedChecks(needs,draft),[]);
+    for(const name of expected)for(const result of ['failure','skipped','cancelled','neutral',undefined])
+      assert(failedChecks({...needs,[name]:{...needs[name],result}},draft).includes(name),name+':'+result);
+    for(const image_build of ['yes','',true])assert(failedChecks({...needs,scope:{...needs.scope,outputs:{...needs.scope.outputs,image_build}}},draft).includes('scope'));
+  }
+  const mixed={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'platform',image_build:'true'})}};
+  assert(failedChecks(mixed,false).includes('scope'));
+});
+
+test('image build tooling workflow selects existing tools Docker and CodeQL without business acceptance',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+  const names=['maintenance','backend','backend-regression','frontend-build','frontend','browser','docker','codeql','miniprogram','accept-media','accept-ui','accept-visual','accept-perf','accept-ops','release-tools'];
+  for(const draft of [true,false])for(const imageBuild of [true,false]){
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:String(imageBuild),application_route:'legacy'})}};
+    for(const name of [...names,'backend-browser-build'])needs[name]={result:'skipped'};
+    const github={event_name:'pull_request',ref_name:'build-inputs',event:{pull_request:{draft,number:1,head:{ref:'build-inputs'}}}};
+    for(const name of names){
+      const expression=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1].replace(/\bneeds\.([a-zA-Z0-9_-]+)/g,(_,key)=>`needs[${JSON.stringify(key)}]`);
+      const actual=new Function('needs','github','vars','inputs','cancelled','fromJSON','always',`return (${expression})`)(needs,github,{CI_FORCE_FULL:'false'},{},()=>false,JSON.parse,()=>true);
+      assert.equal(Boolean(actual),name==='release-tools'||!draft&&(name==='codeql'||imageBuild&&name==='docker'),name+' draft='+draft+' image='+imageBuild);
+    }
+  }
+  assert.match(ci,/image_build: \$\{\{ steps\.scope\.outputs\.image_build \}\}/);
+  const images=readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8');
+  for(const required of ['build production images','scan backend image (high and critical)','scan frontend image (high and critical)','assert API/worker isolation topology','assert prelaunch resource and HTTPS contract','verify production Nginx static asset MIME and security headers'])assert(images.includes('name: '+required),required);
+});
+
+test('image build tooling CLI preserves Dockerfile fingerprints and rechecks the full diff at the stable gate',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'image-tooling-route-'));
+  const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const put=(file,text)=>{mkdirSync(dirname(join(dir,file)),{recursive:true});writeFileSync(join(dir,file),text);};
+  const commit=()=>{git('add','.');git('-c','user.name=Scope fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');};
+  const front='server-version/frontend/Dockerfile',back='server-version/backend/Dockerfile',input='.github/scripts/ci-image-plan.mjs';
+  try{
+    git('init','-q');for(const file of [front,back,input])put(file,'base\n');commit();const base=git('rev-parse','HEAD');
+    const env={...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_HEAD_REF:'feature/image-build',CI_IS_DRAFT:'false',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',CI_FORCE_FULL:'false',GITHUB_OUTPUT:'',IS_DRAFT:'false'};
+    const classify=()=>JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:dir,env,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+    for(const [file,changed] of [[front,['frontend']],[back,['backend']],[input,[]]]){
+      git('reset','--hard',base);put(file,'changed\n');commit();const output=classify();
+      assert.equal(output.scenario,'release-tooling');assert.equal(output.image_build,true);assert.equal(output.codeql,true);assert.equal(output.frontend_build,false);
+      for(const flag of Object.keys(acceptanceFor([])))assert.equal(output[flag],false,flag);
+      const release=JSON.parse(output.release_plan);assert.deepEqual(release.changed,changed);
+      for(const component of changed)assert.notEqual(release.components[component].base,release.components[component].candidate);
+      const outputs=Object.fromEntries(Object.entries(output).map(([key,value])=>[key,String(value)]));
+      const needs={scope:{result:'success',outputs},'release-tools':{result:'success'},docker:{result:'success'},codeql:{result:'success'}};
+      const gate=()=>spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...env,NEEDS_JSON:JSON.stringify(needs)}});
+      const passed=gate();assert.equal(passed.status,0,passed.stderr+passed.stdout);
+      // A false flag cannot suppress image checks, even if the rest of the emitted plan is unchanged.
+      needs.scope.outputs.image_build='false';let rejected=gate();assert.notEqual(rejected.status,0);assert(rejected.stdout.includes('mixed-or-unknown-tooling'));
+      delete needs.scope.outputs.image_build;rejected=gate();assert.notEqual(rejected.status,0);assert(rejected.stdout.includes('mixed-or-unknown-tooling'));
+    }
+    for(const mixed of ['server-version/frontend/src/main.tsx','server-version/backend/package-lock.json','server-version/backend/prisma/schema.prisma','server-version/docker-compose.yml','server-version/scripts/release/executor.py']){
+      git('reset','--hard',base);git('clean','-fd');put(front,'changed\n');put(mixed,'mixed\n');commit();
+      const output=classify();assert.equal(output.scenario,'platform',mixed);assert.equal(output.image_build,false,mixed);
+    }
+    git('reset','--hard',base);git('clean','-fd');put(front,'changed\n');commit();
+    const output=classify();put('server-version/frontend/src/main.tsx','runtime\n');commit();
+    const actual=execFileSync(process.execPath,['--input-type=module','-e',`import {plan} from ${JSON.stringify(new URL('../../server-version/scripts/release/policy.mjs',import.meta.url).href)}; console.log(JSON.stringify(plan(${JSON.stringify(base)},${JSON.stringify(git('rev-parse','HEAD'))})));`],{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']});
+    const outputs=Object.fromEntries(Object.entries(output).map(([key,value])=>[key,String(value)]));outputs.release_plan=actual.trim();
+    const needs={scope:{result:'success',outputs},'release-tools':{result:'success'},docker:{result:'success'},codeql:{result:'success'}};
+    const rejected=spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...env,NEEDS_JSON:JSON.stringify(needs)}});
+    assert.notEqual(rejected.status,0);assert(rejected.stdout.includes('mixed-or-unknown-tooling'));
+  }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+const mixedEntry = file => ({file,status:'M',oldMode:'100644',newMode:'100644'});
+const mixedFiles = ['docs/contributing/example.md','server-version/backend/src/modules/cognitive/tasks/example/package.ts','server-version/backend/src/modules/cognitive/schemas/example.config.ts','server-version/backend/src/modules/cognitive/onboarding/admin.routes.ts'];
+const mixedManifest = () => JSON.stringify({schemaVersion:1,task:'example',identities:[{testType:'example',engineVersion:'1',scoringVersion:'1'}]});
+test('Cognitive mixed product scope permits shared schema and admin code without content admission',()=>{
+  assert.equal(cognitiveMixedProductScope(mixedFiles.map(mixedEntry),mixedManifest),true);
+  assert.equal(cognitiveMixedProductScope(mixedFiles.slice(0,2).map(mixedEntry),mixedManifest),false);
+  assert.equal(cognitiveMixedProductScope(mixedFiles.map(mixedEntry),()=>null),false);
+  assert.equal(cognitiveMixedProductScope(mixedFiles.map(mixedEntry),mixedManifest,()=>JSON.stringify({identities:[{testType:'example',engineVersion:'old',scoringVersion:'old'}]})),false);
+});
+test('Cognitive full scope scans every path for native, unsafe, duplicate and nonregular inputs',()=>{
+  const entries=mixedFiles.map(mixedEntry);
+  for(const extra of [mixedEntry('server-version/frontend/src/modules/cognitive/native-runners.tsx'),mixedEntry('server-version/backend/src/modules/cognitive/content-candidates/other/a.ts'),mixedEntry('src/../bad.ts'),entries[0],{...entries[1],newMode:'120000'},{...entries[1],newMode:'100755'},{...entries[1],status:'D',newMode:'000000'}])
+    assert.equal(cognitiveMixedProductScope([...entries,extra],mixedManifest),false,extra.file);
+});
+test('Cognitive mixed full gate retains generated checks and rejects failed, missing or skipped qualification',()=>{
+  const outputs=scopeOutputs('false','false','false',{scenario:'platform',application_route:'legacy',frontend_build:'true',cognitive:'true',cognitive_intake_light:'false'});
+  const needs={scope:{result:'success',outputs}};
+  const required=requiredChecks(needs,false);
+  for(const name of ['backend','backend-regression','frontend','browser','docker','codeql'])assert(required.includes(name),name);
+  for(const name of required)needs[name]={...needs[name],result:'success'};
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for(const name of required)for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...needs,[name]:{...needs[name],result}},false).includes(name));
+  const workflow=readFileSync('.github/workflows/ci-backend.yml','utf8'),pkg=JSON.parse(readFileSync('server-version/backend/package.json','utf8'));
+  assert.match(workflow,/npm run cognitive:contracts/);assert.match(workflow,/cognitive-ci-diagnostics\.sh/);
+  assert.match(pkg.scripts['cognitive:contracts'],/cognitive:manifest:check/);assert.match(pkg.scripts['cognitive:manifest:check'],/manifests\.cjs --check/);
+});
+
+test('Cognitive mixed with image inputs selects full route and gate recomputes it',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'cognitive-mixed-'));
+  const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const commit=()=>{git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');};
+  try {
+    git('init','-q');writeFileSync(join(dir,'base.txt'),'base');commit();const base=git('rev-parse','HEAD');
+    for(const file of mixedFiles){mkdirSync(dirname(join(dir,file)),{recursive:true});writeFileSync(join(dir,file),'export {}');}
+    const manifest='server-version/backend/src/modules/cognitive/tasks/example/task-package.json';writeFileSync(join(dir,manifest),mixedManifest());
+    const dockerfile='server-version/frontend/Dockerfile';mkdirSync(dirname(join(dir,dockerfile)),{recursive:true});writeFileSync(join(dir,dockerfile),'FROM node:24\n');commit();const head=git('rev-parse','HEAD');
+    const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_FORCE_FULL:'false',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',GITHUB_OUTPUT:''}}));
+    assert.equal(output.scenario,'platform');assert.equal(output.cognitive_intake_light,false);assert.equal(output.cognitive,true);assert.equal(output.image_build,false);
+    const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(output).map(([k,v])=>[k,String(v)]))}};
+    for(const name of requiredChecks(needs,false))needs[name]={...needs[name],result:'success'};
+    assert.deepEqual(recheckCognitiveIntake(needs,{base,head,cwd:dir}),[]);
+    assert(recheckCognitiveIntake({...needs,backend:{result:'failure'}},{base,head,cwd:dir}).includes('backend'));
+    assert(recheckCognitiveIntake({...needs,scope:{...needs.scope,outputs:{...needs.scope.outputs,frontend:'true'}}},{base,head,cwd:dir}).includes('recomputed-cognitive-product-scope'));
+  } finally {rmSync(dir,{recursive:true,force:true});}
 });
