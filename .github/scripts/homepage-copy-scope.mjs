@@ -142,7 +142,24 @@ export function publicRenderBoundary(before,after) {
  function behavior(text) {
   const ast=parse(text);if(!ast)return null;
   const opaque=[];let invalid=false;
+  const identities=new Set(['user','auth','session','api','token','returnTo','signedIn']);
+  const identityDependent=n=>{
+   let found=false;
+   function inspect(child){if(ts.isIdentifier(child)&&identities.has(child.text))found=true;ts.forEachChild(child,inspect);}
+   inspect(n);return found;
+  };
+  // Track aliases of existing identity-dependent values without treating static
+  // feature/theme predicates as authentication or permission control flow.
+  function bindings(n){
+   if(ts.isVariableDeclaration(n)&&n.initializer&&identityDependent(n.initializer))
+    for(const name of n.name.getText(ast).match(/[A-Za-z_$][\w$]*/g)||[])identities.add(name);
+   ts.forEachChild(n,bindings);
+  }
+  bindings(ast);
   function visit(n) {
+   const condition=ts.isIfStatement(n)?n.expression:ts.isConditionalExpression(n)?n.condition:
+    ts.isBinaryExpression(n)&&[ts.SyntaxKind.AmpersandAmpersandToken,ts.SyntaxKind.BarBarToken,ts.SyntaxKind.QuestionQuestionToken].includes(n.operatorToken.kind)?n.left:null;
+   if(condition&&identityDependent(condition))opaque.push(condition.getText(ast));
    if(ts.isExportDeclaration(n)&&n.moduleSpecifier&&!n.isTypeOnly)invalid=true;
    if(ts.isWhileStatement(n)||ts.isDoStatement(n)||ts.isForStatement(n)||ts.isForInStatement(n)||ts.isForOfStatement(n)||ts.isWithStatement(n))invalid=true;
    if(ts.isImportDeclaration(n)) {

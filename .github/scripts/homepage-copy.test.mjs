@@ -68,7 +68,9 @@ test('copy route is exclusive with all backend, database and unrelated consumers
  assert.match(job('merge-gate'),/homepage-copy/);
  assert.match(readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8'),/recomputed-homepage-copy-plan/);
  assert.match(job('codeql'),/homepage-copy.*toolsChanged/);
- assert.match(job('codeql'),/paths: \[server-version\/scripts\/release\/policy.mjs, server-version\/frontend\/src, .github\/scripts\/homepage-copy-scope.mjs/);
+ assert.match(job('codeql'),/PUBLIC_PRESENTATION:.*homepage-copy/);
+ assert.match(job('codeql'),/paths:\['server-version\/scripts\/release\/policy.mjs','server-version\/frontend\/src','\.github\/scripts\/homepage-copy-scope.mjs'/);
+ for(const expression of ci.match(/\$\{\{[\s\S]*?\}\}/g)||[])assert(expression.length<=21000,'GitHub expression length limit');
  const candidate=readFileSync(new URL('./homepage-copy-candidate.py',import.meta.url),'utf8');
  const workflow=readFileSync(new URL('../workflows/ci-homepage-copy.yml',import.meta.url),'utf8');
  const browser=readFileSync(new URL('./homepage-copy-browser.mjs',import.meta.url),'utf8');
@@ -139,4 +141,14 @@ test('passive CUA notes retain the CSS-only route and CSS does not run TypeScrip
  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
  const visual=ci.split('\n  visual:\n')[1].split('\n  survey-review:')[0];
  assert.match(visual,/npm run build/);assert.doesNotMatch(visual,/npm run lint|npm run typecheck|npm test/);
+});
+
+// The public copy boundary must not absorb a new authenticated-role gate.
+test('identity-dependent early return is not public presentation while static JSX conditions remain allowed',()=>{
+ const before=readFileSync(new URL('../../server-version/frontend/src/training/TrainingFeaturePage.tsx',import.meta.url),'utf8');
+ const marker='const { user } = useAuth()';assert(before.includes(marker));
+ const guarded=before.replace(marker,marker+"\n  if (user?.role !== 'TEACHER') return null");
+ assert.equal(publicRenderBoundary(before,guarded),false);
+ const staticCopy=before.replace('{feature.introduction}',"{feature.description ? feature.introduction : '课程功能介绍'}");
+ assert.notEqual(staticCopy,before);assert.equal(publicRenderBoundary(before,staticCopy),true);
 });
