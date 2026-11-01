@@ -1,4 +1,6 @@
 import {execFileSync} from 'node:child_process';
+import {lstatSync,readdirSync} from 'node:fs';
+import {posix} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const files=new Set([
   ".github/scripts/ci-topology.test.mjs",
@@ -68,4 +70,15 @@ export function maintenanceRepairOutputs(){
  const flags=['maintenance','content','presentation','frontend','frontend_test','documentation','frontend_build','ui_required','visual_hosted','scale','scale_intake_light','cognitive_intake_light','cognitive','situational','bundle','codeql','media2','video_core','media7','situational_video','situational_branching','app_shell','canonical_visual','perf_smoke','ops'];
  return {...Object.fromEntries(flags.map(k=>[k,false])),application_route:'maintenance-repair',scenario:'maintenance-repair',runner_profile:'hosted',media_selection:'[]',media_groups:'[]',light_runner:'["ubuntu-24.04"]'};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href&&process.argv[2]==='--codeql-config')console.log(JSON.stringify({paths:[...files].filter(p=>/\.(ts|mjs|cjs|py)$/.test(p)&&!p.includes('/__tests__/')&&!p.includes('/tests/')&&!/test[_.]/.test(p))}));
+export function maintenanceRepairCodeqlConfig(){
+ const selected=[...files].filter(p=>/\.(ts|mjs|cjs|py)$/.test(p)&&!p.includes('/__tests__/')&&!p.includes('/tests/')&&!/test[_.]/.test(p));
+ for(const file of selected)if(!lstatSync(file).isFile())throw Error('Missing regular CodeQL input: '+file);
+ // Python walks directory roots even in a mixed-language scan. Keep the same file scope.
+ const paths=[...new Set(selected.map(file=>posix.dirname(file)))].sort();
+ const ignored=paths.flatMap(directory=>{
+  if(!lstatSync(directory).isDirectory())throw Error('CodeQL paths must be directories: '+directory);
+  return readdirSync(directory).sort().map(name=>posix.join(directory,name)).filter(file=>!selected.includes(file));
+ });
+ return {paths,'paths-ignore':ignored};
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href&&process.argv[2]==='--codeql-config')console.log(JSON.stringify(maintenanceRepairCodeqlConfig()));
