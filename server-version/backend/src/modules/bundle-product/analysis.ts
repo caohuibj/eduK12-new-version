@@ -1,4 +1,5 @@
 import { projectProfileScaleSource } from '../assessment-bundle/profile/sources'
+import { isFrozenAdultSelfReport } from './self-report-audience'
 import { projectDerivedBundleView, type DerivedBundleView } from '../assessment-bundle/onboarding/derived-report'
 import { projectProfileView,isAdultSelfBundleReport } from '../assessment-bundle/profile/report'
 import type { ProfileResult } from '../assessment-bundle/profile/match'
@@ -142,7 +143,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
     if (canonicalHash(facts) !== row.factsHash || facts.identity.snapshotHash !== target.bundleSnapshot.snapshotHash) throw compositeConflict('报告快照校验失败')
     view = projectBundleAudienceView(facts, audience)
     const {bindings} = readInstance(instance)
-    const scaleAdmissions = await db.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}})
+    const scaleAdmissions = await db.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true,respondentType:true,subjectUserId:true,respondentUserId:true}})
     let restrictSummary = false
     let restrictQuality = false
     const profilePolicies=new Map<string,DisclosureCapabilitiesV1|null>()
@@ -160,8 +161,8 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
           frozenReportAudience=runtime.definition.report.audienceContract?.audience
           const contract=runtime.definition.report.audienceContract
           adultSelfReport=isAdultSelfBundleReport(target.declarativePackage,contract,audience)
-            || target.declarativePackage?.schemaVersion===3 && target.declarativePackage.report.narrativeContent==='BUNDLE_OWNED_SELF'
-              && audience==='student' && contract?.audience==='teacher' && contract.respondent==='ADULT_SELF'
+            || isFrozenAdultSelfReport({pack:target.declarativePackage,slotKey:binding.slotKey,audience,contract,
+              sourceRespondentType:runtime.definition.respondentType,relationship:admission})
         }
       } catch { policy = denyAllScaleProjectionPolicy() }
       const capabilities = policy && policy.disposition !== 'UNKNOWN'
