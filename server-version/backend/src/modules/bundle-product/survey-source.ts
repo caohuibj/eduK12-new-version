@@ -10,8 +10,7 @@ import {CatalogSourceError} from '../survey/catalog.sources'
 import {assertSurveyDraft,type FormDraft} from '../survey/builder.definition'
 import {readInstance} from './instance'
 import {assertPackageAdmission} from './package-release'
-import {nativeProfilePackage,type SurveyNativeBundle,type SurveyNativeSource} from './survey-native'
-import {isFrozenAdultSelfReport} from './self-report-audience'
+import {nativeProfilePackage,surveyNativeSourceReportAudience,type SurveyNativeBundle,type SurveyNativeSource} from './survey-native'
 
 const fail=(code:string):never=>{throw new CatalogSourceError(code)}
 /** This is content intake, after the existing strong system-authoring boundary.
@@ -41,11 +40,8 @@ export async function freezeSurveyNativeSource(tx:Prisma.TransactionClient,actor
   const original=await getCatalogSourceSnapshot({actorUserId:actor,ref:{kind:'SCALE',sourceId:item!.scaleId!,sourceVersion:slot.instrumentVersion}},tx)
   if(canonicalHash(original.compiledDefinition)!==canonicalHash(component.unit.compiledDefinition))fail('SURVEY_NATIVE_SCALE_DEFINITION_CHANGED')
   native.policies[binding.slotKey]=binding.scaleDisclosure!
-  const audience=component.unit.provenance.reportAudience,originalAudience=(original.compiledDefinition as ScaleDefinitionV2).report.audienceContract?.audience
-  const adultSelf=isFrozenAdultSelfReport({pack,slotKey:binding.slotKey,audience:'student',contract:(original.compiledDefinition as ScaleDefinitionV2).report.audienceContract,
-    sourceRespondentType:(original.compiledDefinition as ScaleDefinitionV2).respondentType,relationship:{respondentType:'SELF'}})
-  native.reportAudiences[binding.slotKey]=component.unit.provenance.reportConfigured===true&&audience===originalAudience&&
-    (audience==='student'||audience==='researcher'||adultSelf&&(audience==='parent'||audience==='teacher'))?audience as 'student'|'researcher'|'parent'|'teacher':null
+  native.reportAudiences[binding.slotKey]=surveyNativeSourceReportAudience({pack,slotKey:binding.slotKey,definition:original.compiledDefinition as ScaleDefinitionV2,
+    configured:component.unit.provenance.reportConfigured,audience:component.unit.provenance.reportAudience})
  }
  const fields=frozen.contextDefinition?.fields??[]
  if(source.context.length!==fields.length||new Set(source.context.map(c=>c.contextKey)).size!==fields.length||new Set(source.context.map(c=>c.slotKey+':'+c.itemKey)).size!==fields.length)fail('SURVEY_NATIVE_CONTEXT_INCOMPLETE')

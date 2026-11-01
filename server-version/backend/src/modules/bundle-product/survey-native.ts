@@ -38,12 +38,24 @@ export function nativeProfilePackage(native:SurveyNativeBundle){
  if(pack.schemaVersion===3&&frozen.bundleSnapshot.slotBindings.some(s=>!['SCALE','FORM'].includes(s.unitType)&&!(s.unitType==='COGNITIVE'&&['digitbackward','corsi'].includes(s.instrumentKey)&&pack.manifest.definition.respondentTypes.length===1&&pack.manifest.definition.respondentTypes[0]==='SELF'&&s.respondentType==='SELF'&&pack.report.narrativeContent==='BUNDLE_OWNED_SELF')))throw new Error('SURVEY_NATIVE_UNIT_UNSUPPORTED')
  return {frozen,pack}
 }
+/** Freeze an explicitly configured source report without requiring legacy R
+ * metadata that the SELF source and its existing disclosure policy predate. */
+export function surveyNativeSourceReportAudience(input:{pack:import('../assessment-bundle/onboarding/contract').DeclarativePackage;slotKey:string;
+ definition:ScaleDefinitionV2;configured:unknown;audience:unknown}):SurveyNativeBundle['reportAudiences'][string]{
+ const {pack,slotKey,definition,configured,audience}=input,contract=definition.report.audienceContract
+ const adultSelf=isFrozenAdultSelfReport({pack,slotKey,audience:'student',contract,sourceRespondentType:definition.respondentType,relationship:{respondentType:'SELF'}})
+ const sameAudience=audience===contract?.audience||!contract&&adultSelf&&audience==='student'
+ return configured===true&&sameAudience&&(audience==='student'||audience==='researcher'||adultSelf&&(audience==='parent'||audience==='teacher'))
+  ?audience as 'student'|'researcher'|'parent'|'teacher':null
+}
 /** Normalize only the consumer's participant lane; retain the actual source R
  * audience in the frozen source and reportAudiences metadata unchanged. */
 export function surveyNativeFeedbackAudience(native:SurveyNativeBundle,slotKey:string,definition:ScaleDefinitionV2):'student'|'researcher'|null{
  const recorded=native.reportAudiences[slotKey]
  const {pack}=nativeProfilePackage(native)
  if(pack.schemaVersion===2)return recorded==='student'||recorded==='researcher'?recorded:null
+ if(!definition.report.audienceContract)return recorded==='student'&&isFrozenAdultSelfReport({pack,slotKey,audience:'student',
+  contract:undefined,sourceRespondentType:definition.respondentType,relationship:{respondentType:'SELF'}})?'student':null
  if(recorded!==definition.report.audienceContract?.audience)return null
  if(recorded==='student')return recorded
  return recorded===definition.report.audienceContract?.audience&&isFrozenAdultSelfReport({pack,slotKey,audience:'student',

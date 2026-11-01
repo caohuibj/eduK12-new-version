@@ -12,7 +12,11 @@ export function isFrozenAdultSelfReport(input:{pack:DeclarativePackage|undefined
   &&pack.manifest.definition.population.subjectPopulation==='adult'
   &&pack.manifest.definition.respondentTypes.length===1&&pack.manifest.definition.respondentTypes[0]==='SELF'
   &&pack.manifest.definition.slots.find(s=>s.slotKey===input.slotKey)?.respondentType==='SELF'
-  &&contract?.respondent==='ADULT_SELF'&&['student','parent','teacher'].includes(contract.audience??'')
+  // Legacy participant self-reports predate the optional R audience contract.
+  // Their explicit source relationship and frozen SELF admission still apply;
+  // an existing contract always takes precedence and is never inferred away.
+  &&(contract?contract.respondent==='ADULT_SELF'&&['student','parent','teacher'].includes(contract.audience??''):
+    input.sourceRespondentType==='participant_self_report')
   &&['participant_self_report','student_self_report','teacher_self_report'].includes(input.sourceRespondentType??'')
   &&resolveScalePolicyRespondentType(relationship??{})==='SELF'
   &&(relationship?.subjectUserId??null)===(relationship?.respondentUserId??null)
