@@ -1,3 +1,4 @@
+import {MATRIX_PRACTICE_SET_V11,MATRIX_PRACTICE_V11} from './practice-v1.1'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './matrix-layout.css'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -9,7 +10,7 @@ import {
 } from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
-const PRACTICE = matrixSequence('matrix-practice-v1', 6).slice(0, 4)
+const LEGACY_PRACTICE = matrixSequence('matrix-practice-v1', 6).slice(0, 4)
 
 const Glyph: React.FC<{ value: number }> = ({ value }) => {
   const shape = value % 3
@@ -35,7 +36,8 @@ const ItemView: React.FC<{ item: MatrixItemSpec; choose: (index: number) => void
 )
 
 export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
-  const config = taskContext.config as { itemCount: number; itemTimeoutMs: number }
+  const config = taskContext.config as { itemCount: number; itemTimeoutMs: number; practiceSetVersion?:string }
+  const practice=config.practiceSetVersion===MATRIX_PRACTICE_SET_V11?MATRIX_PRACTICE_V11:LEGACY_PRACTICE
   const itemCount = config.itemCount ?? 16
   const itemTimeoutMs = config.itemTimeoutMs ?? 30000
   const sequence = useMemo(() => matrixSequence(taskContext.randomSeed, itemCount), [taskContext.randomSeed, itemCount])
@@ -47,7 +49,7 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
   const startedRef = useRef(0)
   const submittingRef = useRef(false)
   const completingRef = useRef(false)
-  const item = phase === 'practice' ? PRACTICE[practiceIndex] : sequence[trialIndex] ?? sequence[sequence.length - 1]
+  const item = phase === 'practice' ? practice[practiceIndex] : sequence[trialIndex] ?? sequence[sequence.length - 1]
 
   const completeOnce = useCallback(async () => { if (completingRef.current) return; completingRef.current = true; await onTaskComplete?.() }, [onTaskComplete])
   const startPractice = () => { setPracticeIndex(0); setPracticeCorrect(0); setFeedback(''); setPhase('practice') }

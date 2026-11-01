@@ -15,7 +15,7 @@ import { participantPresentations as task12 } from '../tasks/cardsort/participan
 import { participantPresentations as task13 } from '../tasks/digitbackward/participant-presentation'
 import { participantPresentations as task14 } from '../tasks/picturesequence/participant-presentation'
 import { participantPresentations as task15 } from '../tasks/pairedassociate/participant-presentation'
-import { participantPresentations as task16 } from '../tasks/matrix/participant-presentation'
+import { participantPresentations as task16 } from '../tasks/matrix/participant-presentation.v11'
 import { participantPresentations as task17 } from '../tasks/mentalrotation/participant-presentation'
 import { participantPresentations as task18 } from '../tasks/tower/participant-presentation'
 import { participantPresentations as task19 } from '../tasks/trailmaking/participant-presentation'

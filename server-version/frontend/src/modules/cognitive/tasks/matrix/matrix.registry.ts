@@ -23,3 +23,5 @@ export const matrixRegistryEntry: CognitiveFrontendRegistryEntry = {
     disclaimer: '结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。设计难度层级仅保留为研究描述字段，不作为参与者能力等级展示。',
   },
 }
+
+export const matrixRegistryEntryV11:CognitiveFrontendRegistryEntry={...matrixRegistryEntry,engineVersion:'1.1.0',scoringVersion:'1.0.0',reportDefinition:{...matrixRegistryEntry.reportDefinition,showProductIndex:false}}
