@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "swls5_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Satisfaction With Life Scale original English 5-item",
+      "abbreviation": "SWLS5_EN",
+      "instrumentFamily": "Satisfaction With Life Scale original English 5-item"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "Wellbeing self-report source only; not a diagnostic or K12-equivalent instrument.",
+      "constructOverlapTags": [
+        "swls5_en",
+        "source:eddiener",
+        "locale:en",
+        "population:adult_candidate",
+        "response:self",
+        "availability:catalog_only",
+        "rights:noncommercial_only",
+        "scoring:uninstalled",
+        "P:none",
+        "R:not_runtime"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Conservative adult project scope only; China K12 psychometric validity and language equivalence not established."
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Global life satisfaction, no fixed recent-week window",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Catalog only: original copyrighted question wording and response anchors not distributed in public Git.",
+        "Five 1–7 items; author source total 5–35. No validated China K12 norms or diagnostic cutoff.",
+        "Author only permits attributed non-commercial research use; unrestricted commercial deployment/public item reproduction not established.",
+        "No electronic administration or missing-data handling executed; time is an estimate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Non-commercial research candidate source, not validated local executable."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original English source metadata: https://eddiener.com/satisfaction-with-life-scale-swls/; no original questionnaire copied into Git.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Translations require their own rights/validity records. No China K12 evidence."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "生活满意度量表（SWLS；英文5题目录候选）",
+      "citation": "Ed Diener and colleagues: https://eddiener.com/satisfaction-with-life-scale-swls/",
+      "url": "https://eddiener.com/satisfaction-with-life-scale-swls/",
+      "publicationYear": 1985
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "生活满意度（仅报告规划）"
+      ],
+      "limitations": [
+        "英文原版5题，来源量尺为1–7，总分范围5–35；没有已验证的中国K12常模或诊断切点。",
+        "仅保存英文原版的目录来源；未纳入原始题干或选项正文，未提供可执行题本、计分插件、参数P或运行报告R。",
+        "来源标注仅限署名的非商业学术研究使用；公开全文再分发和商业范围尚未确认，目录登记不构成施测或部署授权。",
+        "尚无目标中国教师或学生的常模、漏答规则或本版本适用性验证；不用于诊断。"
+      ],
+      "disclaimer": "仅目录来源候选，待审；尚未施测、计分或发布。题本仍为英文，中文预览不构成中文量表或实际报告。"
+    },
+    "blockers": [
+      "NONCOMMERCIAL_AUTHOR_RIGHTS",
+      "PUBLIC_QUESTION_ITEMS_REDISTRIBUTION_NOT_CLEARED",
+      "TARGET_K12_VALIDITY_MISSING",
+      "EXECUTABLE_C_S_P_R_NOT_INSTALLED"
+    ]
+  }
+}

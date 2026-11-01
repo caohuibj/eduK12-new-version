@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "rses10_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Rosenberg Self-Esteem Scale — English 10-item form (PhenX ordering)",
+      "abbreviation": "RSES-10-EN",
+      "instrumentFamily": "Rosenberg Self-Esteem Scale; original English form, PhenX protocol 180901"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "Global self-esteem as self-reported general positive or negative attitudes toward oneself; not an objective assessment of personal worth, clinical diagnosis, or high-stakes selection.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "rses10_en",
+        "family:Rosenberg_Self_Esteem_Scale",
+        "source:UMD_public_domain",
+        "source:PhenX_180901",
+        "construct:global_self_esteem",
+        "construct:self_concept",
+        "population:adult_18_plus",
+        "population:original_adolescent_adult",
+        "response:self",
+        "response:four_agreement_categories",
+        "language:en",
+        "measurement:ten_item_phenx_order",
+        "scoring:likert_0_to_30",
+        "reverse:3_5_8_9_10",
+        "missing:complete_required_project_policy",
+        "reference:none",
+        "report:descriptive_nondiagnostic",
+        "rights:umd_public_domain",
+        "availability:draft",
+        "relationship:rses10_zh_cn_research_separate_translation"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "The original scale was designed with adolescents and has adult research use. This initial platform package conservatively limits eligibility to adult self-report (18+); PhenX's younger-age recommendation is not an automatic K12 deployment authorization or local validation."
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "General feelings about oneself; no specified last-week or last-month recall interval.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Freeze the selected PhenX 180901 order beginning 'I feel that I'm a person of worth'; do not apply keys from the alternate arrangement beginning 'On the whole'.",
+        "Platform options appear Strongly Disagree → Strongly Agree with internal scores 0/1/2/3; the PhenX paper lists Strongly Agree → Strongly Disagree. This is a presentation order change, not a scoring change.",
+        "Reverse items exactly 3,5,8,9,10. Identity items 1,2,4,6,7. The 0–30 total is not the 10–40 alternative.",
+        "An unanswered item invalidates the total under the explicitly conservative project complete_required rule. Do not claim that the author published this missing-data rule.",
+        "No universal clinical cutoff, percentile or China K12 norm. The duration of three minutes is a platform estimate, not an experimentally verified administration time."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Original English form with source-documented 0–30 Likert scoring; target-platform/territory-specific validity and reference norms are not established."
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Private descriptive self-reflection for adults; not ranking, screening or diagnosis."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Rosenberg (1989 revised edition) English form as represented in PhenX Toolkit protocol 180901; University of Maryland public-domain notice.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "English original-form source, not a translated/validated Chinese edition. The already-registered rses10_zh_cn_research is a separate identity; no reuse of its unpublished translation authority or local norms."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "rses10-en-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "rses10-en-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "rses10-en-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "UMD steward: Rosenberg Self-Esteem Scale is public domain; translations/adaptations permitted with scholarly attribution.",
+      "PhenX protocol 180901: 10 English statements and four response categories; no use permission required.",
+      "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale",
+      "https://socy.umd.edu/about-us/using-rosenberg-self-esteem-scale",
+      "https://www.phenxtoolkit.org/protocols/view/180901"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Rosenberg Self-Esteem Scale — original English",
+        "citation": "Rosenberg, M. (1989). Society and the Adolescent Self-Image (revised edition). Wesleyan University Press; PhenX Toolkit protocol 180901 (2010).",
+        "url": "https://www.phenxtoolkit.org/protocols/view/180901"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Public-domain English Rosenberg scale confirmed by University of Maryland steward; scholarly attribution retained. https://socy.umd.edu/about-us/rosenberg-self-esteem-scale"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "rses10_en_agreement",
+          "options": [
+            {
+              "value": "0",
+              "label": "Strongly Disagree (SD)",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "Disagree (D)",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Agree (A)",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Strongly Agree (SA)",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "RSES10_EN_01",
+          "content": "I feel that I'm a person of worth, at least on an equal plane with others.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_02",
+          "content": "I feel that I have a number of good qualities.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_03",
+          "content": "All in all, I am inclined to feel that I am a failure.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_04",
+          "content": "I am able to do things as well as most other people.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_05",
+          "content": "I feel I do not have much to be proud of.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_06",
+          "content": "I take a positive attitude toward myself.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_07",
+          "content": "On the whole, I am satisfied with myself.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_08",
+          "content": "I wish I could have more respect for myself.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_09",
+          "content": "I certainly feel useless at times.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RSES10_EN_10",
+          "content": "At times I think I am no good at all.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "rses10_en_agreement",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "RSES10_EN_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "RSES10_EN_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "rses10_en_total",
+            "type": "total",
+            "label": "Global self-esteem",
+            "description": "Sum of ten item scores after reversing negatively worded items; higher scores reflect more positive self-reported attitudes toward self, not intrinsic personal worth.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "RSES10_EN_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RSES10_EN_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "rses10_en_total"
+        ],
+        "scoreOrder": [
+          "rses10_en_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "rses10_en_total",
+            "headline": "Reading this self-esteem score in context",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "Your answers produce one total score between 0 and 30. A larger score reflects stronger agreement with positive statements about yourself after five negatively worded statements are reverse-scored. It is a description of how you answered these ten questions, not a measure of your value as a person. There is no universally validated high/low cutoff or population percentile attached to this report. Differences in current experiences, relationships, and interpretation of the statements can affect a result; a single questionnaire cannot determine their causes. This result is not a diagnosis or a prediction of future wellbeing or achievement.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one statement that felt easy or difficult to answer. Consider a specific recent experience that may have shaped your response, without treating that experience as a verdict about your whole identity."
+              },
+              {
+                "category": "strategy",
+                "text": "When a global judgment comes to mind, separate the observable event from the conclusion you draw about yourself. One task that needs work is not evidence that every part of you lacks value."
+              },
+              {
+                "category": "support",
+                "text": "If worries about self-worth are persistent or distressing, consider discussing them with a trusted person or a qualified professional. You do not need to reach any score threshold before seeking support."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "English RSES ten-item PhenX form only, with complete_required as a conservative local implementation rule rather than an author's missing-answer recommendation.",
+          "No diagnostic cutoff, percentile or China K12 norm. A respondent's score and its possible 0–30 range are not a population rank.",
+          "The recorded source permits reuse as public domain, but this candidate has not been installed, published or verified in the production scoring/report consumer."
+        ],
+        "disclaimer": "Descriptive research and adult self-reflection only; not for diagnosis, teacher accountability or high-stakes selection. Cite Rosenberg (1989 revised edition) and PhenX 180901.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "rses10_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "keyed-two",
+        "answers": [
+          {
+            "itemCode": "RSES10_EN_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10_en_total": 20
+          },
+          "totalScoreKeys": [
+            "rses10_en_total"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "RSES10_EN_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_10",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10_en_total": 30
+          },
+          "totalScoreKeys": [
+            "rses10_en_total"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "RSES10_EN_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RSES10_EN_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10_en_total": 0
+          },
+          "totalScoreKeys": [
+            "rses10_en_total"
+          ]
+        }
+      },
+      {
+        "name": "all-strongly-agree-is-middle-not-ceiling",
+        "answers": [
+          {
+            "itemCode": "RSES10_EN_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RSES10_EN_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "rses10_en_total": 15
+          },
+          "totalScoreKeys": [
+            "rses10_en_total"
+          ]
+        }
+      },
+      {
+        "name": "one-required-answer-missing",
+        "answers": [
+          {
+            "itemCode": "RSES10_EN_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RSES10_EN_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RSES10_EN_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "rses10_en_total": null
+          },
+          "totalScoreKeys": [
+            "rses10_en_total"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "BELOW IS A LIST OF STATEMENTS DEALING WITH YOUR GENERAL FEELINGS ABOUT YOURSELF. IF YOU STRONGLY AGREE, CIRCLE SA. IF YOU AGREE WITH THE STATEMENT, CIRCLE A. IF YOU DISAGREE, CIRCLE D. IF YOU STRONGLY DISAGREE, CIRCLE SD.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "PhenX Toolkit protocol 180901 (Rosenberg English; paper instruction preserved, platform response labels shown as four clickable choices), https://www.phenxtoolkit.org/protocols/view/180901"
+  }
+}
