@@ -52,6 +52,14 @@ on:
         type: string
         default: ''
         description: 'Optional HTTPS Alpine repository prefix; empty retains official repositories'
+      export_release:
+        type: boolean
+        default: false
+        description: 'Export scanned runtime/frontend and same-source ops for deployment'
+      release_source:
+        type: string
+        default: ''
+        description: 'Exact approved 40-character release SHA; required for export'
 
 permissions:
   contents: read
@@ -96,6 +104,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.cognitive_product && '0' || '1' }}
+          ref: ${{ inputs.export_release && inputs.release_source || github.sha }}
+      - name: bind explicit release source before export
+        if: inputs.export_release
+        env:
+          RELEASE_SOURCE: ${{ inputs.release_source }}
+          FRONTEND_ONLY: ${{ inputs.frontend_only }}
+          BACKEND_ONLY: ${{ inputs.backend_only }}
+        run: |
+          [[ "$RELEASE_SOURCE" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$RELEASE_SOURCE"
+          test "$FRONTEND_ONLY" != true
+          test "$BACKEND_ONLY" != true
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -144,7 +164,7 @@ jobs:
         env:
           FRONTEND_ONLY: ${{ inputs.frontend_only }}
           BACKEND_ONLY: ${{ inputs.backend_only }}
-          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery || inputs.cognitive_product }}
+          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery || inputs.cognitive_product || inputs.export_release }}
         run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
       - name: verify production Nginx static asset MIME and security headers
         if: inputs.backend_only != true
@@ -192,4 +212,55 @@ jobs:
           name: survey-wave-selection-browser-${{ github.sha }}
           path: survey-wave-selection-browser-report/
           if-no-files-found: error
+          retention-days: 3
+
+      # This opt-in preserves deployable bytes; normal CI callers are unchanged.
+      # Compile/registration evidence is supplied by the approved source's PR CI.
+      - name: build matching ops from the already cached compile stage
+        if: inputs.export_release
+        run: |
+          set -euo pipefail
+          recipe="$(mktemp "$GITHUB_WORKSPACE/server-version/backend/.release-ops.XXXXXX")"
+          trap 'rm -f "$recipe"' EXIT
+          export RELEASE_OPS_RECIPE="$recipe"
+          node --input-type=module <<'JS'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {pathToFileURL} from 'node:url';
+          const {catalogCompileRecipe}=await import(pathToFileURL(process.env.GITHUB_WORKSPACE+'/.github/scripts/ci-image-plan.mjs'));
+          writeFileSync(process.env.RELEASE_OPS_RECIPE,catalogCompileRecipe(readFileSync('backend/Dockerfile','utf8')));
+          JS
+          docker build --target ops --file "$recipe" --tag server-version-ops:release \
+            --build-arg "DEBIAN_MIRROR=$DEBIAN_MIRROR" --build-arg "NPM_REGISTRY=$NPM_REGISTRY" backend
+      - name: retain exact deployable images and operator inputs
+        if: inputs.export_release
+        env:
+          RELEASE_SOURCE: ${{ inputs.release_source }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/release-images"
+          export RELEASE_OUTPUT="$RUNNER_TEMP/release-images"
+          python3 - <<'PY'
+          import json,os,subprocess,pathlib
+          out=pathlib.Path(os.environ['RELEASE_OUTPUT'])
+          images={}
+          for component,tag in [('runtime','server-version-backend:latest'),('frontend','server-version-frontend:latest'),('ops','server-version-ops:release')]:
+              image=json.loads(subprocess.check_output(['docker','image','inspect',tag],text=True))[0]
+              assert image['Os']=='linux' and image['Architecture']=='amd64'
+              images[component]={'imageId':image['Id'],'tag':tag,'sizeBytes':image['Size']}
+          manifest={'schemaVersion':1,'releaseSource':os.environ['RELEASE_SOURCE'],'producerRun':os.environ['GITHUB_RUN_ID'],'producerAttempt':os.environ['GITHUB_RUN_ATTEMPT'],'images':images,'runtimeAndFrontendScans':'existing image steps succeeded','ops':'same Dockerfile build stage; not a new application validation'}
+          (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          PY
+          docker save server-version-backend:latest server-version-frontend:latest server-version-ops:release \
+            | gzip -1 > "$RUNNER_TEMP/release-images/images.tar.gz"
+          ops_container=$(docker create server-version-ops:release)
+          trap 'docker rm "$ops_container" >/dev/null' EXIT
+          docker cp "$ops_container:/app/scripts/runtime-role-defaults.sql" "$RUNNER_TEMP/release-images/runtime-role-defaults.sql"
+          docker cp "$ops_container:/app/scripts/runtime-table-policy.json" "$RUNNER_TEMP/release-images/runtime-table-policy.json"
+      - uses: actions/upload-artifact@v4
+        if: success() && inputs.export_release
+        with:
+          name: release-images-${{ inputs.release_source }}
+          path: ${{ runner.temp }}/release-images/
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 3
