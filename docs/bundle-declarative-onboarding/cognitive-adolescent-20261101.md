@@ -38,7 +38,9 @@
 
 报告包含任务观察、日常体验、两种视角的互补说明、可尝试的小步骤、质量及解释限制。跨方法文字需其列出的每个来源均可解释；缺失、无效或有限质量不生成完整联合说明。原始零值、负的Flanker差值与缺失null分别保留。建议是项目撰写的教育性尝试，没有训练疗效或作者原报告声称。
 
-当前声明式契约只接受`number/string/boolean`，但任务计数字段的注册类型是`integer`。本候选未改共享契约；保留任务slot中的误按次数、Go／No-Go数与CPT目标／命中数选择器，真实原任务结果继续携带分母；Bundle evidence-map只映射现已支持的浮点指标。整数证据进入通用Bundle图表是已记录的共享展示缺口，不能把本PR说成已完成分母图形。本轮没有修改成人线负责的`BundleReport.tsx`，未声称浏览器或最终视觉验收通过。
+本分支原main基线的声明式依赖检查只接受精确相同的number类型，而任务计数注册为integer。本线未复制共享代码；成人PR484的原兼容已处理integer→JSON number且保持精确身份与单位。中文私有包v3复用该兼容，将误按次数、Go／No-Go数及CPT目标／命中数以`unit=count`保存。它们是计数，不作为百分率；无缺失补零。
+
+共享报告只读取已保存的受众投影。本线未修改成人负责的`BundleReport.tsx`或重做UI；最终目标环境使用下述PR484共享增量后，已核对本年龄构念可以直接匹配词表与双来源条件。这是投影与词表契约验证，不是最终浏览器视觉验收。
 
 ## 定向验证与执行位置
 
@@ -53,4 +55,6 @@
 
 已核对成人Draft PR484的`dd8081a354d40f1149a97d92f00beadd45005f5b`。本年龄包的construct改为精确指标身份，以直接复用共享展示词表：`gonogo.commission_rate`、`gonogo.d_prime`、`gonogo.omission_rate`及CPT对应指标。TEXI明确命名`texi.working_memory_mean`、`texi.inhibition_mean`，避免把1–5均分误标成ADEXI项目合计分。
 
-共享组件当前只注册ADEXI合计分，尚不识别TEXI与Flanker。本线未修改成人负责的共享组件。最终整合应在原`bundle-evidence-display.ts`词表补入TEXI两个1–5均分与Flanker三个指标（有符号毫秒效应、两条件0–1准确率）；否则`hasCrossMethodEvidence`不会开启双来源图表。成人PR484也已补上integer→JSON number的原依赖兼容，但此兼容尚非本分支基线。任务整数证据及分母图形可在三线统一整合时使用该共享增量，不复制依赖代码或整份生成清单。
+成人线随后在`89e8fdfdf8073b5cf5ab2b0180d48d084a067986`补齐TEXI与Flanker词表。本线直接消费该确切文件核对私有中文包投影：12个展示指标全部匹配，双来源条件成立；TEXI各1–5均分，Flanker两条件ratio0–1，毫秒差与d′保留负号，零和缺失分开，Go/No-Go分母30及CPT目标分母36均保持计数。该契约验证已通过；未重跑成人UI测试、types/lint或浏览器，也未将这些上游结果归为本线执行。
+
+中文主产品管理员来源导入的目标环境应包含成人PR484@89e8fdf原共享增量，再纳入私有完整source与Bundle overlay并使用现有生成／DRAFT安装命令。没有新加载器、审批或门禁；没有把源码注册称为数据库已安装。三线最终union生成清单，不能用本分支整份generated文件覆盖其他年龄项。
