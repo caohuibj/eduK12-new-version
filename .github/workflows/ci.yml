@@ -370,6 +370,7 @@ jobs:
       image_build: ${{ steps.scope.outputs.image_build }}
       dependencies_frontend_only: ${{ steps.scope.outputs.dependencies_frontend_only }}
       frontend_affected: ${{ steps.scope.outputs.frontend_affected }}
+      backend_focus: ${{ steps.scope.outputs.backend_focus }}
       documentation: ${{ steps.scope.outputs.documentation }}
       codeql: ${{ steps.scope.outputs.codeql }}
       heavy_runner: ${{ steps.scope.outputs.heavy_runner }}
@@ -685,7 +686,7 @@ jobs:
       - name: Survey Mac exact scope, refusal and aggregate contracts
         if: steps.scope.outputs.application_route == 'survey-mac-ui' && github.event_name == 'pull_request'
         run: |
-          node --test .github/scripts/survey-mac-ui-scope.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
+          node --test .github/scripts/backend-api-scope.test.mjs .github/scripts/survey-mac-ui-scope.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
           python3 -B .github/scripts/survey-mac-ui-candidate.test.py
       - name: Authenticator route, strict evidence and no-skip aggregate contracts
         if: steps.scope.outputs.application_route == 'admin-authenticator' && github.event_name == 'pull_request' && github.event.pull_request.draft == false
@@ -1146,6 +1147,7 @@ jobs:
       runner_labels: '["ubuntu-24.04"]'
       run_performance_tests: ${{ needs.scope.outputs.run_performance_tests != 'false' }}
       admin_permissions_functional: ${{ needs.scope.outputs.admin_permissions_functional_only == 'true' }}
+      focus: ${{ needs.scope.outputs.backend_focus || 'full' }}
       training_followup_functional: ${{ needs.scope.outputs.training_functional_only == 'true' && fromJSON(needs.scope.outputs.training_functional_plan).mode == 'training-followup-functional-only' }}
 
   backend-regression:
@@ -1229,11 +1231,12 @@ jobs:
         if: needs.scope.outputs.dependencies_frontend_only == 'true' || needs.scope.outputs.scenario == 'backend' || needs.scope.outputs.scenario == 'frontend' || needs.scope.outputs.application_route == 'homepage-copy' || needs.scope.outputs.scenario == 'release-tooling'
         env:
           BACKEND_MODULES: ${{ needs.scope.outputs.scenario == 'backend' }}
+          BACKEND_API_FOCUS: ${{ needs.scope.outputs.backend_focus }}
           PUBLIC_PRESENTATION: ${{ needs.scope.outputs.application_route == 'homepage-copy' }}
           RELEASE_TOOLING: ${{ needs.scope.outputs.scenario == 'release-tooling' }}
         shell: node {0}
         run: |
-          const config=process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src']}:{paths:['server-version/frontend/src']};
+          const config=process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src',...(process.env.BACKEND_API_FOCUS==='form-intake'?['.github/scripts/backend-api-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs']:[])]}:{paths:['server-version/frontend/src']};
           require('node:fs').appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\n`);
       - name: bound selected cognitive analysis to task inputs and checker controls
         id: cognitive-codeql-config
