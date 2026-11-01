@@ -1,6 +1,6 @@
 {
   "values": {
-    "adult_age_years": {
+    "subject_age_years": {
       "state": "present",
       "value": 35
     },
@@ -47,5 +47,15 @@
     "pba_fed_up",
     "pba_distancing",
     "pa2"
-  ]
+  ],
+  "expectedDerived": {
+    "scalars": {
+      "burden_position": 0.8043478260869565,
+      "efficacy_position": 0.8
+    },
+    "theme": {
+      "state": "MATCHED",
+      "profileId": "pa2"
+    }
+  }
 }

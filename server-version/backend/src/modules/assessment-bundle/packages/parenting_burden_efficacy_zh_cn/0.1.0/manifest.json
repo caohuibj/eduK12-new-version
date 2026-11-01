@@ -58,7 +58,7 @@
     ],
     "engine": {
       "key": "declarative-evidence-v1",
-      "version": "1.0.0"
+      "version": "1.2.0"
     },
     "contextDefinitionKey": "parenting_burden_efficacy_zh_cn_context",
     "contextDefinitionVersion": "0.1.0",
@@ -88,7 +88,7 @@
       "两个原量表均无固定回忆窗口，不擅自改为最近两周。中文版沿用既有工作译稿身份，不声称已验证。",
       "不计算跨工具总分、百分位、诊断、养育能力或儿童结果；分数仅为本人描述的体验与信心。",
       "四角是项目理论性支持主题，不是原作者临界值、常模或实证潜在类别；中间、混合、缺失不强行分型。",
-      "两个叶工具当前scoreDerivedLabels均关闭；V1读取器因此收起规则叙事（包括联合支持主题）；许可数值投影仍可保留。本包是可计算规则与待审报告内容，主题展示仍需共享读取能力支持，不改变叶工具许可或披露策略。"
+      "本组合仍为待审草稿；展示取决于各来源结果的实际开放范围，目前尚未完成所有入口的报告展示验证。"
     ]
   },
   "files": {
@@ -99,5 +99,6 @@
     "publication": "publication.json",
     "context": "context.json"
   },
-  "cognitiveDependencies": []
+  "cognitiveDependencies": [],
+  "packageSchemaVersion": 3
 }

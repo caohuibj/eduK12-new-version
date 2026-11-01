@@ -5,7 +5,7 @@
     "conditions": [
       {
         "op": "gte",
-        "evidenceKey": "adult_age_years",
+        "evidenceKey": "subject_age_years",
         "value": 18
       },
       {
@@ -699,16 +699,46 @@
       "ruleId": "methods",
       "when": {
         "op": "present",
-        "evidenceKey": "adult_age_years"
+        "evidenceKey": "subject_age_years"
       },
       "kind": "limitation",
       "text": "方法说明：b=PBA总分/138；e=(BPSES总分−5)/20。仅用量尺位置≤0.25或≥0.75组织四角支持主题，不是百分位、常模或原作者阈值。只采用完整、有效的原总分；有限质量、缺失、无效或不适用时不生成联合主题。两项总分分别保留，不相加。",
       "evidenceKeys": [
-        "adult_age_years"
+        "subject_age_years"
       ],
       "supportRefs": [
         "b09_design"
       ]
     }
-  ]
+  ],
+  "derivations": [
+    {
+      "key": "burden_position",
+      "op": "RANGE_POSITION",
+      "input": "pba_total",
+      "min": 0,
+      "max": 138,
+      "orientation": "DIRECT"
+    },
+    {
+      "key": "efficacy_position",
+      "op": "RANGE_POSITION",
+      "input": "bpses_total",
+      "min": 5,
+      "max": 25,
+      "orientation": "DIRECT"
+    }
+  ],
+  "theme": {
+    "axisKeys": [
+      "burden_position",
+      "efficacy_position"
+    ],
+    "ruleIds": [
+      "pa1",
+      "pa2",
+      "pa3",
+      "pa4"
+    ]
+  }
 }

@@ -66,9 +66,9 @@
     "qualityPolicy": "interpretable_only"
   },
   {
-    "evidenceKey": "adult_age_years",
+    "evidenceKey": "subject_age_years",
     "slotKey": "context",
-    "selector": "adult_age_years",
+    "selector": "subject_age_years",
     "valueType": "number",
     "unit": "context",
     "construct": "parenting.applicability",

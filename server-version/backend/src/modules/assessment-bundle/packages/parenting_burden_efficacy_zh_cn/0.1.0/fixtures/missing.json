@@ -1,6 +1,6 @@
 {
   "values": {
-    "adult_age_years": {
+    "subject_age_years": {
       "state": "present",
       "value": 35
     },
@@ -37,5 +37,15 @@
     "methods",
     "bpses_summary",
     "pba_total_missing"
-  ]
+  ],
+  "expectedDerived": {
+    "scalars": {
+      "burden_position": null,
+      "efficacy_position": 0.8
+    },
+    "theme": {
+      "state": "INSUFFICIENT",
+      "profileId": null
+    }
+  }
 }

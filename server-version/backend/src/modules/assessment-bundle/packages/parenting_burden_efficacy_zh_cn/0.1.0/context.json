@@ -4,7 +4,7 @@
   "contextDefinitionVersion": "0.1.0",
   "fields": [
     {
-      "contextKey": "adult_age_years",
+      "contextKey": "subject_age_years",
       "required": true,
       "valueType": "number"
     },

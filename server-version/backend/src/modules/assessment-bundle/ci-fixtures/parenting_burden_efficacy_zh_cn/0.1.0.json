@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "synthetic": true,
   "context": {
-    "adult_age_years": 35,
+    "subject_age_years": 35,
     "parent_caregiver_confirmed": true,
     "child_lives_with_parent": true
   },
