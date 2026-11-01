@@ -10,6 +10,8 @@ import { startClassroomQuestion, endClassroomQuestion, closeClassroom, submitCla
  *   server-side relations; client identity fields are ignored.
  * - classroom-wide statistics are sent only to the authorized teacher and
  *   bigscreen subrooms, never to the anonymous student room.
+ * - student question snapshots contain only the prompt, type and public option
+ *   fields; answer keys and scoring metadata stay in the manager subrooms.
  */
 
 import { randomUUID } from 'crypto'
@@ -83,6 +85,32 @@ const answerText = (answer: unknown): string | null => {
 
   const text = String(value).trim()
   return text ? text : null
+}
+
+const participantQuestionContent = (content: unknown): Record<string, unknown> => {
+  const source = asRecord(content)
+  const projected: Record<string, unknown> = {}
+  for (const key of ['type', 'question']) {
+    if (typeof source[key] === 'string') projected[key] = source[key]
+  }
+  if (Array.isArray(source.options)) {
+    projected.options = source.options.map((option: unknown) => {
+      const fields = asRecord(option)
+      const publicOption: Record<string, string | number> = {}
+      // Both option formats are consumed by the existing student and bigscreen UI.
+      for (const key of ['value', 'key']) {
+        const value = fields[key]
+        if (typeof value === 'string' || typeof value === 'number' && Number.isFinite(value)) {
+          publicOption[key] = value
+        }
+      }
+      for (const key of ['label', 'text']) {
+        if (typeof fields[key] === 'string') publicOption[key] = fields[key]
+      }
+      return publicOption
+    })
+  }
+  return projected
 }
 
 /** The teacher control surface receives this small, authoritative snapshot. */
@@ -490,7 +518,7 @@ export class ClassroomSocketHandler {
 
         socket.emit('broadcast:question', {
           questionId: activeQuestion.id,
-          questionContent: activeQuestion.questionContent,
+          questionContent: participantQuestionContent(activeQuestion.questionContent),
           timeLimit: activeQuestion.timeLimit,
           questionIndex: activeQuestion.questionIndex,
           startedAt: activeQuestion.startedAt?.toISOString(),
@@ -677,15 +705,7 @@ export class ClassroomSocketHandler {
       }
 
       const question = outcome.question
-      const broadcastData = {
-        ...classroomQuestionPayload(question),
-      }
-
-      socketService.broadcastToRoom(
-        'classroom:' + classroom.id,
-        'broadcast:question',
-        broadcastData
-      )
+      this.broadcastQuestionStarted(classroom.id, question)
 
       this.scheduleQuestionTimer(
         classroom.id,
@@ -1185,8 +1205,19 @@ export class ClassroomSocketHandler {
   }
 
 
+  private broadcastQuestionStarted(classroomId: string, question: any): void {
+    const room = 'classroom:' + classroomId
+    const managerPayload = { ...classroomQuestionPayload(question) }
+    socketService.broadcastToRoom(room + ':students', 'broadcast:question', {
+      ...managerPayload,
+      questionContent: participantQuestionContent(question.questionContent),
+    })
+    socketService.broadcastToRoom(room + ':teacher', 'broadcast:question', managerPayload)
+    socketService.broadcastToRoom(room + ':bigscreen', 'broadcast:question', managerPayload)
+  }
+
   notifyQuestionStarted(classroomId:string,question:any):void {
-    socketService.broadcastToRoom('classroom:'+classroomId,'broadcast:question',{...classroomQuestionPayload(question)})
+    this.broadcastQuestionStarted(classroomId, question)
     this.scheduleQuestionTimer(classroomId,question.id,question.timeLimit||60,question.startedAt)
   }
   async notifyQuestionEnded(classroomId:string,questionId:string):Promise<void>{
