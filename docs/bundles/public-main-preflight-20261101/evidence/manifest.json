@@ -1,0 +1,47 @@
+[
+  {
+    "name": "backend-types-initial-missing-auth-root.json",
+    "sha256": "3e8841bf1d44419df16c1a5c6e9d1a50aa106249455bfef689634cad9c5f1a57",
+    "gzipSha256": "e63eaefa8e35443703432fd2e4a3adc83212827637b5830147d630e6702612fe"
+  },
+  {
+    "name": "backend-types-initial-missing-auth-root.log",
+    "sha256": "3e8841bf1d44419df16c1a5c6e9d1a50aa106249455bfef689634cad9c5f1a57",
+    "gzipSha256": "e63eaefa8e35443703432fd2e4a3adc83212827637b5830147d630e6702612fe"
+  },
+  {
+    "name": "backend-types.json",
+    "sha256": "373f0c30c4651159394a10151e4d92058f04ebf9bff3b998163d27ec1643df68",
+    "gzipSha256": "c237e36d0ba062e7136abe60988483510f0742ab884ed3aa7088bb0cd56f5f4f"
+  },
+  {
+    "name": "backend-types.log",
+    "sha256": "373f0c30c4651159394a10151e4d92058f04ebf9bff3b998163d27ec1643df68",
+    "gzipSha256": "c237e36d0ba062e7136abe60988483510f0742ab884ed3aa7088bb0cd56f5f4f"
+  },
+  {
+    "name": "content-check-applicability.json",
+    "sha256": "80e25fedd5dd1d7ece4d27bb799881c44c0c11dd0949de2a3e5858578009f941",
+    "gzipSha256": "fb3ecb1781c9dbefc561a165a4713003085841101882524ab254b31a650880e2"
+  },
+  {
+    "name": "preflight-inputs.json",
+    "sha256": "08828e4deed6e9666ecb52ef62eaf16310ea4098628a0403e82d7b3646754d7f",
+    "gzipSha256": "dce62e5877a7e6d62870b625395bb4167903bbdc85740c5d8c3d4336887dea7e"
+  },
+  {
+    "name": "prisma-generate-local.log",
+    "sha256": "76b1c01e5ad012ad116f18c25ff81df65c22f5fdf9de7849e73fbc37e54d5202",
+    "gzipSha256": "c51c18a327d87515c36e14d549dd3284b1888301d4dc657e23b01891cbe6e72e"
+  },
+  {
+    "name": "prisma-generate.log",
+    "sha256": "226a024e8e54c0634bb6b9f1274ac34c6dc2fe898c06752a7364b7f013c9045f",
+    "gzipSha256": "7bf9e2881baa0a999909257817842878f79ae341f3e7a8843f194b89df51eac9"
+  },
+  {
+    "name": "private-client-restored.log",
+    "sha256": "958a1bdab376712994a5fca7f96aff341d3bad252d92e70a8da36b79fc935658",
+    "gzipSha256": "9a547c2b8d097973a693105e4962f056cf151b24c60960804cc30f8afe48274d"
+  }
+]
