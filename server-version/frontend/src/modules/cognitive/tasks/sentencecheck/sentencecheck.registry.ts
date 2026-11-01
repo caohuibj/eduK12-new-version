@@ -26,3 +26,17 @@ export const sentencecheckRegistryEntry: CognitiveFrontendRegistryEntry = {
     disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
   },
 }
+
+export const sentencecheckRegistryEntryV11: CognitiveFrontendRegistryEntry = {
+  ...sentencecheckRegistryEntry,
+  engineVersion: '1.1.0',
+  scoringVersion: '1.1.0',
+  metricDefinitions: sentencecheckRegistryEntry.metricDefinitions.map((metric) => metric.key === 'negationPenaltyMs'
+    ? { ...metric, label: '否定与肯定用时差' } : metric),
+  reportDefinition: {
+    ...sentencecheckRegistryEntry.reportDefinition,
+    showProductIndex: false,
+    practicalTips: ['肯定和否定句都可能相符或不相符，请逐题核对图片。'],
+    disclaimer: '结果描述本次自编句图核对；条件安排已纠正，不作诊断、年龄比较，也不与旧版记录直接比较。',
+  },
+}

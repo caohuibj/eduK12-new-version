@@ -173,3 +173,46 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     }
   },
 ]
+
+const legacyPresentation = participantPresentations[0]
+const legacyReading = legacyPresentation.reportReading!
+participantPresentations.push({
+  ...legacyPresentation,
+  presentationVersion: '1.1.0',
+  engineVersion: '1.1.0',
+  scoringVersion: '1.1.0',
+  metrics: {
+    ...legacyPresentation.metrics,
+    negationPenaltyMs: {
+      label: '否定与肯定用时差',
+      explanation: '否定句正确有效用时中位数减肯定句中位数；是本次条件差，不代表否定加工的因果代价。',
+      singleExplanation: '本次否定句与肯定句的正确有效用时中位数之差，可正、可负、可为0；任一条件没有有效记录为null。',
+    },
+  },
+  practicalTips: ['肯定句和否定句都可能相符或不相符，请每题核对图片。'],
+  disclaimer: '只描述本次自编句图核对，不作诊断或年龄比较；条件安排与旧版不同，结果不直接比较。',
+  reportReading: {
+    ...legacyReading,
+    version: '1.1.0',
+    nextStep: '先结合正确率、超时和有效正确反应数阅读，再描述两类句子的用时差；不要用这个差值判断语言能力。',
+    popular: {
+      ...legacyReading.popular!,
+      concept: '每题读一句关于形状或颜色的话，再核对图片。肯定句和否定句都可能相符，也可能不相符；有没有“不是”不能单独决定答案。',
+      metricHelp: {
+        ...legacyReading.popular!.metricHelp,
+        negationPenaltyMs: { label: '两类句子用时差', explanation: '本次否定句与肯定句的正确有效用时中位数之差；它会受阅读、题目和反应选择影响。' },
+      },
+    },
+    professional: {
+      ...legacyReading.professional!,
+      construct: '自编中文颜色/形状句图核对',
+      procedure: '真假与肯定/否定按四格交叉安排，保留各自计划数量；不能整除时四格尽量接近比例。服务端按种子和配置重建形状、颜色、问属性、否定与问值，再使用既有正确率和有效正确RT公式。',
+      interpretation: '用时差仅为本次描述性条件差，不能认定否定加工的因果代价；不与旧版条件混淆的记录直接比较。',
+      confounders: [...legacyReading.professional!.confounders, '四条件覆盖纠正了旧版混淆，尚无本项目版本的信效度验证。'],
+      metricNotes: {
+        ...legacyReading.professional!.metricNotes,
+        negationPenaltyMs: { definition: '否定条件正确有效RT中位数减肯定条件中位数；任一条件无有效记录为null。', readingHint: '每个真假×否定条件均有计划试次不保证每格有足够正确RT；只作本次描述，不作因果或能力等级推断。' },
+      },
+    },
+  },
+})

@@ -4,6 +4,7 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { SentencecheckConfig, SentencecheckTrialPayload } from '../../types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { buildSentencecheckTrials, SENTENCECHECK_PRACTICE_TRIALS, type SentenceColor, type SentenceShape } from './prng'
+import { buildSentencecheckTrialsV11 } from './generator-v1.1'
 
 const MAX_PRACTICE_ATTEMPTS = 2
 
@@ -37,7 +38,8 @@ export const SentencecheckTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
   const interruptedRef = useRef(false)
   const onsetRef = useRef<number | null>(null)
   const submittingRef = useRef(false)
-  const trials = useMemo(() => buildSentencecheckTrials(taskContext.randomSeed, totalTrials, trueRatio, negationRatio), [taskContext.randomSeed, totalTrials, trueRatio, negationRatio])
+  const crossedConditions = taskContext.engineVersion === '1.1.0'
+  const trials = useMemo(() => (crossedConditions ? buildSentencecheckTrialsV11 : buildSentencecheckTrials)(taskContext.randomSeed, totalTrials, trueRatio, negationRatio), [crossedConditions, taskContext.randomSeed, totalTrials, trueRatio, negationRatio])
   const currentTrial = trials[trialIndex]
 
   useEffect(() => {
@@ -126,7 +128,7 @@ export const SentencecheckTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="句图验证推理" description={<p>每题会给一句话和一张图形。请判断句子与图片是否相符：相符按「相符」，不符按「不相符」。注意“不是”这样的否定说法。</p>} hint={<><p>按键 1/2 或点击按钮作答；练习不计入成绩。</p></>} actionLabel={practiceAttempt > 1 ? '重新开始练习' : '开始练习'} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="句图验证推理" description={<><p>每题会给一句话和一张图形。请判断句子与图片是否相符：相符按「相符」，不符按「不相符」。注意“不是”这样的否定说法。</p>{crossedConditions && <p>肯定句和否定句都可能相符，也可能不相符；请每题核对图片，不要只看有没有“不是”。</p>}</>} hint={<><p>按键 1/2 或点击按钮作答；练习不计入成绩。</p></>} actionLabel={practiceAttempt > 1 ? '重新开始练习' : '开始练习'} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {
