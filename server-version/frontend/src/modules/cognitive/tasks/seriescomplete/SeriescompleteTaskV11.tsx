@@ -11,7 +11,7 @@ type SubPhase = 'fixation' | 'stimulus' | 'feedback' | 'retry'
 
 const PRACTICE_ANSWER = SERIESCOMPLETE_PRACTICE_ITEM.answer
 
-export const SeriescompleteTaskV11: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete }) => {
+export const SeriescompleteTaskV11: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
   const config = taskContext.config as unknown as SeriescompleteConfig
   const totalTrials = config.totalTrials
   const fixationMs = config?.fixationMs ?? 400
@@ -56,8 +56,11 @@ export const SeriescompleteTaskV11: React.FC<CognitiveTaskProps> = ({ taskContex
       const accepted = await onTrialComplete(payload)
       if (accepted === false) { setFormalFeedback('提交失败，请重试当前试次'); setSubPhase('retry'); return }
       setFormalFeedback('已记录，下一题准备中')
+      if (trialIndex + 1 >= totalTrials) {
+        try { await onTaskComplete?.() } catch { setFormalFeedback('已记录；完成确认失败，请返回任务入口恢复。') }
+      }
     } catch { setFormalFeedback('提交失败，请重试当前试次'); setSubPhase('retry') } finally { submittingRef.current = false }
-  }, [phase, subPhase, currentTrial, onTrialComplete, timeoutMs])
+  }, [phase, subPhase, currentTrial, onTrialComplete, trialIndex, totalTrials, onTaskComplete, timeoutMs])
 
   useEffect(() => {
     if (phase !== 'formal' || subPhase !== 'stimulus') return
@@ -101,14 +104,13 @@ export const SeriescompleteTaskV11: React.FC<CognitiveTaskProps> = ({ taskContex
 
   const item = phase === 'practice' ? SERIESCOMPLETE_PRACTICE_ITEM : currentTrial
 
-  if (trialIndex >= totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
   if (phase === 'instruction') return <CognitiveTaskIntro title="数列完成" description={<p>观察数列或字母序列，寻找简洁且贯穿各项的规律，选择接着往下排的一项。英文字母按A到Z排列；题目可能采用等差、等比、递增差值或分组交替等规律。</p>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。本次正式{totalTrials}题，每题最多{timeoutMs / 1000}秒，超时计为漏答；尽量准确，不必追求抢答。完整时长受作答速度和说明练习用时影响。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   const OptionButtons: React.FC<{ show: boolean }> = ({ show }) => show ? (
     <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto mt-5">
       {item!.options.map((option, index) => (
-        <button key={option} type="button" onPointerDown={() => (phase === 'practice' ? handlePracticeChoice(index) : void submitFormal(index))} onClick={(event) => { if (event.detail === 0) { if (phase === 'practice') handlePracticeChoice(index); else void submitFormal(index) } }} className="btn-secondary min-h-12 text-left px-4">
+        <button key={option} type="button" onPointerDown={() => (phase === 'practice' ? handlePracticeChoice(index) : void submitFormal(index))} className="btn-secondary min-h-12 text-left px-4">
           <span className="text-gray-400 mr-2">{index + 1} ·</span>{option}
         </button>
       ))}

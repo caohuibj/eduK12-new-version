@@ -8,11 +8,7 @@ export const seriescompleteRegistryEntryV11: CognitiveFrontendRegistryEntry = {
   engineVersion: '1.1.0',
   scoringVersion: '1.1.0',
   RunnerComponent: SeriescompleteTaskV11, prepareRunner: SeriescompleteTaskV11.prepare,
-  completionMode: 'manual',
-  readiness: { category: 'fixed-trial', inputs: ['keyboard','pointer','touch'], orientation: 'any',
-    globalKeyboardCapture: true, resumeDisposition: 'restart-required',
-    resumeReason: '练习及题内阶段未持久化，未封存的中断记录不能只按最大试次索引自动恢复。',
-    frozenMediaSlots: ['instruction','example','stimulus'] },
+  completionMode: 'task',
   metricDefinitions: [
     { key: 'accuracy', label: '总体正确率', displayType: 'percentage' },
     { key: 'medianRtMs', label: '正确作答中位用时', unit: 'ms', displayType: 'ms' },
@@ -21,7 +17,6 @@ export const seriescompleteRegistryEntryV11: CognitiveFrontendRegistryEntry = {
     { key: 'validRtCount', label: '有效正确RT数', displayType: 'number' },
   ],
   reportDefinition: {
-    showProductIndex: false,
     title: '数列完成表现',
     headlineMetric: 'accuracy',
     summaryMetrics: ['medianRtMs', 'errorCount'],

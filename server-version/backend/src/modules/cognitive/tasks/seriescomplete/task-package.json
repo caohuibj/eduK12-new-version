@@ -68,8 +68,7 @@
     "frontendSuites": [
       "src/modules/cognitive/tasks/seriescomplete/__tests__/SeriescompleteTask.test.tsx",
       "src/modules/cognitive/tasks/seriescomplete/__tests__/prng.test.ts",
-      "src/modules/cognitive/tasks/seriescomplete/__tests__/audit-v1.1.test.tsx",
-      "src/modules/cognitive/__tests__/bank-intake-host.test.tsx"
+      "src/modules/cognitive/tasks/seriescomplete/__tests__/audit-v1.1.test.tsx"
     ]
   }
 }

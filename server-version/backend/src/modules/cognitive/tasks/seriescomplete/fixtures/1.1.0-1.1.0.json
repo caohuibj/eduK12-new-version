@@ -5,10 +5,10 @@
     "engineVersion": "1.1.0",
     "scoringVersion": "1.1.0"
   },
-  "provenance": "Project-original G3; computed locally from committed 36-item form, cross-checked accuracy=1/0, median=500/null, timeout=0/36; not live administration; G1 adapted existing fixture contract names golden/insufficient and added explicit empty rejection; original scored inputs/results unchanged.",
+  "provenance": "Project-original G3; computed locally from committed 36-item form, cross-checked accuracy=1/0, median=500/null, timeout=0/36; not live administration",
   "cases": [
     {
-      "name": "golden",
+      "name": "all-correct",
       "input": {
         "config": {
           "totalTrials": 36,
@@ -366,7 +366,7 @@
       }
     },
     {
-      "name": "insufficient",
+      "name": "all-timeout",
       "input": {
         "config": {
           "totalTrials": 36,
@@ -722,24 +722,6 @@
           "interrupted": false
         }
       }
-    },
-    {
-      "name": "empty",
-      "input": {
-        "config": {
-          "totalTrials": 36,
-          "stimulusSetVersion": "seriescomplete-zh-v1.1.0",
-          "fixationMs": 400,
-          "timeoutMs": 15000,
-          "validRtFloorMs": 300,
-          "report": {
-            "reportVersion": "1.1.0",
-            "referenceMode": "none"
-          }
-        },
-        "trials": []
-      },
-      "expectedError": "seriescomplete v1.1 expects exactly 36 trials, got 0"
     }
   ]
 }

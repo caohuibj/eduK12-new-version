@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "icarmatrix",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreIcarmatrixV2 at task authoring time (2026-10-31); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-bank-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "bankItemId": "matgen-std-rotate-rotate-006",
+              "responseIndex": 2,
+              "rtMs": 4200,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "bankItemId": "matgen-std-identity-rotate-008",
+              "responseIndex": 0,
+              "rtMs": 4500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "bankItemId": "matgen-std-shade-rotate-009",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "bankItemId": "matgen-std-identity-shape-003",
+              "responseIndex": 2,
+              "rtMs": 320,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 50,
+        "metrics": {
+          "accuracy": 0.5,
+          "medianRtMs": 4200,
+          "correctCount": 2,
+          "accuracyByRuleTag": {
+            "rotate": 0.3333,
+            "identity": 0.5,
+            "shade": 0,
+            "shape": 1
+          }
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "interrupted": false,
+          "excessiveTimeouts": false,
+          "rapidGuessing": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-bank-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "icarmatrix v2 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "totalTrials": 4,
+          "matrixType": "3x3",
+          "stimulusSetVersion": "matgen-bank-v1.0.0",
+          "fixationMs": 400,
+          "timeoutMs": 30000,
+          "validRtFloorMs": 500,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "bankItemId": "matgen-std-rotate-rotate-006",
+              "responseIndex": 2,
+              "rtMs": 4200,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "bankItemId": "matgen-std-identity-rotate-008",
+              "responseIndex": 0,
+              "rtMs": 4500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "bankItemId": "matgen-std-shade-rotate-009",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "icarmatrix v2 expects exactly 4 trials, got 3"
+    }
+  ]
+}
