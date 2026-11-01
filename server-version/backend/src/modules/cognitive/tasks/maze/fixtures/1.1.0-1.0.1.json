@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "maze",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.1"
+  },
+  "provenance": "Reuses unchanged C1.0.1 formal sequence and scorer golden inputs/expected outputs. C1.1.0 changes only non-persisted independent practice.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "mazeCols": 7,
+          "mazeRows": 7,
+          "timeLimitMs": 120000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "mazeIndex": 0,
+              "moves": [
+                2,
+                1,
+                1,
+                2,
+                1,
+                0,
+                1,
+                2,
+                1,
+                1,
+                2,
+                3,
+                2,
+                2,
+                1,
+                2
+              ],
+              "completionTimeMs": 5000,
+              "completed": true,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "mazeIndex": 1,
+              "moves": [
+                1,
+                1,
+                2,
+                3,
+                2,
+                3,
+                2,
+                2,
+                2,
+                1,
+                2,
+                1,
+                0,
+                0,
+                3,
+                0,
+                1,
+                0,
+                1,
+                2,
+                1,
+                0,
+                1,
+                0,
+                3,
+                3,
+                0,
+                1,
+                1,
+                1,
+                2,
+                2,
+                2,
+                3,
+                2,
+                2,
+                1,
+                2
+              ],
+              "completionTimeMs": 6000,
+              "completed": true,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "pathEfficiency": 1,
+          "completedCount": 2,
+          "totalDeadEnds": 0,
+          "medianCompletionTimeMs": 5500
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "incompleteMazes": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "mazeCols": 7,
+          "mazeRows": 7,
+          "timeLimitMs": 120000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": []
+      },
+      "expectedError": "maze v1 expects exactly 2 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "mazeCols": 7,
+          "mazeRows": 7,
+          "timeLimitMs": 120000,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "mazeIndex": 0,
+              "moves": [
+                2,
+                1,
+                1,
+                2,
+                1,
+                0,
+                1,
+                2,
+                1,
+                1,
+                2,
+                3,
+                2,
+                2,
+                1,
+                2
+              ],
+              "completionTimeMs": 5000,
+              "completed": true,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "maze v1 expects exactly 2 trials, got 1"
+    }
+  ]
+}

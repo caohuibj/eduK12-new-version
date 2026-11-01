@@ -15,4 +15,22 @@ export const seeds: CognitiveSeed[] = [
     scoringVersion: '1.0.1',
     config: { totalTrials: 4, mazeCols: 7, mazeRows: 7, timeLimitMs: 120000, report: NO_REFERENCE_REPORT },
   },
+{
+  "testType": "maze",
+  "configVersion": "1.1.0",
+  "name": "Maze Navigation 1.1.0 — independent 3×3 practice",
+  "status": "DRAFT",
+  "engineVersion": "1.1.0",
+  "scoringVersion": "1.0.1",
+  "config": {
+    "totalTrials": 4,
+    "mazeCols": 7,
+    "mazeRows": 7,
+    "timeLimitMs": 120000,
+    "report": {
+      "reportVersion": "1.1.0",
+      "referenceMode": "none"
+    }
+  }
+}
 ]
