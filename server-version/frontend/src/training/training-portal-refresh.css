@@ -203,3 +203,13 @@
   .hui-training :is(.training-feature-card,.training-feature-more svg,.training-portal-login) { transition: none; }
   .hui-training .training-feature-card:hover { transform: none; }
 }
+
+.hui-training .training-feature-audience{margin:20px 0 0;color:var(--training-muted);font-size:13px;line-height:1.9}
+.hui-training .training-feature-audience strong{display:block;margin-bottom:5px;color:var(--training-bamboo);font-size:12px}
+.hui-training .training-feature-results{padding:30px;border:1px solid var(--training-border);border-radius:14px;background:var(--portal-card)}
+.hui-training .training-feature-results h2{font-size:27px;margin-bottom:22px}
+.hui-training .training-feature-results ul{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.hui-training .training-feature-results li{display:flex;gap:10px;color:var(--training-muted);font-size:14px;line-height:1.9}
+.hui-training .training-feature-results li svg{flex-shrink:0;margin-top:5px;color:var(--training-bamboo)}
+.hui-training .training-feature-results>p:last-child{margin:22px 0 0;padding-top:18px;border-top:1px solid var(--training-border);color:var(--training-muted);font-size:13px;line-height:1.9}
+@media(max-width:600px){.hui-training .training-feature-results{padding:22px}.hui-training .training-feature-results h2{font-size:24px}}

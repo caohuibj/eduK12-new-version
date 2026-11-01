@@ -1,0 +1,58 @@
+/* Shared reading structure; palettes and page character belong to each entry. */
+.public-feature-guide--school{--guide-ink:var(--hs-ink);--guide-muted:var(--hs-muted,#526d55);--guide-line:var(--hs-border);--guide-surface:var(--hs-surface,#fffff8);--guide-soft:var(--hs-surface-soft,#eaf2e7);--guide-action:var(--hs-primary);--guide-on-action:var(--hs-on-primary,#fff);--guide-radius:22px}
+.public-feature-guide--teacher{--guide-ink:var(--ht-ink);--guide-muted:var(--ht-quiet);--guide-line:var(--ht-line);--guide-surface:var(--ht-paper);--guide-soft:var(--ht-surface-soft,#f4e8db);--guide-action:var(--ht-copper);--guide-on-action:var(--ht-on-primary,#fff);--guide-radius:6px}
+.public-feature-guide{max-width:1120px;margin:auto;padding:24px 28px 40px;color:var(--guide-ink);line-height:1.85;overflow-wrap:anywhere}
+.public-feature-guide a{color:var(--guide-action);text-decoration:none}
+.public-feature-guide a:hover{text-decoration:underline;text-underline-offset:5px}
+.public-feature-guide a:focus-visible{outline:3px solid var(--guide-action);outline-offset:4px}
+.public-feature-guide .guide-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:13px}
+.guide-navigation{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 34px;padding-bottom:20px;border-bottom:1px solid var(--guide-line)}
+.guide-navigation a{display:flex;align-items:center;min-height:44px;padding:7px 18px;border-radius:var(--guide-radius);font-size:14px}
+.guide-navigation a[aria-current=page]{background:var(--guide-soft);font-weight:650}
+.guide-hero{display:grid;grid-template-columns:1.5fr 1fr;gap:60px;align-items:center;padding:16px 0 48px}
+.public-feature-guide .guide-kicker{margin:0 0 10px;color:var(--guide-action);font-size:12px;font-weight:600;letter-spacing:.07em}
+.public-feature-guide h1{margin:0 0 22px;font-family:'Songti SC','STSong',serif;font-size:clamp(30px,3.3vw,44px);font-weight:600;line-height:1.5;text-wrap:balance}
+.public-feature-guide p{margin:0;color:var(--guide-muted);font-size:15px;line-height:1.95}
+.public-feature-guide .guide-audience{padding:30px;background:var(--guide-soft);border:1px solid var(--guide-line);border-radius:var(--guide-radius)}
+.guide-audience>svg{color:var(--guide-action);margin-bottom:18px}
+.public-feature-guide .guide-audience h2{font-size:18px;margin:0 0 10px}
+.guide-contents{display:flex;flex-wrap:wrap;gap:30px;border-block:1px solid var(--guide-line)}
+.guide-contents a{display:inline-flex;align-items:center;min-height:52px;font-size:14px}
+.guide-section{margin:48px 0;scroll-margin-top:24px}
+.public-feature-guide h2{font-size:27px;line-height:1.6;margin:0 0 24px;font-weight:600}
+.public-feature-guide h3{font-size:18px;line-height:1.7;margin:12px 0 10px;font-weight:600}
+.guide-capabilities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.guide-capabilities>section{padding:26px;background:var(--guide-surface);border:1px solid var(--guide-line);border-radius:var(--guide-radius)}
+.guide-number{flex-shrink:0;min-width:20px;white-space:nowrap;font-size:12px;letter-spacing:.06em;color:var(--guide-action)}
+.guide-workflow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 36px;list-style:none;padding:28px;border:1px solid var(--guide-line);border-radius:var(--guide-radius);background:var(--guide-surface)}
+.guide-workflow li{display:flex;gap:18px;align-items:flex-start}
+.guide-workflow .guide-number{padding-top:4px}
+.guide-workflow h3{margin:0 0 6px}
+.public-feature-guide .guide-workflow p{font-size:14px}
+.guide-results{display:grid;grid-template-columns:1.1fr 1fr;gap:52px;padding-block:30px;border-block:1px solid var(--guide-line)}
+.guide-results ul{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.guide-results li{display:flex;gap:10px;font-size:15px;color:var(--guide-muted)}
+.guide-results li>svg{flex-shrink:0;margin-top:5px;color:var(--guide-action)}
+.guide-results aside{padding-left:28px;border-left:1px solid var(--guide-line)}
+.guide-results aside h3{margin:0 0 14px}
+.guide-results aside p+p{margin-top:12px}
+.guide-entry{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:32px;background:var(--guide-soft);border-radius:var(--guide-radius);margin:0 0 22px}
+.guide-entry>div{max-width:40em}
+.guide-entry h2{margin-bottom:8px;font-size:24px}
+.public-feature-guide .guide-primary{display:inline-flex;align-items:center;justify-content:center;gap:20px;flex-shrink:0;min-height:48px;padding:10px 20px;border-radius:8px;background:var(--guide-action);color:var(--guide-on-action);font-size:14px;font-weight:600}
+/* Teacher retains the ruled journal character; School uses soft campus panels. */
+.public-feature-guide--teacher .guide-capabilities{gap:28px}
+.public-feature-guide--teacher .guide-capabilities>section{border:0;border-top:2px solid var(--guide-line);background:transparent;padding:20px 0;border-radius:0}
+.public-feature-guide--teacher .guide-workflow{border:0;border-left:2px solid var(--guide-line);border-radius:0;padding:20px 28px}
+.public-feature-guide--school .guide-audience{border-radius:22px 22px 54px 22px}
+.ht-guide-topbar>a{display:flex;align-items:center;gap:10px;min-height:44px;color:var(--ht-copper);text-decoration:none;font-size:14px}
+.ht-guide-topbar nav a{display:inline-flex;align-items:center;min-height:44px;padding:7px 10px;color:var(--ht-ink);font-size:14px;text-decoration:none}
+.ht-guide-topbar nav a:focus-visible{outline:3px solid var(--ht-copper);outline-offset:3px}
+@media(max-width:760px){
+ .public-feature-guide{padding:16px 20px 30px}.guide-navigation{gap:4px;margin-bottom:22px}.guide-navigation a{padding:7px 10px;font-size:13px}
+ .guide-hero{grid-template-columns:1fr;gap:24px;padding:6px 0 28px}.public-feature-guide h1{font-size:32px}.public-feature-guide .guide-audience{padding:24px}.guide-audience>svg{margin-bottom:10px}
+ .guide-capabilities{grid-template-columns:1fr}.guide-capabilities>section{padding:22px}.public-feature-guide h2{font-size:23px;margin-bottom:18px}.guide-section{margin:34px 0}
+ .guide-workflow{grid-template-columns:1fr;padding:22px;gap:24px}.guide-results{grid-template-columns:1fr;gap:26px}.guide-results aside{padding:22px 0 0;border-left:0;border-top:1px solid var(--guide-line)}
+ .guide-entry{flex-direction:column;align-items:flex-start;padding:24px;gap:20px}.guide-contents{gap:22px}.guide-contents a{font-size:13px}.ht-app .ht-guide-topbar{flex-direction:row;align-items:center;flex-wrap:wrap}
+ .ht-guide-topbar nav{width:auto}
+}

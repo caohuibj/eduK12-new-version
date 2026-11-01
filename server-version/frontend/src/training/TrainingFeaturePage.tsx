@@ -26,6 +26,7 @@ export default function TrainingFeaturePage() {
           <p className="training-portal-kicker"><span>{feature.marker} /</span> {feature.title}</p>
           <h1 id="training-feature-title">{feature.headline}</h1>
           <p className="training-feature-lead">{feature.introduction}</p>
+          <p className="training-feature-audience"><strong>适用角色与场景</strong>{feature.audience}</p>
           <a className="training-feature-anchor" href="#feature-start">找到我的使用入口<ArrowRight size={17} aria-hidden="true" /></a>
         </div>
         <aside className="training-feature-preview" aria-label={`${feature.title}流程示意`}>
@@ -39,15 +40,20 @@ export default function TrainingFeaturePage() {
       <nav className="training-feature-tabs" aria-label="浏览 Training 功能">{trainingFeatures.map(({ slug: key, title, marker }) => <Link key={key} to={`/features/${key}`} aria-current={key === slug ? 'page' : undefined}><span>{marker}</span>{title}<ArrowRight size={15} aria-hidden="true" /></Link>)}</nav>
 
       <section className="training-portal-section" aria-labelledby="feature-capabilities-title">
-        <div className="training-portal-section-heading"><div><p className="training-portal-kicker">功能，不止一个入口</p><h2 id="feature-capabilities-title">让每一步，都有着落。</h2></div><p>{feature.description}</p></div>
+        <div className="training-portal-section-heading"><div><p className="training-portal-kicker">功能与使用场景</p><h2 id="feature-capabilities-title">可以做什么</h2></div><p>{feature.description}</p></div>
         <div className="training-feature-capabilities">{feature.capabilities.map(({ title, text }, index) => <article key={title}><span className="training-feature-capability-number">0{index + 1}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
       </section>
 
       <section className="training-portal-section" aria-labelledby="feature-steps-title">
-        <div className="training-portal-section-heading"><div><p className="training-portal-kicker">从这里开始</p><h2 id="feature-steps-title">三个步骤，走进{feature.title}。</h2></div></div>
+        <div className="training-portal-section-heading"><div><p className="training-portal-kicker">从这里开始</p><h2 id="feature-steps-title">如何使用{feature.title}</h2></div></div>
         <ol className="training-feature-steps">{feature.steps.map(({ title, text }, index) => <li key={title}><span className="training-learning-number">0{index + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol>
       </section>
 
+      <section className="training-feature-results training-portal-section" aria-labelledby="feature-results-title">
+        <p className="training-portal-kicker">完成之后</p><h2 id="feature-results-title">产出与使用边界</h2>
+        <ul>{feature.outputs.map(text => <li key={text}><Check size={17} aria-hidden="true"/><span>{text}</span></li>)}</ul>
+        <p>{feature.boundary}</p>
+      </section>
       <section className="training-feature-start" id="feature-start" aria-labelledby="feature-start-title">
         <p className="training-portal-kicker">把了解，变成一次开始</p><h2 id="feature-start-title">进入你的学习与课程空间。</h2>
         <div className="training-feature-entry-grid">

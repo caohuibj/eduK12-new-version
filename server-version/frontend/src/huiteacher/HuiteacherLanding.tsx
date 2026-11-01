@@ -1,18 +1,6 @@
 import type { ProductTheme } from '../components/product-theme/useProductTheme'
-import { useRef, useState } from 'react'
-import { NotebookPen, School, ScanEye, Sprout } from 'lucide-react'
+import { teacherFeatures } from './teacher-features'
 
-/* Summarized from the implemented Teacher workspaces on main, not the future product roadmap. */
-const features=[
-  {title:'教师成长',description:'在实践中看见成长',Icon:NotebookPen,
-    detail:'通过自主测评、评价任务与个人反馈，回顾日常实践。',note:'使用自己的教育账号，进入教师成长空间。'},
-  {title:'学校改进',description:'让共同改进有方向',Icon:School,
-    detail:'组织调查、活动评价与群体反馈，支持学校共同改进。',note:'学校管理功能由已开通的产品与本人授权决定。'},
-  {title:'实践观察',description:'留下观察与专业反馈',Icon:ScanEye,
-    detail:'在课堂、会议与教研中，记录事实观察与专业意见。',note:'专家以活动邀请参与，私人反思由本人保留。'},
-  {title:'持续改进',description:'让目标走向行动',Icon:Sprout,
-    detail:'从反馈出发，设定目标、记录行动，再次回顾进展。',note:'在已获授权的任务或实践活动中延续成长。'},
-]
 function Arrow() {
   return <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M4 12h15M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -21,12 +9,6 @@ function Arrow() {
 
 export function HuiteacherLanding({ onEnter, theme = 'light' }: { onEnter: () => void; theme?: ProductTheme }) {
   const artwork=theme === 'dark' ? 'educator-journal-moonlight' : 'educator-journal'
-  const about=useRef<HTMLDialogElement>(null)
-  const aboutTitle=useRef<HTMLHeadingElement>(null)
-  const [feature,setFeature]=useState(features[0])
-  const openFeature=(next:typeof features[number])=>{
-    setFeature(next);about.current?.showModal();aboutTitle.current?.focus()
-  }
   return <>
     <section className="ht-journal" aria-labelledby="ht-journal-title">
       <div className="ht-journal-copy">
@@ -46,23 +28,14 @@ export function HuiteacherLanding({ onEnter, theme = 'light' }: { onEnter: () =>
           alt={theme === 'dark' ? '月光落在展开的工作手记上，书页里的教室窗外挂着月亮，一旁是铜杏色笔记本。' : '阳光落在展开的工作手记上，书页留着教室观察的铅笔速写，一旁是浅杏色笔记本。'}/>
       </figure>
       <section className="ht-feature-strip" id="ht-features" aria-label="教师发展与学校改进" tabIndex={-1}>
-        {features.map(({title,description,Icon},index)=><button className="ht-feature" type="button" key={title}
-          onClick={()=>openFeature(features[index])} aria-labelledby={`ht-feature-title-${index}`} aria-describedby={`ht-feature-desc-${index}`}>
+        {teacherFeatures.map(({title,description,icon:Icon,path},index)=><a className="ht-feature" href={path} key={path}
+          aria-labelledby={`ht-feature-title-${index}`} aria-describedby={`ht-feature-desc-${index}`}>
           <Icon size={29} strokeWidth={1.5} aria-hidden="true"/>
           <h2 id={`ht-feature-title-${index}`}>{title}</h2>
           <p id={`ht-feature-desc-${index}`}>{description}</p>
-        </button>)}
+        </a>)}
       </section>
     </section>
-    <dialog className="ht-about" ref={about} aria-labelledby="ht-about-title"
-      onClick={event=>{if(event.target===event.currentTarget)about.current?.close()}}>
-      <div className="ht-about-inner">
-        <button type="button" className="ht-about-close" onClick={()=>about.current?.close()} aria-label="关闭平台介绍">×</button>
-        <h2 id="ht-about-title" ref={aboutTitle} tabIndex={-1}>{feature.title}</h2>
-        <p>{feature.detail}</p>
-        <p className="ht-about-note">{feature.note}</p>
-        <button type="button" className="ht-primary" onClick={()=>{about.current?.close();onEnter()}}>进入 Teacher <Arrow/></button>
-      </div>
-    </dialog>
+
   </>
 }
