@@ -1234,7 +1234,7 @@ jobs:
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: select affected component analysis paths
         id: deps-codeql
-        if: needs.scope.outputs.scenario == 'catalog-discovery' || needs.scope.outputs.dependencies_frontend_only == 'true' || needs.scope.outputs.scenario == 'backend' || needs.scope.outputs.scenario == 'frontend' || needs.scope.outputs.application_route == 'homepage-copy' || needs.scope.outputs.scenario == 'release-tooling'
+        if: needs.scope.outputs.dependencies_frontend_only == 'true' || needs.scope.outputs.scenario == 'catalog-discovery' || needs.scope.outputs.scenario == 'backend' || needs.scope.outputs.scenario == 'frontend' || needs.scope.outputs.application_route == 'homepage-copy' || needs.scope.outputs.scenario == 'release-tooling'
         env:
           CATALOG_DISCOVERY: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
           BACKEND_MODULES: ${{ needs.scope.outputs.scenario == 'backend' }}

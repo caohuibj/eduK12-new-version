@@ -10,7 +10,12 @@ case "${FRONTEND_ONLY:-}:${BACKEND_ONLY:-false}" in
   *) echo 'Select frontend-only, backend-only or full images' >&2; exit 1 ;;
 esac
 ci_task_bake_dir="$(mktemp -d "$RUNNER_TEMP/eduk12-ci-images.XXXXXX")"
-trap 'rm -rf -- "$ci_task_bake_dir"' EXIT
+ci_task_catalog_recipe=''
+cleanup() {
+  rm -rf -- "$ci_task_bake_dir"
+  if [ -n "$ci_task_catalog_recipe" ]; then rm -f -- "$ci_task_catalog_recipe"; fi
+}
+trap cleanup EXIT
 # Compose may include unused target definitions; resolve the explicitly selected
 # Bake targets before applying strict image/tag/runtime-stage validation.
 # Force a SINGLE local Docker exporter rather than using --load: recent Buildx
@@ -19,7 +24,8 @@ trap 'rm -rf -- "$ci_task_bake_dir"' EXIT
 docker compose --env-file /dev/null build --print "${images[@]}" > "$ci_task_bake_dir/compose.json"
 docker buildx bake --file "$ci_task_bake_dir/compose.json" --print "${images[@]}" > "$ci_task_bake_dir/plan.json"
 if [ "${CATALOG_DISCOVERY:-false}" = true ]; then
-  export CATALOG_BACKEND_DOCKERFILE="$ci_task_bake_dir/Dockerfile"
+  ci_task_catalog_recipe="$(mktemp "$ci_task_repo/server-version/backend/.catalog-ci.Dockerfile.XXXXXX")"
+  export CATALOG_BACKEND_DOCKERFILE="$ci_task_catalog_recipe"
   node --input-type=module <<'JS'
 import {readFileSync,writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
