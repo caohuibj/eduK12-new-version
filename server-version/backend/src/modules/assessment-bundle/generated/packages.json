@@ -16645,5 +16645,1248 @@
         "NOT_APPLICABLE": "本版本不适用于本次填写的对象"
       }
     }
+  },
+  {
+    "schemaVersion": 3,
+    "manifest": {
+      "definition": {
+        "schemaVersion": 1,
+        "bundleKey": "working_memory_everyday_adult_zh_cn",
+        "bundleVersion": "0.1.0",
+        "status": "DRAFT",
+        "category": "integrated",
+        "name": "工作记忆任务与日常执行｜成人描述性草稿",
+        "description": "Corsi顺序空间序列、倒背数字和ADEXI日常工作记忆体验并列，保留任务实际分母与日常合计；不生成跨任务总分。依赖待合共享核心与报告呈现，保持开发草稿。",
+        "respondentTypes": [
+          "SELF"
+        ],
+        "initiationModes": [
+          "TEACHER_ASSIGNMENT",
+          "STUDENT_COURSE"
+        ],
+        "population": {
+          "subjectPopulation": "adult",
+          "subjectMinAgeYears": 18,
+          "subjectMaxAgeYears": 100
+        },
+        "slots": [
+          {
+            "slotKey": "context",
+            "unitType": "FORM",
+            "position": 0,
+            "required": true,
+            "instrumentKey": "working_memory_everyday_adult_zh_cn_context",
+            "instrumentVersion": "0.1.0",
+            "respondentType": "SELF"
+          },
+          {
+            "slotKey": "spatial",
+            "unitType": "COGNITIVE",
+            "position": 1,
+            "required": true,
+            "instrumentKey": "corsi",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "trialCount",
+              "totalCorrectTrials",
+              "maxSpan"
+            ]
+          },
+          {
+            "slotKey": "backward",
+            "unitType": "COGNITIVE",
+            "position": 2,
+            "required": true,
+            "instrumentKey": "digitbackward",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "completedLevelCount",
+              "totalCorrectTrials",
+              "maxSpan"
+            ]
+          },
+          {
+            "slotKey": "everyday",
+            "unitType": "SCALE",
+            "position": 3,
+            "required": true,
+            "instrumentKey": "adexi_v1",
+            "instrumentVersion": "2.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "working_memory"
+            ],
+            "admissionContext": {
+              "assessmentContext": "ADULT_WORKING_MEMORY_SELF_REPORT",
+              "requirements": [
+                {
+                  "contextKey": "birth_year_month"
+                }
+              ],
+              "birthYearMonthContextKey": "birth_year_month"
+            }
+          }
+        ],
+        "engine": {
+          "key": "declarative-evidence-v1",
+          "version": "1.2.0"
+        },
+        "contextDefinitionKey": "working_memory_everyday_adult_zh_cn_context",
+        "contextDefinitionVersion": "0.1.0",
+        "reportDefinitionKey": "working_memory_everyday_adult_zh_cn_report",
+        "reportDefinitionVersion": "0.1.0",
+        "publicationRequirements": {
+          "scientificGate": true,
+          "rightsGate": true,
+          "languageGate": true,
+          "reportGate": true,
+          "safetyGate": false,
+          "nonCommercialOnly": false
+        },
+        "rightsRequirements": {
+          "required": true,
+          "instrumentKeys": [
+            "corsi",
+            "digitbackward",
+            "adexi_v1"
+          ]
+        },
+        "safetyCapability": {
+          "safetyCapable": false,
+          "productionTriggerEnabled": false
+        },
+        "limitations": [
+          "EXPERIMENTAL描述性开发草稿。WM1–WM4是围绕日常体验与证据覆盖的叙事，不是认知高低、心理类型、诊断、IQ、常模百分位或选拔依据。",
+          "Corsi采用顺序回忆，反映空间序列保持；倒背数字要求完全倒序。两任务的长度、难度与停止规则不同，不比较谁更强，也不相减或合并总分。最大完全正确长度仅按完整协议产生，不从不完整记录补造标准广度。",
+          "ADEXI施测完整14题；本包只读工作记忆九项合计9–45，较高表示报告的日常困难更多。抑制维度仍在原单项报告中，不重复加权，不改成均分。",
+          "日常量尺位置w=(WM−9)/36不是百分位；.25/.75仅为本包试验叙事锚点，不是原作者切点或患病概率。原工具没有分型，单项报告保持原状。",
+          "两项任务分别保留完全正确序列数、实际施测序列数和本协议正确率；倒背序列数=2×完整完成级数。不同任务的比例不等值，不能相减或解释谁更强；日常坐标也不与任务比例相加。",
+          "跨方法解释需要三项来源有效。缺失、有限解释、无效和不适用分别处理；不补分，不把质量问题解释为能力较低，也不让自评与任务互相证明或否定。",
+          "重复测量须保持任务协议、材料、练习关系与设备条件，并记录重复暴露和熟悉效应。变化仅描述本协议表现，不能直接推断一般智力或日常迁移改善。",
+          "本候选依赖尚未合入main的共享派生核心与报告呈现接线，仍是开发草稿。倒背数字目前仍为草稿；本包不附第三方题本，不新增公开施测、报告分享权限或科学批准。"
+        ]
+      },
+      "files": {
+        "evidence": "evidence-map.json",
+        "rules": "rules.json",
+        "report": "report.json",
+        "scientific": "scientific.json",
+        "publication": "publication.json",
+        "context": "context.json"
+      },
+      "cognitiveDependencies": [
+        {
+          "slotKey": "spatial",
+          "configVersion": "1.0.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "profile": "standard"
+        },
+        {
+          "slotKey": "backward",
+          "configVersion": "1.0.0",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "profile": "standard"
+        }
+      ],
+      "packageSchemaVersion": 3
+    },
+    "evidence": [
+      {
+        "evidenceKey": "context.age",
+        "slotKey": "context",
+        "selector": "subject_age_years",
+        "valueType": "number",
+        "unit": "context",
+        "construct": "subject_age",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "spatial.trials",
+        "slotKey": "spatial",
+        "selector": "trialCount",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "spatial_sequence_trial_count",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "spatial.correct",
+        "slotKey": "spatial",
+        "selector": "totalCorrectTrials",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "spatial_sequence_correct_count",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "spatial.span",
+        "slotKey": "spatial",
+        "selector": "maxSpan",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "spatial_sequence_max_span",
+        "role": "SUPPORTING",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "backward.levels",
+        "slotKey": "backward",
+        "selector": "completedLevelCount",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "backward_completed_level_count",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "backward.correct",
+        "slotKey": "backward",
+        "selector": "totalCorrectTrials",
+        "valueType": "number",
+        "unit": "count",
+        "construct": "backward_sequence_correct_count",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "backward.span",
+        "slotKey": "backward",
+        "selector": "maxSpan",
+        "valueType": "number",
+        "unit": "level",
+        "construct": "backward_sequence_max_span",
+        "role": "SUPPORTING",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "everyday.wm",
+        "slotKey": "everyday",
+        "selector": "working_memory",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "everyday_working_memory_difficulties_sum",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      }
+    ],
+    "rules": {
+      "version": "0.1.0",
+      "applicability": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "context.age",
+            "value": 18
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "context.age",
+            "value": 100
+          }
+        ]
+      },
+      "items": [
+        {
+          "ruleId": "spatial_record",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "spatial.correct"
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "空间序列｜这里记录按亮起顺序回忆的正式序列数和完全正确数。请结合本次长度范围与完成情况理解，不能把这一记录当作倒序操作或标准化能力排名。",
+          "evidenceKeys": [
+            "spatial.trials",
+            "spatial.correct"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "backward_record",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.correct"
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "倒背数字｜这里按本次完整协议记录倒序回忆结果。每个完整级数包含2个正式序列，序列总数和正确率保留实际分母；它们不能与空间序列的比例直接比较谁更强。",
+          "evidenceKeys": [
+            "backward.levels",
+            "backward.correct"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "everyday_record",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "everyday.wm",
+                "value": 9
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "everyday.wm",
+                "value": 45
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "日常记忆组织｜ADEXI工作记忆九项合计范围9–45，较高表示本次报告的日常困难更多。这里保留合计，不改成官网均分；抑制维度在原14题单项报告中另行呈现。",
+          "evidenceKeys": [
+            "everyday.wm"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "wm1",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "present",
+                    "evidenceKey": "spatial.trials"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "spatial.correct"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "backward.levels"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "backward.correct"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "everyday.wm"
+                  },
+                  {
+                    "op": "all",
+                    "conditions": [
+                      {
+                        "op": "gte",
+                        "evidenceKey": "everyday.wm",
+                        "value": 9
+                      },
+                      {
+                        "op": "lte",
+                        "evidenceKey": "everyday.wm",
+                        "value": 45
+                      }
+                    ]
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "spatial.trials",
+                    "value": 2
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "spatial.correct",
+                    "value": 0
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "backward.levels",
+                    "value": 1
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "backward.correct",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "everyday.wm",
+                "value": 36
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "WM1｜日常记忆组织体验值得讨论。本次自评较多地报告了记住和组织信息的困难。两项任务提供的是各自协议中的事实，不能证明或否定这些体验。可以选一件最近需要反复确认步骤的事情，试着写成清单、设置提醒，再看看哪种支持最有帮助。",
+          "evidenceKeys": [
+            "spatial.trials",
+            "spatial.correct",
+            "backward.levels",
+            "backward.correct",
+            "everyday.wm"
+          ],
+          "supportRefs": [
+            "b15_design"
+          ]
+        },
+        {
+          "ruleId": "wm2",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "present",
+                    "evidenceKey": "spatial.trials"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "spatial.correct"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "backward.levels"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "backward.correct"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "everyday.wm"
+                  },
+                  {
+                    "op": "all",
+                    "conditions": [
+                      {
+                        "op": "gte",
+                        "evidenceKey": "everyday.wm",
+                        "value": 9
+                      },
+                      {
+                        "op": "lte",
+                        "evidenceKey": "everyday.wm",
+                        "value": 45
+                      }
+                    ]
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "spatial.trials",
+                    "value": 2
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "spatial.correct",
+                    "value": 0
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "backward.levels",
+                    "value": 1
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "backward.correct",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "everyday.wm",
+                "value": 18
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "WM2｜日常困难较少被报告。本次自评较少报告相关困难，仍请保留两项任务中的正确与错误记录；这不等于没有记忆问题。可以回想目前哪些提醒或安排已经在帮忙，在需要同时处理更多信息时继续使用。",
+          "evidenceKeys": [
+            "spatial.trials",
+            "spatial.correct",
+            "backward.levels",
+            "backward.correct",
+            "everyday.wm"
+          ],
+          "supportRefs": [
+            "b15_design"
+          ]
+        },
+        {
+          "ruleId": "wm3",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "present",
+                    "evidenceKey": "spatial.trials"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "spatial.correct"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "backward.levels"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "backward.correct"
+                  },
+                  {
+                    "op": "present",
+                    "evidenceKey": "everyday.wm"
+                  },
+                  {
+                    "op": "all",
+                    "conditions": [
+                      {
+                        "op": "gte",
+                        "evidenceKey": "everyday.wm",
+                        "value": 9
+                      },
+                      {
+                        "op": "lte",
+                        "evidenceKey": "everyday.wm",
+                        "value": 45
+                      }
+                    ]
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "spatial.trials",
+                    "value": 2
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "spatial.correct",
+                    "value": 0
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "backward.levels",
+                    "value": 1
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "backward.correct",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "everyday.wm",
+                "value": 18
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "everyday.wm",
+                "value": 36
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "WM3｜连续体验画像。本次自评位于本包两个试验叙事锚点之间，不强行归入高低类型。可以从一个希望改善的多步骤情境开始：哪些信息最容易漏掉，能否拆短指令、减少同时处理的信息，并请对方确认下一步？",
+          "evidenceKeys": [
+            "spatial.trials",
+            "spatial.correct",
+            "backward.levels",
+            "backward.correct",
+            "everyday.wm"
+          ],
+          "supportRefs": [
+            "b15_design"
+          ]
+        },
+        {
+          "ruleId": "wm4",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "missing",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "everyday.wm"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "everyday.wm"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "everyday.wm"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "WM4｜证据尚不完整。请先分别阅读已有来源；不补填缺失分数，也不形成跨方法结论。缺失、不适用或技术质量问题不代表能力较低。",
+          "evidenceKeys": [
+            "spatial.trials",
+            "spatial.correct",
+            "backward.levels",
+            "backward.correct",
+            "everyday.wm"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "scope",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "everyday.wm"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "两项任务与日常自评回答不同问题。不比较两任务谁更强，不相加为总工作记忆分，不把任务熟悉效应当作一般能力提升；这里的建议只是可尝试的生活支持。",
+          "evidenceKeys": [
+            "spatial.trials",
+            "spatial.correct",
+            "backward.levels",
+            "backward.correct",
+            "everyday.wm"
+          ],
+          "supportRefs": []
+        }
+      ],
+      "derivations": [
+        {
+          "key": "spatial.ratio",
+          "op": "RATIO",
+          "numerator": "spatial.correct",
+          "denominator": "spatial.trials",
+          "denominatorMultiplier": 1
+        },
+        {
+          "key": "backward.trials",
+          "op": "SCALE",
+          "input": "backward.levels",
+          "factor": 2
+        },
+        {
+          "key": "backward.ratio",
+          "op": "RATIO",
+          "numerator": "backward.correct",
+          "denominator": "backward.levels",
+          "denominatorMultiplier": 2
+        },
+        {
+          "key": "everyday.position",
+          "op": "RANGE_POSITION",
+          "input": "everyday.wm",
+          "min": 9,
+          "max": 45,
+          "orientation": "DIRECT"
+        }
+      ]
+    },
+    "report": {
+      "key": "working_memory_everyday_adult_zh_cn_report",
+      "version": "0.1.0",
+      "locale": "zh-CN",
+      "blocks": [
+        {
+          "blockId": "spatial",
+          "kind": "evidence",
+          "title": "空间序列｜顺序保持记录",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "spatial_record"
+          ],
+          "rowKeys": [
+            "spatial_n",
+            "spatial_correct",
+            "spatial_ratio",
+            "spatial_span"
+          ]
+        },
+        {
+          "blockId": "backward",
+          "kind": "evidence",
+          "title": "倒背数字｜倒序操作记录",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "backward_record"
+          ],
+          "rowKeys": [
+            "backward_levels",
+            "backward_n",
+            "backward_correct",
+            "backward_ratio",
+            "backward_span"
+          ]
+        },
+        {
+          "blockId": "everyday",
+          "kind": "evidence",
+          "title": "日常记忆组织｜ADEXI工作记忆合计9–45",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "everyday_record"
+          ],
+          "rowKeys": [
+            "everyday_sum",
+            "everyday_position"
+          ]
+        },
+        {
+          "blockId": "reflection",
+          "kind": "conclusions",
+          "title": "把任务事实与日常体验并列理解",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "wm1",
+            "wm2",
+            "wm3"
+          ],
+          "rowKeys": []
+        },
+        {
+          "blockId": "coverage",
+          "kind": "limitations",
+          "title": "证据覆盖与解释边界",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "wm4",
+            "scope"
+          ],
+          "rowKeys": []
+        }
+      ],
+      "states": {
+        "missing": "WM4｜证据尚不完整。保留已获准展示的独立结果，不补值或生成跨方法结论。",
+        "limited": "WM4｜部分来源只能有限解释。请先阅读可用单项记录，本次不据此形成跨方法结论。",
+        "unavailable": "WM4｜当前来源不满足组合解释条件；这不代表能力较低。年龄未知或不在18–100岁时，本版本不适用。"
+      },
+      "narrativeContent": "BUNDLE_OWNED_SELF",
+      "rows": [
+        {
+          "rowKey": "spatial_n",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "spatial.trials"
+          },
+          "label": "空间序列｜实际正式序列数",
+          "unit": "count",
+          "order": 0,
+          "range": {
+            "min": 0,
+            "max": 12
+          },
+          "timeframe": "本次Corsi顺序回忆标准协议"
+        },
+        {
+          "rowKey": "spatial_correct",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "spatial.correct"
+          },
+          "label": "空间序列｜完全正确序列数",
+          "unit": "count",
+          "order": 1,
+          "range": {
+            "min": 0,
+            "max": 12
+          },
+          "denominatorRef": {
+            "kind": "evidence",
+            "key": "spatial.trials"
+          },
+          "timeframe": "本次Corsi顺序回忆标准协议"
+        },
+        {
+          "rowKey": "spatial_ratio",
+          "valueRef": {
+            "kind": "derived",
+            "key": "spatial.ratio"
+          },
+          "label": "空间序列｜本协议正确率",
+          "unit": "ratio",
+          "order": 2,
+          "range": {
+            "min": 0,
+            "max": 1
+          },
+          "denominatorRef": {
+            "kind": "evidence",
+            "key": "spatial.trials"
+          },
+          "timeframe": "本次Corsi顺序回忆标准协议"
+        },
+        {
+          "rowKey": "spatial_span",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "spatial.span"
+          },
+          "label": "空间序列｜最大完全正确长度（方块数）",
+          "unit": "count",
+          "order": 3,
+          "range": {
+            "min": 0,
+            "max": 8
+          },
+          "timeframe": "本次完整Corsi标准协议"
+        },
+        {
+          "rowKey": "backward_levels",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "backward.levels"
+          },
+          "label": "倒背数字｜完整完成级数（每级2序列）",
+          "unit": "count",
+          "order": 4,
+          "range": {
+            "min": 0,
+            "max": 6
+          },
+          "timeframe": "本次倒背数字标准协议"
+        },
+        {
+          "rowKey": "backward_n",
+          "valueRef": {
+            "kind": "derived",
+            "key": "backward.trials"
+          },
+          "label": "倒背数字｜实际正式序列数",
+          "unit": "count",
+          "order": 5,
+          "range": {
+            "min": 0,
+            "max": 12
+          },
+          "timeframe": "本次倒背数字标准协议"
+        },
+        {
+          "rowKey": "backward_correct",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "backward.correct"
+          },
+          "label": "倒背数字｜完全正确序列数",
+          "unit": "count",
+          "order": 6,
+          "range": {
+            "min": 0,
+            "max": 12
+          },
+          "denominatorRef": {
+            "kind": "derived",
+            "key": "backward.trials"
+          },
+          "timeframe": "本次倒背数字标准协议"
+        },
+        {
+          "rowKey": "backward_ratio",
+          "valueRef": {
+            "kind": "derived",
+            "key": "backward.ratio"
+          },
+          "label": "倒背数字｜本协议正确率",
+          "unit": "ratio",
+          "order": 7,
+          "range": {
+            "min": 0,
+            "max": 1
+          },
+          "denominatorRef": {
+            "kind": "derived",
+            "key": "backward.trials"
+          },
+          "timeframe": "本次倒背数字标准协议"
+        },
+        {
+          "rowKey": "backward_span",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "backward.span"
+          },
+          "label": "倒背数字｜最大完全正确长度（数字个数）",
+          "unit": "count",
+          "order": 8,
+          "range": {
+            "min": 0,
+            "max": 7
+          },
+          "timeframe": "本次完整倒背数字标准协议"
+        },
+        {
+          "rowKey": "everyday_sum",
+          "valueRef": {
+            "kind": "evidence",
+            "key": "everyday.wm"
+          },
+          "label": "日常记忆组织｜ADEXI工作记忆九项合计",
+          "unit": "sum",
+          "order": 9,
+          "range": {
+            "min": 9,
+            "max": 45
+          },
+          "itemCount": 9,
+          "timeframe": "近期日常体验；沿用来源指令"
+        },
+        {
+          "rowKey": "everyday_position",
+          "valueRef": {
+            "kind": "derived",
+            "key": "everyday.position"
+          },
+          "label": "日常记忆组织｜量尺位置（不是百分位）",
+          "unit": "position",
+          "order": 10,
+          "range": {
+            "min": 0,
+            "max": 1
+          },
+          "timeframe": "近期日常体验；沿用来源指令"
+        }
+      ]
+    },
+    "scientific": {
+      "maturity": "EXPERIMENTAL",
+      "scope": "B15任务与日常自评互补的确定性叙事开发草稿。使用既有共享核心的有界派生与三组数字行声明；未建立常模、诊断、预测或联合效度，未完成生产/课程端到端呈现。设计日期不作为专家审核日期，工具证据与新组合证据分开。",
+      "references": [
+        {
+          "id": "b15_design",
+          "citation": "B15《工作记忆任务与日常执行》独立设计指导v1.0，受控来源已真实核验。WM1–WM4及.25/.75为本项目EXPERIMENTAL提案，不是原工具切点或独立专家批准。",
+          "allowedClaims": [
+            "independent_summary",
+            "cross_source_condition"
+          ]
+        },
+        {
+          "id": "shared_design",
+          "citation": "《共享画像与实施规范》v1.0，受控来源已真实核验。保留原量尺、缺失与来源；不直接相加或推断任务与自评一致。",
+          "allowedClaims": [
+            "independent_summary",
+            "cross_source_condition"
+          ]
+        }
+      ]
+    },
+    "fixtures": {
+      "valid": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 30
+          },
+          "spatial.trials": {
+            "state": "present",
+            "value": 12
+          },
+          "spatial.correct": {
+            "state": "present",
+            "value": 8
+          },
+          "spatial.span": {
+            "state": "present",
+            "value": 8
+          },
+          "backward.levels": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.correct": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.span": {
+            "state": "present",
+            "value": 7
+          },
+          "everyday.wm": {
+            "state": "present",
+            "value": 36
+          }
+        },
+        "expectedRuleIds": [
+          "spatial_record",
+          "backward_record",
+          "everyday_record",
+          "wm1",
+          "scope"
+        ],
+        "expectedKind": "COMPUTED",
+        "expectedDerived": {
+          "scalars": {
+            "spatial.ratio": 0.6666666666666666,
+            "backward.trials": 12,
+            "backward.ratio": 0.5,
+            "everyday.position": 0.75
+          }
+        }
+      },
+      "missing": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 30
+          },
+          "spatial.trials": {
+            "state": "present",
+            "value": 12
+          },
+          "spatial.correct": {
+            "state": "present",
+            "value": 8
+          },
+          "spatial.span": {
+            "state": "present",
+            "value": 8
+          },
+          "backward.levels": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.correct": {
+            "state": "missing"
+          },
+          "backward.span": {
+            "state": "present",
+            "value": 7
+          },
+          "everyday.wm": {
+            "state": "present",
+            "value": 36
+          }
+        },
+        "expectedRuleIds": [
+          "spatial_record",
+          "everyday_record",
+          "wm4",
+          "scope"
+        ],
+        "expectedKind": "COMPUTED",
+        "expectedDerived": {
+          "scalars": {
+            "spatial.ratio": 0.6666666666666666,
+            "backward.trials": 12,
+            "backward.ratio": null,
+            "everyday.position": 0.75
+          }
+        }
+      },
+      "invalid": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 30
+          },
+          "spatial.trials": {
+            "state": "present",
+            "value": 12
+          },
+          "spatial.correct": {
+            "state": "present",
+            "value": 8
+          },
+          "spatial.span": {
+            "state": "present",
+            "value": 8
+          },
+          "backward.levels": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.correct": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.span": {
+            "state": "present",
+            "value": 7
+          },
+          "everyday.wm": {
+            "state": "invalid"
+          }
+        },
+        "expectedRuleIds": [
+          "spatial_record",
+          "backward_record",
+          "wm4",
+          "scope"
+        ],
+        "expectedKind": "COMPUTED",
+        "expectedDerived": {
+          "scalars": {
+            "spatial.ratio": 0.6666666666666666,
+            "backward.trials": 12,
+            "backward.ratio": 0.5,
+            "everyday.position": null
+          }
+        }
+      },
+      "not-applicable": {
+        "values": {
+          "context.age": {
+            "state": "present",
+            "value": 17
+          },
+          "spatial.trials": {
+            "state": "present",
+            "value": 12
+          },
+          "spatial.correct": {
+            "state": "present",
+            "value": 8
+          },
+          "spatial.span": {
+            "state": "present",
+            "value": 8
+          },
+          "backward.levels": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.correct": {
+            "state": "present",
+            "value": 6
+          },
+          "backward.span": {
+            "state": "present",
+            "value": 7
+          },
+          "everyday.wm": {
+            "state": "present",
+            "value": 36
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "UNAVAILABLE"
+      }
+    },
+    "publication": {
+      "requestedStatus": "DRAFT"
+    },
+    "context": {
+      "schemaVersion": 1,
+      "contextDefinitionKey": "working_memory_everyday_adult_zh_cn_context",
+      "contextDefinitionVersion": "0.1.0",
+      "fields": [
+        {
+          "contextKey": "subject_age_years",
+          "required": true,
+          "valueType": "number"
+        },
+        {
+          "contextKey": "birth_year_month",
+          "required": true,
+          "valueType": "string"
+        }
+      ]
+    }
   }
 ]
