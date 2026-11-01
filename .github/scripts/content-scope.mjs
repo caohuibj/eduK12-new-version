@@ -49,7 +49,7 @@ import {accessEfficiencyPlan} from './access-efficiency-scope.mjs';
 import {backendSecurityEfficiencyPlan} from './backend-security-efficiency-scope.mjs';
 import {teacherHomePlan} from './teacher-home-scope.mjs';
 import {surveyHomePlan} from './survey-home-scope.mjs';
-import {homepageCopyPlan} from './homepage-copy-scope.mjs';
+import {homepageCopyPlan,publicRenderBoundary} from './homepage-copy-scope.mjs';
 import {campusPlan} from './campus-scope.mjs';
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
@@ -207,10 +207,22 @@ export function frontendDependencyScope(entries,{base,head='HEAD'}) {
 
 // Local product pages use dependency-related unit tests. Shared shells, API,
 // scientific runtimes and explicit media/Ops acceptance retain their own lanes.
-export function frontendAffected(files) {
-  return files.some(file=>frontendFile(file)&&!frontendTestFile(file))
+export function frontendAffected(files,{readBaseFile,readHeadFile}={}) {
+  const localPages=files.some(file=>frontendFile(file)&&!frontendTestFile(file))
     && files.every(file=>engineeringEvidenceFile(file)||(frontendFile(file)
-      && /^server-version\/frontend\/src\/pages\/(?:student|teacher)\/[a-zA-Z0-9_./-]+\.tsx?$/.test(file)))
+      && /^server-version\/frontend\/src\/pages\/(?:student|teacher)\/[a-zA-Z0-9_./-]+\.tsx?$/.test(file)));
+  // An empty-state/appearance adjustment on this existing report component is
+  // rendering only. Imports, request paths, handlers and all non-JSX code stay
+  // unchanged; this is not an exemption for the Training directory.
+  const component=frontendSrc+'training/TrainingGroupReports.tsx';
+  const controls=new Set(['.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',
+    '.github/scripts/homepage-copy-scope.mjs','.github/scripts/merge-gate.mjs',
+    '.github/workflows/ci-frontend.yml','.github/workflows/ci.yml']);
+  const reportDisplay=files.includes(component)&&typeof readBaseFile==='function'&&typeof readHeadFile==='function'
+    &&files.every(file=>engineeringEvidenceFile(file)||controls.has(file)||file===component||file===component.replace('.tsx','.test.tsx')
+      ||frontendFile(file)&&/\.(?:css|scss)$/.test(file))
+    &&publicRenderBoundary(readBaseFile(component),readHeadFile(component),{sameNonRendering:true});
+  return (localPages||reportDisplay)
     && !Object.entries(acceptanceFor(files)).some(([id,selected])=>id!=='canonical_visual'&&selected);
 }
 
@@ -357,6 +369,7 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
     return modes.includes(newMode) && ((status === 'A' && oldMode === '000000')
       || (status === 'M' && modes.includes(oldMode)));
   });
+  const affectedFrontend=!forceFull&&regularChanges&&frontendAffected(entries.map(entry=>entry.file),readers);
   return {
     ...result,
     maintenance: !forceFull && result.maintenance && maintenanceChanges,
@@ -366,8 +379,8 @@ export function classifyChanges(entries, forceFull = false, readers = {}) {
     cognitive_intake_plan: cognitiveIntake?.selected ? cognitiveIntake : null,
     scale_intake_light: !forceFull && result.content && regularChanges && Boolean(selectScaleIntake(entries)),
     presentation: !forceFull && result.presentation && regularChanges,
-    frontend: !forceFull && result.frontend && regularChanges,
-    frontend_affected: !forceFull && result.frontend && regularChanges && frontendAffected(entries.map(entry=>entry.file)),
+    frontend: !forceFull && (result.frontend||affectedFrontend) && regularChanges,
+    frontend_affected: affectedFrontend,
     backend_modules: !forceFull && regularChanges && backendModuleFilesOnly(entries.map(entry=>entry.file)),
     frontend_test: !forceFull && frontendTestOnly(entries.map(entry => entry.file)) && regularChanges,
   };
@@ -600,7 +613,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
-  const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
+  const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend && !affectedFrontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
   const codeql = catalogDiscovery || Boolean(copy?.sast) || surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

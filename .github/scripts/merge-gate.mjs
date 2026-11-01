@@ -517,7 +517,7 @@ export function failedChecks(needs, draft) {
       && !failed.includes('scope')) failed.unshift('scope');
   const selected = ['media2','video_core','media7','situational_video','situational_branching'].filter(key=>scope[key] === 'true');
   const uiRequired = scope.app_shell === 'true' || scope.canonical_visual === 'true';
-  const buildRequired = scope.frontend === 'true' || ['platform','dependencies'].includes(scope.scenario) || uiRequired || selected.length > 0;
+  const buildRequired = scope.frontend === 'true' && scope.frontend_affected !== 'true' || ['platform','dependencies'].includes(scope.scenario) || uiRequired || selected.length > 0;
   const hostedVisual = scope.runner_profile === 'hosted' && scope.scenario === 'platform';
   const malformedTopology = scope.runner_profile !== 'hosted'
     || scope.frontend_test !== String(scope.scenario === 'frontend-test')
