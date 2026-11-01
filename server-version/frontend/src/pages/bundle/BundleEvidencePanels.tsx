@@ -28,7 +28,7 @@ export default function BundleEvidencePanels({ evidence, overall }: { evidence: 
     <ReportSection title="任务中的本次表现" eyebrow="认知任务" description="比率图的 0–1 表示事件比例；不能与问卷分数换算。">
       <ReportMetricGrid>{known.filter(item => item.sourceKind === 'COGNITIVE_METRIC').map(card)}</ReportMetricGrid>
     </ReportSection>
-    {known.some(item => item.sourceKind === 'SCALE_SCORE') && <ReportSection title="日常生活中的体验" eyebrow="自评问卷" description="各分量表保留自己的原始端点；条的位置不是同龄排名。">
+    {known.some(item => item.sourceKind === 'SCALE_SCORE') && <ReportSection title="日常生活中的体验与观察" eyebrow="问卷来源" description="各来源保留自己的原始端点；条的位置不是同龄排名。">
       <div className="space-y-4">{known.filter(item => item.sourceKind === 'SCALE_SCORE').map(card)}</div>
     </ReportSection>}
   </>

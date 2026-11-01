@@ -1,0 +1,84 @@
+{
+  "base": "4588d8894d18b83565b4129283799065a7cdde94",
+  "mergeCommits": [
+    "a1132778966133425ef257f54b6b96caa8de48ff",
+    "28e9de9158c9e7a945c6d4bd4387b06f19de95ce",
+    "5e8e00309177fd309f75761e3471d3d1511075bf"
+  ],
+  "sourceHeads": {
+    "484": "c2175b0c90d5901ea5f221b20853eef3141b7891",
+    "485": "45fa14ce1385e8264739a2a1d30f95b39d2c6d50",
+    "490": "08354c6f05739c040e9443b65604163373e266dd"
+  },
+  "publicDeclarations": [
+    {
+      "key": "child_chexi_parent_zh_cn_v1",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "child_chexi_teacher_zh_cn_v1",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "child_cognitive_control_parent_teacher_zh_cn",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "child_cognitive_control_parent_zh_cn",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "child_cognitive_control_teacher_zh_cn",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "child_cognitive_tasks_zh_cn",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "cognitive_self_regulation_adolescent_en_v1",
+      "version": "1.0.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "example_descriptive_v1",
+      "version": "1.0.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "integrated_gonogo_adexi_adult_zh_cn_v1",
+      "version": "1.1.0",
+      "status": "DRAFT"
+    },
+    {
+      "key": "learning_motivation_math_support",
+      "version": "0.1.1",
+      "status": "DRAFT"
+    },
+    {
+      "key": "learning_motivation_math_support",
+      "version": "0.1.2",
+      "status": "DRAFT"
+    },
+    {
+      "key": "teacher_jdr_workplace_zh_cn",
+      "version": "0.1.0",
+      "status": "DRAFT"
+    }
+  ],
+  "mainSourceFilesRetained": 550,
+  "newScaleSourcePaths": [
+    "server-version/backend/src/modules/scale/instruments/texi_self_en/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/texi_self_en/1.0.0/source.json"
+  ],
+  "privateChineseExecutablesPresent": false,
+  "privateCompleteCandidate": "ca4012481153bffda3ced2046061b23a5a0c0292",
+  "privateLibraryId": "libfile_61696cb8e7388191b190bf31112478f8",
+  "privateLibraryVersion": 1
+}

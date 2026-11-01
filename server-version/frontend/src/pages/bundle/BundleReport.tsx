@@ -143,7 +143,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
           {view.profileView && <BundleProfileSummary view={view.profileView}/>}
           {!view.profileView && <ReportCoreSummary label={report.reportDefinition.sections.summary || '结果概览'}>
             <p className="text-sm font-normal">
-              {summaryLabels[view.engineSummary?.domainStatus] || view.engineSummary?.reportingMode || view.engineSummary?.reason || (crossMethod ? '两扇窗，共同观察：任务反映明确规则下的本次表现，自评反映日常生活中的体验。分别阅读两类线索，可以帮助您选择下一步想尝试的小改变。' : '请结合各项证据和解释范围阅读。')}
+              {summaryLabels[view.engineSummary?.domainStatus] || view.engineSummary?.reportingMode || view.engineSummary?.reason || (crossMethod ? '两扇窗，共同观察：任务反映明确规则下的本次表现，问卷反映日常生活中的体验或观察。分别阅读两类线索，可以帮助您选择下一步想尝试的小改变。' : '请结合各项证据和解释范围阅读。')}
             </p>
           </ReportCoreSummary>}
 

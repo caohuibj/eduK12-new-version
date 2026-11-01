@@ -11,7 +11,7 @@ describe('separate cognitive and questionnaire evidence display', () => {
   it('uses original ranges and actual denominators; leaves d-prime and RT variability unscaled', () => {
     show(report(rows()))
     expect(screen.getByRole('heading', { name: '任务中的本次表现' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: '日常生活中的体验' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '日常生活中的体验与观察' })).toBeInTheDocument()
     expect(screen.getByText('20%')).toBeInTheDocument()
     expect(screen.getByText('13.9%')).toBeInTheDocument()
     expect(screen.getByText(/本次分母 30 次/)).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe('separate cognitive and questionnaire evidence display', () => {
       item('flanker.flanker_effect_ms', -18.5), item('flanker.congruent_accuracy', .95), item('flanker.incongruent_accuracy', .85),
       item('texi.working_memory_mean', 3.2, 'SCALE_SCORE'), item('texi.inhibition_mean', 2.4, 'SCALE_SCORE'),
     ]))
-    expect(screen.getByRole('heading', { name: '日常生活中的体验' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '日常生活中的体验与观察' })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: /TEXI · 工作记忆.*范围 1 到 5.*本次结果 3.2/ })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: /TEXI · 抑制.*范围 1 到 5.*本次结果 2.4/ })).toBeInTheDocument()
     expect(screen.getByText(/9 题原始均分，高分表示报告的日常困难更多/)).toBeInTheDocument()

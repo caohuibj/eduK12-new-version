@@ -1,3 +1,5 @@
+import { CHILD_BUNDLE_DISPLAYS } from './bundle-child-evidence-display'
+
 export type BundleEvidence = {
   evidenceKey: string
   constructKey: string
@@ -10,6 +12,7 @@ type MetricDisplay = { label: string; sourceKind: string; range?: { min: number;
 // Display vocabulary only: exact constructs identify the original measure and
 // scale. Never infer ranges from a package name, a value or an arbitrary suffix.
 const displays: Record<string, MetricDisplay> = {
+  ...CHILD_BUNDLE_DISPLAYS,
   'gonogo.commission_rate': { label: 'Go/No-Go · No-Go 误按率', sourceKind: 'COGNITIVE_METRIC', range: { min: 0, max: 1 }, ratio: true, denominator: 'gonogo.nogo_trial_count', note: '分母是不应按键的 No-Go 试次。' },
   'gonogo.omission_rate': { label: 'Go/No-Go · Go 遗漏率', sourceKind: 'COGNITIVE_METRIC', range: { min: 0, max: 1 }, ratio: true, denominator: 'gonogo.go_trial_count', note: '分母是应按键的 Go 试次。' },
   'gonogo.d_prime': { label: 'Go/No-Go · 辨别敏感度 d′', sourceKind: 'COGNITIVE_METRIC', note: '本次信号辨别指标，保留负值；无常模等级。' },
