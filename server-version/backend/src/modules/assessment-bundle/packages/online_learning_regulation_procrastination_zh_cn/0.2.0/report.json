@@ -1,0 +1,300 @@
+{
+  "key": "online_learning_regulation_procrastination_zh_cn_report",
+  "version": "0.2.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "core",
+      "kind": "conclusions",
+      "title": "持续投入与拖延：两个位置和一个可讨论的主题",
+      "audience": [
+        "student"
+      ],
+      "rowKeys": [
+        "effort_position",
+        "procrastination_position"
+      ],
+      "ruleIds": [
+        "ol1",
+        "ol2",
+        "ol3",
+        "ol4",
+        "continuous"
+      ]
+    },
+    {
+      "blockId": "motivation_emotion",
+      "kind": "evidence",
+      "title": "分别看学习动机与情绪",
+      "audience": [
+        "student"
+      ],
+      "rowKeys": [
+        "srlo_online_academic_self_efficacy",
+        "srlo_online_intrinsic_motivation",
+        "srlo_online_extrinsic_motivation",
+        "srlo_online_negative_achievement_emotion"
+      ],
+      "ruleIds": [
+        "negative_emotion_meaning"
+      ]
+    },
+    {
+      "blockId": "strategies_environment",
+      "kind": "evidence",
+      "title": "分别看学习做法与可用条件",
+      "audience": [
+        "student"
+      ],
+      "rowKeys": [
+        "srlo_planning_time_management",
+        "srlo_metacognition",
+        "srlo_study_environment",
+        "srlo_online_effort_regulation",
+        "srlo_online_social_support",
+        "srlo_online_task_strategies"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "procrastination_source",
+      "kind": "evidence",
+      "title": "拖延原量尺：保留一般习惯的含义",
+      "audience": [
+        "student"
+      ],
+      "rowKeys": [
+        "ips_raw"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "scope",
+      "kind": "limitations",
+      "title": "如何使用这些结果",
+      "audience": [
+        "student"
+      ],
+      "rowKeys": [],
+      "ruleIds": [
+        "reading_boundaries"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "组合所需结果不完整，暂不形成主题；获准的独立结果仍可分别查看，不补零。",
+    "limited": "本次部分结果只能有限参考，依赖它们的派生位置和主题暂不形成。",
+    "unavailable": "当前适用条件、结果质量或已冻结披露条件不足以提供相应解释；不代表学习能力较低。"
+  },
+  "narrativeContent": "BUNDLE_OWNED_SELF",
+  "rows": [
+    {
+      "rowKey": "effort_position",
+      "valueRef": {
+        "kind": "derived",
+        "key": "effort_position"
+      },
+      "label": "持续投入的量尺位置 r（不是百分位）",
+      "unit": "position",
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "itemCount": 4,
+      "order": 0,
+      "timeframe": "当前所选大学在线或混合课程；r=(努力调节题均分−1)/6"
+    },
+    {
+      "rowKey": "procrastination_position",
+      "valueRef": {
+        "kind": "derived",
+        "key": "procrastination_position"
+      },
+      "label": "一般拖延习惯的量尺位置 d（不是百分位）",
+      "unit": "position",
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "itemCount": 9,
+      "order": 1,
+      "timeframe": "一般处理日常任务的习惯；d=(IPS总分−9)/36"
+    },
+    {
+      "rowKey": "srlo_online_academic_self_efficacy",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_academic_self_efficacy"
+      },
+      "label": "面对这门课程的信心",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 4,
+      "order": 2,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_online_intrinsic_motivation",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_intrinsic_motivation"
+      },
+      "label": "学习本身带来的兴趣",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 5,
+      "order": 3,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_online_extrinsic_motivation",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_extrinsic_motivation"
+      },
+      "label": "成绩与他人期待的推动（不统一代表好坏）",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 3,
+      "order": 4,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_online_negative_achievement_emotion",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_negative_achievement_emotion"
+      },
+      "label": "学习时的难受与压力（更多不代表更好调节）",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 5,
+      "order": 5,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_planning_time_management",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "planning_time_management"
+      },
+      "label": "安排目标和时间",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 5,
+      "order": 6,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_metacognition",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "metacognition"
+      },
+      "label": "检查与调整学习方法",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 5,
+      "order": 7,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_study_environment",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "study_environment"
+      },
+      "label": "可用的学习环境",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 3,
+      "order": 8,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_online_effort_regulation",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_effort_regulation"
+      },
+      "label": "遇到干扰时继续投入",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 4,
+      "order": 9,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_online_social_support",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_social_support"
+      },
+      "label": "通过网络互相支持",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 5,
+      "order": 10,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "srlo_online_task_strategies",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "online_task_strategies"
+      },
+      "label": "理解和联系课程内容",
+      "unit": "mean",
+      "range": {
+        "min": 1,
+        "max": 7
+      },
+      "itemCount": 5,
+      "order": 11,
+      "timeframe": "当前所选课程的自述；原题均分，无固定回忆天数"
+    },
+    {
+      "rowKey": "ips_raw",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "procrastination"
+      },
+      "label": "一般任务中的拖延习惯",
+      "unit": "sum",
+      "range": {
+        "min": 9,
+        "max": 45
+      },
+      "itemCount": 9,
+      "order": 12,
+      "timeframe": "一般处理日常任务的习惯；2021中文九题版"
+    }
+  ]
+}

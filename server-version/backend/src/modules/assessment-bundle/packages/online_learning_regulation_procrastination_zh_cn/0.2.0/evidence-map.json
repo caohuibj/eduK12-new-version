@@ -1,0 +1,189 @@
+[
+  {
+    "evidenceKey": "online_academic_self_efficacy",
+    "slotKey": "srlo",
+    "selector": "online_academic_self_efficacy",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_academic_self_efficacy",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "online_intrinsic_motivation",
+    "slotKey": "srlo",
+    "selector": "online_intrinsic_motivation",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_intrinsic_motivation",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "online_extrinsic_motivation",
+    "slotKey": "srlo",
+    "selector": "online_extrinsic_motivation",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_extrinsic_motivation",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "online_negative_achievement_emotion",
+    "slotKey": "srlo",
+    "selector": "online_negative_achievement_emotion",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_negative_achievement_emotion",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "planning_time_management",
+    "slotKey": "srlo",
+    "selector": "planning_time_management",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.planning_time_management",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "metacognition",
+    "slotKey": "srlo",
+    "selector": "metacognition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.metacognition",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "study_environment",
+    "slotKey": "srlo",
+    "selector": "study_environment",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.study_environment",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "online_effort_regulation",
+    "slotKey": "srlo",
+    "selector": "online_effort_regulation",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_effort_regulation",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "online_social_support",
+    "slotKey": "srlo",
+    "selector": "online_social_support",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_social_support",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "online_task_strategies",
+    "slotKey": "srlo",
+    "selector": "online_task_strategies",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.online_task_strategies",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "procrastination",
+    "slotKey": "ips",
+    "selector": "irrational_procrastination",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "online_learning.procrastination",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "subject_age_years",
+    "slotKey": "context",
+    "selector": "subject_age_years",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "context.subject_age_years",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "university_student_confirmed",
+    "slotKey": "context",
+    "selector": "university_student_confirmed",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "context.university_student_confirmed",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "course_id",
+    "slotKey": "context",
+    "selector": "course_id",
+    "valueType": "string",
+    "unit": "context",
+    "construct": "context.course_id",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "course_mode",
+    "slotKey": "context",
+    "selector": "course_mode",
+    "valueType": "string",
+    "unit": "context",
+    "construct": "context.course_mode",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "learning_stage",
+    "slotKey": "context",
+    "selector": "learning_stage",
+    "valueType": "string",
+    "unit": "context",
+    "construct": "context.learning_stage",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "birth_year_month",
+    "slotKey": "context",
+    "selector": "birth_year_month",
+    "valueType": "string",
+    "unit": "context",
+    "construct": "context.birth_year_month",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

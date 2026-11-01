@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "online_learning_regulation_procrastination_zh_cn_context",
+  "contextDefinitionVersion": "0.1.0",
+  "fields": [
+    {
+      "contextKey": "subject_age_years",
+      "required": true,
+      "valueType": "number"
+    },
+    {
+      "contextKey": "university_student_confirmed",
+      "required": true,
+      "valueType": "boolean"
+    },
+    {
+      "contextKey": "course_id",
+      "required": true,
+      "valueType": "string"
+    },
+    {
+      "contextKey": "course_mode",
+      "required": true,
+      "valueType": "enum",
+      "enumValues": [
+        "online",
+        "blended"
+      ]
+    },
+    {
+      "contextKey": "learning_stage",
+      "required": true,
+      "valueType": "string"
+    }
+  ]
+}

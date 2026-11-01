@@ -1,0 +1,2874 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+      "abbreviation": "SRL-O44-ZH",
+      "instrumentFamily": "Self-regulation for learning online (SRL-O); Broadbent et al. corrected 2022/2023"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "MOTIVATION",
+        "SELF_EFFICACY",
+        "ENGAGEMENT"
+      ],
+      "constructDefinition": "以当前一门大学在线或混合课程为参照，自述动机、课程信心、负性学习情绪及六类学习策略，共十维；不是人格或客观学习能力，也不自动形成44题总分或两个上位因子分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:self_regulation",
+        "domain:motivation",
+        "domain:self_efficacy",
+        "domain:online_learning",
+        "construct:online_academic_self_efficacy",
+        "construct:intrinsic_motivation",
+        "construct:extrinsic_motivation",
+        "construct:negative_achievement_emotion",
+        "construct:planning_time_management",
+        "construct:metacognition",
+        "construct:study_environment",
+        "construct:effort_regulation",
+        "construct:online_social_support",
+        "construct:task_strategies",
+        "construct:ten_dimensions",
+        "construct:no_overall_total",
+        "orientation:self_regulated_learning",
+        "orientation:social_cognitive_learning",
+        "orientation:educational_psychology",
+        "orientation:not_therapy_specific",
+        "population:adult_research",
+        "population:university_students",
+        "population:online_or_blended_course",
+        "population:project_18_plus",
+        "population:single_university_n634",
+        "population:random_split_313_321",
+        "population:not_k12_validated",
+        "population:country_not_inferred",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:44_items",
+        "response:seven_point_1_to_7",
+        "response:only_endpoints_labelled",
+        "response:fixed_corrected_table8_order",
+        "response:no_reverse_items",
+        "response:ten_facet_means",
+        "response:no_fixed_recall_period",
+        "response:complete_required_project_policy",
+        "use:research",
+        "use:reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:no_chinese_norms",
+        "use:no_bands",
+        "use:not_selection",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:redistribution_allowed",
+        "license:adaptation_allowed",
+        "license:commercial_reuse_allowed",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:independent_platform_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:cognitive_debrief_not_established",
+        "language_validation:maturity_pilot",
+        "在线学习",
+        "混合学习",
+        "学习自我调节",
+        "大学生自评",
+        "学习动机",
+        "学习信心",
+        "内在动机",
+        "外在动机",
+        "学习焦虑",
+        "目标规划",
+        "时间管理",
+        "学习方法反思",
+        "学习环境",
+        "努力调节",
+        "在线求助",
+        "任务策略",
+        "中文研究工作稿",
+        "非诊断",
+        "domain:motivation_learning",
+        "domain:selfreg_executive",
+        "construct:academic_self_efficacy",
+        "population:ages_18_unspecified"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原634名同一大学英语在线/混合课程学生，随机分313/321组，年龄18–59和18–57，女性82%/85%；不是两次独立招募。未凭作者单位填研究国别。项目保守限定18岁及以上、当前正在大学在线/混合课程学习的本人；不外推K12，中文尚未验证。"
+    },
+    "administration": {
+      "itemCount": 44,
+      "estimatedMinutes": 12,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "以当前一门大学在线或混合课程为参照；无固定7/30天回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定修正后正式Table8的44题与十维题序，不拿QSF八处不同词句静默替换。",
+        "1–7七点，两端完全不符合我/非常符合我，中间2–6仅数字；原作者表Not at all true of me/Very true of me，论文Methods多very差异单独留档。",
+        "前四维题1–17与后六维题18–44各有独立指导语，PREPARED sidecar未接入runtime；不塞首题、不丢必要说明。",
+        "十维4/5/3/5/5/5/3/4/5/5题，各维原分均分1–7，无反向、无总分或自动上位因子。",
+        "负性情绪高=更多负性体验；外在动机高不统一等于好，不机械按4分分档。",
+        "complete_required是平台保守政策：每维题不全则该维不算，不补零、不变分母；整体质量失效时不生成解释。",
+        "12分钟为平台估计，不是作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "独立中文工作译稿，译审/认知访谈/本地验证尚待完成；仅供研究和课程学习反思，不作能力、诊断或排名判断。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "独立中文工作译稿，译审/认知访谈/本地验证尚待完成；仅供研究和课程学习反思，不作能力、诊断或排名判断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Broadbent等2022/2023修正后Table8完整44题；作者正式DOCX用于两组指导语/端点，QSF仅静态核实十维均分。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "EDUK12.TOP独立中文研究工作译稿，非官方认可中文版；不继承2026护理预注册或西语验证。catalog evidence的territory必填而国别未核实，故不虚填证据记录；原英语单校634人随机分组研究完整保留于references.md。勘误09323-w的Extrinsic→Intrinsic反馈纠错、八处Table8/QSF差异已单独归档。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "srlo44_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "assessmentContexts": [
+      "UNIVERSITY_ONLINE_OR_BLENDED_CURRENT_COURSE"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "srlo44_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "srlo44_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© The Author(s) 2022, corrected publication 2022: Jaclyn Broadbent, Ernesto Panadero, Jason M. Lodge and Matthew Fuller-Tyszkiewicz. Broadbent, J., Panadero, E., Lodge, J. M., & Fuller-Tyszkiewicz, M. (2023; online 2022). The self-regulation for learning online (SRL-O) questionnaire. Metacognition and Learning, 18, 135–163. https://doi.org/10.1007/s11409-022-09319-6. Corrected 26 October 2022: https://doi.org/10.1007/s11409-022-09323-w. 原论文修正后Table8的44题在CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）内，未见该表单独版权排除。允许署名使用、分享、再分发与翻译改编，包括商用；须保留作者、来源、许可链接和改动说明。中文题文与两端锚点为EDUK12.TOP独立研究工作翻译；指导语依据作者表意译整理，报告为平台原创，未获作者中文版认可。作者QSF仅静态核对十维均分，无程序/整包版式复制；八处词句/标点差异以论文优先并另档。原修正PDF SHA256 26a57eed8fb02538edfb306303da61ed7c9a7460eccfc320f935d8e88402e5a4。",
+      "标签仅供检索，不授予产品使用/发布权限。DRAFT不激活入口；当前大学在线/混合课程情境需调用方明确提供。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "The self-regulation for learning online (SRL-O) questionnaire; corrected published Table 8, 44 items",
+        "citation": "Broadbent, J., Panadero, E., Lodge, J. M., & Fuller-Tyszkiewicz, M. (2023; online 2022). The self-regulation for learning online (SRL-O) questionnaire. Metacognition and Learning, 18, 135–163. https://doi.org/10.1007/s11409-022-09319-6. Corrected 26 October 2022: https://doi.org/10.1007/s11409-022-09323-w.",
+        "url": "https://link.springer.com/article/10.1007/s11409-022-09319-6",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© The Author(s) 2022, corrected publication 2022: Jaclyn Broadbent, Ernesto Panadero, Jason M. Lodge and Matthew Fuller-Tyszkiewicz. Broadbent, J., Panadero, E., Lodge, J. M., & Fuller-Tyszkiewicz, M. (2023; online 2022). The self-regulation for learning online (SRL-O) questionnaire. Metacognition and Learning, 18, 135–163. https://doi.org/10.1007/s11409-022-09319-6. Corrected 26 October 2022: https://doi.org/10.1007/s11409-022-09323-w. 原论文修正后Table8的44题在CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）内，未见该表单独版权排除。允许署名使用、分享、再分发与翻译改编，包括商用；须保留作者、来源、许可链接和改动说明。中文题文与两端锚点为EDUK12.TOP独立研究工作翻译；指导语依据作者表意译整理，报告为平台原创，未获作者中文版认可。作者QSF仅静态核对十维均分，无程序/整包版式复制；八处词句/标点差异以论文优先并另档。原修正PDF SHA256 26a57eed8fb02538edfb306303da61ed7c9a7460eccfc320f935d8e88402e5a4。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "srlo_truth_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常符合我",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SRLO_01",
+          "content": "我有信心掌握这门在线课程的内容并完成作业。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_02",
+          "content": "即使觉得内容困难，我也有信心顺利坚持学完这门在线课程。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_03",
+          "content": "我有信心付出这门在线课程取得高分所需的努力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_04",
+          "content": "我有信心准确弄清任务要求我做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_05",
+          "content": "我总能在课程内容中找到引起自己好奇的部分。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_06",
+          "content": "我喜欢在这门在线课程中学习新东西。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_07",
+          "content": "我觉得学习这门在线课程很愉快。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_08",
+          "content": "在这门在线课程中学到新内容时，我会感到很满足。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_09",
+          "content": "学到新的技能或知识时，我会有成就感。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_10",
+          "content": "我想在这门在线课程中表现出色，好向朋友和家人展示一番。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_11",
+          "content": "我想表现出色，是因为别人确实对我有期待，或我认为他们对我有期待。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_12",
+          "content": "我想在这门在线课程中取得比其他同学更好的成绩。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_13",
+          "content": "我感到很无助，以至于无法全力投入在线学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_14",
+          "content": "在线学习让我觉得难以承受，因此我考虑退学。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_15",
+          "content": "学习时，我想分散自己的注意力来减轻焦虑。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_16",
+          "content": "我焦虑得甚至不想开始在线学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_17",
+          "content": "一想到必须在线学习，我就开始感到难受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_18",
+          "content": "我会设定短期目标，例如每天或每周的目标。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_19",
+          "content": "我会为学习设定切实可行的截止时间。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_20",
+          "content": "我会把大目标拆成可以付诸行动的小目标。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_21",
+          "content": "我会列出需要完成的具体行动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_22",
+          "content": "我每周都会安排日程，确保有适当的时间用于在线学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_23",
+          "content": "做类似的作业或学习任务时，我会想一想过去哪些学习方法对自己有用。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_24",
+          "content": "我会花时间理解任务，确保准确明白自己需要做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 23,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_25",
+          "content": "完成任务后，我通常会评价自己的表现。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 24,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_26",
+          "content": "我会回顾过去收到的反馈，检查当前的学习是否已有改进。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 25,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_27",
+          "content": "我会对照老师提供的评分标准评价自己的作业，想一想怎样改进。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 26,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_28",
+          "content": "我能够不受干扰地学习这门在线课程。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 27,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_29",
+          "content": "我能找到安静、不受干扰的地方学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 28,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_30",
+          "content": "我知道在哪里学习这门在线课程最有效率。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 29,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_31",
+          "content": "即使有更有趣的事情可做，我也会努力进行在线学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 30,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_32",
+          "content": "在线学习遇到困难时，我仍会坚持实现自己的学习目标。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 31,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_33",
+          "content": "学习这门在线课程时，如果开始走神，我会特意努力重新集中注意力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 32,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_34",
+          "content": "无论心情如何，我都会坚持在线学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 33,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_35",
+          "content": "其他同学在网上提出我能回答的问题时，我会尽量帮助他们。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 34,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_36",
+          "content": "不确定这门在线课程该怎么学时，我会通过网络向了解相关知识的人求助。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 35,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_37",
+          "content": "我会请老师或同学澄清这门在线课程中的信息。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 36,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_38",
+          "content": "这门在线课程遇到困难时，我会通过网络向他人求助，例如讨论区、社交媒体、电子邮件或即时消息。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 37,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_39",
+          "content": "需要帮助时，我会使用电子邮件、讨论区、社交媒体等联系老师和其他同学。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 38,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_40",
+          "content": "在线学习时，我会为课程内容想出自己的例子，让内容对自己更有意义。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 39,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_41",
+          "content": "在线学习时，我会总结所学内容，整理自己的思路。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 40,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_42",
+          "content": "在线学习时，我会尝试把课程内容与已有知识联系起来。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 41,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_43",
+          "content": "学习在线课程内容时，我会尝试形成自己的想法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 42,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SRLO_44",
+          "content": "我会尝试做核心课程内容以外的额外学习来加深理解，例如多做解题练习或额外阅读。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 43,
+          "responseSetKey": "srlo_truth_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SRLO_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_32",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_34",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_35",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_36",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_37",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_38",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_39",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_40",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_41",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_42",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_43",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SRLO_44",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "online_academic_self_efficacy",
+            "type": "dimension",
+            "label": "面对这门课程的信心",
+            "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "online_intrinsic_motivation",
+            "type": "dimension",
+            "label": "学习本身带来的兴趣",
+            "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "online_extrinsic_motivation",
+            "type": "dimension",
+            "label": "成绩与他人期待的推动",
+            "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "online_negative_achievement_emotion",
+            "type": "dimension",
+            "label": "学习时的难受与压力",
+            "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "planning_time_management",
+            "type": "dimension",
+            "label": "安排目标和时间",
+            "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "metacognition",
+            "type": "dimension",
+            "label": "检查与调整学习方法",
+            "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_27",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "study_environment",
+            "type": "dimension",
+            "label": "可用的学习环境",
+            "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_30",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "online_effort_regulation",
+            "type": "dimension",
+            "label": "遇到干扰时继续投入",
+            "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_31",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_32",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_34",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "online_social_support",
+            "type": "dimension",
+            "label": "通过网络互相支持",
+            "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_35",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_36",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_37",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_38",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_39",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "online_task_strategies",
+            "type": "dimension",
+            "label": "理解和联系课程内容",
+            "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SRLO_40",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_41",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_42",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_43",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SRLO_44",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "online_academic_self_efficacy",
+          "online_intrinsic_motivation",
+          "online_extrinsic_motivation",
+          "online_negative_achievement_emotion",
+          "planning_time_management",
+          "metacognition",
+          "study_environment",
+          "online_effort_regulation",
+          "online_social_support",
+          "online_task_strategies"
+        ],
+        "scoreOrder": [
+          "online_academic_self_efficacy",
+          "online_intrinsic_motivation",
+          "online_extrinsic_motivation",
+          "online_negative_achievement_emotion",
+          "planning_time_management",
+          "metacognition",
+          "study_environment",
+          "online_effort_regulation",
+          "online_social_support",
+          "online_task_strategies"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "online_academic_self_efficacy",
+            "headline": "面对这门课程的信心",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注你对这门在线课程的信心：是否相信自己能理解内容、完成作业、投入所需努力，以及弄清任务要求。分数越大，表示本次回答中这类信心越多，并不证明已经掌握课程，也不能判断一个人的能力。不同课程、任务说明是否清楚、过去的学习经验和眼前可用的支持，都可能影响这份信心。可以回想一次比较有把握的学习经历，找出当时哪些做法或帮助现在仍然用得上。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这门课程里，你对哪项任务比较有把握？哪一步还需要更清楚的说明或支持？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个十分钟左右能开始的小任务，做完后记下一处已弄清的内容和一个仍需询问的问题。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "online_intrinsic_motivation",
+            "headline": "学习本身带来的兴趣",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注学习本身是否吸引你，包括好奇、愉快、学会新东西的满足和成就感。分数越大，表示本次回答更认同这些体验，并不要求你随时热爱学习，也不代表所有课程都同样有趣。课程内容、授课方式、疲劳和现实压力都可能影响兴趣。可以留意哪一个问题让你稍微想多看一眼，再从那个具体问题开始探索；暂时缺乏兴趣也可以先了解原因，无须据此评价自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪个课程问题让你产生过一点好奇？是什么使它吸引你？"
+              },
+              {
+                "category": "strategy",
+                "text": "从课程里挑一个想了解的问题，花十分钟找一个例子或解释，再用一句话记下新发现。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "online_extrinsic_motivation",
+            "headline": "成绩与他人期待的推动",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注成绩、与同学比较，以及家人朋友的期待怎样推动你学习。分数越大，表示本次回答更认同这些外在推动，并不统一表示学习更好或更差。它们有时帮助人确定目标，有时也可能带来压力；还可以与对内容本身的兴趣同时存在。可以分别想一想，哪些期待是自己认同的，哪些主要来自比较或担心让别人失望，再决定怎样为这门课程设定一个自己愿意承担的目标。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你希望达到的成绩对自己有什么意义？其中哪些期待来自你认同的方向？"
+              },
+              {
+                "category": "strategy",
+                "text": "写下一个自己认同的课程目标和一个可完成的小步骤；若比较带来压力，试着先按这个目标安排一次学习。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "online_negative_achievement_emotion",
+            "headline": "学习时的难受与压力",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注在线学习时的无助、焦虑、难受，以及想分散注意力或退出学习的体验。分数越大，表示本次回答中这些不舒服的感受更多；高分不是更好的学习表现，也不是疾病诊断。任务负担、课程安排、身体状态和支持是否及时，都可能影响回答。可以先辨认眼下最难承受的是哪一步，再考虑减小这一步的要求，或向课程老师、同学及学校支持服务说明具体困难。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次不想开始学习时，最难的是任务本身、紧迫时间，还是其他压力？"
+              },
+              {
+                "category": "strategy",
+                "text": "把眼前任务拆成只需几分钟的第一步；如果仍难以承受，把具体困难写给老师或学校支持服务。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "planning_time_management",
+            "headline": "安排目标和时间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注你怎样把学习目标变成可安排的行动，包括设定近期目标、合理期限、拆分任务和预留每周学习时间。分数越大，表示本次回答更认同这些安排方式，不等于计划一定实现，也不是自律程度的排名。课程任务的清晰度、工作照顾责任及可支配时间都会影响安排。可以看看最近一次没赶上的计划，是任务太大、时间估少了，还是出现了必须处理的事情，再给下一次留一点调整余地。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "下次学习最需要完成的一件事是什么？现有时间是否足够？"
+              },
+              {
+                "category": "strategy",
+                "text": "为下一次学习只列一件优先任务和可用时间，另留一小段缓冲；结束后看看估计与实际有何不同。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "metacognition",
+            "headline": "检查与调整学习方法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注你会不会停下来检查怎样学、任务究竟要求什么，以及完成后怎样利用评分标准和反馈调整做法。分数越大，表示本次回答更认同这些检查与调整，不表示已经找到了唯一正确的学习方法，也不能据此判断聪明与否。不同任务可能需要不同办法，老师是否提供清楚反馈也很重要。可以从一次具体作业出发，比较自己原先的理解和实际要求，挑一个能够在下一次试着改变的小地方。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "上一次作业的反馈中，哪一条能帮助你改变下一次的做法？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次交作业前，对照一条评分标准检查一小段内容，并根据过去一条反馈作一次具体修改。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "study_environment",
+            "headline": "可用的学习环境",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注你是否有安静、干扰较少的学习地点，以及是否知道在哪儿学习这门课程比较有效率。分数越大，表示本次回答中这类环境条件更充足，不代表一个人更努力或更有能力。居住空间、设备共享、家庭责任和可用场所都可能影响回答。环境不理想时，先找一个可以改变的小条件就有意义；也可以了解学校是否提供自习空间或其他资源，不必把客观限制全部归到自己身上。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "学习时最常打断你的是什么？哪些限制需要外部资源帮助？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次学习前先试一个小调整，例如关闭一类通知，或预约一段安静的自习时间，再观察是否有帮助。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "online_effort_regulation",
+            "headline": "遇到干扰时继续投入",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注在线学习遇到困难、走神或其他更有趣的事情时，你怎样继续投入。分数越大，表示本次回答更认同坚持和重新集中注意力的做法，不代表必须一直学习或忽略疲劳。休息、调整任务和求助也可能是继续学习所需的条件。可以留意自己通常在哪一步开始分心，分辨是内容不清楚、任务太大，还是已经需要休息，再为下一次学习准备一个可执行的安排。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你一般何时开始走神或想停下？当时更需要澄清、减小任务，还是休息？"
+              },
+              {
+                "category": "strategy",
+                "text": "为下一次学习设置一段可承受的专注时间，并预先安排休息；分心时先记下干扰，再决定下一步。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "online_social_support",
+            "headline": "通过网络互相支持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注你怎样通过网络向老师或同学求助、澄清信息，也包括在能回答时帮助其他同学。分数越大，表示本次回答更认同这些联系与互助，不等于身边支持一定充足，更不能说明人缘好坏。课程是否有方便的联系渠道、回应是否及时以及你是否感到安全，都可能影响回答。可以想一想最近一个没弄懂的问题，选一个合适的渠道，把背景和已经尝试的办法一起写清楚，让别人更容易理解你的需要。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这门课程里，有哪个具体问题你希望找人讨论？哪个渠道让你比较安心？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个真实疑问，附上课程位置和已尝试的步骤，通过讨论区或电子邮件向一位合适的人询问。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "online_task_strategies",
+            "headline": "理解和联系课程内容",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一部分关注你是否用自己的例子、总结和已有知识来理解在线课程，并通过额外练习或阅读加深理解。分数越大，表示本次回答更认同这些做法，不证明理解一定准确，也不意味着额外学习越多越好。不同内容适合不同方法，时间和精力也有限。可以挑一小段刚学过的内容，用自己的话解释，再找一个例子检查解释是否说得通；如果卡住，那一处就可以成为下次提问或练习的起点。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "刚学的内容能否用自己的话解释？它与你已知道的哪件事有关？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个概念，写两三句总结并自拟一个例子；核对材料后，把仍不明白的一点留作提问。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+          "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+          "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+          "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+          "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+          "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+        ],
+        "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and plain-language editorial check; human expert review PENDING",
+            "reviewedAt": "2026-10-26T10:19:45.857460Z",
+            "basis": "修正后Table8完整44题、作者十维均分证据与端点已核。独立工作翻译，未冒称人工批准；无反向/总分/分档；负性情绪及外在动机分别解释。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "srlo44",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "SRLO_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_24",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_25",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_26",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_27",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_28",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_30",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_35",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_37",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_39",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_40",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_41",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_42",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_43",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_44",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "online_academic_self_efficacy": 1,
+            "online_intrinsic_motivation": 1,
+            "online_extrinsic_motivation": 1,
+            "online_negative_achievement_emotion": 1,
+            "planning_time_management": 1,
+            "metacognition": 1,
+            "study_environment": 1,
+            "online_effort_regulation": 1,
+            "online_social_support": 1,
+            "online_task_strategies": 1
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "SRLO_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_18",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_19",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_20",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_21",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_22",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_23",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_24",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_25",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_26",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_27",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_28",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_29",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_30",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_31",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_32",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_33",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_34",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_35",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_36",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_37",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_38",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_39",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_40",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_41",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_42",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_43",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_44",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "online_academic_self_efficacy": 7,
+            "online_intrinsic_motivation": 7,
+            "online_extrinsic_motivation": 7,
+            "online_negative_achievement_emotion": 7,
+            "planning_time_management": 7,
+            "metacognition": 7,
+            "study_environment": 7,
+            "online_effort_regulation": 7,
+            "online_social_support": 7,
+            "online_task_strategies": 7
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "SRLO_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_24",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_25",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_26",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_27",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_28",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_29",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_30",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_31",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_32",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_33",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_34",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_35",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_36",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_37",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_38",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_39",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_40",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_41",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_42",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_43",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_44",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "online_academic_self_efficacy": 4,
+            "online_intrinsic_motivation": 4,
+            "online_extrinsic_motivation": 4,
+            "online_negative_achievement_emotion": 4,
+            "planning_time_management": 4,
+            "metacognition": 4,
+            "study_environment": 4,
+            "online_effort_regulation": 4,
+            "online_social_support": 4,
+            "online_task_strategies": 4
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      },
+      {
+        "name": "ascending_cycle",
+        "answers": [
+          {
+            "itemCode": "SRLO_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_16",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_21",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_24",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_25",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_26",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_27",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_28",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_29",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_30",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_31",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_32",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_33",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_34",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_35",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_36",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_38",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_39",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_40",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_41",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_42",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_43",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_44",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "online_academic_self_efficacy": 2.5,
+            "online_intrinsic_motivation": 4.2,
+            "online_extrinsic_motivation": 4,
+            "online_negative_achievement_emotion": 3.8,
+            "planning_time_management": 4.6,
+            "metacognition": 4,
+            "study_environment": 3.3333333333333335,
+            "online_effort_regulation": 4.5,
+            "online_social_support": 3.4,
+            "online_task_strategies": 4.2
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      },
+      {
+        "name": "facet_constants",
+        "answers": [
+          {
+            "itemCode": "SRLO_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SRLO_23",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_24",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_25",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_26",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_27",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "SRLO_28",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_29",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_30",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "SRLO_31",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_32",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_33",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_34",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SRLO_35",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_36",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_37",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_38",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_39",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SRLO_40",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_41",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_42",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_43",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SRLO_44",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "online_academic_self_efficacy": 1,
+            "online_intrinsic_motivation": 2,
+            "online_extrinsic_motivation": 3,
+            "online_negative_achievement_emotion": 4,
+            "planning_time_management": 5,
+            "metacognition": 6,
+            "study_environment": 7,
+            "online_effort_regulation": 1,
+            "online_social_support": 2,
+            "online_task_strategies": 3
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      },
+      {
+        "name": "missing_self_efficacy_item",
+        "answers": [
+          {
+            "itemCode": "SRLO_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_24",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_25",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_26",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_27",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_28",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_29",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_30",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_31",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_32",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_33",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_34",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_35",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_36",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_37",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_38",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_39",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_40",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_41",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_42",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_43",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SRLO_44",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "online_academic_self_efficacy": null,
+            "online_intrinsic_motivation": 4,
+            "online_extrinsic_motivation": 4,
+            "online_negative_achievement_emotion": 4,
+            "planning_time_management": 4,
+            "metacognition": 4,
+            "study_environment": 4,
+            "online_effort_regulation": 4,
+            "online_social_support": 4,
+            "online_task_strategies": 4
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      },
+      {
+        "name": "empty",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "online_academic_self_efficacy": null,
+            "online_intrinsic_motivation": null,
+            "online_extrinsic_motivation": null,
+            "online_negative_achievement_emotion": null,
+            "planning_time_management": null,
+            "metacognition": null,
+            "study_environment": null,
+            "online_effort_regulation": null,
+            "online_social_support": null,
+            "online_task_strategies": null
+          },
+          "totalScoreKeys": [
+            "online_academic_self_efficacy",
+            "online_intrinsic_motivation",
+            "online_extrinsic_motivation",
+            "online_negative_achievement_emotion",
+            "planning_time_management",
+            "metacognition",
+            "study_environment",
+            "online_effort_regulation",
+            "online_social_support",
+            "online_task_strategies"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请以你当前正在修读的一门大学在线或混合课程为参照，整份问卷都围绕同一门课程作答。\n\n第一部分：学习动机与态度（第01–17题）\n以下问题询问你对这门课程的学习动机和态度。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。\n\n第二部分：学习策略（第18–44题）\n以下问题询问你在这门课程中使用的学习策略。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "docs/scale-instruments/research-drafts/srlo44/1.0.0/administration.md、administration-sidecar.prepared.json @ b92c69aefa2472775fa7ee86b9c208366886c908；作者双段指导语的独立中文工作译稿，选课句为平台适配；两段合为当前顶层instruction全文，非逐段插入题本。"
+  }
+}
