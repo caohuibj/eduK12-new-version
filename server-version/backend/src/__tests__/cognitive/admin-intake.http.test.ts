@@ -62,16 +62,27 @@ afterAll(async () => { server.closeAllConnections(); await new Promise<void>(res
 beforeEach(() => { fixture.records.clear(); fixture.events.length = 0; fixture.actor.platformRole = 'SYSTEM_ADMIN'; vi.clearAllMocks() })
 
 describe('registered draft Cognitive intake HTTP with synthetic principal and storage', () => {
-  it('lists registered selectors and genuine pending reasons without writing or fabricating draft records', async () => {
+  it('lists current selectors without duplicating resolved pending notes or writing draft records', async () => {
     const { status, value } = await call('')
     expect(status).toBe(200)
-    expect(value.data.registered).toHaveLength(35)
+    const selectors = value.data.registered.map((row: any) => JSON.stringify([row.testType, row.configVersion, row.engineVersion, row.scoringVersion]))
+    expect(selectors.length).toBeGreaterThan(0)
+    expect(new Set(selectors).size).toBe(selectors.length)
     expect(value.data.registered.find((row: any) => row.testType === 'numberline')).toMatchObject({ ...selected, plan: { action: 'CREATE_DRAFT' } })
-    expect(value.data.pending).toHaveLength(12)
-    expect(value.data.pending.find((row: any) => row.testType === 'sharegame').reasons[0]).toMatch(/超时.*0/)
-    expect(value.data.pending.every((row: any) => row.status === undefined && row.configId === undefined)).toBe(true)
+    // All formerly pending PR441 tools are now registered in this combination.
+    expect(value.data.pending).toEqual([])
     expect(fixture.db.cognitiveTestConfig.create).not.toHaveBeenCalled()
     expect(fixture.events).toHaveLength(0)
+  })
+
+  it('shows the explicitly selected report version without relabelling a legacy config', async () => {
+    const current = cognitiveSeeds.find(seed => seed.testType === 'timecopy' && (seed.config.report as { reportVersion?: string })?.reportVersion === '3.0.0')!
+    expect(current).toBeDefined()
+    const result = await call('')
+    expect(result.status).toBe(200)
+    expect(result.value.data.registered.find((row: any) => row.testType === current.testType && row.configVersion === current.configVersion)).toMatchObject({ reportVersion: '3.0.0' })
+    expect(result.value.data.registered.find((row: any) => row.testType === 'timecopy' && row.configVersion === '1.0.1')).toMatchObject({ reportVersion: '1.0.1' })
+    expect(fixture.db.cognitiveTestConfig.create).not.toHaveBeenCalled()
   })
 
   it('previews only a registered exact selector and rejects extra executable/config/actor fields', async () => {

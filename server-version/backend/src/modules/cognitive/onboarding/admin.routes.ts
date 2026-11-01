@@ -5,6 +5,7 @@ import { requireRecentAdminKey } from '../../admin-permissions/guards'
 import { success, error } from '../../../utils/response'
 import { BAD_REQUEST, CognitiveServiceError } from '../cognitive.errors'
 import { cognitiveSeeds } from '../generated/seeds'
+import { reportMetaSchema } from '../schemas/report-meta'
 import { getCognitiveRegistryEntry } from '../cognitive.registry'
 import { isCognitiveNewAdmissionEnabled } from '../product-eligibility'
 import { cognitiveInstallSelectionSchema, planCognitiveConfigInstall, installCognitiveConfigs, type CognitiveInstallRow } from './install'
@@ -46,10 +47,11 @@ cognitiveIntakeAdminRouter.get('/', handle(async req => {
     registered: items.map((candidate, index) => {
       const seed = cognitiveSeeds.find(item => sameCognitiveInstallIdentity(item, candidate))
       const entry = getCognitiveRegistryEntry(candidate.testType, candidate.engineVersion, candidate.scoringVersion)
+      const selectedReport = reportMetaSchema.safeParse(seed?.config.report)
       return {
         ...candidate,
         name: entry?.name ?? seed?.name ?? candidate.testType,
-        reportVersion: entry?.reportDefinitionVersion ?? null,
+        reportVersion: selectedReport.success ? selectedReport.data.reportVersion : entry?.reportDefinitionVersion ?? null,
         profiles: Object.values(entry?.profiles ?? {}).map(profile => ({ key: profile.profile, estimatedMinutes: profile.estimatedMinutes })),
         reportMetrics: Object.values(entry?.metricDefinitions ?? {}).filter(metric => metric.role !== 'research_only').map(metric => metric.label),
         plan: rows[index],
