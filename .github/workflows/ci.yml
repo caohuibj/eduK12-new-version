@@ -1271,6 +1271,7 @@ jobs:
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
       catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
+      cognitive_owned_by_backend: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.frontend == 'true' && needs.scope.outputs.frontend_affected != 'true' && needs.scope.outputs.scenario != 'survey-wave-selection' && needs.scope.outputs.scenario != 'frontend-performance' && needs.scope.outputs.scenario != 'dependencies' }}
       base_sha: ${{ needs.scope.outputs.diff_base }}
 
   browser:
