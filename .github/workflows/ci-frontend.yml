@@ -3,6 +3,9 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      bundle_family:
+        type: boolean
+        default: false
       base_sha:
         type: string
         default: ''
@@ -126,7 +129,7 @@ jobs:
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
           JS
       - name: affected catalog selectors and paging contracts
-        if: inputs.catalog_discovery
+        if: inputs.catalog_discovery && !inputs.bundle_family
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
