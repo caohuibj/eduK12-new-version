@@ -19,12 +19,14 @@ export type BundleReportData = {
   view: any
 }
 
-export default function BundleReport({ report, attemptId, staff, recoveryToken, reload }: {
+export default function BundleReport({ report, attemptId, staff, recoveryToken, reload, downloadReport }: {
   report: BundleReportData
   attemptId: string
   staff: boolean
   recoveryToken?: string
   reload: () => void
+  /** Alternate authorized projection for separately bound respondent attempts. */
+  downloadReport?: () => Promise<BundleReportData>
 }) {
   const [history, setHistory] = useState<any[]>([])
   const [error, setError] = useState('')
@@ -76,7 +78,8 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
     try {
       // Fetch the same authorized server projection; never reconstruct facts in the browser.
       let data
-      if (staff) data = await call('/bundle-products/attempts/' + attemptId + '/report?analysisId=' + report.analysisId)
+      if (downloadReport) data = await downloadReport()
+      else if (staff) data = await call('/bundle-products/attempts/' + attemptId + '/report?analysisId=' + report.analysisId)
       else {
         const response = await (recoveryToken
           ? api.get<any>('/public/composite-assessments/attempts/' + attemptId + '/report', { headers: { 'X-Recovery-Token': recoveryToken } })

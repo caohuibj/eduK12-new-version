@@ -7,6 +7,7 @@ import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit
 export const contextForNormalizedFormEntries = (
   entries: Array<{ item: { id: string; contextKey: string | null }; normalizedValue: TypedFormValue; storedValue?: string | null }>,
   items: ContextFormItem[],
+  subjectUserId?: string | null,
 ): { encrypted: string; hash: string } => {
   const answers = entries.filter(entry => entry.item.contextKey && entry.normalizedValue !== null).map(entry => {
     if (typeof entry.normalizedValue !== 'string') {
@@ -20,6 +21,7 @@ export const contextForNormalizedFormEntries = (
   } catch (error) {
     throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', error instanceof Error ? error.message : '人口学上下文无效', 400)
   }
+  if (subjectUserId) context.subjectUserId = subjectUserId
   // Infrastructure/encryption failures must remain server errors.
   return { encrypted: encryptAssessmentContext(context), hash: hashAssessmentContext(context) }
 }

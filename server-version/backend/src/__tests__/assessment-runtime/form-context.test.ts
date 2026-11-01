@@ -20,6 +20,17 @@ beforeEach(() => {
 afterEach(() => { vi.useRealTimers(); vi.unstubAllEnvs() })
 
 describe('normalized form context', () => {
+  it('binds observer demographics to the persisted child without changing unbound historical context', () => {
+    const item = { id: 'birth', contextKey: 'birthYearMonth', type: 'year_month', required: true }
+    const entries = [{ item, normalizedValue: '2018-01' }]
+    const legacy = contextForNormalizedFormEntries(entries, [item])
+    const bound = contextForNormalizedFormEntries(entries, [item], 'actual-child')
+    const context = decryptAssessmentContext(bound.encrypted)
+    expect(context.subjectUserId).toBe('actual-child')
+    expect(context.values).toEqual(decryptAssessmentContext(legacy.encrypted).values)
+    expect(bound.hash).toBe(hashAssessmentContext(context));expect(bound.hash).not.toBe(legacy.hash)
+    expect(decryptAssessmentContext(legacy.encrypted).subjectUserId).toBeUndefined()
+  })
   it.each(presets)('accepts %s plaintext while retaining encrypted storage', (key, value, type) => {
     const item: ContextFormItem = { id: key, contextKey: key, type, required: true, options: [{ value, label: value }] }
     const storedValue = writeContextFormAnswer(key, value)

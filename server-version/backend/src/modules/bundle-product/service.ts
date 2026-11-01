@@ -82,6 +82,7 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       if(trackingSourceId&&(!trackingSource||trackingSource.status!=='PUBLISHED'||!trackingSource.personalTrackingBaselineId||!readTrainingTracking(trackingSource.personalTracking)))throw compositeConflict('纵向包来源不可用')
       if(trackingSource)owner(actor,trackingSource)
       const definition = entry.definition
+      if (definition.respondentTypes.length > 1) throw compositeBadRequest('跨报告者测评包必须分别分配真实作答者，不能作为单人测评投放')
       if (input.publicEnabled && !definition.initiationModes.includes('ANONYMOUS_SELF')) throw compositeForbidden('此包不支持匿名投放')
       if (input.courseId && !definition.initiationModes.includes('TEACHER_ASSIGNMENT')) throw compositeForbidden('此包不支持课程投放')
       if (input.courseId) {
@@ -104,12 +105,13 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
         const boolean = field.valueType === 'boolean'
         const choices = boolean ? ['true', 'false'] : field.enumValues
         const form=profileForm??{
-          formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey,
+          formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey === 'subject_birth_year_month' ? '儿童出生年月（YYYY-MM）' : field.contextKey,
           formOptions: choices ? choices.map(value => ({ label: value, value })) : Prisma.JsonNull,
         }
         const item = await tx.compositeAssessmentItem.create({ data: {
           compositeAssessmentId: row.id, type: 'FORM', required: field.required, position: position++,
           ...form,
+          ...(field.contextKey === 'subject_birth_year_month' && field.valueType === 'string' ? { contextKey: 'birthYearMonth', formType: 'year_month' } : {}),
         } })
         bindings.context.push({ contextKey: field.contextKey, valueType: field.valueType, itemId: item.id })
       }

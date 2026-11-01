@@ -1,0 +1,24 @@
+[
+  {
+    "evidenceKey": "chexi_working_memory",
+    "slotKey": "chexi",
+    "selector": "working_memory",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "chexi.parent.working_memory_mean",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "chexi_inhibition",
+    "slotKey": "chexi",
+    "selector": "inhibition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "chexi.parent.inhibition_mean",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  }
+]
