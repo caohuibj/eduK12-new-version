@@ -1,0 +1,26 @@
+[
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 1000
+    },
+    "charts": 6,
+    "horizontalOverflow": false,
+    "pageErrors": [],
+    "externalOrApiRequests": [],
+    "screenshot": "/tmp/adult-bundle-evidence/report-1280.png",
+    "kind": "synthetic-real-chromium-report-only"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "charts": 6,
+    "horizontalOverflow": false,
+    "pageErrors": [],
+    "externalOrApiRequests": [],
+    "screenshot": "/tmp/adult-bundle-evidence/report-390.png",
+    "kind": "synthetic-real-chromium-report-only"
+  }
+]

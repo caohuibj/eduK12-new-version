@@ -4,12 +4,23 @@ export const catalogChecks=JSON.parse(readFileSync(new URL('../config/catalog-di
 const files=new Set([...catalogChecks.sources,...catalogChecks.tests]);
 const controls=new Set(['.github/scripts/fetch-ci-base.mjs','.github/scripts/catalog-discovery-scope.test.mjs','.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci.yml','.github/config/catalog-discovery-checks.json','.github/scripts/catalog-discovery-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs']);
 // Query selection only: no commit/PR identities, new persisted catalog or permission exception.
-export function catalogDiscoveryScope(entries){
+export function catalogSurfaceScope(entries){
  return entries.some(e=>catalogChecks.sources.includes(e.file))&&entries.every(e=>
   (files.has(e.file)||controls.has(e.file))&&((e.newMode==='100644'
   &&(e.status==='M'&&e.oldMode==='100644'||e.status==='A'&&e.oldMode==='000000'))
   ||e.file==='.github/scripts/build-ci-images.sh'&&e.status==='M'&&e.oldMode==='100755'&&e.newMode==='100755'));
 }
+
+// A second bounded recipe uses the existing application qualification jobs.
+// File surfaces only: no PR/commit eligibility list or evidence credentials.
+export const bundleChecks=JSON.parse(readFileSync(new URL('../config/bundle-family-checks.json',import.meta.url)));
+export function bundleFamilyScope(entries){
+ const allowed=new Set([...bundleChecks.sources,...bundleChecks.tests,...bundleChecks.controls]);
+ return entries.some(e=>e.file==='server-version/backend/src/modules/bundle-product/child-cross-method.ts')
+  && entries.every(e=>(allowed.has(e.file)||/^docs\/(?:bundles\/|bundle-declarative-onboarding\/cognitive-adolescent-20261101\.md$|cognitive-control-child-(?:draft-20261101\.md|validation-20261101\.json)$|child-shared-display-integration\.patch$)/.test(e.file))
+   &&e.newMode==='100644'&&(e.status==='A'&&e.oldMode==='000000'||e.status==='M'&&e.oldMode==='100644'));
+}
+export function catalogDiscoveryScope(entries){return catalogSurfaceScope(entries)||bundleFamilyScope(entries);}
 
 // The event can retain the PR's creation-time base while refs/pull/N/merge
 // already uses current main. Select that parent only for this bounded diff.

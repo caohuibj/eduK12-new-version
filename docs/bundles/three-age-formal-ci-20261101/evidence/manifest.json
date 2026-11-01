@@ -1,0 +1,32 @@
+[
+  {
+    "name": "actionlint.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec"
+  },
+  {
+    "name": "frontend-pretypecheck-fixed.log",
+    "sha256": "846d14c8dac1704a4b1f09774ce6f012277800406fd431e5ac5e89081f0156fd",
+    "gzipSha256": "3657c322dfb93513ed571c678db96babc11a840af33db110d23aae5de9d1143f"
+  },
+  {
+    "name": "frontend-pretypecheck.log",
+    "sha256": "ba8877ddaecd40f984fc21577ca02e3e7f54d3c007624ab92eaa261e940f71d2",
+    "gzipSha256": "75f755987770537876c43d6fcd6b4bfaf93d7a978f18a422755ce246bf72f44d"
+  },
+  {
+    "name": "new-scope.log",
+    "sha256": "f602139e5681541f197d366eda62371adc03ef1180bcb806de02bbcd2002e82e",
+    "gzipSha256": "4fcb735635ac770faeda395c047718bfce218b79b69602ac293dafe25d8b35ed"
+  },
+  {
+    "name": "scope.err",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec"
+  },
+  {
+    "name": "scope.json",
+    "sha256": "f49d4d20ccc8f5cb8b5b2aad77f73cb7a18690115c7e376b4ac093a13e5cb6fd",
+    "gzipSha256": "af8eaf2ade612c2b91a77996b6d0a9fb74032884f827e85174280690c15b46be"
+  }
+]

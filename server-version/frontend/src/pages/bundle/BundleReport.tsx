@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react'
 import api from '../../api/client'
 import BundleProfileSummary from './BundleProfileSummary'
+import BundleEvidencePanels from './BundleEvidencePanels'
+import { bundleEvidenceLabel, bundleEvidenceValue, hasCrossMethodEvidence } from './bundle-evidence-display'
 import { ProductButton, ProductStatus } from '../../components/product-ui'
 import { ReportCoreSummary, ReportDetails, ReportSection } from '../../modules/reporting/ReportPrimitives'
 
@@ -17,12 +19,14 @@ export type BundleReportData = {
   view: any
 }
 
-export default function BundleReport({ report, attemptId, staff, recoveryToken, reload }: {
+export default function BundleReport({ report, attemptId, staff, recoveryToken, reload, downloadReport }: {
   report: BundleReportData
   attemptId: string
   staff: boolean
   recoveryToken?: string
   reload: () => void
+  /** Alternate authorized projection for separately bound respondent attempts. */
+  downloadReport?: () => Promise<BundleReportData>
 }) {
   const [history, setHistory] = useState<any[]>([])
   const [error, setError] = useState('')
@@ -74,7 +78,8 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
     try {
       // Fetch the same authorized server projection; never reconstruct facts in the browser.
       let data
-      if (staff) data = await call('/bundle-products/attempts/' + attemptId + '/report?analysisId=' + report.analysisId)
+      if (downloadReport) data = await downloadReport()
+      else if (staff) data = await call('/bundle-products/attempts/' + attemptId + '/report?analysisId=' + report.analysisId)
       else {
         const response = await (recoveryToken
           ? api.get<any>('/public/composite-assessments/attempts/' + attemptId + '/report', { headers: { 'X-Recovery-Token': recoveryToken } })
@@ -94,6 +99,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
   }
 
   const view = report.view
+  const crossMethod = hasCrossMethodEvidence(view?.evidence ?? [])
   const qualityLabels: Record<string, string> = {
     interpretable: '可解释',
     limited: '仅支持有限解释',
@@ -106,6 +112,14 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
     age_rejected: '不符合本测评包的适用年龄。',
     missing_sources: '缺少形成综合结果所需的来源。',
   }
+  const evidenceList = <ul className="space-y-2 text-sm text-gray-700">
+    {view?.evidence?.filter((value: any) => value.sourceKind !== 'CONTEXT_FACT').map((value: any) => (
+      <li key={value.evidenceKey} className="report-feedback">
+        <strong>{bundleEvidenceLabel(value)}</strong>：{bundleEvidenceValue(value)}
+        （{{ interpretable: '可解释', limited: '有限解释', invalid: '无效', unavailable: '不可用' }[value.quality as string] || value.quality}）
+      </li>
+    ))}
+  </ul>
 
   return (
     <section className="space-y-5 break-words" aria-label="Bundle 综合报告">
@@ -129,7 +143,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
           {view.profileView && <BundleProfileSummary view={view.profileView}/>}
           {!view.profileView && <ReportCoreSummary label={report.reportDefinition.sections.summary || '结果概览'}>
             <p className="text-sm font-normal">
-              {summaryLabels[view.engineSummary?.domainStatus] || view.engineSummary?.reportingMode || view.engineSummary?.reason || '请结合各项证据和解释范围阅读。'}
+              {summaryLabels[view.engineSummary?.domainStatus] || view.engineSummary?.reportingMode || view.engineSummary?.reason || (crossMethod ? '两扇窗，共同观察：任务反映明确规则下的本次表现，问卷反映日常生活中的体验或观察。分别阅读两类线索，可以帮助您选择下一步想尝试的小改变。' : '请结合各项证据和解释范围阅读。')}
             </p>
           </ReportCoreSummary>}
 
@@ -137,16 +151,11 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
             <p className="text-sm text-gray-700">{qualityLabels[view.quality?.overall] || '暂无质量信息'}</p>
           </ReportSection>}
 
-          {!view.profileView && <ReportSection title={report.reportDefinition.sections.evidence || '证据'} eyebrow="冻结结果">
-            <ul className="space-y-2 text-sm text-gray-700">
-              {view.evidence?.filter((value: any) => value.sourceKind !== 'CONTEXT_FACT').map((value: any) => (
-                <li key={value.evidenceKey} className="report-feedback">
-                  <strong>{value.constructKey}</strong>：{value.value?.state === 'present' ? String(value.value.value) : '暂无可展示结果'}
-                  （{{ interpretable: '可解释', limited: '有限解释', invalid: '无效', unavailable: '不可用' }[value.quality as string] || value.quality}）
-                </li>
-              ))}
-            </ul>
-          </ReportSection>}
+          {!view.profileView && <BundleEvidencePanels evidence={view.evidence ?? []} overall={view.quality?.overall} />}
+
+          {!view.profileView && (crossMethod
+            ? <ReportDetails title="原始指标与质量">{evidenceList}</ReportDetails>
+            : <ReportSection title={report.reportDefinition.sections.evidence || '证据'} eyebrow="冻结结果">{evidenceList}</ReportSection>)}
 
           {view.limitations?.length > 0 && (
             <ReportSection title={report.reportDefinition.sections.limitations || '限制'} eyebrow="阅读限制">
@@ -162,7 +171,7 @@ export default function BundleReport({ report, attemptId, staff, recoveryToken, 
             ? (
               <ReportSection key={block.blockId} title={block.title || '报告区段'}>
                 {block.conclusions?.length > 0 && <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700">{block.conclusions.map((item: any) => <li key={item.ruleId}>{item.text}</li>)}</ul>}
-                {block.evidence?.length > 0 && <ul className="mt-2 space-y-1 text-sm text-gray-700">{block.evidence.map((item: any) => <li key={item.evidenceKey}>{item.constructKey}：{item.value?.state === 'present' ? String(item.value.value) : '暂无可展示结果'}</li>)}</ul>}
+                {block.evidence?.length > 0 && <ul className="mt-2 space-y-1 text-sm text-gray-700">{block.evidence.map((item: any) => <li key={item.evidenceKey}>{bundleEvidenceLabel(item)}：{bundleEvidenceValue(item)}</li>)}</ul>}
                 {block.limitations?.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-700">{block.limitations.map((text: string) => <li key={text}>{text}</li>)}</ul>}
               </ReportSection>
             )

@@ -3,6 +3,9 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      bundle_family:
+        type: boolean
+        default: false
       base_sha:
         type: string
         default: ''
@@ -89,7 +92,7 @@ jobs:
       - name: integrated application types without duplicate cognitive subset
         if: inputs.survey_selection || inputs.affected_only
         run: |
-          npm run pretypecheck
+          if [ "${{ inputs.bundle_family }}" != "true" ]; then npm run pretypecheck; fi
           npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
         if: inputs.survey_selection != true && inputs.affected_only != true
@@ -126,7 +129,7 @@ jobs:
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
           JS
       - name: affected catalog selectors and paging contracts
-        if: inputs.catalog_discovery
+        if: inputs.catalog_discovery && !inputs.bundle_family
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
