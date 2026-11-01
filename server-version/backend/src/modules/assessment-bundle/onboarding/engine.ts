@@ -2,7 +2,7 @@ import type { BundleEngineInputV1, BundleEngineResultV1 } from '../registry'
 import type { EvidenceItemV1 } from '../types'
 import { runBundleProfile } from '../profile/match'
 import { parseDeclarativePackage, type DeclarativePackage, type Condition } from './contract'
-import {computeDerivedValues} from './derivations'
+import {computeDerivedValues,effectiveDerivedEvidence} from './derivations'
 export type Truth = true | false | 'unknown'
 export function evaluateCondition(c: Condition, evidence: EvidenceItemV1[]): Truth {
   if (c.op === 'all' || c.op === 'any') {
@@ -113,11 +113,11 @@ export function runProfileEvidence(input:BundleEngineInputV1):BundleEngineResult
 export function runDerivedEvidence(input:BundleEngineInputV1):BundleEngineResultV1 {
   const pack=parseDeclarativePackage(input.declarativePackage)
   if(pack.schemaVersion!==3)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
-  const result=runRules(input,pack)
+  const evidence=effectiveDerivedEvidence(pack,input.evidence),result=runRules({...input,evidence},pack)
   if(result.kind==='UNAVAILABLE')return result
   const conclusions=(result.payload as {conclusions:Array<{ruleId:string}>}).conclusions
   return {kind:'COMPUTED',payload:{schemaVersion:'declarative-derived-report-v1',status:'declarative',
     identity:{bundleKey:pack.manifest.definition.bundleKey,bundleVersion:pack.manifest.definition.bundleVersion,engineVersion:'1.2.0',mappingVersion:pack.rules.version,templateVersion:pack.report.version},
-    conclusions,derived:computeDerivedValues(pack,input.evidence,conclusions.map(c=>c.ruleId)),
+    conclusions,derived:computeDerivedValues(pack,evidence,conclusions.map(c=>c.ruleId)),
   }}
 }

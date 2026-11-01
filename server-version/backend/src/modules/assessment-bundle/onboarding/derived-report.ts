@@ -1,14 +1,15 @@
 import {z} from 'zod'
 import type {DisclosureCapabilitiesV1} from '../../scale/policy/types'
-import type {BundleReportAudienceV1,EvidenceItemV1} from '../types'
+import type {BundleReportAudienceV1,EvidenceItemV1,EvidenceQualityStateV1} from '../types'
 import type {DeclarativePackage,DerivedPackage} from './contract'
 import {derivationInputs} from './contract'
-import {numericEvidenceState,readFrozenDerivedValues,type DerivedState,type DerivedTheme,type ExactMaximumSet} from './derivations'
+import {effectiveDerivedEvidence,numericEvidenceState,readFrozenDerivedValues,type DerivedState,type DerivedTheme,type ExactMaximumSet} from './derivations'
 
 export interface DerivedConclusion {ruleId:string;ruleVersion:string;kind:string;text:string;evidenceKeys:string[];supportRefs:string[]}
 export interface DerivedReportRow {
   rowKey:string;label:string;value:number|null;state:DerivedState|'redacted';unit:DerivedPackage['report']['rows'][number]['unit']
   range:{min:number;max:number}|null;denominator:number|null;itemCount:number|null;timeframe:string|null;order:number;evidenceKeys:string[]
+  quality?:EvidenceQualityStateV1
 }
 export interface DerivedBundleView {
   schemaVersion:'bundle-derived-view-v1'
@@ -36,7 +37,7 @@ export function projectDerivedBundleView(input:{
   if(input.pack.schemaVersion!==3)return null
   const pack=input.pack,payload=savedPayload.parse(input.payload),id=payload.identity
   if(id.bundleKey!==pack.manifest.definition.bundleKey||id.bundleVersion!==pack.manifest.definition.bundleVersion||id.mappingVersion!==pack.rules.version||id.templateVersion!==pack.report.version)throw new Error('DERIVED_SAVED_PACKAGE_IDENTITY')
-  const values=readFrozenDerivedValues(pack,payload.derived),byKey=new Map(input.evidence.map(e=>[e.evidenceKey,e])),mapping=new Map(pack.evidence.map(e=>[e.evidenceKey,e]))
+  const values=readFrozenDerivedValues(pack,payload.derived),byKey=new Map(effectiveDerivedEvidence(pack,input.evidence).map(e=>[e.evidenceKey,e])),mapping=new Map(pack.evidence.map(e=>[e.evidenceKey,e]))
   const sameSet=(a:readonly string[],b:readonly string[])=>a.length===b.length&&[...a].sort().every((x,n)=>x===[...b].sort()[n])
   if(new Set(payload.conclusions.map(c=>c.ruleId)).size!==payload.conclusions.length)throw new Error('DERIVED_SAVED_CONCLUSION_IDENTITY')
   for(const c of payload.conclusions){
@@ -54,19 +55,29 @@ export function projectDerivedBundleView(input:{
   })
   const derivations=new Map(pack.rules.derivations.map(d=>[d.key,d]))
   const refInputs=(ref:DerivedPackage['report']['rows'][number]['valueRef'])=>ref.kind==='evidence'?[ref.key]:derivationInputs(derivations.get(ref.key)!)
-  const refValue=(ref:DerivedPackage['report']['rows'][number]['valueRef'])=>ref.kind==='evidence'?numericEvidenceState(byKey.get(ref.key)):values.scalars.find(s=>s.key===ref.key)!
+  const refValue=(ref:DerivedPackage['report']['rows'][number]['valueRef'])=>{
+    if(ref.kind==='evidence'){
+      const e=byKey.get(ref.key)
+      // Original limited numeric results may remain visible as limited rows;
+      // bounded calculations and narrative still require interpretable inputs.
+      return e?.quality==='limited'&&e.value.state==='present'&&typeof e.value.value==='number'&&Number.isFinite(e.value.value)?{state:'present' as const,value:e.value.value}:numericEvidenceState(e)
+    }
+    const saved=values.scalars.find(s=>s.key===ref.key)!,bad=refInputs(ref).map(k=>numericEvidenceState(byKey.get(k))).find(s=>s.state!=='present')
+    return bad??saved
+  }
   const blocks=pack.report.blocks.filter(b=>b.audience.includes(input.audience))
   const allowedRows=new Set(blocks.flatMap(b=>b.rowKeys??[])),allowedSets=new Set(blocks.flatMap(b=>b.maxSetKeys??[])),allowedRules=new Set(blocks.flatMap(b=>b.ruleIds))
   const rows=pack.report.rows.filter(r=>allowedRows.has(r.rowKey)).sort((a,b)=>a.order-b.order).map(r=>{
     const keys=[...new Set([...refInputs(r.valueRef),...(r.denominatorRef?refInputs(r.denominatorRef):[])])].sort(),visible=keys.every(numeric),v=refValue(r.valueRef),denominator=r.denominatorRef?refValue(r.denominatorRef):null
     return {rowKey:r.rowKey,label:r.label,unit:r.unit,order:r.order,range:r.range??null,itemCount:r.itemCount??null,timeframe:r.timeframe??null,evidenceKeys:keys,
+      quality:!visible?'unavailable':v.state==='invalid'?'invalid':keys.some(k=>byKey.get(k)?.quality==='limited')?'limited':v.state==='present'?'interpretable':'unavailable',
       state:visible?v.state:'redacted',value:visible&&v.state==='present'?v.value:null,denominator:visible&&denominator?.state==='present'?denominator.value:null} as DerivedReportRow
   })
   const maxSets=values.maxSets.filter(s=>allowedSets.has(s.key)).map(s=>({key:s.key,
     state:narratable(s.inputKeys)?s.state:'redacted',maximum:narratable(s.inputKeys)?s.maximum:null,maxKeys:narratable(s.inputKeys)?s.maxKeys:null,orderedKeys:narratable(s.inputKeys)?s.orderedKeys:null,
   } as DerivedBundleView['maxSets'][number]))
   let theme:DerivedBundleView['theme']=null
-  if(values.theme){
+  if(values.theme&&pack.rules.theme!.ruleIds.every(id=>allowedRules.has(id))){
     const dependencies=[...new Set([...pack.rules.theme!.axisKeys.flatMap(k=>derivationInputs(derivations.get(k)!)),...pack.rules.theme!.ruleIds.flatMap(id=>pack.rules.items.find(r=>r.ruleId===id)!.evidenceKeys)])]
     theme=narratable(dependencies)?values.theme:{...values.theme,state:'WITHHELD',profileId:null}
   }

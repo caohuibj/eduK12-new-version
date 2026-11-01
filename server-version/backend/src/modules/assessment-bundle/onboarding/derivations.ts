@@ -23,6 +23,18 @@ export function numericEvidenceState(e:EvidenceItemV1|undefined):{state:DerivedS
   if(e.value.state!=='present'||e.quality!=='interpretable')return {state:'missing',value:null}
   return typeof e.value.value==='number'&&Number.isFinite(e.value.value)?{state:'present',value:e.value.value}:{state:'invalid',value:null}
 }
+/** Declared exact-source ranges also guard rule evaluation. Keep original facts
+ * untouched; this is an effective view for the new bounded calculation only. */
+export function effectiveDerivedEvidence(pack:DerivedPackage,evidence:readonly EvidenceItemV1[]):EvidenceItemV1[]{
+  const ranges=new Map<string,Array<{min:number;max:number}>>()
+  const add=(key:string,range:{min:number;max:number})=>ranges.set(key,[...(ranges.get(key)??[]),range])
+  for(const d of pack.rules.derivations)if(d.op==='RANGE_POSITION')add(d.input,d)
+  for(const row of pack.report.rows)if(row.valueRef.kind==='evidence'&&row.range)add(row.valueRef.key,row.range)
+  return evidence.map(e=>{
+    const raw=e.value.state==='present'?e.value.value:null
+    return typeof raw==='number'&&Number.isFinite(raw)&&ranges.get(e.evidenceKey)?.some(r=>raw<r.min||raw>r.max)?{...e,value:{state:'invalid'},quality:'invalid'}:e
+  })
+}
 function inputState(inputs:ReturnType<typeof numericEvidenceState>[]):DerivedState {
   return inputs.some(x=>x.state==='invalid')?'invalid':inputs.some(x=>x.state==='not_applicable')?'not_applicable':inputs.some(x=>x.state!=='present')?'missing':'present'
 }
