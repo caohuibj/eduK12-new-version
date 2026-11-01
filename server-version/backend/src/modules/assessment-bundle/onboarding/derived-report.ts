@@ -69,8 +69,9 @@ export function projectDerivedBundleView(input:{
   const allowedRows=new Set(blocks.flatMap(b=>b.rowKeys??[])),allowedSets=new Set(blocks.flatMap(b=>b.maxSetKeys??[])),allowedRules=new Set(blocks.flatMap(b=>b.ruleIds))
   const rows=pack.report.rows.filter(r=>allowedRows.has(r.rowKey)).sort((a,b)=>a.order-b.order).map(r=>{
     const keys=[...new Set([...refInputs(r.valueRef),...(r.denominatorRef?refInputs(r.denominatorRef):[])])].sort(),visible=keys.every(numeric),v=refValue(r.valueRef),denominator=r.denominatorRef?refValue(r.denominatorRef):null
+    const qualityVisible=visible&&keys.every(k=>input.policies.get(mapping.get(k)!.slotKey)?.resultQualityDetails===true)
     return {rowKey:r.rowKey,label:r.label,unit:r.unit,order:r.order,range:r.range??null,itemCount:r.itemCount??null,timeframe:r.timeframe??null,evidenceKeys:keys,
-      quality:!visible?'unavailable':v.state==='invalid'?'invalid':keys.some(k=>byKey.get(k)?.quality==='limited')?'limited':v.state==='present'?'interpretable':'unavailable',
+      ...(qualityVisible?{quality:v.state==='invalid'?'invalid':keys.some(k=>byKey.get(k)?.quality==='limited')?'limited':v.state==='present'?'interpretable':'unavailable'}:{}),
       state:visible?v.state:'redacted',value:visible&&v.state==='present'?v.value:null,denominator:visible&&denominator?.state==='present'?denominator.value:null} as DerivedReportRow
   })
   const maxSets=values.maxSets.filter(s=>allowedSets.has(s.key)).map(s=>({key:s.key,
