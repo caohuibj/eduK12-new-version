@@ -1,0 +1,35 @@
+[
+  {
+    "evidenceKey": "bps",
+    "slotKey": "bedtime",
+    "selector": "bedtime_procrastination",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "sleep.bedtime_procrastination",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "sci",
+    "slotKey": "sleep",
+    "selector": "sleep_condition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "sleep.sleep_condition",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "adult",
+    "slotKey": "context",
+    "selector": "adult_confirmed",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "context.adult",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]
