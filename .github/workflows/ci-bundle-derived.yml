@@ -1,0 +1,96 @@
+name: Bundle derived runtime targeted checks
+on:
+  workflow_call:
+    inputs:
+      base:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: 'true'
+      BUNDLE_DERIVED_BASE: ${{ inputs.base }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: verify the affected full diff and control refusal cases
+        run: |
+          node .github/scripts/bundle-derived-checks.mjs scope
+          node --test .github/scripts/bundle-derived-checks.test.mjs
+      - name: prepare existing backend native dependency prerequisites
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: install exact backend and frontend dependencies
+        run: |
+          npm ci --prefix server-version/backend
+          npm ci --prefix server-version/frontend
+      - name: generate the client from the actual unchanged schema
+        working-directory: server-version/backend
+        run: npx prisma generate
+      - name: compile affected backend and frontend import closures
+        run: |
+          node .github/scripts/bundle-derived-checks.mjs types backend
+          node .github/scripts/bundle-derived-checks.mjs types frontend
+      - name: core calculations, frozen DTO, saved readers and Scale START contracts
+        working-directory: server-version/backend
+        run: >-
+          node node_modules/vitest/vitest.mjs run
+          src/__tests__/bundle-onboarding/derived-core.test.ts
+          src/__tests__/bundle-onboarding/derived-adapters.test.ts
+          src/__tests__/bundle-onboarding/derived-saved-read.test.ts
+          src/__tests__/bundle-onboarding/scale-start-context.test.ts
+          --maxWorkers=1 --reporter=json --outputFile=../../bundle-derived-ci/backend-tests.json
+      - name: shared DTO renderer and existing report consumers
+        working-directory: server-version/frontend
+        run: >-
+          node node_modules/vitest/vitest.mjs run
+          src/modules/reporting/BundleDerivedReport.test.tsx
+          src/pages/bundle/__tests__/BundleReport.test.tsx
+          src/pages/bundle/__tests__/CrossLineBundleDisplay.test.tsx
+          src/components/education-tools/EducationAssessmentReport.bundle.test.tsx
+          src/survey/StoredPackageReports.test.tsx
+          --maxWorkers=1 --reporter=json --outputFile=../../bundle-derived-ci/frontend-tests.json
+      - name: Survey native and derived FINAL receipt and saved reopen contracts
+        working-directory: server-version/frontend
+        run: >-
+          node node_modules/vitest/vitest.mjs run src/survey/SurveyPublicApp.final.test.tsx
+          --testNamePattern='shows saved (derived|native) Bundle'
+          --maxWorkers=1 --reporter=json --outputFile=../../bundle-derived-ci/survey-tests.json
+      - name: select changed application and control SAST inputs
+        id: sast
+        run: node .github/scripts/bundle-derived-checks.mjs sast-config
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          config: ${{ steps.sast.outputs.config }}
+          ram: 8000
+          threads: 4
+      - name: analyze with the existing JavaScript and TypeScript query set
+        id: analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          upload: never
+          upload-database: false
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bundle-derived-targeted-${{ github.sha }}
+          path: |
+            bundle-derived-ci/
+            ${{ steps.analysis.outputs.sarif-output }}
+          if-no-files-found: error
+          retention-days: 14
