@@ -67,6 +67,7 @@ import { visualwmRegistryEntry as task64 } from '../tasks/visualwm/visualwm.regi
 import { cogestRegistryEntry as task65 } from '../tasks/cogest/cogest.registry'
 import { cogestRegistryEntryV11 as task66 } from '../tasks/cogest/cogest.registry-v1.1'
 import { mazeRegistryEntry as task67 } from '../tasks/maze/maze.registry'
-import { auditoryrtRegistryEntry as task68 } from '../tasks/auditoryrt/auditoryrt.registry'
-import { auditorynbackRegistryEntry as task69 } from '../tasks/auditorynback/auditorynback.registry'
-export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47, task48, task49, task50, task51, task52, task53, task54, task55, task56, task57, task58, task59, task60, task61, task62, task63, task64, task65, task66, task67, task68, task69]
+import { mazeRegistryEntryV11 as task68 } from '../tasks/maze/maze.registry'
+import { auditoryrtRegistryEntry as task69 } from '../tasks/auditoryrt/auditoryrt.registry'
+import { auditorynbackRegistryEntry as task70 } from '../tasks/auditorynback/auditorynback.registry'
+export const cognitiveRunnerEntries = [task0, task1, task2, task3, task4, task5, task6, task7, task8, task9, task10, task11, task12, task13, task14, task15, task16, task17, task18, task19, task20, task21, task22, task23, task24, task25, task26, task27, task28, task29, task30, task31, task32, task33, task34, task35, task36, task37, task38, task39, task40, task41, task42, task43, task44, task45, task46, task47, task48, task49, task50, task51, task52, task53, task54, task55, task56, task57, task58, task59, task60, task61, task62, task63, task64, task65, task66, task67, task68, task69, task70]

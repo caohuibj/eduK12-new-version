@@ -24,3 +24,11 @@ export const mazeRegistryEntry: CognitiveFrontendRegistryEntry = {
     disclaimer: '结果反映本次任务表现，不代表诊断或正式能力评估。',
   },
 }
+
+
+export const mazeRegistryEntryV11: CognitiveFrontendRegistryEntry = {
+  ...mazeRegistryEntry,
+  name: '看图走迷宫（独立练习）',
+  engineVersion: '1.1.0',
+  scoringVersion: '1.0.1',
+}
