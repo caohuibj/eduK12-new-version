@@ -24,4 +24,4 @@ export const matrixRegistryEntry: CognitiveFrontendRegistryEntry = {
   },
 }
 
-export const matrixRegistryEntryV11:CognitiveFrontendRegistryEntry={...matrixRegistryEntry,engineVersion:'1.1.0',scoringVersion:'1.0.0',reportDefinition:{...matrixRegistryEntry.reportDefinition,showProductIndex:false}}
+export const matrixRegistryEntryV11:CognitiveFrontendRegistryEntry={...matrixRegistryEntry,engineVersion:'1.1.0',scoringVersion:'1.0.0',readiness:{ category: 'fixed-trial', inputs: ['keyboard', 'pointer', 'touch'], orientation: 'any', globalKeyboardCapture: false, resumeDisposition: 'restart-required', resumeReason: '当前版本没有持久化练习或题内阶段；中断后按既有规则重新开始。', frozenMediaSlots: ['instruction', 'example', 'stimulus'] },reportDefinition:{...matrixRegistryEntry.reportDefinition,showProductIndex:false}}

@@ -54,3 +54,7 @@
 - 没有浏览器真实施测、数据库安装、全平台测试、正式 CI、部署或人群可靠性实验。原14项 R 的已合格输入证据不重复跑。
 - 原件保存在本地 `cognitive-practice-r3-evidence-20261101`：counterexamples.json、matrix-ui.json、matrix-core.json、types.log。公开交接仅保留本篇脱敏反例与源码，不上传原始环境日志。
 - 集成负责人需从 task-package 生成既有公共 registry/索引，合并新 C 与新 P/R；本分组没有修改公共生成文件，也没有把本地包级验证称为最终集成已通过。
+
+### 汇总上下文的启动契约接线
+
+新matrix/maze C1.1在既有registry中已能解析runner，但共享readiness仅声明旧C，实际解析新身份返回undefined。汇总仅在这两个新registry项声明既有输入、键盘捕获与restart-required契约，不修改旧身份或共享门禁。matrix无全局键盘捕获；maze实际使用window方向键监听。两个精确身份回归先各失败于undefined，补接后2 PASS；未知1.1.1仍不存在。R2另外三个新身份的接线由D负责，不在此复制一套。

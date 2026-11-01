@@ -31,4 +31,5 @@ export const mazeRegistryEntryV11: CognitiveFrontendRegistryEntry = {
   name: '看图走迷宫（独立练习）',
   engineVersion: '1.1.0',
   scoringVersion: '1.0.1',
+  readiness: { category: 'visuospatial', inputs: ['keyboard', 'pointer', 'touch'], orientation: 'any', globalKeyboardCapture: true, resumeDisposition: 'restart-required', resumeReason: '当前版本没有持久化练习或题内阶段；中断后按既有规则重新开始。', frozenMediaSlots: ['instruction', 'example', 'stimulus'] },
 }
