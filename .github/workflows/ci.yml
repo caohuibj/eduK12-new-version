@@ -352,6 +352,7 @@ jobs:
       composite_csv_memory_plan: ${{ steps.scope.outputs.composite_csv_memory_plan }}
       scale_library_governance_plan: ${{ steps.scope.outputs.scale_library_governance_plan }}
       bundle_family: ${{ steps.scope.outputs.bundle_family }}
+      bundle_runtime: ${{ steps.scope.outputs.bundle_runtime }}
       diff_base: ${{ steps.scope.outputs.diff_base }}
       application_route: ${{ steps.scope.outputs.application_route }}
       release_plan: ${{ steps.scope.outputs.release_plan }}
@@ -631,7 +632,7 @@ jobs:
           import {personalTrackingReadyPlan} from './.github/scripts/personal-tracking-ready.mjs';
           import {onboardingPlan} from './.github/scripts/onboarding-scope.mjs';
           import {groupReportDraftPlan,groupReportDiffBase} from './.github/scripts/group-report-draft.mjs';
-          import {catalogDiffBase} from './.github/scripts/catalog-discovery-scope.mjs';
+          import {catalogDiffBase,catalogDiscoveryScope} from './.github/scripts/catalog-discovery-scope.mjs';
           import {execFileSync} from 'node:child_process';
           import {toolingOnly} from './server-version/scripts/release/policy.mjs';
           const checkout=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
@@ -642,7 +643,7 @@ jobs:
           const personal=personalTrackingReadyPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'});
           const onboarding=personal?null:onboardingPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
           const groupDraft=personal||onboarding?null:groupReportDraftPlan(entries,actualBase,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-          const lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(personal)||Boolean(onboarding)||Boolean(groupDraft)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (Boolean(personal)||Boolean(onboarding)||Boolean(groupDraft)||catalogDiscoveryScope(entries)||docs||toolingOnly(entries)||Boolean(followup)||entries.some(e=>['.github/scripts/survey-governance-bindings.json','.github/scripts/training-polish-bindings.json','.github/scripts/survey-review-bindings.json','.github/scripts/training-admin-integration-bindings.json','.github/scripts/training-entry-bindings.json','.github/scripts/participant-capacity-bindings.json','.github/scripts/survey-assessment-bindings.json','.github/scripts/training-assessment-bindings.json','.github/scripts/school-teacher-visual-bindings.json','.github/scripts/participant-access-bindings.json','.github/scripts/training-manual-ui-bindings.json','.github/scripts/training-appearance-bindings.json','.github/scripts/shared-authoring-bindings.json','.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-self-bindings.json','.github/scripts/school-teacher-native-bindings.json','.github/scripts/school-teacher-package-bindings.json'].includes(e.file)));
           appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
@@ -800,6 +801,10 @@ jobs:
       - name: group report Draft boundary contracts
         if: steps.scope.outputs.application_route == 'group-report-draft'
         run: node --test .github/scripts/group-report-draft.test.mjs
+
+      - name: validate bounded Bundle runtime routing
+        if: steps.scope.outputs.bundle_runtime == 'true'
+        run: node --test .github/scripts/bundle-runtime-scope.test.mjs
 
   maintenance:
     needs: scope
@@ -1261,6 +1266,7 @@ jobs:
     uses: ./.github/workflows/ci-frontend.yml
     with:
       bundle_family: ${{ needs.scope.outputs.bundle_family == 'true' }}
+      bundle_runtime: ${{ needs.scope.outputs.bundle_runtime == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
@@ -3758,6 +3764,8 @@ jobs:
     env:
       CI: 'true'
       BUNDLE_FAMILY: ${{ needs.scope.outputs.bundle_family }}
+      BUNDLE_RUNTIME: ${{ needs.scope.outputs.bundle_runtime }}
+      BUNDLE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       LIBRARY_DISCOVERY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -3792,8 +3800,12 @@ jobs:
         run: |
           npm ci
           npx prisma generate
+      - name: prepare the isolated schema for Bundle runtime contracts
+        if: needs.scope.outputs.bundle_runtime == 'true'
+        working-directory: server-version/backend
+        run: npx prisma db push --skip-generate
       - name: changed image build controls
-        if: needs.scope.outputs.bundle_family != 'true'
+        if: needs.scope.outputs.bundle_family != 'true' && needs.scope.outputs.bundle_runtime != 'true'
         run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs
       - name: existing catalog unit and temporary-table PostgreSQL contracts
         working-directory: server-version/backend
@@ -3801,7 +3813,7 @@ jobs:
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
           import {execFileSync} from 'node:child_process';
-          const recipe=process.env.BUNDLE_FAMILY==='true'?'bundle-family-checks.json':'catalog-discovery-checks.json';
+          const recipe=process.env.BUNDLE_RUNTIME==='true'?'bundle-runtime-checks.json':process.env.BUNDLE_FAMILY==='true'?'bundle-family-checks.json':'catalog-discovery-checks.json';
           const {backendChecks}=JSON.parse(readFileSync('../../.github/config/'+recipe,'utf8'));
           const files=[...backendChecks.unitFiles,...backendChecks.postgresFiles];
           execFileSync('npm',['test','--',...files,'--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/tmp/catalog-backend.json'],{stdio:'inherit'});

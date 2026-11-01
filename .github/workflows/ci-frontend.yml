@@ -3,6 +3,9 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      bundle_runtime:
+        type: boolean
+        default: false
       bundle_family:
         type: boolean
         default: false
@@ -92,7 +95,7 @@ jobs:
       - name: integrated application types without duplicate cognitive subset
         if: inputs.survey_selection || inputs.affected_only
         run: |
-          if [ "${{ inputs.bundle_family }}" != "true" ]; then npm run pretypecheck; fi
+          if [ "${{ inputs.bundle_family }}" != "true" ] && [ "${{ inputs.bundle_runtime }}" != "true" ]; then npm run pretypecheck; fi
           npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
         if: inputs.survey_selection != true && inputs.affected_only != true
@@ -129,7 +132,7 @@ jobs:
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
           JS
       - name: affected catalog selectors and paging contracts
-        if: inputs.catalog_discovery && !inputs.bundle_family
+        if: inputs.catalog_discovery && !inputs.bundle_family && !inputs.bundle_runtime
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
@@ -138,6 +141,16 @@ jobs:
           const files=checks.tests.filter(f=>f.startsWith('server-version/frontend/')).map(f=>f.slice('server-version/frontend/'.length));
           execFileSync('npm',['test','--',...files,'--reporter=default','--reporter=json','--outputFile=/tmp/catalog-frontend.json'],{stdio:'inherit'});
           execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/catalog-frontend.json',...files],{stdio:'inherit'});
+          JS
+      - name: affected frozen Bundle report components
+        if: inputs.bundle_runtime
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const {frontendChecks:files}=JSON.parse(readFileSync('../../.github/config/bundle-runtime-checks.json','utf8'));
+          execFileSync('npm',['test','--',...files,'--reporter=default','--reporter=json','--outputFile=/tmp/bundle-runtime-frontend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/bundle-runtime-frontend.json',...files],{stdio:'inherit'});
           JS
       - name: affected Wave selector and direct consumers
         if: inputs.survey_selection
