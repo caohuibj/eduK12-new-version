@@ -1,3 +1,4 @@
+import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
 import {cognitiveMixedProductScope,cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
 import {backendApiFocus} from './backend-api-scope.mjs';
 import {catalogDiscoveryScope,catalogDiffBase,bundleFamilyScope,bundleRuntimeScope} from './catalog-discovery-scope.mjs';
@@ -413,6 +414,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const event = process.env.CI_EVENT;
   refuseUnplannedPR356();
   const base = catalogDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),changedEntries);
+  if((event==='push'||event==='pull_request'&&process.env.CI_PR_REPOSITORY===process.env.GITHUB_REPOSITORY)&&process.env.CI_FORCE_FULL!=='true'&&readEdgeScope(base)){const output={...edgeConfigOutputs(),diff_base:base};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const personal=personalTrackingReadyPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'});
   if(personal){const output=personalTrackingReadyOutputs(personal);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const onboarding=onboardingPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
