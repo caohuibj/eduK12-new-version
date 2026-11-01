@@ -1,4 +1,5 @@
 import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from './product-eligibility'
+import {cognitiveClassificationTags} from '../survey/catalog-discovery'
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { readCognitiveQuota } from './attempt-quota'
@@ -199,7 +200,7 @@ export const listPublishedConfigs = async (userId: string, role: UserRole) => {
   return configs.filter(row => isCognitiveProductEligible(row.testType)).map(row => {
     assertCognitiveCatalogConfiguration(row)
     const { config: _privateConfig, ...catalog } = row
-    return {...catalog,...(profileHeaders.get(row.id)??{})}
+    return {...catalog,classificationTags:cognitiveClassificationTags(row.testType,row.engineVersion,row.scoringVersion),...(profileHeaders.get(row.id)??{})}
   })
 }
 

@@ -3,15 +3,16 @@ import { listScaleInstrumentSources } from '../scale/onboarding/instrument-regis
 import { listCognitiveRegistryEntries } from '../cognitive/cognitive.registry'
 import { deriveCatalogDomainSummary } from '../cognitive/library/catalog'
 import { getCognitiveDomainDefinition } from '../cognitive-analysis/domain.registry'
+import {listSituationPackages} from '../situational/situation-package.registry'
 import {
-  catalogKeywordTerms, catalogTagFacets, matchesCatalogDiscovery, scaleSourceClassificationTags,
+  catalogKeywordTerms, catalogTagFacets, matchesCatalogDiscovery, scaleSourceClassificationTags,catalogTagsFromIds,catalogTagDictionary,catalogClassificationTags,
   type CatalogClassificationTag, type CatalogDiscoveryFilters,
 } from '../scale/library/catalog-discovery'
 
 /** Management discovery only. These labels never enter an executable snapshot,
  * approval hash, rights decision, scientific qualification or participant result. */
 export type DiscoveryRecord = {
-  kind: 'SCALE' | 'COGNITIVE'; key: string; version: string; engine: string; scoring: string
+  kind: 'SCALE' | 'COGNITIVE' | 'SJT'; key: string; version: string; engine: string; scoring: string
   tags: CatalogClassificationTag[]; ids: string[]; terms: string
 }
 
@@ -42,21 +43,54 @@ export function catalogDiscoveryRecords(): DiscoveryRecord[] {
     return { kind: 'COGNITIVE' as const, key: entry.testType, version: '', engine: entry.engineVersion, scoring: entry.scoringVersion, tags,
       ids: tags.map(tag => tag.id), terms: [entry.testType, ...tags.flatMap(tag => [tag.id, tag.label])].join(' ').toLowerCase() }
   })
-  return [...scales, ...cognitive]
+  const sjt=listSituationPackages().map(pkg=>{
+    const tags=sjtClassificationTags(pkg.definition)
+    return {kind:'SJT' as const,key:pkg.key,version:pkg.instrumentVersion,engine:'',scoring:'',tags,ids:tags.map(t=>t.id),terms:[pkg.key,pkg.definition.source.title??'',...tags.flatMap(t=>[t.id,t.label])].join(' ').toLowerCase()}
+  })
+  return [...scales, ...cognitive,...sjt]
 }
+
+/** Only explicitly published constructs; never infer an audience from a title. */
+export const sjtClassificationTags=(definition:{scoring:{publishedMetrics:readonly {construct:string}[]}})=>catalogTagsFromIds(definition.scoring.publishedMetrics.map(metric=>'sjt-construct:'+metric.construct))
+
+/** Same frozen imported-C header projection as the component publication work.
+ * This is source metadata, never a second persisted or executable catalog. */
+export async function importedStandardDiscoveryRecords(db:Pick<Prisma.TransactionClient,'$queryRaw'>):Promise<DiscoveryRecord[]>{
+ const rows=await db.$queryRaw<Array<{key:string;version:string;title:string;catalog:{construct?:Parameters<typeof catalogClassificationTags>[0];population?:NonNullable<Parameters<typeof catalogClassificationTags>[1]>['population']};language:string|null}>>`SELECT DISTINCT ON(tool_key,snapshot->>'instrumentVersion') tool_key AS key,snapshot->>'instrumentVersion' AS version,snapshot->>'title' AS title,
+  snapshot#>'{parts,CONTENT,reference,metadata,catalog}' AS catalog,COALESCE(snapshot#>>'{definition,versionAxes,locale}',snapshot#>>'{parts,CONTENT,reference,metadata,instruction,language}') AS language
+  FROM survey_standard_releases WHERE snapshot#>>'{parts,CONTENT,reference,metadata,databaseSource,kind}'='DB_IMPORTED'
+  ORDER BY tool_key,snapshot->>'instrumentVersion',created_at DESC,id DESC`
+ return rows.filter(row=>typeof row.key==='string'&&typeof row.version==='string').map(row=>{
+  const tags=catalogClassificationTags(row.catalog?.construct??{}, {population:row.catalog?.population,targetLocale:row.language??undefined})
+  return {kind:'SCALE',key:row.key,version:row.version,engine:'',scoring:'',tags,ids:tags.map(t=>t.id),terms:[row.title,...tags.flatMap(t=>[t.id,t.label])].join(' ').toLowerCase()}
+ })
+}
+
+export const jsonTagIds=(value:Prisma.Sql)=>Prisma.sql`CASE WHEN jsonb_typeof(${value})='array' THEN ${value} ELSE '[]'::jsonb END`
+export const respondentTagIds=(value:Prisma.Sql)=>Prisma.sql`COALESCE((SELECT jsonb_agg('respondent:'||respondent) FROM jsonb_array_elements_text(${jsonTagIds(value)}) respondent),'[]'::jsonb)`
+export const sjtMetadataTagIds=(definition:Prisma.Sql)=>Prisma.sql`COALESCE((SELECT jsonb_agg(DISTINCT 'sjt-construct:'||(metric->>'construct')) FROM jsonb_array_elements(${jsonTagIds(Prisma.sql`${definition}#>'{scoring,publishedMetrics}'`)}) metric WHERE jsonb_typeof(metric->'construct')='string'),'[]'::jsonb)`
 
 export const discoveryFacets = (records: readonly DiscoveryRecord[], family?: string) => catalogTagFacets(records.filter(record => !family || record.kind === family).map(record => record.tags))
 
 /** A small source-owned metadata table, not a second persisted catalog. SQL joins
  * exact declared identities; unregistered/private versions retain empty labels. */
-export function discoveryJoin(records: readonly DiscoveryRecord[], identity: { kind: Prisma.Sql; key: Prisma.Sql; version: Prisma.Sql; engine: Prisma.Sql; scoring: Prisma.Sql }) {
+export function discoveryJoin(records: readonly DiscoveryRecord[], identity: { kind: Prisma.Sql; key: Prisma.Sql; version: Prisma.Sql; engine: Prisma.Sql; scoring: Prisma.Sql },tagIds:Prisma.Sql=Prisma.sql`'[]'::jsonb`) {
   return Prisma.sql`LEFT JOIN LATERAL (
-    SELECT d.tags, d.ids, d.terms FROM jsonb_to_recordset(${JSON.stringify(records)}::jsonb)
+    WITH registered AS (SELECT d.tags,d.ids,d.terms FROM jsonb_to_recordset(${JSON.stringify(records)}::jsonb)
       AS d(kind text,key text,version text,engine text,scoring text,tags jsonb,ids jsonb,terms text)
     WHERE d.kind=${identity.kind} AND d.key=${identity.key}
-      AND (d.kind='SCALE' AND d.version=${identity.version}
+      AND (d.kind IN ('SCALE','SJT') AND d.version=${identity.version}
         OR d.kind='COGNITIVE' AND d.engine=${identity.engine} AND d.scoring=${identity.scoring})
-    LIMIT 1
+    LIMIT 1), source_tags AS (
+      SELECT DISTINCT value#>>'{}' AS id FROM jsonb_array_elements(${jsonTagIds(tagIds)}) WHERE jsonb_typeof(value)='string'
+    ), labels AS (SELECT ${JSON.stringify({...catalogTagDictionary(),...Object.fromEntries(records.flatMap(record=>record.tags.map(({id,...tag})=>[id,tag])))})}::jsonb AS dictionary), combined AS (
+      SELECT jsonb_array_elements(tags) AS tag,0 AS priority FROM registered
+      UNION ALL SELECT jsonb_build_object('id',id,'label',COALESCE(dictionary->id->>'label',CASE WHEN id LIKE 'sjt-construct:%' THEN substring(id FROM 15)
+       WHEN id<>'age:-' AND id~'^age:([0-9]+([.][0-9]+)?)?-([0-9]+([.][0-9]+)?)?$' THEN CASE WHEN split_part(substring(id FROM 5),'-',1)='' THEN split_part(substring(id FROM 5),'-',2)||'岁及以下' WHEN split_part(substring(id FROM 5),'-',2)='' THEN split_part(substring(id FROM 5),'-',1)||'岁及以上' ELSE replace(substring(id FROM 5),'-','–')||'岁' END ELSE id END),
+       'facet',COALESCE(dictionary->id->>'facet',CASE WHEN id LIKE 'sjt-construct:%' THEN 'construct' WHEN id<>'age:-' AND id~'^age:([0-9]+([.][0-9]+)?)?-([0-9]+([.][0-9]+)?)?$' THEN 'population' WHEN split_part(id,':',1) IN ('population','construct','subject','domain','language','orientation','response','use','license') THEN split_part(id,':',1) ELSE 'other' END)),1 FROM source_tags CROSS JOIN labels
+    ), unique_tags AS (SELECT DISTINCT ON(tag->>'id') tag FROM combined ORDER BY tag->>'id',priority)
+    SELECT COALESCE(jsonb_agg(tag),'[]'::jsonb) AS tags,COALESCE(jsonb_agg(tag->>'id'),'[]'::jsonb) AS ids,
+      concat_ws(' ',(SELECT terms FROM registered),string_agg(concat_ws(' ',tag->>'id',tag->>'label'),' ')) AS terms FROM unique_tags
   ) AS discovery ON TRUE`
 }
 

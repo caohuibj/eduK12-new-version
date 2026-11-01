@@ -1,3 +1,5 @@
+import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -29,13 +31,14 @@ export const educationConfigurationDistributionRoots=(actorId:string,scope:Educa
 /** Bounded management headers. Historical own issuances stay readable for
  * reconciliation/revocation; they never make an unavailable source assignable. */
 export async function educationStandardManagementCatalog(actorId:string,scope:EducationConfigurationScope,raw:unknown){
- const input=query.parse(raw),size=25
+ const input=query.extend(catalogDiscoveryQueryFields).parse(raw),size=25
  return prisma.$transaction(async tx=>{
   await assertEducationConfigurationManager(tx,actorId,scope)
+  const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(tx)]
   const rows=await tx.$queryRaw<Array<{id:string;title:string;toolKey:string;instrumentVersion:string;combinationHash:string;state:string;
    contentVersion:string;parametersVersion:string;reportVersion:string;approved:boolean;nativeStatus:string|null;measurementId:string|null;measurementAvailable:boolean;organizationAvailable:boolean;
-   authorities:Array<{id:string;version:number;validFrom:string;expiresAt:string}>}>>(Prisma.sql`
-   SELECT s.id,s.snapshot->>'title' AS title,s.tool_key AS "toolKey",s.snapshot->>'instrumentVersion' AS "instrumentVersion",s.combination_hash AS "combinationHash",s.state,
+   authorities:Array<{id:string;version:number;validFrom:string;expiresAt:string}>;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`
+   SELECT COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",s.id,s.snapshot->>'title' AS title,s.tool_key AS "toolKey",s.snapshot->>'instrumentVersion' AS "instrumentVersion",s.combination_hash AS "combinationHash",s.state,
     s.snapshot#>>'{parts,CONTENT,version}' AS "contentVersion",s.snapshot#>>'{parts,PARAMETERS,version}' AS "parametersVersion",s.snapshot#>>'{parts,REPORT,version}' AS "reportVersion",
     COALESCE(p.decision='APPROVED' AND NOT p.paused,false) AS approved,native.status::text AS "nativeStatus",s.measurement_release->>'releaseId' AS "measurementId",
     COALESCE(m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash',false) AS "measurementAvailable",
@@ -46,13 +49,14 @@ export async function educationStandardManagementCatalog(actorId:string,scope:Ed
    FROM survey_standard_releases s LEFT JOIN survey_tool_policies p ON p.product=${scope.product} AND p.resource_key='standard-release:'||s.id AND p.fingerprint=s.combination_hash
    LEFT JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
    LEFT JOIN scales native ON native.code=s.tool_key AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+   ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.tool_key`,version:Prisma.sql`s.snapshot->>'instrumentVersion'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})}
    WHERE (EXISTS(${educationConfigurationDistributionRoots(actorId,scope,Prisma.sql`s.measurement_release->>'releaseId'`)}) OR EXISTS(
     SELECT 1 FROM content_capability_grants own JOIN assessment_management_events e ON e.id=own.id AND e.action=${EDUCATION_STANDARD_USE_ACTION}
     WHERE own.issuer_id=${actorId} AND own.product=${scope.product} AND own.scope_kind='ORGANIZATION' AND own.scope_id=${scope.organizationId} AND e.resource_id=s.id))
-    AND (${input.q}='' OR strpos(lower(s.snapshot->>'title'),lower(${input.q}))>0 OR strpos(lower(s.tool_key),lower(${input.q}))>0)
+    AND ${discoverySqlFilter([Prisma.sql`s.snapshot->>'title'`,Prisma.sql`s.tool_key`],{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')})}
    ORDER BY s.tool_key,s.created_at,s.id LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
-  return {page:input.page,hasMore:rows.length>size,list:rows.slice(0,size).map(row=>({
-   id:row.id,title:row.title,toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,combinationHash:row.combinationHash,
+  return {page:input.page,hasMore:rows.length>size,tagFacets:discoveryFacets(records,'SCALE'),list:rows.slice(0,size).map(row=>({
+   id:row.id,title:row.title,toolKey:row.toolKey,classificationTags:row.classificationTags,instrumentVersion:row.instrumentVersion,combinationHash:row.combinationHash,
    versions:{CONTENT:row.contentVersion,PARAMETERS:row.parametersVersion,REPORT:row.reportVersion},authorities:row.authorities.length<=128?row.authorities:[],
    assignable:row.organizationAvailable&&row.state==='ONLINE'&&row.approved&&row.nativeStatus==='PUBLISHED'&&row.measurementAvailable&&row.authorities.length>0&&row.authorities.length<=128,
    unavailableReason:!row.organizationAvailable?'本校当前产品已暂停或尚未开通':row.state!=='ONLINE'?'该配置已停止新增使用':!row.approved?'该配置未获当前入口批准或已暂停':row.nativeStatus!=='PUBLISHED'?'原生量表尚未装载或发布':

@@ -1,3 +1,5 @@
+import {discoveryJoin,discoverySqlFilter} from '../survey/catalog-discovery'
+import type {CatalogDiscoveryFilters,CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {isSupportedEducationLibraryVariant} from './education-supported-variants'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -13,7 +15,7 @@ import {ScaleLibraryError,fail} from './contracts'
 export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClient,input:{
  product:'SCHOOL'|'TEACHER';organizationId:string;actorId:string;
  workflow:{kind:'ACTIVITY'|'EVENT';id:string};cursor?:string
-}){
+}&CatalogDiscoveryFilters){
  const size=25,batchSize=50,scanBudget=200
  let cursor=input.cursor??''
  if(cursor.length>240||(cursor!==''&&!cursor.startsWith('library-scale:')))fail('EDUCATION_LIBRARY_CURSOR_INVALID',400)
@@ -31,11 +33,15 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
  // Scope before candidate retrieval; final pagination follows current issuer /
  // membership / deny qualification, so unauthorized rows cannot consume a page.
  const entries:RelationalProductEntryV1[]=[],qualified=new Map<string,boolean>()
+ const classificationTagsByKey:Record<string,CatalogClassificationTag[]>={}
  let scanned=0,exhausted=false
  while(entries.length<size&&scanned<scanBudget){
- const rows=await tx.$queryRaw<Array<{entry:unknown;entryHash:string}>>(Prisma.sql`
-  SELECT r.entry,r.entry_hash AS "entryHash" FROM registered_assessment_resources r
+ const rows=await tx.$queryRaw<Array<{entry:unknown;entryHash:string;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`
+  SELECT discovery.tags AS "classificationTags",r.entry,r.entry_hash AS "entryHash" FROM registered_assessment_resources r
   JOIN scale_library_entries e ON e.id=r.entry->'libraryOrigin'->>'entryId'
+  JOIN scale_library_submissions submission ON submission.id=e.submission_id
+  LEFT JOIN scales source ON submission.product='TRAINING' AND source.id=submission.source_id AND source.creator_id=submission.author_id
+  ${discoveryJoin([],{kind:Prisma.sql`NULL`,key:Prisma.sql`NULL`,version:Prisma.sql`NULL`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(source.tags)`)}
   WHERE r.status='PUBLISHED' AND e.status='ACTIVE' AND r.entry->'libraryOrigin'->>'product'=${input.product}
     AND r.resource_key LIKE 'library-scale:%'
     AND EXISTS(SELECT 1 FROM scale_library_use_grants g WHERE g.entry_id=e.id
@@ -43,7 +49,7 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
       AND ((g.scope_kind='USER' AND g.user_id=${input.actorId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL)))
     AND NOT EXISTS(SELECT 1 FROM registered_assessment_resources newer WHERE newer.resource_key=r.resource_key
       AND newer.status='PUBLISHED' AND (newer.created_at,newer.id)>(r.created_at,r.id))
-    AND r.resource_key>${cursor}
+    AND r.resource_key>${cursor} AND ${discoverySqlFilter([Prisma.sql`r.entry->>'title'`,Prisma.sql`r.resource_key`],input)}
   ORDER BY r.resource_key LIMIT ${batchSize}`)
  if(rows.length===0){exhausted=true;break}
  for(const row of rows){
@@ -67,9 +73,10 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
   if(!qualified.get(origin.entryId))continue
   const {libraryOrigin:_origin,...metadata}=full
   entries.push(metadata)
+  classificationTagsByKey[full.applicability.resourceKey]=row.classificationTags
   if(entries.length===size)break
  }
  if(rows.length<batchSize&&cursor===(rows[rows.length-1].entry as EducationLibraryResourceEntry).applicability.resourceKey){exhausted=true;break}
  }
- return {entries,nextCursor:exhausted?null:cursor}
+ return {entries,classificationTagsByKey,nextCursor:exhausted?null:cursor}
 }

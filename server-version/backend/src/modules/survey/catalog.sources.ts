@@ -1,6 +1,6 @@
 import {isSurveyCognitiveProfileRef,readSurveyCognitiveProfileSource,SURVEY_PROFILE_ADAPTER} from './cognitive-profile.source'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
-import {catalogDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
+import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,jsonTagIds,sjtClassificationTags,sjtMetadataTagIds,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
 import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
@@ -353,12 +353,12 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   let offset=(page-1)*limit
   const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
-  const records=catalogDiscoveryRecords(),filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
+  const records=[...catalogDiscoveryRecords(),...(kind==='SCALE'?await importedStandardDiscoveryRecords(db):[])],filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
   const profileHeaders=new Map<string,{available:boolean;reason:string|null}>()
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
   if(kind!=='SCALE'&&input.includeGoverned!==false){
-    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,title,snapshot_hash,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity)} WHERE family=${kind} AND state='ONLINE' AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.title`,Prisma.sql`t.snapshot_hash`],filters)} ORDER BY submitted_at,id`)
+    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,title,snapshot_hash,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity,Prisma.sql`${jsonTagIds(Prisma.sql`t.reference#>'{metadata,tags}'`)} || CASE WHEN t.family='SJT' THEN ${sjtMetadataTagIds(Prisma.sql`t.snapshot#>'{unit,compiledDefinition}'`)} ELSE '[]'::jsonb END`)} WHERE family=${kind} AND state='ONLINE' AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.title`,Prisma.sql`t.snapshot_hash`],filters)} ORDER BY submitted_at,id`)
     for(const row of governed)sourceTags.set('survey-tool:'+row.id,row.classification_tags??[])
     for(const row of governed.slice(offset,offset+take))refs.push({ref:{kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},title:row.title})
     offset=Math.max(0,offset-governed.length)
@@ -373,15 +373,23 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
-    const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED'&&matchesCatalogDiscovery([p.key,p.definition.source.title??''],[],filters)&&(!query||(p.key+' '+p.definition.source.title).toLowerCase().includes(query.toLowerCase()))).sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
+    const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED'&&matchesCatalogDiscovery([p.key,p.definition.source.title??''],sjtClassificationTags(p.definition),filters)&&(!query||(p.key+' '+p.definition.source.title).toLowerCase().includes(query.toLowerCase()))).sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
+    for(const pkg of builtins)sourceTags.set('registry:'+pkg.key,sjtClassificationTags(pkg.definition))
     for(const pkg of builtins.slice(offset,offset+Math.max(0,take-refs.length)))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
-    const rows=refs.length<take&&!filters.tags?.length?await db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED',AND:filters.keyword?.trim().toLowerCase().split(/\s+/).filter(Boolean).map(term=>({instrumentKey:{contains:term,mode:'insensitive' as const}})),...(query?{instrumentKey:contains}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-builtins.length),take:take-refs.length}):[]
-    for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.instrumentKey})
+    const headers=refs.length<take?await db.$queryRaw<Array<{id:string;classification_tags:CatalogClassificationTag[]}>>(Prisma.sql`
+      SELECT s.id,discovery.tags AS classification_tags FROM sjt_author_releases s
+      ${discoveryJoin(records,{kind:Prisma.sql`'SJT'`,key:Prisma.sql`s.instrument_key`,version:Prisma.sql`s.instrument_version`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},sjtMetadataTagIds(Prisma.sql`s.package->'definition'`))}
+      WHERE s.status='PUBLISHED' AND (${query}='' OR s.instrument_key ILIKE ${pattern})
+      AND ${discoverySqlFilter([Prisma.sql`s.instrument_key`,Prisma.sql`s.package#>>'{definition,source,title}'`],filters)}
+      ORDER BY s.id LIMIT ${take-refs.length} OFFSET ${Math.max(0,offset-builtins.length)}`):[]
+    const rows=headers.length?await db.sjtAuthorRelease.findMany({where:{id:{in:headers.map(row=>row.id)},status:'PUBLISHED'},orderBy:{id:'asc'}}):[]
+    for(const header of headers)sourceTags.set(header.id,header.classification_tags)
+    for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:(row.package as unknown as SituationPackage).definition.source.title||row.instrumentKey})
     cached={sjtAuthorRelease:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='COGNITIVE'){
     if(input.includeGoverned!==false){
-     const [header]=await db.$queryRaw<Array<{total:number;list:Array<{id:string;name:string;profile:string;hash:string;available:boolean}>}>>(Prisma.sql`WITH profiles AS MATERIALIZED (
-      SELECT c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}' AS profile,p.fingerprint AS hash,
+     const [header]=await db.$queryRaw<Array<{total:number;list:Array<{id:string;name:string;profile:string;hash:string;available:boolean;classification_tags:CatalogClassificationTag[]}>}>>(Prisma.sql`WITH profiles AS MATERIALIZED (
+      SELECT c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}' AS profile,p.fingerprint AS hash,(jsonb_agg(discovery.tags)->0) AS classification_tags,
        bool_or(c.status='PUBLISHED' AND m.status='PUBLISHED' AND c.test_type IN ('reaction','gonogo') AND m.content#>'{executable,presentation}'='null'::jsonb AND t.template_hash IS NOT NULL AND e.metadata#>>'{executionRequirements,hasPresentation}'='false' AND e.metadata#>>'{executionRequirements,referenceCount}'='0') AS available
       FROM survey_tool_policies p JOIN assessment_management_events e ON e.action='COGNITIVE_PROFILE_APPROVED' AND e.metadata->>'artifactFormatVersion'='2' AND e.metadata->>'artifactHash'=p.fingerprint
        JOIN cognitive_test_configs c ON c.id=e.resource_id
@@ -390,9 +398,10 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
        ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
       WHERE p.product='SURVEY' AND p.decision='APPROVED' AND NOT p.paused AND p.resource_key='cognitive-profile:'||c.id||':'||(e.metadata#>>'{configuration,profile}')
        AND (${query}='' OR c.name ILIKE ${pattern} OR c.test_type ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`c.name`,Prisma.sql`c.test_type`],filters)} GROUP BY c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}',p.fingerprint)
-     SELECT (SELECT count(*)::int FROM profiles) AS total,COALESCE((SELECT jsonb_agg(row) FROM (SELECT id,name,profile,hash,available FROM profiles ORDER BY id,hash LIMIT ${Math.max(0,take-refs.length)} OFFSET ${offset}) row),'[]'::jsonb) AS list`)
+     SELECT (SELECT count(*)::int FROM profiles) AS total,COALESCE((SELECT jsonb_agg(row) FROM (SELECT id,name,profile,hash,available,classification_tags FROM profiles ORDER BY id,hash LIMIT ${Math.max(0,take-refs.length)} OFFSET ${offset}) row),'[]'::jsonb) AS list`)
      for(const row of header.list){
       const ref:CatalogSourceRef={kind:'COGNITIVE',sourceId:'cognitive-profile:'+row.id+':'+row.profile,sourceVersion:row.hash}
+      sourceTags.set(ref.sourceId,row.classification_tags??[])
       refs.push({ref,title:row.name+' · '+(row.profile==='experience'?'体验报告':row.profile==='research'?'科研报告':'正式报告')})
       profileHeaders.set(ref.sourceId+':'+ref.sourceVersion,{available:row.available===true,reason:row.available===true?null:'该精确配置来源或 Survey 原生/媒体/参考适配尚不可用'})
      }
@@ -414,7 +423,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   }else fail('SOURCE_KIND_UNSUPPORTED')
   const list:CatalogSourceRow[]=[]
   for(const item of refs.slice(0,limit)){try{
-    if(isSurveyCognitiveProfileRef(item.ref)){const header=profileHeaders.get(item.ref.sourceId+':'+item.ref.sourceVersion);if(!header)return fail('SOURCE_PROFILE_HEADER_MISSING');list.push({...item,available:header.available,unsupportedReason:header.reason,definitionDigest:item.ref.sourceVersion});continue}
+    if(isSurveyCognitiveProfileRef(item.ref)){const header=profileHeaders.get(item.ref.sourceId+':'+item.ref.sourceVersion);if(!header)return fail('SOURCE_PROFILE_HEADER_MISSING');list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:header.available,unsupportedReason:header.reason,definitionDigest:item.ref.sourceVersion});continue}
     const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},isGovernedSource(item.ref.sourceId)?db:cached,true,db,scaleReleases)
     list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
   }catch(e){

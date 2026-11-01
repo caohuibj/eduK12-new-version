@@ -1,3 +1,5 @@
+import {catalogDiscoveryRecords,discoveryFacets} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
 import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run-contract'
@@ -86,8 +88,9 @@ async function resourcesResponse(req: Request, res: Response, schoolActivity?:{o
     }
     try {
       const page = req.query.page === undefined ? 1 : Number(req.query.page)
+      const filters=schoolActivity?z.object(catalogDiscoveryQueryFields).parse(req.query):{}
       const registered = schoolActivity
-        ?await prisma.$transaction(tx=>listEducationLibraryResourcePage(tx,{product:'SCHOOL',organizationId:schoolActivity.organizationId,actorId:req.user!.userId,workflow:{kind:'ACTIVITY',id:schoolActivity.courseId},cursor:z.string().optional().parse(req.query.cursor)}))
+        ?await prisma.$transaction(tx=>listEducationLibraryResourcePage(tx,{product:'SCHOOL',organizationId:schoolActivity.organizationId,actorId:req.user!.userId,workflow:{kind:'ACTIVITY',id:schoolActivity.courseId},...filters,cursor:z.string().optional().parse(req.query.cursor)}))
         :await listReleasedRegisteredResourcePage(req.user.userId, req.user.role, page)
       for (const entry of registered.entries) {
         const ref = entry.applicability
@@ -96,6 +99,8 @@ async function resourcesResponse(req: Request, res: Response, schoolActivity?:{o
       const list = []
       for (const entry of entries.values()) {
         const ref = entry.applicability
+        const classificationTags:CatalogClassificationTag[]='classificationTagsByKey' in registered?registered.classificationTagsByKey[ref.resourceKey]??[]:[]
+        if(!matchesCatalogDiscovery([entry.title,ref.resourceKey],classificationTags,filters))continue
         productionRunResourceAuthorityRegistry.assertStartSupported(ref.resourceKind)
         // Entries are already release-checked; static adapters remain the
         // authority for static content. Registered entries need no second read.
@@ -106,9 +111,9 @@ async function resourcesResponse(req: Request, res: Response, schoolActivity?:{o
         const visiblePolicy=ref.resourceKey.startsWith('library-scale:')?{...policy,
           relationshipKinds:policy.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),
           ...(policy.allowedTargetModes?{allowedTargetModes:policy.allowedTargetModes.filter(mode=>mode!=='COURSE_TEACHER')}:{})}:policy
-        list.push({ title: entry.title, ...visiblePolicy })
+        list.push({ title: entry.title,classificationTags, ...visiblePolicy })
       }
-      return success(res, { list, ...('nextCursor' in registered?{nextCursor:registered.nextCursor}:{nextPage:registered.nextPage}) })
+      return success(res, { list,...(schoolActivity?{tagFacets:discoveryFacets(catalogDiscoveryRecords())}:{}), ...('nextCursor' in registered?{nextCursor:registered.nextCursor}:{nextPage:registered.nextPage}) })
     } catch (err) { return fail(res, err) }
   }
 

@@ -1,3 +1,5 @@
+import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets,sjtMetadataTagIds} from '../survey/catalog-discovery'
+import type {CatalogDiscoveryFilters,CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import type {AuthenticatedPrincipal} from '../../types'
@@ -14,7 +16,7 @@ export class EducationAssessmentCatalogError extends Error{
 export type EducationAssessmentCatalogInput={
  product:'SCHOOL'|'TEACHER';organizationId:string;workflowId:string;runId:string
  expectedVersion:number;actor:AuthenticatedPrincipal;cursor?:string
-}
+}&CatalogDiscoveryFilters
 const deny=(code:string,status=409):never=>{throw new EducationAssessmentCatalogError(code,status)}
 const unavailableCodes=new Set(['EDUCATION_ASSESSMENT_RESOURCE_NOT_AVAILABLE','EDUCATION_ASSESSMENT_ORIGINAL_ISSUER_REVOKED'])
 
@@ -55,11 +57,16 @@ export async function listEducationAssessmentResources(input:EducationAssessment
   if(input.product==='TEACHER'&&await tx.huiteacherStudentEvaluationConfig.findUnique({where:{
    organizationId_eventId:{organizationId:input.organizationId,eventId:input.workflowId}},select:{id:true}}))
    deny('HUITEACHER_STUDENT_EVAL_TRACK_READONLY',403)
-  const rows=await tx.$queryRaw<Array<{id:string;family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';version:string}>>(Prisma.sql`
-   SELECT id,family,entry->'educationOrigin'->>'adapterVersion' AS version FROM education_assessment_deliveries
-   WHERE product=${input.product} AND organization_id=${input.organizationId} AND status='PUBLISHED'
-    ${input.cursor?Prisma.sql`AND id>${input.cursor}`:Prisma.empty}
-   ORDER BY id LIMIT 11`)
+  const records=catalogDiscoveryRecords()
+  const rows=await tx.$queryRaw<Array<{id:string;family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';version:string;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`
+   SELECT discovery.tags AS "classificationTags",delivery.id,delivery.family,delivery.entry->'educationOrigin'->>'adapterVersion' AS version FROM education_assessment_deliveries delivery
+   LEFT JOIN composite_assessments source ON source.id=delivery.source_composite_id
+   LEFT JOIN measurement_content_releases measurement ON delivery.family<>'BUNDLE' AND measurement.id=delivery.entry#>>'{educationOrigin,units,0,measurement,releaseId}'
+   ${discoveryJoin(records,{kind:Prisma.sql`CASE WHEN delivery.family='COGNITIVE' THEN 'COGNITIVE' ELSE NULL END`,key:Prisma.sql`measurement.content#>>'{executable,testType}'`,version:Prisma.sql`NULL`,engine:Prisma.sql`measurement.content#>>'{executable,engineVersion}'`,scoring:Prisma.sql`measurement.content#>>'{executable,scoringVersion}'`},Prisma.sql`COALESCE(to_jsonb(source.tags),'[]'::jsonb)||CASE WHEN delivery.family='SITUATIONAL' THEN ${sjtMetadataTagIds(Prisma.sql`measurement.content->'executable'`)} ELSE '[]'::jsonb END`)}
+   WHERE delivery.product=${input.product} AND delivery.organization_id=${input.organizationId} AND delivery.status='PUBLISHED'
+    AND ${discoverySqlFilter([Prisma.sql`delivery.entry->>'title'`],input)}
+    ${input.cursor?Prisma.sql`AND delivery.id>${input.cursor}`:Prisma.empty}
+   ORDER BY delivery.id LIMIT 11`)
   const list=[]
   let unavailableCount=0
   for(const row of rows.slice(0,10)){
@@ -68,7 +75,7 @@ export async function listEducationAssessmentResources(input:EducationAssessment
     const source=await assertEducationAssessmentRunUse(tx,{actorUserId:input.actor.userId,organizationId:input.organizationId,runId:input.runId,resource})
     productionRunResourceAuthorityRegistry.assertStartSupported(resource.family)
     const policy=relationalEntryToRunPolicy(source.entry)
-    list.push({title:source.entry.title,...resource,product:input.product,organizationId:input.organizationId,
+    list.push({title:source.entry.title,classificationTags:row.classificationTags,...resource,product:input.product,organizationId:input.organizationId,
      releaseStatus:'PUBLISHED' as const,availability:'AVAILABLE' as const,educationOriginHash:source.entry.educationOriginHash,
      units:source.origin.units,requestedPolicy:{subjectRoles:[...policy.subjectRoles],respondentRoles:[...policy.respondentRoles],
       relationshipKinds:[...policy.relationshipKinds],perspectives:[...policy.perspectives],analysisMode:policy.analysisMode,
@@ -83,6 +90,6 @@ export async function listEducationAssessmentResources(input:EducationAssessment
    }
   }
   return {scope:{product:input.product,organizationId:input.organizationId,workflowId:input.workflowId,runId:input.runId,expectedVersion:run.version},
-   list,nextCursor:rows.length>10?rows[9].id:null,unavailableCount}
+   list,tagFacets:discoveryFacets(records),nextCursor:rows.length>10?rows[9].id:null,unavailableCount}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }
