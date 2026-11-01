@@ -15,10 +15,12 @@ vi.mock('../api/materialGrants',async()=>{
 const standard={id:'s1',name:'标准测试量表',code:'STANDARD',version:'1.0',status:'PUBLISHED',instrumentClass:'STANDARD',description:'量表介绍'}
 const custom={...standard,id:'s2',name:'自编测试量表',code:'CUSTOM',instrumentClass:'CUSTOM_DESCRIPTIVE'}
 const teacher={id:'t1',username:'trainer_test',nickname:'已审培训师',role:'TEACHER',teacherApproved:true,isActive:true,isFrozen:false}
+const page=(list:unknown[],current=1,total=list.length)=>({code:0,data:{list,page:current,pageSize:20,total,hasMore:current*20<total}})
+const cognitiveConfig={id:'c1',name:'开放认知配置',testType:'TASK',configVersion:'1',instruction:'任务介绍',accessPolicy:'OPEN'}
 const record={id:'g1',teacherId:'t1',resourceType:'SCALE',resourceId:'s1',createdAt:'2026-10-23T00:00:00Z',teacher,resource:standard,resourceMissing:false}
 beforeEach(()=>{
  vi.clearAllMocks()
- api.get.mockImplementation(url=>Promise.resolve(url==='/scales'?{code:0,data:{list:[standard,custom],total:2}}:{code:0,data:[]}))
+ api.get.mockImplementation(url=>Promise.resolve(url==='/scales'?page([standard,custom]):url==='/cognitive/configs'?page([cognitiveConfig]):page([])))
  grants.list.mockResolvedValue({code:0,data:{list:[]}})
  grants.listTeachers.mockResolvedValue({code:0,data:{list:[teacher,{...teacher,id:'pending',username:'pending_trainer',teacherApproved:false}],total:2}})
  grants.set.mockResolvedValue({code:0,data:{list:[]}});grants.remove.mockResolvedValue({code:0})
@@ -35,16 +37,24 @@ describe('Training inline resources and authorization',()=>{
   expect(within(screen.getByText(custom.name).closest('tr')!).getByRole('button',{name:'管理授权'})).toBeDisabled()
   expect(screen.getByText('精确版本共用库审批')).toBeVisible()
   expect(document.querySelector('a[href^="/scales"]')).toBeNull()
-  expect(api.get).toHaveBeenCalledExactlyOnceWith('/scales',{params:{page:1,pageSize:100,view:'training-catalog'}})
+  expect(api.get).toHaveBeenCalledExactlyOnceWith('/scales',{params:{page:1,pageSize:20,view:'training-catalog'}})
  })
- it('reads all catalog pages before global search and displays local paging without truncation',async()=>{
+ it('requests only the current server page and resets paging when applying a later-page tag',async()=>{
   const rows=Array.from({length:101},(_,index)=>({...standard,id:'s'+index,name:'量表 '+index}))
-  api.get.mockImplementation((_url,config)=>Promise.resolve({code:0,data:{list:config.params.page===1?rows.slice(0,100):rows.slice(100),total:101}}))
+  api.get.mockImplementation((_url,config)=>{
+   const {page:current,keyword,tags}=config.params
+   const list=keyword||tags?[rows[100]]:rows.slice((current-1)*20,current*20)
+   return Promise.resolve({...page(list,current,keyword||tags?1:101),data:{...page(list,current,keyword||tags?1:101).data,tagFacets:{domain:[{id:'domain:later',label:'后页分类'}]}}})
+  })
   render(<TrainingAdminResources/>);expect(await screen.findByText('量表 0')).toBeVisible();expect(screen.getByText('共 101 项资源 · 第 1 / 6 页')).toBeVisible()
-  fireEvent.click(screen.getByRole('button',{name:'下一页'}));expect(screen.getByText('量表 20')).toBeVisible()
+  expect(api.get).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button',{name:'下一页'}));expect(await screen.findByText('量表 20')).toBeVisible()
   fireEvent.click(screen.getByRole('button',{name:'资源检索'}))
-  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'量表 100'}});fireEvent.click(screen.getByRole('button',{name:'查询'}))
-  expect(screen.getByText('量表 100')).toBeVisible();expect(screen.getByText('共 1 项资源')).toBeVisible();expect(screen.queryByRole('button',{name:'下一页'})).not.toBeInTheDocument();expect(api.get).toHaveBeenCalledTimes(2)
+  fireEvent.change(screen.getByLabelText('领域'),{target:{value:'domain:later'}})
+  fireEvent.click(screen.getByRole('button',{name:'检索'}))
+  expect(await screen.findByText('量表 100')).toBeVisible();expect(screen.getByText('共 1 项资源')).toBeVisible();expect(screen.queryByRole('button',{name:'下一页'})).not.toBeInTheDocument()
+  expect(api.get).toHaveBeenLastCalledWith('/scales',{params:{page:1,pageSize:20,view:'training-catalog',tags:'domain:later'}})
+  expect(api.get).toHaveBeenCalledTimes(3)
  })
  it('treats incomplete catalog reads as errors and retries without granting partial data',async()=>{
   api.get.mockResolvedValueOnce({code:0,data:{list:[],total:4}})
@@ -56,18 +66,18 @@ describe('Training inline resources and authorization',()=>{
   let resolve!:(value:unknown)=>void;api.get.mockImplementationOnce(()=>new Promise(done=>{resolve=done}))
   render(<TrainingAdminResources/>);fireEvent.change(screen.getByRole('combobox',{name:'资源类型'}),{target:{value:'COGNITIVE_CONFIG'}})
   expect(await screen.findByText('开放认知配置')).toBeVisible()
-  await act(async()=>resolve({code:0,data:{list:[standard],total:1}}))
+  await act(async()=>resolve(page([standard])))
   expect(screen.queryByText(standard.name)).not.toBeInTheDocument()
  })
  it('filters resource lifecycle and permits only published ordinary-resource grants',async()=>{
-  api.get.mockResolvedValue({code:0,data:{list:[standard,{...standard,id:'draft',name:'草稿量表',status:'DRAFT'}],total:2}})
+  api.get.mockImplementation((_url,config)=>Promise.resolve(page(config.params.status==='DRAFT'?[{...standard,id:'draft',name:'草稿量表',status:'DRAFT'}]:[standard,{...standard,id:'draft',name:'草稿量表',status:'DRAFT'}])))
   render(<TrainingAdminResources/>);await screen.findByText(standard.name)
   openResourceActions('草稿量表')
   expect(within(screen.getByText('草稿量表').closest('tr')!).getByRole('button',{name:'管理授权'})).toBeDisabled()
   fireEvent.click(screen.getByRole('button',{name:'资源检索'}))
-  fireEvent.change(screen.getByRole('combobox',{name:'发布状态'}),{target:{value:'DRAFT'}});fireEvent.click(screen.getByRole('button',{name:'查询'}))
-  expect(screen.queryByText(standard.name)).not.toBeInTheDocument();expect(screen.getByText('草稿量表')).toBeVisible()
-  fireEvent.click(screen.getByRole('button',{name:'清除筛选'}));expect(screen.getByText(standard.name)).toBeVisible()
+  fireEvent.change(screen.getByRole('combobox',{name:'发布状态'}),{target:{value:'DRAFT'}});fireEvent.click(screen.getByRole('button',{name:'检索'}))
+  expect(screen.queryByText(standard.name)).not.toBeInTheDocument();expect(await screen.findByText('草稿量表')).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'清除筛选'}));expect(await screen.findByText(standard.name)).toBeVisible()
  })
  it('uses the existing complete grant editor, excludes unapproved teachers and saves the exact resource identity',async()=>{
   render(<TrainingAdminResources/>);await screen.findByText(standard.name)
@@ -88,7 +98,7 @@ describe('Training inline resources and authorization',()=>{
   await waitFor(()=>expect(cognitive.updateConfigAccessPolicy).toHaveBeenCalledExactlyOnceWith('c1','GRANT'))
  })
  it('keeps fixed bundle versions exact and blocks packages without publication eligibility',async()=>{
-  api.get.mockImplementation(url=>Promise.resolve(url==='/scales'?{code:0,data:{list:[],total:0}}:{code:0,data:[{name:'合格固定包',bundleKey:'fixed',bundleVersion:'2.1',status:'PUBLISHED',canInstantiate:true},{name:'未就绪固定包',bundleKey:'blocked',bundleVersion:'1',status:'PUBLISHED',canInstantiate:false,publicationBlockers:['资格缺失']}]}))
+  api.get.mockImplementation(url=>Promise.resolve(url==='/scales'?page([]):page([{name:'合格固定包',bundleKey:'fixed',bundleVersion:'2.1',status:'PUBLISHED',canInstantiate:true},{name:'未就绪固定包',bundleKey:'blocked',bundleVersion:'1',status:'PUBLISHED',canInstantiate:false,publicationBlockers:['资格缺失']}])) )
   render(<TrainingAdminResources/>);fireEvent.change(screen.getByRole('combobox',{name:'资源类型'}),{target:{value:'ASSESSMENT_BUNDLE'}})
   await screen.findByText('合格固定包');openResourceActions('未就绪固定包');openResourceActions('合格固定包');expect(within(screen.getByText('未就绪固定包').closest('tr')!).getByRole('button',{name:'管理授权'})).toBeDisabled()
   fireEvent.click(within(screen.getByText('合格固定包').closest('tr')!).getByRole('button',{name:'管理授权'}))
@@ -132,9 +142,9 @@ describe('Training inline resources and authorization',()=>{
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();expect(screen.getByRole('button',{name:'资源检索'})).toHaveFocus()
   fireEvent.click(screen.getByRole('button',{name:'资源检索'}));fireEvent.change(screen.getByRole('searchbox'),{target:{value:standard.code}})
   fireEvent.pointerDown(screen.getByRole('heading',{name:'资源与授权'}));expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button',{name:'资源检索'}));expect(screen.getByRole('searchbox')).toHaveValue(standard.code);fireEvent.click(screen.getByRole('button',{name:'查询'}))
+  fireEvent.click(screen.getByRole('button',{name:'资源检索'}));expect(screen.getByRole('searchbox')).toHaveValue(standard.code);fireEvent.click(screen.getByRole('button',{name:'检索'}))
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();expect(screen.getByText('关键词：STANDARD')).toBeVisible()
-  fireEvent.click(screen.getByRole('button',{name:'清除筛选'}));expect(screen.getByText(custom.name)).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'清除筛选'}));expect(await screen.findByText(custom.name)).toBeVisible()
   expect(grants.set).not.toHaveBeenCalled();expect(cognitive.updateConfigAccessPolicy).not.toHaveBeenCalled()
  })
  it('keeps grant searches and revocation collapsed without hiding the resource or trainer',async()=>{

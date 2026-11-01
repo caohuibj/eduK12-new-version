@@ -10,13 +10,14 @@ type Props = {
   facets: CatalogTagFacets
   onChange: (filters: CatalogFilters) => void
   onApply: (filters: CatalogFilters) => void
+  onReset?: () => void
   includeOrigin?: boolean
   disabled?: boolean
   label?: string
   showKeyword?: boolean
 }
 
-export default function CatalogDiscoveryFilters({ filters, facets, onChange, onApply, includeOrigin = false, disabled = false, label = '量表目录检索', showKeyword = true }: Props) {
+export default function CatalogDiscoveryFilters({ filters, facets, onChange, onApply, onReset, includeOrigin = false, disabled = false, label = '量表目录检索', showKeyword = true }: Props) {
   const advancedFacets = CATALOG_FACETS.filter(facet => facet !== 'domain' && facet !== 'population')
   const advancedCount = advancedFacets.filter(facet => filters[facet]).length + Number(includeOrigin && filters.origin !== 'ALL')
   const facetControl = (facet: typeof CATALOG_FACETS[number]) => <label key={facet}>{CATALOG_FACET_LABELS[facet]}
@@ -35,7 +36,7 @@ export default function CatalogDiscoveryFilters({ filters, facets, onChange, onA
       {facetControl('population')}
       <div className="catalog-discovery-actions">
         <button type="submit"><Search size={16} aria-hidden="true" />检索</button>
-        <button type="button" onClick={() => { onChange({ ...EMPTY_CATALOG_FILTERS }); onApply({ ...EMPTY_CATALOG_FILTERS }) }}>清除筛选</button>
+        <button type="button" onClick={() => { if(onReset){onReset();return}onChange({ ...EMPTY_CATALOG_FILTERS }); onApply({ ...EMPTY_CATALOG_FILTERS }) }}>清除筛选</button>
       </div>
       <details className="catalog-discovery-advanced">
         <summary>更多筛选{advancedCount > 0 ? `（${advancedCount} 项已选）` : ''}</summary>
