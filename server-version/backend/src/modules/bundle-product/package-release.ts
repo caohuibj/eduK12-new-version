@@ -1,5 +1,5 @@
 import { verifyPackageFixtures } from '../assessment-bundle/onboarding/fixtures'
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto'
 import { Prisma, PrismaClient, type BundlePackageRelease } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalJsonString } from '../assessment-runtime/canonical'
@@ -28,7 +28,15 @@ export async function installPackage(db:PrismaClient,actorId:string,raw:unknown)
     const where={bundleKey_bundleVersion:{bundleKey:d.bundleKey,bundleVersion:d.bundleVersion}}
     const previous=await tx.bundlePackageRelease.findUnique({where})
     if(previous){if(previous.contentHash!==hash)throw new Error('BUNDLE_VERSION_IMMUTABLE');return previous}
-    return tx.bundlePackageRelease.create({data:{bundleKey:d.bundleKey,bundleVersion:d.bundleVersion,contentHash:hash,content:p as unknown as Prisma.InputJsonValue,installedBy:actorId}})
+    // Bind the JSON text directly: the Prisma 5.22 JSON-object write path
+    // changes some valid fractional numbers before they reach jsonb.
+    const [installed] = await tx.$queryRaw<BundlePackageRelease[]>`
+      INSERT INTO bundle_package_releases
+        (id, "bundleKey", "bundleVersion", "contentHash", content, "installedBy", "updatedAt")
+      VALUES (${randomUUID()}, ${d.bundleKey}, ${d.bundleVersion}, ${hash}, ${JSON.stringify(p)}::jsonb, ${actorId}, CURRENT_TIMESTAMP)
+      RETURNING *
+    `
+    return installed
   })
 }
 async function assertPublishedDependencies(db: Prisma.TransactionClient, p: ReturnType<typeof parseDeclarativePackage>) {
