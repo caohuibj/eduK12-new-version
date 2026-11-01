@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "sentencecheck",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Self-generated four-cell stimuli; independently specified all-correct metrics (four RTs: two 500ms and two 800ms); no empirical validation claim.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "trueRatio": 0.5,
+          "negationRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "sentencecheck-v1.1-golden",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "shape": "triangle",
+              "color": "blue",
+              "questionKind": "color",
+              "negated": false,
+              "askedValue": "蓝色",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "shape": "circle",
+              "color": "yellow",
+              "questionKind": "color",
+              "negated": true,
+              "askedValue": "黄色",
+              "response": false,
+              "rtMs": 800,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "shape": "triangle",
+              "color": "red",
+              "questionKind": "shape",
+              "negated": true,
+              "askedValue": "圆形",
+              "response": true,
+              "rtMs": 800,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "shape": "circle",
+              "color": "red",
+              "questionKind": "shape",
+              "negated": false,
+              "askedValue": "方形",
+              "response": false,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "medianRtMs": 650,
+          "negationPenaltyMs": 300,
+          "errorCount": 0,
+          "timeoutCount": 0,
+          "validRtCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "trueRatio": 0.5,
+          "negationRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "sentencecheck-v1.1-golden",
+        "trials": []
+      },
+      "expectedError": "sentencecheck v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "trueRatio": 0.5,
+          "negationRatio": 0.5,
+          "fixationMs": 500,
+          "timeoutMs": 8000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "sentencecheck-v1.1-golden",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "shape": "triangle",
+              "color": "blue",
+              "questionKind": "color",
+              "negated": false,
+              "askedValue": "蓝色",
+              "response": true,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "sentencecheck v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

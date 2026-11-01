@@ -1,5 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
+// Original C/S/R declarations remain addressable; R3 is explicit per identity.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -270,6 +271,311 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "label": "区组数"
           }
         ]
+      }
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "cardsort",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "title": "跟着提示分卡片",
+    "metrics": {
+      "switchCostRtMs": {
+        "label": "换规则比沿用规则多用的时间",
+        "explanation": "规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。",
+        "singleExplanation": "规则转换额外耗时：切换规则试次相对重复规则试次增加的反应时间。"
+      },
+      "switchCostAccuracy": {
+        "label": "规则转换准确率代价",
+        "explanation": "准确率转换代价：切换规则时相对重复规则时的正确率变化。",
+        "singleExplanation": "准确率转换代价：切换规则时相对重复规则时的正确率变化。"
+      },
+      "perseverativeErrorRate": {
+        "label": "仍按旧规则作答的比例",
+        "explanation": "规则转换后仍按上一规则作答的比例。",
+        "singleExplanation": "规则转换后仍按上一规则作答的比例。"
+      },
+      "postSwitchRecovery": {
+        "label": "换规则后的恢复记录",
+        "explanation": "转换后的重复试次正确率减去转换试次正确率。",
+        "singleExplanation": "转换后的重复试次正确率减去转换试次正确率。"
+      },
+      "accuracySwitch": {
+        "label": "换规则时答对比例",
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
+      },
+      "accuracyRepeat": {
+        "label": "沿用规则且卡片有冲突时答对比例",
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
+      },
+      "medianRtSwitch": {
+        "label": "转换条件典型反应时间",
+        "explanation": "规则转换试次中正确有效反应时间的中位数。",
+        "singleExplanation": "规则转换试次中正确有效反应时间的中位数。"
+      },
+      "medianRtRepeat": {
+        "label": "重复条件典型反应时间",
+        "explanation": "规则重复且答案冲突的试次中正确有效反应时间的中位数。",
+        "singleExplanation": "规则重复且答案冲突的试次中正确有效反应时间的中位数。"
+      },
+      "overallAccuracy": {
+        "label": "总体准确率",
+        "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。",
+        "singleExplanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
+      },
+      "omissionRate": {
+        "label": "未反应比例",
+        "explanation": "遗漏比例：应该响应但没有响应的比例。",
+        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
+      },
+      "perseverativeErrorCount": {
+        "label": "持续性错误次数",
+        "explanation": "规则转换后仍按上一规则选择的次数。",
+        "singleExplanation": "规则转换后仍按上一规则选择的次数。"
+      }
+    },
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
+      "experience": {
+        "tier": "PILOT",
+        "profileLabel": "体验版",
+        "participantConclusion": "这份报告描述本次跟着提示分卡片的作答记录。",
+        "reportCaveats": [
+          "24题/2组，4题练习；含说明与组间自定休息约2–3分钟（配置估计，未实测）。8次切换不足以据单次差值判断稳定灵活性。",
+          "体验24题分2组，每组12题；每组第一题不计切换/重复，按现有生成规则共8次切换和14次重复。计分只从重复题中选出颜色与形状指向不同答案的题作对照，所以实际对照分母随本次种子变化，并非14题全部纳入；仍不把单次时间差视为稳定切换能力。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "正式版",
+        "participantConclusion": "这份报告描述本次跟着提示分卡片的作答记录。",
+        "reportCaveats": [
+          "只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究版",
+        "participantConclusion": "这份报告描述本次跟着提示分卡片的作答记录。",
+        "reportCaveats": [
+          "研究版是本项目的较长配置；材料、题量或时序与参考研究有差异，详见方法附注。增加题量不等于已经证实可靠性。",
+          "只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "每题先读“颜色/形状”，再看卡片。发现错了，就回到当前提示；不必凭记忆猜接下来是什么规则。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "只描述本次作答过程；屏幕、输入方式、疲劳、知识与练习经历都可能影响记录。没有经过验证的同龄人排名、诊断或稳定能力结论。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "这一次，按颜色还是按形状？",
+      "introduction": "同一张卡片，换个规则就可能要去另一边。先读本题提示，再把它送到合适的位置。",
+      "summary": {
+        "template": "这次换分类规则后的正确比例是 {accuracySwitch}；换规则与沿用规则时，通常用时相差 {switchCostRtMs}。",
+        "metricKeys": [
+          "switchCostRtMs",
+          "accuracySwitch"
+        ]
+      },
+      "studentMetricKeys": [
+        "switchCostRtMs",
+        "accuracySwitch",
+        "accuracyRepeat"
+      ],
+      "processMetricKeys": [],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientSwitchTrials",
+        "insufficientRepeatTrials"
+      ],
+      "metricGates": {},
+      "nextStep": "每题先读“颜色/形状”，再看卡片。发现错了，就回到当前提示；不必凭记忆猜接下来是什么规则。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracySwitch",
+          "accuracyRepeat"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "rules",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "屏幕会明确提示按颜色或形状分类。比较规则刚改变与沿用上一题规则时的记录，看看这次切换规则的过程；不是让你猜一个隐藏规则。",
+        "takeaway": "换规则时出错，不等于不灵活。用时差、正确比例和是否沿用旧规则，需放在本次题量与具体题面中一起看。",
+        "exampleTitle": "把过程放进一个生活场景",
+        "example": "整理玩具时，先按颜色放，再改成按形状放，需要重新留意分类依据。这是规则切换的例子，不能据此评定现实中的适应力。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "先看提示",
+            "text": "这题按颜色，还是按形状？"
+          },
+          {
+            "title": "再分卡片",
+            "text": "按本题规则选左边或右边。"
+          },
+          {
+            "title": "换了就重看",
+            "text": "下一题规则可能改变，不沿用上一题答案。"
+          }
+        ],
+        "boundary": "体验24题分2组，每组12题；每组第一题不计切换/重复，按现有生成规则共8次切换和14次重复。计分只从重复题中选出颜色与形状指向不同答案的题作对照，所以实际对照分母随本次种子变化，并非14题全部纳入；仍不把单次时间差视为稳定切换能力。",
+        "metricHelp": {
+          "switchCostRtMs": {
+            "label": "换规则比沿用规则多用的时间",
+            "explanation": "换规则和沿用规则时的典型用时差；快慢要连同正确率看。"
+          },
+          "switchCostAccuracy": {
+            "label": "换规则时，正确比例的变化",
+            "explanation": "沿用规则的正确比例减去换规则的正确比例。"
+          },
+          "accuracySwitch": {
+            "label": "换规则时答对比例",
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
+          },
+          "accuracyRepeat": {
+            "label": "沿用规则且卡片有冲突时答对比例",
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。 对照只含两种规则答案相冲突的重复题。"
+          },
+          "omissionRate": {
+            "label": "需要回应时，没有留下回应",
+            "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+          },
+          "perseverativeErrorCount": {
+            "label": "继续沿用旧规则的记录",
+            "explanation": "按任务规则统计的这类错误次数，不能据此判断性格。"
+          },
+          "overallAccuracy": {
+            "label": "总体准确率",
+            "explanation": "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。"
+          },
+          "perseverativeErrorRate": {
+            "label": "仍按旧规则作答的比例",
+            "explanation": "规则转换后仍按上一规则作答的比例。"
+          },
+          "postSwitchRecovery": {
+            "label": "换规则后的恢复记录",
+            "explanation": "转换后的重复试次正确率减去转换试次正确率。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "规则分类转换与持续性错误",
+        "procedure": "按当前冻结规则校验分类，分别统计转换/重复表现、持续性错误和转换后恢复。 方法与文献核对：研究档144题/6组，每组24题；每组round(23×0.33)=8次切换，共48切换/90重复/6起始题。题间350毫秒、提示500毫秒、响应窗2000毫秒。4题练习至少对3题。Zelazo(2006), DOI 10.1038/nprot.2006.46，原DCCS是先按一维后改另一维，本项目为逐题提示并多次切换；切换题限定冲突卡，对照只纳入冲突重复题，属于项目研究变式，不是标准DCCS或威斯康星卡片分类。只取得原摘要，未核全文练习/精确题量。",
+        "interpretation": "研究版是本项目的较长配置，不是标准化或信效度认证。体验24题分2组，每组12题；每组第一题不计切换/重复，按现有生成规则共8次切换和14次重复。计分只从重复题中选出颜色与形状指向不同答案的题作对照，所以实际对照分母随本次种子变化，并非14题全部纳入；仍不把单次时间差视为稳定切换能力。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
+          "题量和条件内有效记录较少时，单次差值容易波动；本项目未测定本档指标的重测可靠性。"
+        ],
+        "metricNotes": {
+          "switchCostRtMs": {
+            "definition": "切换条件的正确反应中位 RT 减去重复条件的正确反应中位 RT。",
+            "readingHint": "同时审阅条件准确率与试次覆盖；负差值保留，不转化为能力等级。"
+          },
+          "switchCostAccuracy": {
+            "definition": "重复条件正确率减去切换条件正确率。",
+            "readingHint": "是条件比例差值，不能忽略分母及速度—准确率权衡。"
+          },
+          "perseverativeErrorRate": {
+            "definition": "规则转换后仍按上一规则作答的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "postSwitchRecovery": {
+            "definition": "转换后的重复试次正确率减去转换试次正确率。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "accuracySwitch": {
+            "definition": "规则发生转换时正确作答的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "accuracyRepeat": {
+            "definition": "规则重复且两种规则答案冲突时正确作答的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "medianRtSwitch": {
+            "definition": "规则转换试次中正确有效反应时间的中位数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "medianRtRepeat": {
+            "definition": "规则重复且答案冲突的试次中正确有效反应时间的中位数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "overallAccuracy": {
+            "definition": "所有正式试次中正确且反应时间有效的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "perseverativeErrorCount": {
+            "definition": "规则转换后仍按上一规则选择的次数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式题数/轮数"
+          },
+          {
+            "key": "blockCount",
+            "label": "分组数"
+          },
+          {
+            "key": "switchRatio",
+            "label": "每组后续题的计划切换比例"
+          },
+          {
+            "key": "cueMs",
+            "label": "规则提示时长（毫秒）"
+          },
+          {
+            "key": "stimulusMs",
+            "label": "呈现或响应窗（毫秒，以任务说明为准）"
+          },
+          {
+            "key": "isiMs",
+            "label": "题间间隔（毫秒）"
+          }
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "这次短体验：这次换分类规则后的正确比例是 {accuracySwitch}；换规则与沿用规则时，通常用时相差 {switchCostRtMs}。 只描述本次记录，不能据此认定稳定能力。",
+          "metricKeys": [
+            "switchCostRtMs",
+            "accuracySwitch"
+          ]
+        }
       }
     }
   }

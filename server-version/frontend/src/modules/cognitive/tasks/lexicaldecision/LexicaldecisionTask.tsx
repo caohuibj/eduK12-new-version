@@ -1,3 +1,4 @@
+import { reportIntroV3 } from './report-intro-v3'
 import { CognitiveTaskIntro } from '../shared/CognitiveTaskPresentation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -15,6 +16,7 @@ export const LexicaldecisionTask: React.FC<CognitiveTaskProps> = ({
   onTaskComplete,
 }) => {
   const config = taskContext.config as {
+    report?: { reportVersion?: string }
     totalTrials?: number
     stimulusMs?: number
     trialTimeoutMs?: number
@@ -184,7 +186,7 @@ export const LexicaldecisionTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="中文词汇判断" description={<p>判断屏幕上的字符串是不是中文真词。可以点击按钮，也可以按 1 / W 选择“真词”，按 2 / N 选择“伪词”。</p>} hint={<><p>先完成 4 道练习，至少答对 3 道再开始。练习不计入正式结果；正式作答时请兼顾准确和速度。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro title={config.report?.reportVersion === '3.0.0' ? reportIntroV3.title : "中文词汇判断"} description={config.report?.reportVersion === '3.0.0' ? <p>{reportIntroV3.description}</p> : <p>判断屏幕上的字符串是不是中文真词。可以点击按钮，也可以按 1 / W 选择“真词”，按 2 / N 选择“伪词”。</p>} hint={config.report?.reportVersion === '3.0.0' ? <p>本次正式任务共 {totalTrials}{reportIntroV3.unit}。{reportIntroV3.hint}</p> : <><p>先完成 4 道练习，至少答对 3 道再开始。练习不计入正式结果；正式作答时请兼顾准确和速度。</p></>} onAction={startPractice} />
     )
   }
 

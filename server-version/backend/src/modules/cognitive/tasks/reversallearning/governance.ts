@@ -12,6 +12,6 @@ export const catalog: CognitiveLibraryCatalogEntry = {
       '不作人格、风险偏好或决策能力判断。',
       '未达 criterion 时指标解释受限。',
     ],
-    sourceNotes: ['Reversal learning 经典范式（内部实现）。'],
+    sourceNotes: ['Cools et al. (2002), DOI 10.1523/JNEUROSCI.22-11-04563.2002, https://pmc.ncbi.nlm.nih.gov/articles/PMC6758810/；实际核Materials and Methods。原单侧误导负反馈不等于双选项80/20；本项目固定一次反转为变式。'],
     rightsProvenance: 'internal-generated',
   }

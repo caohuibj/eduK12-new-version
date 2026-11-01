@@ -364,3 +364,497 @@ export type StroopTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Numberline 冻结 config（与后端 numberline.config schema 一致）。 */
+export interface NumberlineConfig {
+  totalTrials: number
+  lineMax: number
+  maxResponseMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Numberline 单 trial payload（与后端 numberline.trial schema 一致）。 */
+export type NumberlineTrialPayload = {
+  targetNumber: number
+  responsePosition: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+/** Arithverify 冻结 config（与后端 arithverify.config schema 一致）。 */
+export interface ArithverifyConfig {
+  totalTrials: number
+  operandMax: number
+  trueRatio: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Arithverify 单 trial payload（与后端 arithverify.trial schema 一致）。 */
+export type ArithverifyTrialPayload = {
+  leftOperand: number
+  rightOperand: number
+  displayedResult: number
+  response: boolean | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+/** Sizecongruity 冻结 config（与后端 sizecongruity.config schema 一致）。 */
+export interface SizecongruityConfig {
+  totalTrials: number
+  congruentRatio: number
+  minDigit: number
+  maxDigit: number
+  minGap: number
+  fontLargeRem: number
+  fontSmallRem: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Sizecongruity 单 trial payload（与后端 sizecongruity.trial schema 一致）。 */
+export type SizecongruityTrialPayload = {
+  leftDigit: number
+  rightDigit: number
+  leftFontScale: 'large' | 'small'
+  rightFontScale: 'large' | 'small'
+  response: 'left' | 'right' | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+/** Delaydiscount 冻结 config（与后端 delaydiscount.config schema 一致）。 */
+export interface DelaydiscountConfig {
+  delayBands: number[]
+  delayedAmount: number
+  bisectionSteps: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Delaydiscount 单 trial payload（与后端 delaydiscount.trial schema 一致）。 */
+export type DelaydiscountTrialPayload = {
+  delayDays: number
+  delayedAmount: number
+  immediateAmount: number
+  choice: 'now' | 'later' | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+/** Gamblingdeck 冻结 config（与后端 gamblingdeck.config schema 一致）。 */
+export interface GamblingdeckConfig {
+  totalTrials: number
+  blockSize: number
+  fixationMs: number
+  feedbackMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Gamblingdeck 单 trial payload（与后端 gamblingdeck.trial schema 一致）。 */
+export type GamblingdeckTrialPayload = {
+  deck: 'A' | 'B' | 'C' | 'D'
+  rtMs: number | null
+  interrupted: boolean
+}
+
+export type GamblingdeckDeck = GamblingdeckTrialPayload['deck']
+
+/** Symbolmatch 冻结 config（与后端 symbolmatch.config schema 一致）。 */
+export interface SymbolmatchConfig {
+  totalTrials: number
+  symbolDigitMap: Array<[string, number]>
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Symbolmatch 单 trial payload（与后端 symbolmatch.trial schema 一致）。 */
+export type SymbolmatchTrialPayload = {
+  symbol: string
+  response: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+/** Runningspan 冻结 config（与后端 runningspan.config schema 一致）。 */
+export interface RunningspanConfig {
+  totalTrials: number
+  listLengthMin: number
+  listLengthMax: number
+  recallLength: number
+  stimulusMs: number
+  isiMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Runningspan 单 trial payload（与后端 runningspan.trial schema 一致）。 */
+export type RunningspanTrialPayload = {
+  sequence: string[]
+  response: string[]
+  responseDurationMs: number
+  interrupted: boolean
+}
+
+/** Sentencecheck 冻结 config（与后端 sentencecheck.config schema 一致）。 */
+export interface SentencecheckConfig {
+  totalTrials: number
+  trueRatio: number
+  negationRatio: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Sentencecheck 单 trial payload（与后端 sentencecheck.trial schema 一致）。 */
+export type SentencecheckTrialPayload = {
+  shape: 'circle' | 'square' | 'triangle'
+  color: 'red' | 'blue' | 'green' | 'yellow'
+  questionKind: 'shape' | 'color'
+  negated: boolean
+  askedValue: string
+  response: boolean | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+
+
+/** Seqlearn 冻结 config（与后端 seqlearn.config schema 一致）。 */
+export interface SeqlearnConfig {
+  totalTrials: number
+  trialsPerBlock: number
+  patternSequence: number[]
+  randomBlockIndices: number[]
+  fixationMs: number
+  stimulusMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Seqlearn 单 trial payload（与后端 seqlearn.trial schema 一致）。 */
+export type SeqlearnTrialPayload = {
+  position: number
+  response: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+/** Timecopy 冻结 config（与后端 timecopy.config schema 一致）。 */
+export interface TimecopyConfig {
+  totalTrials: number
+  targetMinMs: number
+  targetMaxMs: number
+  maxResponseMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Timecopy 单 trial payload（与后端 timecopy.trial schema 一致）。 */
+export type TimecopyTrialPayload = {
+  targetMs: number
+  responseMs: number
+  interrupted: boolean
+}
+
+
+
+
+export interface LetternumseriesConfig {
+  totalTrials: number
+  lettersPerTrial: number
+  digitsPerTrial: number
+  stimulusMs: number
+  isiMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type LetternumseriesTrialPayload = {
+  sequence: string[]
+  lettersResponse: string[]
+  digitsResponse: string[]
+  responseDurationMs: number
+  interrupted: boolean
+}
+
+export interface SemanticfluencyConfig {
+  totalTrials: number
+  durationMs: number
+  stimulusSetVersion: string
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type SemanticfluencyTrialPayload = {
+  category: 'animals' | 'fruits'
+  responses: string[]
+  responseDurationMs: number
+  interrupted: boolean
+}
+
+export interface CancellationConfig {
+  totalTrials: number
+  durationMs: number
+  stimulusSetVersion: string
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type CancellationTrialPayload = {
+  scanIndex: number
+  selectedCells: number[]
+  responseDurationMs: number
+  interrupted: boolean
+}
+
+export interface TrustgameConfig {
+  offers: number[]
+  potTotal: number
+  fixationMs: number
+  timeoutMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type TrustgameTrialPayload = {
+  roundIndex: number
+  offerToSelf: number
+  response: 'accept' | 'reject' | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+
+
+export interface UfovConfig {
+  totalTrials: number
+  stimulusMs: number
+  fixationMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type UfovTrialPayload = {
+  centralTarget: 'circle' | 'triangle'
+  peripheralPosition: number
+  centralResponse: number | null
+  peripheralResponse: number | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+export interface PursuitrotorConfig {
+  totalTrials: number
+  trackMs: number
+  revolutionMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type PursuitrotorTrialPayload = {
+  trialIndex: number
+  timeOnTargetMs: number
+  totalTrackMs: number
+  interrupted: boolean
+}
+
+export interface VisualwmConfig {
+  totalTrials: number
+  studyMs: number
+  retentionMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type VisualwmTrialPayload = {
+  setSize: number
+  isChange: boolean
+  response: 'same' | 'change' | null
+  rtMs: number | null
+  interrupted: boolean
+}
+
+export interface MazeConfig {
+  totalTrials: number
+  mazeCols: number
+  mazeRows: number
+  timeLimitMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type MazeTrialPayload = {
+  mazeIndex: number
+  moves: number[]
+  completionTimeMs: number | null
+  completed: boolean
+  interrupted: boolean
+}
+
+export interface AuditoryrtConfig {
+  totalTrials: number
+  foreperiodMinMs: number
+  foreperiodMaxMs: number
+  toneFrequencyHz: number
+  toneDurationMs: number
+  maxRtWindowMs: number
+  interTrialIntervalMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type AuditoryrtTrialPayload = {
+  trialIndex: number
+  foreperiodMs: number
+  rtMs: number | null
+  interrupted: boolean
+  audioLatencyMs: number | null
+}
+
+export interface AuditorynbackConfig {
+  nLevel: number
+  totalTrials: number
+  targetRatio: number
+  stimulusMs: number
+  isiMs: number
+  toneFrequenciesHz: number[]
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type AuditorynbackTrialPayload = {
+  trialIndex: number
+  toneIndex: number
+  responded: boolean
+  rtMs: number | null
+  interrupted: boolean
+  audioLatencyMs: number | null
+}
+
+
+export interface LineangleConfig {
+  totalTrials: number
+  angleStepDeg: number
+  optionCount: number
+  minAngleSepSteps: number
+  fixationMs: number
+  timeoutMs: number
+  validRtFloorMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+export type LineangleTrialPayload = {
+  targetAngle: number
+  optionAngles: number[]
+  responseAngle: number | null
+  rtMs: number | null
+  interrupted: boolean
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "task": "cogest",
+  "order": 129,
+  "identities": [
+    {
+      "testType": "cogest",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 129
+    },
+    {
+      "testType": "cogest",
+      "engineVersion": "1.1.0",
+      "scoringVersion": "1.1.0",
+      "order": 1129
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "cogest",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/cogest/cogest.registry.ts",
+      "export": "cogestRegistryEntry"
+    },
+    {
+      "testType": "cogest",
+      "engineVersion": "1.1.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/cogest/cogest.registry-v1.1.ts",
+      "export": "cogestRegistryEntryV11"
+    }
+  ],
+  "banks": [
+    {
+      "file": "bank.ts",
+      "export": "bankMeta"
+    },
+    {
+      "file": "bank-v1.1.ts",
+      "export": "bankMeta"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      129,
+      129,
+      129
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/cogest/__tests__/CogestTask.test.tsx",
+      "src/modules/cognitive/tasks/cogest/__tests__/prng.test.ts",
+      "src/modules/cognitive/tasks/cogest/__tests__/audit-v1.1.test.tsx",
+      "src/modules/cognitive/__tests__/bank-intake-host.test.tsx"
+    ]
+  }
+}

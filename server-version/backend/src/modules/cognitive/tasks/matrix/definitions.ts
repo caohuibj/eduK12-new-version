@@ -25,5 +25,16 @@ export const matrixRegistryMeta = {
   } as Record<string, QualityDefinition>,
   reportDefinitionVersion: '1.0.0',
   reportDefinition: { title: '矩阵规则推理', headlineMetric: 'accuracy', primaryMetrics: ['accuracy', 'accuracyByRuleFamily'], secondaryMetrics: ['reachedDifficulty', 'medianRtMs', 'omissionRate'], practicalTips: ['正确率按规则族和难度覆盖一起阅读，不换算 IQ 或智力等级。'], disclaimer: '结果只反映本次内部矩阵规则任务表现，不是 Raven、IQ、临床判断或人口常模。' } satisfies SingleTaskReportDefinition,
-  recommendedForCreate: true,
+  recommendedForCreate: false,
+}
+
+/** Practice-only protocol revision; the 24 formal items and score formulas are unchanged. */
+export const matrixRegistryMetaV11={...matrixRegistryMeta,
+ profileDefinitionVersion:'1.1.0',reportDefinitionVersion:'1.4.0',
+ profiles:{
+  experience:{...matrixRegistryMeta.profiles.experience,reportCaveats:['6道正式题；另有4道独立练习，不将少量题目解释为稳定子能力。']},
+  standard:{...matrixRegistryMeta.profiles.standard,reportCaveats:['16道正式题；独立练习不含正式题面，题池仍是本项目生成变式。']},
+  research:{...matrixRegistryMeta.profiles.research,reportCaveats:['24个正式试次；练习与正式题面隔离，正式池仍可能在不同标签下重用同一题面，未验证常模或等值。']},
+ },
+ reportDefinition:{...matrixRegistryMeta.reportDefinition,showProductIndex:false},recommendedForCreate:true,
 }

@@ -191,6 +191,126 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['面孔身份与目标情绪（合成集 + seed）', '正确应答'],
     serverDerivedFacts: ['正确性判定', 'metrics（balancedAccuracy/confusionMatrix）', 'quality flags'],
   },
+  numberline: {
+    testType: 'numberline',
+    clientObservedFacts: ['线上点击位置比例（responsePosition）', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['逐试次目标数（seed/config 分层序列）', '数字线端点（frozen config）'],
+    serverDerivedFacts: ['估计值/绝对误差/符号误差换算', 'metrics（paePercent/biasPercent/withinTenRate）', 'quality flags'],
+  },
+  arithverify: {
+    testType: 'arithverify',
+    clientObservedFacts: ['对/错判断响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['操作数与呈现结果（seed/config）', '等式真伪（由操作数权威推导）'],
+    serverDerivedFacts: ['等式真伪与正确性判定', 'metrics（accuracy/medianRtMs/problemSizeSlopeMs）', 'quality flags'],
+  },
+  sizecongruity: {
+    testType: 'sizecongruity',
+    clientObservedFacts: ['左/右侧判断响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['数字对与字号条件（seed/config）', '数值较大侧（由数字权威推导）'],
+    serverDerivedFacts: ['较大侧与一致性条件判定', 'metrics（sizeCongruityEffectMs/条件RT与正确率）', 'quality flags'],
+  },
+  delaydiscount: {
+    testType: 'delaydiscount',
+    clientObservedFacts: ['now/later 选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['延迟带与延后全额（frozen config）', '每步即时金额（二分轨迹可由选择权威复核）'],
+    serverDerivedFacts: ['二分轨迹校验与无差异点', 'metrics（aucDelayDiscounting/laterChoiceRate）', 'quality flags'],
+  },
+  gamblingdeck: {
+    testType: 'gamblingdeck',
+    clientObservedFacts: ['箱选择（A-D）', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['每箱计划内位置（由选择序列权威推导）', '奖惩计划（scoringVersion 钉死）'],
+    serverDerivedFacts: ['逐试次净结果', 'metrics（advantageousChoiceRate/netScore/blockTrendSlope/deckChoiceRates）', 'quality flags'],
+  },
+  symbolmatch: {
+    testType: 'symbolmatch',
+    clientObservedFacts: ['数字选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['符号序列（seed/config 均匀生成）', '符号-数字映射（frozen config）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/medianRtMs）', 'quality flags'],
+  },
+  runningspan: {
+    testType: 'runningspan',
+    clientObservedFacts: ['按序回忆的字母序列', '回忆用时', 'interrupted'],
+    runtimeReconstructableFacts: ['呈现序列（seed/config）与呈现时序（frozen config）'],
+    serverDerivedFacts: ['目标窗口与串行正确性', 'metrics（runningSpanAccuracy/intrusionRate）', 'quality flags'],
+  },
+  sentencecheck: {
+    testType: 'sentencecheck',
+    clientObservedFacts: ['相符/不相符判断', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['形状/颜色事实（seed/config）', '句式模板（frozen config 模板结构）'],
+    serverDerivedFacts: ['陈述真伪与正确性判定', 'metrics（accuracy/negationPenaltyMs）', 'quality flags'],
+  },
+  seqlearn: {
+    testType: 'seqlearn',
+    clientObservedFacts: ['位置按键选择', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['冻结重复序列与随机块位置（config）', '模式块位置（由序列权威推导）'],
+    serverDerivedFacts: ['模式块位置校验与正确性', 'metrics（srtPatternAdvantageMs/条件RT）', 'quality flags'],
+  },
+  timecopy: {
+    testType: 'timecopy',
+    clientObservedFacts: ['复制起止按键时长', 'interrupted'],
+    runtimeReconstructableFacts: ['目标间隔（seed/config 分层序列）', '复制时长上限（frozen config）'],
+    serverDerivedFacts: ['相对误差与方向偏差', 'metrics（meanAbsErrorRatio/biasRatio/withinTwentyRate）', 'quality flags'],
+  },
+  letternumseries: {
+    testType: 'letternumseries',
+    clientObservedFacts: ['两段按序回忆输入', '回忆用时', 'interrupted'],
+    runtimeReconstructableFacts: ['呈现序列（seed/config）与呈现时序（frozen config）'],
+    serverDerivedFacts: ['字母序/数字序串行正确性', 'metrics（overallAccuracy/lettersAccuracy/digitsAccuracy）', 'quality flags'],
+  },
+  semanticfluency: {
+    testType: 'semanticfluency',
+    clientObservedFacts: ['自由输入的词序列', '输入用时', 'interrupted'],
+    runtimeReconstructableFacts: ['类别轮次（seed/config）', '词库与归一化口径（frozen bank）'],
+    serverDerivedFacts: ['归一化匹配/去重/侵入判定', 'metrics（uniqueValidPerTrial/intrusionRate）', 'quality flags'],
+  },
+  cancellation: {
+    testType: 'cancellation',
+    clientObservedFacts: ['最终选中的格子集合', '扫描用时', 'interrupted'],
+    runtimeReconstructableFacts: ['符号网格与目标集（seed+scan 重建）'],
+    serverDerivedFacts: ['命中/漏报/误报求交判定', 'metrics（hitRate/falseAlarmRate）', 'quality flags'],
+  },
+  trustgame: {
+    testType: 'trustgame',
+    clientObservedFacts: ['接受/拒绝选择', '决策用时', 'interrupted'],
+    runtimeReconstructableFacts: ['提议序列（frozen config）'],
+    serverDerivedFacts: ['公平划分判定与接受率', 'metrics（acceptanceRate/unfairAcceptanceRate）', 'quality flags'],
+  },
+  ufov: {
+    testType: 'ufov',
+    clientObservedFacts: ['中心判别选择', '周边位置选择', '串联作答用时', 'interrupted'],
+    runtimeReconstructableFacts: ['中心图形与周边位置（seed+trialIndex 重建）'],
+    serverDerivedFacts: ['中心正确性/周边正确性/双重正确性', 'metrics（dualCorrectRate/centralAccuracy/peripheralAccuracy）', 'quality flags'],
+  },
+  pursuitrotor: {
+    testType: 'pursuitrotor',
+    clientObservedFacts: ['在目标上时间', '总追踪时长', 'interrupted'],
+    runtimeReconstructableFacts: ['轨道参数（frozen config 圆轨恒速）'],
+    serverDerivedFacts: ['追踪时间比换算', 'metrics（onTargetRate）', 'quality flags'],
+  },
+  visualwm: {
+    testType: 'visualwm',
+    clientObservedFacts: ['变化判断响应', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['记忆阵列与变化位置（seed 生成 + frozen config set size）'],
+    serverDerivedFacts: ['正确性判定', 'metrics（accuracy/K 估计/dPrime）', 'quality flags'],
+  },
+  maze: {
+    testType: 'maze',
+    clientObservedFacts: ['路径移动序列', '完成用时', 'interrupted'],
+    runtimeReconstructableFacts: ['迷宫结构（seed 生成 + frozen config 尺寸）', '最短路径（BFS）'],
+    serverDerivedFacts: ['路径合法性判定', 'metrics（路径效率/完成率）', 'quality flags'],
+  },
+  auditoryrt: {
+    testType: 'auditoryrt',
+    clientObservedFacts: ['逐试次 rtMs 与提前/漏失事实', 'interrupted', 'audioLatencyMs 留痕'],
+    runtimeReconstructableFacts: ['前瞻期调度（seed 均匀抖动 + frozen config 上下限）', '纯音参数（frozen config）'],
+    serverDerivedFacts: ['有效窗口与预期/漏失判定', 'metrics（medianRtMs/rtCv）', 'quality flags'],
+  },
+  auditorynback: {
+    testType: 'auditorynback',
+    clientObservedFacts: ['逐试次是否按键与 raw RT', 'interrupted', 'audioLatencyMs 留痕'],
+    runtimeReconstructableFacts: ['音序列（服务端按 seed 重建；客户端回显仅审计）', 'n 水平/音集/节奏（frozen config）'],
+    serverDerivedFacts: ['命中/误报判定', 'metrics（Hautus d′/hitRate/falseAlarmRate）', 'quality flags（含 stimulusEchoMismatch）'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -321,6 +441,106 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'emotionrecognition',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE],
     futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  numberline: {
+    testType: 'numberline',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 responsePosition 与 raw RT'],
+    futureCaptureFacts: ['输入通道区分（touch/mouse/keyboard 定位）', 'device provenance', 'viewport/dpr'],
+  },
+  arithverify: {
+    testType: 'arithverify',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  sizecongruity: {
+    testType: 'sizecongruity',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  delaydiscount: {
+    testType: 'delaydiscount',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次选择与轨迹金额'],
+    futureCaptureFacts: ['真实激励（真实货币/积分兑换）', 'device provenance', 'viewport/dpr'],
+  },
+  gamblingdeck: {
+    testType: 'gamblingdeck',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次箱选择'],
+    futureCaptureFacts: ['选择前犹豫内的指针轨迹', '真实激励', 'device provenance', 'viewport/dpr'],
+  },
+  symbolmatch: {
+    testType: 'symbolmatch',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  runningspan: {
+    testType: 'runningspan',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次回忆序列与用时'],
+    futureCaptureFacts: ['逐字母回忆选择时序', '真实 input modality', 'device provenance'],
+  },
+  sentencecheck: {
+    testType: 'sentencecheck',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  seqlearn: {
+    testType: 'seqlearn',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次响应与 raw RT'],
+    futureCaptureFacts: ['显性觉察自评', '真实 input modality', 'device provenance'],
+  },
+  timecopy: {
+    testType: 'timecopy',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次复制时长'],
+    futureCaptureFacts: ['策略自评（默数/节律）', 'device provenance', 'viewport/dpr'],
+  },
+  letternumseries: {
+    testType: 'letternumseries',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次两段回忆输入与用时'],
+    futureCaptureFacts: ['逐项回忆选择时序', '真实 input modality', 'device provenance'],
+  },
+  semanticfluency: {
+    testType: 'semanticfluency',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐词输入序列与用时'],
+    futureCaptureFacts: ['逐词输入间隔时序', '输入法中间态', 'device/keyboard provenance'],
+  },
+  cancellation: {
+    testType: 'cancellation',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮选中格子集与用时'],
+    futureCaptureFacts: ['逐格点击时序', '真实 input modality', 'device provenance'],
+  },
+  trustgame: {
+    testType: 'trustgame',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮选择与用时'],
+    futureCaptureFacts: ['真实接收者与真实激励', '真实 input modality', '决策前犹豫内指针轨迹'],
+  },
+  ufov: {
+    testType: 'ufov',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次两项响应与用时'],
+    futureCaptureFacts: ['自适应偏心率轨迹', '眼动数据', '真实 input modality', 'device provenance'],
+  },
+  pursuitrotor: {
+    testType: 'pursuitrotor',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐轮追踪时间与用时'],
+    futureCaptureFacts: ['指针轨迹采样', '采样率与延迟', '真实 input modality（mouse/touch 区分）', 'device provenance'],
+  },
+  visualwm: {
+    testType: 'visualwm',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次变化判断与用时'],
+    futureCaptureFacts: ['真实 input modality', 'device provenance', 'viewport/dpr'],
+  },
+  maze: {
+    testType: 'maze',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐迷宫移动序列与完成用时'],
+    futureCaptureFacts: ['指针/按键轨迹采样', '真实 input modality', 'device provenance'],
+  },
+  auditoryrt: {
+    testType: 'auditoryrt',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 rtMs/foreperiodMs/audioLatencyMs'],
+    futureCaptureFacts: ['音频输出延迟自动校准事实', '真实 input modality（事件级区分 key/pointer）', 'device provenance'],
+  },
+  auditorynback: {
+    testType: 'auditorynback',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 responded/rtMs/toneIndex 回显'],
+    futureCaptureFacts: ['音频输出延迟自动校准事实', '反应标准（criterion）逐块漂移', '真实 input modality（事件级区分 key/pointer）', 'device provenance'],
   },
 }
 
