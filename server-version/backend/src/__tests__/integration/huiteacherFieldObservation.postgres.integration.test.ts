@@ -257,6 +257,31 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       kind:'FORMAL_FEEDBACK',status:'SUBMITTED',
     }})).toBe(1)
     expect(await db.huiteacherFieldFormEvidence.count({where:{recordId:{in:racing.map(row=>row.id)}}})).toBe(1)
+    for(const permission of ['*','EDUCATION_ACCESS','HUITEACHER_ACCESS']){
+      const fact=await createHuiteacherObservation({organizationId:school.id,eventId:event.id,
+        actorUserId:expert.id,kind:'FACT',content:'Synthetic fact before access withdrawal'})
+      const denial=await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:school.id,
+        userId:expert.id,permission,reason:'Synthetic current access stop',deniedByUserId:manager.id}})
+      const count=await db.huiteacherObservationRecord.count({where:{eventId:event.id}})
+      await expect(createHuiteacherObservation({organizationId:school.id,eventId:event.id,
+        actorUserId:expert.id,kind:'FACT',content:'Must not be saved'})).rejects.toMatchObject({statusCode:403})
+      await expect(updateHuiteacherObservation({id:fact.id,actorUserId:expert.id,
+        expectedRevision:1,content:'Must not replace'})).rejects.toMatchObject({statusCode:403})
+      await expect(submitHuiteacherObservation({id:fact.id,actorUserId:expert.id,
+        expectedRevision:1})).rejects.toMatchObject({statusCode:403})
+      expect(await db.huiteacherObservationRecord.count({where:{eventId:event.id}})).toBe(count)
+      expect(await db.huiteacherObservationRecord.findUnique({where:{id:fact.id}})).toMatchObject({revision:1,status:'DRAFT'})
+      await db.organizationAccessDeny.update({where:{id:denial.id},data:{liftedAt:new Date(),liftedByUserId:manager.id}})
+      const changed=await updateHuiteacherObservation({id:fact.id,actorUserId:expert.id,
+        expectedRevision:1,content:'Allowed again after lifting access deny'})
+      expect((await submitHuiteacherObservation({id:fact.id,actorUserId:expert.id,
+        expectedRevision:changed.revision})).status).toBe('SUBMITTED')
+    }
+    // An accepted nonmember observer does not need product-administrator authority.
+    await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:school.id,
+      userId:expert.id,permission:'HUITEACHER_ADMIN',reason:'Synthetic manager-only deny',deniedByUserId:manager.id}})
+    expect((await createHuiteacherObservation({organizationId:school.id,eventId:event.id,
+      actorUserId:expert.id,kind:'FACT',content:'Still an accepted external observer'})).status).toBe('DRAFT')
     await revokeHuiteacherObserver({
       organizationId:school.id,eventId:event.id,
       actorUserId:manager.id,observerUserId:expert.id,
