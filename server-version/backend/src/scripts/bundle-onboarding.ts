@@ -1,3 +1,4 @@
+import { publicDeclarationDependencies } from '../modules/assessment-bundle/onboarding/public-check'
 import { verifyPackageFixtures } from '../modules/assessment-bundle/onboarding/fixtures'
 import path from 'node:path'
 import fs from 'node:fs'
@@ -10,6 +11,7 @@ async function main(){
   const [command,...args]=process.argv.slice(2)
   if(command==='scaffold'){if(args.length!==2)throw new Error('Usage: scaffold <bundle_key> <new-directory>');writePackage(path.resolve(args[1]),scaffoldPackage(args[0]));return {ok:true,status:'DRAFT'}}
   if(command==='generate'||command==='manifest-check')return {ok:true,count:generatePackages(root,generated,command==='manifest-check').length}
+  if(command==='check-public'){const packages=discoverPackages(root);packages.forEach(verifyPackageFixtures);const results=packages.map(p=>({key:p.manifest.definition.bundleKey,...publicDeclarationDependencies(p)}));const blockers=results.flatMap(p=>p.blockers);if(blockers.length)throw new Error(blockers.join('; '));return {ok:true,scope:'public-draft-declarations',publicationReady:false,packages:results}}
   if(command==='check'){const packages=args[0]?[loadPackage(path.resolve(args[0]))]:discoverPackages(root);packages.forEach(verifyPackageFixtures);const blockers=packages.flatMap(p=>dependencyBlockers(p));if(blockers.length)throw new Error(blockers.join('; '));return {ok:true,packages:packages.map(p=>({key:p.manifest.definition.bundleKey,hash:hashDeclarativePackage(p)}))}}
   if(command==='preview'){const p=loadPackage(path.resolve(args[0]));return {ok:true,contentHash:hashDeclarativePackage(p),definition:p.manifest.definition,rules:p.rules,report:p.report,...(p.schemaVersion===2?{profile:p.profile}:{}),blockers:dependencyBlockers(p),publication:'Requires installation and independent signed approval'}}
   const {PrismaClient}=await import('@prisma/client'),db=new PrismaClient()
