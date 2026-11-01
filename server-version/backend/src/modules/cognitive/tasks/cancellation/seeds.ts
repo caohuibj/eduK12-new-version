@@ -1,6 +1,6 @@
 import type { CognitiveSeed } from '../../task-seed.types'
+import { CANCELLATION_STIMULUS_SET_VERSION } from './generator'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const seeds: CognitiveSeed[] = [
   {
     "testType": "cancellation",
@@ -12,7 +12,7 @@ export const seeds: CognitiveSeed[] = [
     "config": {
       "totalTrials": 2,
       "durationMs": 45000,
-      "stimulusSetVersion": "cancellation-zh-v1.0.1",
+      "stimulusSetVersion": CANCELLATION_STIMULUS_SET_VERSION,
       "report": {
         "reportVersion": "1.0.1",
         "referenceMode": "none"
@@ -29,7 +29,7 @@ export const seeds: CognitiveSeed[] = [
     "config": {
       "totalTrials": 2,
       "durationMs": 45000,
-      "stimulusSetVersion": "cancellation-zh-v1.0.1",
+      "stimulusSetVersion": CANCELLATION_STIMULUS_SET_VERSION,
       "report": {
         "reportVersion": "3.0.0",
         "referenceMode": "none"
