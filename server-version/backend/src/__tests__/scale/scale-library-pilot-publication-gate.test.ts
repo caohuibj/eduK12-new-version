@@ -135,12 +135,18 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
   })
 
   it('keeps localization review state separate from Product Release', () => {
+    const pendingManifest = who5LocalizationManifest({ reviewStatus: 'PENDING', reviewedAt: undefined })
     const result = runGate({
-      localizationManifest: who5LocalizationManifest({ reviewStatus: 'PENDING', reviewedAt: undefined }),
+      localizationManifest: pendingManifest,
     })
     expect(result.decision.publishable).toBe(true)
     expect(result.decision.warnings.some((warning) => warning.includes('reviewStatus=PENDING'))).toBe(true)
-    expect(result.localizationUsable).toBe(false)
+    expect(result.localizationUsable).toBe(true)
+    expect(pendingManifest.reviewStatus).toBe('PENDING')
+    expect(pendingManifest.reviewedAt).toBeUndefined()
+    const mismatched = runGate({ locale: 'en', localizationManifest: pendingManifest })
+    expect(mismatched.localizationUsable).toBe(false)
+    expect(mismatched.decision.warnings.some((warning) => warning.includes('targetLocale'))).toBe(true)
   })
 
   it('warns on PILOT-level incomplete localization research items', () => {

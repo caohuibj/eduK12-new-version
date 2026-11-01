@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ips9_2021_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "irrational_procrastination"
+        ],
+        "scoreOrder": [
+          "irrational_procrastination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "irrational_procrastination",
+            "headline": "回看从打算到开始的那一步",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答整理的是你在日常任务中，从“知道该做”到“实际开始”之间的体验。有时我们本想处理一件重要的事，却先刷了一会儿消息、整理桌面，回头才发现时间已经过去。也有些推迟来自任务不清楚、精力不足或必须照顾别的事情。可以先选一个最近发生的例子，看看当时卡在了哪里，再想一个更容易开始的小动作。分数只对应这次自述，不能替你解释所有原因，也不需要把它变成对自己的责备。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次推迟原本打算做的事，当时是不知道第一步、担心做不好，还是有更紧急的安排？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一件还想完成的事，把“做完它”改写成一个马上能开始的小动作，例如打开文件并写下一句提纲。"
+              },
+              {
+                "category": "environment",
+                "text": "开始前把最容易分心的提示暂时收起来，并给这个小动作留一个明确的位置和时段；之后看看是否适合你。"
+              },
+              {
+                "category": "support",
+                "text": "如果拖延反复让你难受或影响生活，可以和可信任的人讨论具体困难，需要时寻求专业支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+          "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+          "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+          "没有回答的题不会算作最低分，题目不完整时不作本次解释。"
+        ],
+        "disclaimer": "供限定年龄大学生回顾日常任务习惯；不能用于诊断、排名或评价个人价值。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+            "reviewedAt": "2026-10-26T06:00:54.999476Z",
+            "basis": "Shaw & Zhang 2021 Table1已发表中文9题；平台新增说明和报告尚待人工复核；不套用常模或临床阈值。"
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "irrational_procrastination"
+        ],
+        "scoreOrder": [
+          "irrational_procrastination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "irrational_procrastination",
+            "headline": "“待会儿”不是日历上的一天",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：把打算重新约清楚，不把自己重新骂一遍。\n\n这九题回看“本来想做，却仍往后放”的通常体验，统一计分后9–45分，数值越大表示整体更认可题中拖延描述。它不是“拖延症”标签，也不会替你把所有延期都判不合理。\n\n假设作业本已经打开，却先处理消息、再忙几件次要小事，回来才发现时间少了。也可能今天确实有更紧急的事，或可用精力与条件不足。“待会儿”背后的情况，需要回到具体经历看，不能由一个数字破案。\n\n如果这件事仍值得做，可以给它一个看得见的新约定；若计划本身不现实，也允许调整或求助。问卷没有要求你永远把每一分钟用满，下面的做法也不是按分数开出的处方。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "看看“待会儿”去了哪儿：记下原计划与实际先做的事，看看是合理改期还是让自己付出了不必要代价，不开启自我批评大会。"
+              },
+              {
+                "category": "strategy",
+                "text": "给它一个门牌号：确定可行的时机或触发条件，而不只说“有空再做”。条件不具备时，先问清或重新协商。"
+              },
+              {
+                "category": "environment",
+                "text": "留一张返回便签：暂停任务前写一句“回来接着做这里”，让重回计划少一道寻找入口的工序；不要求靠一次小技巧解决所有拖延。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "源中文证据与当前用途限18–22岁大学生，平台新增说明仍待完善，不提供高低等级或排名。九题需答完整才计算，漏答不是0分。"
+        ],
+        "disclaimer": "供限定年龄大学生回顾日常任务习惯；不能用于诊断、排名或评价个人价值。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T16:04:01Z",
+            "basis": "本次只读审阅ips9_2021_zh_cn C1.0.0精确source、既有固定方法证据及新R1.2.0文字，核情境/构念/组别方向/时窗/人群、0与null、固定例子及可选行动；不继承旧日期，不声称作者批准、平台科学验证或新schema/scorer/PG/CI通过。"
+          }
+        }
+      }
+    }
+  ]
+}

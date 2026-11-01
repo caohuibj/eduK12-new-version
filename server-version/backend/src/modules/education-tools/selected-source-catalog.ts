@@ -1,3 +1,4 @@
+import {standardNativeScaleJoin} from '../scale/component-import/native-source'
 import {Prisma} from '@prisma/client'
 import {EDUCATION_STANDARD_USE_ACTION,educationStandardUseMetadata} from '../assessment-authorization/education-standard-use'
 import {readEducationStandardCurrentEvidence,educationStandardEvidenceCurrent,type EducationUseHeader} from '../assessment-authorization/education-standard-use-current'
@@ -24,7 +25,7 @@ export async function selectedEducationCatalogChoices(tx:Prisma.TransactionClien
     AND g.valid_from<=clock_timestamp() AT TIME ZONE 'UTC' AND g.expires_at>clock_timestamp() AT TIME ZONE 'UTC'
     AND (e.metadata#>>'{selectedBinding,binding,configuration,configId}'=ANY(${configs}::text[]) OR EXISTS(
      SELECT 1 FROM survey_standard_releases s JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash'
-     JOIN scales native ON native.code=s.tool_key AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+     JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
      WHERE s.state='ONLINE' AND g.resource_keys=ARRAY['education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash]::text[] AND s.tool_key IN (SELECT tool_key FROM survey_standard_releases WHERE id=ANY(${ids}::text[]))))
    ORDER BY g.id LIMIT 129`)
   overflow=uses.length>128

@@ -1,3 +1,8 @@
+## 首次部署与后续小更新的操作入口
+
+首次 full、frontend-only、service 和 content 更新统一见 [部署操作手册](operations.md)。
+`server-version/scripts/release/update.sh` 默认只生成计划，复用现场 Compose 入口与现有内容 CLI；不自动构建、迁移小修或触发生产切换。
+
 ## Frontend startup / catalog paging scope (2026-10-21)
 
 This bounded `frontend-performance` scenario admits only the named product-entry,

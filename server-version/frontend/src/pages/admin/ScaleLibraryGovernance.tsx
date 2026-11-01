@@ -35,7 +35,7 @@ function SurveyLibraryDisclosure({ enabled, label, children }: { enabled: boolea
 import SurveyLibraryAdmin from './SurveyLibraryAdmin'
 import StandardTripletWorkspace from './StandardTripletWorkspace'
 import {useAuth} from '../../contexts/AuthContext'
-export default function ScaleLibraryGovernance(){const location=useLocation(),{user}=useAuth();return new URLSearchParams(location.search).get('workspace')==='survey'?<SurveyLibraryAdmin/>:user?.platformRole==='SYSTEM_ADMIN'?<StandardTripletWorkspace authored={<LegacyScaleLibraryGovernance authoredOnly/>}/>:<LegacyScaleLibraryGovernance/>}
+export default function ScaleLibraryGovernance(){const location=useLocation(),{user}=useAuth();return new URLSearchParams(location.search).get('workspace')==='survey'?<SurveyLibraryAdmin/>:user?.platformRole==='SYSTEM_ADMIN'?<StandardTripletWorkspace actorId={user.id} authored={<LegacyScaleLibraryGovernance authoredOnly/>}/>:<LegacyScaleLibraryGovernance/>}
 export function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolean}={}) {
   const {user}=useAuth()
   const [entryChoices,setEntryChoices]=useState<Record<string,EntryAdmissionProduct[]>>({})

@@ -101,7 +101,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
   const timingByColumn=new Map(source.codebook.map(c=>[c.columnKey,c.timingContract]))
   const purposeByColumn=new Map(source.codebook.map(c=>[c.columnKey,c.purpose??'CONTENT']))
   const hasQualityItems=source.codebook.some(c=>(!waveId||c.waveId===waveId)&&
-    (c.purpose==='ATTENTION_CHECK'||c.purpose==='SOCIAL_DESIRABILITY'))
+    (c.purpose==='UNSCORED'||c.purpose==='ATTENTION_CHECK'||c.purpose==='SOCIAL_DESIRABILITY'))
   const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
     'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash',
     'attempt_started_at_utc','final_completed_at_utc',

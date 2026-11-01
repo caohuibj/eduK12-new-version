@@ -38,7 +38,7 @@ describe('Survey wave prepare draft-validation transport',()=>{
     })
     const res=response(),next=vi.fn()
     await handler(request(),res as unknown as Response,next)
-    expect(prepare).toHaveBeenCalledWith('actor',expect.any(String),expect.any(String),3,undefined,undefined)
+    expect(prepare).toHaveBeenCalledWith('actor',expect.any(String),expect.any(String),3,undefined,undefined,undefined)
     expect(res.status).toHaveBeenCalledWith(400)
     expect(res.json).toHaveBeenCalledWith({code:'SURVEY_DRAFT_INVALID',
       message:'questions：共享场景至少两道题目',

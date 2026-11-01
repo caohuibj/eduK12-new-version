@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_nfc10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "12d62646f9e28fb576a8aaa4f677b8c5ab2964c379a6d956fea1cbf13de384a3",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "need_for_cognition"
+        ],
+        "scoreOrder": [
+          "need_for_cognition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "need_for_cognition",
+            "headline": "认知需求：什么会让你愿意多想一会儿",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项关注你对复杂思考、挑战性阅读和理解信息的兴趣与自我感受。分数越高，表示这次更认可这些描述。比如，遇到一个有趣的问题时，有的人想追根究底，有的人更想先找到够用的答案。这里不评判谁更聪明，时间、疲劳和任务意义都值得一起考虑。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想一个让你自愿认真思考的问题：吸引你的是内容本身、解决问题的用途，还是找到答案的过程？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个你真正在意的小问题，先写下自己的猜想，再找一条支持或修正它的信息。把重点放在发现了什么，而不是答得多快。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+          "目前没有足够依据把这个中文版本的结果划分高低或与别人比较。",
+          "题目也涉及阅读习惯和对理解能力的自我感受；它不测智力，不能单凭结果判断学习动机或潜力。",
+          "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、考核或排名。"
+        ],
+        "disclaimer": "仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:03:00Z",
+            "basis": "Checked non-stigmatizing adult self-reflection wording, bounds, no unsupported norms and separate reflection/action suggestions; NOT psychometric validation or localization approval."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "need_for_cognition"
+        ],
+        "scoreOrder": [
+          "need_for_cognition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "need_for_cognition",
+            "headline": "思考也有菜单，不必每次都点最难的",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：选一个你真想弄明白的问题，不必用难度证明自己。\n\n把思考当作一份菜单：有时想慢慢品一道复杂问题，有时只需要一份够用的答案。这十题汇总你对复杂思考、挑战性阅读与理解信息的兴趣和自我感受，合计10–50分；数值越大，表示整体更认可这些描述，不是一张智商排行榜。\n\n假设你看到一条让人在意的说法：你可以顺着出处多查一步，也可以先弄清它是否与眼前任务有关。读得慢、想请人解释，或今天没有精力深挖，都不是“菜单选错了”。这份问卷没有考你答题，更不会从总分知道你适合哪门课。\n\n如果你享受追根究底，就给真正好奇的问题一点位置；如果你更愿意把精力留给实际用途，也可以有自己的取舍。比喻只供对照，既不要求你喜欢所有难题，也不要求你为了得分接近所有“复杂的人”。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先看自己想点什么：选一个真实好奇的小问题，写清“我到底想知道哪一点”。把目的放前面，不把难题当勋章。"
+              },
+              {
+                "category": "strategy",
+                "text": "尝一口证据：给自己的初步想法找一条支持或反对的信息，再用一句话说它带来了什么变化。重点是发现，不是抢答速度。"
+              },
+              {
+                "category": "support",
+                "text": "允许换做法：读不懂就换一份说明、找个例子或再问一次；达到当前需要也可以结束。愿不愿意继续思考，由兴趣、任务和精力一起决定。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本还在研究完善，没有可用的人群分档或排名；不能拿它判断聪明程度或学习潜力。十题需答完整才计算，漏答不是0分。"
+        ],
+        "disclaimer": "仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:28:34Z",
+            "basis": "本次只读审阅ipip_nfc10_zh_cn_research C1.0.0当前source、既有材料及新R1.2.0文字，核得分方向/范围、通常性时窗、固定解释与条件式例子、适配行动和短提示。保持source/bands/scoreKeys和受众权限，不继承旧审核日期，不声称本中文验证、作者批准或本轮golden/PG/CI通过。"
+          }
+        }
+      }
+    }
+  ]
+}

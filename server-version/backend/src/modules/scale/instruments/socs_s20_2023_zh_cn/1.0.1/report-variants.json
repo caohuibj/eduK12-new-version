@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "socs_s20_2023_zh_cn",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "97cb10b7b6afeb39be018b2d0dbe1a8d0727c33c807bf77df92e9bfebda8b96d",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "recognizing_suffering",
+          "understanding_universality",
+          "feeling_for_self",
+          "tolerating_feelings",
+          "acting_to_alleviate",
+          "total"
+        ],
+        "scoreOrder": [
+          "recognizing_suffering",
+          "understanding_universality",
+          "feeling_for_self",
+          "tolerating_feelings",
+          "acting_to_alleviate",
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "recognizing_suffering",
+            "headline": "识别自己的痛苦",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你是否能留意到自己的痛苦，例如察觉情绪变沉、发现自己正在勉强支撑，或认出不舒服刚出现时的迹象。能否注意到这些变化会受到当时的忙碌程度和处境影响，回答并不评价你是否足够敏感或坚强。你可以回想最近一个不太顺利的时刻，看看自己是在什么时候发现难受的。下次有类似感觉时，先用一个简单的词描述它，给自己留一点辨认需要的时间。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近你在什么时候注意到自己有些难受？"
+              },
+              {
+                "category": "strategy",
+                "text": "用一个简单的词描述当时的感受。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "understanding_universality",
+            "headline": "理解痛苦是共同经历",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你是否理解，痛苦、失落与不顺利也是许多人会经历的事情。想到这一点，有时能让人少一些孤立感，但每个人的处境和所需支持仍然不同，不必用“别人也这样”来压下自己的感受。可以回想一次你觉得只有自己遇到困难的时候，看看有没有可信任的人也分享过相似经历。下一次感到孤单时，试着对自己说一句承认困难的话，再决定是否愿意向合适的人寻求理解。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一种经历让你觉得自己并不孤单？"
+              },
+              {
+                "category": "strategy",
+                "text": "先承认困难，再考虑向合适的人寻求理解。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "feeling_for_self",
+            "headline": "关怀受苦的自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注当你遇到困难或对自己失望时，是否仍愿意以关心和温和的态度回应自己。有时善待自己很自然，有时却很难做到，这些回答只是整理你描述的回应方式，不是给你的品格打分。你可以想一想，如果一个你关心的人正经历类似处境，你会怎样和他说话。下次发现自己责备自己时，试着换一句既承认问题、又给自己留有照顾空间的话，看看这样的说法是否适合当时的你。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果是你关心的人遇到同样的事，你会怎样回应？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试用一句温和而实际的话回应自己。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "tolerating_feelings",
+            "headline": "容纳不舒服的感受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注面对难受的情绪时，你是否愿意让感受存在，同时保留一点选择怎样回应的空间。容纳情绪并不要求你独自忍耐所有困难，也不代表情绪应该马上消失。不同情境下，暂停、休息或寻求支持都可能合适。可以回想一次情绪出现却没有完全带着你走的经历，看看当时什么帮助了你。下一次有轻微不安时，先辨认感受，再选择一件眼前能够做到的、照顾自己的小事。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么帮助你在情绪出现时保留一点选择空间？"
+              },
+              {
+                "category": "strategy",
+                "text": "辨认感受后，选择一件能照顾自己的小事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "acting_to_alleviate",
+            "headline": "采取行动照顾自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注当自己痛苦或遇到困难时，你是否尝试采取行动照顾自己。这样的行动可以很小，例如休息片刻、减少一个不必要的负担，或向合适的人说明自己的需要，不要求你立刻解决困难的原因。回答会受到现实条件影响，并不衡量你是否已经把一切处理好。可以想一想，最近什么事情让你稍微好受一点。下次遇到相似处境时，选一个可行的小行动，做完后再看看是否需要调整或求助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一件小事让你稍微好受一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个可行的小行动，做完后看看是否需要调整。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "total",
+            "headline": "自我关怀整体描述",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "整体描述将二十个回答放在一起，帮助你回顾自己面对痛苦时如何留意感受、理解共同经历、表达关怀、容纳情绪和采取行动。它不能替代五个方面各自的体验，也不是评价你是否值得被关心的标准。不同生活处境可能让同一个人的回答发生变化，不需要把结果当作固定标签。你可以从五个方面中选一个最想了解的地方，回想一个具体场景，再尝试一件适合当前条件的小事，观察自己真正需要什么。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "五个方面里，你现在最愿意了解哪一个？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个具体场景，尝试一件当前做得到的小事。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+          "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人；证据对应发表文本，本版第9题平台勘误未单独验证。",
+          "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+          "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+          "本版第9题为明示平台勘误，报告与内容供本地审核；内容准备、技术安装和公共发布分别记录，不以来源研究或本条说明代替真实使用授权。"
+        ],
+        "disclaimer": "用于成人回顾面对痛苦时的自我关怀方式；不是诊断、筛查或疗效判断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "recognizing_suffering",
+          "understanding_universality",
+          "feeling_for_self",
+          "tolerating_feelings",
+          "acting_to_alleviate",
+          "total"
+        ],
+        "scoreOrder": [
+          "recognizing_suffering",
+          "understanding_universality",
+          "feeling_for_self",
+          "tolerating_feelings",
+          "acting_to_alleviate",
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "recognizing_suffering",
+            "headline": "看见难受，不用先交一份原因说明书",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：先知道自己不好受，也可以是照顾的起点。\n\n五个方面各四题和整体二十题都用1–5均分，越大表示更认可相关关怀方式，不是更痛苦；题本没有固定一周或一月窗口。例子只是供你核对。\n\n识别分较大，表示更认同自己能留意到痛苦或早期迹象。比如忙完才知道刚才一直紧绷，不用先把原因解释完才允许休息。\n\n已有辨认方式可以保留，暂时说不清也能留下“不清楚”，不需要把自己查得更仔细才算关心。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给感受一个暂用名，再留一个需要。只看一个愿意回顾的片段即可，不要求不断自查，也可以随时停。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "understanding_universality",
+            "headline": "别人也会难，不会把你的需要抵消",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "共同经历四题均分1–5，越大表示更认同人都会遇到痛苦、不安或挣扎。它不是“大家都一样所以别在意”的分数。\n\n例如，失误后觉得只剩自己不行，后来听到相似经验，可能多一点理解。这里只是例子，不要求你寻找一场痛苦比赛。\n\n能提供连接的就保留，不适合的比较可以放下。你的实际处境与所需支持，不因别人也难就自动变小。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "愿意时找一个安全的交流入口，谈一件具体的事，或接触一段可靠的相关经历。只借理解，不比谁更惨，也不要求马上振作。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "feeling_for_self",
+            "headline": "对自己失望时，也不必收回照顾",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "关怀四题均分1–5，越大表示更认同困难中仍愿意善待自己、照顾感受，不是做到了就该立刻开心。\n\n比如一件事没做好，可以补救，也可以不再用狠话催自己。这个例子不是系统发现的个人问题。\n\n有用的回应继续用；若暂时温和不起来，也别给自己加一项“关怀失败”。照顾可以平实，不必包装成积极宣言。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "把一句狠话换成事实和需要，再给实际支持留一步。不是把问题说成没事，也不拿心情有没有立刻变好判合格。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "tolerating_feelings",
+            "headline": "给感受留个位，不等于把自己困在里面",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "容纳四题均分1–5，越大表示更认同能留意难受、不过度批判或被它完全带走。不代表越忍越会关怀。\n\n例如，有点失落时先知道自己失落，再决定休息或找支持。这里只是轻微情境，不是要求你直面所有难处。\n\n需要暂停、换注意或获得照护都可以；安全与边界不用为这个分数让位。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "轻微、愿意、安全才试着辨认一下，再选休息、求助或合适行动。不舒服就停，不把“我该容纳”变成强迫自己继续承受的命令。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "acting_to_alleviate",
+            "headline": "照顾不是再塞满一张待办表",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "照顾行动四题均分1–5，越大表示更认同自己痛苦时会尝试做有利于自己的事，不是行动数量或问题解决率。\n\n比如减掉一项不必要的任务，也可能比继续安排新项目更合适。这是例子，不是总分已判断你的日程。\n\n能用的办法保留，受时间、经济或支持限制时也如实看条件，不把缺资源说成不爱自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "只留一个现实动作：问清信息、减少负担、休息或请求协助，挑当前做得到的。做后看需要有没有被照顾，没用就换，不为完成清单继续加码。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "total",
+            "headline": "总览不设通关顺序，也不查关怀资格",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "二十题总均分1–5，越大表示整体更认同这些关怀方式。它是平台明确采用的整理口径，不是人生状态、诊断或疗效通关章。\n\n注意得到难受，却没有条件立刻行动，和其他组合可能算出相近数值。总数没查明原因，也没有规定先识别、再理解、最后才配求助。\n\n已有支持可以保留，眼下只挑一个最相关的需要。不必把五方面全做完，更不需提高分数才值得被照顾。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给眼前需要留一个入口，不开一场全套训练：选一件小事或一个支持请求，之后看是否合适。可以调整、暂停或跳过，不把关怀变成新考核。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文证据限职场样本；第9题平台勘误未单独验证，本版不作等级、诊断或疗效判断。"
+        ],
+        "disclaimer": "用于成人回顾面对痛苦时的自我关怀方式；不是诊断、筛查或疗效判断。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:18:04Z",
+            "basis": "本次AI文字自审对应socs_s20_2023_zh_cn的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

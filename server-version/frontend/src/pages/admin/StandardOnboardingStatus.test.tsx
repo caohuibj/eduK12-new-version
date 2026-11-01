@@ -14,6 +14,31 @@ const entry=(over:Partial<StandardOnboardingEntry>={}):StandardOnboardingEntry=>
 beforeEach(()=>{vi.resetAllMocks();api.mockResolvedValue({list:[entry()]})})
 
 describe('read-only per-version standard onboarding status',()=>{
+ it('shows catalog gaps in the main area without inventing executable content',async()=>{
+  const gap='待补经许可的精确中文12题、完整作答选项及缺失计分规则；当前仅有目录来源，不能启动施测。'
+  const pending=entry({instrumentKey:'ctas12_zh_cn',instrumentVersion:'1.0.0',stage:'仅目录候选',blockers:[gap,'SCORING_MISSING_RULE_NOT_VERIFIED','EXISTING_PUBLIC_REDISTRIBUTION_HOLD','VERSIONED_SCORER_NOT_REGISTERED'],nextActions:[]})
+  pending.states={...pending.states,imported:false}
+  api.mockResolvedValue({list:[pending]})
+  render(<StandardOnboardingStatus/>)
+  const row=await screen.findByRole('article')
+  expect(within(row).getByText(gap,{selector:'p'})).toBeVisible()
+  expect(within(row).getByText(gap,{selector:'code'})).not.toBeVisible()
+  expect(within(row).getByText(/计分或缺失作答规则尚未核实/)).toBeVisible()
+  expect(within(row).getByText(/原许可记录保留公开再分发 HOLD/)).toBeVisible()
+  expect(within(row).getByText(/所需版本的专用计分器尚未安装登记/)).toBeVisible()
+  expect(within(row).getByText('仅目录资料，尚无可执行内容')).toBeVisible()
+  expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+ })
+ it('routes pending intake to existing import or drafts using only exact display identity',async()=>{
+  const open=vi.fn();render(<StandardOnboardingStatus onOpenWorkspace={open}/>)
+  const row=await screen.findByRole('article')
+  fireEvent.click(within(row).getByRole('button',{name:'补齐内容并导入'}))
+  fireEvent.click(within(row).getByRole('button',{name:'查找已有草稿'}))
+  const target={instrumentKey:'pending',instrumentVersion:'1.0',name:'待审译本'}
+  expect(open.mock.calls).toEqual([[target,'import'],[target,'drafts']])
+  expect(api).toHaveBeenCalledExactlyOnceWith('/onboarding-status?limit=25')
+  expect(within(row).queryByRole('button',{name:/发布|安装/})).not.toBeInTheDocument()
+ })
  it('keeps lifecycle and product decisions separate, renders located actions and preserves unknown blockers',async()=>{
   render(<StandardOnboardingStatus/>)
   const row=await screen.findByRole('article',{name:'待审译本 · 1.0'})

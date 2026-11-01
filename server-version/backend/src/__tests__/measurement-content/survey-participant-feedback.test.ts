@@ -66,10 +66,15 @@ describe('participant general route current authorization and frozen timing',()=
   expect(mocks.transaction).not.toHaveBeenCalled();expect(mocks.final).not.toHaveBeenCalled()
  })
  it('uses existing locked credential/consent branch for explicit Scale feedback',async()=>{
+  final.completedAt=new Date('2026-10-31T00:00:00.099Z')
   const response=await readGeneralForOwnAttempt(proof)
   expect(response).toMatchObject({kind:'DESCRIPTIVE',pending:false,measurements:[{metrics:[{key:'safe',value:7}]}]})
   expect(mocks.lock).toHaveBeenCalledTimes(3);expect(mocks.consent).toHaveBeenCalledTimes(1)
-  expect(mocks.legacy).not.toHaveBeenCalled();expect(JSON.stringify(response)).not.toMatch(/privateDetail|rawAnswers|reference|template|99/)
+  // Public receipt time may legitimately contain the private-score witness99.
+  // Validate it separately; retain the complete private payload prohibition.
+  const {completedAt,...feedback}=response
+  expect(completedAt).toEqual(final.completedAt)
+  expect(mocks.legacy).not.toHaveBeenCalled();expect(JSON.stringify(feedback)).not.toMatch(/privateDetail|rawAnswers|reference|template|99/)
  })
  it('preserves AFTER_COLLECTION pending and releases only at existing collection boundary',async()=>{
   activeUnit.participantFeedback={...policy(),release:'AFTER_COLLECTION'}

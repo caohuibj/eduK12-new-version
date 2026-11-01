@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "base": "63f849c5bb3dfd7c215d719fc9b75e233664dca8",
+  "originalReviewCommit": "093d86e842da12d443301fd4a37d5d046ecb9185",
+  "branch": "fix/report-empty-waves-source-history-20261031",
+  "componentTrees": {
+    "backend": "36f419652e29ca78b997bc6ca52fc39176aca4e6",
+    "frontend": "14a77f52e24c1699c6cf8136999eb583d70ebda1"
+  },
+  "repairs": [
+    "Authorized published School/Training waves with no completed result retain an immutable missing reference and a null trend point.",
+    "School task tools supply the actual task history; read-only 25+1 metadata pagination uses PostgreSQL microseconds and ID.",
+    "Training task keys carry Composite/Cognitive/Scale cursor family and source position; one bounded 101-row lookahead crosses family edges."
+  ],
+  "excluded": "Differencing protection is unchanged in this branch. No other developer patch was imported.",
+  "checks": [
+    {
+      "reporter": "empty-wave.json",
+      "passed": 10,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        "keeps an empty published T2 between T1/T3 and never fills the saved gap on later reads",
+        "School plan thin adapter delegates disclosure and reuses group snapshots maps stable plan leafs independently of participant visibility and freezes actual times; old read never rediscovers or scores",
+        "School plan thin adapter delegates disclosure and reuses group snapshots refuses lost manager authority, a narrowed prior public view, and a stale execution pointer instead of falling back",
+        "School plan thin adapter delegates disclosure and reuses group snapshots preserves the saved report through wording-only changes while retaining numeric permission checks",
+        "School plan thin adapter delegates disclosure and reuses group snapshots keeps allowed outputs when another planned score is not disclosed, and retains per-wave suppression",
+        "School plan thin adapter delegates disclosure and reuses group snapshots uses the actual Cognitive protocol when compiled publication identities differ",
+        "School plan thin adapter delegates disclosure and reuses group snapshots keeps NONE/INDIVIDUAL_ONLY sources unavailable instead of deriving GROUP access from the personal plan",
+        "School plan thin adapter delegates disclosure and reuses group snapshots rejects a cross-slot same-named score before source access",
+        "keeps empty Scale T2 between completed T1/T3 and freezes the gap instead of rescanning on read",
+        "does not turn a populated but undisclosed source into an empty wave"
+      ]
+    },
+    {
+      "reporter": "training-paging.json",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        "pages composite=0, Cognitive=101, Scale=0 through all families without duplicates",
+        "pages composite=0, Cognitive=0, Scale=101 through all families without duplicates",
+        "pages composite=99, Cognitive=101, Scale=101 through all families without duplicates"
+      ]
+    },
+    {
+      "reporter": "training-paging-ui.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 2,
+      "cases": [
+        "continues a typed standalone cursor and appends sources without resetting the selection"
+      ]
+    },
+    {
+      "reporter": "training-cursor-controller.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        "accepts a typed standalone cursor at the actual HTTP controller boundary"
+      ]
+    },
+    {
+      "reporter": "school-history-boundaries.json",
+      "passed": 2,
+      "failed": 0,
+      "filtered": 36,
+      "cases": [
+        "pages only source-scoped pointers with the full time/ID cursor, never recomputing report facts",
+        "Huischool governed report HTTP surface pages School saved group history with a source-bound microsecond cursor using GET only"
+      ]
+    },
+    {
+      "reporter": "school-history-ui.json",
+      "passed": 6,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        "School group workbench uses the selected task history beyond the latest100, appends older versions and resets on source change",
+        "School group workbench continues an empty filtered source page without reloading the catalog or reports",
+        "School group workbench generates a selected leaf subgroup and prints the same authorized snapshot",
+        "School group workbench reopens the latest artifact without discovering sources or recalculating",
+        "School group workbench recovers a failed catalogue request with a GET only",
+        "School group workbench does not restore a previous school from a late response"
+      ]
+    },
+    {
+      "reporter": "school-history-postgres.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        "School history pointer SQL on a disposable PostgreSQL fixture keeps 26 same-time pointers reachable and scopes organization/run/track/kind/schema without decoding facts"
+      ]
+    }
+  ],
+  "executedPassedCases": 24,
+  "newRegressionCases": 12,
+  "directlyAffectedExistingCases": 12,
+  "typechecks": {
+    "backend": {
+      "command": "tsc --noEmit -p tsconfig.json",
+      "exit": 0,
+      "log": "backend-types.log"
+    },
+    "frontendFirst": {
+      "exit": 2,
+      "cause": "New test used Array.at, unsupported by the existing frontend TS lib target.",
+      "log": "frontend-types.log"
+    },
+    "frontendFinal": {
+      "command": "tsc --noEmit -p tsconfig.app.json",
+      "exit": 0,
+      "log": "frontend-types-repair.log"
+    },
+    "frontendChangedLint": {
+      "command": "eslint src/school/SchoolGroupReports.tsx src/school/SchoolGroupReports.test.tsx src/training/TrainingGroupReports.test.tsx",
+      "exit": 0,
+      "log": "frontend-lint.log"
+    }
+  },
+  "provenance": {
+    "backendCases": "Real services/modules with mocked authority and storage boundaries.",
+    "schoolHTTP": "Actual loopback Express GET route; existing auth and history service mocked.",
+    "UI": "Actual React components in jsdom with mocked API.",
+    "postgres": "Actual new School pointer SQL on an isolated disposable PostgreSQL16.15 two-metadata-table fixture, 26 same-time pointers +5 excluded rows. Manager context mocked. Not an application-schema migration or FINAL journey. Temporary container removed.",
+    "before": "Original review reporters assert erroneous behavior on 093d86e8, not fix-validation results. Retained without rerunning old repros."
+  },
+  "noNewFinals": true,
+  "noProductionWrites": true,
+  "noSchemaOrDependencyChange": true,
+  "formalCI": "Not activated; final Draft publication intentionally pauses automatic CI until A binds the reviewed candidate to existing affected qualification. No claim of Ready, gate pass, merge or deployment.",
+  "rollback": "Revert these application commits through a normal reviewed revert. No schema reversal or report deletion needed; existing frozen artifacts are retained.",
+  "files": [
+    {
+      "path": "backend-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "before/empty-middle-wave-final.json",
+      "bytes": 1636,
+      "sha256": "3201b49e9f56d2f3ee9d7633386756d940d37df9896dbe6b8b6efa7cfb352128"
+    },
+    {
+      "path": "before/school-history-ui.json",
+      "bytes": 1021,
+      "sha256": "a629517d3cbd51e2e95b2f95e7f61a69db05d6ebee04808184d6b60ad002c29c"
+    },
+    {
+      "path": "before/training-probes.json",
+      "bytes": 1611,
+      "sha256": "e4d1ac313c9b92549be66239cd2ec2073b7234038d6fa08925db81473570349e"
+    },
+    {
+      "path": "empty-wave.json",
+      "bytes": 5444,
+      "sha256": "fd6607d04eb84e2c667ec5ce596c1e33bdd15bdafa696526ff83766440ec06ac"
+    },
+    {
+      "path": "frontend-lint.log",
+      "bytes": 445,
+      "sha256": "f3f3dad2c707d9bdf31598b13832ec016f270a58785e66174058b2fffb376e9c"
+    },
+    {
+      "path": "frontend-types-repair.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "frontend-types.log",
+      "bytes": 214,
+      "sha256": "b44feb0a416fb7e4645bae96755ab04bc3116214e28c08e9200fa7957fb84814"
+    },
+    {
+      "path": "school-history-boundaries.json",
+      "bytes": 13646,
+      "sha256": "696f5883a76da672ce7bb3dbd14a625a86ed1571577b127de544c34b66f76846"
+    },
+    {
+      "path": "school-history-postgres.json",
+      "bytes": 1224,
+      "sha256": "9ad07866c4a504da4295cfe5dca368d0721f9d39e63ab00bde30f7c91aa54694"
+    },
+    {
+      "path": "school-history-ui.json",
+      "bytes": 2667,
+      "sha256": "2a6268d3c5a593f9af900a358c34efafa3c2200605c1b1575cbc1ec831cd85ea"
+    },
+    {
+      "path": "training-cursor-controller.json",
+      "bytes": 1017,
+      "sha256": "a2f703e30e6005718fc388d32ac853c533e183907a5564e5ff8da85dd037e627"
+    },
+    {
+      "path": "training-paging-ui.json",
+      "bytes": 1626,
+      "sha256": "f0cc2e8fb577b0bfad7060125a0f0b9a5e0e63589d8862fa56afcc49a9d39667"
+    },
+    {
+      "path": "training-paging.json",
+      "bytes": 1626,
+      "sha256": "881cb600aaadae108333e17abc24c008de2b0dd2352fc4948d2e3d54789ade47"
+    }
+  ]
+}

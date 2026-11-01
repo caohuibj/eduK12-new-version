@@ -184,6 +184,7 @@
     "scale_axis_snapshots": "RUNTIME_RW",
     "scale_deployment_policies": "RUNTIME_RW",
     "scale_publication_audits": "RUNTIME_RW",
+    "scale_component_drafts": "RUNTIME_RW",
     "scales": "RUNTIME_RW",
     "situational_attempts": "RUNTIME_RW",
     "situational_raw_submissions": "RUNTIME_RW",

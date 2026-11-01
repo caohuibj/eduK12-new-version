@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "csacs9_zh_cn",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "dda712f00fcfc13128a024671e897349764821ed604a8f2b6e337a8cb67d619c",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "centering",
+          "transcending",
+          "self_as_context_total"
+        ],
+        "scoreOrder": [
+          "centering",
+          "transcending",
+          "self_as_context_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "centering",
+            "headline": "起伏中稳住自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分看看情绪和想法像浪一样涌来时，你能否找到一点平静，不急着跟它们较劲。例如，发现自己正在担心，却仍能留意当下要做的一小步。它不是要求你把情绪压下去，也不是每次都必须冷静。一次烦乱不能说明你做得不好，回答只是你对自己常见体验的描述，没有公认的及格线。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次烦乱时，你是否曾给自己留过一个停顿？当时有什么帮助？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着对一个缠住自己的念头加一句“我注意到，我现在有一个……的想法”，再选择眼前一件小事去做。如果练习让你更不舒服，就先停止，转而看看身边的物品或感受脚踩地面；持续困扰可向合适的专业人员寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "transcending",
+            "headline": "退一步看见自己的经历",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你能否在经历变化时，保留一个观察自己的角度。例如，除了“我正在难过”，也留意“我正在觉察难过”。经历会变化，你不必把某一刻的念头当成自己的全部。这不是让你变得疏离、假装没有感受，也不是测量有没有更高境界。它只提供一种回顾经历的视角，不定义你是谁。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一个念头让你觉得“这就是全部的我”？换个角度观察它，会有什么不同？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着对一个缠住自己的念头加一句“我注意到，我现在有一个……的想法”，再选择眼前一件小事去做。如果练习让你更不舒服，就先停止，转而看看身边的物品或感受脚踩地面；持续困扰可向合适的专业人员寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "self_as_context_total",
+            "headline": "给念头和情绪留一点空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注的不是你有没有烦恼，而是烦恼出现时，你能否一边觉察它，一边保留一点选择空间。结果只是这次的自我描述，不是心理疾病诊断，也没有公认的好坏分界。两个方面可以分开阅读，但题目数量不同，不宜直接用两组总和比较强弱；更有用的是找到一个贴近生活、值得继续观察的小情境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这两个生活主题中，哪个更贴近你最近的体验？有没有题目没能表达的部分？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着对一个缠住自己的念头加一句“我注意到，我现在有一个……的想法”，再选择眼前一件小事去做。如果练习让你更不舒服，就先停止，转而看看身边的物品或感受脚踩地面；持续困扰可向合适的专业人员寻求支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "源研究为中国大学生非临床便利样本，不证明临床、中小学生或所有成年人的适用性；本次数字呈现及新增反馈待审。",
+          "没有诊断阈值、全国常模排名、风险颜色或已掌握ACT标签。",
+          "每方面要求完整作答，整体总分要求9题完整；这是保守平台缺失规则，源论文未给缺失插补办法。",
+          "原7已按2022最终模型排除，不与原10题或其他语言版本混用；两个分量表题数不同，不比较原始总和大小。"
+        ],
+        "disclaimer": "供18–25岁大学生研究与非诊断自我了解。采用已发表中文题文，但本次数字呈现和平台反馈仍待审核；不用于治疗决策、能力排名或判断心理健康。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:59:00Z",
+            "basis": "AI editorial check only, published Chinese items independently read against Appendix image; source research not platform scientific approval."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "centering",
+          "transcending",
+          "self_as_context_total"
+        ],
+        "scoreOrder": [
+          "centering",
+          "transcending",
+          "self_as_context_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "centering",
+            "headline": "念头很吵，也可以给自己留一点站稳的位置",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题和分4–28，数字越大，表示更认同自己在情绪和想法起伏时有一点安顿、观察和不被完全卷入的空间，不是情绪必须安静的合格证。\n\n比如，一句反馈让心里起了波动，如果你也遇到过，可以先看见“我现在很失落”，不必再要求波浪马上消失。站稳不是不许动摇，而是试着不把所有回应都交给最响的那一刻；暂时站不稳时，休息和支持也可以是选择。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回看一件不太沉重的烦心事，看看哪一个停顿、环境或陪伴曾让你稍微有余地；没有找到也可以如实保留。"
+              },
+              {
+                "category": "strategy",
+                "text": "愿意时先说一句“我注意到自己正在……”，再选择休息、处理或求助，不把“必须平静”当下一步的通行证。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "transcending",
+            "headline": "你能看见一段经历，不必把自己缩成一句旁白",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题和分5–35，数字越大，表示更认同在经历变化时仍保留观察视角的描述，不是比别人看得更高。\n\n生活里的旁白会变：一次是“我很紧张”，一次是“今天轻松一些”。如果这个比喻合适，可以留意自己都曾觉察这些变化，而不是只认领其中一句作为全部的我。它不是要你退到生活外面，也不需要找到一个神秘、永远不变的自己；看不懂比喻时，放下也可以。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选两个普通片段，看看旁白怎样不同，不必翻出最痛苦的记忆，也不需要证明哪一句才是真正的自己。"
+              },
+              {
+                "category": "strategy",
+                "text": "遇到“我就是……”的总标签时，试着补上场景：“这件事发生时，我有这样的想法。”不舒服就停止，不把观察练成疏离自己。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "self_as_context_total",
+            "headline": "带走一句话：念头可以写进经历，不必写成你的全部",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "九题合计9–63，数字越大，整体表示更认同前面两类观察与安顿自己的体验。两组题目汇进同一个总分，不会多出第三项能力；它也不是心理灵活性的全科成绩。\n\n例如，一次不顺利后出现“我什么都不行”的旁白，可以被记下来，却不必立刻印成整个人的封面。如果这个画面适合你，可以把事情、念头和接下来仍在意的事分开看看。不是要求你想开，更不是说外在困难靠换旁白就能解决；现实支持仍可以请进来。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给一件具体事情写三行：发生了什么、心里怎么说、我还在意什么。让念头占一行，不占满全部页面。"
+              },
+              {
+                "category": "support",
+                "text": "选自己愿意的方式就够；若向内观察更难受，可以停下，回到周围实际活动或寻找支持，不必完成一份“观察者”作业。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "目前只用于18–25岁大学生研究与自我了解，无个人高低或诊断分界；两组题数不同，不用原始和分比强弱，漏答不当最低分。"
+        ],
+        "disclaimer": "供18–25岁大学生研究与非诊断自我了解。采用已发表中文题文，但本次数字呈现和平台反馈仍待审核；不用于治疗决策、能力排名或判断心理健康。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:58:29Z",
+            "basis": "本次仅审读新R文字与当前源的构念、窗口、分数方向及适龄受众；不运行计分／报告测试，不构成人工译审、作者批准或心理测量验证。保留原自答受众及权限，不扩大适用范围。"
+          }
+        }
+      }
+    }
+  ]
+}

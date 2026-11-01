@@ -18,14 +18,19 @@ const values={
  final:finalScaleSubmitSchema.parse({submissionId:'synthetic-golden-submit',attemptEpoch:1,definitionHash:'definition',itemTimings:{freeKey:{ms:2}},answers:[{itemCode:'A',responseValue:1}]})
 }
 // Captured from the actual Zod 3.25.76 parsers before the dependency upgrade.
+// The later versioned-instruction writer records an explicit null. Keep the
+// historical fixture intact and pin only this intentional current-write change.
+const currentContracts={...golden,runtime:{...golden.runtime,instruction:null,
+ snapshotHash:'b1692359bc9c0904487167198231b086602a4f097691dca9b612875fdd318a12'}}
 describe('Zod 4 preserves persisted assessment contracts',()=>{
- it('reconstructs byte-equivalent scientific and admission facts',()=>{
-  expect(JSON.parse(JSON.stringify(values))).toEqual(golden)
-  for(const key of Object.keys(values) as Array<keyof typeof values>)expect(canonicalHash(values[key])).toBe(canonicalHash(golden[key]))
+ it('reconstructs byte-equivalent scientific and admission facts with the explicit instruction field',()=>{
+  expect(JSON.parse(JSON.stringify(values))).toEqual(currentContracts)
+  for(const key of Object.keys(values) as Array<keyof typeof values>)expect(canonicalHash(values[key])).toBe(canonicalHash(currentContracts[key]))
  })
  it('reads historical Zod 3 frozen payloads without rehashing or rewriting',()=>{
   expect(parseFrozenUnitAdmission(golden.admission)).toEqual(golden.admission)
   expect(parseFrozenScaleRuntimeSnapshot(golden.runtime)).toEqual(golden.runtime)
+  expect(golden.runtime).not.toHaveProperty('instruction')
   expect(parseFrozenSituationalRuntimeSnapshot(golden.sjt)).toEqual(golden.sjt)
   expect(parseFrozenActiveSlotSet(golden.slots)).toEqual(golden.slots)
   expect(finalScaleSubmitSchema.parse(golden.final)).toEqual(golden.final)

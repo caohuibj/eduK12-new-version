@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_attending_emotions10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "f2b3e97bdf000ef0665edc0b2e8cc4f814b218dc3a2b83afc0e79e029199e5c4",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "ipip_attending_emotions10"
+        ],
+        "scoreOrder": [
+          "ipip_attending_emotions10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_attending_emotions10",
+            "headline": "情绪关注：你会不会留意心里的变化",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项关注你是否留意、思考自己的情绪。分数越高，表示这次更认可关注情绪的描述。它有点像注意到心里的“天气”正在变化，但不测你能否把天气变晴。关注得多，不一定调节得更好；关注得少，也不能直接说能力不足。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次情绪变化：你先注意到身体的感觉、脑中的想法，还是想做某件事的冲动？"
+              },
+              {
+                "category": "strategy",
+                "text": "用一个词给当下感受命名，如“有些紧张”或“有点期待”，再把注意力带回眼前的一件小事。不必追着每种情绪反复分析。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+          "目前没有可靠依据划分高低或排名；这项结果也不代表整体情绪能力或调节能力。",
+          "原英文研究的数据不能当作本中文版本已经验证的证明。",
+          "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选或教师考核。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。情绪关注不是整体情绪智力或调节能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:41:00Z",
+            "basis": "AI editorial check: adult descriptive self-report, no ability/character diagnosis or unsupported norm transfer; not human expert translation review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "ipip_attending_emotions10"
+        ],
+        "scoreOrder": [
+          "ipip_attending_emotions10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_attending_emotions10",
+            "headline": "看见提示灯，不必把每盏灯都拆开检修",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：留意一个信号，不等于必须追问到底。\n\n把情绪想成心里亮起的提示灯：这十题问你会不会注意它、想想它为什么亮。总分10–50，数值越大，表示整体更认可留意和思考情绪的描述；不是灯越多就越会驾驶，也不是你已经准确读懂了每个信号。\n\n假设计划临时改变，你先觉察到烦躁，才发现自己原来很期待。这盏灯可以提醒你看一眼发生了什么，却不要求你马上把整套线路拆开。若暂时看不懂，也可以先写下“我现在有点不舒服，还不确定”。\n\n如果看一眼就够用，可以带着这点了解回到生活；如果越检查越转圈，也允许先停一停。比喻供你自行对照，不把分数写成“情绪敏感型”或“情绪迟钝型”，也不替你决定该关注多少。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先记亮了什么灯：用一个大概的词说说感受，不知道名称也可以。先看到，不急着证明自己看得准。"
+              },
+              {
+                "category": "strategy",
+                "text": "只查眼前这一段：问发生了什么、哪一点对自己重要。一个具体情景就够，不开一场必须解释全部心情的大会。"
+              },
+              {
+                "category": "environment",
+                "text": "允许暂时合上检修盖：若发现自己反复绕同一个问题，可以先回到吃饭、散步或原来的活动，想再梳理时另找合适时机。不把暂停理解成忽略自己。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本还在研究完善，没有可用的人群分档或排名。十题需答完整才计算；漏答不是0分，关注多少也不等于调节能力好坏。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。情绪关注不是整体情绪智力或调节能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:54:20Z",
+            "basis": "本次只读审阅ipip_attending_emotions10_zh_cn_research C1.0.0精确source及已有材料与新R1.2.0文字；核范围/方向/通常时窗、构念边界、固定例子与可选行动、null不作0及必要短提示。不继承旧日期、不改变受众权限，不声称新译审、中文验证或schema/scorer/PG/CI通过。"
+          }
+        }
+      }
+    }
+  ]
+}

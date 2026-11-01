@@ -7,6 +7,7 @@ import { previewScaleInstrument } from '../../modules/scale/onboarding/preview'
 import { compileScalePolicy } from '../../modules/scale/policy/compile'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { scoreScale } from '../../modules/scale/scale-scoring'
+import { evaluateResearchGradeReadiness } from '../../modules/scale/library/research-readiness'
 
 const fixture = () => {
   const source = structuredClone(getScaleInstrumentSource('who5', '1.0.0')!)
@@ -61,7 +62,17 @@ describe('single scoped scientific qualification authority', () => {
   it('does not apply a reviewed research claim to a different deployment territory', () => {
     const source = fixture(); source.catalog.scientificMaturity = 'RESEARCH_GRADE'
     const preview = previewScaleInstrument({ source, authorizations: [], locale: 'zh-CN', territory: 'US', commercialNature: 'NON_COMMERCIAL', deploymentModes: ['STANDALONE'] })
-    expect(preview.blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+    // Structural activation is separate from the territory of reviewed claims.
+    expect(preview.allowActivation).toBe(true)
+    expect(preview.scientific.review?.territory).toBe('CN')
+    expect(preview.scientific.review).toEqual(source.scientificReview)
+    const research = (territory: string) => evaluateResearchGradeReadiness({
+      intendedUses: source.scientificReview!.intendedUses, evidence: source.catalog.evidence,
+      deployment: { locale: 'zh-CN', territory },
+    })
+    expect(research('CN').status).toBe('READY')
+    expect(research('US').status).toBe('NOT_ESTABLISHED')
+    expect(research('US').evidenceRefs).toEqual([])
   })
   it('cannot earn grade through titles or reference pointers without use-specific sufficient evidence', () => {
     const source = fixture(); source.catalog.evidence[0].rating = 'INSUFFICIENT'

@@ -1,4 +1,5 @@
 import { frozenScalePresentationSchema, freezeLibraryScalePresentation, type FrozenScalePresentation } from '../scale/scale-presentation'
+import { frozenScaleInstructionSchema, type FrozenScaleInstruction } from './frozen-scale-instruction'
 import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { assertAssessmentOperationallyActive } from '../assessment-governance/operational-hold'
@@ -13,8 +14,6 @@ import {
   createFrozenScaleRuntimeSnapshotV2FromV1,
   parseFrozenScaleRuntimeSnapshotV2,
   type FrozenScaleRuntimeSnapshotV2,
-  frozenScaleInstructionSchema,
-  type FrozenScaleInstruction,
 } from './runtime-snapshot-v2'
 import { z } from 'zod'
 
@@ -220,6 +219,8 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     frozenAt?: Date
     requestedMode?: import('../scale/policy/deployment').ScaleDeploymentModeV1
     instruction?: FrozenScaleInstruction | null
+    /** Exact DB C pointer from an authorized immutable standard source. */
+    importedScaleId?: string
     /** Content facts from an actual immutable education unit, never authority.
      * The owning START layer verifies current U and DB seal containment. */
     sealedLibraryPresentation?: {entryId:string;sourceDefinitionHash:string;presentation:FrozenScalePresentation}
@@ -255,11 +256,25 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   // old V1 contract tests may not; they deliberately keep the exact legacy
   // writer behavior. A real DB resolution error never falls back open.
   const scaleModel = (db as any).scale
-  if (!scaleModel || typeof scaleModel.findUnique !== 'function') return v1
-  const scale = await scaleModel.findUnique({
-    where: { code: input.instrumentKey },
-    select: { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true, libraryEntryId: true, measurementReleaseId: true },
+  if (!scaleModel || typeof scaleModel.findUnique !== 'function') {
+    if (input.importedScaleId) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
+    return v1
+  }
+  const scaleSelect = { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true, libraryEntryId: true, measurementReleaseId: true, standardSourceKind: true, standardToolKey: true }
+  let scale = await scaleModel.findUnique({
+    where: input.importedScaleId ? { id: input.importedScaleId } : { code: input.instrumentKey },
+    select: scaleSelect,
   })
+  if (input.importedScaleId && (!scale || scale.standardSourceKind !== 'DB_IMPORTED' || scale.standardToolKey !== input.instrumentKey || scale.instrumentVersion !== input.instrumentVersion)) {
+    throw new Error('Scale new start denied: IMPORTED_SOURCE_IDENTITY_MISMATCH')
+  }
+  if(!input.importedScaleId&&(!scale||scale.instrumentVersion!==input.instrumentVersion)&&typeof scaleModel.findFirst==='function'){
+    const imported=await scaleModel.findFirst({
+      where:{standardSourceKind:'DB_IMPORTED',standardToolKey:input.instrumentKey,instrumentVersion:input.instrumentVersion},
+      select:scaleSelect,
+    })
+    if(imported)scale=imported
+  }
   if (!scale) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
   if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')
 

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ctas2_cognitive_en",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "b9852ae50b80d2fe5db8340eddeb5deb4dfbf5a2e526fc667b221e7023dc496a",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "cognitive_test_anxiety"
+        ],
+        "scoreOrder": [
+          "cognitive_test_anxiety"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_test_anxiety",
+            "headline": "Cognitive experiences around tests",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This result describes how often you endorsed thoughts and perceived interference related to examinations. The total raw score ranges from 24 to 96; a larger result reflects more endorsement of cognitive test-anxiety experiences. It is not a diagnosis or a percentile rank.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Consider which thoughts arise during test preparation and which arise after receiving the test."
+              },
+              {
+                "category": "strategy",
+                "text": "Try a brief study plan with specific practice tasks, manageable breaks and a pre-test routine."
+              },
+              {
+                "category": "support",
+                "text": "If worry significantly affects daily functioning or studying, consider talking with a qualified counselor or trusted support person."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "This author-hosted CTAS-2 form was primarily studied in university populations; it is not validated as a Chinese K12 norm in this package.",
+          "University low/moderate/high thresholds have deliberately not been loaded as K12 cutoffs; referencePolicy=none.",
+          "The total reflects self-reported cognitive test anxiety, not objective ability, school performance, clinical symptoms or future outcomes.",
+          "Incomplete responses are not assigned a numeric total in this initial executable draft; source did not establish a defensible proration rule."
+        ],
+        "disclaimer": "Research-oriented description only. This draft is not for diagnosis, school ranking, high-stakes selection or unsupervised deployment."
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "cognitive_test_anxiety"
+        ],
+        "scoreOrder": [
+          "cognitive_test_anxiety"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "cognitive_test_anxiety",
+            "headline": "Leave one space for action, not another exam to pass / 给行动留一格，不再加一场“必须不紧张”的考试",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "Take-home: leave room for a next step, without first winning an argument with worry.\n\nThis number is the sum of 24 answers, from 24 to 96. Larger means these descriptions of exam-related worry, self-doubt and interference were rated as more typical of you. It is not a worry counter, an intelligence score or a forecast of the result. There is no fixed recall period or pass mark here.\n\nImagine a revision page competing with a thought about failing, or a test question competing with guesses about everyone else's progress. Those are possible scenes, not a story the system has uncovered about you. A single total cannot tell which scene fits, and there are no separate preparation, test-taking or post-test scores.\n\nA useful routine can stay. A difficult moment can also call for clearer information, realistic preparation conditions or support—not another lecture about trying harder. You do not have to feel perfectly calm, think positively or push the number down to make your next choice. A smaller number does not make a real difficulty unimportant, and a larger one does not define you as a student.\n\n中文对照：一句带走的话：给下一步留一格，不先和担心辩出输赢。\n\n这是24题相加的24–96原始总分，越大表示这次更觉得考试担忧、自我怀疑和干扰相关描述符合自己，不是担心计数器、智力分或成绩预告。没有固定回顾天数，也没有及格线。\n\n想象眼前复习页与“万一考不好”争注意，或一道题与“别人做到哪了”的猜测挤在一起；这只是可能场景，报告没发现你的个人故事。一个总分也拆不出备考、考中和考后三种分数。\n\n好用的安排继续用。困难时也可以需要清楚信息、现实准备条件或支持，而不是再听一遍“努力点”。不必完全平静、强迫积极或先把数字压下去，才能开始下一步。较小数字不会让真实困难变得不重要，较大数字也不会决定你是怎样的学生。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Give one moment two short notes: “the thought that showed up” and “the next useful thing I can do.” A concept to check or a question to ask is enough. This is not a task to prove the thought wrong or to turn it into cheerful self-talk. / 只给一个片段留两句：出现了什么担心、接下来一件有用的事是什么。核对一个概念或问清一句即可，不用先证明担心错了，也不用改写成乐观口号。"
+              },
+              {
+                "category": "strategy",
+                "text": "Keep one small restart plan, not a perfect-performance script. In low-pressure practice, read what is asked, note what you know and follow the rules about moving on. Or after a test, keep one practical lesson and stop guessing the score for a while. Choose one; worry does not have to disappear first. / 留一个小接续办法，不写完美表现剧本。低压力练习时看清问什么、写出已知，并遵守跳题规则；或者考后只留一个实际改进点，暂时不再猜分。选一个即可，不用等担心彻底消失。"
+              },
+              {
+                "category": "support",
+                "text": "Support is not a prize reserved for crossing a score line. If worry keeps affecting sleep, studying or daily life, take one example to a safe, trusted educator, learning-support professional or qualified mental-health professional. You do not have to show that you have already tried everything alone. / 支持不是达到某条分数线才发的奖励。担忧持续影响睡眠、学习或生活时，可以带一个例子找安全可信的教育工作者、学习支持人员或合适心理健康专业人士，不必先证明自己已经独自试尽所有办法。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Adult research candidate, mainly university evidence; self-description only—not diagnosis, ability, grade prediction or severity grading. / 仅成人研究候选，证据主要来自大学情境；自述非诊断、能力、成绩预测或严重分级。"
+        ],
+        "disclaimer": "Research-oriented description only. This draft is not for diagnosis, school ranking, high-stakes selection or unsupervised deployment.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      }
+    }
+  ]
+}

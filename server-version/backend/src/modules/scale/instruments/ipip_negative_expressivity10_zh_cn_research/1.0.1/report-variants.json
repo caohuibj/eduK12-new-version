@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "db881941217057cefaa71b9b19f9e137689997752b96224ecd2eb7d4aecfbaa7",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "ipip_negative_expressivity10"
+        ],
+        "scoreOrder": [
+          "ipip_negative_expressivity10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "难受的时候，别人有多容易看见你的感受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答关注的是：难过、害怕或生气时，别人有多容易看见你的感受。它不是在判断你是不是“情绪不好的人”。分数越高，表示这些感受越容易通过表情或行动流露；越少外露，也不等于更平静或更会调节。表达得多或少都没有统一的好坏答案。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次不开心：你想让别人理解什么？你实际表达出来的内容，和心里想说的一样吗？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以试着把“你怎么总这样”换成“刚才发生这件事时，我有些生气，我希望……”。表达感受不等于吼叫、威胁或伤害别人；情绪很强时，先暂停一下也可以。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "习惯、文化、关系安全感和具体场合都会影响表达。这个中文工作译稿尚待审核与验证，没有诊断分界值，也不能据此判断情绪控制能力。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "10题需完整回答；漏答不当作零分，也不代填。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T17:05:00Z",
+            "basis": "AI editorial check only: descriptive adult reflection, no norms, diagnostic/ability/moral labels or therapy claims; not human expert translation or psychometric review."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "ipip_negative_expressivity10"
+        ],
+        "scoreOrder": [
+          "ipip_negative_expressivity10"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_negative_expressivity10",
+            "headline": "给感受一行字幕，不把人缩成一个表情",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：有声音或没声音，都不是心里全部的故事。\n\n把表情和动作想成别人看到的画面，心里的感受未必都有字幕。这十题回看难过、害怕、生气怎样外露或藏住，总分10–50；数值越大表示整体更认可容易向外表达的描述，不是“负能量”有多少。\n\n假设你皱着眉，想表达的其实是“这个变化让我没准备好”；或者你很安静，心里却已经很难受。问卷没有现场看见这些情景，也不据一个总分认定你暴躁、能忍或会不会调节。\n\n如果你愿意让某个人知道，可以给画面加一句清楚的话；如果现在不合适，也可以等一等。字幕不是必须直播的要求，表达也不必靠把音量开大。更值得关心的是意思有没有被传递、边界和安全有没有被照顾。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先写自己想说的字幕：用一句话说明“发生了什么、我有什么感受、我希望什么”，不先写对方整个人怎么样。"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一种安全的播出方式：可以当面说、写下来，或等彼此有余力再谈。想表达不等于要吼叫、威胁或伤害；也不必把安静当作唯一正确答案。"
+              },
+              {
+                "category": "support",
+                "text": "不合适时可以暂停播放：如果场合或关系让你不安心，先保护自己并考虑可靠支持。你可以决定说多少，不需要拿表达程度证明自己。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本还在研究完善，没有可用的人群分档或排名。十题需答完整才计算；漏答不是0分，外露多少也不是痛苦或控制能力的等级。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial content self-review; not human expert or psychometric approval",
+            "reviewedAt": "2026-10-29T15:54:20Z",
+            "basis": "本次只读审阅ipip_negative_expressivity10_zh_cn_research C1.0.1精确source及已有材料与新R1.2.0文字；核范围/方向/通常时窗、构念边界、固定例子与可选行动、null不作0及必要短提示。不继承旧日期、不改变受众权限，不声称新译审、中文验证或schema/scorer/PG/CI通过。"
+          }
+        }
+      }
+    }
+  ]
+}

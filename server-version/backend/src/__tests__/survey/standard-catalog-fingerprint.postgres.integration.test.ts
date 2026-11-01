@@ -14,6 +14,7 @@ import {csrfProtection} from '../../middleware/csrf'
 import {errorHandler} from '../../middleware/errorHandler'
 import {generateToken} from '../../utils/jwt'
 import {standardPolicyIdentity} from '../../modules/survey/tool-policy'
+import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
 const url=integrationDatabaseUrl('SURVEY_FOLLOWUP_TEST_DATABASE_URL'),suite=url?describe:describe.skip
 suite('SDQ and original shared Scale coexist in the actual Survey admin directory',()=>{
  let server:Server,base:string,token:string,entryId:string
@@ -38,8 +39,21 @@ suite('SDQ and original shared Scale coexist in the actual Survey admin director
  afterAll(async()=>{if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
  const call=async(path:string,body?:unknown)=>{const res=await fetch(base+'/api/platform/survey-library'+path,{method:body===undefined?'GET':'POST',headers:{Origin:'https://training.eduk12.top',Cookie:'ptool_session='+token+'; ptool_csrf=synthetic','x-csrf-token':'synthetic','Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:res.status,body:await res.json()}}
  it('reads both real SDQ and the newly approved original entry, then validates the same exact approval fingerprint',async()=>{
+  const expectedStandard=listScaleInstrumentSources().map(source=>`standard:${source.identity.instrumentKey}:${source.identity.instrumentVersion}`).sort()
+  // Include all persisted authored fixtures, so the bound is exact even when
+  // this isolated database already contains entries from another fixture suite.
+  const authored=await db.$queryRaw<Array<{id:string}>>`SELECT id FROM scale_library_entries`
+  expect(authored.some(row=>row.id===entryId)).toBe(true)
+  const expectedCatalogIds=[...expectedStandard,...authored.map(row=>'authored:'+row.id)].sort()
   const rows=[]
-  for(let page=1;page<=10;page++){const r=await call('/catalog?page='+page);expect(r.status).toBe(200);rows.push(...r.body.data.list);if(!r.body.data.hasMore)break}
+  for(let page=1;page<=Math.ceil(expectedCatalogIds.length/25)+1;page++){
+   const r=await call('/catalog?page='+page);expect(r.status).toBe(200)
+   expect(r.body.data.list).toHaveLength(Math.max(0,Math.min(25,expectedCatalogIds.length-(page-1)*25)))
+   expect(r.body.data.hasMore).toBe(page*25<expectedCatalogIds.length)
+   rows.push(...r.body.data.list)
+  }
+  expect(rows.map(row=>row.catalogId).sort()).toEqual(expectedCatalogIds)
+  expect(new Set(rows.map(row=>row.catalogId)).size).toBe(expectedCatalogIds.length)
   const sdq=rows.find(r=>r.origin==='STANDARD_REGISTRY'&&r.exactVersion.instrumentKey==='sdq_teacher_zh_cn')
   expect(sdq).toBeTruthy();expect(rows.some(r=>r.origin==='AUTHORED'&&r.exactVersion.entryId===entryId)).toBe(true)
   expect(sdq.policyIdentity).toEqual(standardPolicyIdentity('sdq_teacher_zh_cn','1.0.0'))

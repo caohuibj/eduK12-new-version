@@ -540,12 +540,13 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
       },
     })
 
-    // Without a passed-in parent, admission reads the child once and the
-    // composite parent once.
+    // First delivery must re-read the child under its existing write lock;
+    // an epoch or admission winner can change while that lock is acquired.
+    // The context-bearing composite parent is still loaded only once.
     const childA = await createChild()
     const { value: first, calls: firstCalls } = await runObserved(() => ensureScaleAdmissionAtDelivery(childA.id))
     expect(first).toBeTruthy()
-    expect(callCount(firstCalls, 'Assessment', 'findUnique')).toBe(1)
+    expect(callCount(firstCalls, 'Assessment', 'findUnique')).toBe(2)
     expect(callCount(firstCalls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(1)
 
     // With the parent passed in (unified attempt-state reader), the parent
@@ -569,14 +570,17 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
     })
     if (!parent) throw new Error('Work C scale parent fixture is missing')
     const childB = await createChild()
+    await ensureScaleAdmissionAtDelivery(childB.id) // Freeze once before measuring read-only reuse.
     const { calls: secondCalls } = await runObserved(() => ensureScaleAdmissionAtDelivery(childB.id, parent as any))
     expect(callCount(secondCalls, 'Assessment', 'findUnique')).toBe(1)
     expect(callCount(secondCalls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(0)
 
     // With both the parent and the already-loaded child passed in (unified
     // attempt-state reader), neither the parent nor the child is re-read.
+    const childCId = (await createChild()).id
+    await ensureScaleAdmissionAtDelivery(childCId)
     const childC = await prisma.assessment.findUnique({
-      where: { id: (await createChild()).id },
+      where: { id: childCId },
       select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     })
     if (!childC) throw new Error('Work C scale child fixture is missing')
@@ -994,12 +998,15 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
     expect(value.status).toBe('IN_PROGRESS')
     expect(value.currentItem?.type).toBe('SCALE')
 
-    // Narrow parent + lazy current-unit: the parent projection carries only
-    // cheap child summaries, so the current-unit delivery performs exactly one
-    // authoritative Assessment.findUnique (shared by runtime validation and
-    // admission) and never re-reads the composite parent.
-    expect(callCount(calls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(1)
-    expect(callCount(calls, 'Assessment', 'findUnique')).toBe(1)
+    // Cold delivery reads the locked child and its current frozen context.
+    // Those write-time checks cannot reuse a pre-lock admission projection.
+    expect(callCount(calls, 'CompositeAssessmentAttempt', 'findUnique')).toBe(2)
+    expect(callCount(calls, 'Assessment', 'findUnique')).toBe(2)
+    // Once frozen, the original load-once budget remains strict.
+    const warm=await runObserved(()=>compositeService.getAttemptState(attempt.id,{userId:teacherId}))
+    expect(warm.value.currentItem?.type).toBe('SCALE')
+    expect(callCount(warm.calls,'CompositeAssessmentAttempt','findUnique')).toBe(1)
+    expect(callCount(warm.calls,'Assessment','findUnique')).toBe(1)
 
     await prisma.assessment.deleteMany({ where: { compositeAttemptId: attempt.id } })
     await prisma.compositeAssessmentItem.deleteMany({ where: { compositeAssessmentId: composite.id } })

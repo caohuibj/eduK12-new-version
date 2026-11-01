@@ -41,14 +41,13 @@ describe('Wave 0 Scale Library TEXI gate parity', () => {
     { instrumentKey: 'texi_parent_zh_cn', respondent: 'PARENT', scaleId: 'scale-texi-parent' },
     { instrumentKey: 'texi_teacher_zh_cn', respondent: 'TEACHER', scaleId: 'scale-texi-teacher' },
   ] as const)(
-    'keeps $instrumentKey unavailable while the authoritative TEXI localization manifest is unsigned',
+    'keeps $instrumentKey pending review visible while enforcing the exact content locale and deployment publication',
     ({ instrumentKey, respondent, scaleId }) => {
       const pkg = getScalePackage(instrumentKey, '1.0.0')!
-      const originalReleaseStatus = pkg.releaseStatus
-      pkg.releaseStatus = 'PUBLISHED'
-      try {
+      expect(pkg.releaseStatus).toBe('PUBLISHED')
+      const readEntry = (locale: string, status = 'PUBLISHED') => {
         const model = buildScaleLibraryReadModel({
-          locale: 'en',
+          locale,
           territory: 'CN',
           respondent,
           viewerRole: 'ADMIN',
@@ -58,23 +57,32 @@ describe('Wave 0 Scale Library TEXI gate parity', () => {
             scaleId,
             code: instrumentKey,
             instrumentVersion: '1.0.0',
-            status: 'PUBLISHED',
+            status,
           }],
         })
-        const entry = model.entries.find((candidate) => candidate.identity.instrumentKey === instrumentKey)!
-
-        // Source-owned localization remains pending and blocks launch independently of product readiness.
-        expect(entry.localization.reviewStatus).toBe('PENDING')
-        expect(entry.availability.status).toBe('RESTRICTED')
-        expect(entry.availability.launch).toBeUndefined()
-        expect(entry.availability.reasons.join(' ')).toContain('本地化治理条件尚未满足')
-        expect(entry.governance?.gate.publishable).toBe(true)
-        expect(entry.governance?.gate.warnings.some((error) => (
-          error.includes('reviewStatus=PENDING')
-        ))).toBe(true)
-      } finally {
-        pkg.releaseStatus = originalReleaseStatus
+        return model.entries.find((candidate) => candidate.identity.instrumentKey === instrumentKey)!
       }
+      const entry = readEntry('en')
+
+      // Manual review remains pending; English content is not a Chinese form.
+      expect(entry.localization.reviewStatus).toBe('PENDING')
+      expect(entry.localization.targetLocale).toBe('en')
+      expect(entry.availability.status).toBe('AVAILABLE')
+      expect(entry.availability.launch).toEqual({ scaleId, route: `/student/scales/${scaleId}` })
+      expect(entry.governance?.gate.publishable).toBe(true)
+      expect(entry.governance?.gate.warnings.some(warning => warning.includes('reviewStatus=PENDING'))).toBe(true)
+
+      const wrongLocale = readEntry('zh-CN')
+      expect(wrongLocale.localization.reviewStatus).toBe('PENDING')
+      expect(wrongLocale.availability.status).toBe('RESTRICTED')
+      expect(wrongLocale.availability.launch).toBeUndefined()
+      expect(wrongLocale.availability.reasons).toContain('当前内容语言为 en，不提供 zh-CN 版本。')
+
+      const unpublished = readEntry('en', 'DRAFT')
+      expect(unpublished.availability.status).toBe('RESTRICTED')
+      expect(unpublished.availability.launch).toBeUndefined()
+      expect(unpublished.availability.reasons).toContain('当前量表部署尚未发布。')
+      expect(unpublished.governance?.gate.publishable).toBe(false)
     },
   )
 })

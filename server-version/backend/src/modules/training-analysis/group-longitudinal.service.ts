@@ -3,6 +3,7 @@ import {prisma} from '../../config/database'
 import {compositeBadRequest,compositeNotFound} from '../composite/composite.errors'
 import {readTrainingTracking} from '../composite/personal-tracking'
 import {groupTrackingMetrics,projectGroupLongitudinal,type GroupLongitudinalWave} from '../reporting/group-longitudinal'
+import type {TaskGroupProjection} from '../reporting/group-summary'
 import {listTaskGroupLongitudinalArtifactsPage,type TaskArtifactCursor,saveTaskGroupLongitudinalArtifact,readTaskGroupLongitudinalArtifact} from '../reporting/task-artifact'
 import {assertTrainingGroupAccess,assertTrainingGroupTaskHistoryAccess,listTrainingGroupPlanTasks,listTrainingAnalysisSources,type TrainingAnalysisActor} from './source'
 import {trainingCognitiveGroupAssignmentId,trainingScaleGroupId} from './group-source'
@@ -34,7 +35,7 @@ export async function trainingGroupLongitudinalCatalog(input:Scope&{before?:Task
    ...await listTaskGroupLongitudinalArtifactsPage(tx,state.source,state.plan.id,input.before)}
  })
 }
-type Bindings={waves:Array<{taskId:string;bindings:TrainingGroupBindings}>}
+type Bindings={waves:Array<{taskId:string}&({missing:true}|{missing?:false;bindings:TrainingGroupBindings})>}
 export async function generateTrainingGroupLongitudinal(input:Scope&{planId:string;sourceKey:string;throughWaveId:string}){
  const state=await prisma.$transaction(tx=>resolvePlan(tx,input))
  if(!state||state.plan.id!==input.planId)throw compositeBadRequest('只能生成已正式发布的纵向计划报告')
@@ -48,6 +49,16 @@ export async function generateTrainingGroupLongitudinal(input:Scope&{planId:stri
   if(selected.some(s=>!s.binding))throw compositeBadRequest('波次缺少继承的冻结指标')
   const catalog=await prisma.$transaction(tx=>listTrainingAnalysisSources(tx,input.actor,input.courseId,{authorityLock:'SHARE',taskId:wave.id,group:true}))
   const candidates=catalog.tools.filter(tool=>selected.every(({metric,binding})=>tool.source.metrics.some(m=>m.itemId===binding!.itemId&&(metric.kind==='FORM'||m.metricKey===binding!.scoreKey))))
+  if(!catalog.tools.length){
+   // Scale/SJT discovery needs a completed result. Only an actually empty,
+   // already-authorized plan task may bypass that observation lookup.
+   const completed=await prisma.compositeAssessmentAttempt.findFirst({where:{compositeAssessmentId:wave.id,deliveryCourseId:input.courseId,assignmentRef:null,status:'COMPLETED',deliveryMode:'FINAL_ONLY',runtimeGeneration:'UNIFIED_V1'},select:{id:true}})
+   if(!completed){
+    const projection:TaskGroupProjection={schemaVersion:1,descriptionVersion:'group-descriptive-v1',title:'课程群体报告',sourceLabel:wave.title,populationLabel:'本波次暂无完成结果',cutoff:new Date().toISOString(),completedN:null,assignedN:null,countUnit:'PERSON',tool:{key:input.sourceKey,title:metrics[0].label,kind:metrics[0].kind},metrics:[],limitations:['本波次尚无完成结果，数值及人数保持空值。']}
+    prepared.push({id:wave.id,ordinal:wave.ordinal,label:wave.title,projection,metricKeys:Object.fromEntries(selected.map(s=>[s.metric.id,s.binding!.scoreKey])),populationKeys:null,observedFrom:null,observedUntil:null})
+    bindings.waves.push({taskId:wave.id,missing:true});continue
+   }
+  }
   if(candidates.length!==1)throw compositeBadRequest(candidates.length?'此来源含多个冻结分卷或材料组，需沿原群体来源分层，不能合并':'所选叶工具没有当前课程的群体数值披露权限或可用冻结来源')
   const tool=candidates[0],{taskId,publication,configDigest,variantKey,materialGroupKey}=tool.source
   const group=await prepareTrainingGroupReport({actor:input.actor,courseId:input.courseId,selection:{taskId,toolKey:tool.key,publication,configDigest,variantKey,...(materialGroupKey===undefined?{}:{materialGroupKey})}})
@@ -61,21 +72,22 @@ export async function generateTrainingGroupLongitudinal(input:Scope&{planId:stri
   }
   prepared.push({id:wave.id,ordinal:wave.ordinal,label:wave.title,projection:group.projection,metricKeys:keys,protocols,populationKeys:group.populationKeys,observedFrom:null,observedUntil:null})
   bindings.waves.push({taskId:wave.id,bindings:group.sourceBindings})
-  if(bindings.waves.reduce((n,w)=>n+w.bindings.parents.length,0)>6000)throw compositeBadRequest('纵向来源超过现有6000条分析范围，请缩小波次范围')
+  if(bindings.waves.reduce((n,w)=>n+(w.missing===true?0:w.bindings.parents.length),0)>6000)throw compositeBadRequest('纵向来源超过现有6000条分析范围，请缩小波次范围')
  }
  // Completion metadata for the already selected parents only. No second result
  // reader, rescoring or identity matching; source selection stays in source.ts.
- const dates=await prisma.compositeAssessmentAttempt.findMany({where:{id:{in:bindings.waves.flatMap(w=>w.bindings.parents.map(p=>p.attemptId))}},select:{id:true,completedAt:true}})
+ const dates=await prisma.compositeAssessmentAttempt.findMany({where:{id:{in:bindings.waves.flatMap(w=>w.missing===true?[]:w.bindings.parents.map(p=>p.attemptId))}},select:{id:true,completedAt:true}})
  const times=new Map(dates.map(d=>[d.id,d.completedAt?.toISOString()]))
  for(const [i,wave]of prepared.entries()){
-  const observed=bindings.waves[i].bindings.parents.flatMap(p=>times.get(p.attemptId)?[times.get(p.attemptId)!]:[]).sort()
+  const ref=bindings.waves[i]
+  const observed=ref.missing===true?[]:ref.bindings.parents.flatMap(p=>times.get(p.attemptId)?[times.get(p.attemptId)!]:[]).sort()
   wave.observedFrom=observed[0]??null;wave.observedUntil=observed.at(-1)??null
  }
  const projection=projectGroupLongitudinal({plan,metrics,waves:prepared})
  return prisma.$transaction(async tx=>{
   const current=await resolvePlan(tx,input)
   if(current?.plan.id!==plan.id)missing()
-  for(const wave of bindings.waves)await assertTrainingGroupBindingsCurrent(tx,{...input,taskId:wave.taskId},wave.bindings)
+  for(const wave of bindings.waves)if(wave.missing!==true)await assertTrainingGroupBindingsCurrent(tx,{...input,taskId:wave.taskId},wave.bindings)
   return saveTaskGroupLongitudinalArtifact(tx,{source:state.source,selector:{planId:plan.id,sourceKey:input.sourceKey},sourceBindings:bindings,projection,generatedBy:input.actor.userId})
  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:60000})
 }
@@ -87,7 +99,7 @@ export async function readTrainingGroupLongitudinal(input:Scope&{artifactId:stri
   if(!artifact)missing()
   const bindings=artifact!.sourceBindings as Bindings
   if(!bindings.waves.length||bindings.waves.some(w=>!state!.waves.some(p=>p.id===w.taskId)))missing()
-  for(const wave of bindings.waves)await assertTrainingGroupBindingsCurrent(tx,{...input,taskId:wave.taskId},wave.bindings)
+  for(const wave of bindings.waves)if(wave.missing!==true)await assertTrainingGroupBindingsCurrent(tx,{...input,taskId:wave.taskId},wave.bindings)
   return {artifactId:artifact!.artifactId,generatedAt:artifact!.generatedAt,projection:artifact!.projection}
  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
