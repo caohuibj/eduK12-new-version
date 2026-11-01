@@ -135,13 +135,13 @@ const releaseToolFiles=new Set([
  '.github/workflows/ci.yml','.github/workflows/ci-frontend.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/merge-gate.mjs',
  '.github/scripts/local-validation.mjs','.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs',
- '.gitignore','AGENTS.md','docs/ci-runner-policy.md','docs/release/README.md','docs/release/audit-20261009.md','docs/release/validation-20261009.md',
+ '.gitignore','AGENTS.md','docs/ci-runner-policy.md','docs/release/README.md','docs/release/operations.md','docs/release/audit-20261009.md','docs/release/validation-20261009.md',
  'server-version/docs/release-candidate-checklist-v1.md','server-version/docs/release-verify-local.md',
- ...['ingress.py','test_ingress.py','policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh'].map(f=>'server-version/scripts/release/'+f),
+ ...['ingress.py','test_ingress.py','policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh','update.sh'].map(f=>'server-version/scripts/release/'+f),
 ]);
 export function toolingOnly(entries){
  if(entries.some(e=>imageBuildFile(e.file)))return imageBuildOnly(entries);
- return entries.some(e=>releaseToolFiles.has(e.file))&&entries.every(e=>(releaseToolFiles.has(e.file)||engineeringEvidenceFile(e.file)||backendTestFile(e.file))&&(e.file==='.github/scripts/build-ci-images.sh'?e.status==='M'&&e.oldMode==='100755'&&e.newMode==='100755':e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644'))));
+ return entries.some(e=>releaseToolFiles.has(e.file))&&entries.every(e=>(releaseToolFiles.has(e.file)||engineeringEvidenceFile(e.file)||backendTestFile(e.file))&&(e.file==='.github/scripts/build-ci-images.sh'?e.status==='M'&&e.oldMode==='100755'&&e.newMode==='100755':e.file==='server-version/scripts/release/update.sh'?e.newMode==='100755'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100755')):e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644'))));
 }
 export function componentFingerprint(sha,component){
  const roots=component==='frontend'?[front]:['server-version/backend/'];

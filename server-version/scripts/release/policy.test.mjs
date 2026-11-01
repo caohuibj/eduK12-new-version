@@ -77,3 +77,20 @@ test('exact ingress bundle uses tools gate; unknown vhosts, app files, deletions
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}},'release-tools':{result:'success'},codeql:{result:'success'}};
  assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
  });
+
+test('deployment entry exact files use existing release tooling for add and normal update',()=>{
+ const entry={file:'server-version/scripts/release/update.sh',status:'A',oldMode:'000000',newMode:'100755'};
+ const docs={...regular('docs/release/operations.md'),status:'A',oldMode:'000000'};
+ const files=[entry,docs,regular('docs/release/README.md')];
+ assert.equal(toolingOnly(files),true);
+ assert.equal(toolingOnly(files.map(e=>e===entry?{...e,status:'M',oldMode:'100755'}:e)),true);
+});
+test('deployment entry mixed runtime schema unknown scripts and abnormal modes stay outside tooling',()=>{
+ const entry={file:'server-version/scripts/release/update.sh',status:'A',oldMode:'000000',newMode:'100755'};
+ const files=[entry,{...regular('docs/release/operations.md'),status:'A',oldMode:'000000'},regular('docs/release/README.md')];
+ for(const file of ['server-version/backend/src/modules/campus/service.ts','server-version/backend/prisma/schema.prisma','server-version/scripts/release/unknown.sh']){
+  const mixed=[...files,regular(file)];assert.equal(toolingOnly(mixed),false,file);assert.equal(classify(mixed,()=>['','x']).route,'C',file);
+ }
+ for(const change of [{newMode:'100644'},{newMode:'120000'},{status:'D',newMode:'000000'},{status:'M',oldMode:'100644'}])
+  assert.equal(toolingOnly([{...entry,...change},...files.slice(1)]),false,JSON.stringify(change));
+});
