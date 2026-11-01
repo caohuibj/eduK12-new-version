@@ -9,7 +9,7 @@
 精确身份。实际 `pages/CognitiveRunner.tsx` 的 READY 分支同时要求 runner 与
 readiness，因而旧 onboarding 后端检查通过仍不能从真实宿主开始。
 
-仅在下列20个 `frontend/src/modules/cognitive/tasks/<key>/<key>.registry.ts`
+初始 readiness 提交 `e8a846470b3c95fb645ffe384c82ead2c9bace82` 仅在下列20个 `frontend/src/modules/cognitive/tasks/<key>/<key>.registry.ts`
 增加 `readiness` 对象。共用 `registry.ts` 的可选类型及 `core/readiness.ts`
 对现有 generated runner entries 的精确投影，与 #481 的同名两文件逐字相同。
 不增加第二份准入名单、安装资格体系或版本回退；旧25个契约不变。
@@ -57,7 +57,7 @@ pursuitrotor 未解决触摸滚动/取消处理，故不声明 T。
 cancellation 题内定义的 CellGrid 随计时重挂会丢失焦点，故不声明 K。
 后续扩大这两项输入支持需先修相应交互，不能仅改声明。
 
-## 本次定向证据
+## 初始 readiness 提交的定向证据
 
 使用官方 Node **24.21.0** linux-x64；发行归档与官方 SHASUMS256 一致。
 复用既有依赖目录；未重新安装依赖或修改 lock。不将本地结果称为正式 CI。
@@ -78,12 +78,29 @@ cancellation 题内定义的 CellGrid 随计时重挂会丢失焦点，故不声
 未运行全平台、后端、数据库、构建、正式 CI、安全扫描、浏览器实机施测或生产安装。
 既有题库/计分/报告证据不因本次元数据接线而重做，也不扩大为端到端验收。
 
-## 独立的既有缺口
+## 独立追加：timecopy 保存失败只重试首次记录
 
-原20项仍采用 task completion。抽查前10项发现：末题 onTaskComplete 失败时，
-宿主 COMPLETING 卸载后恢复 RUNNING 的 task 状态不足以重建原终态；部分 trial
-保存 throw 仅 finally、或返回 false 后重新开放当前刺激。这些是既有完成/保存失败
-恢复问题，不由本次 READY 修复解决；未改 completionMode 或声称 FINAL 可靠性通过。
-需由主集成方另定最小恢复范围，不能把本补丁视为20项全部发布资格。
+已收窄此前对20项完成/保存恢复问题的泛化描述。只确认并修复 timecopy 的这个
+具体条件路径，不把其他19项或全部 FINAL 流程称为已有确定缺陷。
+
+- 真实 `useCognitiveSession.appendTrial` 在普通入口的 FINAL_ONLY 本地保存失败时
+  返回 false，保持当前 trialIndex。旧 TimecopyTask 此时回到 ready，允许重新计时，
+  没有保留首次 payload 的保存重试入口。
+- 修改前的一项故障探针通过实际 hook、reducer 和 finalDraftStore 复现：首次
+  responseMs=1250 保存失败，重新复制后保存成3450。API为合成会话；故障注入为
+  putTrial 一次 reject；存储使用测试环境的内存后端，不是浏览器原生 IndexedDB
+  或生产故障复现。新回归断言在旧代码上1失败/1正常继续通过，保留原始记录。
+- 现在 pendingPayloadRef 保留首次 targetMs/responseMs/interrupted。失败后只显示
+  重试保存，停在 feedback，不重新计时或修改成绩；成功后清除待存记录并由现有
+  hook 推进试次。没有改 FINAL 封存、完成回调、计分、报告、版本或历史记录。
+- Node24.21.0 下仅追加此文件2项检查，通过：失败等待5000ms后重试仍保存原1250，
+  以及普通1600ms作答保存后正常进入下一题；未运行练习/正式全套或真实FINAL。
+  未重跑初始29项或其余20套。追加的受影响类型检查3 roots、440 source closure、
+  0 diagnostics；两份TSX定向lint为0 errors，保留原先useEffect缺phase依赖的1个
+  warning（该effect及依赖数组与初始提交相同），未扩改无关逻辑。
+
+其他完成/保存失败流程属于本次未验证范围，不据此扩大阻断。
+`restart-required` 阻止 FINAL_ONLY 草稿仅凭试次索引重挂是既定设计，不是缺陷。
+已封存 FINAL 网络失败已有 pending/error 后核对重试路径，不能泛称都会重挂回说明。
 
 此分支仅供 D 取用并与报告组/#481统一集成；不合并、不 Ready、不部署、不写生产。
