@@ -1,4 +1,5 @@
 import type { CognitiveSeed } from '../../task-seed.types'
+import { CANCELLATION_STIMULUS_SET_VERSION } from './generator'
 
 const NO_REFERENCE_REPORT = {
   reportVersion: '1.0.1',
@@ -13,6 +14,6 @@ export const seeds: CognitiveSeed[] = [
     status: 'DRAFT',
     engineVersion: '1.0.1',
     scoringVersion: '1.0.0',
-    config: { totalTrials: 2, durationMs: 45000, stimulusSetVersion: 'cancellation-zh-v1.0.1', report: NO_REFERENCE_REPORT },
+    config: { totalTrials: 2, durationMs: 45000, stimulusSetVersion: CANCELLATION_STIMULUS_SET_VERSION, report: NO_REFERENCE_REPORT },
   },
 ]
