@@ -354,6 +354,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
   const records=[...catalogDiscoveryRecords(),...(kind==='SCALE'?await importedStandardDiscoveryRecords(db):[])],filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
+  const tagsForRef=(ref:CatalogSourceRef)=>sourceTags.get(ref.sourceId+':'+ref.sourceVersion)??sourceTags.get(ref.sourceId)
   const profileHeaders=new Map<string,{available:boolean;reason:string|null}>()
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
@@ -374,7 +375,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
     const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED'&&matchesCatalogDiscovery([p.key,p.definition.source.title??''],sjtClassificationTags(p.definition),filters)&&(!query||(p.key+' '+p.definition.source.title).toLowerCase().includes(query.toLowerCase()))).sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
-    for(const pkg of builtins)sourceTags.set('registry:'+pkg.key,sjtClassificationTags(pkg.definition))
+    for(const pkg of builtins)sourceTags.set('registry:'+pkg.key+':'+pkg.instrumentVersion,sjtClassificationTags(pkg.definition))
     for(const pkg of builtins.slice(offset,offset+Math.max(0,take-refs.length)))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
     const headers=refs.length<take?await db.$queryRaw<Array<{id:string;classification_tags:CatalogClassificationTag[]}>>(Prisma.sql`
       SELECT s.id,discovery.tags AS classification_tags FROM sjt_author_releases s
@@ -423,12 +424,12 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   }else fail('SOURCE_KIND_UNSUPPORTED')
   const list:CatalogSourceRow[]=[]
   for(const item of refs.slice(0,limit)){try{
-    if(isSurveyCognitiveProfileRef(item.ref)){const header=profileHeaders.get(item.ref.sourceId+':'+item.ref.sourceVersion);if(!header)return fail('SOURCE_PROFILE_HEADER_MISSING');list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:header.available,unsupportedReason:header.reason,definitionDigest:item.ref.sourceVersion});continue}
+    if(isSurveyCognitiveProfileRef(item.ref)){const header=profileHeaders.get(item.ref.sourceId+':'+item.ref.sourceVersion);if(!header)return fail('SOURCE_PROFILE_HEADER_MISSING');list.push({...item,...(tagsForRef(item.ref)?.length?{classificationTags:tagsForRef(item.ref)}:{}),available:header.available,unsupportedReason:header.reason,definitionDigest:item.ref.sourceVersion});continue}
     const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},isGovernedSource(item.ref.sourceId)?db:cached,true,db,scaleReleases)
-    list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
+    list.push({...item,...(tagsForRef(item.ref)?.length?{classificationTags:tagsForRef(item.ref)}:{}),available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
   }catch(e){
     if(!(e instanceof CatalogSourceError)&&!(e instanceof Error&&e.name==='SurveyDraftError'))throw e
-    list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:false,unsupportedReason:e instanceof CatalogSourceError?e.code:'SOURCE_SURVEY_DISPLAY_SHAPE_UNSUPPORTED'})
+    list.push({...item,...(tagsForRef(item.ref)?.length?{classificationTags:tagsForRef(item.ref)}:{}),available:false,unsupportedReason:e instanceof CatalogSourceError?e.code:'SOURCE_SURVEY_DISPLAY_SHAPE_UNSUPPORTED'})
   }}
   const moreSources=refs.length>limit
   return {list,page,hasMore:moreSources&&page<CATALOG_MAX_PAGE,
