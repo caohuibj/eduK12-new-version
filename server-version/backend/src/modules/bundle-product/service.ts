@@ -21,6 +21,7 @@ import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
+import { bundleBirthYearMonthForm, validateBundleStartContextMappings } from './start-context'
 
 export type BundleActor = { userId: string; role: UserRole }
 export const author = (actor: BundleActor) => {
@@ -82,6 +83,7 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       if(trackingSourceId&&(!trackingSource||trackingSource.status!=='PUBLISHED'||!trackingSource.personalTrackingBaselineId||!readTrainingTracking(trackingSource.personalTracking)))throw compositeConflict('纵向包来源不可用')
       if(trackingSource)owner(actor,trackingSource)
       const definition = entry.definition
+      validateBundleStartContextMappings(definition, entry.contextDefinition)
       if (input.publicEnabled && !definition.initiationModes.includes('ANONYMOUS_SELF')) throw compositeForbidden('此包不支持匿名投放')
       if (input.courseId && !definition.initiationModes.includes('TEACHER_ASSIGNMENT')) throw compositeForbidden('此包不支持课程投放')
       if (input.courseId) {
@@ -101,9 +103,10 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       let position = 0
       for (const field of entry.contextDefinition?.fields ?? []) {
         const profileForm=profileContextForm(entry.declarativePackage,field)
+        const birthForm = bundleBirthYearMonthForm(definition, field.contextKey)
         const boolean = field.valueType === 'boolean'
         const choices = boolean ? ['true', 'false'] : field.enumValues
-        const form=profileForm??{
+        const form=birthForm ? { ...birthForm, formOptions: Prisma.JsonNull } : profileForm??{
           formType: choices ? 'single_choice' : 'text_input', formLabel: field.contextKey === 'subject_age_years' ? '年龄（周岁）' : field.contextKey,
           formOptions: choices ? choices.map(value => ({ label: value, value })) : Prisma.JsonNull,
         }
