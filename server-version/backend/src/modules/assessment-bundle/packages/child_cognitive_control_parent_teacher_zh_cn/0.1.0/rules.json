@@ -1,0 +1,276 @@
+{
+  "version": "0.1.0",
+  "items": [
+    {
+      "ruleId": "gonogo_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_commission_errors"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_nogo_trial_count"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_go_trial_count"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_d_prime"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "本次任务区分该回应和该等待的信号。误按使用No-Go试次作分母，遗漏使用Go试次作分母；先核对试次数和质量，再阅读比例。",
+      "evidenceKeys": [
+        "gonogo_commission_rate",
+        "gonogo_commission_errors",
+        "gonogo_nogo_trial_count",
+        "gonogo_omission_rate",
+        "gonogo_go_trial_count",
+        "gonogo_d_prime"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "flanker_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "flanker_flanker_effect_ms"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_congruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_incongruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_median_rt_congruent"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_median_rt_incongruent"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "本次箭头任务需要看清中间目标并忽略旁边箭头。反应时间差应与一致、不一致两条件正确率一起阅读；差值可以为负，不能单独当成能力高低。",
+      "evidenceKeys": [
+        "flanker_flanker_effect_ms",
+        "flanker_congruent_accuracy",
+        "flanker_incongruent_accuracy",
+        "flanker_median_rt_congruent",
+        "flanker_median_rt_incongruent"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "task_reflection",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_commission_errors"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_nogo_trial_count"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_go_trial_count"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_d_prime"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_flanker_effect_ms"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_congruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_incongruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_median_rt_congruent"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_median_rt_incongruent"
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "两项任务提供不同规则下的本次记录。可以和孩子回顾哪里容易忘记规则、什么时候需要提示，并尝试一次只给一个清晰动作信号；这些记录不构成日常自我调节能力的综合分数。",
+      "evidenceKeys": [
+        "gonogo_commission_rate",
+        "gonogo_commission_errors",
+        "gonogo_nogo_trial_count",
+        "gonogo_omission_rate",
+        "gonogo_go_trial_count",
+        "gonogo_d_prime",
+        "flanker_flanker_effect_ms",
+        "flanker_congruent_accuracy",
+        "flanker_incongruent_accuracy",
+        "flanker_median_rt_congruent",
+        "flanker_median_rt_incongruent"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "parent_chexi_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "parent_chexi_working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "parent_chexi_inhibition"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "家长报告了家庭生活中的日常行为体验，均分范围1至5，较高代表报告的困难更多。",
+      "evidenceKeys": [
+        "parent_chexi_working_memory",
+        "parent_chexi_inhibition"
+      ],
+      "supportRefs": [
+        "chexi_original"
+      ]
+    },
+    {
+      "ruleId": "parent_chexi_complementary",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_flanker_effect_ms"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "parent_chexi_working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "parent_chexi_inhibition"
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "任务记录与这位成人的日常观察来自不同情境，提供互补线索，不能直接换算或凭分数认定一致或分歧。可一起回顾具体活动中的提示、干扰与转换要求，先尝试清单、较短步骤和提前约定的暂停信号。",
+      "evidenceKeys": [
+        "gonogo_commission_rate",
+        "flanker_flanker_effect_ms",
+        "parent_chexi_working_memory",
+        "parent_chexi_inhibition"
+      ],
+      "supportRefs": [
+        "chexi_original",
+        "chexi_cross_cultural"
+      ]
+    },
+    {
+      "ruleId": "teacher_chexi_observation",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "teacher_chexi_working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "teacher_chexi_inhibition"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "教师报告了课堂及学校活动中的日常行为体验，均分范围1至5，较高代表报告的困难更多。",
+      "evidenceKeys": [
+        "teacher_chexi_working_memory",
+        "teacher_chexi_inhibition"
+      ],
+      "supportRefs": [
+        "chexi_original"
+      ]
+    },
+    {
+      "ruleId": "teacher_chexi_complementary",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo_commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker_flanker_effect_ms"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "teacher_chexi_working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "teacher_chexi_inhibition"
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "任务记录与这位成人的日常观察来自不同情境，提供互补线索，不能直接换算或凭分数认定一致或分歧。可一起回顾具体活动中的提示、干扰与转换要求，先尝试清单、较短步骤和提前约定的暂停信号。",
+      "evidenceKeys": [
+        "gonogo_commission_rate",
+        "flanker_flanker_effect_ms",
+        "teacher_chexi_working_memory",
+        "teacher_chexi_inhibition"
+      ],
+      "supportRefs": [
+        "chexi_original",
+        "chexi_cross_cultural"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "key": "integrated_adult_control_report",
+  "version": "1.0.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "task_notes",
+      "kind": "conclusions",
+      "title": "任务告诉我们的事",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "gonogo_observation",
+        "cpt_observation",
+        "cpt_stability"
+      ]
+    },
+    {
+      "blockId": "daily_notes",
+      "kind": "conclusions",
+      "title": "日常体验告诉我们的事",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "daily_observation"
+      ]
+    },
+    {
+      "blockId": "cross_method",
+      "kind": "conclusions",
+      "title": "两扇窗，共同观察",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "complementary"
+      ]
+    },
+    {
+      "blockId": "actions",
+      "kind": "conclusions",
+      "title": "可以尝试的小改变",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "action_plan"
+      ]
+    },
+    {
+      "blockId": "quality_notes",
+      "kind": "conclusions",
+      "title": "缺失与解释边界",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "unavailable_gonogo_commission_rate",
+        "unavailable_cpt_omission_rate",
+        "unavailable_adexi_working_memory_sum",
+        "unavailable_adexi_inhibition_sum"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "部分来源缺少结果，请分别阅读可用的单项证据。",
+    "limited": "部分证据仅支持有限解释，本次不据此形成完整跨方法结论。",
+    "unavailable": "结果质量不足或未获披露授权，不能形成完整跨方法结论。"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "青少年13–19岁跨方法描述性DRAFT。非经验Profile，不定义高低阈值、不换算量尺、不主张一致性或差异具有诊断意义。英文自评＋中文报告；中文完整版私有待审。",
+  "references": [
+    {
+      "id": "texi_2020",
+      "citation": "Thorell LB, Lazarević N, Milovanović I, Bugarski Ignjatović V. (2020). Child Neuropsychology 26(6):857–864. https://doi.org/10.1080/09297049.2020.1726885. 302 Serbian adolescents aged13–19 and parents; self-report and parent report.",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "texi_scoring",
+      "citation": "Thorell, official TEXI Subscales (self/other), https://chexi.se/onewebmedia/TEXI%20subscales.pdf . Working memory items1,2,5,7,8,9,11,12,13; inhibition3,4,6,10,14,15,16,17,18,19,20; means.",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "toplak_2013",
+      "citation": "Toplak ME, West RF, Stanovich KE. (2013). Practitioner review: Do performance-based measures and ratings of executive function assess the same construct? JCPP54(2):131–143. https://doi.org/10.1111/jcpp.12001 . Supports complementary interpretation, not individual agreement/difference thresholds.",
+      "allowedClaims": [
+        "joint_conclusion"
+      ]
+    },
+    {
+      "id": "project_protocol",
+      "citation": "EduK12 main24061f5e3, cognitive/tasks/gonogo,cpt,flanker: standard120/180/80 trials. Project descriptive wording and educational suggestions; no intervention efficacy or age validation claim.",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition"
+      ]
+    }
+  ]
+}

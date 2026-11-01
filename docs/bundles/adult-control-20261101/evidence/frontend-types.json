@@ -1,0 +1,14 @@
+{
+  "node": "v24.21.0",
+  "typescript": "5.6.3",
+  "roots": [
+    "/workspace/adult-bundle/server-version/frontend/src/pages/bundle/BundleReport.tsx",
+    "/workspace/adult-bundle/server-version/frontend/src/pages/bundle/BundleEvidencePanels.tsx",
+    "/workspace/adult-bundle/server-version/frontend/src/pages/bundle/bundle-evidence-display.ts",
+    "/workspace/adult-bundle/server-version/frontend/src/pages/bundle/__tests__/BundleEvidencePanels.test.tsx",
+    "/workspace/adult-bundle/server-version/frontend/src/test/setup.ts",
+    "/workspace/adult-bundle/server-version/frontend/src/vite-env.d.ts"
+  ],
+  "files": 292,
+  "diagnostics": []
+}

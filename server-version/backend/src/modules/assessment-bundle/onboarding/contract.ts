@@ -4,6 +4,7 @@ import { profileSchema, validateProfileModel, profileStateSchema } from '../prof
 import { parseBundleContextDefinition } from '../context'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { assessmentBundleDefinitionSchema, BUNDLE_KEY, EXACT_VERSION, SLOT_KEY } from '../schema'
+import { parseAssessmentBundleDefinition } from '../definition'
 
 export const PACKAGE_LIMITS = { bytes: 1024 * 1024, depth: 24, conditionDepth: 8, conditions: 256, rules: 64, evidence: 128, blocks: 128 } as const
 const key = z.string().regex(SLOT_KEY).max(100)
@@ -27,7 +28,7 @@ const declaration = z.object({ ...assessmentBundleDefinitionSchema.shape,
   slots: assessmentBundleDefinitionSchema.shape.slots.max(64),
   status: z.literal('DRAFT'),
   engine: z.object({ key: z.literal('declarative-evidence-v1'), version: z.literal('1.0.0') }).strict(),
-  respondentTypes: z.tuple([z.literal('SELF')]),
+  respondentTypes: z.array(z.enum(['SELF', 'PARENT', 'TEACHER'])).min(1).max(3),
   safetyCapability: z.object({ safetyCapable: z.literal(false), productionTriggerEnabled: z.literal(false) }).strict(),
 }).strict()
 const packageV1Schema = z.object({
@@ -137,6 +138,7 @@ export function parseDeclarativePackage(raw: unknown): DeclarativePackage {
   const fail = (path: string, message: string): never => { throw new Error(`${path}: ${message}`) }
   const unique = (items: string[], path: string) => { if (new Set(items).size !== items.length) fail(path, 'duplicate identity') }
   const definition = value.manifest.definition
+  parseAssessmentBundleDefinition(definition)
   unique(definition.slots.map(s => s.slotKey), 'manifest.definition.slots')
   unique(definition.slots.map(s => String(s.position)), 'manifest.definition.slots.position')
   unique(value.evidence.map(e => e.evidenceKey), 'evidence')

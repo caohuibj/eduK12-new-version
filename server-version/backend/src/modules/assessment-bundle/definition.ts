@@ -17,6 +17,9 @@ const assertRespondentPopulation = (definition: AssessmentBundleDefinitionV1) =>
     if (respondents.has('SELF') || (!respondents.has('PARENT') && !respondents.has('TEACHER'))) {
       bundleContractFail('INVALID_RESPONDENT_POPULATION', 'observer Bundle 只能使用 PARENT 和/或 TEACHER')
     }
+  } else if (definition.category === 'integrated' && respondents.has('SELF') && definition.engine.key === 'declarative-evidence-v1') {
+    // Cross-attempt orchestration binds each slot to its real respondent.
+    // The ordinary single-attempt product creator separately refuses this mix.
   } else if (respondents.size !== 1 || !respondents.has('SELF')) {
     bundleContractFail('INVALID_RESPONDENT_POPULATION', `${definition.category} Bundle 只能使用 SELF respondent`)
   }
