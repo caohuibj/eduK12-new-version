@@ -1,8 +1,17 @@
 import {execFileSync} from 'node:child_process';
 const nginx='server-version/frontend/nginx.conf', compose='server-version/docker-compose.yml';
+const main='server-version/frontend/nginx-main.conf',dockerfile='server-version/frontend/Dockerfile';
 const controls=new Set(['.github/workflows/ci.yml','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/edge-config-scope.mjs','.github/scripts/edge-config.test.mjs','.github/scripts/edge-config-smoke.sh']);
 export function edgeConfigScope(entries,readBase,readHead){
- if(!entries.some(e=>e.file===nginx)||entries.some(e=>!['A','M'].includes(e.status)||e.newMode!=='100644'||(e.oldMode!=='100644'&&e.oldMode!=='000000')||![nginx,compose].includes(e.file)&&!controls.has(e.file)))return false;
+ if(!entries.some(e=>[nginx,main].includes(e.file))||entries.some(e=>!['A','M'].includes(e.status)||e.newMode!=='100644'||(e.oldMode!=='100644'&&e.oldMode!=='000000')||![nginx,main,dockerfile,compose].includes(e.file)&&!controls.has(e.file)))return false;
+ if(entries.some(e=>e.file===dockerfile)){
+  const before=readBase(dockerfile),after=readHead(dockerfile);
+  // Only split out the existing runtime config stage and bake both Nginx files.
+  // Build/dependencies/base images and runtime commands must remain unchanged.
+  const additions='COPY nginx-main.conf /etc/nginx/nginx.conf\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\n\nFROM runtime-config AS runtime\n';
+  const originalCopy='COPY --from=build /app/dist /usr/share/nginx/html\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\n';
+  if(!entries.some(e=>e.file===main)||typeof before!=='string'||typeof after!=='string'||!after.includes(additions)||after.replace('FROM nginx:1.31.6-alpine3.24-slim AS runtime-config\n','FROM nginx:1.31.6-alpine3.24-slim AS runtime\n').replace(additions,'').replace('COPY --from=build /app/dist /usr/share/nginx/html\n',originalCopy)!==before)return false;
+ }
  if(entries.some(e=>e.file===compose)){
   const before=readBase(compose),after=readHead(compose);
   // This route permits only the frontend nofile addition, not arbitrary Compose edits.
