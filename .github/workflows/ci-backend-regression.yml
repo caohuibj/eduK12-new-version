@@ -131,7 +131,7 @@ jobs:
         run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
       - name: clear reports from previous regression jobs
         # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
-        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json
+        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt /tmp/eduk12-teacher-self-group.json /tmp/eduk12-library-self-group.json /tmp/eduk12-teacher-private-group.json /tmp/eduk12-school-private-source.json /tmp/eduk12-school-composition-delta.json /tmp/eduk12-school-native-source.json /tmp/eduk12-school-native-reports.json /tmp/eduk12-education-marker.json /tmp/eduk12-education-feedback-policy.json /tmp/eduk12-education-standard-marker.json /tmp/eduk12-education-license-selection.json /tmp/eduk12-education-publication.json /tmp/eduk12-group-native.json /tmp/eduk12-evc-lifecycle.json /tmp/eduk12-evc-restore.json /tmp/eduk12-legacy-education-setup.json
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -193,6 +193,7 @@ jobs:
           # These consumers require no installed configs or seeded business rows.
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool cognitive_install_ci_test
           docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool library_http_ci_test
+          docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool component_import_ci_test
           for variant in marker feedback_policy standard_marker license_selection publication; do
             docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool --template=ptool --owner=ptool "education_${variant}_ci_test"
           done
@@ -330,6 +331,8 @@ jobs:
           --exclude=src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts
           --exclude=src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts
           --exclude=src/__tests__/survey/library-management.http.integration.test.ts
+          --exclude=src/__tests__/scale/component-publication.postgres.integration.test.ts
+          --exclude=src/__tests__/scale/component-management.http.integration.test.ts
           --exclude=src/__tests__/integration/teacherSelfGroupScale.postgres.integration.test.ts
           --exclude=src/__tests__/integration/librarySelfGroupScale.postgres.integration.test.ts
           --exclude=src/__tests__/integration/teacherPrivateCompositionGroup.postgres.integration.test.ts
@@ -417,6 +420,18 @@ jobs:
         run: |
           npm test -- src/__tests__/survey/library-management.http.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-library-http-vitest.json
           node scripts/assert-release-test-report.mjs /tmp/eduk12-library-http-vitest.json src/__tests__/survey/library-management.http.integration.test.ts
+      - name: component import and system-admin HTTP in their empty database
+        if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success'
+        env:
+          # Step-local URLs exist before Vitest imports database/fixture modules.
+          # The job default and every other suite keep their existing databases.
+          DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/component_import_ci_test?schema=public
+          COMPONENT_IMPORT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/component_import_ci_test?schema=public
+          SURVEY_WORKSPACE_ENABLED: 'true'
+          SURVEY_PUBLICATION_ENABLED: 'true'
+        run: |
+          npm test -- src/__tests__/scale/component-publication.postgres.integration.test.ts src/__tests__/scale/component-management.http.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-component-import-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-component-import-vitest.json src/__tests__/scale/component-publication.postgres.integration.test.ts src/__tests__/scale/component-management.http.integration.test.ts
       - name: real legacy education publication for the current compatibility consumer
         id: legacy-feedback
         if: (success() || failure()) && inputs.focus == 'full' && steps.empty-fixtures.outcome == 'success' && steps.historical-fixtures.outcome == 'success'
@@ -488,7 +503,7 @@ jobs:
       - name: preserve all disjoint functional reports and require their complete union
         if: (success() || failure()) && inputs.focus == 'full'
         run: >-
-          node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-library-http-vitest.json
+          node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest.json /tmp/eduk12-training-bundle-producer.json /tmp/eduk12-training-course-producer.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-roster.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-teacher-runtime-vitest.json /tmp/eduk12-cognitive-install-vitest.json /tmp/eduk12-library-http-vitest.json /tmp/eduk12-component-import-vitest.json
           /tmp/eduk12-teacher-self-group.json
           /tmp/eduk12-library-self-group.json
           /tmp/eduk12-teacher-private-group.json
@@ -543,6 +558,8 @@ jobs:
           src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts
           src/__tests__/cognitive/onboarding-install.postgres.integration.test.ts
           src/__tests__/survey/library-management.http.integration.test.ts
+          src/__tests__/scale/component-publication.postgres.integration.test.ts
+          src/__tests__/scale/component-management.http.integration.test.ts
           src/__tests__/survey/governed-native.postgres.integration.test.ts
           src/__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts
           src/__tests__/cognitive/concurrency.integration.test.ts
@@ -642,6 +659,7 @@ jobs:
             /tmp/eduk12-teacher-runtime-vitest.json
             /tmp/eduk12-cognitive-install-vitest.json
             /tmp/eduk12-library-http-vitest.json
+            /tmp/eduk12-component-import-vitest.json
             /tmp/eduk12-teacher-self-group.json
             /tmp/eduk12-library-self-group.json
             /tmp/eduk12-teacher-private-group.json
