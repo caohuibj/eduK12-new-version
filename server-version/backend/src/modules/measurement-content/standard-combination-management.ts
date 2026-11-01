@@ -1,5 +1,5 @@
-import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets} from '../survey/catalog-discovery'
-import {catalogDiscoveryQueryFields,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,discoveryPageSql,discoveryJoin} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -26,11 +26,11 @@ export async function trainingStandardManagementCatalog(actorId:string,raw:unkno
   const input=z.object({page,...catalogDiscoveryQueryFields}).strict().parse(typeof raw==='object'&&raw!==null?raw:{page:raw}),currentPage=input.page,size=25
   return prisma.$transaction(async tx=>{
     await manager(tx,actorId)
-    const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(tx)]
-    const rows=await tx.$queryRaw<Array<{id:string;title:string;toolKey:string;instrumentVersion:string;
+    const records=catalogDiscoveryRecords()
+    const [catalog]=await tx.$queryRaw<Array<{facetTags:CatalogClassificationTag[];list:Array<{id:string;title:string;toolKey:string;instrumentVersion:string;
       combinationHash:string;state:string;contentVersion:string;parametersVersion:string;reportVersion:string;
-      entryDecision:string;entryPaused:boolean;nativeStatus:string|null;measurementReleaseId:string|null;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`
-      SELECT COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",r.id,r.snapshot->>'title' AS title,r.tool_key AS "toolKey",r.snapshot->>'instrumentVersion' AS "instrumentVersion",
+      entryDecision:string;entryPaused:boolean;nativeStatus:string|null;measurementReleaseId:string|null;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`
+      SELECT r.created_at,discovery.ids,discovery.terms,COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",r.id,r.snapshot->>'title' AS title,r.tool_key AS "toolKey",r.snapshot->>'instrumentVersion' AS "instrumentVersion",
         r.combination_hash AS "combinationHash",r.state,
         r.snapshot#>>'{parts,CONTENT,version}' AS "contentVersion",
         r.snapshot#>>'{parts,PARAMETERS,version}' AS "parametersVersion",
@@ -41,12 +41,12 @@ export async function trainingStandardManagementCatalog(actorId:string,raw:unkno
         AND p.fingerprint=r.combination_hash AND p.product='TRAINING'
       LEFT JOIN scales native ON native.code=r.tool_key AND native.instrument_version=r.snapshot->>'instrumentVersion'
         AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
-      ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`r.tool_key`,version:Prisma.sql`r.snapshot->>'instrumentVersion'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})}
+      ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`r.tool_key`,version:Prisma.sql`r.snapshot->>'instrumentVersion'`,metadata:Prisma.sql`r.snapshot#>'{parts,CONTENT,reference,metadata}'`,locale:Prisma.sql`r.snapshot#>>'{definition,versionAxes,locale}'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})}
       WHERE (p.decision='APPROVED' OR EXISTS(SELECT 1 FROM material_grants g
         WHERE g.resource_type='STANDARD_COMBINATION' AND g.resource_id=r.id))
-      AND ${discoverySqlFilter([Prisma.sql`r.snapshot->>'title'`,Prisma.sql`r.tool_key`,Prisma.sql`r.snapshot->>'instrumentVersion'`],input)}
-      ORDER BY r.tool_key,r.created_at,r.id LIMIT ${size+1} OFFSET ${(currentPage-1)*size}`)
-    return {page:currentPage,hasMore:rows.length>size,tagFacets:discoveryFacets(records,'SCALE'),list:rows.slice(0,size).map(row=>({
+      `,filters:input,text:[Prisma.sql`v.title`,Prisma.sql`v."toolKey"`,Prisma.sql`v."instrumentVersion"`],order:Prisma.sql`v."toolKey",v.created_at,v.id`,limit:size+1,offset:(currentPage-1)*size}))
+    const rows=catalog.list
+    return {page:currentPage,hasMore:rows.length>size,tagFacets:catalogTagFacets([catalog.facetTags]),list:rows.slice(0,size).map(row=>({
       id:row.id,title:row.title,toolKey:row.toolKey,instrumentVersion:row.instrumentVersion,classificationTags:row.classificationTags,
       combinationHash:row.combinationHash,state:row.state,
       versions:{CONTENT:row.contentVersion,PARAMETERS:row.parametersVersion,REPORT:row.reportVersion},

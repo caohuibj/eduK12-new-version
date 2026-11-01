@@ -1,5 +1,5 @@
-import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets,sjtMetadataTagIds,jsonTagIds} from '../survey/catalog-discovery'
-import {catalogDiscoveryQueryFields,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,sjtMetadataTagIds,jsonTagIds} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -94,11 +94,11 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'OBSERVER'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
-  const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(tx)]
+  const records=catalogDiscoveryRecords()
   // Deduplicate grant keys before the PK joins and paginate/search real source
   // headers in this single statement. No page-size sparse post-filter, no full
   // bodies, deep ancestry reads or per-card runtime materialization.
-  const candidates=await tx.$queryRaw<Array<EducationPublicSourceHeader&SelectedCatalogFacts&{classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`WITH authorized_grants AS (
+  const [catalog]=await tx.$queryRaw<Array<{list:Array<EducationPublicSourceHeader&SelectedCatalogFacts&{classificationTags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(Prisma.sql`WITH authorized_grants AS (
    SELECT g.id,g.subject_id,g.issuer_id,g.resource_keys,g.version,g.valid_from,g.expires_at,typed.actor_id,typed.metadata
    FROM content_capability_grants g LEFT JOIN assessment_management_events typed ON typed.id=g.id AND typed.action=${EDUCATION_STANDARD_USE_ACTION}
    WHERE g.subject_id=${c.principal.userId} AND g.product=${c.entry} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${c.organizationId}
@@ -137,7 +137,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    LEFT JOIN sjt_author_releases sjt ON sources.kind='SJT_RELEASE' AND sjt.id=sources.id
    LEFT JOIN static_sjt_measurement_mappings static_sjt ON sources.kind='SJT_RELEASE' AND static_sjt.id=sources.id
    LEFT JOIN survey_governed_tools form ON sources.kind='FORM' AND form.id=sources.id
-   ${discoveryJoin(records,{kind:Prisma.sql`CASE WHEN sources.kind='STANDARD_SCALE' THEN 'SCALE' WHEN sources.kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE') THEN 'COGNITIVE' WHEN sources.kind='SJT_RELEASE' THEN 'SJT' ELSE 'FORM' END`,key:Prisma.sql`COALESCE(standard.tool_key,cognitive.test_type,sjt.instrument_key,static_sjt.instrument_key)`,version:Prisma.sql`COALESCE(standard.snapshot->>'instrumentVersion',sjt.instrument_version,static_sjt.instrument_version)`,engine:Prisma.sql`cognitive.engine_version`,scoring:Prisma.sql`cognitive.scoring_version`},Prisma.sql`CASE WHEN sources.kind='FORM' THEN ${jsonTagIds(Prisma.sql`form.reference#>'{metadata,tags}'`)} WHEN sources.kind='SJT_RELEASE' THEN ${sjtMetadataTagIds(Prisma.sql`sjt.package->'definition'`)} ELSE '[]'::jsonb END`)}
+   ${discoveryJoin(records,{kind:Prisma.sql`CASE WHEN sources.kind='STANDARD_SCALE' THEN 'SCALE' WHEN sources.kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE') THEN 'COGNITIVE' WHEN sources.kind='SJT_RELEASE' THEN 'SJT' ELSE 'FORM' END`,key:Prisma.sql`COALESCE(standard.tool_key,cognitive.test_type,sjt.instrument_key,static_sjt.instrument_key)`,metadata:Prisma.sql`standard.snapshot#>'{parts,CONTENT,reference,metadata}'`,locale:Prisma.sql`standard.snapshot#>>'{definition,versionAxes,locale}'`,version:Prisma.sql`COALESCE(standard.snapshot->>'instrumentVersion',sjt.instrument_version,static_sjt.instrument_version)`,engine:Prisma.sql`cognitive.engine_version`,scoring:Prisma.sql`cognitive.scoring_version`},Prisma.sql`CASE WHEN sources.kind='FORM' THEN ${jsonTagIds(Prisma.sql`form.reference#>'{metadata,tags}'`)} WHEN sources.kind='SJT_RELEASE' THEN ${sjtMetadataTagIds(Prisma.sql`sjt.package->'definition'`)} ELSE '[]'::jsonb END`)}
   ), page AS (SELECT classified.* FROM classified CROSS JOIN LATERAL (SELECT classified.ids,classified.terms) discovery
    WHERE (${input.cursor??null}::text IS NULL OR key COLLATE "C">${input.cursor??null} COLLATE "C")
     AND (${input.kind??null}::text IS NULL OR (${input.kind}='COGNITIVE' AND kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE')) OR kind=${input.kind==='SCALE'?'STANDARD_SCALE':input.kind==='COGNITIVE'?'COGNITIVE_CONFIG':input.kind==='SJT'?'SJT_RELEASE':'FORM'})
@@ -146,16 +146,18 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    ORDER BY key COLLATE "C" LIMIT 41), shown_page AS (SELECT * FROM page ORDER BY key COLLATE "C" LIMIT 40), typed_page_grants AS (
     SELECT g.* FROM authorized_grants g WHERE g.actor_id IS NOT NULL AND EXISTS(SELECT 1 FROM shown_page p WHERE p.key=ANY(g.resource_keys))
     ORDER BY g.id LIMIT 129
-   ) SELECT page.*,clock_timestamp() AS "catalogReadAt",
+   ) SELECT COALESCE((SELECT jsonb_agg(item) FROM (SELECT page.*,clock_timestamp() AS "catalogReadAt",
     EXISTS(SELECT 1 FROM authorized_grants g WHERE g.actor_id IS NULL AND page.key=ANY(g.resource_keys)) AS "legacyUseAvailable",
     (SELECT count(*)>128 FROM typed_page_grants) AS "typedOverflow",
     COALESCE((SELECT jsonb_agg(jsonb_build_object('id',g.id,'subject_id',g.subject_id,'issuer_id',g.issuer_id,'resource_keys',g.resource_keys,
      'version',g.version,'valid_from',g.valid_from AT TIME ZONE 'UTC','expires_at',g.expires_at AT TIME ZONE 'UTC','actor_id',g.actor_id,'metadata',g.metadata))
      FROM typed_page_grants g WHERE page.key=ANY(g.resource_keys)),'[]'::jsonb) AS "typedUses"
-    FROM page ORDER BY key COLLATE "C"`)
+    FROM page ORDER BY key COLLATE "C") item),'[]'::jsonb) AS list,
+    COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM classified CROSS JOIN LATERAL jsonb_array_elements("classificationTags") tag),'[]'::jsonb) AS "facetTags"`)
+  const candidates=catalog.list.map(row=>({...row,catalogReadAt:new Date(String(row.catalogReadAt))}))
   const selected=candidates.slice(0,40)
   const configured=await selectedEducationCatalogChoices(tx,c,selected)
-  return {tagFacets:discoveryFacets(records),list:selected.flatMap<EducationPublicCatalogCard>(header=>{
+  return {tagFacets:catalogTagFacets([catalog.facetTags]),list:selected.flatMap<EducationPublicCatalogCard>(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
    const native=['COGNITIVE_CONFIG','COGNITIVE_PROFILE','SJT_RELEASE'].includes(header.kind)
    const applicable=native?administration.responseMode==='SELF'&&['participant_self_report',c.entry==='SCHOOL'?'student_self_report':'teacher_self_report'].includes(header.nativeRespondentType??''):administration.responseMode==='EXPERT_REPORT'?supportsExpertSource(header.expertApplicability,administration)

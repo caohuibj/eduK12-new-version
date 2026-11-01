@@ -55,6 +55,8 @@ const classification=(id:string):{label:string;facet:CatalogTagFacet}=>{
   if(id.startsWith('language:'))return {label:languageLabels[id.slice(9)]??id.slice(9),facet:'language'}
   const age=/^age:(\d+(?:\.\d+)?)?-(\d+(?:\.\d+)?)?$/.exec(id)
   if(age&&(age[1]||age[2]))return {label:!age[1]?age[2]+'岁及以下':!age[2]?age[1]+'岁及以上':age[1]+'–'+age[2]+'岁',facet:'population'}
+  const grades=/^grades:(\d+)-(\d+)$/.exec(id)
+  if(grades)return {label:grades[1]+'–'+grades[2]+'年级',facet:'population'}
   if(Object.prototype.hasOwnProperty.call(labels,id))return labels[id]
   const term=Object.prototype.hasOwnProperty.call(dictionary,id)?dictionary[id]:undefined
   const namespace=term?.axis??id.split(':')[0]

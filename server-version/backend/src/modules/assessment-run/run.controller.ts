@@ -1,5 +1,4 @@
-import {catalogDiscoveryRecords,discoveryFacets} from '../survey/catalog-discovery'
-import {catalogDiscoveryQueryFields,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import { RELATIONAL_RESOURCE_KINDS } from '../assessment-relational/types'
 import {addPrivateScaleRunTrack,addPrivateFormRunTrack,addPrivateCompositionRunTrack} from '../education-tools/private-tool.run-adapter'
 import {educationPrivateRunTrackInput} from '../education-tools/private-tool.run-contract'
@@ -113,7 +112,7 @@ async function resourcesResponse(req: Request, res: Response, schoolActivity?:{o
           ...(policy.allowedTargetModes?{allowedTargetModes:policy.allowedTargetModes.filter(mode=>mode!=='COURSE_TEACHER')}:{})}:policy
         list.push({ title: entry.title,classificationTags, ...visiblePolicy })
       }
-      return success(res, { list,...(schoolActivity?{tagFacets:discoveryFacets(catalogDiscoveryRecords())}:{}), ...('nextCursor' in registered?{nextCursor:registered.nextCursor}:{nextPage:registered.nextPage}) })
+      return success(res, { list,...(schoolActivity?{tagFacets:catalogTagFacets(['facetTags' in registered?registered.facetTags:[]])}:{}), ...('nextCursor' in registered?{nextCursor:registered.nextCursor}:{nextPage:registered.nextPage}) })
     } catch (err) { return fail(res, err) }
   }
 

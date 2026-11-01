@@ -1,4 +1,4 @@
-import {discoveryJoin,discoverySqlFilter} from '../survey/catalog-discovery'
+import {discoveryPageSql,discoveryJoin} from '../survey/catalog-discovery'
 import type {CatalogDiscoveryFilters,CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {isSupportedEducationLibraryVariant} from './education-supported-variants'
 import {Prisma} from '@prisma/client'
@@ -34,10 +34,11 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
  // membership / deny qualification, so unauthorized rows cannot consume a page.
  const entries:RelationalProductEntryV1[]=[],qualified=new Map<string,boolean>()
  const classificationTagsByKey:Record<string,CatalogClassificationTag[]>={}
+ let facetTags:CatalogClassificationTag[]=[]
  let scanned=0,exhausted=false
  while(entries.length<size&&scanned<scanBudget){
- const rows=await tx.$queryRaw<Array<{entry:unknown;entryHash:string;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`
-  SELECT discovery.tags AS "classificationTags",r.entry,r.entry_hash AS "entryHash" FROM registered_assessment_resources r
+ const [catalog]=await tx.$queryRaw<Array<{list:Array<{entry:unknown;entryHash:string;classificationTags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`
+  SELECT r.resource_key,r.entry->>'title' AS title,discovery.ids,discovery.terms,discovery.tags AS "classificationTags",r.entry,r.entry_hash AS "entryHash" FROM registered_assessment_resources r
   JOIN scale_library_entries e ON e.id=r.entry->'libraryOrigin'->>'entryId'
   JOIN scale_library_submissions submission ON submission.id=e.submission_id
   LEFT JOIN scales source ON submission.product='TRAINING' AND source.id=submission.source_id AND source.creator_id=submission.author_id
@@ -49,8 +50,9 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
       AND ((g.scope_kind='USER' AND g.user_id=${input.actorId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL)))
     AND NOT EXISTS(SELECT 1 FROM registered_assessment_resources newer WHERE newer.resource_key=r.resource_key
       AND newer.status='PUBLISHED' AND (newer.created_at,newer.id)>(r.created_at,r.id))
-    AND r.resource_key>${cursor} AND ${discoverySqlFilter([Prisma.sql`r.entry->>'title'`,Prisma.sql`r.resource_key`],input)}
-  ORDER BY r.resource_key LIMIT ${batchSize}`)
+    `,filters:input,text:[Prisma.sql`v.title`,Prisma.sql`v.resource_key`],condition:Prisma.sql`v.resource_key>${cursor}`,order:Prisma.sql`v.resource_key`,limit:batchSize}))
+ const rows=catalog.list
+ facetTags=catalog.facetTags
  if(rows.length===0){exhausted=true;break}
  for(const row of rows){
   if(canonicalHash(row.entry)!==row.entryHash)fail('EDUCATION_LIBRARY_REGISTERED_IDENTITY_MISMATCH')
@@ -78,5 +80,5 @@ export async function listEducationLibraryResourcePage(tx:Prisma.TransactionClie
  }
  if(rows.length<batchSize&&cursor===(rows[rows.length-1].entry as EducationLibraryResourceEntry).applicability.resourceKey){exhausted=true;break}
  }
- return {entries,classificationTagsByKey,nextCursor:exhausted?null:cursor}
+ return {entries,classificationTagsByKey,facetTags,nextCursor:exhausted?null:cursor}
 }

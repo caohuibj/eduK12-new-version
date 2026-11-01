@@ -1,5 +1,5 @@
-import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets,sjtMetadataTagIds} from '../modules/survey/catalog-discovery'
-import {catalogDiscoveryQueryFields} from '../modules/scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryJoin,discoverySqlFilter,sjtMetadataTagIds} from '../modules/survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../modules/scale/library/catalog-discovery'
 import {authorizedTrainingMaterial} from '../modules/assessment-media/training-materials'
 import {serveAssessmentMaterial} from '../modules/assessment-media/material-delivery'
 import {materialSchema} from '../modules/assessment-media/material'
@@ -85,7 +85,7 @@ router.get('/tools', handle(async req => {
   const [cognitive,situational,bundles,library] = await Promise.all([
     listPublishedConfigs(actor,req.user.role), listSituationalResourceSummaries(actor), bundleProductService.catalog(req.user), libraryReadableScaleIds(actor),
   ])
-  const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(prisma)]
+  const records=catalogDiscoveryRecords()
   const extra = [
     ...cognitive.map(row=>({id:row.id,kind:'cognitive',name:row.name,version:row.configVersion,href:'/cognitive-assignments',classificationTags:row.classificationTags})),
     ...situational.map(row=>({id:row.id,kind:'situational',name:row.name || row.instrumentKey,version:row.instrumentVersion,href:'/questionnaire-products/new',classificationTags:records.find(record=>record.kind==='SJT'&&record.key===row.instrumentKey&&record.version===row.instrumentVersion)?.tags??[]})),
@@ -97,7 +97,7 @@ router.get('/tools', handle(async req => {
       CASE WHEN s.library_entry_id IS NULL THEN s.creator_id ELSE NULL END AS "ownerId",s.updated_at AS "updatedAt",'/scales/'||s.id AS href,
       (s.library_entry_id IS NULL AND s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion",COALESCE(to_jsonb(s.tags),'[]'::jsonb)||COALESCE(discovery.ids,'[]'::jsonb) AS "tagIds"
       FROM scales s JOIN users u ON u.id=s.creator_id
-      ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE
+      ${standardDiscoveryMetadataJoin(Prisma.sql`s.code`,Prisma.sql`s.instrument_version`)} ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE
       -- Approved wrappers are exact immutable versions, independent of the author's
       -- account domain and private source. Only the central reader authorizes them.
       (s.library_entry_id IS NOT NULL AND s.status='PUBLISHED' AND s.id=ANY(${library.ids}::text[]))
@@ -130,8 +130,8 @@ router.get('/tools', handle(async req => {
     AND (${q.source}='all' OR (${q.source}='owned' AND r."ownerId"=${actor}) OR (${q.source}='granted' AND r."ownerId" IS DISTINCT FROM ${actor}))`
   const [list,count]=await prisma.$transaction([
     prisma.$queryRaw<any[]>(Prisma.sql`WITH r AS (${classified}) SELECT r.* FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where} ORDER BY "updatedAt" DESC NULLS LAST,kind,id LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`),
-    prisma.$queryRaw<{total:bigint}[]>(Prisma.sql`WITH r AS (${classified}) SELECT COUNT(*)::bigint AS total FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where}`),
+    prisma.$queryRaw<Array<{total:bigint;facetTags:CatalogClassificationTag[]}>>(Prisma.sql`WITH r AS (${classified}) SELECT COUNT(*)::bigint AS total,COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM r CROSS JOIN LATERAL jsonb_array_elements("classificationTags") tag),'[]'::jsonb) AS "facetTags" FROM r CROSS JOIN LATERAL (SELECT r.ids,r.terms) discovery WHERE ${where}`),
   ])
-  return {tagFacets:discoveryFacets(records), list:list.map(({tagIds:_tagIds,ids:_ids,terms:_terms,...row})=>({...row,source:row.ownerId===actor?'owned':'granted'})),total:Number(count[0]?.total||0),page:q.page,pageSize:q.pageSize }
+  return {tagFacets:catalogTagFacets([count[0]?.facetTags??[]]), list:list.map(({tagIds:_tagIds,ids:_ids,terms:_terms,...row})=>({...row,source:row.ownerId===actor?'owned':'granted'})),total:Number(count[0]?.total||0),page:q.page,pageSize:q.pageSize }
 }))
 export default router

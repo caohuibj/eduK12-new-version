@@ -1,5 +1,5 @@
-import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets} from '../survey/catalog-discovery'
-import {catalogDiscoveryQueryFields,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,discoveryPageSql,discoveryJoin} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {readApprovedCognitiveProfileArtifact} from './cognitive-profile-approved-source'
 import {Prisma} from '@prisma/client'
 import {randomUUID} from 'node:crypto'
@@ -236,17 +236,18 @@ export async function listTrainingCognitiveProfileConfigurations(actorId:string,
  const input=z.object({page:z.coerce.number().int().min(1).max(10000).default(1),q:z.string().trim().max(120).default(''),...catalogDiscoveryQueryFields}).strict().parse(raw),size=25,records=catalogDiscoveryRecords()
  return prisma.$transaction(async tx=>{
   await assertEntryAdmin(tx,actorId,'TRAINING')
-  const rows=await tx.$queryRaw<Array<{configId:string;title:string;artifactHash:string;configuration:unknown;sourceAvailable:boolean;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`SELECT DISTINCT COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",c.id AS "configId",c.name AS title,p.fingerprint AS "artifactHash",
+  const [catalog]=await tx.$queryRaw<Array<{facetTags:CatalogClassificationTag[];list:Array<{configId:string;title:string;artifactHash:string;configuration:unknown;sourceAvailable:boolean;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`SELECT DISTINCT c.test_type AS search_key,discovery.ids,discovery.terms,COALESCE(discovery.tags,'[]'::jsonb) AS "classificationTags",c.id AS "configId",c.name AS title,p.fingerprint AS "artifactHash",
    e.metadata->'configuration' AS configuration,(c.status='PUBLISHED' AND m.status='PUBLISHED' AND m.family='COGNITIVE' AND m.layer='MEASUREMENT' AND t.template_hash IS NOT NULL) AS "sourceAvailable"
    FROM survey_tool_policies p JOIN assessment_management_events e ON e.action='COGNITIVE_PROFILE_APPROVED' AND e.metadata->>'artifactHash'=p.fingerprint AND e.metadata->>'artifactFormatVersion'='2'
     JOIN cognitive_test_configs c ON c.id=e.resource_id AND p.resource_key='cognitive-profile:'||c.id||':'||(e.metadata#>>'{configuration,profile}')
     LEFT JOIN measurement_content_releases m ON m.id=c.measurement_release_id AND m.id=e.metadata#>>'{configuration,measurement,releaseId}' AND m.content_hash=e.metadata#>>'{configuration,measurement,contentHash}'
     LEFT JOIN assessment_public_templates t ON t.template_hash=p.fingerprint AND t.template_kind='COGNITIVE_PROFILE_CONFIGURATION'
    ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
-   WHERE ${discoverySqlFilter([Prisma.sql`c.name`,Prisma.sql`c.test_type`],{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')})} AND p.product='TRAINING' AND p.decision='APPROVED' AND NOT p.paused
-   ORDER BY c.id,p.fingerprint LIMIT ${size+1} OFFSET ${(input.page-1)*size}`)
+   WHERE p.product='TRAINING' AND p.decision='APPROVED' AND NOT p.paused
+   `,filters:{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')},text:[Prisma.sql`v.title`,Prisma.sql`v.search_key`],order:Prisma.sql`v."configId",v."artifactHash"`,limit:size+1,offset:(input.page-1)*size}))
+  const rows=catalog.list
   const conflicts=new Set(rows.filter((r,i)=>rows.some((other,j)=>i!==j&&r.configId===other.configId&&r.artifactHash===other.artifactHash)).map(r=>r.artifactHash))
-  return {page:input.page,hasMore:rows.length>size,tagFacets:discoveryFacets(records,'COGNITIVE'),list:rows.slice(0,size).map(row=>{
+  return {page:input.page,hasMore:rows.length>size,tagFacets:catalogTagFacets([catalog.facetTags]),list:rows.slice(0,size).map(row=>{
    const identity=cognitiveProfileApprovalReceipt.shape.configuration.parse(row.configuration),available=Boolean(row.sourceAvailable&&!conflicts.has(row.artifactHash))
    return {configId:row.configId,title:row.title,artifactHash:row.artifactHash,profile:identity.profile,configuration:identity,classificationTags:row.classificationTags,
     available,unavailableReason:available?null:'已批准来源或原审批证据不可用，请管理员核对'}

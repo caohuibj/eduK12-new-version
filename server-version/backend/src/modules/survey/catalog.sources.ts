@@ -1,7 +1,7 @@
 import {isSurveyCognitiveProfileRef,readSurveyCognitiveProfileSource,SURVEY_PROFILE_ADAPTER} from './cognitive-profile.source'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
-import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,jsonTagIds,sjtClassificationTags,sjtMetadataTagIds,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
-import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryPageSql,jsonTagIds,sjtClassificationTags,sjtMetadataTagIds,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity} from './catalog-discovery'
+import {catalogTagFacets,matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { compileSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
@@ -353,44 +353,58 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   let offset=(page-1)*limit
   const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
-  const records=[...catalogDiscoveryRecords(),...(kind==='SCALE'?await importedStandardDiscoveryRecords(db):[])],filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
+  const records=catalogDiscoveryRecords(),filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
+  const sourceFacetTags:CatalogClassificationTag[]=[]
   const tagsForRef=(ref:CatalogSourceRef)=>sourceTags.get(ref.sourceId+':'+ref.sourceVersion)??sourceTags.get(ref.sourceId)
   const profileHeaders=new Map<string,{available:boolean;reason:string|null}>()
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
   if(kind!=='SCALE'&&input.includeGoverned!==false){
-    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,title,snapshot_hash,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity,Prisma.sql`${jsonTagIds(Prisma.sql`t.reference#>'{metadata,tags}'`)} || CASE WHEN t.family='SJT' THEN ${sjtMetadataTagIds(Prisma.sql`t.snapshot#>'{unit,compiledDefinition}'`)} ELSE '[]'::jsonb END`)} WHERE family=${kind} AND state='ONLINE' AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.title`,Prisma.sql`t.snapshot_hash`],filters)} ORDER BY submitted_at,id`)
+    const [catalog]=await db.$queryRaw<Array<{list:Array<{id:string;title:string;snapshot_hash:string;classification_tags?:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`SELECT t.submitted_at,discovery.ids,discovery.terms,id,title,snapshot_hash,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity,Prisma.sql`${jsonTagIds(Prisma.sql`t.reference#>'{metadata,tags}'`)} || CASE WHEN t.family='SJT' THEN ${sjtMetadataTagIds(Prisma.sql`t.snapshot#>'{unit,compiledDefinition}'`)} ELSE '[]'::jsonb END`)} WHERE family=${kind} AND state='ONLINE' AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern}) `,filters,text:[Prisma.sql`v.title`,Prisma.sql`v.snapshot_hash`],order:Prisma.sql`v.submitted_at,v.id`,tagColumn:Prisma.sql`v.classification_tags`}))
+    const governed=catalog.list
+    sourceFacetTags.push(...catalog.facetTags)
     for(const row of governed)sourceTags.set('survey-tool:'+row.id,row.classification_tags??[])
     for(const row of governed.slice(offset,offset+take))refs.push({ref:{kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},title:row.title})
     offset=Math.max(0,offset-governed.length)
   }
   if(kind==='SCALE'){
-    const online=input.includeGoverned===false?[]:await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string};classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,combination_hash,snapshot,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_standard_releases t ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`t.tool_key`,version:Prisma.sql`t.snapshot->>'instrumentVersion'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE state='ONLINE' AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.tool_key`,Prisma.sql`t.snapshot->>'title'`,Prisma.sql`t.combination_hash`],filters)} ORDER BY tool_key,created_at,id`)
+    const [catalog]=input.includeGoverned===false?[{list:[],facetTags:[]}]:await db.$queryRaw<Array<{list:Array<{id:string;combination_hash:string;snapshot:{title:string};classification_tags?:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`SELECT t.tool_key,t.created_at,discovery.ids,discovery.terms,id,combination_hash,jsonb_build_object('title',t.snapshot->'title','toolKey',t.tool_key) AS snapshot,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_standard_releases t ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`t.tool_key`,version:Prisma.sql`t.snapshot->>'instrumentVersion'`,metadata:Prisma.sql`t.snapshot#>'{parts,CONTENT,reference,metadata}'`,locale:Prisma.sql`t.snapshot#>>'{definition,versionAxes,locale}'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE state='ONLINE' AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern}) `,filters,text:[Prisma.sql`v.tool_key`,Prisma.sql`v.snapshot->>'title'`,Prisma.sql`v.combination_hash`],order:Prisma.sql`v.tool_key,v.created_at,v.id`,tagColumn:Prisma.sql`v.classification_tags`}))
+    const online=catalog.list
+    sourceFacetTags.push(...catalog.facetTags)
     for(const row of online)sourceTags.set('survey-standard:'+row.id,row.classification_tags??[])
     for(const r of online.slice(offset,offset+take))refs.push({ref:{kind:'SCALE',sourceId:'survey-standard:'+r.id,sourceVersion:r.combination_hash},title:r.snapshot.title})
-    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',...scaleDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
-    for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
-    for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='SCALE'&&record.key===row.code&&record.version===row.instrumentVersion)?.tags??[])
+    const [native]=await db.$queryRaw<Array<{list:Array<{id:string;name:string;sourceVersion:string;classificationTags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`
+      SELECT s.id,s.name,s.code,s.instrument_version AS "sourceVersion",discovery.ids,discovery.terms,discovery.tags AS "classificationTags" FROM scales s
+      ${standardDiscoveryMetadataJoin(Prisma.sql`s.code`,Prisma.sql`s.instrument_version`)}
+      ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`s.code`,version:Prisma.sql`s.instrument_version`,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(s.tags)`)}
+      WHERE s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND (${query}='' OR s.name ILIKE ${pattern} OR s.code ILIKE ${pattern})
+      ${online.length?Prisma.sql`AND NOT(s.code=ANY(${online.map(row=>(row.snapshot as unknown as {toolKey:string}).toolKey)}::text[]))`:Prisma.empty}`,
+      filters,text:[Prisma.sql`v.name`,Prisma.sql`v.code`],order:Prisma.sql`v.id`,limit:Math.max(0,take-refs.length),offset:Math.max(0,offset-online.length)}))
+    sourceFacetTags.push(...native.facetTags)
+    const rows=native.list.length?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',id:{in:native.list.map(row=>row.id)}},orderBy:{id:'asc'}}):[]
+    for(const header of native.list)refs.push({ref:{kind,sourceId:header.id,sourceVersion:header.sourceVersion},title:header.name})
+    for(const header of native.list)sourceTags.set(header.id,header.classificationTags)
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
+    for(const pkg of listSituationPackages().filter(pkg=>pkg.releaseStatus==='PUBLISHED'))sourceFacetTags.push(...sjtClassificationTags(pkg.definition))
     const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED'&&matchesCatalogDiscovery([p.key,p.definition.source.title??''],sjtClassificationTags(p.definition),filters)&&(!query||(p.key+' '+p.definition.source.title).toLowerCase().includes(query.toLowerCase()))).sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
     for(const pkg of builtins)sourceTags.set('registry:'+pkg.key+':'+pkg.instrumentVersion,sjtClassificationTags(pkg.definition))
     for(const pkg of builtins.slice(offset,offset+Math.max(0,take-refs.length)))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
-    const headers=refs.length<take?await db.$queryRaw<Array<{id:string;classification_tags:CatalogClassificationTag[]}>>(Prisma.sql`
-      SELECT s.id,discovery.tags AS classification_tags FROM sjt_author_releases s
+    const [catalog]=await db.$queryRaw<Array<{list:Array<{id:string;instrument_key:string;title:string|null;sourceVersion:string;classification_tags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`
+      SELECT s.id,s.instrument_key,s.instrument_version AS "sourceVersion",s.package#>>'{definition,source,title}' AS title,discovery.ids,discovery.terms,discovery.tags AS classification_tags FROM sjt_author_releases s
       ${discoveryJoin(records,{kind:Prisma.sql`'SJT'`,key:Prisma.sql`s.instrument_key`,version:Prisma.sql`s.instrument_version`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},sjtMetadataTagIds(Prisma.sql`s.package->'definition'`))}
-      WHERE s.status='PUBLISHED' AND (${query}='' OR s.instrument_key ILIKE ${pattern})
-      AND ${discoverySqlFilter([Prisma.sql`s.instrument_key`,Prisma.sql`s.package#>>'{definition,source,title}'`],filters)}
-      ORDER BY s.id LIMIT ${take-refs.length} OFFSET ${Math.max(0,offset-builtins.length)}`):[]
+      WHERE s.status='PUBLISHED' AND (${query}='' OR s.instrument_key ILIKE ${pattern})`,filters,text:[Prisma.sql`v.instrument_key`,Prisma.sql`v.title`],order:Prisma.sql`v.id`,limit:Math.max(0,take-refs.length),offset:Math.max(0,offset-builtins.length),tagColumn:Prisma.sql`v.classification_tags`}))
+    const headers=catalog.list
+    sourceFacetTags.push(...catalog.facetTags)
     const rows=headers.length?await db.sjtAuthorRelease.findMany({where:{id:{in:headers.map(row=>row.id)},status:'PUBLISHED'},orderBy:{id:'asc'}}):[]
     for(const header of headers)sourceTags.set(header.id,header.classification_tags)
-    for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:(row.package as unknown as SituationPackage).definition.source.title||row.instrumentKey})
+    for(const header of headers)refs.push({ref:{kind,sourceId:header.id,sourceVersion:header.sourceVersion},title:header.title||header.instrument_key})
     cached={sjtAuthorRelease:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='COGNITIVE'){
     if(input.includeGoverned!==false){
-     const [header]=await db.$queryRaw<Array<{total:number;list:Array<{id:string;name:string;profile:string;hash:string;available:boolean;classification_tags:CatalogClassificationTag[]}>}>>(Prisma.sql`WITH profiles AS MATERIALIZED (
-      SELECT c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}' AS profile,p.fingerprint AS hash,(jsonb_agg(discovery.tags)->0) AS classification_tags,
+     const [header]=await db.$queryRaw<Array<{total:number;facetTags:CatalogClassificationTag[];list:Array<{id:string;name:string;profile:string;hash:string;available:boolean;classification_tags:CatalogClassificationTag[]}>}>>(Prisma.sql`WITH profiles AS MATERIALIZED (
+      SELECT c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}' AS profile,p.fingerprint AS hash,(jsonb_agg(discovery.tags)->0) AS classification_tags,(jsonb_agg(discovery.ids)->0) AS ids,max(discovery.terms) AS terms,
        bool_or(c.status='PUBLISHED' AND m.status='PUBLISHED' AND c.test_type IN ('reaction','gonogo') AND m.content#>'{executable,presentation}'='null'::jsonb AND t.template_hash IS NOT NULL AND e.metadata#>>'{executionRequirements,hasPresentation}'='false' AND e.metadata#>>'{executionRequirements,referenceCount}'='0') AS available
       FROM survey_tool_policies p JOIN assessment_management_events e ON e.action='COGNITIVE_PROFILE_APPROVED' AND e.metadata->>'artifactFormatVersion'='2' AND e.metadata->>'artifactHash'=p.fingerprint
        JOIN cognitive_test_configs c ON c.id=e.resource_id
@@ -398,8 +412,10 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
        LEFT JOIN assessment_public_templates t ON t.template_hash=p.fingerprint AND t.template_kind='COGNITIVE_PROFILE_CONFIGURATION'
        ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
       WHERE p.product='SURVEY' AND p.decision='APPROVED' AND NOT p.paused AND p.resource_key='cognitive-profile:'||c.id||':'||(e.metadata#>>'{configuration,profile}')
-       AND (${query}='' OR c.name ILIKE ${pattern} OR c.test_type ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`c.name`,Prisma.sql`c.test_type`],filters)} GROUP BY c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}',p.fingerprint)
-     SELECT (SELECT count(*)::int FROM profiles) AS total,COALESCE((SELECT jsonb_agg(row) FROM (SELECT id,name,profile,hash,available,classification_tags FROM profiles ORDER BY id,hash LIMIT ${Math.max(0,take-refs.length)} OFFSET ${offset}) row),'[]'::jsonb) AS list`)
+       AND (${query}='' OR c.name ILIKE ${pattern} OR c.test_type ILIKE ${pattern}) GROUP BY c.id,c.name,c.test_type,e.metadata#>>'{configuration,profile}',p.fingerprint)
+      , matches AS (SELECT v.* FROM profiles v CROSS JOIN LATERAL (SELECT v.ids,v.terms) discovery WHERE ${discoverySqlFilter([Prisma.sql`v.name`,Prisma.sql`v.test_type`],filters)})
+     SELECT (SELECT count(*)::int FROM matches) AS total,COALESCE((SELECT jsonb_agg(DISTINCT tag) FROM profiles CROSS JOIN LATERAL jsonb_array_elements(classification_tags) tag),'[]'::jsonb) AS "facetTags",COALESCE((SELECT jsonb_agg(row) FROM (SELECT id,name,profile,hash,available,classification_tags FROM matches ORDER BY id,hash LIMIT ${Math.max(0,take-refs.length)} OFFSET ${offset}) row),'[]'::jsonb) AS list`)
+     sourceFacetTags.push(...header.facetTags)
      for(const row of header.list){
       const ref:CatalogSourceRef={kind:'COGNITIVE',sourceId:'cognitive-profile:'+row.id+':'+row.profile,sourceVersion:row.hash}
       sourceTags.set(ref.sourceId,row.classification_tags??[])
@@ -408,9 +424,15 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
      }
      offset=Math.max(0,offset-header.total)
     }
-    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED',...cognitiveDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{testType:contains}]}:{})},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
-    for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.configVersion},title:row.name})
-    for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='COGNITIVE'&&record.key===row.testType&&record.engine===row.engineVersion&&record.scoring===row.scoringVersion)?.tags??[])
+    const [native]=await db.$queryRaw<Array<{list:Array<{id:string;name:string;sourceVersion:string;classificationTags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`
+      SELECT c.id,c.name,c.test_type,c.config_version AS "sourceVersion",discovery.ids,discovery.terms,discovery.tags AS "classificationTags" FROM cognitive_test_configs c
+      ${discoveryJoin(records,{kind:Prisma.sql`'COGNITIVE'`,key:Prisma.sql`c.test_type`,version:Prisma.sql`NULL`,engine:Prisma.sql`c.engine_version`,scoring:Prisma.sql`c.scoring_version`})}
+      WHERE c.status='PUBLISHED' AND (${query}='' OR c.name ILIKE ${pattern} OR c.test_type ILIKE ${pattern})`,
+      filters,text:[Prisma.sql`v.name`,Prisma.sql`v.test_type`],order:Prisma.sql`v.id`,limit:Math.max(0,take-refs.length),offset}))
+    sourceFacetTags.push(...native.facetTags)
+    const rows=native.list.length?await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED',id:{in:native.list.map(row=>row.id)}},orderBy:{id:'asc'}}):[]
+    for(const header of native.list)refs.push({ref:{kind,sourceId:header.id,sourceVersion:header.sourceVersion},title:header.name})
+    for(const header of native.list)sourceTags.set(header.id,header.classificationTags)
     cached={cognitiveTestConfig:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.configVersion===where.configVersion)??null}} as unknown as Database
   }else if(kind==='FORM'&&!input.organizationId){
     const rows=filters.tags?.length?[]:await db.questionnaireFormSection.findMany({where:{contextSection:false,AND:filters.keyword?.trim().toLowerCase().split(/\s+/).filter(Boolean).map(term=>({title:{contains:term,mode:'insensitive' as const}})),...(query?{title:contains}:{}),items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
@@ -433,7 +455,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   }}
   const moreSources=refs.length>limit
   return {list,page,hasMore:moreSources&&page<CATALOG_MAX_PAGE,
-    terminalReason:!moreSources?'END_OF_CATALOG':page===CATALOG_MAX_PAGE?'PAGE_LIMIT_REACHED':null,tagFacets:discoveryFacets(records,kind)}
+    terminalReason:!moreSources?'END_OF_CATALOG':page===CATALOG_MAX_PAGE?'PAGE_LIMIT_REACHED':null,tagFacets:catalogTagFacets([sourceFacetTags])}
 }
 
 /** One source-row lock and one bounded source read per family, plus one authority read per distinct Form grantor/organization.

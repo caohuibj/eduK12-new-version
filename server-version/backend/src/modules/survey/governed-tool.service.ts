@@ -1,8 +1,8 @@
 import {readInstance as readNativeInstance} from '../bundle-product/instance'
 import {freezeSurveyNativeSource,assertSurveyNativeAdmission} from '../bundle-product/survey-source'
 import type {SurveyNativeSource} from '../bundle-product/survey-native'
-import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,jsonTagIds,sjtMetadataTagIds,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity} from './catalog-discovery'
-import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,standardDiscoveryMetadataJoin,discoveryPageSql,jsonTagIds,sjtMetadataTagIds,discoveryJoin,governedDiscoveryIdentity} from './catalog-discovery'
+import {catalogTagFacets,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
 import {randomUUID} from 'node:crypto'
@@ -118,15 +118,16 @@ export async function submitGovernedPackage(actor:string,input:{requestId:string
 export async function governedSources(actor:string,kind:'SCALE'|'COGNITIVE'|'SJT'|'FORM',page:number,query=''){await assertStandardSystem(prisma,actor);return listCatalogSources({actorUserId:actor,kind,page,query,includeGoverned:false},prisma)}
 export async function governedCatalog(actor:string,input:{family?:GovernedFamily;page:number;query?:string}&CatalogDiscoveryFilters,system=true){
  if(system)await assertStandardSystem(prisma,actor);else await prisma.$transaction(tx=>assertSurveyLibraryManager(tx,actor))
- const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(prisma)],filters={...input,keyword:input.keyword||input.query}
- const rows=await prisma.$queryRaw<Array<GovernedSummaryRow&{classification_tags?:import('../scale/library/catalog-discovery').CatalogClassificationTag[]}>>(Prisma.sql`SELECT ${governedSummaryColumns},COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity,Prisma.sql`${jsonTagIds(Prisma.sql`t.reference#>'{metadata,tags}'`)} || CASE WHEN t.family='SJT' THEN ${sjtMetadataTagIds(Prisma.sql`t.snapshot#>'{unit,compiledDefinition}'`)} ELSE '[]'::jsonb END`)} WHERE (${input.family??null}::text IS NULL OR t.family=${input.family??null}) AND ${discoverySqlFilter([Prisma.sql`t.title`,Prisma.sql`t.tool_key`,Prisma.sql`t.snapshot_hash`],filters)} ${system?Prisma.empty:Prisma.sql`AND t.state IN ('ONLINE','WITHDRAWN')`} ORDER BY t.submitted_at DESC,t.id LIMIT 26 OFFSET ${(input.page-1)*25}`)
+ const records=catalogDiscoveryRecords(),filters={...input,keyword:input.keyword||input.query}
+ const [catalog]=await prisma.$queryRaw<Array<{list:Array<GovernedSummaryRow&{classification_tags:CatalogClassificationTag[]}>;facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`SELECT discovery.ids,discovery.terms,${governedSummaryColumns},COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${standardDiscoveryMetadataJoin(governedDiscoveryIdentity.key,governedDiscoveryIdentity.version,governedDiscoveryIdentity.kind)} ${discoveryJoin(records,{...governedDiscoveryIdentity,metadata:Prisma.sql`imported_discovery_source.metadata`,locale:Prisma.sql`imported_discovery_source.locale`},Prisma.sql`${jsonTagIds(Prisma.sql`t.reference#>'{metadata,tags}'`)} || CASE WHEN t.family='SJT' THEN ${sjtMetadataTagIds(Prisma.sql`t.snapshot#>'{unit,compiledDefinition}'`)} ELSE '[]'::jsonb END`)} WHERE (${input.family??null}::text IS NULL OR t.family=${input.family??null}) ${system?Prisma.empty:Prisma.sql`AND t.state IN ('ONLINE','WITHDRAWN')`}`,filters,text:[Prisma.sql`v.title`,Prisma.sql`v.tool_key`,Prisma.sql`v.snapshot_hash`],order:Prisma.sql`v.submitted_at DESC,v.id`,limit:26,offset:(input.page-1)*25,tagColumn:Prisma.sql`v.classification_tags`}))
+ const rows=catalog.list
  const selected=rows.slice(0,25),policies=await readToolPolicies(prisma,selected.map(governedPolicyIdentity)),list=[]
  for(const r of selected){
   const policy=policies.get('governed-release:'+r.id+':'+r.snapshot_hash)!,contentReasons=r.blockers,approvalReasons=r.state==='ONLINE'?[]:[r.state==='TRIAL_FAILED'?'自动试运行未通过':r.state==='WITHDRAWN'?'已停止新增使用':'尚未通过系统批准及自动试运行',...r.blockers]
   const assignmentReasons=[...approvalReasons,...contentReasons,...(policy.decision==='APPROVED'?[]:['尚未批准 Survey 使用范围']),...(policy.paused?['Survey 新增使用已暂停：'+policy.reason]:[])]
   list.push({...summaryView(r),classificationTags:r.classification_tags??[],policy,states:{content:{ready:!contentReasons.length,reasons:contentReasons},assignment:{ready:!assignmentReasons.length,reasons:assignmentReasons},deployment:{ready:false,reasons:[...assignmentReasons,'投放时还需核对研究者的精确版本授权和冻结绑定']}}})
  }
- return {list,page:input.page,hasMore:rows.length>25,tagFacets:discoveryFacets(records,input.family)}
+ return {list,page:input.page,hasMore:rows.length>25,tagFacets:catalogTagFacets([catalog.facetTags])}
 }
 export async function governedDetail(actor:string,id:string){await assertStandardSystem(prisma,actor);const row=await governedRow(prisma,id);const trials=await prisma.$queryRaw<Array<{id:string;run_id:string;case_index:number;result_hash:string;created_at:Date;report:unknown}>>`SELECT id,run_id,case_index,result_hash,created_at,result->'report' AS report FROM survey_governed_trials WHERE tool_id=${id} ORDER BY created_at DESC LIMIT 60`;return {...governedView(row),snapshot:row.snapshot,reference:{...row.reference,applications:[...row.reference.applications,{submittedBy:row.submitted_by,submittedAt:row.submitted_at}],approvals:[...row.reference.approvals,...(row.approved_by?[{approvedBy:row.approved_by,approvedAt:row.approved_at,reason:row.approval_reason}]:[])]},trials}}
 export async function governedComponentOptions(actor:string,page=1,query=''){

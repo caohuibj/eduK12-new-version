@@ -107,7 +107,7 @@ describe('immutable system catalog source adapters',()=>{
       cognitiveTestConfig:{findMany:vi.fn().mockResolvedValue([])},huiteacherFormInstrument:{findMany:vi.fn()}}
     const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',limit:500,page:1,includeGoverned:false},db as never)
     expect(result.list.length).toBeLessThanOrEqual(25)
-    expect(db.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({take:26}))
+    expect(db.$queryRaw.mock.calls[0][0].values).toContain(26);expect(db.scale.findMany).not.toHaveBeenCalled()
     expect(db.huiteacherFormInstrument.findMany).not.toHaveBeenCalled()
   })
   it('rechecks multiple frozen grants with one query per family and rejects changed source',async()=>{
@@ -147,13 +147,13 @@ describe('immutable system catalog source adapters',()=>{
 
   it('keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup',async()=>{
     const definition=scale(),rows=Array.from({length:26},(_,i)=>({id:'source-'+i,instrumentVersion:'1',status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',code:'custom-'+i,name:'Source '+i,definition,definitionHash:hashScaleDefinition(definition)}))
-    const db={scale:{findMany:vi.fn().mockResolvedValue(rows),findFirst:vi.fn()},$queryRaw:vi.fn()}
+    const db={scale:{findMany:vi.fn().mockResolvedValue(rows),findFirst:vi.fn()},$queryRaw:vi.fn().mockResolvedValue([{list:rows.map(row=>({id:row.id,name:row.name,sourceVersion:row.instrumentVersion,classificationTags:[]})),facetTags:[]}])}
     const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',page:2,limit:25,includeGoverned:false},db as never)
     expect(result.list).toHaveLength(25);expect(result.hasMore).toBe(true)
     expect(result.list.every(r=>!r.available&&r.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(db.scale.findMany).toHaveBeenCalledTimes(1)
-    expect(db.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({skip:25,take:26}))
-    expect(db.scale.findFirst).not.toHaveBeenCalled();expect(db.$queryRaw).not.toHaveBeenCalled()
+    expect(db.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({where:expect.objectContaining({id:{in:rows.map(row=>row.id)}})}))
+    expect(db.scale.findFirst).not.toHaveBeenCalled();expect(db.$queryRaw).toHaveBeenCalledOnce()
   })
 
   it('reuses an actual published owner Questionnaire Form section with exact content version and provenance',async()=>{

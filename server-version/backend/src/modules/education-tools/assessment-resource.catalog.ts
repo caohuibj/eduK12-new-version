@@ -1,5 +1,5 @@
-import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets,sjtMetadataTagIds} from '../survey/catalog-discovery'
-import type {CatalogDiscoveryFilters,CatalogClassificationTag} from '../scale/library/catalog-discovery'
+import {catalogDiscoveryRecords,discoveryPageSql,discoveryJoin,sjtMetadataTagIds} from '../survey/catalog-discovery'
+import {catalogTagFacets,type CatalogDiscoveryFilters,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import type {AuthenticatedPrincipal} from '../../types'
@@ -58,15 +58,14 @@ export async function listEducationAssessmentResources(input:EducationAssessment
    organizationId_eventId:{organizationId:input.organizationId,eventId:input.workflowId}},select:{id:true}}))
    deny('HUITEACHER_STUDENT_EVAL_TRACK_READONLY',403)
   const records=catalogDiscoveryRecords()
-  const rows=await tx.$queryRaw<Array<{id:string;family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';version:string;classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`
-   SELECT discovery.tags AS "classificationTags",delivery.id,delivery.family,delivery.entry->'educationOrigin'->>'adapterVersion' AS version FROM education_assessment_deliveries delivery
+  const [catalog]=await tx.$queryRaw<Array<{facetTags:CatalogClassificationTag[];list:Array<{id:string;family:'COGNITIVE'|'SITUATIONAL'|'BUNDLE';version:string;classificationTags:CatalogClassificationTag[]}>}>>(discoveryPageSql({source:Prisma.sql`
+   SELECT delivery.entry->>'title' AS title,discovery.ids,discovery.terms,discovery.tags AS "classificationTags",delivery.id,delivery.family,delivery.entry->'educationOrigin'->>'adapterVersion' AS version FROM education_assessment_deliveries delivery
    LEFT JOIN composite_assessments source ON source.id=delivery.source_composite_id
    LEFT JOIN measurement_content_releases measurement ON delivery.family<>'BUNDLE' AND measurement.id=delivery.entry#>>'{educationOrigin,units,0,measurement,releaseId}'
    ${discoveryJoin(records,{kind:Prisma.sql`CASE WHEN delivery.family='COGNITIVE' THEN 'COGNITIVE' ELSE NULL END`,key:Prisma.sql`measurement.content#>>'{executable,testType}'`,version:Prisma.sql`NULL`,engine:Prisma.sql`measurement.content#>>'{executable,engineVersion}'`,scoring:Prisma.sql`measurement.content#>>'{executable,scoringVersion}'`},Prisma.sql`COALESCE(to_jsonb(source.tags),'[]'::jsonb)||CASE WHEN delivery.family='SITUATIONAL' THEN ${sjtMetadataTagIds(Prisma.sql`measurement.content->'executable'`)} ELSE '[]'::jsonb END`)}
    WHERE delivery.product=${input.product} AND delivery.organization_id=${input.organizationId} AND delivery.status='PUBLISHED'
-    AND ${discoverySqlFilter([Prisma.sql`delivery.entry->>'title'`],input)}
-    ${input.cursor?Prisma.sql`AND delivery.id>${input.cursor}`:Prisma.empty}
-   ORDER BY delivery.id LIMIT 11`)
+`,filters:input,text:[Prisma.sql`v.title`],condition:input.cursor?Prisma.sql`v.id>${input.cursor}`:Prisma.sql`TRUE`,order:Prisma.sql`v.id`,limit:11}))
+  const rows=catalog.list
   const list=[]
   let unavailableCount=0
   for(const row of rows.slice(0,10)){
@@ -90,6 +89,6 @@ export async function listEducationAssessmentResources(input:EducationAssessment
    }
   }
   return {scope:{product:input.product,organizationId:input.organizationId,workflowId:input.workflowId,runId:input.runId,expectedVersion:run.version},
-   list,tagFacets:discoveryFacets(records),nextCursor:rows.length>10?rows[9].id:null,unavailableCount}
+   list,tagFacets:catalogTagFacets([catalog.facetTags]),nextCursor:rows.length>10?rows[9].id:null,unavailableCount}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

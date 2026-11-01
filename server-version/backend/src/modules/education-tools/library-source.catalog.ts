@@ -1,5 +1,5 @@
-import {catalogDiscoveryRecords,discoveryFacets,discoveryJoin,discoverySqlFilter} from '../survey/catalog-discovery'
-import {catalogDiscoveryQueryFields,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
+import {discoveryPageSql,discoveryJoin} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,catalogTagFacets,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -133,21 +133,21 @@ export async function listEducationLibrarySources(c:PrivateToolContext,raw:unkno
  const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode,input.targetKind)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
-  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT discovery.tags AS "classificationTags",${libraryHeaderFields(c.entry,administration.responseMode,input.targetKind)}
+  const [catalog]=await tx.$queryRaw<Array<{list:Header[];facetTags:CatalogClassificationTag[]}>>(discoveryPageSql({source:Prisma.sql`SELECT discovery.ids,discovery.terms,discovery.tags AS "classificationTags",${libraryHeaderFields(c.entry,administration.responseMode,input.targetKind)}
    FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
    JOIN measurement_content_releases m ON m.id=e.release_id AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
    LEFT JOIN scales source ON s.product='TRAINING' AND source.id=s.source_id AND source.creator_id=s.author_id
    ${discoveryJoin([],{kind:Prisma.sql`NULL`,key:Prisma.sql`NULL`,version:Prisma.sql`NULL`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(source.tags)`)}
-   WHERE e.status='ACTIVE' AND (${input.cursor??null}::text IS NULL OR e.id>${input.cursor??null})
-    AND ${discoverySqlFilter([Prisma.sql`s.snapshot->>'title'`],{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')})}
+   WHERE e.status='ACTIVE'
     AND EXISTS(SELECT 1 FROM scale_library_use_grants g WHERE g.entry_id=e.id AND g.product=${c.entry}
      AND g.organization_id=${c.organizationId} AND g.status='ACTIVE'
      AND ((g.scope_kind='USER' AND g.user_id=${c.principal.userId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL)))
-   ORDER BY e.id LIMIT 121`)
+   `,filters:{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')},text:[Prisma.sql`v.title`],condition:Prisma.sql`(${input.cursor??null}::text IS NULL OR v."entryId">${input.cursor??null})`,order:Prisma.sql`v."entryId"`,limit:121}))
+  const rows=catalog.list
   const scanned=rows.slice(0,120),allowed=await readEducationLibrarySourceUses(tx,c,scanned.map(row=>row.entryId))
   const visible=scanned.filter(row=>allowed.has(row.entryId)),selected=visible.slice(0,40)
   const moreVisible=visible.length>40,moreCandidates=rows.length>120
-  return {tagFacets:discoveryFacets(catalogDiscoveryRecords()),list:selected.map(projectLibraryHeader),
+  return {tagFacets:catalogTagFacets([catalog.facetTags]),list:selected.map(projectLibraryHeader),
    nextCursor:moreVisible?selected.at(-1)!.entryId:moreCandidates?scanned.at(-1)!.entryId:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

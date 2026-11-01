@@ -1,3 +1,4 @@
+import type {PaginationParams} from '../../utils/pagination'
 import {readInstance,type BundleBindings} from './instance'
 export {readInstance} from './instance'
 export type {BundleBindings} from './instance'
@@ -21,7 +22,7 @@ import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
-import {catalogClassificationTags} from '../scale/library/catalog-discovery'
+import {catalogClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 
 export type BundleActor = { userId: string; role: UserRole }
 export const author = (actor: BundleActor) => {
@@ -215,16 +216,27 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
     })
     return detail(actor,id)
   }
-  async function catalog(actor: BundleActor) {
+  const ownTags=(entry:ReturnType<BundleDefinitionProvider['list']>[number])=>catalogClassificationTags({}, {population:{respondentTypes:entry.definition.respondentTypes,minAge:entry.definition.population.subjectMinAgeYears,maxAge:entry.definition.population.subjectMaxAgeYears}})
+  async function catalogRow(actor:BundleActor,entry:ReturnType<BundleDefinitionProvider['list']>[number]){
+    const definition=entry.definition
+    let allowed=true,publicationBlockers:string[]=[]
+    try{await eligible(actor,definition.bundleKey,definition.bundleVersion)}catch(error:any){allowed=false;publicationBlockers=[error.message]}
+    return {...definition,classificationTags:ownTags(entry),...(allowed&&entry.declarativePackage?{status:'PUBLISHED' as const}:{}),canInstantiate:allowed&&process.env.BUNDLE_PRODUCTS_ENABLED==='true',publicationBlockers}
+  }
+  function catalog(actor:BundleActor):Promise<Array<Awaited<ReturnType<typeof catalogRow>>>>
+  function catalog(actor:BundleActor,options:{pagination:PaginationParams;filters:CatalogDiscoveryFilters&{status?:string}}):Promise<{list:Array<Awaited<ReturnType<typeof catalogRow>>>;page:number;pageSize:number;hasMore:boolean;tagFacets:ReturnType<typeof catalogTagFacets>}>
+  async function catalog(actor:BundleActor,options?:{pagination:PaginationParams;filters:CatalogDiscoveryFilters&{status?:string}}){
     author(actor)
-    return Promise.all(provider.list().map(async entry => {
-      const definition = entry.definition
-      let allowed = true
-      let publicationBlockers: string[] = []
-      try { await eligible(actor, definition.bundleKey, definition.bundleVersion) } catch (error: any) { allowed = false; publicationBlockers = [error.message] }
-      return { ...definition,classificationTags:catalogClassificationTags({}, {population:{respondentTypes:definition.respondentTypes,minAge:definition.population.subjectMinAgeYears,maxAge:definition.population.subjectMaxAgeYears}}), ...(allowed && entry.declarativePackage ? { status: 'PUBLISHED' } : {}), canInstantiate: allowed && process.env.BUNDLE_PRODUCTS_ENABLED === 'true',
-        publicationBlockers }
-    }))
+    const all=provider.list()
+    if(!options)return Promise.all(all.map(entry=>catalogRow(actor,entry)))
+    const {pagination,filters}=options
+    const matches=all.filter(entry=>matchesCatalogDiscovery([entry.definition.name,entry.definition.bundleKey,entry.definition.bundleVersion,entry.definition.description],ownTags(entry),filters))
+      .sort((a,b)=>a.definition.bundleKey.localeCompare(b.definition.bundleKey)||a.definition.bundleVersion.localeCompare(b.definition.bundleVersion))
+    // Effective publication status still comes from the original admission rule.
+    // For the default status only the selected page needs source checks.
+    const filtered=filters.status&&filters.status!=='all'?(await Promise.all(matches.map(entry=>catalogRow(actor,entry)))).filter(row=>row.status===filters.status):null
+    const list=filtered?filtered.slice(pagination.skip,pagination.skip+pagination.take):await Promise.all(matches.slice(pagination.skip,pagination.skip+pagination.take).map(entry=>catalogRow(actor,entry)))
+    return {list,page:pagination.page,pageSize:pagination.pageSize,hasMore:pagination.skip+pagination.take<(filtered?.length??matches.length),tagFacets:catalogTagFacets(all.map(ownTags))}
   }
   async function list(actor: BundleActor) {
     author(actor)
