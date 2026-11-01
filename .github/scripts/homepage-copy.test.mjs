@@ -68,7 +68,7 @@ test('copy route is exclusive with all backend, database and unrelated consumers
  assert.match(job('merge-gate'),/homepage-copy/);
  assert.match(readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8'),/recomputed-homepage-copy-plan/);
  assert.match(job('codeql'),/homepage-copy.*toolsChanged/);
- assert.match(job('codeql'),/paths: \[server-version\/frontend\/src, .github\/scripts\/homepage-copy-scope.mjs/);
+ assert.match(job('codeql'),/paths: \[server-version\/scripts\/release\/policy.mjs, server-version\/frontend\/src, .github\/scripts\/homepage-copy-scope.mjs/);
  const candidate=readFileSync(new URL('./homepage-copy-candidate.py',import.meta.url),'utf8');
  const workflow=readFileSync(new URL('../workflows/ci-homepage-copy.yml',import.meta.url),'utf8');
  const browser=readFileSync(new URL('./homepage-copy-browser.mjs',import.meta.url),'utf8');
@@ -96,6 +96,7 @@ const staticBefore="export function Page(){return <main><h1>旧说明</h1><a hre
 const staticAfter=staticBefore.replace('旧说明','新说明');
 test('public presentation admits markup and data while retaining runtime behavior',()=>{
  assert.equal(publicRenderBoundary(staticBefore,staticAfter),true);
+ assert.ok(publicPresentation([entry(staticFile),entry('.github/workflows/scale-onboarding-boundary.yml'),entry('.github/scripts/content-workflows.test.mjs'),entry('server-version/scripts/release/policy.mjs')],ref=>ref==='base'?staticBefore:staticAfter));
  assert.deepEqual(publicPresentation([entry(staticFile)],ref=>ref==='base'?staticBefore:staticAfter),{pages:[{page:'survey',static:true}],executable:true});
  for(const after of [staticAfter+";fetch('/api/auth')",staticAfter+";export * from '../api/auth'",staticAfter+";import '../api/origins'",staticAfter.replace('<main>','<main dangerouslySetInnerHTML={{__html:source}}>'),staticAfter+";while(true){}"])
   assert.equal(publicRenderBoundary(staticBefore,after),false,after);
