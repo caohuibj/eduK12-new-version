@@ -1,6 +1,4 @@
-import { participantPresentations as allPresentations } from './participant-presentation'
-
-// Original copy is materialized alongside its predecessor, selected by frozen reportVersion.
-export const historicalPresentations = allPresentations.filter(p => p.reportReading?.version !== '3.0.0')
-export const reportRevision = allPresentations.find(p => p.reportReading?.version === '3.0.0')!
-export const participantPresentations = [reportRevision]
+import {participantPresentations as all} from './participant-presentation'
+export const historicalPresentations=all.filter(p=>p.reportReading?.version!=='3.0.0')
+export const reportRevision=all.find(p=>p.engineVersion==='1.1.0'&&p.reportReading?.version==='3.0.0')!
+export const participantPresentations=[reportRevision]

@@ -8,12 +8,12 @@
 - 四项修订 #480：`b42393cffe1c4364c1fc5568b656ed612fc60849`。
 - 八题库 #481：`4e003a24c51c50bfd8abbfd123cc8c02b9575745`。#478实际是管理员入库界面，不属于本报告基线。
 - Timecopy首次payload保存修复：`7c4718a379c9d00622adf1de42c6bb1fca5b7277`；迷宫独立练习核心修订：`7332a07b21952007e9ed7d661a136916dde855d5`。
-- 上述已有核心差异组合成审阅基线 `reports/cognitive-47-base-20261101`，head `917480229721e256394e11ea51ec8b9b45ae51a7`。这个分支仅供区分报告差异，没有修改原PR分支，也不代表生产/CI/发布通过；核心PR进入main后应重定位报告PR基线。
+- 上述已有核心差异组合成审阅基线 `reports/cognitive-47-base-20261101`，head `4b0a0661d9742341b45687678dd58996d085bc59`。这个分支仅供区分报告差异，没有修改原PR分支，也不代表生产/CI/发布通过；核心PR进入main后应重定位报告PR基线。
 - R1交接：`b08fd18add73da2be6ac55d5afc7110964417f24`；R2：`7fc8405a11ced478a0326cb069c5c9f504d0f6d0`；R3只取报告增量：`42ad96c5ab5f96568d3e0edf2cbe17e8b13fb947`；R4：`b39d66b9f1166429d0007e165a7d52e15cf6c5fc`。
 
 ## 本次实际改动
 
-所有当前推荐C/S身份各新增一个 `*-report3` DRAFT配置，reportVersion、presentationVersion与reportReading.version均为3.0.0，referenceMode=none。原配置、原呈现值与冻结报告保留；无reportVersion或旧配置继续使用原呈现，新配置显式选择R3。旧迷宫C1.0.1的先前未发布R3草稿也保留为兼容地址，不计为第48种工具。
+所有当前推荐C/S身份各新增一个 `*-report3` DRAFT配置，reportVersion、presentationVersion与reportReading.version均为3.0.0，referenceMode=none。原配置、原呈现值与冻结报告保留；无reportVersion或旧配置继续使用原呈现，新配置显式选择R3。旧迷宫C1.0.1与旧matrix C1.0.0的先前未发布R3草稿也保留为兼容地址，不增加工具种数。
 
 各组工厂式报告文案已在原task-owned声明中物化，按既有manifest生成机制注册。旧呈现排在前面，R3按报告版本选择；兼容文件仅转出这些声明，不再作为注册入口。无需数据库迁移、重算历史或新报告平台。新开场文案也只由R3配置选择；timecopy保存修复与迷宫C1.1行为均保留。
 
@@ -54,7 +54,7 @@
 | R3 | icarmatrix | 2.1.0 / 1.1.0 | `2.1.0-report3` | `{"totalTrials":4}` | `{"totalTrials":7}` |
 | R3 | lineangle | 2.0.0 / 2.0.0 | `2.0.0-report3` | `{"totalTrials":12}` | `{"totalTrials":60}` |
 | R3 | logicdeduce | 2.0.0 / 2.0.0 | `2.0.0-report3` | `{"totalTrials":18}` | `{"totalTrials":36}` |
-| R3 | matrix | 1.0.0 / 1.0.0 | `1.0.0-report3` | `{"itemCount":6}` | `{"itemCount":24}` |
+| R3 | matrix | 1.1.0 / 1.0.0 | `1.1.0-report3` | `{"itemCount":6}` | `{"itemCount":24}` |
 | R3 | mentalrotation | 1.0.0 / 1.0.0 | `1.0.0-report3` | `{"totalTrials":12}` | `{"totalTrials":80}` |
 | R3 | proofread | 1.1.0 / 1.1.0 | `1.1.0-report3` | `{"totalTrials":18}` | `{"totalTrials":36}` |
 | R3 | readingcomp | 1.1.0 / 1.1.0 | `1.1.0-report3` | `{"totalTrials":18}` | `{"totalTrials":36}` |
@@ -89,6 +89,8 @@
 
 ## 已核证据与边界
 
+后续R3增量：`fd35f4ad194f078c51ce61939a79c3d2784c8e10`修订tower合法移动/首次尝试和ICAR解释；`bf869a8007c9ed1911e9a4c1776ad6fa831694f6`隔离matrix练习，已纳入。相同正式题池/评分复用原作者有界证据，仅复核matrix新身份绑定及这三项报告，未重跑全14或47项。
+
 - Node24.21.0：47种当前任务、体验/研究共94个配置冻结通过；逐值核对全部旧呈现与旧seed均保留；剥离report元数据后两模式参数与原配置一致。
 - 对每份冻结报告检查普通合成值、真实数值零与全null三种投影，共282份；无缺失补零、未解析占位符或缺失图表补值，单任务报告不生成0–100产品指数。语义流畅性每轮词数按count显示。此为报告投影契约检查，未重复执行47套scorer，也不是施测结果或可靠性验证。
 - 前端认知闭包与后端profile-freeze依赖闭包类型检查；manifest、94个注册data声明与依赖检查见本次验证结果。
@@ -106,7 +108,7 @@
 | reversallearning | 当前80/0与参考80/20的设计差异，R1正在论证或修订，不能只凭披露宣称原协议对齐。 |
 | sentencecheck / visualwm / auditorynback | 真假否定、练习复用与短体验目标机会，由R2独立核修。 |
 | seqlearn | 施测前介绍可能提示规律，R2正在最小处理；报告与开场须保留其最终修复。 |
-| matrix / mentalrotation / tower | R3正在核实练习是否真实泄露正式题，不能把未核实风险写成已解决。 |
+| matrix / mentalrotation / tower | matrix已有确证反例，已纳入独立4练习的新C/P1.1、S1.0；正式6/16/24与scorer不变。mentalrotation原协议允许重复刺激，不因重复判缺陷；tower四个一步练习与正式无重合，撤回先前误判。tower用时明确为首次移动尝试（可能违规），不称纯计划时长。 |
 | maze | 已在独立C1.1修订隔离3×3练习；旧C1.0.1保留重复首图的历史条件，不改写旧报告。短体验2图仍不足以给稳定能力结论。 |
 
 后续只接收对应增量、检查受影响接线与文案，不据此重跑各组全测试或新增平台门禁。

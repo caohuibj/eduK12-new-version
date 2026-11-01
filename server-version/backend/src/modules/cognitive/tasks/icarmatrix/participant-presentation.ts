@@ -1,6 +1,5 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -613,7 +612,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "research": {
         "tier": "PILOT",
         "profileLabel": "研究变式",
-        "participantConclusion": "matRiks作者官方实现可生成2×2或3×3规则矩阵及10个干扰项；本项目保留审订七题和五个干扰项，并固定009参与。ICAR项目官方也不授权以分数推个人IQ；本素材的直接来源是MIT许可matRiks生成器，不声称使用ICAR标准题或继承其测量属性。",
+        "participantConclusion": "matRiks作者官方实现可生成2×2或3×3规则矩阵及10个干扰项；本项目保留审订七题和五个干扰项，并固定009参与。ICAR项目官方明确不应据分数推算个人IQ；本素材的直接来源是MIT许可matRiks生成器，不声称使用ICAR标准题或继承其测量属性。",
         "reportCaveats": [
           "体验约2–3分钟；研究约4–6分钟，非实测。每题30秒+0.4秒注视，4/7题正式上界约2.0/3.6分钟，另计说明练习。",
           "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
@@ -727,7 +726,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "professional": {
         "construct": "流体推理（图形规则归纳）",
         "procedure": "C2.1.0/S1.1.0，七道审订3×3素材，4/6/7题；按seed选题并重排六个选项，约束题009必出，题内规则标签可重叠。400ms注视、30秒响应；全部正式题入准确率分母，已答/答对/未答分别记数，合法0与缺失分开。 Brancaccio等 matRiks 0.1.5，官方DOI 10.32614/CRAN.package.matRiks: https://cran.r-project.org/package=matRiks ; 官方ICAR边界: https://icar-project.com/",
-        "interpretation": "matRiks作者官方实现可生成2×2或3×3规则矩阵及10个干扰项；本项目保留审订七题和五个干扰项，并固定009参与。ICAR项目官方也不授权以分数推个人IQ；本素材的直接来源是MIT许可matRiks生成器，不声称使用ICAR标准题或继承其测量属性。",
+        "interpretation": "matRiks作者官方实现可生成2×2或3×3规则矩阵及10个干扰项；本项目保留审订七题和五个干扰项，并固定009参与。ICAR项目官方明确不应据分数推算个人IQ；本素材的直接来源是MIT许可matRiks生成器，不声称使用ICAR标准题或继承其测量属性。",
         "confounders": [
           "本项目采用matRiks生成素材的七题审订范围，不是完整ICAR或Raven；没有IQ换算、常模或等值版本。",
           "体验约2–3分钟；研究约4–6分钟，非实测。每题30秒+0.4秒注视，4/7题正式上界约2.0/3.6分钟，另计说明练习。",

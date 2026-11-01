@@ -1403,10 +1403,10 @@
   {
     "group": "R3",
     "task": "matrix",
-    "engineVersion": "1.0.0",
+    "engineVersion": "1.1.0",
     "scoringVersion": "1.0.0",
-    "previousConfigVersion": "1.0.0",
-    "configVersion": "1.0.0-report3",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
     "reportVersion": "3.0.0",
     "profiles": {
       "experience": {
@@ -1419,7 +1419,7 @@
           "itemCount": 6
         },
         "reportCaveats": [
-          "体验档题目较少，不进入综合分析。"
+          "6道正式题；另有4道独立练习，不将少量题目解释为稳定子能力。"
         ]
       },
       "standard": {
@@ -1432,7 +1432,7 @@
           "itemCount": 16
         },
         "reportCaveats": [
-          "内部生成题库，只描述本次规则归纳表现。"
+          "16道正式题；独立练习不含正式题面，题池仍是本项目生成变式。"
         ]
       },
       "research": {
@@ -1445,7 +1445,7 @@
           "itemCount": 24
         },
         "reportCaveats": [
-          "科研档覆盖全部三种规则族和难度；仍不是智力测验。"
+          "24个正式试次；练习与正式题面隔离，正式池仍可能在不同标签下重用同一题面，未验证常模或等值。"
         ]
       }
     }

@@ -1,6 +1,5 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
-// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -225,14 +224,14 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
     "title": "塔式规划",
     "metrics": {
       "minimumMoveSolveRate": {
-        "label": "最短步解题比例",
-        "explanation": "以最少步数解出的题目占全部题目的比例。",
-        "singleExplanation": "以最少步数解出的题目占全部题目的比例。"
+        "label": "最少合法步解题比例",
+        "explanation": "以最少合法移动达到目标的关卡占全部关卡的比例；违规尝试不算合法步数，另列次数。",
+        "singleExplanation": "以最少合法移动达到目标的关卡占全部关卡的比例；违规尝试不算合法步数，另列次数。"
       },
       "excessMoves": {
-        "label": "已解题平均额外步数",
-        "explanation": "已解题目相对最短解法多走的平均步数。",
-        "singleExplanation": "已解题目相对最短解法多走的平均步数。"
+        "label": "已解题平均额外合法步数",
+        "explanation": "已解关卡中，合法移动相对最短合法路径多走的平均步数；违规尝试另列。",
+        "singleExplanation": "已解关卡中，合法移动相对最短合法路径多走的平均步数；违规尝试另列。"
       },
       "solveRate": {
         "label": "解题比例",
@@ -240,9 +239,9 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "singleExplanation": "达到目标圆盘状态的题目比例。"
       },
       "firstMoveLatencyMs": {
-        "label": "首步计划时长",
-        "explanation": "从题目开始到第一次移动的典型等待时长，并不直接等同于计划能力。",
-        "singleExplanation": "从题目开始到第一次移动的典型等待时长，并不直接等同于计划能力。"
+        "label": "首次移动尝试等待时间",
+        "explanation": "从题目开始到首次移动尝试的等待时间，在有尝试的关卡中取中位数；首次尝试可能违规，不能当作纯计划时长。",
+        "singleExplanation": "从题目开始到首次移动尝试的等待时间，在有尝试的关卡中取中位数；首次尝试可能违规，不能当作纯计划时长。"
       },
       "ruleViolations": {
         "label": "规则违反次数",
@@ -264,7 +263,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "participantConclusion": "回看这次完成的4题；只描述本次表现。",
         "reportCaveats": [
           "体验约3–5分钟；研究约15–22分钟，已有估计而非实测。90秒是无操作保护，每次移动会重置，不是整关总时限。",
-          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首步等待也可能包含读题和操作时间。",
+          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首次移动尝试等待时间也可能包含读题和操作时间，且这次尝试可能违规。",
           "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
         ],
         "showProductIndex": false
@@ -275,7 +274,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "participantConclusion": "回看这次完成的10题；只描述本次表现。",
         "reportCaveats": [
           "体验约3–5分钟；研究约15–22分钟，已有估计而非实测。90秒是无操作保护，每次移动会重置，不是整关总时限。",
-          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首步等待也可能包含读题和操作时间。",
+          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首次移动尝试等待时间也可能包含读题和操作时间，且这次尝试可能违规。",
           "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
         ],
         "showProductIndex": false
@@ -286,7 +285,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
         "participantConclusion": "Shallice（1982）研究非例行任务中的规划；这里的圆盘三柱状态、难度配额、移动上限与无操作保护为自编，不能视为原Tower of London器材、完整协议或临床解释。",
         "reportCaveats": [
           "体验约3–5分钟；研究约15–22分钟，已有估计而非实测。90秒是无操作保护，每次移动会重置，不是整关总时限。",
-          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首步等待也可能包含读题和操作时间。",
+          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首次移动尝试等待时间也可能包含读题和操作时间，且这次尝试可能违规。",
           "常规时长为估计而非实测；未以本项目数据证明测量可靠性。"
         ],
         "showProductIndex": false
@@ -297,13 +296,13 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       "把本次记录与当时环境、完成情况一起阅读；再次体验会有熟悉效应。"
     ],
     "singleHiddenMetrics": [],
-    "disclaimer": "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首步等待也可能包含读题和操作时间。 只描述本次记录，不换算IQ、同龄排名或诊断。 练习与正式使用同一内部素材池，可能再次遇到相同素材；熟悉效应需一起考虑。",
+    "disclaimer": "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首次移动尝试等待时间也可能包含读题和操作时间，且这次尝试可能违规。 只描述本次记录，不换算IQ、同龄排名或诊断。",
     "reportReading": {
       "version": "3.0.0",
       "title": "先想一想，再挪第一步",
       "introduction": "把圆盘从当前摆法移到目标摆法，像一次小型路线规划。报告分别看是否解出、用了几步，以及有没有碰到规则限制。",
       "summary": {
-        "template": "在全部关卡中，这次达到目标的比例为 {solveRate}；其中以最少步数完成的关卡占全部关卡 {minimumMoveSolveRate}。",
+        "template": "在全部关卡中，这次达到目标的比例为 {solveRate}；其中以最少合法移动完成的关卡占全部关卡 {minimumMoveSolveRate}，违规尝试另列。",
         "metricKeys": [
           "solveRate",
           "minimumMoveSolveRate"
@@ -366,38 +365,42 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "text": "按本任务规则作答；报告回看这一次的选择与过程。"
           }
         ],
-        "boundary": "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首步等待也可能包含读题和操作时间。",
+        "boundary": "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首次移动尝试等待时间也可能包含读题和操作时间，且这次尝试可能违规。",
         "metricHelp": {
           "minimumMoveSolveRate": {
-            "label": "用最少步数解出多少",
-            "explanation": "本次关卡中按任务内最少步数解出的比例。"
+            "label": "最少合法步解题比例",
+            "explanation": "以最少合法移动达到目标的关卡占全部关卡的比例；违规尝试不算合法步数，另列次数。"
           },
           "excessMoves": {
-            "label": "比最少路径多走的步数",
-            "explanation": "任务内的额外移动记录；要结合完成情况阅读。"
+            "label": "已解题平均额外合法步数",
+            "explanation": "已解关卡中，合法移动相对最短合法路径多走的平均步数；违规尝试另列。"
           },
           "solveRate": {
             "label": "解出了多少比例的关卡",
             "explanation": "本次关卡中成功达到目标的比例。"
+          },
+          "firstMoveLatencyMs": {
+            "label": "首次移动尝试等待时间",
+            "explanation": "从题目开始到首次移动尝试的等待时间，在有尝试的关卡中取中位数；首次尝试可能违规，不能当作纯计划时长。"
           }
         }
       },
       "professional": {
         "construct": "约束移动任务中的规划与执行",
-        "procedure": "三柱、三圆盘，遵守顶盘先移和大盘不得压小盘；4/10/18关难度配额2/2/0、4/4/2、6/6/6。移动上限由最短步数与factor=3确定；90秒无操作保护。最短步解题率分母为全部关卡，额外步数只在已解关卡中平均；首步用时只在有移动的关卡取中位。 Shallice, Specific impairments of planning (1982), DOI 10.1098/rstb.1982.0082: https://pubmed.ncbi.nlm.nih.gov/6125971/ 当前练习从同一内部池取4题；研究档覆盖全池，存在练习刺激重现。练习记录不进入正式分母，但熟悉效应仍会影响后续表现。",
+        "procedure": "三柱、三圆盘，遵守顶盘先移和大盘不得压小盘；4/10/18关难度配额2/2/0、4/4/2、6/6/6。移动上限由最短步数与factor=3确定；90秒无操作保护。最短合法步解题率分母为全部关卡；最短/额外步数仅计合法移动，违规尝试另列。额外合法步数只在已解关卡中平均；首次移动尝试等待时间在有尝试的关卡取中位，第一条尝试即使违规也纳入。 Shallice, Specific impairments of planning (1982), DOI 10.1098/rstb.1982.0082: https://pubmed.ncbi.nlm.nih.gov/6125971/ 练习是4道手写一步问题，正式问题最短需2步；练习与正式起点—目标对不同。ID文字重用不代表解答重现；练习记录不进入正式分母。",
         "interpretation": "Shallice（1982）研究非例行任务中的规划；这里的圆盘三柱状态、难度配额、移动上限与无操作保护为自编，不能视为原Tower of London器材、完整协议或临床解释。",
         "confounders": [
-          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首步等待也可能包含读题和操作时间。",
+          "三柱圆盘是本项目规划变式；熟悉游戏规则会影响结果，首次移动尝试等待时间也可能包含读题和操作时间，且这次尝试可能违规。",
           "体验约3–5分钟；研究约15–22分钟，已有估计而非实测。90秒是无操作保护，每次移动会重置，不是整关总时限。",
           "模式名称不代表已完成心理测量验证；次数增加不自动保证可靠性。"
         ],
         "metricNotes": {
           "minimumMoveSolveRate": {
-            "definition": "以最少步数解出的题目占全部题目的比例。",
+            "definition": "以最少合法移动达到目标的关卡占全部关卡的比例；违规尝试不算合法步数，另列次数。",
             "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
           },
           "excessMoves": {
-            "definition": "已解题目相对最短解法多走的平均步数。",
+            "definition": "已解关卡中，合法移动相对最短合法路径多走的平均步数；违规尝试另列。",
             "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
           },
           "solveRate": {
@@ -405,7 +408,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
             "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
           },
           "firstMoveLatencyMs": {
-            "definition": "从题目开始到第一次移动的典型等待时长，并不直接等同于计划能力。",
+            "definition": "从题目开始到首次移动尝试的等待时间，在有尝试的关卡中取中位数；首次尝试可能违规，不能当作纯计划时长。",
             "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
           },
           "ruleViolations": {
