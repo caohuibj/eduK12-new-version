@@ -99,8 +99,13 @@ export class BundleDefinitionProvider {
     // It covers exactly 18+ without an upper bound, never arbitrary age ranges.
     const adultSelfDeclared=population.subjectPopulation==='adult' && population.subjectMinAgeYears===18 && population.subjectMaxAgeYears===undefined &&
       entry.declarativePackage?.schemaVersion===2 && 'kind' in entry.declarativePackage.profile.applicability
+    const measurementSlots=entry.definition.slots.filter(slot=>slot.unitType!=='FORM')
+    const birthKey=measurementSlots[0]?.admissionContext?.birthYearMonthContextKey
+    const frozenBirthDeclared=entry.definition.respondentTypes.length===1 && entry.definition.respondentTypes[0]==='SELF'
+      && Boolean(birthKey) && measurementSlots.every(slot=>slot.unitType==='SCALE' && slot.required && slot.admissionContext?.birthYearMonthContextKey===birthKey)
+      && entry.contextDefinition?.fields.some(field=>field.contextKey===birthKey && field.required && field.valueType==='string')
     if ((population.subjectMinAgeYears !== undefined || population.subjectMaxAgeYears !== undefined) &&
-        !adultSelfDeclared && !(childObserver && entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_birth_year_month' && field.required && field.valueType === 'string')) &&
+        !adultSelfDeclared && !frozenBirthDeclared && !(childObserver && entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_birth_year_month' && field.required && field.valueType === 'string')) &&
         !entry.contextDefinition?.fields.some(field => field.contextKey === 'subject_age_years' && field.required && field.valueType === 'number')) {
       blockers.push('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
     }

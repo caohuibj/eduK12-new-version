@@ -19,9 +19,10 @@ export type FrozenSurveyCognitiveProfile={schemaVersion:2;templateKey:typeof SUR
  feedback:{policyVersion:'SURVEY_DESCRIPTIVE_V1';mode:'GENERAL';metricKeys:[];release:'AFTER_FINAL'}}
 function fail(message='Survey 精确 profile 冻结定义不一致'):never{throw new Error(message)}
 /** The first explicit adapter admits existing text/native reaction and gonogo
- * kernels only. It does not invent a renderer, media authority or norm transfer. */
+ * and span kernels only. Existing span runners and scorers retain stopping rules;
+ * no renderer, media authority or norm transfer is introduced. */
 export function assertSurveyCognitiveProfileExecutable(artifact:CognitiveProfileArtifact){
- if(artifact.schemaVersion!==2||!artifact.execution||!['reaction','gonogo'].includes(artifact.identity.testType)
+ if(artifact.schemaVersion!==2||!artifact.execution||!['reaction','gonogo','digitbackward','corsi'].includes(artifact.identity.testType)
   ||artifact.execution.presentation!==null||artifact.execution.referenceDefinitions.length||artifact.execution.compiledRuntime.referenceBindingDefinition.selections.length)
   fail('此精确 profile 尚无已验证的 Survey 原生/媒体/参考适配，暂不可选')
 }

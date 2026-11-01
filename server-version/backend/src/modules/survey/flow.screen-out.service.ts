@@ -96,7 +96,7 @@ export async function screenOutResearchAttempt(input:FinalInput){
     try{
       result=verified!.compute(input.answers,assignment,
         input.presentation?.shownBlocks,'SCREEN_OUT',input.itemTimings,
-        taskReceipts.cognitiveResults,taskReceipts.nativeSituationalResults)
+        taskReceipts.cognitiveResults,taskReceipts.nativeSituationalResults,attempt.startedAt)
     }catch(e){
       if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)

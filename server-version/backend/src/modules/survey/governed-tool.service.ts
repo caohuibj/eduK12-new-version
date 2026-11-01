@@ -107,7 +107,7 @@ export async function previewSurveyNativeSource(actor:string,id:string){
  const row=await prisma.compositeAssessment.findFirst({where:{id,createdBy:actor,status:'PUBLISHED',productKind:'ASSESSMENT_BUNDLE'},include:{bundleInstance:true}})
  if(!row?.bundleInstance)governedFail(404,'原生整包必须是本人已发布版本')
  const {frozen}=readNativeInstance(row.bundleInstance)
- if(frozen.declarativePackage?.schemaVersion!==2)governedFail(409,'此来源尚无理论画像适配')
+ if(frozen.declarativePackage?.schemaVersion!==2&&frozen.declarativePackage?.schemaVersion!==3)governedFail(409,'此来源尚无原生整包报告适配')
  return {title:row.name,compositeId:row.id,definitionHash:row.bundleInstance.definitionHash,bindingsHash:row.bundleInstance.bindingsHash,slots:frozen.bundleSnapshot.slotBindings.map(s=>({slotKey:s.slotKey,kind:s.unitType})),context:frozen.contextDefinition?.fields.map(f=>({contextKey:f.contextKey,valueType:f.valueType}))??[]}
 }
 export async function submitGovernedPackage(actor:string,input:{requestId:string;family:'COMBINATION'|'BUNDLE';toolKey:string;version:string;title:string;components:Array<{slotKey:string;source:{type:'STANDARD'|'GOVERNED';id:string;hash:string}}> ;report:PackageReport|null;nativeBundle?:SurveyNativeSource;reference:Record<string,unknown>},proof:AdminSessionProof){return prisma.$transaction(async tx=>{

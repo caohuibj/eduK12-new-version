@@ -1,0 +1,38 @@
+{
+  "scope": "Frozen adult SELF reader and Survey consumer audience bridge",
+  "localOnly": true,
+  "leafScoringInvoked": false,
+  "savedReaderPositive": {
+    "passed": 1,
+    "PBA": 111,
+    "BPSES": 21,
+    "theme": "MATCHED/pa2",
+    "realSourceContractUnchanged": "ADULT_SELF/parent"
+  },
+  "parentProxyNegative": {
+    "passed": 1,
+    "theme": "WITHHELD",
+    "rawValuesRetained": [
+      111,
+      21
+    ]
+  },
+  "surveyConsumer": {
+    "passed": 1,
+    "sourceAudienceUnchanged": "parent",
+    "feedbackLane": "student",
+    "parentObserver": "denied"
+  },
+  "initialTypes": {
+    "diagnostics": 1,
+    "reason": "Redundant researcher comparison after strict source-audience narrowing"
+  },
+  "formalCi": "not activated",
+  "privateFixtureMetadataPublished": false,
+  "correctedTypecheck": {
+    "roots": 9,
+    "files": 2066,
+    "diagnostics": 0,
+    "exitCode": 0
+  }
+}

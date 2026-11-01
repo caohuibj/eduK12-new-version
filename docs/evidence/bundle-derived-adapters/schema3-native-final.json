@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "schemaVersion": 3,
+  "installed": true,
+  "exactWholeGrant": true,
+  "wrongOwnerImportDenied": true,
+  "finalCommitted": true,
+  "singleReports": 2,
+  "jointReady": true,
+  "frozenDobAndTime": true,
+  "resultsHash": "5831db7b77d58095307242ab54584eaf897c5838693afb0ba3a6a344dababb00",
+  "reopenEqual": true,
+  "replayIdempotent": true,
+  "wrongCredentialDenied": true,
+  "withdrawnFeedbackDenied": true,
+  "noRescore": true,
+  "noRecompute": true,
+  "noReage": true,
+  "historyRetained": true,
+  "production": false,
+  "evidenceScope": "Local isolated service chain only; not formal CI, production, or readiness of other bundles.",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15-bookworm",
+    "database": "disposable loopback test only",
+    "schema": "current migrations applied to empty isolated DB"
+  },
+  "checks": {
+    "testFile": "server-version/backend/src/__tests__/bundle-onboarding/schema3-native-final.postgres.integration.test.ts",
+    "executedCases": 1,
+    "passed": 1,
+    "pending": 0,
+    "runtimeMs": 1268,
+    "newTypeRoots": 4,
+    "newTypeClosure": 2535,
+    "newTypeDiagnostics": 0,
+    "previousTwelveCasesRerun": false,
+    "previousTypeClosuresRerun": false,
+    "numericRoundtripDifferences": 0
+  },
+  "retainedFirstFailures": [
+    {
+      "stage": "install",
+      "classification": "test fixture",
+      "error": "BUNDLE_FIXTURE_MISMATCH:valid",
+      "repair": "Use original public installation scenarios, not unit-only empty fixture envelopes."
+    },
+    {
+      "stage": "publish",
+      "classification": "test fixture",
+      "error": "BUNDLE_CLAIM_NOT_APPROVED",
+      "repair": "Declare the synthetic independent_summary and cross_source_condition claims explicitly."
+    },
+    {
+      "stage": "create source",
+      "classification": "test fixture",
+      "error": "anonymous delivery not allowed",
+      "repair": "Use the existing supported course delivery; keep the restriction."
+    },
+    {
+      "stage": "preview native source",
+      "classification": "product",
+      "error": "schema3 rejected by remaining schema2-only preview",
+      "repair": "Accept the already supported schema2/schema3 at preview; retain ownership/publication checks."
+    },
+    {
+      "stage": "read frozen wave",
+      "classification": "product",
+      "error": "frozen publication digest mismatch after Prisma JSON numeric coercion",
+      "example": {
+        "original": 1.7777777777777777,
+        "storedBeforeFix": 1.777777777777778
+      },
+      "repair": "Bind serialized JSON to PostgreSQL JSONB as a parameter; retain the failed immutable row, continue with a new synthetic wave."
+    }
+  ],
+  "limitations": [
+    "Synthetic schema3 declaration uses the source score/DOB contract with string and boolean context only; it does not verify enum authoring or claim real B10 publication.",
+    "B09/B15 DOB and private CHEXI dependency gaps remain unchanged.",
+    "Setup checkpoints reused completed source installation, trial and grant steps; no prior successful stage was repeated on repair.",
+    "Initial Prisma type-discovery issues and fixture failures remain recorded locally."
+  ]
+}
