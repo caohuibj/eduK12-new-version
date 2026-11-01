@@ -140,3 +140,5 @@ Cools 2002及numberline作者全文现已实际取得，旧“全文未取”的
 后续结果：限定新R字段用例1 PASS（原16例未重跑）；6个实际修改sidecar的依赖闭包types为0诊断。合计17个局部用例分别取得通过记录，原组件7 PASS按未变renderer证据复用。
 
 集成提醒：反转独立行为修复为 `fix/cognitive-reversal-research-20261101` / `6afe514acc6733fcd610424057d5d794bd05a64a`。它与本组仅在反转Task介绍行及participant-presentation入口有合成点：保留新C1.1.0执行逻辑、旧C和两套冻结身份；把本组易懂文字应用到相应新展示，**新C研究档保留30题训练/2秒正式窗/500毫秒正式反馈及独立练习图形**，不能沿用本组旧C的4题/3秒研究说明。新C报告应基于已修的动态criterion标签，并覆盖其方法附注；共享表由统一集成人员一次生成。
+
+独审继承字段同步：新版patterncompare.correctCount的独立/专业定义明确选对且达到有效RT下限；新版trailmaking专业metricNotes.omissionRate同步为“未在时限内成功完成的计划步骤比例”，包含错点未完成。只复验现有字段用例1 PASS，旧R原件和scorer未改。

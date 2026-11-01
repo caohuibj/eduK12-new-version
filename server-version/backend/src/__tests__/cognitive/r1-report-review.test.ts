@@ -47,6 +47,8 @@ describe('R1 display revisions', () => {
     }
     expect(reversal.protocols.experience!.reportCaveats.join(' ')).toContain('至少3次选到当时较有利的符号')
     expect(resolveParticipantPresentation(identity('patterncompare'))!.metrics.correctPerMinute.explanation).toContain('配置durationSec')
+    expect(resolveParticipantPresentation(identity('patterncompare'))!.metrics.correctCount.explanation).toContain('选对且反应用时达到')
+    expect(resolveParticipantPresentation(identity('trailmaking'))!.reportReading!.professional!.metricNotes.omissionRate.definition).toContain('未在时限内成功完成的计划步骤比例')
     expect(resolveParticipantPresentation(identity('trailmaking'))!.metrics.omissionRate.explanation).toContain('未在时限内成功完成的计划步骤比例')
   })
 

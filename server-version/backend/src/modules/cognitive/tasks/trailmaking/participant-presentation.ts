@@ -54,6 +54,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
     },
     professional: {
       ...previous.reportReading!.professional!,
+      metricNotes: { ...previous.reportReading!.professional!.metricNotes, omissionRate: { definition: "未在时限内成功完成的计划步骤比例；包含错点后仍未完成，不仅是完全没有响应。", readingHint: "分母为计划步骤数；与实际完成步数及错点一起阅读。" } },
       configFields: [{"key": "form", "label": "任务部分"}, {"key": "partAItemCount", "label": "A部分目标数"}, {"key": "partBItemCount", "label": "B部分目标数"}, {"key": "stepTimeoutMs", "label": "每步响应上限（毫秒）"}],
       procedure: previous.reportReading!.professional!.procedure + " 方法与文献核对：研究档A24目标+B24目标，8×6网格内种子洗牌位置，按点击目标逐步记录、每步15秒。Reitan(1958), DOI 10.2466/pms.1958.8.3.271，以及Bowie与Harvey(2006), DOI 10.1038/nprot.2006.390为原测试/施测文献；本项目是数字点击变式，不复制原纸笔布局或临床常模。本轮已核Bowie与Harvey作者上传协议：纸笔A/B各25目标，各有练习，连续计总时长，错误纠正仍计时，通常300秒停止。本项目仅A练习4目标、A/B各24目标、每步15秒超时后记录，与原协议不同；本项目差值是B每步平均用时减A每步平均用时，仍混合搜索、字母知识与动作因素。",
       interpretation: "研究版是本项目的较长配置，不是标准化或信效度认证。体验只做A部分12个目标，没有B部分，不能解释数字/字母切换。练习为A部分4目标，至少完成3个；每步最多15秒。英文顺序知识、视觉搜索与手部操作都会影响结果。",

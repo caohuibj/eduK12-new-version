@@ -9,6 +9,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
   title: "图形找不同",
   metrics: {
     ...previous.metrics,
+    correctCount: { ...previous.metrics.correctCount, explanation: "选对且反应用时达到本次有效下限的正式次数；选对但过快的不计入。", singleExplanation: "选对且反应用时达到本次有效下限的次数。" },
     accuracy: { ...previous.metrics.accuracy, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。", singleExplanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
     correctPerMinute: { ...previous.metrics.correctPerMinute, explanation: "正确有效次数除以冻结配置durationSec，再乘60；按配置时长折算，不是按实测完成时长，也不是同龄人排名。", singleExplanation: "按本次配置的正式秒数折算为每分钟答对数，不是实测一分钟的结果。", label: "折算每分钟答对数" },
     medianCorrectRtMs: { ...previous.metrics.medianCorrectRtMs, label: "答对时通常用多久" },
@@ -36,6 +37,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
       ...previous.reportReading!.popular!,
       metricHelp: {
         ...previous.reportReading!.popular!.metricHelp,
+        correctCount: { label: "正确有效次数", explanation: "选对且反应用时达到本次有效下限的正式次数；过快选对不计入。" },
         accuracy: { label: previous.metrics.accuracy.label, explanation: "按得比本次设定的最短有效时间还快，即使选对也不计作正确；过快反应和未回答都保留在计算比例的总次数里。" },
         correctPerMinute: { ...previous.reportReading!.popular!.metricHelp.correctPerMinute, label: "折算每分钟答对数", explanation: "正确有效次数除以配置durationSec，再乘60；体验档按配置30秒折算，不是按实测时长计算。" },
         medianCorrectRtMs: { ...previous.reportReading!.popular!.metricHelp.medianCorrectRtMs, label: "答对时通常用多久", explanation: previous.reportReading!.popular!.metricHelp.medianCorrectRtMs?.explanation ?? previous.metrics.medianCorrectRtMs.explanation ?? "答对时通常用多久" },
@@ -51,6 +53,7 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = pr
     },
     professional: {
       ...previous.reportReading!.professional!,
+      metricNotes: { ...previous.reportReading!.professional!.metricNotes, correctCount: { definition: "正式题中选对且rtMs不缺失、达到冻结validRtFloorMs下限的次数。", readingHint: "过快选对不纳入正确次数，但保留在比例分母中。" } },
       configFields: [{"key": "durationSec", "label": "正式时长（秒）"}, {"key": "trialTimeoutMs", "label": "每题响应上限（毫秒）"}, {"key": "isiMs", "label": "题间间隔（毫秒）"}, {"key": "validRtFloorMs", "label": "纳入用时统计的最短时间（毫秒）"}],
       procedure: previous.reportReading!.professional!.procedure + " 方法与文献核对：研究档正式90秒，单题最多2500毫秒，题间250毫秒；种子逐题生成自编几何图形，并非固定等量的相同/不同题。4题练习至少对3题。NIH Toolbox官方同异判断说明支持范式参照，但当前官方页面的总施测约4分钟不等于本项目正式计时；未取得完整原始试次/时序协议，不称Toolbox复刻，不采用其常模。",
       interpretation: "研究版是本项目的较长配置，不是标准化或信效度认证。体验版正式阶段30秒，题数随作答速度变化。每分钟正确数是按30秒折算，不代表真的持续做满1分钟；短时间的波动、屏幕清晰度和操作熟练度都会影响结果。",
