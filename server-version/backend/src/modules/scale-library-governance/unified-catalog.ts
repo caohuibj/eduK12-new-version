@@ -38,11 +38,14 @@ export async function readUnifiedCatalog(actorId: string, product: LegacyLibrary
   const standard = await readStandard(actorId,product)
   const filtered=(pagination.origin==='AUTHORED'?[]:standard.entries).filter(row=>matchesCatalogDiscovery([row.identity.canonicalName,row.identity.instrumentKey,row.identity.instrumentVersion,row.construct.constructDefinition],scaleEntryClassificationTags(row),pagination))
   const plan = platformCatalogPagePlan(filtered, pagination.page, pagination.pageSize)
-  const authored = pagination.origin==='STANDARD_REGISTRY'||pagination.tags?.length?{list:[],hasMore:false}:await listEntries(actorId, undefined, { offset: plan.authoredOffset, limit: plan.authoredLimit, ...(pagination.keyword?{keyword:pagination.keyword}:{}) },product)
+  const authored = pagination.origin==='STANDARD_REGISTRY'?{list:[],hasMore:false,tagFacets:catalogTagFacets([])}:await listEntries(actorId, undefined, { offset: plan.authoredOffset, limit: plan.authoredLimit, ...(pagination.keyword?{keyword:pagination.keyword}:{}),...(pagination.tags?.length?{tags:pagination.tags}:{}) },product)
+  const tagFacets=catalogTagFacets(standard.entries.map(scaleEntryClassificationTags))
+  for(const facet of Object.keys(tagFacets) as Array<keyof typeof tagFacets>)
+    tagFacets[facet]=[...new Map([...tagFacets[facet],...(authored.tagFacets?.[facet]??[])].map(tag=>[tag.id,tag])).values()].sort((a,b)=>a.label.localeCompare(b.label,'zh-CN')||a.id.localeCompare(b.id))
   return {
     ...combinePlatformCatalog(plan.standardPage, authored.list, product),
     generatedAt: standard.generatedAt, page: pagination.page, pageSize: pagination.pageSize,
-    hasMore: plan.standardHasMore || authored.hasMore, tagFacets:catalogTagFacets(standard.entries.map(scaleEntryClassificationTags)),
+    hasMore: plan.standardHasMore || authored.hasMore, tagFacets,
   }
 }
 

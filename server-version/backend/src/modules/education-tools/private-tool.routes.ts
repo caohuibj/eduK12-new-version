@@ -13,7 +13,7 @@ import {ScaleAnswerValidationError} from '../scale/scale-scoring'
 import type {EducationToolEntry} from './access'
 import {EducationPrivateToolError,privateToolId,privateToolKind,type PrivateToolContext} from './private-tool.contracts'
 import * as service from './private-tool.service'
-import {listEducationPublicSources,educationPublicCatalogQuery} from './public-source.catalog'
+import {listEducationPublicSources} from './public-source.catalog'
 import {readEducationPublicFormPreview,readEducationPublicStandardPreview} from './public-source.preview'
 import {educationCompositionResponseModeSchema} from './private-tool.composition-contracts'
 import {expertTargetKindSchema} from './expert-observation.contract'
@@ -58,7 +58,7 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   const query=sourcePreviewQuery.parse(req.query)
   return readEducationLibraryScalePreview(context(req),privateToolId.parse(req.params.versionId),query.contentHash,query.responseMode,query.targetKind)
  }))
- router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),educationPublicCatalogQuery.parse(req.query))))
+ router.get('/public-sources',handle(req=>listEducationPublicSources(context(req),req.query)))
  router.get('/public-sources/native/:provider/:versionId',handle(req=>{
   const input=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),profile:educationCognitiveProfileSchema.optional(),artifactHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),responseMode:educationCompositionResponseModeSchema.optional()}).strict().parse(req.query)
   return readEducationNativePreview(context(req),{...input,provider:z.enum(['COGNITIVE_CONFIG','SJT_RELEASE']).parse(req.params.provider),versionId:privateToolId.parse(req.params.versionId)})

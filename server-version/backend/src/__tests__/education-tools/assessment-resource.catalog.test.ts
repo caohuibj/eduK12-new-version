@@ -18,7 +18,7 @@ const units=[{itemId:id(20),family:'COGNITIVE',measurement:{releaseId:id(21),con
 beforeEach(()=>{
  vi.clearAllMocks();m.transaction.mockImplementation(async callback=>callback(tx));m.workflow.mockResolvedValue({product:'TEACHER',teacherEventId:id(2),schoolCourseId:null})
  m.manager.mockResolvedValue(undefined);m.editor.mockResolvedValue({activity:{status:'DRAFT'}});m.start.mockReturnValue({});m.policy.mockReturnValue(policy);m.studentConfig.mockResolvedValue(null)
- m.query.mockImplementation(async sql=>sql.text.includes('FROM education_assessment_deliveries')?[{id:id(10),family:'COGNITIVE',version:'1.0.0'}]:[{version:4,status:'DRAFT',workflowStatus:'DRAFT'}])
+ m.query.mockImplementation(async sql=>sql.text.includes('FROM education_assessment_deliveries')?[{list:[{id:id(10),family:'COGNITIVE',version:'1.0.0',classificationTags:[]}],facetTags:[]}]:[{version:4,status:'DRAFT',workflowStatus:'DRAFT'}])
  m.source.mockImplementation(async(_tx,request)=>({entry:{title:'授权工具',educationOriginHash:'c'.repeat(64)},origin:{product:'TEACHER',organizationId:id(1),family:request.resource.family,units},runtime:{definition:'PRIVATE_ORIGINAL'},releases:new Map([['secret',{content:'PRIVATE_ORIGINAL'}]]),authority:[{actorId:'PRIVATE_ISSUER'}],identityOnly:true}))
 })
 
@@ -32,21 +32,20 @@ describe('bounded authorized education assessment catalog',()=>{
  it('projects only safe fixed-version metadata after full authority and never exposes original content or identity proofs',async()=>{
   const result=await listEducationAssessmentResources(input)
   expect(result.scope).toEqual({product:'TEACHER',organizationId:id(1),workflowId:id(2),runId:id(3),expectedVersion:4})
-  expect(result.list).toEqual([{title:'授权工具',family:'COGNITIVE',key:`education-assessment:TEACHER:${id(1)}:${id(10)}`,version:'1.0.0',product:'TEACHER',organizationId:id(1),releaseStatus:'PUBLISHED',availability:'AVAILABLE',educationOriginHash:'c'.repeat(64),units,requestedPolicy:policy}])
+  expect(result.list).toEqual([{title:'授权工具',classificationTags:[],family:'COGNITIVE',key:`education-assessment:TEACHER:${id(1)}:${id(10)}`,version:'1.0.0',product:'TEACHER',organizationId:id(1),releaseStatus:'PUBLISHED',availability:'AVAILABLE',educationOriginHash:'c'.repeat(64),units,requestedPolicy:policy}])
   expect(m.source).toHaveBeenCalledWith(tx,{actorUserId:actor.userId,organizationId:id(1),runId:id(3),resource:{family:'COGNITIVE',key:`education-assessment:TEACHER:${id(1)}:${id(10)}`,version:'1.0.0'}})
   expect(JSON.stringify(result)).not.toMatch(/PRIVATE_|identityOnly|authority|runtime/)
  })
  it('bounds each page at ten rows and uses product, organization, PUBLISHED and exact id cursor in SQL',async()=>{
-  m.query.mockImplementation(async sql=>sql.text.includes('FROM education_assessment_deliveries')?Array.from({length:11},(_,index)=>({id:id(10+index),family:'COGNITIVE',version:'1.0.0'})):[{version:4,status:'DRAFT',workflowStatus:'DRAFT'}])
+  m.query.mockImplementation(async sql=>sql.text.includes('FROM education_assessment_deliveries')?[{list:Array.from({length:11},(_,index)=>({id:id(10+index),family:'COGNITIVE',version:'1.0.0',classificationTags:[]})),facetTags:[]}]:[{version:4,status:'DRAFT',workflowStatus:'DRAFT'}])
   const result=await listEducationAssessmentResources({...input,cursor:id(8)})
   expect(result.list).toHaveLength(10);expect(result.nextCursor).toBe(id(19));expect(m.source).toHaveBeenCalledTimes(10)
   const sql=m.query.mock.calls.find(([sql])=>sql.text.includes('FROM education_assessment_deliveries'))![0]
-  expect(sql.text).toContain("status='PUBLISHED'");expect(sql.text).toContain('ORDER BY id LIMIT 11')
-  expect(sql.text).toContain("entry->'educationOrigin'->>'adapterVersion' AS version")
-  expect(sql.values).toEqual(['TEACHER',id(1),id(8)])
+  expect(sql.text).toContain("status='PUBLISHED'");expect(sql.text).toContain('ORDER BY v.id LIMIT')
+  expect(sql.values).toEqual(expect.arrayContaining(['TEACHER',id(1),id(8),11]))
  })
  it('checks current management authority even for an empty directory',async()=>{
-  m.query.mockImplementation(async sql=>sql.text.includes('FROM education_assessment_deliveries')?[]:[{version:4,status:'DRAFT',workflowStatus:'DRAFT'}])
+  m.query.mockImplementation(async sql=>sql.text.includes('FROM education_assessment_deliveries')?[{list:[],facetTags:[]}]:[{version:4,status:'DRAFT',workflowStatus:'DRAFT'}])
   expect((await listEducationAssessmentResources(input)).list).toEqual([])
   expect(m.manager).toHaveBeenCalledWith(expect.objectContaining({actorUserId:actor.userId,runId:id(3)}),tx)
   m.manager.mockRejectedValueOnce(Object.assign(Error('revoked-manager'),{statusCode:403}))

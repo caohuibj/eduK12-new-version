@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {publishSurveyMeasurementDraft} from './measurement-publication.service'
 import {ContentReleaseError} from '../measurement-content/release'
 import {SurveyMediaError} from './media.references'
@@ -87,7 +88,7 @@ surveyBuilderRouter.post('/:pid/instruments/:iid/bulk-import/apply',handle(req=>
   service.applySurveyImport(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),applyInput.parse(req.body))))
 
 surveyBuilderRouter.get('/:pid/catalog',handle(req=>service.listResearcherCatalog(req.user!.userId,id.parse(req.params.pid),
-  z.coerce.number().int().min(1).max(1000).default(1).parse(req.query.page))))
+  z.coerce.number().int().min(1).max(1000).default(1).parse(req.query.page),z.object(catalogDiscoveryQueryFields).parse(req.query))))
 surveyBuilderRouter.post('/:pid/catalog/:gid/import',handle(req=>service.importCatalogDraft(req.user!.userId,
   id.parse(req.params.pid),id.parse(req.params.gid),copy.parse(req.body))))
 

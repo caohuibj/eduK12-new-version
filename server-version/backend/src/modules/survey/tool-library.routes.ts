@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
 import {authenticateSurvey} from '../../middleware/auth'
@@ -27,7 +28,7 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
   }
 }
 const uid=(req:Request)=>req.user!.userId
-surveyToolLibraryRouter.get('/catalog',handle(req=>library.catalogTemplates(uid(req),page.parse(req.query.page))))
+surveyToolLibraryRouter.get('/catalog',handle(req=>library.catalogTemplates(uid(req),page.parse(req.query.page),z.object(catalogDiscoveryQueryFields).parse(req.query))))
 surveyToolLibraryRouter.get('/',handle(req=>library.listTemplates(uid(req),{page:page.parse(req.query.page),query:z.string().trim().max(200).default('').parse(req.query.query),kind:z.enum(['','FORM','SCALE','COMPOSITION']).default('').parse(req.query.kind),selectableOnly:z.enum(['true','false']).default('false').parse(req.query.selectable)==='true'})))
 surveyToolLibraryRouter.post('/',handle(req=>library.createTemplate(uid(req),z.object({requestId:id,kind:library.toolKind,title}).strict().parse(req.body))))
 surveyToolLibraryRouter.get('/:tid',handle(req=>library.getTemplate(uid(req),id.parse(req.params.tid))))
