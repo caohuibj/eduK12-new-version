@@ -31,3 +31,14 @@ The real existing `manifest-check` passed for all 12 production package declarat
 - Six existing child Bundle declarations also lack their required smoke files. No placeholder smoke is claimed as real runtime qualification. The historical failing CI run is `41283656524`; it is not a result for this candidate. Feature inventory and release-tool dependency fixes are owned separately.
 
 Use the existing PR503 rather than opening another runtime PR. Retarget its base to main so the already merged main history is not presented as part of its diff against the older core branch. Core/reader original commits remain visible; the coordinating owner chooses the actual merge order. Keep Draft until the applicable real CI and remaining dependencies are resolved. No APPROVE or merge is performed here.
+
+
+## Isolated schema3 installed/authorized FINAL checkpoint
+
+The single `schema3-native-final.postgres.integration.test.ts` chain subsequently passed on disposable loopback PostgreSQL16.15 with the current migrations. It installs a test-only schema3 declaration based on the public source score/DOB contract, obtains normal exact WHOLE grants, commits a real Survey FINAL, and reads the same frozen single/joint feedback. Wrong-owner import, wrong credential and participant withdrawal are denied. Saved reads and replay explicitly prohibit rescoring, reanalysis and rebuilding age facts; the final history/hash remains intact after withdrawal.
+
+This test declaration uses string/boolean context only, not enum authoring or a real B10 release. Source item definitions are unchanged. The original public four installation scenarios are separate test inputs; no private item text or live answer data is used. Synthetic reviews/accounts are DB fixtures, not GitHub reviews or professional source approval.
+
+The chain exposed and repaired two concrete product omissions: native-source preview still rejected schema3, and publication JSON object serialization changed fractional source facts before its first read. The publication writer now binds the already serialized JSON to JSONB using parameters, matching the existing Bundle installer; the original digest, numeric values and immutable-history check are unchanged. The failed frozen row was retained, and a new synthetic wave was used after repair.
+
+Only the new test/preview/publication type roots were checked (4 roots /2535 files /0 diagnostics); the earlier12 cases and50/12-root checks were not rerun. Sanitized local evidence and retained first failures are in `docs/evidence/bundle-derived-adapters/schema3-native-final.json`. Formal CI is still pending at this evidence checkpoint.

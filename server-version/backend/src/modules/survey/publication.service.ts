@@ -379,12 +379,13 @@ export async function freezeResearchWaveDraft(input:{
     const publicationId=randomUUID()
     await retainSurveyMedia(tx,input.actorUserId,input.projectId,publicationId,
       units.map(unit=>({kind:unit.kind,definition:unit.displayDefinition,compiledDefinition:unit.compiledDefinition,sourceProvenance:unit.sourceProvenance})))
-    await tx.surveyPublication.create({data:{
-      id:publicationId,projectId:input.projectId,
-      version:version+1,definitionDigest:digest,
-      compiledSnapshot:JSON.parse(serial) as Prisma.InputJsonValue,
-      consentVersion:wave.consentVersion,purpose:'RESEARCH_ONLY',createdAt:frozenAt,
-    }})
+    // Bind the exact serialized JSON, as the Bundle installer does. Passing a
+    // JS object through Prisma's JSON codec can change fractional source facts
+    // and break the digest of this immutable publication on its first read.
+    await tx.$executeRaw`INSERT INTO survey_publications
+      (id,project_id,version,definition_digest,compiled_snapshot,consent_version,purpose,created_at)
+      VALUES (${publicationId},${input.projectId},${version+1},${digest},${serial}::jsonb,
+        ${wave.consentVersion},'RESEARCH_ONLY',${frozenAt})`
     if(quotaPolicy){
       await tx.surveyExperimentQuotaBucket.createMany({data:
         Object.entries(quotaPolicy.groupLimits).map(([groupKey,maxAssigned])=>({
