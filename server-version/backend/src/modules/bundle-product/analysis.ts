@@ -1,3 +1,4 @@
+import {loadBundleCognitiveDisclosures} from './cognitive-disclosure'
 import { projectProfileScaleSource } from '../assessment-bundle/profile/sources'
 import { isFrozenAdultSelfReport } from './self-report-audience'
 import { projectDerivedBundleView, type DerivedBundleView } from '../assessment-bundle/onboarding/derived-report'
@@ -179,6 +180,21 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
       }
       if (!capabilities?.individualInterpretations || !capabilities?.scoreDerivedLabels) restrictSummary = true
       if (!capabilities?.resultQualityDetails) restrictQuality = true
+    }
+    if(target.declarativePackage?.schemaVersion===3){
+      const cognitive=await loadBundleCognitiveDisclosures(db,{parent,bindings,pack:target.declarativePackage,facts,audience})
+      for(const [slotKey,disclosure]of cognitive){
+        profilePolicies.set(slotKey,disclosure.capabilities)
+        for(let i=0;i<facts.evidence.length;i++){
+          const evidence=facts.evidence[i]
+          if(evidence.source.kind!=='COGNITIVE_METRIC'||evidence.source.slotKey!==slotKey)continue
+          if(!disclosure.capabilities.numericScores||!disclosure.metricKeys.has(evidence.source.metricKey))view.evidence[i].value={state:'redacted'}
+          view.evidence[i].criterionBandKey=null
+          if(!disclosure.capabilities.resultQualityDetails)view.evidence[i].quality='unavailable'
+        }
+        if(!disclosure.capabilities.individualInterpretations)restrictSummary=true
+        if(!disclosure.capabilities.resultQualityDetails)restrictQuality=true
+      }
     }
     if (restrictSummary) {
       view.engineSummary = {engineKey:facts.enginePayload.engineKey,engineVersion:facts.enginePayload.engineVersion,kind:facts.enginePayload.kind}
