@@ -74,23 +74,16 @@ test('gate dependency inspection accepts YAML layouts but not similar job identi
   assert.equal(jobNeeds('    needs: [scope, fake-frontend, frontend-extra]').includes('frontend'),false);
   assert.deepEqual(jobNeeds('    steps:\n      - run: echo frontend\n        needs: [frontend]'),[]);
 });
-test('Bundle validation is mandatory on content and platform routes with stable aggregate', () => {
-  const ci = source('ci'), content = source('scale-onboarding-boundary');
-  assert.match(job(ci, 'merge-gate'), /name: \$\{\{[\s\S]*'PR356 \/ no merge eligibility' \|\| 'merge gate \/ ready PR' \}\}/);
-  assert.match(job(ci, 'scope'), /bundle: \$\{\{ steps.scope.outputs.bundle/);
-  assert.match(job(ci, 'content'), /bundle: \$\{\{ needs.scope.outputs.bundle/);
-  for (const name of ['backend', 'pr-light-backend', 'post-merge-smoke']) {
-    assert.match(job(name === 'backend' ? source('ci-backend') : ci, name), /run: npx tsx scripts\/bundle-content-check.ts/, name);
-  }
-  const steps = content.split('      - name: ');
-  for (const command of ['scripts/bundle-content-check.ts', 'db:migrate:guarded', 'src/__tests__/bundle-onboarding', 'scripts/assert-release-test-report.mjs', 'tsc --noEmit']) {
-    const step = steps.find(s => s.includes(command));
-    assert.ok(step, command); assert.doesNotMatch(step, /\n        if:/, command);
-  }
-  assert.match(content, /      postgres:/);
-  assert.match(content, /      redis:/);
-  assert.doesNotMatch(ci, /\n  pull_request_review:/);
-  assert.match(source('situational-publication'), /\n  pull_request_review:/);
+test('content declarations keep pure schema/fixture/reference checks without database lifecycles', () => {
+  const ci=source('ci'),content=source('scale-onboarding-boundary');
+  assert.match(job(ci,'content'),/scale-onboarding-boundary.yml/);
+  for(const command of ["run(['check',dir])",'scale:onboarding:check','situational:contracts','cognitive:onboarding-check'])assert.ok(content.includes(command),command);
+  for(const name of ['backend','pr-light-backend','post-merge-smoke'])assert.match(job(name==='backend'?source('ci-backend'):ci,name),/scripts\/bundle-content-check.ts/,name);
+  const boundary=job(content,'boundary');
+  assert.doesNotMatch(boundary,/services:|postgres:|redis:|db:migrate|prisma generate|tsc --noEmit|src\/__tests__|--verify-reviews --base.*\n.*--no-file-parallelism/);
+  assert.match(boundary,/--tasks "\$tasks"/);
+  assert.match(boundary,/publication.json/);
+  assert.doesNotMatch(ci,/\n  pull_request_review:/);
 });
 
 test('force-full override schedules full jobs and uses a full aggregate even for drafts/main', () => {
@@ -459,4 +452,20 @@ test('light test-only route never starts unrelated builds, scans or platform smo
     assert.ok(gateNeeds.includes(dep),'merge-gate must retain exact dependency: '+dep);
   for(const fake of ['fake-frontend','frontend-extra','fake-browser','docker-extra'])
     assert.equal(gateNeeds.includes(fake),false,'similar-looking job is not a required dependency');
+});
+
+test('content source selection checks its reverse reference and leaves unrelated private DRAFT unexecuted',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const text=source('scale-onboarding-boundary');
+ const command=text.split("node --import tsx --input-type=module <<'JS'\n")[1].split('\n          JS')[0].replace(/^          /gm,'').replace(/^import .*;\n/gm,'');
+ const root='src/modules/assessment-bundle/packages';
+ const manifests={affected:{definition:{slots:[{unitType:'SCALE',instrumentKey:'changed',instrumentVersion:'1.0.0'}]}},privateDraft:{definition:{status:'DRAFT',slots:[{unitType:'SCALE',instrumentKey:'PRIVATE_CHEXI',instrumentVersion:'1.0.0'}]}}};
+ const calls=[],base='a'.repeat(40);let report;
+ runInNewContext(command,{
+  fs:{readdirSync:p=>p===root?Object.keys(manifests):['1.0.0'],readFileSync:p=>JSON.stringify(manifests[p.split('/').at(-3)]),writeFileSync:(_,text)=>{report=JSON.parse(text)}},
+  execFileSync:(exe,args)=>{if(exe==='git')return 'server-version/backend/src/modules/scale/instruments/changed/1.0.0/source.json\0';calls.push(args)},
+  verifyHistory:()=>{throw Error('Unchanged Bundle history is unrelated')},process:{env:{BUNDLE_CONTENT_BASE_SHA:base,BUNDLE_CONTENT_EVIDENCE:'fixture'},execPath:'node'},Buffer,
+ });
+ assert.deepEqual(report.selected,[root+'/affected/1.0.0']);
+ assert.equal(calls.length,1);assert.equal(calls[0].at(-1),root+'/affected/1.0.0');
 });

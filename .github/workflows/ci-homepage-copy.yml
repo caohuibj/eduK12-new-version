@@ -1,4 +1,4 @@
-name: Homepage copy candidate
+name: Public presentation candidate
 on:
   workflow_call:
     inputs:
@@ -50,7 +50,7 @@ jobs:
         run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output homepage-copy-evidence/scan.json eduk12-homepage-copy:${{ github.sha }}
       - name: install pinned Chromium
         run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
-      - name: affected homepage copy and wrapping on the same scanned image
+      - name: affected public routes, navigation and wrapping on the same scanned image
         run: node .github/scripts/homepage-copy-browser.mjs
       - uses: actions/upload-artifact@v4
         if: success() || failure()

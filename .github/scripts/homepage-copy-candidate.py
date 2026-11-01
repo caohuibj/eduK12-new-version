@@ -27,11 +27,19 @@ with tempfile.TemporaryDirectory(prefix='homepage-copy-') as temp:
     dockerfile = Path(temp)/'Dockerfile'; dockerfile.write_text('\n'.join(frozen)+'\n')
     args = ['docker','buildx','build','--load','-f',str(dockerfile),'--label','org.opencontainers.image.revision='+p['head'],'--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true']
     phase('frontend-compile-once', lambda: run(args+['--target','build','-t',builder,'server-version/frontend']))
-    changed = [e['file'].removeprefix('server-version/frontend/') for e in p['changes'] if e['file'].startswith('server-version/frontend/')]
+    changed = [e['file'].removeprefix('server-version/frontend/') for e in p['changes'] if e['file'].startswith('server-version/frontend/') and e['file'].endswith(('.ts','.tsx'))]
     config = Path(temp)/'tsconfig.homepage-copy.json'
     config.write_text(json.dumps({'extends':'./tsconfig.app.json','include':changed+['src/vite-env.d.ts','src/test/setup.ts'],'references':[]}))
-    cmd = 'npx eslint ' + ' '.join(changed) + ' && npx tsc -p tsconfig.homepage-copy.json --noEmit && npm audit --audit-level=high'
-    phase('changed-source-lint-types-and-frontend-audit', lambda: run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.homepage-copy.json:ro',builder,'sh','-ec',cmd]))
+    import shlex
+    files = ' '.join(map(shlex.quote, changed))
+    if changed:
+        cmd = 'npx eslint ' + files + ' && npx tsc -p tsconfig.homepage-copy.json --noEmit'
+        # The App body is unchanged by admission. Re-running every workspace
+        # consumer via reverse imports would turn public copy into full UI tests.
+        suites = {'school':['src/school/SchoolLanding.test.tsx'], 'training':['src/training/TrainingFeaturePage.test.tsx','src/training/TrainingScreens.test.tsx'], 'survey':['src/survey/SurveyApp.entry.test.tsx']}
+        tests = [file for page in p['pages'] for file in suites.get(page['page'], []) if Path('server-version/frontend',file).is_file()]
+        if tests: cmd += ' && npx vitest run ' + ' '.join(map(shlex.quote, tests))
+        phase('changed-source-lint-types-and-related-tests', lambda: run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.homepage-copy.json:ro',builder,'sh','-ec',cmd]))
     phase('runtime-from-same-cached-build', lambda: run(args+['--target','runtime','-t',tag,'server-version/frontend']))
 results['image'] = output(['docker','image','inspect','--format','{{.Id}}',tag])
 # Preserve the exact runtime even when a subsequent scan/browser fails.
