@@ -4,6 +4,7 @@ import type { CognitiveTaskProps } from '../../core/runner.types'
 import type { VisualwmConfig, VisualwmTrialPayload } from '../../types'
 import { CognitiveFocusStage } from '../shared/CognitiveFocusStage'
 import { visualwmTrial } from './generator'
+import { VISUALWM_PRACTICE_V11 } from './practice.v11'
 
 type Phase = 'instruction' | 'practice' | 'formal' | 'completed'
 type PhaseStep = 'fixation' | 'study' | 'retention' | 'probe' | 'feedback'
@@ -12,7 +13,9 @@ const CANVAS = 260
 const ORBIT_RADIUS = 90
 const SQUARE_SIZE = 36
 
-export const VisualwmTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete }) => {
+type VisualwmTaskProps = CognitiveTaskProps & { independentPractice?: boolean }
+
+export const VisualwmTask: React.FC<VisualwmTaskProps> = ({ taskContext, trialIndex, onTrialComplete, onTaskComplete, independentPractice = false }) => {
   const config = taskContext.config as unknown as VisualwmConfig
   const totalTrials = config?.totalTrials ?? 16
   const studyMs = config?.studyMs ?? 500
@@ -26,7 +29,8 @@ export const VisualwmTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const responseLockedRef = useRef(false)
   const probeOnsetRef = useRef<number | null>(null)
   const pendingPayloadRef = useRef<VisualwmTrialPayload | null>(null)
-  const stimulus = useMemo(() => visualwmTrial(taskContext.randomSeed, trialIndex), [taskContext.randomSeed, trialIndex])
+  const formalStimulus = useMemo(() => visualwmTrial(taskContext.randomSeed, trialIndex), [taskContext.randomSeed, trialIndex])
+  const stimulus = independentPractice && phase === 'practice' ? VISUALWM_PRACTICE_V11 : formalStimulus
 
   useEffect(() => {
     if (phase !== 'formal') return

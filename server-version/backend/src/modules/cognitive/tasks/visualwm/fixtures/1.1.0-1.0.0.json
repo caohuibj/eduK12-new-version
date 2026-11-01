@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "visualwm",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Copied unchanged formal inputs and expected results from visualwm/1.0.1/1.0.0; engine 1.1.0 changes practice only and reuses scoreVisualwmV1. Checked by the task-local version test.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "studyMs": 500,
+          "retentionMs": 900,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "setSize": 3,
+              "isChange": true,
+              "response": "change",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "setSize": 4,
+              "isChange": false,
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "setSize": 5,
+              "isChange": true,
+              "response": "change",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "setSize": 6,
+              "isChange": false,
+              "response": "same",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "accuracy": 1,
+          "hitRate": 1,
+          "falseAlarmRate": 0,
+          "medianRtMs": 500,
+          "correctCount": 4
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "studyMs": 500,
+          "retentionMs": 900,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": []
+      },
+      "expectedError": "visualwm v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "studyMs": 500,
+          "retentionMs": 900,
+          "validRtFloorMs": 200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "setSize": 3,
+              "isChange": true,
+              "response": "change",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "visualwm v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

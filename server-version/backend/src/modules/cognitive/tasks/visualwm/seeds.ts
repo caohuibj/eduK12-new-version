@@ -1,4 +1,5 @@
 import type { CognitiveSeed } from '../../task-seed.types'
+import { seedsV11 } from './seeds.v11'
 
 const NO_REFERENCE_REPORT = {
   reportVersion: '1.0.1',
@@ -15,4 +16,5 @@ export const seeds: CognitiveSeed[] = [
     scoringVersion: '1.0.0',
     config: { totalTrials: 16, studyMs: 500, retentionMs: 900, validRtFloorMs: 200, report: NO_REFERENCE_REPORT },
   },
+  ...seedsV11,
 ]
