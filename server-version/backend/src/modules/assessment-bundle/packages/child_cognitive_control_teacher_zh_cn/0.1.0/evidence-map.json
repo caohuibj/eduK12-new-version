@@ -1,0 +1,145 @@
+[
+  {
+    "evidenceKey": "gonogo_commission_rate",
+    "slotKey": "gonogo",
+    "selector": "commissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "gonogo.commission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_commission_errors",
+    "slotKey": "gonogo",
+    "selector": "commissionErrors",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "gonogo.commission_errors",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_nogo_trial_count",
+    "slotKey": "gonogo",
+    "selector": "nogoTrialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "gonogo.nogo_trial_count",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_omission_rate",
+    "slotKey": "gonogo",
+    "selector": "omissionRate",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "gonogo.omission_rate",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_go_trial_count",
+    "slotKey": "gonogo",
+    "selector": "goTrialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "gonogo.go_trial_count",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "gonogo_d_prime",
+    "slotKey": "gonogo",
+    "selector": "dPrime",
+    "valueType": "number",
+    "unit": "d-prime",
+    "construct": "gonogo.d_prime",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_flanker_effect_ms",
+    "slotKey": "flanker",
+    "selector": "flankerEffectMs",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "flanker.flanker_effect_ms",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_congruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "congruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "flanker.congruent_accuracy",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_incongruent_accuracy",
+    "slotKey": "flanker",
+    "selector": "incongruentAccuracy",
+    "valueType": "number",
+    "unit": "ratio",
+    "construct": "flanker.incongruent_accuracy",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_median_rt_congruent",
+    "slotKey": "flanker",
+    "selector": "medianRtCongruent",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "flanker.median_rt_congruent",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "flanker_median_rt_incongruent",
+    "slotKey": "flanker",
+    "selector": "medianRtIncongruent",
+    "valueType": "number",
+    "unit": "ms",
+    "construct": "flanker.median_rt_incongruent",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "teacher_chexi_working_memory",
+    "slotKey": "teacher_chexi",
+    "selector": "working_memory",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "chexi.teacher.working_memory_mean",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "teacher_chexi_inhibition",
+    "slotKey": "teacher_chexi",
+    "selector": "inhibition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "chexi.teacher.inhibition_mean",
+    "role": "PRIMARY",
+    "direction": "lower",
+    "qualityPolicy": "interpretable_only"
+  }
+]

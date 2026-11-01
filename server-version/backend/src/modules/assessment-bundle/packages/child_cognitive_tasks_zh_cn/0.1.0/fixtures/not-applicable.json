@@ -1,0 +1,39 @@
+{
+  "values": {
+    "gonogo_commission_rate": {
+      "state": "not_applicable"
+    },
+    "gonogo_commission_errors": {
+      "state": "not_applicable"
+    },
+    "gonogo_nogo_trial_count": {
+      "state": "not_applicable"
+    },
+    "gonogo_omission_rate": {
+      "state": "not_applicable"
+    },
+    "gonogo_go_trial_count": {
+      "state": "not_applicable"
+    },
+    "gonogo_d_prime": {
+      "state": "not_applicable"
+    },
+    "flanker_flanker_effect_ms": {
+      "state": "not_applicable"
+    },
+    "flanker_congruent_accuracy": {
+      "state": "not_applicable"
+    },
+    "flanker_incongruent_accuracy": {
+      "state": "not_applicable"
+    },
+    "flanker_median_rt_congruent": {
+      "state": "not_applicable"
+    },
+    "flanker_median_rt_incongruent": {
+      "state": "not_applicable"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "COMPUTED"
+}

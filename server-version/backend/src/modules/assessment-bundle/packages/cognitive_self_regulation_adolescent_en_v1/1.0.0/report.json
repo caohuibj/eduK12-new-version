@@ -1,0 +1,86 @@
+{
+  "key": "cognitive_self_regulation_adolescent_en_v1_report",
+  "version": "1.0.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "task_observations",
+      "kind": "evidence",
+      "title": "本次任务：反应、注意与干扰",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "task_reaction",
+        "task_attention",
+        "task_interference"
+      ]
+    },
+    {
+      "blockId": "daily_experience",
+      "kind": "evidence",
+      "title": "日常体验：听听你自己的描述",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "daily_self_report"
+      ]
+    },
+    {
+      "blockId": "together",
+      "kind": "conclusions",
+      "title": "把两种视角放在一起",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "methods_complement"
+      ]
+    },
+    {
+      "blockId": "actions",
+      "kind": "conclusions",
+      "title": "选一个小改变，观察一周",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "action_pause",
+        "action_steps"
+      ]
+    },
+    {
+      "blockId": "limits",
+      "kind": "limitations",
+      "title": "先看清这次能说明什么",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "gonogo_missing",
+        "gonogo_invalid",
+        "gonogo_not_applicable",
+        "cpt_missing",
+        "cpt_invalid",
+        "cpt_not_applicable",
+        "flanker_missing",
+        "flanker_invalid",
+        "flanker_not_applicable",
+        "texi_missing",
+        "texi_invalid",
+        "texi_not_applicable"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "部分来源或指标缺失；已获得的结果仍可分开查看，不把缺失当成零。",
+    "limited": "本次部分来源质量有限；查看单项质量说明，仅保留有依据的独立描述，所需来源不足时不生成跨方法解释。",
+    "unavailable": "目前不能生成有依据的综合说明。请查看已有单项结果和质量提示，必要时与施测者一起核实。"
+  }
+}
