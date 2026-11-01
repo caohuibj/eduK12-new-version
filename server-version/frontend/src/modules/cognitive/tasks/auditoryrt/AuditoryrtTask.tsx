@@ -144,7 +144,7 @@ export const AuditoryrtTask: React.FC<CognitiveTaskProps> = ({ taskContext, tria
     } else setPhase('blocked')
   }, [practiceIndex, practicePassed, practiceAttempt])
 
-  if (phase === 'instruction' || phase === 'practice-instruction') return <CognitiveTaskIntro title="听觉简单反应时" description={<p>请戴上耳机或打开声音。安静等待，「嘀」的一声响起后，立刻按空格键（或点击按钮）。声音出现的时间不固定，请不要抢拍。像听到提示音后点一下，这里记录电脑上的一次提示与按键过程，不是纯听觉神经传导速度。</p>} hint={<><p>需要可发声的设备；点「开始练习」后会先播一声提示音，可用于调整音量。</p><p>练习共2次，每次听到声音后按一次；要等下一声再按，按住空格不算新的回答。请先确认能听清提示音；练习失败会重呈完整说明，最多3轮。练习不计入成绩。</p></>} onAction={() => { if (phase === 'practice-instruction') setPhase('practice'); else void startPractice() }} />
+  if (phase === 'instruction' || phase === 'practice-instruction') return <CognitiveTaskIntro title="听觉简单反应时" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>请戴上耳机或打开声音。安静等待，「嘀」的一声响起后，立刻按空格键（或点击按钮）。声音出现的时间不固定，请不要抢拍。像听到提示音后点一下，这里记录电脑上的一次提示与按键过程，不是纯听觉神经传导速度。</p>) : (<p>请戴上耳机或打开声音。安静等待，「嘀」的一声响起后，立刻按空格键（或点击按钮）。声音出现的时间不固定，请不要抢拍。</p>)} hint={<><p>需要可发声的设备；点「开始练习」后会先播一声提示音，可用于调整音量。</p><p>练习共2次，每次听到声音后按一次；要等下一声再按，按住空格不算新的回答。请先确认能听清提示音；练习失败会重呈完整说明，最多3轮。练习不计入成绩。</p></>} onAction={() => { if (phase === 'practice-instruction') setPhase('practice'); else void startPractice() }} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">{practicePassed.length > 0 ? '练习尚未通过，本次正式测评未开始。' : '当前设备无法播放音频，本次测评未开始。请检查设备音量与浏览器音频权限。'}</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

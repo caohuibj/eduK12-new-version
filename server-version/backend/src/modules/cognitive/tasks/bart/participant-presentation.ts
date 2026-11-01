@@ -1,5 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
+// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -434,259 +435,103 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
-  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
-{
-  "schemaVersion": 1,
-  "presentationVersion": "3.0.0",
-  "testType": "bart",
-  "engineVersion": "1.0.0",
-  "scoringVersion": "1.1.0",
-  "title": "气球：继续还是收取",
-  "metrics": {
-    "adjustedPumps": {
-      "label": "成功收取时的平均充气次数",
-      "explanation": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。",
-      "singleExplanation": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。"
-    },
-    "explosionCount": {
-      "label": "爆破次数",
-      "explanation": "本次充气达到爆破阈值的气球数。",
-      "singleExplanation": "本次充气达到爆破阈值的气球数。"
-    },
-    "cashoutCount": {
-      "label": "现金化次数",
-      "explanation": "主动结束充气并收取虚拟积分的气球数。",
-      "singleExplanation": "主动结束充气并收取虚拟积分的气球数。"
-    },
-    "meanPumpsAllCompleted": {
-      "label": "已完成气球平均充气次数",
-      "explanation": "所有已完成气球的平均充气次数，包含爆破气球。",
-      "singleExplanation": "所有已完成气球的平均充气次数，包含爆破气球。"
-    },
-    "cashoutRate": {
-      "label": "完成气球中的收取比例",
-      "explanation": "分母为完成的气球，须结合未完成数量。",
-      "singleExplanation": "分母为完成的气球，须结合未完成数量。"
-    },
-    "completedBalloonCount": {
-      "label": "完成气球数",
-      "explanation": "通过收取积分或爆破结束的气球数。",
-      "singleExplanation": "通过收取积分或爆破结束的气球数。"
-    },
-    "omissionRate": {
-      "label": "遗漏比例",
-      "explanation": "遗漏比例：应该响应但没有响应的比例。",
-      "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
-    }
-  },
-  "hiddenMetrics": [],
-  "suppressTips": false,
-  "protocols": {
-    "experience": {
-      "tier": "PILOT",
-      "profileLabel": "简短体验",
-      "participantConclusion": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
-      "reportCaveats": [
-        "本次正式任务共10个气球。另有4个练习气球，至少完成3个。",
-        "体验约2–4分钟；研究约6–14分钟（流程估计，非实测）。",
-        "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
-        "保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
-        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
-      ],
-      "showProductIndex": false
-    },
-    "standard": {
-      "tier": "PILOT",
-      "profileLabel": "常规任务",
-      "participantConclusion": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
-      "reportCaveats": [
-        "本次正式任务共30个气球。另有4个练习气球，至少完成3个。",
-        "体验约2–4分钟；研究约6–14分钟（流程估计，非实测）。",
-        "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
-        "保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
-        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
-      ],
-      "showProductIndex": false
-    },
-    "research": {
-      "tier": "PILOT",
-      "profileLabel": "研究变式",
-      "participantConclusion": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
-      "reportCaveats": [
-        "本次正式任务共50个气球。另有4个练习气球，至少完成3个。",
-        "体验约2–4分钟；研究约6–14分钟（流程估计，非实测）。",
-        "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
-        "保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
-        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
-      ],
-      "showProductIndex": false
-    }
-  },
-  "practicalTips": [
-    "读平均充气次数时，也看看收取了几个气球；尝试回想你是否随刚才的爆破而改变选择。"
-  ],
-  "singleHiddenMetrics": [],
-  "disclaimer": "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
-  "reportReading": {
-    "version": "3.0.0",
-    "title": "再充一下，还是把点数收好？",
-    "introduction": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
-    "summary": {
-      "template": "成功收取 {cashoutCount} 个、爆破 {explosionCount} 个；成功收取气球的平均充气次数为 {adjustedPumps}。",
-      "metricKeys": [
-        "adjustedPumps",
-        "cashoutCount",
-        "explosionCount",
-        "completedBalloonCount"
-      ]
-    },
-    "studentMetricKeys": [
-      "adjustedPumps",
-      "cashoutCount",
-      "explosionCount",
-      "completedBalloonCount"
-    ],
-    "processMetricKeys": [
-      "completedBalloonCount",
-      "cashoutCount",
-      "explosionCount"
-    ],
-    "withholdFlags": [
-      "legacyUninterpretable",
-      "insufficientCompletedBalloons",
-      "insufficientCashoutBalloons",
-      "invalidOutcome"
-    ],
-    "metricGates": {},
-    "nextStep": "读平均充气次数时，也看看收取了几个气球；尝试回想你是否随刚才的爆破而改变选择。",
-    "caveatTerms": {
-      "正式版": "标准协议",
-      "体验版": "短程协议",
-      "研究版": "科研协议",
-      "科研版": "科研协议",
-      "科研档": "科研协议",
-      "人口常模": "经过验证的同龄人比较依据",
-      "常模等级": "经过验证的同龄人等级",
-      "年龄等级": "年龄对应的能力等级",
-      "稳定能力等级": "固定的能力水平",
-      "内部配置": "这次任务设置",
-      "正式档": "标准任务",
-      "体验档": "简短体验",
-      "标准协议": "标准任务",
-      "短程协议": "简短体验"
-    },
-    "illustration": "rules",
-    "chart": {
-      "kind": "metrics",
-      "metricKeys": [
-        "adjustedPumps",
-        "cashoutCount",
-        "explosionCount"
-      ]
-    },
-    "popular": {
-      "conceptTitle": "这个小游戏在观察什么",
-      "concept": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
-      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
-      "exampleTitle": "生活里也会遇到",
-      "example": "像小游戏里攒分后决定何时保存进度：多试一步可能多赚，也可能失去这一轮暂存点数。真实生活的代价和信息通常复杂得多。",
-      "scene": "rules",
-      "frames": [
-        {
-          "title": "任务怎样进行",
-          "text": "10 / 30 / 50个气球；另有4个练习气球，至少完成3个。"
-        },
-        {
-          "title": "大概需要多久",
-          "text": "体验约2–4分钟；研究约6–14分钟。这是按流程估计，尚无本轮实测分布。"
-        },
-        {
-          "title": "怎样读这次记录",
-          "text": "读平均充气次数时，也看看收取了几个气球；尝试回想你是否随刚才的爆破而改变选择。"
-        }
-      ],
-      "boundary": "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
-      "metricHelp": {
-        "adjustedPumps": {
-          "label": "成功收取时的平均充气次数",
-          "explanation": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。"
-        },
-        "cashoutCount": {
-          "label": "现金化次数",
-          "explanation": "主动结束充气并收取虚拟积分的气球数。"
-        },
-        "explosionCount": {
-          "label": "爆破次数",
-          "explanation": "本次充气达到爆破阈值的气球数。"
-        },
-        "completedBalloonCount": {
-          "label": "完成气球数",
-          "explanation": "通过收取积分或爆破结束的气球数。"
-        }
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "bart",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "title": "气球：继续还是收取",
+    "metrics": {
+      "adjustedPumps": {
+        "label": "成功收取时的平均充气次数",
+        "explanation": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。",
+        "singleExplanation": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。"
+      },
+      "explosionCount": {
+        "label": "爆破次数",
+        "explanation": "本次充气达到爆破阈值的气球数。",
+        "singleExplanation": "本次充气达到爆破阈值的气球数。"
+      },
+      "cashoutCount": {
+        "label": "现金化次数",
+        "explanation": "主动结束充气并收取虚拟积分的气球数。",
+        "singleExplanation": "主动结束充气并收取虚拟积分的气球数。"
+      },
+      "meanPumpsAllCompleted": {
+        "label": "已完成气球平均充气次数",
+        "explanation": "所有已完成气球的平均充气次数，包含爆破气球。",
+        "singleExplanation": "所有已完成气球的平均充气次数，包含爆破气球。"
+      },
+      "cashoutRate": {
+        "label": "完成气球中的收取比例",
+        "explanation": "分母为完成的气球，须结合未完成数量。",
+        "singleExplanation": "分母为完成的气球，须结合未完成数量。"
+      },
+      "completedBalloonCount": {
+        "label": "完成气球数",
+        "explanation": "通过收取积分或爆破结束的气球数。",
+        "singleExplanation": "通过收取积分或爆破结束的气球数。"
+      },
+      "omissionRate": {
+        "label": "遗漏比例",
+        "explanation": "遗漏比例：应该响应但没有响应的比例。",
+        "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
       }
     },
-    "professional": {
-      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
-      "procedure": "10 / 30 / 50个气球；另有4个练习气球，至少完成3个。 保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
-      "interpretation": "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
-      "confounders": [
-        "设备与输入方式、显示和响应延迟会影响用时记录。",
-        "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
-        "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
-        "设备与输入方式",
-        "练习、熟悉和这次有效观察量"
-      ],
-      "metricNotes": {
-        "adjustedPumps": {
-          "definition": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。",
-          "readingHint": "保留原计分；只按此分母与任务条件解释。"
-        },
-        "explosionCount": {
-          "definition": "本次充气达到爆破阈值的气球数。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "cashoutCount": {
-          "definition": "主动结束充气并收取虚拟积分的气球数。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "meanPumpsAllCompleted": {
-          "definition": "所有已完成气球的平均充气次数，包含爆破气球。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "cashoutRate": {
-          "definition": "分母为完成的气球，须结合未完成数量。",
-          "readingHint": "保留原计分；只按此分母与任务条件解释。"
-        },
-        "completedBalloonCount": {
-          "definition": "通过收取积分或爆破结束的气球数。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "omissionRate": {
-          "definition": "遗漏比例：应该响应但没有响应的比例。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        }
-      },
-      "configFields": [
-        {
-          "key": "totalTrials",
-          "label": "计划正式试次数"
-        },
-        {
-          "key": "timeoutMs",
-          "label": "响应时限（毫秒）"
-        },
-        {
-          "key": "blockCount",
-          "label": "区组数"
-        },
-        {
-          "key": "balloonCount",
-          "label": "气球数量"
-        }
-      ]
-    },
-    "summaryByProfile": {
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
       "experience": {
+        "tier": "PILOT",
+        "profileLabel": "简短体验",
+        "participantConclusion": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
+        "reportCaveats": [
+          "本次正式任务共10个气球。另有4个练习气球，至少完成3个。",
+          "体验约2–4分钟；研究约6–14分钟（流程估计，非实测）。",
+          "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
+          "保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
+          "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "常规任务",
+        "participantConclusion": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
+        "reportCaveats": [
+          "本次正式任务共30个气球。另有4个练习气球，至少完成3个。",
+          "体验约2–4分钟；研究约6–14分钟（流程估计，非实测）。",
+          "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
+          "保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
+          "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究变式",
+        "participantConclusion": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
+        "reportCaveats": [
+          "本次正式任务共50个气球。另有4个练习气球，至少完成3个。",
+          "体验约2–4分钟；研究约6–14分钟（流程估计，非实测）。",
+          "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
+          "保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
+          "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "读平均充气次数时，也看看收取了几个气球；尝试回想你是否随刚才的爆破而改变选择。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "再充一下，还是把点数收好？",
+      "introduction": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
+      "summary": {
         "template": "成功收取 {cashoutCount} 个、爆破 {explosionCount} 个；成功收取气球的平均充气次数为 {adjustedPumps}。",
         "metricKeys": [
           "adjustedPumps",
@@ -694,18 +539,173 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
           "explosionCount",
           "completedBalloonCount"
         ]
+      },
+      "studentMetricKeys": [
+        "adjustedPumps",
+        "cashoutCount",
+        "explosionCount",
+        "completedBalloonCount"
+      ],
+      "processMetricKeys": [
+        "completedBalloonCount",
+        "cashoutCount",
+        "explosionCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientCompletedBalloons",
+        "insufficientCashoutBalloons",
+        "invalidOutcome"
+      ],
+      "metricGates": {},
+      "nextStep": "读平均充气次数时，也看看收取了几个气球；尝试回想你是否随刚才的爆破而改变选择。",
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "rules",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "adjustedPumps",
+          "cashoutCount",
+          "explosionCount"
+        ]
+      },
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "每次充气会增加暂存点数，也可能爆破。你随时可以收取；报告分别记录收取和爆破，不把一种策略评成更好的人格。",
+        "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+        "exampleTitle": "生活里也会遇到",
+        "example": "像小游戏里攒分后决定何时保存进度：多试一步可能多赚，也可能失去这一轮暂存点数。真实生活的代价和信息通常复杂得多。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "任务怎样进行",
+            "text": "10 / 30 / 50个气球；另有4个练习气球，至少完成3个。"
+          },
+          {
+            "title": "大概需要多久",
+            "text": "体验约2–4分钟；研究约6–14分钟。这是按流程估计，尚无本轮实测分布。"
+          },
+          {
+            "title": "怎样读这次记录",
+            "text": "读平均充气次数时，也看看收取了几个气球；尝试回想你是否随刚才的爆破而改变选择。"
+          }
+        ],
+        "boundary": "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
+        "metricHelp": {
+          "adjustedPumps": {
+            "label": "成功收取时的平均充气次数",
+            "explanation": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。"
+          },
+          "cashoutCount": {
+            "label": "现金化次数",
+            "explanation": "主动结束充气并收取虚拟积分的气球数。"
+          },
+          "explosionCount": {
+            "label": "爆破次数",
+            "explanation": "本次充气达到爆破阈值的气球数。"
+          },
+          "completedBalloonCount": {
+            "label": "完成气球数",
+            "explanation": "通过收取积分或爆破结束的气球数。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+        "procedure": "10 / 30 / 50个气球；另有4个练习气球，至少完成3个。 保留充气、爆破、收取及排除爆破气球的 adjusted pumps 定义。作者整理的原版为30气球、每泵0.05美元及多种爆破范围；本版最多12泵、15秒时限、虚拟点数，研究50气球也不是原协议复刻。",
+        "interpretation": "体验只有10个气球，偶然爆破会明显影响平均值。未爆破气球平均充气次数只使用成功收取的气球，不能代表所有尝试，更不能推断稳定冒险倾向。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
+          "设备与输入方式",
+          "练习、熟悉和这次有效观察量"
+        ],
+        "metricNotes": {
+          "adjustedPumps": {
+            "definition": "只对成功收取的气球求平均，排除爆破及未完成气球；没有成功收取时为缺失。",
+            "readingHint": "保留原计分；只按此分母与任务条件解释。"
+          },
+          "explosionCount": {
+            "definition": "本次充气达到爆破阈值的气球数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "cashoutCount": {
+            "definition": "主动结束充气并收取虚拟积分的气球数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "meanPumpsAllCompleted": {
+            "definition": "所有已完成气球的平均充气次数，包含爆破气球。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "cashoutRate": {
+            "definition": "分母为完成的气球，须结合未完成数量。",
+            "readingHint": "保留原计分；只按此分母与任务条件解释。"
+          },
+          "completedBalloonCount": {
+            "definition": "通过收取积分或爆破结束的气球数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "遗漏比例：应该响应但没有响应的比例。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式试次数"
+          },
+          {
+            "key": "timeoutMs",
+            "label": "响应时限（毫秒）"
+          },
+          {
+            "key": "blockCount",
+            "label": "区组数"
+          },
+          {
+            "key": "balloonCount",
+            "label": "气球数量"
+          }
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "成功收取 {cashoutCount} 个、爆破 {explosionCount} 个；成功收取气球的平均充气次数为 {adjustedPumps}。",
+          "metricKeys": [
+            "adjustedPumps",
+            "cashoutCount",
+            "explosionCount",
+            "completedBalloonCount"
+          ]
+        }
+      },
+      "hiddenByProfile": {
+        "experience": []
+      },
+      "qualityLabels": {
+        "insufficientCompletedBalloons": "可计入的气球较少",
+        "insufficientCashoutBalloons": "成功收取的气球较少",
+        "constantPumpPattern": "多个气球充气次数相同",
+        "excessiveOmissions": "未完成气球较多"
       }
     },
-    "hiddenByProfile": {
-      "experience": []
-    },
-    "qualityLabels": {
-      "insufficientCompletedBalloons": "可计入的气球较少",
-      "insufficientCashoutBalloons": "成功收取的气球较少",
-      "constantPumpPattern": "多个气球充气次数相同",
-      "excessiveOmissions": "未完成气球较多"
-    }
-  },
-  "experienceHeadline": "adjustedPumps"
-}
+    "experienceHeadline": "adjustedPumps"
+  }
 ]

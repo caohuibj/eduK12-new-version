@@ -117,7 +117,7 @@ export const LogicdeduceTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   const item = phase === 'practice' ? practiceItem : currentTrial
 
   if (revised && trialIndex >= totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
-  if (phase === 'instruction') return <CognitiveTaskIntro title="多条件逻辑推断" description={<><p>每题给出若干逻辑条件，请从四个选项中选出能从条件推导出的结论。</p><p>安排小组发言顺序时，“小林在小周前面”并不自动告诉你第三个人排在哪里。 这次任务只记录本次作答表现。</p></>} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p>{revised&&<p>只依据题内条件选择唯一答案，先保证准确。正式共 {totalTrials} 题，每题最多 {timeoutMs/1000} 秒；超时进入下一题。正式题若全部用满时限约需 {(totalTrials*(timeoutMs+600)/60000).toFixed(1)} 分钟，另计自行阅读说明和练习的时间（非实测时长）。</p>}</>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="多条件逻辑推断" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<><p>每题给出若干逻辑条件，请从四个选项中选出能从条件推导出的结论。</p><p>安排小组发言顺序时，“小林在小周前面”并不自动告诉你第三个人排在哪里。 这次任务只记录本次作答表现。</p></>) : (<p>每题给出若干逻辑条件，请从四个选项中选出能从条件推导出的结论。</p>)} hint={<><p>按键 1–4 或点击选项作答；练习不计入成绩。</p>{revised&&<p>只依据题内条件选择唯一答案，先保证准确。正式共 {totalTrials} 题，每题最多 {timeoutMs/1000} 秒；超时进入下一题。正式题若全部用满时限约需 {(totalTrials*(timeoutMs+600)/60000).toFixed(1)} 分钟，另计自行阅读说明和练习的时间（非实测时长）。</p>}</>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   const OptionButtons: React.FC<{ show: boolean }> = ({ show }) => show ? (

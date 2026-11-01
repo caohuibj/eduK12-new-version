@@ -135,7 +135,7 @@ export const SizecongruityTask: React.FC<CognitiveTaskProps> = ({ taskContext, t
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="数量大小比较" description={<p>字写得大，数值不一定大。屏幕上会同时出现两个数字。请判断哪个数的数值更大：左边大按「1」，右边大按「2」。注意：只比数值，忽略数字显示的大小。</p>} hint={<>{practiceAttempt > 1 && <p>上一轮练习未通过，请重新阅读完整说明和例子，再开始下一轮。</p>}<p>例子：7写得小、3写得大时，也要选择数值较大的7。</p><p>按键 1/2、方向键或点击按钮作答；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="数量大小比较" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>字写得大，数值不一定大。屏幕上会同时出现两个数字。请判断哪个数的数值更大：左边大按「1」，右边大按「2」。注意：只比数值，忽略数字显示的大小。</p>) : (<p>屏幕上会同时出现两个数字。请判断哪个数的数值更大：左边大按「1」，右边大按「2」。注意：只比数值，忽略数字显示的大小。</p>)} hint={<>{practiceAttempt > 1 && <p>上一轮练习未通过，请重新阅读完整说明和例子，再开始下一轮。</p>}<p>例子：7写得小、3写得大时，也要选择数值较大的7。</p><p>按键 1/2、方向键或点击按钮作答；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习尚未通过，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

@@ -1,0 +1,2449 @@
+[
+  {
+    "group": "R1",
+    "task": "arithverify",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          2
+        ],
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次算式验证表现，不是数学能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，难度与标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "cancellation",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 1
+        },
+        "reportCaveats": [
+          "体验版仅 1 轮，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "reportCaveats": [
+          "结果描述本次视觉搜索划消表现，不是注意力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "reportCaveats": [
+          "科研档增加轮次；网格与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "cardsort",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 24,
+          "blockCount": 2
+        },
+        "reportCaveats": [
+          "体验版转换试次较少，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 72,
+          "blockCount": 3
+        },
+        "reportCaveats": [
+          "正式版区分转换代价、重复表现和持续性错误，不形成执行功能总分。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          9,
+          12
+        ],
+        "configPatch": {
+          "totalTrials": 144,
+          "blockCount": 6
+        },
+        "reportCaveats": [
+          "科研档增加规则转换试次；仍不是临床卡片分类测验或年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "flanker",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "reportCaveats": [
+          "体验版试次较少，干扰效应稳定性有限，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 80
+        },
+        "reportCaveats": [
+          "正式版同时呈现干扰 RT 与两条件准确率，不形成单一抑制等级。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          9,
+          12
+        ],
+        "configPatch": {
+          "totalTrials": 160
+        },
+        "reportCaveats": [
+          "科研档增加平衡试次；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "numberline",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          2
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "reportCaveats": [
+          "结果描述本次数字线估计表现，不是数学能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，难度与标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "patterncompare",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          1,
+          2
+        ],
+        "configPatch": {
+          "durationSec": 30
+        },
+        "reportCaveats": [
+          "体验版仅持续 30 秒，速度指标稳定性有限，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "durationSec": 60
+        },
+        "reportCaveats": [
+          "正式版使用自制几何刺激，只描述本次加工速度表现。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "durationSec": 90
+        },
+        "reportCaveats": [
+          "科研档持续 90 秒；刺激为内部自制，不使用 NIH 常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "reversallearning",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 40,
+          "acquisitionTrials": 20,
+          "reversalTrials": 20
+        },
+        "reportCaveats": [
+          "体验版阶段较短，结果仅描述本次概率学习任务表现。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          7,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 120,
+          "acquisitionTrials": 60,
+          "reversalTrials": 60
+        },
+        "reportCaveats": [
+          "请同时阅读 acquisition、reversal、持续性错误和 criterion 指标，不作人格或风险判断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          14,
+          18
+        ],
+        "configPatch": {
+          "totalTrials": 240,
+          "acquisitionTrials": 120,
+          "reversalTrials": 120
+        },
+        "reportCaveats": [
+          "科研版增加固定阶段的试次，仍不等同于人格、决策能力或风险偏好测量。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "sizecongruity",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          2
+        ],
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。短程干扰效应不稳定。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "结果描述本次数量比较表现，不是数学能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          8,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 96
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，难度与标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "symbolmatch",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          2
+        ],
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "结果描述本次符号配对速度与准确，不是智力或年龄常模判断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 80
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，映射与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "trailmaking",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "form": "A",
+          "partAItemCount": 12,
+          "partBItemCount": 0
+        },
+        "reportCaveats": [
+          "体验版只包含 A 部分，结果仅描述本次视觉搜索与动作任务表现。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "form": "AB",
+          "partAItemCount": 12,
+          "partBItemCount": 12
+        },
+        "reportCaveats": [
+          "A+B 的完成时间会受到设备、指针方式和动作速度影响，不进行设备常模校正。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          9,
+          13
+        ],
+        "configPatch": {
+          "form": "AB",
+          "partAItemCount": 24,
+          "partBItemCount": 24
+        },
+        "reportCaveats": [
+          "科研版使用较长的 A+B 序列和 seed 等价布局，仍只提供描述性结果。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R1",
+    "task": "ufov",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "reportCaveats": [
+          "结果描述本次双重任务表现，不是注意力诊断或驾驶能力评估。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "reportCaveats": [
+          "科研档增加试次；刺激时长与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "auditorynback",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "reportCaveats": [
+          "体验版只有12个音；若匹配音不足6次，结果按受限记录阅读，不作稳定能力判断。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "结果反映本次听觉工作记忆更新表现，不是人口常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "reportCaveats": [
+          "科研版增加试次；n水平、音集与节奏和标准档一致。重复次数不保证个体估计稳定，仍不是人口常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "auditoryrt",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "reportCaveats": [
+          "结果反映本次听觉反应速度，不是人口常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 48
+        },
+        "reportCaveats": [
+          "科研版增加试次以提高稳定性；前瞻期调度与难度和标准档一致；仍不是人口常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "digitbackward",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "startSpan": 2,
+          "maxSpan": 4
+        },
+        "reportCaveats": [
+          "体验档广度范围较窄，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "startSpan": 2,
+          "maxSpan": 7
+        },
+        "reportCaveats": [
+          "完全倒序作答；结果与顺背分开呈现。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "startSpan": 2,
+          "maxSpan": 8
+        },
+        "reportCaveats": [
+          "科研档扩展到广度 8；仍不是 Wechsler 分数或常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "letternumseries",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 6
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 10
+        },
+        "reportCaveats": [
+          "结果描述本次字母数字序列的重排回忆表现，不是记忆能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，序列长度与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "pairedassociate",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "pairCount": 6,
+          "learningRounds": 2,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "reportCaveats": [
+          "体验档仅 6 对、2 轮，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          8,
+          12
+        ],
+        "configPatch": {
+          "pairCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "reportCaveats": [
+          "正式档描述多轮配对学习，不包含延迟指标。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          16,
+          21
+        ],
+        "configPatch": {
+          "pairCount": 18,
+          "learningRounds": 4,
+          "delayedEnabled": true,
+          "delayedDelayMs": 30000
+        },
+        "reportCaveats": [
+          "延迟阶段未完成时 delayedAccuracy 保持缺失。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "picturesequence",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "itemCount": 6,
+          "learningRounds": 2,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "reportCaveats": [
+          "体验档仅 6 项、2 轮，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "itemCount": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false,
+          "delayedDelayMs": 0
+        },
+        "reportCaveats": [
+          "正式档报告即时学习与顺序保持，不包含延迟指标。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          13,
+          17
+        ],
+        "configPatch": {
+          "itemCount": 15,
+          "learningRounds": 3,
+          "delayedEnabled": true,
+          "delayedDelayMs": 30000
+        },
+        "reportCaveats": [
+          "延迟阶段未完成时保持缺失，不以 0 代替。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "runningspan",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "reportCaveats": [
+          "结果描述本次运行广度的更新与回忆表现，不是记忆能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          8,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，列表范围与回忆长度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "sentencecheck",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次句图相符判断的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，模板与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "seqlearn",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 40,
+          "randomBlockIndices": [
+            3
+          ]
+        },
+        "reportCaveats": [
+          "体验版，学习指标仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 60,
+          "randomBlockIndices": [
+            4
+          ]
+        },
+        "reportCaveats": [
+          "结果描述本次序列学习过程，不是学习能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 100,
+          "randomBlockIndices": [
+            6
+          ]
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，序列与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "visualwm",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "reportCaveats": [
+          "结果描述本次视觉工作记忆表现，不是记忆诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "reportCaveats": [
+          "科研档增加试次；集合大小范围与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R2",
+    "task": "wordlist",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "listLength": 8,
+          "learningRounds": 2,
+          "delayedEnabled": false
+        },
+        "reportCaveats": [
+          "体验版只描述即时自由回忆过程，不包括延迟回忆。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          6,
+          8
+        ],
+        "configPatch": {
+          "listLength": 12,
+          "learningRounds": 3,
+          "delayedEnabled": false
+        },
+        "reportCaveats": [
+          "结果描述本次键盘自由回忆表现，不是记忆能力诊断或人口常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          10,
+          14
+        ],
+        "configPatch": {
+          "listLength": 15,
+          "learningRounds": 5,
+          "delayedEnabled": true
+        },
+        "reportCaveats": [
+          "科研版增加学习轮次和延迟回忆；延迟阶段需要单独完成并经 pilot 审查。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "cogest",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "标准档30题；项目自编描述性数量级估算试测草稿，不提供临床或人群常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研档36题；共用同一自编题池，不重复抽题；科研档命名不代表已完成心理测量验证。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "embeddedfigures",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 6
+        },
+        "reportCaveats": [
+          "6题简短体验，可能受偶然失误影响；不与其他版本作常模比较。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 10
+        },
+        "reportCaveats": [
+          "10题自编线条图形匹配，不是标准EFT或能力诊断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 16
+        },
+        "reportCaveats": [
+          "16题使用相同刺激规则并增加重复；没有经验证的年龄常模或题目难度标定。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "icarmatrix",
+    "engineVersion": "2.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "2.1.0",
+    "configVersion": "2.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "reportCaveats": [
+          "七题试测范围中的四题；估计稳定性有限，不与长版视为等效。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 6
+        },
+        "reportCaveats": [
+          "七题试测范围中的六题；未建立难度或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 7
+        },
+        "reportCaveats": [
+          "七道不重复试测题；不是 ICAR 全套或标准化测验，不适合反复施测估计等值变化。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "lineangle",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "previousConfigVersion": "2.0.0",
+    "configVersion": "2.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次线段方向匹配表现，不是空间能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，角度步长与选项数和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "logicdeduce",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "previousConfigVersion": "2.0.0",
+    "configVersion": "2.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18题简短体验；不与长版或其他人排名比较。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30题；记录本次表现，无同龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36道独立正式题；时长为估计，尚无信效度或常模研究。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "matrix",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "itemCount": 6
+        },
+        "reportCaveats": [
+          "体验档题目较少，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          8,
+          12
+        ],
+        "configPatch": {
+          "itemCount": 16
+        },
+        "reportCaveats": [
+          "内部生成题库，只描述本次规则归纳表现。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          12,
+          18
+        ],
+        "configPatch": {
+          "itemCount": 24
+        },
+        "reportCaveats": [
+          "科研档覆盖全部三种规则族和难度；仍不是智力测验。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "mentalrotation",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 12
+        },
+        "reportCaveats": [
+          "体验档角度条件较少，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "角度、镜像和图形族平衡；不代表完整空间能力。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          11,
+          16
+        ],
+        "configPatch": {
+          "totalTrials": 80
+        },
+        "reportCaveats": [
+          "科研档使用完整内部题库；仍不是空间智力常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "proofread",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18 道正式题；短程结果稳定性未验证。时长为估计，非实测。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30 道正式题；只描述本次表现，无同龄常模。时长为估计，非实测。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36 道正式题；与短程协议使用同一原创题池，不宣称等值或验证效度。时长为估计，非实测。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "readingcomp",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18 道正式题；短程结果稳定性未验证。时长为估计，非实测。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30 道正式题；只描述本次表现，无同龄常模。时长为估计，非实测。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36 道正式题；与短程协议使用同一原创题池，不宣称等值或验证效度。时长为估计，非实测。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "seriescomplete",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次数列完成的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研档使用全部 36 题；与标准档共用同一内部题池；难度未经过标定；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "tower",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "problemCount": 4
+        },
+        "reportCaveats": [
+          "体验档仅含低、中难度问题，不进入综合分析。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          8,
+          13
+        ],
+        "configPatch": {
+          "problemCount": 10
+        },
+        "reportCaveats": [
+          "报告解题、最短路径效率与规则违反，不形成计划能力等级。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          15,
+          22
+        ],
+        "configPatch": {
+          "problemCount": 18
+        },
+        "reportCaveats": [
+          "科研档覆盖三档最短路径难度；重复测试可能有练习效应。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "wordanalogy",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版使用18道正式题；本次比例不代表稳定能力或同龄排名。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次言语类比推理的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          7,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研参数档使用36道已审题目；未建立常模、信效度或新旧题库等值证据。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "wordmeaning",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "体验版使用18道正式题；本次比例不代表稳定能力或同龄排名。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "结果描述本次词汇理解的表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "科研参数档使用36道已审题目；未建立常模、信效度或新旧题库等值证据。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R3",
+    "task": "wordproblem",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "previousConfigVersion": "2.0.0",
+    "configVersion": "2.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 18
+        },
+        "reportCaveats": [
+          "18题简短体验；不与长版或其他人排名比较。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 30
+        },
+        "reportCaveats": [
+          "30题；记录本次表现，无同龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          11
+        ],
+        "configPatch": {
+          "totalTrials": 36
+        },
+        "reportCaveats": [
+          "36道独立正式题；时长为估计，尚无信效度或常模研究。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "lexicaldecision",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "体验版试次数较少，结果只描述本次词汇判断任务。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          7,
+          10
+        ],
+        "configPatch": {
+          "totalTrials": 100
+        },
+        "reportCaveats": [
+          "真词和伪词按冻结刺激库平衡抽样；结果不是语言能力诊断或人口常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          14,
+          20
+        ],
+        "configPatch": {
+          "totalTrials": 200
+        },
+        "reportCaveats": [
+          "科研版增加试次并保留词频带、字长和生成器版本，发布前仍须完成词库与设备 pilot。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "emotionrecognition",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.0",
+    "configVersion": "1.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 24
+        },
+        "reportCaveats": [
+          "体验版每类面孔数量较少，只描述本次六类面孔分类。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "reportCaveats": [
+          "合成面孔按六类严格平衡；结果不是情绪识别能力、共情或人格判断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          12,
+          18
+        ],
+        "configPatch": {
+          "totalTrials": 120
+        },
+        "reportCaveats": [
+          "科研版覆盖 20 组内部合成身份；内容、文化、可访问性和设备 pilot 完成前保持 DRAFT。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "bart",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.1.0",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          4
+        ],
+        "configPatch": {
+          "balloonCount": 10
+        },
+        "reportCaveats": [
+          "体验版只描述本次虚拟 balloon 行为，不输出风险等级。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "balloonCount": 30
+        },
+        "reportCaveats": [
+          "指标只描述泵压、爆破和现金化次数，不推断稳定的人格或风险特征。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          8,
+          12
+        ],
+        "configPatch": {
+          "balloonCount": 50
+        },
+        "reportCaveats": [
+          "科研版增加 balloon 数量用于稳定性审查；不使用好坏等级或风险分类。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "delaydiscount",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "bisectionSteps": 3
+        },
+        "reportCaveats": [
+          "体验版，无差异点估计较粗，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "bisectionSteps": 5
+        },
+        "reportCaveats": [
+          "结果描述本次跨期选择表现，不是自控力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "bisectionSteps": 7
+        },
+        "reportCaveats": [
+          "科研档仅增加每带二分步数（重复次数），难度与标准档一致；无差异点估计更精细；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "gamblingdeck",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 40
+        },
+        "reportCaveats": [
+          "体验版，学习趋势指标仅作演示。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          7
+        ],
+        "configPatch": {
+          "totalTrials": 60
+        },
+        "reportCaveats": [
+          "结果描述本次决策学习过程，不是冲动性诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          8,
+          12
+        ],
+        "configPatch": {
+          "totalTrials": 100
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，计划与难度和标准档一致；分块趋势估计更稳；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "timecopy",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 6
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 10
+        },
+        "reportCaveats": [
+          "结果描述本次时间复制表现，不是注意力或时间管理能力诊断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 20
+        },
+        "reportCaveats": [
+          "科研档仅增加试次，目标范围和难度与标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "semanticfluency",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "reportCaveats": [
+          "结果描述本次类别流畅性表现，不是语言能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          6,
+          9
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "科研档增加类别轮次；词库与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "trustgame",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "offers": [
+            50,
+            20,
+            80,
+            10
+          ]
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          3,
+          5
+        ],
+        "configPatch": {
+          "offers": [
+            50,
+            20,
+            80,
+            10,
+            40,
+            30,
+            60,
+            20
+          ]
+        },
+        "reportCaveats": [
+          "结果描述本次响应者决策的选择分布，不是品德评价或人格判断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "offers": [
+            50,
+            20,
+            80,
+            10,
+            40,
+            30,
+            60,
+            20,
+            50,
+            10,
+            70,
+            30
+          ]
+        },
+        "reportCaveats": [
+          "科研档增加轮次；提议结构与难度和标准档一致；仍不是人格或品德常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "pursuitrotor",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0",
+    "previousConfigVersion": "1.0.1",
+    "configVersion": "1.0.1-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          4,
+          6
+        ],
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "reportCaveats": [
+          "结果描述本次追踪运动的表现，不是运动能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          8,
+          12
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "科研档增加轮次；轨道参数与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "maze",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.1",
+    "previousConfigVersion": "1.1.0",
+    "configVersion": "1.1.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "totalTrials": 2
+        },
+        "reportCaveats": [
+          "体验版仅 2 个迷宫，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          5,
+          8
+        ],
+        "configPatch": {
+          "totalTrials": 4
+        },
+        "reportCaveats": [
+          "结果描述本次迷宫导航表现，不是空间能力诊断或年龄常模。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          8,
+          12
+        ],
+        "configPatch": {
+          "totalTrials": 8
+        },
+        "reportCaveats": [
+          "科研档增加迷宫数量；迷宫尺寸与难度和标准档一致；仍不是年龄常模。"
+        ]
+      }
+    }
+  },
+  {
+    "group": "R4",
+    "task": "sharegame",
+    "engineVersion": "2.0.0",
+    "scoringVersion": "2.0.0",
+    "previousConfigVersion": "2.0.0",
+    "configVersion": "2.0.0-report3",
+    "reportVersion": "3.0.0",
+    "profiles": {
+      "experience": {
+        "profile": "experience",
+        "estimatedMinutes": [
+          2,
+          2
+        ],
+        "configPatch": {
+          "endowments": [
+            20,
+            50,
+            100
+          ]
+        },
+        "reportCaveats": [
+          "体验版，结果仅供体验。"
+        ]
+      },
+      "standard": {
+        "profile": "standard",
+        "estimatedMinutes": [
+          2,
+          3
+        ],
+        "configPatch": {
+          "endowments": [
+            20,
+            50,
+            100,
+            50,
+            100
+          ]
+        },
+        "reportCaveats": [
+          "结果描述本次分享决策的选择分布，不是品德评价或人格判断。"
+        ]
+      },
+      "research": {
+        "profile": "research",
+        "estimatedMinutes": [
+          3,
+          4
+        ],
+        "configPatch": {
+          "endowments": [
+            20,
+            50,
+            100,
+            20,
+            50,
+            100,
+            50,
+            100
+          ]
+        },
+        "reportCaveats": [
+          "科研档仅增加轮次，禀赋结构与难度和标准档一致；仍不是人格或品德常模。"
+        ]
+      }
+    }
+  }
+]

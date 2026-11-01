@@ -30,11 +30,12 @@
     "file": "seeds.ts",
     "export": "seeds",
     "orders": [
-      25
+      22,
+      22
     ]
   },
   "presentation": {
-    "file": "participant-presentation-r2.ts",
+    "file": "participant-presentation.ts",
     "export": "participantPresentations"
   },
   "scientific": {

@@ -11,13 +11,13 @@ const identity = (testType: string) => ({ testType, engineVersion: names.indexOf
 const projection = (testType: string, profile: 'experience' | 'research', metrics: Record<string, number | null>) => {
   const id = identity(testType)
   const definition = buildCognitiveV2TaskDefinition(requireCognitiveRegistryEntry(id.testType, id.engineVersion, id.scoringVersion))
-  return projectThreeLayerReport({ ...id, configVersion: id.engineVersion, profile, protocolSignature: 'r1-synthetic-report', participantPresentation: resolveParticipantPresentation(id), definition: definition.report, metricDefinitions: definition.metrics, qualityDefinitions: definition.quality, metrics, score: { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 24, scorerVersion: '1.0.0' } } })
+  return projectThreeLayerReport({ ...id, configVersion: id.engineVersion, profile, protocolSignature: 'r1-synthetic-report', participantPresentation: resolveParticipantPresentation({ ...id, reportVersion: '3.0.0' }), definition: definition.report, metricDefinitions: definition.metrics, qualityDefinitions: definition.quality, metrics, score: { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 24, scorerVersion: '1.0.0' } } })
 }
 
 describe('R1 display revisions', () => {
   it.each(names)('%s has a separate current display without changing metric or calculation identities', async (name) => {
     const previous = (await import(`../../modules/cognitive/tasks/${name}/participant-presentation.previous.ts`)).participantPresentations[0]
-    const current = resolveParticipantPresentation(identity(name))!
+    const current = resolveParticipantPresentation({ ...identity(name), reportVersion: '3.0.0' })!
     expect(current.presentationVersion).not.toBe(previous.presentationVersion)
     expect(current.reportReading!.version).not.toBe(previous.reportReading.version)
     expect(current.engineVersion).toBe(previous.engineVersion)
@@ -73,7 +73,7 @@ describe('R1 display revisions', () => {
       frozen.participantPresentation = oldPresentation
       const input = { ...identity('flanker'), configVersion: '1.0.0', profile: 'experience' as const, frozenReport: frozen, score: 70, metrics: { flankerEffectMs: 0, congruentAccuracy: 1, incongruentAccuracy: 1 }, qualityFlags: { interpretable: true }, reference: null }
       const before = buildCognitiveSingleTaskReport(input)
-      const current = resolveParticipantPresentation(identity('flanker'))!
+      const current = resolveParticipantPresentation({ ...identity('flanker'), reportVersion: '3.0.0' })!
       const title = current.title
       try { current.title = 'synthetic later wording'; expect(buildCognitiveSingleTaskReport(input)).toEqual(before) }
       finally { current.title = title }

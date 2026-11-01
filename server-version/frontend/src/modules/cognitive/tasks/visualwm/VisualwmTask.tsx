@@ -144,7 +144,7 @@ export const VisualwmTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="视觉工作记忆" description={<p>几个彩色方块会同时短暂出现。消失后整组方块会再次出现，其中一个带深色边框。请判断这个方块的颜色是“相同”还是“改变”了。像短暂看见一组彩色便签后核对变化，这里记录本次颜色判断，不是视力或记忆容量诊断。</p>} hint={<><p>不要用言语描述颜色，直接记住颜色本身。探测画面出现后，按1选“相同”、按2选“改变”，也可点按钮；每题只记录第一次选择。练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="视觉工作记忆" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>几个彩色方块会同时短暂出现。消失后整组方块会再次出现，其中一个带深色边框。请判断这个方块的颜色是“相同”还是“改变”了。像短暂看见一组彩色便签后核对变化，这里记录本次颜色判断，不是视力或记忆容量诊断。</p>) : (<p>几个彩色方块会同时短暂出现。消失后整组方块会再次出现，其中一个带深色边框。请判断这个方块的颜色是“相同”还是“改变”了。</p>)} hint={<><p>不要用言语描述颜色，直接记住颜色本身。探测画面出现后，按1选“相同”、按2选“改变”，也可点按钮；每题只记录第一次选择。练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'completed') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700">已全部完成，正在生成结果…</p></div>
 
   if (phase === 'practice') {

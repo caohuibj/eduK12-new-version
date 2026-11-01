@@ -128,7 +128,7 @@ export const RunningspanTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="运行记忆广度" description={<p>字母会一个接一个出现，你不知道何时停止。请在心里一直保留“最近的几个”字母。序列停止后，按出现顺序选出最后 {recallLength} 个字母。像在滚动消息里记住最后几条，这里观察序列结束后能否按顺序找回末尾内容。</p>} hint={<><p>回忆阶段不限时；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="运行记忆广度" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>字母会一个接一个出现，你不知道何时停止。请在心里一直保留“最近的几个”字母。序列停止后，按出现顺序选出最后 {recallLength} 个字母。像在滚动消息里记住最后几条，这里观察序列结束后能否按顺序找回末尾内容。</p>) : (<p>字母会一个接一个出现，你不知道何时停止。请在心里一直保留“最近的几个”字母。序列停止后，按出现顺序选出最后 {recallLength} 个字母。</p>)} hint={<><p>回忆阶段不限时；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

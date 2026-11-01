@@ -1,5 +1,6 @@
 import type { CognitiveParticipantPresentationV1 } from '../../participant-presentation.types'
 
+// Original declarations stay first; only explicit reportVersion 3.0.0 selects this revision.
 export const participantPresentations: CognitiveParticipantPresentationV1[] = [
   {
     "schemaVersion": 1,
@@ -253,285 +254,300 @@ export const participantPresentations: CognitiveParticipantPresentationV1[] = [
       }
     }
   },
-  // Report 3.0.0: selected explicitly by a new draft config; legacy entries above stay unchanged.
-{
-  "schemaVersion": 1,
-  "presentationVersion": "3.0.0",
-  "testType": "lexicaldecision",
-  "engineVersion": "1.0.0",
-  "scoringVersion": "1.0.0",
-  "title": "词语快辨",
-  "metrics": {
-    "dPrime": {
-      "label": "区分指标 d′（方法附注）",
-      "explanation": "由命中率和误报率计算；不是词汇量、百分位或智力分。",
-      "singleExplanation": "由命中率和误报率计算；不是词汇量、百分位或智力分。"
-    },
-    "lexicalityEffectMs": {
-      "label": "真词/伪词反应时差",
-      "explanation": "伪词条件减去真词条件的正确反应中位时间。",
-      "singleExplanation": "伪词条件减去真词条件的正确反应中位时间。"
-    },
-    "accuracyReal": {
-      "label": "真实词判断正确率",
-      "explanation": "分母为实际呈现的真实词试次；未答不是正确作答。",
-      "singleExplanation": "分母为实际呈现的真实词试次；未答不是正确作答。"
-    },
-    "accuracyPseudo": {
-      "label": "非词判断正确率",
-      "explanation": "分母为实际呈现的非词试次；与真实词正确率分别阅读。",
-      "singleExplanation": "分母为实际呈现的非词试次；与真实词正确率分别阅读。"
-    },
-    "medianRtReal": {
-      "label": "真词反应时中位数",
-      "explanation": "正确判断真词的有效反应时间中位数。",
-      "singleExplanation": "正确判断真词的有效反应时间中位数。"
-    },
-    "medianRtPseudo": {
-      "label": "伪词反应时中位数",
-      "explanation": "正确判断伪词的有效反应时间中位数。",
-      "singleExplanation": "正确判断伪词的有效反应时间中位数。"
-    },
-    "accuracyByFrequencyBand": {
-      "label": "各词频带正确率",
-      "explanation": "按内部词频分组列出正确率，不代表语言能力等级。",
-      "singleExplanation": "按内部词频分组列出正确率，不代表语言能力等级。"
-    },
-    "omissionRate": {
-      "label": "遗漏比例",
-      "explanation": "遗漏比例：应该响应但没有响应的比例。",
-      "singleExplanation": "遗漏比例：应该响应但没有响应的比例。"
-    },
-    "validResponseCount": {
-      "label": "有效响应数",
-      "explanation": "本次真词与伪词项目的有效响应次数。",
-      "singleExplanation": "本次真词与伪词项目的有效响应次数。"
-    }
-  },
-  "hiddenMetrics": [],
-  "suppressTips": false,
-  "protocols": {
-    "experience": {
-      "tier": "PILOT",
-      "profileLabel": "简短体验",
-      "participantConclusion": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
-      "reportCaveats": [
-        "本次正式任务共40次词语判断。另有4次练习。",
-        "体验约2–4分钟；研究约6–12分钟（流程估计，非实测）。",
-        "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
-        "沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
-        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
-      ],
-      "showProductIndex": false
-    },
-    "standard": {
-      "tier": "PILOT",
-      "profileLabel": "常规任务",
-      "participantConclusion": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
-      "reportCaveats": [
-        "本次正式任务共100次词语判断。另有4次练习。",
-        "体验约2–4分钟；研究约6–12分钟（流程估计，非实测）。",
-        "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
-        "沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
-        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
-      ],
-      "showProductIndex": false
-    },
-    "research": {
-      "tier": "PILOT",
-      "profileLabel": "研究变式",
-      "participantConclusion": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
-      "reportCaveats": [
-        "本次正式任务共200次词语判断。另有4次练习。",
-        "体验约2–4分钟；研究约6–12分钟（流程估计，非实测）。",
-        "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
-        "沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
-        "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
-      ],
-      "showProductIndex": false
-    }
-  },
-  "practicalTips": [
-    "先看真实词和非词两边的正确率，再看用时；下次阅读陌生词时，可以停一下核对上下文。"
-  ],
-  "singleHiddenMetrics": [],
-  "disclaimer": "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
-  "reportReading": {
-    "version": "3.0.0",
-    "title": "这两个字，像一个常见词吗？",
-    "introduction": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
-    "summary": {
-      "template": "真实词判断正确率 {accuracyReal}，非词判断正确率 {accuracyPseudo}；有效作答 {validResponseCount} 次。",
-      "metricKeys": [
-        "accuracyReal",
-        "accuracyPseudo",
-        "validResponseCount"
-      ]
-    },
-    "studentMetricKeys": [
-      "accuracyReal",
-      "accuracyPseudo",
-      "validResponseCount"
-    ],
-    "processMetricKeys": [
-      "validResponseCount"
-    ],
-    "withholdFlags": [
-      "legacyUninterpretable",
-      "insufficientRealWords",
-      "insufficientPseudoWords"
-    ],
-    "metricGates": {},
-    "nextStep": "先看真实词和非词两边的正确率，再看用时；下次阅读陌生词时，可以停一下核对上下文。",
-    "chart": {
-      "kind": "metrics",
-      "metricKeys": [
-        "accuracyReal",
-        "accuracyPseudo"
-      ]
-    },
-    "caveatTerms": {
-      "正式版": "标准协议",
-      "体验版": "短程协议",
-      "研究版": "科研协议",
-      "科研版": "科研协议",
-      "科研档": "科研协议",
-      "人口常模": "经过验证的同龄人比较依据",
-      "常模等级": "经过验证的同龄人等级",
-      "年龄等级": "年龄对应的能力等级",
-      "稳定能力等级": "固定的能力水平",
-      "内部配置": "这次任务设置",
-      "正式档": "标准任务",
-      "体验档": "简短体验",
-      "标准协议": "标准任务",
-      "短程协议": "简短体验"
-    },
-    "illustration": "rules",
-    "popular": {
-      "conceptTitle": "这个小游戏在观察什么",
-      "concept": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
-      "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
-      "exampleTitle": "生活里也会遇到",
-      "example": "读消息时，熟悉的词往往一眼认出；陌生组合会让人多看一眼。这个任务把这种差别放到按钮选择里。",
-      "scene": "rules",
-      "frames": [
-        {
-          "title": "任务怎样进行",
-          "text": "40 / 100 / 200 次；真实词与非词各半；另有4次练习。"
-        },
-        {
-          "title": "大概需要多久",
-          "text": "体验约2–4分钟；研究约6–12分钟。这是按流程估计，尚无本轮实测分布。"
-        },
-        {
-          "title": "怎样读这次记录",
-          "text": "先看真实词和非词两边的正确率，再看用时；下次阅读陌生词时，可以停一下核对上下文。"
-        }
-      ],
-      "boundary": "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
-      "metricHelp": {
-        "accuracyReal": {
-          "label": "真实词判断正确率",
-          "explanation": "分母为实际呈现的真实词试次；未答不是正确作答。"
-        },
-        "accuracyPseudo": {
-          "label": "非词判断正确率",
-          "explanation": "分母为实际呈现的非词试次；与真实词正确率分别阅读。"
-        },
-        "validResponseCount": {
-          "label": "有效响应数",
-          "explanation": "本次真词与伪词项目的有效响应次数。"
-        }
+  {
+    "schemaVersion": 1,
+    "presentationVersion": "3.0.0",
+    "testType": "lexicaldecision",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "title": "词语快辨",
+    "metrics": {
+      "dPrime": {
+        "label": "区分指标 d′（方法附注）",
+        "explanation": "由命中率和误报率计算；不是词汇量、百分位或智力分。",
+        "singleExplanation": "由命中率和误报率计算；不是词汇量、百分位或智力分。"
+      },
+      "lexicalityEffectMs": {
+        "label": "非词与真实词的有效作答用时差",
+        "explanation": "非词条件的有效作答用时中位数减去真实词条件的中位数；两边均包含错误但用时有效的作答，正值表示本次非词作答较慢。",
+        "singleExplanation": "非词条件的有效作答用时中位数减去真实词条件的中位数；两边均包含错误但用时有效的作答，正值表示本次非词作答较慢。"
+      },
+      "accuracyReal": {
+        "label": "真实词判断正确率",
+        "explanation": "分母为实际呈现的真实词试次；未答不是正确作答。",
+        "singleExplanation": "分母为实际呈现的真实词试次；未答不是正确作答。"
+      },
+      "accuracyPseudo": {
+        "label": "非词判断正确率",
+        "explanation": "分母为实际呈现的非词试次；与真实词正确率分别阅读。",
+        "singleExplanation": "分母为实际呈现的非词试次；与真实词正确率分别阅读。"
+      },
+      "medianRtReal": {
+        "label": "真实词有效作答的典型用时",
+        "explanation": "真实词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。",
+        "singleExplanation": "真实词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。"
+      },
+      "medianRtPseudo": {
+        "label": "非词有效作答的典型用时",
+        "explanation": "非词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。",
+        "singleExplanation": "非词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。"
+      },
+      "accuracyByFrequencyBand": {
+        "label": "各词频带正确率",
+        "explanation": "按内部词频分组列出正确率，不代表语言能力等级。",
+        "singleExplanation": "按内部词频分组列出正确率，不代表语言能力等级。"
+      },
+      "omissionRate": {
+        "label": "未答或用时无效的比例",
+        "explanation": "分母为计划正式试次数；未响应、缺少用时、低于有效用时下限或超过截止时间的记录均计入，不只是没有按键。",
+        "singleExplanation": "分母为计划正式试次数；未响应、缺少用时、低于有效用时下限或超过截止时间的记录均计入，不只是没有按键。"
+      },
+      "validResponseCount": {
+        "label": "有效响应数",
+        "explanation": "本次真词与伪词项目的有效响应次数。",
+        "singleExplanation": "本次真词与伪词项目的有效响应次数。"
       }
     },
-    "professional": {
-      "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
-      "procedure": "40 / 100 / 200 次；真实词与非词各半；另有4次练习。 沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
-      "interpretation": "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
-      "confounders": [
-        "设备与输入方式、显示和响应延迟会影响用时记录。",
-        "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
-        "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
-        "设备与输入方式",
-        "练习、熟悉和这次有效观察量"
-      ],
-      "metricNotes": {
-        "dPrime": {
-          "definition": "由命中率和误报率计算；不是词汇量、百分位或智力分。",
-          "readingHint": "保留原计分；只按此分母与任务条件解释。"
-        },
-        "lexicalityEffectMs": {
-          "definition": "伪词条件减去真词条件的正确反应中位时间。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "accuracyReal": {
-          "definition": "分母为实际呈现的真实词试次；未答不是正确作答。",
-          "readingHint": "保留原计分；只按此分母与任务条件解释。"
-        },
-        "accuracyPseudo": {
-          "definition": "分母为实际呈现的非词试次；与真实词正确率分别阅读。",
-          "readingHint": "保留原计分；只按此分母与任务条件解释。"
-        },
-        "medianRtReal": {
-          "definition": "正确判断真词的有效反应时间中位数。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "medianRtPseudo": {
-          "definition": "正确判断伪词的有效反应时间中位数。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "accuracyByFrequencyBand": {
-          "definition": "按内部词频分组列出正确率，不代表语言能力等级。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "omissionRate": {
-          "definition": "遗漏比例：应该响应但没有响应的比例。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        },
-        "validResponseCount": {
-          "definition": "本次真词与伪词项目的有效响应次数。",
-          "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
-        }
-      },
-      "configFields": [
-        {
-          "key": "totalTrials",
-          "label": "计划正式试次数"
-        },
-        {
-          "key": "timeoutMs",
-          "label": "响应时限（毫秒）"
-        },
-        {
-          "key": "blockCount",
-          "label": "区组数"
-        }
-      ]
-    },
-    "summaryByProfile": {
+    "hiddenMetrics": [],
+    "suppressTips": false,
+    "protocols": {
       "experience": {
+        "tier": "PILOT",
+        "profileLabel": "简短体验",
+        "participantConclusion": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
+        "reportCaveats": [
+          "本次正式任务共40次词语判断。另有4次练习。",
+          "体验约2–4分钟；研究约6–12分钟（流程估计，非实测）。",
+          "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
+          "沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
+          "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+        ],
+        "showProductIndex": false
+      },
+      "standard": {
+        "tier": "PILOT",
+        "profileLabel": "常规任务",
+        "participantConclusion": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
+        "reportCaveats": [
+          "本次正式任务共100次词语判断。另有4次练习。",
+          "体验约2–4分钟；研究约6–12分钟（流程估计，非实测）。",
+          "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
+          "沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
+          "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+        ],
+        "showProductIndex": false
+      },
+      "research": {
+        "tier": "PILOT",
+        "profileLabel": "研究变式",
+        "participantConclusion": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
+        "reportCaveats": [
+          "本次正式任务共200次词语判断。另有4次练习。",
+          "体验约2–4分钟；研究约6–12分钟（流程估计，非实测）。",
+          "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
+          "沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
+          "尚无本轮实测可靠性；研究模式名称不代表标准复刻或已验证效度。"
+        ],
+        "showProductIndex": false
+      }
+    },
+    "practicalTips": [
+      "先看真实词和非词两边的正确率，再看用时；下次阅读陌生词时，可以停一下核对上下文。"
+    ],
+    "singleHiddenMetrics": [],
+    "disclaimer": "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
+    "reportReading": {
+      "version": "3.0.0",
+      "title": "这两个字，像一个常见词吗？",
+      "introduction": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
+      "summary": {
         "template": "真实词判断正确率 {accuracyReal}，非词判断正确率 {accuracyPseudo}；有效作答 {validResponseCount} 次。",
         "metricKeys": [
           "accuracyReal",
           "accuracyPseudo",
           "validResponseCount"
         ]
+      },
+      "studentMetricKeys": [
+        "accuracyReal",
+        "accuracyPseudo",
+        "validResponseCount"
+      ],
+      "processMetricKeys": [
+        "validResponseCount"
+      ],
+      "withholdFlags": [
+        "legacyUninterpretable",
+        "insufficientRealWords",
+        "insufficientPseudoWords"
+      ],
+      "metricGates": {},
+      "nextStep": "先看真实词和非词两边的正确率，再看用时；下次阅读陌生词时，可以停一下核对上下文。",
+      "chart": {
+        "kind": "metrics",
+        "metricKeys": [
+          "accuracyReal",
+          "accuracyPseudo"
+        ]
+      },
+      "caveatTerms": {
+        "正式版": "标准协议",
+        "体验版": "短程协议",
+        "研究版": "科研协议",
+        "科研版": "科研协议",
+        "科研档": "科研协议",
+        "人口常模": "经过验证的同龄人比较依据",
+        "常模等级": "经过验证的同龄人等级",
+        "年龄等级": "年龄对应的能力等级",
+        "稳定能力等级": "固定的能力水平",
+        "内部配置": "这次任务设置",
+        "正式档": "标准任务",
+        "体验档": "简短体验",
+        "标准协议": "标准任务",
+        "短程协议": "简短体验"
+      },
+      "illustration": "rules",
+      "popular": {
+        "conceptTitle": "这个小游戏在观察什么",
+        "concept": "你要在真实词语和拼出的非词之间作判断。这里记录你对这批材料分得是否准确，以及按键花了多久。",
+        "takeaway": "先看本次记录，再结合题量、缺失和任务条件理解。",
+        "exampleTitle": "生活里也会遇到",
+        "example": "读消息时，熟悉的词往往一眼认出；陌生组合会让人多看一眼。这个任务把这种差别放到按钮选择里。",
+        "scene": "rules",
+        "frames": [
+          {
+            "title": "任务怎样进行",
+            "text": "40 / 100 / 200 次；真实词与非词各半；另有4次练习。"
+          },
+          {
+            "title": "大概需要多久",
+            "text": "体验约2–4分钟；研究约6–12分钟。这是按流程估计，尚无本轮实测分布。"
+          },
+          {
+            "title": "怎样读这次记录",
+            "text": "先看真实词和非词两边的正确率，再看用时；下次阅读陌生词时，可以停一下核对上下文。"
+          }
+        ],
+        "boundary": "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
+        "metricHelp": {
+          "accuracyReal": {
+            "label": "真实词判断正确率",
+            "explanation": "分母为实际呈现的真实词试次；未答不是正确作答。"
+          },
+          "accuracyPseudo": {
+            "label": "非词判断正确率",
+            "explanation": "分母为实际呈现的非词试次；与真实词正确率分别阅读。"
+          },
+          "validResponseCount": {
+            "label": "有效响应数",
+            "explanation": "本次真词与伪词项目的有效响应次数。"
+          },
+          "medianRtReal": {
+            "label": "真实词有效作答的典型用时",
+            "explanation": "真实词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。"
+          },
+          "medianRtPseudo": {
+            "label": "非词有效作答的典型用时",
+            "explanation": "非词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。"
+          },
+          "lexicalityEffectMs": {
+            "label": "非词与真实词的有效作答用时差",
+            "explanation": "非词条件的有效作答用时中位数减去真实词条件的中位数；两边均包含错误但用时有效的作答，正值表示本次非词作答较慢。"
+          },
+          "omissionRate": {
+            "label": "未答或用时无效的比例",
+            "explanation": "分母为计划正式试次数；未响应、缺少用时、低于有效用时下限或超过截止时间的记录均计入，不只是没有按键。"
+          }
+        }
+      },
+      "professional": {
+        "construct": "本项目任务条件下的表现描述；没有同龄常模或本轮实测可靠性。",
+        "procedure": "40 / 100 / 200 次；真实词与非词各半；另有4次练习。 沿用词汇判断范式，但本项目简体词表与生成非词不是 Chinese Lexicon Project 的香港粤语、繁体双字词材料，不能使用其反应时或准确率常模。",
+        "interpretation": "用词经验、地区语言和键盘都会影响结果；40 次体验每类约20次，不能给词汇量、阅读年龄或稳定能力下结论。",
+        "confounders": [
+          "设备与输入方式、显示和响应延迟会影响用时记录。",
+          "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+          "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。",
+          "设备与输入方式",
+          "练习、熟悉和这次有效观察量"
+        ],
+        "metricNotes": {
+          "dPrime": {
+            "definition": "由命中率和误报率计算；不是词汇量、百分位或智力分。",
+            "readingHint": "保留原计分；只按此分母与任务条件解释。"
+          },
+          "lexicalityEffectMs": {
+            "definition": "非词条件的有效作答用时中位数减去真实词条件的中位数；两边均包含错误但用时有效的作答，正值表示本次非词作答较慢。",
+            "readingHint": "只描述本批材料与有效用时记录；不是仅对答对题求平均，也不作词汇量或能力推断。"
+          },
+          "accuracyReal": {
+            "definition": "分母为实际呈现的真实词试次；未答不是正确作答。",
+            "readingHint": "保留原计分；只按此分母与任务条件解释。"
+          },
+          "accuracyPseudo": {
+            "definition": "分母为实际呈现的非词试次；与真实词正确率分别阅读。",
+            "readingHint": "保留原计分；只按此分母与任务条件解释。"
+          },
+          "medianRtReal": {
+            "definition": "真实词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。",
+            "readingHint": "只描述本批材料与有效用时记录；不是仅对答对题求平均，也不作词汇量或能力推断。"
+          },
+          "medianRtPseudo": {
+            "definition": "非词条件中，满足用时条件的作答时间中位数，包含判断正确和判断错误的作答。",
+            "readingHint": "只描述本批材料与有效用时记录；不是仅对答对题求平均，也不作词汇量或能力推断。"
+          },
+          "accuracyByFrequencyBand": {
+            "definition": "按内部词频分组列出正确率，不代表语言能力等级。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          },
+          "omissionRate": {
+            "definition": "分母为计划正式试次数；未响应、缺少用时、低于有效用时下限或超过截止时间的记录均计入，不只是没有按键。",
+            "readingHint": "只描述本批材料与有效用时记录；不是仅对答对题求平均，也不作词汇量或能力推断。"
+          },
+          "validResponseCount": {
+            "definition": "本次真词与伪词项目的有效响应次数。",
+            "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+          }
+        },
+        "configFields": [
+          {
+            "key": "totalTrials",
+            "label": "计划正式试次数"
+          },
+          {
+            "key": "timeoutMs",
+            "label": "响应时限（毫秒）"
+          },
+          {
+            "key": "blockCount",
+            "label": "区组数"
+          }
+        ]
+      },
+      "summaryByProfile": {
+        "experience": {
+          "template": "真实词判断正确率 {accuracyReal}，非词判断正确率 {accuracyPseudo}；有效作答 {validResponseCount} 次。",
+          "metricKeys": [
+            "accuracyReal",
+            "accuracyPseudo",
+            "validResponseCount"
+          ]
+        }
+      },
+      "hiddenByProfile": {
+        "experience": [
+          "dPrime",
+          "accuracyByFrequencyBand",
+          "lexicalityEffectMs"
+        ]
+      },
+      "qualityLabels": {
+        "insufficientPseudoWords": "非词的有效作答较少",
+        "insufficientRealWords": "真实词的有效作答较少",
+        "constantResponse": "多次使用同一按钮",
+        "excessiveOmissions": "未答或用时不在范围内的记录较多"
       }
     },
-    "hiddenByProfile": {
-      "experience": [
-        "dPrime",
-        "accuracyByFrequencyBand",
-        "lexicalityEffectMs"
-      ]
-    },
-    "qualityLabels": {
-      "insufficientPseudoWords": "非词的有效作答较少",
-      "insufficientRealWords": "真实词的有效作答较少",
-      "constantResponse": "多次使用同一按钮",
-      "excessiveOmissions": "未答或用时不在范围内的记录较多"
-    }
-  },
-  "experienceHeadline": "accuracyReal"
-}
+    "experienceHeadline": "accuracyReal"
+  }
 ]

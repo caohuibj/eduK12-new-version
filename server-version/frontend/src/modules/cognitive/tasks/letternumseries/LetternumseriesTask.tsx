@@ -156,7 +156,7 @@ export const LetternumseriesTask: React.FC<CognitiveTaskProps> = ({ taskContext,
     </div>
   ) : null
 
-  if (phase === 'instruction') return <CognitiveTaskIntro title="字母数字序列" description={<p>字母和数字会混在一起逐个出现。停止后分两步回忆：先把字母按 A→Z 的顺序选出来，再把数字按从小到大选出来。像把一串混排标签重新分组，这里是看屏幕后整理顺序的小游戏，不是听力或标准韦氏测验。</p>} hint={<><p>回忆阶段不限时；练习不计入成绩。</p></>} onAction={startPractice} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="字母数字序列" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>字母和数字会混在一起逐个出现。停止后分两步回忆：先把字母按 A→Z 的顺序选出来，再把数字按从小到大选出来。像把一串混排标签重新分组，这里是看屏幕后整理顺序的小游戏，不是听力或标准韦氏测验。</p>) : (<p>字母和数字会混在一起逐个出现。停止后分两步回忆：先把字母按 A→Z 的顺序选出来，再把数字按从小到大选出来。</p>)} hint={<><p>回忆阶段不限时；练习不计入成绩。</p></>} onAction={startPractice} />
   if (phase === 'blocked') return <div className="card p-8 max-w-2xl text-center"><p className="text-gray-700 mb-4">练习未完成，本次正式测评未开始。</p><button type="button" className="btn-secondary" onClick={() => window.history.back()}>返回</button></div>
 
   if (phase === 'practice') {

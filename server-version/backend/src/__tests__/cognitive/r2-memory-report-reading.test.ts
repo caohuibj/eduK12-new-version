@@ -9,8 +9,8 @@ import type { CognitiveParticipantPresentationV1 } from '../../modules/cognitive
 import type { CognitiveProfile, CognitiveScoreResult } from '../../modules/cognitive/v2/types';
 const keys = ['digitbackward', 'picturesequence', 'pairedassociate', 'wordlist', 'runningspan', 'sentencecheck', 'seqlearn', 'letternumseries', 'visualwm', 'auditoryrt', 'auditorynback'];
 const load = async (key: string) => {
-    const { participantPresentations } = await import(`../../modules/cognitive/tasks/${key}/participant-presentation-r2.ts`);
-    const presentation = participantPresentations[0] as CognitiveParticipantPresentationV1;
+    const { participantPresentations } = await import(`../../modules/cognitive/tasks/${key}/participant-presentation.ts`);
+    const presentation = participantPresentations.find((p: CognitiveParticipantPresentationV1) => p.reportReading?.version === '3.0.0') as CognitiveParticipantPresentationV1;
     const entry = requireCognitiveRegistryEntry(key, presentation.engineVersion, presentation.scoringVersion);
     const definition = buildCognitiveV2TaskDefinition(entry);
     const fixture = JSON.parse(readFileSync(new URL(`../../modules/cognitive/tasks/${key}/fixtures/${presentation.engineVersion}-${presentation.scoringVersion}.json`, import.meta.url), 'utf8')).cases[0].input;
@@ -31,7 +31,7 @@ describe('R2 memory and audio participant reports', () => {
     it('renders new text using actual scorer fixtures and resolvable metric placeholders', async () => {
         for (const key of keys) {
             const report = await render(key);
-            expect(report.reading?.reportVersion, key).toBe('2.0.0');
+            expect(report.reading?.reportVersion, key).toBe('3.0.0');
             expect(report.reading?.feedback.summary, key).not.toMatch(/\{\w+\}|undefined|NaN|毫秒 毫秒/);
             const { presentation, entry } = await load(key);
             expect(Object.keys(presentation.metrics).sort(), key).toEqual(Object.keys(entry.metricDefinitions).sort());
@@ -57,41 +57,35 @@ describe('R2 memory and audio participant reports', () => {
         expect([...audio.headline, ...audio.user].find(m => m.key === 'nonmatchCount')?.value).toBe(8);
         expect([...audio.headline, ...audio.user, ...audio.detail].some(m => m.key === 'dPrime')).toBe(false);
     });
-    it('keeps old frozen wording and config unchanged while freezing R2 separately', async () => {
+    it('keeps old frozen wording while an explicit new config freezes R3 separately', async () => {
         const beforeKey = process.env.DATA_ENCRYPTION_KEY;
         process.env.DATA_ENCRYPTION_KEY = '1'.repeat(64);
         try {
             for (const key of keys) {
                 const { entry, presentation, fixture } = await load(key);
-                const live = resolveParticipantPresentation(entry)!;
-                const old = structuredClone(live);
                 const oldDefinition = JSON.stringify(entry.reportDefinition);
                 const before = freezeAssignmentProfile({ entry, baseConfig: fixture.config, profile: 'experience' });
                 const oldFrozen = readFrozenReport(before.resolvedReportSnapshotEncrypted)!;
+                const config = { ...fixture.config, report: { ...fixture.config.report, reportVersion: '3.0.0' } };
+                const next = freezeAssignmentProfile({ entry, baseConfig: config, profile: 'experience' });
+                const newFrozen = readFrozenReport(next.resolvedReportSnapshotEncrypted)!;
+                expect(newFrozen.presentationVersion, key).toBe('3.0.0');
+                expect(newFrozen.participantPresentation!.reportReading!.version, key).toBe('3.0.0');
+                expect(next.resolvedConfigHash, key).not.toBe(before.resolvedConfigHash);
+                const { report: oldReport, ...oldParameters } = before.resolvedConfig as Record<string, unknown>;
+                const { report: newReport, ...newParameters } = next.resolvedConfig as Record<string, unknown>;
+                expect(newParameters, key).toEqual(oldParameters);
+                expect(JSON.stringify(entry.reportDefinition), key).toBe(oldDefinition);
+                const title = presentation.reportReading!.title;
                 try {
-                    Object.assign(live, structuredClone(presentation)); // Emulates the integrator's generated manifest binding.
-                    const next = freezeAssignmentProfile({ entry, baseConfig: fixture.config, profile: 'experience' });
-                    const newFrozen = readFrozenReport(next.resolvedReportSnapshotEncrypted)!;
-                    expect(newFrozen.presentationVersion, key).toBe('2.0.0');
-                    expect(newFrozen.participantPresentation!.reportReading!.version, key).toBe('2.0.0');
-                    expect(next.resolvedConfigHash, key).toBe(before.resolvedConfigHash);
-                    expect(JSON.stringify(entry.reportDefinition), key).toBe(oldDefinition);
-                    live.reportReading!.title = 'later live edit';
+                    presentation.reportReading!.title = 'later live edit';
                     expect(readFrozenReport(next.resolvedReportSnapshotEncrypted), key).toEqual(newFrozen);
                     expect(readFrozenReport(before.resolvedReportSnapshotEncrypted), key).toEqual(oldFrozen);
-                }
-                finally {
-                    for (const field of Object.keys(live))
-                        delete (live as unknown as Record<string, unknown>)[field];
-                    Object.assign(live, old);
-                }
+                } finally { presentation.reportReading!.title = title; }
             }
-        }
-        finally {
-            if (beforeKey === undefined)
-                delete process.env.DATA_ENCRYPTION_KEY;
-            else
-                process.env.DATA_ENCRYPTION_KEY = beforeKey;
+        } finally {
+            if (beforeKey === undefined) delete process.env.DATA_ENCRYPTION_KEY;
+            else process.env.DATA_ENCRYPTION_KEY = beforeKey;
         }
     });
 });

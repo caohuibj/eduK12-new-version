@@ -1,5 +1,7 @@
 # R4 报告润色与模式核对（11项）
 
+> 集成说明：本页保留交接阶段事实与证据；最终当前身份、显式R3选择与待核问题以[47项汇总](../cognitive/reports-47-20261101/README.md)为准。
+
 基线：#480 `b42393cffe1c4364c1fc5568b656ed612fc60849`。本分支仅增加报告/说明R3及必要的冻结选择接线；不修改刺激、计分、练习或profile参数，不代表发布、效度或可靠性验证。后续其他组在同一独立Draft PR集成。
 
 每项新增 `configVersion=<原配置>-report3`、`config.report.reportVersion=3.0.0`、`presentationVersion=3.0.0`、`reportReading.version=3.0.0`；状态DRAFT、referenceMode=none。原C/S、原配置、旧报告文字完整保留。无R选择继续使用原呈现；显式R3才冻结新版。历史冻结报告直接读取原snapshot。没有另建任务平台或安装/发布门禁。
