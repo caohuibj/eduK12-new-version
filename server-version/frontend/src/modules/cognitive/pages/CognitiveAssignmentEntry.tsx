@@ -1,6 +1,6 @@
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import { useCognitiveEnabled } from '../../../contexts/CapabilitiesContext'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ArrowLeft, Play, RotateCcw } from 'lucide-react'
 import { cognitiveApi } from '../api'
@@ -22,9 +22,9 @@ import type { CognitiveAssignmentSummary, CognitiveSession } from '../types'
  *    避免首次开始即误报 RECOVERY_REQUIRED）。
  */
 
-const CognitiveAssignmentEntry: React.FC = () => {
+const CognitiveAssignmentEntryContent: React.FC<{ assignmentId?: string }> = ({ assignmentId }) => {
   const cognitiveEnabled = useCognitiveEnabled()
-  const { assignmentId } = useParams<{ assignmentId: string }>()
+  const active = useRef(true)
   const [loading, setLoading] = useState(true)
   const [assignment, setAssignment] = useState<CognitiveAssignmentSummary | null>(null)
   const learner = useTrainingLearnerNavigation({ courseId: assignment?.courseId })
@@ -36,6 +36,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
   const [ledgerStatus, setLedgerStatus] = useState<string | null>(null)
 
   useEffect(() => {
+    active.current = true
     if (!assignmentId) return
     let cancelled = false
     const fetchAssignment = async () => {
@@ -63,6 +64,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
     }
     return () => {
       cancelled = true
+      active.current = false
     }
   }, [assignmentId])
 
@@ -72,6 +74,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
     setError(null)
     try {
       const response = await cognitiveApi.createSession(assignmentId)
+      if (!active.current) return
       if (response.code !== 0 || !response.data) {
         const code = (response as unknown as { statusCode?: number }).statusCode
         setError(code === 409 ? '已达到最大测评次数' : (response.message || '无法开始或继续测评'))
@@ -82,6 +85,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
       writeSessionLedger(session.sessionId, { status: session.status, trialIndex: -1 })
       navigate(`/student/cognitive/sessions/${session.sessionId}`)
     } catch (err) {
+      if (!active.current) return
       const status = (err as { statusCode?: number }).statusCode
       setError(
         status === 409
@@ -89,7 +93,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
           : (err as { message?: string }).message || '无法开始或继续测评'
       )
     } finally {
-      setSubmitting(false)
+      if (active.current) setSubmitting(false)
     }
   }, [assignmentId, navigate, submitting])
 
@@ -183,6 +187,11 @@ const CognitiveAssignmentEntry: React.FC = () => {
       </div>
     </div>
   )
+}
+
+const CognitiveAssignmentEntry: React.FC = () => {
+  const { assignmentId } = useParams<{ assignmentId: string }>()
+  return <CognitiveAssignmentEntryContent key={assignmentId} assignmentId={assignmentId} />
 }
 
 export default CognitiveAssignmentEntry

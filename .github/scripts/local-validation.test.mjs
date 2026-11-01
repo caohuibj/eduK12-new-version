@@ -51,11 +51,16 @@ test('unrelated documentation does not invalidate tooling evidence',()=>fixture(
  assert.equal(admit(signed,pub,base,git('rev-parse','HEAD')).checks[0].check,'release-tools');
 }));
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
-test('image selection changes use the existing tools recipe without Docker execution',()=>fixture(({base,head})=>{
- const commands=recipe('release-tools',base,head);
- assert(commands.some(argv=>argv.includes('.github/scripts/ci-image-plan.test.mjs')));
- assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
-},'.github/scripts/ci-image-plan.mjs'));
+test('image selection and Dockerfile-only changes use the existing tools recipe without Docker execution',()=>{
+ for(const file of ['.github/scripts/ci-image-plan.mjs','server-version/frontend/Dockerfile','server-version/backend/Dockerfile'])fixture(({base,head,payload})=>{
+  const commands=recipe('release-tools',base,head);
+  assert(commands.some(argv=>argv.includes('.github/scripts/ci-image-plan.test.mjs')),file);
+  assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
+  const signed=seal(payload,keys.privateKey);
+  fs.mkdirSync('server-version/frontend',{recursive:true});fs.writeFileSync('server-version/frontend/Dockerfile','FROM changed-input\n');git('add','.');git('commit','-m','changed frontend build input');
+  assert.throws(()=>admit(signed,pub,base,git('rev-parse','HEAD')),/inputs changed/);
+ },file);
+});
 test('dependency routing controls use their existing bounded tools contract',()=>fixture(({base,head})=>{
  const commands=recipe('release-tools',base,head);
  assert(commands.some(argv=>argv.includes('.github/scripts/dependency-routing.test.mjs')));

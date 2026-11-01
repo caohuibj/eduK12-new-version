@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runtimeRefreshPlan, verifyResolvedPlan } from './ci-image-plan.mjs';
-import { readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { buildSources, runtimeRefreshPlan, verifyResolvedPlan } from './ci-image-plan.mjs';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync, spawnSync } from 'node:child_process';
 const selections=[
   {frontendOnly:true,backendOnly:false,targets:['frontend'],scenario:'frontend'},
   {frontendOnly:false,backendOnly:true,targets:['backend','worker'],scenario:'backend'},
@@ -26,12 +29,89 @@ test('runtime refresh preserves source, tags and build arguments without mutatin
     assert.deepEqual(input,before);
     for (const [name,target] of Object.entries(plan.target)) {
       assert.deepEqual(target['no-cache-filter'],['runtime']); assert.equal(target['no-cache'],false);
-      assert.deepEqual(target.args, name === 'frontend' ? before.target[name].args
-        : {...before.target[name].args, DEBIAN_MIRROR: 'deb.debian.org'});
+      assert.deepEqual(target.args, {...before.target[name].args, NPM_REGISTRY: 'https://registry.npmjs.org',
+        ...(name === 'frontend' ? {ALPINE_MIRROR: ''} : {DEBIAN_MIRROR: 'deb.debian.org'})});
       for (const key of ['context','dockerfile','tags']) assert.deepEqual(target[key],before.target[name][key]);
     }
     verifyResolvedPlan(resolved(plan),frontendOnly,backendOnly);
   }
+});
+
+test('explicit regional sources reach only the selected image targets and resolved verification', () => {
+  const env = {DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn', NPM_REGISTRY: 'https://registry.npmmirror.com',
+    ALPINE_MIRROR: 'https://mirrors.tuna.tsinghua.edu.cn/alpine'};
+  for (const {frontendOnly,backendOnly,targets} of selections) {
+    const plan = resolved(runtimeRefreshPlan(fixture(frontendOnly,backendOnly), frontendOnly, backendOnly, env));
+    assert.deepEqual(Object.keys(plan.target), targets);
+    for (const name of targets) {
+      assert.equal(plan.target[name].args.NPM_REGISTRY, env.NPM_REGISTRY);
+      const arg = name === 'frontend' ? 'ALPINE_MIRROR' : 'DEBIAN_MIRROR';
+      assert.equal(plan.target[name].args[arg], env[arg]);
+      assert.equal(Object.hasOwn(plan.target[name].args, name === 'frontend' ? 'DEBIAN_MIRROR' : 'ALPINE_MIRROR'), false);
+      for (const source of ['NPM_REGISTRY', arg]) {
+        const changed = structuredClone(plan); delete changed.target[name].args[source];
+        assert.throws(() => verifyResolvedPlan(changed, frontendOnly, backendOnly, env), /Resolved build source changed/);
+      }
+    }
+    verifyResolvedPlan(plan, frontendOnly, backendOnly, env);
+  }
+});
+
+test('source parameters exclude credentials and preserve the Debian host/Alpine prefix contracts', () => {
+  assert.deepEqual(buildSources(), {DEBIAN_MIRROR:'deb.debian.org', NPM_REGISTRY:'https://registry.npmjs.org', ALPINE_MIRROR:''});
+  for (const env of [{DEBIAN_MIRROR:'mirrors.tuna.tsinghua.edu.cn/debian'},
+    {NPM_REGISTRY:'http://registry.npmmirror.com'}, {NPM_REGISTRY:'https://name:secret@example.invalid'},
+    {ALPINE_MIRROR:'https://example.invalid/alpine?key=value'}, {ALPINE_MIRROR:'https://example.invalid/alpine&replacement'}])
+    assert.throws(() => buildSources(env));
+});
+
+test('the existing C producer exposes matching source inputs and Alpine keeps signed security updates', () => {
+  const workflow = readFileSync(new URL('../workflows/ci-images.yml', import.meta.url), 'utf8');
+  for (const name of ['debian_mirror','npm_registry','alpine_mirror'])
+    assert.equal(workflow.match(new RegExp(`^      ${name}:$`, 'gm')).length, 2);
+  assert.match(workflow, /DEBIAN_MIRROR: \$\{\{ inputs\.debian_mirror/);
+  assert.match(workflow, /NPM_REGISTRY: \$\{\{ inputs\.npm_registry/);
+  assert.match(workflow, /ALPINE_MIRROR: \$\{\{ inputs\.alpine_mirror/);
+  const dockerfile = readFileSync(new URL('../../server-version/frontend/Dockerfile', import.meta.url), 'utf8');
+  assert.match(dockerfile, /ARG ALPINE_MIRROR=\n/);
+  assert.match(dockerfile, /if \[ -n "\$ALPINE_MIRROR" \]/);
+  assert.match(dockerfile, /\$\{ALPINE_MIRROR%\/\}/);
+  assert.match(dockerfile, /apk upgrade --no-cache/);
+  assert.match(dockerfile, /'libexpat>=2\.8\.5-r0'/);
+  assert.doesNotMatch(dockerfile, /--allow-untrusted|--no-check-certificate/);
+});
+
+test('the existing CLI forwards regional environment for frontend backend and full selection without Docker', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'eduk12-image-plan-'));
+  try {
+    const file = join(directory, 'plan.json');
+    const sources = {DEBIAN_MIRROR:'mirrors.tuna.tsinghua.edu.cn', NPM_REGISTRY:'https://registry.npmmirror.com',
+      ALPINE_MIRROR:'https://mirrors.tuna.tsinghua.edu.cn/alpine'};
+    for (const {frontendOnly,backendOnly,targets} of selections) {
+      const input = fixture(frontendOnly,backendOnly);
+      for (const [name,target] of Object.entries(input.target))
+        target.context = fileURLToPath(new URL(`../../server-version/${name === 'frontend' ? 'frontend' : 'backend'}/`, import.meta.url));
+      writeFileSync(file, JSON.stringify(input));
+      const run = args => spawnSync(process.execPath, [fileURLToPath(new URL('./ci-image-plan.mjs', import.meta.url)), file, ...args],
+        {env:{...process.env, ...sources, FRONTEND_ONLY:String(frontendOnly), BACKEND_ONLY:String(backendOnly)}, encoding:'utf8'});
+      const generated = run([]);
+      assert.equal(generated.status, 0, generated.stderr);
+      assert.deepEqual(JSON.parse(generated.stdout).buildSources, sources);
+      assert.deepEqual(JSON.parse(generated.stdout).targets, targets);
+      const plan = JSON.parse(readFileSync(file, 'utf8'));
+      assert.deepEqual(Object.keys(plan.target), targets);
+      for (const name of targets) {
+        assert.equal(plan.target[name].args.NPM_REGISTRY, sources.NPM_REGISTRY);
+        const arg = name === 'frontend' ? 'ALPINE_MIRROR' : 'DEBIAN_MIRROR';
+        assert.equal(plan.target[name].args[arg], sources[arg]);
+      }
+      writeFileSync(file, JSON.stringify(resolved(plan)));
+      const verified = run(['--verify']);
+      assert.equal(verified.status, 0, verified.stderr);
+      assert.equal(JSON.parse(verified.stdout).verify, true);
+      assert.deepEqual(JSON.parse(verified.stdout).targets, targets);
+    }
+  } finally { rmSync(directory, {recursive:true, force:true}); }
 });
 test('missing refresh, whole-image cache bypass, wrong tags or publishing cannot pass resolved validation', () => {
   for (const change of [t=>delete t['no-cache-filter'],t=>t['no-cache']=true,t=>t.pull=false,

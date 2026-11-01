@@ -42,8 +42,8 @@
 
 ## 下载来源铁律（2026-10-13 用户确认）
 
-- **只有生产服务器使用清华或可信大陆镜像；GitHub Actions 一律使用官方源。** GitHub 包括托管与自托管 runner、所有工作流、脚本、Docker build stage、浏览器和工具安装；不因产物叫“生产镜像”而在 GitHub 切换大陆源。本机开发也使用官方源。
-- 完整规则唯一维护来源为 `docs/release/README.md`。GitHub Debian 使用签名官方 `deb.debian.org`/`debian-security`，npm 使用 `https://registry.npmjs.org`，浏览器、工具及基础镜像使用厂商官方发行入口。
+- **默认只有生产服务器使用清华或可信大陆镜像，GitHub Actions 使用官方源。** 现有 C 镜像 producer 可通过显式源参数选择地域镜像，默认及其他工作流不变，详见 `docs/release/README.md`。不因产物叫“生产镜像”自动切源；本机开发仍用官方源。
+- 完整规则唯一维护来源为 `docs/release/README.md`。除上述显式 C 镜像参数外，GitHub Debian 使用签名官方 `deb.debian.org`/`debian-security`，npm 使用 `https://registry.npmjs.org`，浏览器、工具及基础镜像使用厂商官方发行入口。
 - GitHub 明确设置 npm registry 和 `replace-registry-host=always`，让锁文件中的历史镜像地址服从官方源；Docker npm 安装同样遵循显式 `NPM_REGISTRY`。依赖版本、锁文件 integrity、TLS、签名和原 HIGH/CRITICAL 扫描要求保持有效。
 - 生产服务器位于大陆，按当次授权优先使用可信大陆镜像/受控加速入口，保留版本及校验；不可用时说明原因并使用官方源。规则修改不授权部署或在生产重新构建已合格产物。
 
