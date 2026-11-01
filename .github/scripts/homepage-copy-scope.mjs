@@ -13,6 +13,7 @@ export const copyTools = new Set([
   '.github/scripts/merge-gate.mjs', '.github/workflows/ci.yml', 'docs/release/README.md',
   '.github/workflows/scale-onboarding-boundary.yml', '.github/scripts/content-workflows.test.mjs',
   '.github/scripts/school-teacher-native.test.mjs',
+  '.github/workflows/ci-frontend.yml', '.github/scripts/content-scope.test.mjs',
   'server-version/scripts/release/policy.mjs', 'docs/ci-runner-policy.md',
 ]);
 const git = (...args) => execFileSync('git', args, {encoding:'utf8'}).trim();
@@ -137,7 +138,7 @@ const publicImport = name => new Set(['react','lucide-react',
  './SurveyAppearance','./survey-appearance-links','../products/origins','./school-features','./teacher-features','./survey-features','./featureContent',
 ]).has(name) || /^\.\/[a-zA-Z0-9_-]+\.(?:css|webp)$/.test(name);
 
-export function publicRenderBoundary(before,after) {
+export function publicRenderBoundary(before,after,{sameNonRendering=false}={}) {
  const ts=require('typescript');
  function behavior(text) {
   const ast=parse(text);if(!ast)return null;
@@ -191,6 +192,17 @@ export function publicRenderBoundary(before,after) {
    ts.forEachChild(n,visit);
   }
   visit(ast);return invalid?null:opaque.map(compact);
+ }
+ if(sameNonRendering) {
+  const shape=text=>{
+   const tree=parse(text);if(!tree)return null;
+   const result=ts.transform(tree,[context=>root=>ts.visitNode(root,function visit(node){
+    if(ts.isJsxElement(node)||ts.isJsxSelfClosingElement(node)||ts.isJsxFragment(node))return ts.factory.createIdentifier('PRESENTATION');
+    return ts.visitEachChild(node,visit,context);
+   })]);
+   try{return tokens(ts.createPrinter({removeComments:true}).printFile(result.transformed[0]));}finally{result.dispose();}
+  };
+  if(before==null||shape(before)!==shape(after))return false;
  }
  const next=behavior(after);if(!next)return false;
  const old=before==null?[]:behavior(before);if(!old)return false;
