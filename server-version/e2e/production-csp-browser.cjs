@@ -4,8 +4,6 @@ const assert=require('node:assert/strict')
 const fs=require('node:fs')
 const path=require('node:path')
 const http=require('node:http')
-const os=require('node:os')
-const {spawnSync}=require('node:child_process')
 const {chromium}=require('../backend/node_modules/playwright-core')
 const root=path.resolve(__dirname,'..'), frontend=path.join(root,'frontend')
 const config=fs.readFileSync(path.join(frontend,'nginx.conf'),'utf8')
@@ -13,7 +11,8 @@ const policy=config.match(/add_header Content-Security-Policy "([^"]+)" always;/
 assert.ok(policy,'production CSP must be enforced')
 assert.ok(!policy.includes("'unsafe-eval'"),'string evaluation must stay disabled')
 assert.ok(!config.includes('Content-Security-Policy-Report-Only'))
-const temp=fs.mkdtempSync(path.join(os.tmpdir(),'eduk12-csp-'))
+// Fixed synthetic H.264 fixture: playback is tested, not FFmpeg installation.
+const hlsFixture=path.join(__dirname,'fixtures','csp-hls')
 function pdf(){
  const stream='0 0 1 rg 5 5 80 40 re f\n'
  const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 160 90] /Contents 4 0 R >>','<< /Length '+Buffer.byteLength(stream)+' >>\nstream\n'+stream+'endstream']
@@ -60,8 +59,6 @@ window.negativeDone=true;
 `
 let browser,server
 async function main(){
- const result=spawnSync('ffmpeg',['-hide_banner','-loglevel','error','-f','lavfi','-i','color=c=blue:s=160x90:r=25','-t','1','-an','-c:v','libx264','-pix_fmt','yuv420p','-f','hls','-hls_time','1','-hls_list_size','0',path.join(temp,'probe.m3u8')])
- assert.equal(result.status,0,'ffmpeg required for real HLS playback')
  const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.pdf':'application/pdf','.m3u8':'application/vnd.apple.mpegurl','.ts':'video/mp2t','.wasm':'application/wasm','.woff':'font/woff','.woff2':'font/woff2','.svg':'image/svg+xml'}
  server=http.createServer((req,res)=>{
   res.setHeader('Content-Security-Policy',policy);res.setHeader('X-Content-Type-Options','nosniff')
@@ -79,7 +76,7 @@ async function main(){
    '/compat/pdf.mjs':path.join(frontend,'node_modules/pdfjs-dist/build/pdf.mjs'),
    '/compat/pdf.worker.min.mjs':path.join(frontend,'node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),
    '/compat/hls.mjs':path.join(frontend,'node_modules/hls.js/dist/hls.mjs'),
-   '/compat/probe.m3u8':path.join(temp,'probe.m3u8'),'/compat/probe0.ts':path.join(temp,'probe0.ts')
+   '/compat/probe.m3u8':path.join(hlsFixture,'probe.m3u8'),'/compat/probe0.ts':path.join(hlsFixture,'probe0.mpegts')
   }
   if(pathname==='/compat/probe.pdf')return send('application/pdf',pdf())
   let file=compat[pathname]
@@ -112,5 +109,4 @@ async function main(){
 main().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{
  if(browser)await browser.close()
  if(server)await new Promise(resolve=>server.close(resolve))
- fs.rmSync(temp,{recursive:true,force:true})
 })

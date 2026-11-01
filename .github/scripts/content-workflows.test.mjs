@@ -416,7 +416,9 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
   assert.match(part,/redis:/);
   assert.match(part,/ci-artifact\.mjs\" verify backend/);
   assert.match(part,/ci-artifact\.mjs\" verify frontend/);
-  assert.match(part,/timeout -k 10s 180s sudo -n apt-get install/);
+  const csp=part.slice(part.indexOf('      - name: enforced production CSP browser acceptance'),part.indexOf('      - name: administrator virtual CTAP2'));
+  assert.match(csp,/node e2e\/production-csp-browser\.cjs/);
+  assert.doesNotMatch(csp,/apt-get|ffmpeg/);
   assert.match(job(source('ci'),'browser'),/uses: \.\/\.github\/workflows\/ci-browser\.yml/);
   const dependencies=jobNeeds(job(source('ci'),'merge-gate'));
   for(const name of ['scope','backend-regression','frontend-build','frontend','browser','docker'])
