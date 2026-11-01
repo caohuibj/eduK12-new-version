@@ -1,6 +1,7 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {post356Plan,post356Outputs,files,baseSHA,branch} from './post356-scope.mjs';
+import {post356Plan,post356Outputs,files,baseSHA,branch,productMerge,controlMerge} from './post356-scope.mjs';
+import {classifyChanges} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const head='a'.repeat(40),source='b'.repeat(40);
 const env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_PR_NUMBER:'999',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version',CI_SOURCE_HEAD:source};
@@ -41,6 +42,29 @@ test('control-only repair forbids application changes and shallow post-merge fet
  assert.throws(()=>post356Plan([...controlEntries,entries[0]],controlBase,head,read,e));
  assert.throws(()=>post356Plan(controlEntries,controlBase,head,(...a)=>a[1]===head+':server-version/backend'?'e'.repeat(40):read(),e));
  const calls=[];const mergeRead=(...a)=>{calls.push(a);return a[0]==='cat-file'?`tree ${'c'.repeat(40)}\nparent ${controlBase}\nparent ${source}\n\nmerge`:read()};
- const plan=post356Plan(controlEntries,controlBase,head,mergeRead,{CI_EVENT:'push',GITHUB_REF_NAME:'main'});
- assert.equal(plan.postMerge,true);assert(calls.some(a=>JSON.stringify(a)===JSON.stringify(['fetch','--no-tags','--depth=2','origin',head])));
+ const plan=post356Plan(controlEntries,controlBase,controlMerge,mergeRead,{CI_EVENT:'push',GITHUB_REF_NAME:'main'});
+ assert.equal(plan.postMerge,true);assert(calls.some(a=>JSON.stringify(a)===JSON.stringify(['fetch','--no-tags','--depth=2','origin',controlMerge])));
 })
+
+test('current maintenance of historical controls reaches ordinary routing without reading frozen candidates',()=>{
+ const controls=['.github/scripts/post356-scope.mjs','.github/scripts/post356-scope.test.mjs'].map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+ for(const event of [{CI_EVENT:'pull_request',CI_HEAD_REF:'fix/current-maintenance'},{CI_EVENT:'push',GITHUB_REF_NAME:'main'}])
+  assert.equal(post356Plan(controls,'d'.repeat(40),head,()=>assert.fail('unrelated candidate must not read Git'),event),null);
+ const changes=[...controls,{file:'server-version/scripts/host-ops/monitor.py',status:'M',oldMode:'100644',newMode:'100644'}];
+ assert.equal(classifyChanges(changes).maintenance,true);
+ assert.equal(classifyChanges(controls).maintenance,false);
+});
+
+test('both historical identities retain base and missing-control rejection',async()=>{
+ const {controlBranch,controlBase}=await import('./post356-scope.mjs');
+ for(const ref of [branch,controlBranch]){
+  assert.throws(()=>post356Plan(entries,'d'.repeat(40),head,read,{...env,CI_HEAD_REF:ref}),/Frozen base drift/);
+  assert.throws(()=>post356Plan([],baseSHA,head,read,{...env,CI_HEAD_REF:ref}),/scope missing/);
+ }
+ for(const [merge,base] of [[productMerge,baseSHA],[controlMerge,controlBase]]){
+  const selected=merge===productMerge?entries:(await import('./post356-scope.mjs')).controlFiles.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+  const reader=(...a)=>a[0]==='cat-file'?`tree ${'c'.repeat(40)}\nparent ${base}\nparent ${source}\n\nmerge`:read();
+  assert.equal(post356Plan(selected,base,merge,reader,{CI_EVENT:'push',GITHUB_REF_NAME:'main'}).postMerge,true);
+  assert.throws(()=>post356Plan(selected,'d'.repeat(40),merge,reader,{CI_EVENT:'push',GITHUB_REF_NAME:'main'}),/Frozen base drift/);
+ }
+});

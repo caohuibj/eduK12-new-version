@@ -6,6 +6,7 @@ import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { readBoundHuiteacherFieldForm } from './fieldForm.service'
 import {createCanonicalFieldEvidence} from './fieldComposition.evidence'
+import { fieldEventAccessAllowed } from './fieldEventAccess'
 
 type Tx=Prisma.TransactionClient
 export type TeacherObserverRole='EXPERT'|'PEER'
@@ -70,6 +71,7 @@ async function activeObserver(tx:Tx,input:{
       AND grant_row."status"='ACCEPTED'
       AND grant_row."expires_at">statement_timestamp()
       AND grant_row."revoked_at" IS NULL
+      AND ${fieldEventAccessAllowed(input.organizationId,input.userId)}
     FOR SHARE
   `
   if(rows.length)return rows[0]

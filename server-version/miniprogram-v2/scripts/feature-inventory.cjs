@@ -48,5 +48,14 @@ function scan(relative,organization=false){
 scan('server-version/frontend/src/App.tsx');scan('server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx',true)
 for(const row of rows)if(row.implementationType==='NATIVE'&&!row.miniDestination)row.implementationType='PENDING_PARITY_REVIEW'
 const target=path.join(root,'docs/miniprogram-v2/web-feature-inventory.json'),content=JSON.stringify({baseline:'1ff0e8ef',generatedFrom:['server-version/frontend/src/App.tsx','server-version/frontend/src/pages/organization/OrganizationProductRoutes.tsx'],note:'Route evidence does not prove complete parity. LOCAL means local implementation/tests only; all native compile/device gates pending. Pending authoring/media/governance are retained explicitly.',features:rows},null,2)+'\n'
-if(process.argv.includes('--check')){if(fs.readFileSync(target,'utf8')!==content)throw new Error('Feature inventory is stale')}else fs.writeFileSync(target,content)
+function semanticInventory(value){
+ const inventory=JSON.parse(value)
+ if(!Array.isArray(inventory.features))throw new Error('Invalid feature inventory')
+ inventory.features=inventory.features.map(feature=>{
+  if(typeof feature.source!=='string'||!/^.+:[1-9][0-9]*$/.test(feature.source))throw new Error('Invalid feature source locator')
+  return {...feature,source:feature.source.replace(/:[1-9][0-9]*$/,':LINE')}
+ })
+ return JSON.stringify(inventory)
+}
+if(process.argv.includes('--check')){if(semanticInventory(fs.readFileSync(target,'utf8'))!==semanticInventory(content))throw new Error('Feature inventory is stale')}else fs.writeFileSync(target,content)
 console.log('Web route inventory: '+rows.length+' routes')

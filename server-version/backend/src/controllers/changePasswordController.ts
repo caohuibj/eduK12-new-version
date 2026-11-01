@@ -12,7 +12,7 @@ export async function changePasswordHandler(req: Request, res: Response) {
     return success(res, null, '密码修改成功')
   } catch (cause) {
     if (cause instanceof PasswordChangeError) {
-      return cause.unauthenticated ? unauthorized(res) : error(res, cause.message)
+      return cause.unauthenticated ? unauthorized(res) : error(res, cause.message, -1, cause.statusCode)
     }
     logger.error('修改密码错误', cause)
     return error(res, Messages.COMMON.FAILED)

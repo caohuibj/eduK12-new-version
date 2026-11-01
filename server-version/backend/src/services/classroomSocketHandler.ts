@@ -340,8 +340,31 @@ export class ClassroomSocketHandler {
     }
   }
 
+  private async authorizeStudentIdentity(socket: Socket, studentId?: string): Promise<boolean> {
+    // A failed signed session must never fall through to anonymous participation.
+    if (socket.data.authenticationInvalidated !== true && socket.data.authenticated !== true) return true
+    if (socket.data.authenticationInvalidated === true ||
+      !(await socketService.refreshAuthenticatedSocket(socket))) {
+      socket.data.authenticationInvalidated = true
+      this.emitError(socket, '学生登录会话已失效，请重新登录')
+      return false
+    }
+    if (socket.data.userRole !== UserRole.STUDENT) {
+      this.emitError(socket, '学生连接身份无效')
+      return false
+    }
+    if (typeof socket.data.userId !== 'string' ||
+      (studentId !== undefined && socket.data.userId !== studentId)) {
+      socket.data.authenticationInvalidated = true
+      this.emitError(socket, '学生登录会话已失效，请重新登录')
+      return false
+    }
+    return true
+  }
+
   private async handleStudentJoin(socket: Socket, data: unknown): Promise<void> {
     try {
+      if (!(await this.authorizeStudentIdentity(socket))) return
       if (socket.data.clientRole) {
         this.emitError(socket, '当前 Socket 已加入课堂')
         return
@@ -740,6 +763,7 @@ export class ClassroomSocketHandler {
       const classroomId = socket.data.classroomId
       const sessionId = socket.data.sessionId
       const studentId = socket.data.studentId
+      if (!(await this.authorizeStudentIdentity(socket, studentId))) return
       const questionId = readString(data, 'questionId')
       const answer = asRecord(data).answer
 

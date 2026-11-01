@@ -21,6 +21,9 @@ on:
       affected_only:
         type: boolean
         default: false
+      cognitive_owned_by_backend:
+        type: boolean
+        default: false
       runner_labels:
         type: string
         required: true
@@ -111,8 +114,11 @@ jobs:
           done
           exit 1
       - name: full frontend tests
-        if: inputs.survey_selection != true && inputs.affected_only != true
+        if: inputs.survey_selection != true && inputs.affected_only != true && inputs.cognitive_owned_by_backend != true
         run: npm test
+      - name: frontend tests excluding exact onboarding-owned suites
+        if: inputs.survey_selection != true && inputs.affected_only != true && inputs.cognitive_owned_by_backend
+        run: node ../scripts/cognitive/frontend-tests.cjs --onboarding-owned-by-backend
       - name: dependency-related frontend tests
         if: inputs.affected_only && inputs.catalog_discovery != true
         run: |

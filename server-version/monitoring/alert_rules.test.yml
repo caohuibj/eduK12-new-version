@@ -1,0 +1,55 @@
+rule_files:
+  - alert_rules.yml
+evaluation_interval: 1m
+tests:
+  - name: low traffic ten percent failures
+    interval: 1m
+    input_series:
+      - series: 'ptool_api_requests_total{status="200"}'
+        values: '0+5.4x15'
+      - series: 'ptool_api_requests_total{status="500"}'
+        values: '0+0.6x15'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: EduK12Api5xxRateHigh
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: EduK12Api5xxRateHigh
+        exp_alerts:
+          - exp_labels: {severity: critical, service: backend}
+            exp_annotations: {summary: API 5xx rate exceeded 5 percent for five minutes}
+  - name: zero traffic remains quiet
+    interval: 1m
+    input_series:
+      - series: 'ptool_api_requests_total{status="200"}'
+        values: '0+0x15'
+      - series: 'ptool_api_requests_total{status="500"}'
+        values: '0+0x15'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: EduK12Api5xxRateHigh
+        exp_alerts: []
+  - name: ordinary traffic one percent stays quiet
+    interval: 1m
+    input_series:
+      - series: 'ptool_api_requests_total{status="200"}'
+        values: '0+594x15'
+      - series: 'ptool_api_requests_total{status="500"}'
+        values: '0+6x15'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: EduK12Api5xxRateHigh
+        exp_alerts: []
+  - name: ordinary traffic ten percent failures
+    interval: 1m
+    input_series:
+      - series: 'ptool_api_requests_total{status="200"}'
+        values: '0+540x15'
+      - series: 'ptool_api_requests_total{status="500"}'
+        values: '0+60x15'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: EduK12Api5xxRateHigh
+        exp_alerts:
+          - exp_labels: {severity: critical, service: backend}
+            exp_annotations: {summary: API 5xx rate exceeded 5 percent for five minutes}

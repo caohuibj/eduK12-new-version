@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {seal,authenticate,admit,binding,recipe,toolingBackendTests} from './local-validation.mjs';
+import {seal,authenticate,admit,binding,recipe,toolingBackendTests,fromEnvironment} from './local-validation.mjs';
 import {classifyChanges} from './content-scope.mjs';
 import {classify} from '../../server-version/scripts/release/policy.mjs';
 import {requiredChecks} from './merge-gate.mjs';
@@ -22,7 +22,7 @@ function fixture(fn,file='.github/scripts/contract.mjs') {
   git('add','.');git('commit','-m','isolated base');const base=git('rev-parse','HEAD');
   fs.writeFileSync(file,'export const v=2;\n');git('add','.');git('commit','-m','isolated candidate');const head=git('rev-parse','HEAD');
   const record={check:'release-tools',status:'success',binding:binding('release-tools',base,head),logSha256:'a'.repeat(64),commands:recipe('release-tools',base,head).map(argv=>({argv,exitCode:0,seconds:0.01}))};
-  const payload={schema:1,repository:'caohuibj/eduK12-new-version',base,head,checks:[record]};
+  const payload={schema:1,repository:'caohuibj/eduK12-new-version',base,head,branch:git('branch','--show-current'),checks:[record]};
   fn({base,head,payload,record});
  } finally {process.chdir(cwd);fs.rmSync(dir,{recursive:true,force:true})}
 }
@@ -49,6 +49,29 @@ test('consumed code or configuration change fails without automatic retest',()=>
 test('unrelated documentation does not invalidate tooling evidence',()=>fixture(({base,payload})=>{
  const signed=seal(payload,keys.privateKey);fs.writeFileSync('AGENTS.md','reworded guidance\n');git('add','.');git('commit','-m','docs only');
  assert.equal(admit(signed,pub,base,git('rev-parse','HEAD')).checks[0].check,'release-tools');
+}));
+
+test('an old merged receipt does not claim a new branch merely through ancestry',()=>fixture(({base,head,payload})=>{
+ git('checkout','-b','new-maintenance');fs.writeFileSync('.github/scripts/contract.mjs','export const v=3;\n');git('add','.');git('commit','-m','new tooling inputs');
+ const next=git('rev-parse','HEAD');assert.equal(spawnSync('git',['merge-base','--is-ancestor',head,next]).status,0);
+ const saved={...process.env};
+ try {
+  process.env.HUI_LOCAL_VALIDATION_PUBLIC_KEY=pub;process.env.HUI_LOCAL_VALIDATION_EVIDENCE=JSON.stringify(seal(payload,keys.privateKey));process.env.HUI_EVIDENCE_BRANCH='new-maintenance';
+  assert.deepEqual(fromEnvironment(base,next),{checks:[]});
+  process.env.HUI_LOCAL_VALIDATION_EVIDENCE=JSON.stringify({...seal(payload,keys.privateKey),signature:'tampered'});
+  assert.throws(()=>fromEnvironment(base,next),/Untrusted\/tampered/);
+ } finally {process.env=saved}
+}));
+
+test('exact head and nonancestor equivalent tree remain reusable across branches',()=>fixture(({base,head,payload})=>{
+ const saved={...process.env};
+ try {
+  process.env.HUI_LOCAL_VALIDATION_PUBLIC_KEY=pub;process.env.HUI_LOCAL_VALIDATION_EVIDENCE=JSON.stringify(seal(payload,keys.privateKey));process.env.HUI_EVIDENCE_BRANCH='different-branch';
+  assert.equal(fromEnvironment(base,head).checks.length,1);
+  const equivalent=git('commit-tree',git('rev-parse',head+'^{tree}'),'-p',base,'-m','independent equivalent tree');
+  assert.notEqual(spawnSync('git',['merge-base','--is-ancestor',head,equivalent]).status,0);
+  assert.equal(fromEnvironment(base,equivalent).checks.length,1);
+ } finally {process.env=saved}
 }));
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
 test('image selection and Dockerfile-only changes use the existing tools recipe without Docker execution',()=>{

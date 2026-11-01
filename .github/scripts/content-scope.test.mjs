@@ -115,7 +115,15 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   assert.match(frontend,/\['related','--run',\.\.\.files\]/);
   assert.doesNotMatch(frontend,/npm test -- --changed/);
   assert.match(frontend,/report\.numPassedTests>0/,'a missing related-test result cannot pass');
-  assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true\n        run: npm test/);
+  assert.match(frontend,/if: inputs\.survey_selection != true && inputs\.affected_only != true && inputs\.cognitive_owned_by_backend != true\n        run: npm test/);
+  const full=frontend.match(/name: full frontend tests\n        if: (.+)\n/)[1];
+  const partition=frontend.match(/name: frontend tests excluding exact onboarding-owned suites\n        if: (.+)\n/)[1];
+  for(const survey_selection of [false,true])for(const affected_only of [false,true])for(const cognitive_owned_by_backend of [false,true]){
+    const inputs={survey_selection,affected_only,cognitive_owned_by_backend};
+    const enabled=expression=>Boolean(new Function('inputs',`return (${expression})`)(inputs));
+    assert.equal(enabled(full),!survey_selection&&!affected_only&&!cognitive_owned_by_backend);
+    assert.equal(enabled(partition),!survey_selection&&!affected_only&&cognitive_owned_by_backend);
+  }
 });
 test('all three content domains and combined content qualify', () => {
   for (const file of [scale, cognitive, sjt]) assert.equal(classify([file]).content, true);

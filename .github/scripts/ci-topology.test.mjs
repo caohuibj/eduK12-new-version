@@ -5,13 +5,53 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import {runInNewContext} from 'node:vm';
-import { runnerPlan } from './content-scope.mjs';
+import { runnerPlan, acceptanceFor } from './content-scope.mjs';
 import { treeDigest, verifyManifest } from './ci-artifact.mjs';
 import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
 import { readNeeds, MAX_NEEDS_BYTES, requiredChecks, failedChecks } from './merge-gate.mjs';
+import {createRequire} from 'node:module';
+import {readdirSync} from 'node:fs';
+const require=createRequire(import.meta.url);
+const {assertAcceptanceReport}=require('../../server-version/scripts/cognitive/acceptance.cjs');
+const {frontendTestArguments}=require('../../server-version/scripts/cognitive/frontend-tests.cjs');
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
+test('Cognitive suite ownership partitions exact declared files and keeps both jobs mandatory',()=>{
+ const root=new URL('../../',import.meta.url).pathname;
+ const tasks=join(root,'server-version/backend/src/modules/cognitive/tasks');
+ const declared=[...new Set(readdirSync(tasks,{withFileTypes:true}).filter(entry=>entry.isDirectory()).flatMap(entry=>
+  JSON.parse(readFileSync(join(tasks,entry.name,'task-package.json'),'utf8')).acceptance.frontendSuites))].sort();
+ const args=frontendTestArguments(root);
+ assert.deepEqual(args.slice(0,2),['run','--maxWorkers=2']);assert(declared.length>0);
+ assert.deepEqual(args.slice(2).filter((_,index)=>index%2===0),declared.map(()=>'--exclude'));
+ assert.deepEqual(args.slice(2).filter((_,index)=>index%2===1),declared);
+ const scope={result:'success',outputs:{...Object.fromEntries(Object.keys(acceptanceFor([])).map(key=>[key,'false'])),
+  application_route:'legacy',scenario:'frontend',frontend:'true',content:'false',presentation:'false',documentation:'false',
+  maintenance:'false',frontend_test:'false',frontend_build:'true',ui_required:'false',visual_hosted:'false',codeql:'true',
+  runner_profile:'hosted',media_selection:'[]',media_groups:'[]'}};
+ const checks=requiredChecks({scope},false);
+ assert(checks.includes('backend-browser-build'));assert(checks.includes('frontend'));
+ const complete=Object.fromEntries(checks.map(name=>[name,name==='scope'?scope:{result:'success'}]));
+ assert.deepEqual(failedChecks(complete,false),[]);
+ for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...complete,'backend-browser-build':{result}},false).length);
+ const workflow=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
+ assert.match(workflow,/cognitive_owned_by_backend:\n\s+type: boolean\n\s+default: false/);
+ assert.match(workflow,/inputs\.cognitive_owned_by_backend != true\n\s+run: npm test/);
+ assert.match(workflow,/run: node \.\.\/scripts\/cognitive\/frontend-tests\.cjs --onboarding-owned-by-backend/);
+});
+
+test('Cognitive onboarding refuses missing failed skipped duplicate and empty declared suite results',()=>{
+ const cwd='/synthetic/frontend',suite='src/modules/cognitive/fixture.test.ts';
+ const report={success:true,testResults:[{name:join(cwd,suite),status:'passed',assertionResults:[{status:'passed'}]}]};
+ assert.doesNotThrow(()=>assertAcceptanceReport(report,cwd,[suite]));
+ for(const change of [
+  value=>{value.success=false},value=>{value.testResults=[]},value=>{value.testResults.push(value.testResults[0])},
+  value=>{value.testResults[0].status='failed'},value=>{value.testResults[0].assertionResults=[]},
+  ...['failed','pending','skipped','todo'].map(status=>value=>{value.testResults[0].assertionResults[0].status=status}),
+ ]){const value=structuredClone(report);change(value);assert.throws(()=>assertAcceptanceReport(value,cwd,[suite]),/COG_RUNNER_ACCEPTANCE_FAILED/)}
+});
+
 function mergeGateWriter() {
   const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   const gate=workflow.split('  merge-gate:\n')[1];

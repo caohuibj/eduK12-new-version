@@ -121,6 +121,16 @@ suite('Huiteacher PR4 human consensus — distinct experts, matching signature, 
     })).rejects.toThrow()
     const reviewed=await myHuiteacherConsensusReviews(a.id)
     expect(reviewed.list.some(x=>x.id===draft.id)).toBe(true)
+    for(const permission of ['*','EDUCATION_ACCESS','HUITEACHER_ACCESS']){
+      const denial=await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:org.id,
+        userId:a.id,permission,reason:'Synthetic reviewer access stop',deniedByUserId:manager.id}})
+      expect((await myHuiteacherConsensusReviews(a.id)).list.some(x=>x.id===draft.id)).toBe(false)
+      await expect(approveHuiteacherFieldConsensus({actorUserId:a.id,consensusId:draft.id,
+        expectedRevision:draft.revision,expectedDigest:draft.digest})).rejects.toMatchObject({statusCode:403})
+      expect(await db.huiteacherFieldConsensusApproval.count({where:{consensusId:draft.id}})).toBe(0)
+      await db.organizationAccessDeny.update({where:{id:denial.id},data:{liftedAt:new Date(),liftedByUserId:manager.id}})
+      expect((await myHuiteacherConsensusReviews(a.id)).list.some(x=>x.id===draft.id)).toBe(true)
+    }
     await expect(approveHuiteacherFieldConsensus({
       actorUserId:stranger.id,consensusId:draft.id,
       expectedRevision:draft.revision,expectedDigest:draft.digest,
@@ -133,6 +143,12 @@ suite('Huiteacher PR4 human consensus — distinct experts, matching signature, 
     expect(parallel.map(receipt=>receipt.replayed).sort()).toEqual([false,true])
     expect(await db.huiteacherFieldConsensusApproval.count({where:{consensusId:draft.id,observerUserId:a.id,revision:draft.revision}})).toBe(1)
     expect((await myHuiteacherConsensusReviews(a.id)).list.find(row=>row.id===draft.id)?.approvedByMe).toBe(true)
+    const deniedReplay=await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:org.id,
+      userId:a.id,permission:'HUITEACHER_ACCESS',reason:'Synthetic replay access stop',deniedByUserId:manager.id}})
+    await expect(approveHuiteacherFieldConsensus({actorUserId:a.id,consensusId:draft.id,
+      expectedRevision:draft.revision,expectedDigest:draft.digest})).rejects.toMatchObject({statusCode:403})
+    expect(await db.huiteacherFieldConsensusApproval.count({where:{consensusId:draft.id,observerUserId:a.id}})).toBe(1)
+    await db.organizationAccessDeny.update({where:{id:deniedReplay.id},data:{liftedAt:new Date(),liftedByUserId:manager.id}})
     expect((await approveHuiteacherFieldConsensus({
       actorUserId:a.id,consensusId:draft.id,expectedRevision:draft.revision,
       expectedDigest:draft.digest,

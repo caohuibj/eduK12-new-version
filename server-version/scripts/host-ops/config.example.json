@@ -15,6 +15,10 @@
     "eduk12-prod-postgres",
     "eduk12-prod-redis"
   ],
+  "runtime_container_roles": {
+    "eduk12-prod-backend": "backend",
+    "eduk12-prod-worker": "worker"
+  },
   "ready_urls": [
     "https://api.eduk12.top/ready",
     "https://eduk12.top/ready"

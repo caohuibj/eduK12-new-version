@@ -79,22 +79,40 @@ def collect(config):
         # Use inspect's restricted template: never collect Config.Env, logs or health bodies.
         template = '{{.Name}}|{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}|{{.RestartCount}}|{{.Image}}'
         template += '|{{json .NetworkSettings.Ports}}|{{json .HostConfig.Privileged}}|{{.HostConfig.NetworkMode}}'
+        template += '|{{index .Config.Labels "com.docker.compose.service"}}|{{.Id}}'
+        names = config["containers"]
+        roles = config.get("runtime_container_roles", {})
+        if (not isinstance(names, list) or not all(isinstance(name, str) and name for name in names)
+                or not isinstance(roles, dict) or len(set(names)) != len(names)
+                or any(name not in names or role not in ("backend", "worker") for name, role in roles.items())):
+            raise ValueError("runtime container roles")
         items = {}
-        for name in config["containers"]:
-            raw = command(["/usr/bin/docker", "inspect", "--format", template, name]).strip().split("|")
-            if len(raw) != 8:
-                raise ValueError("container metadata")
-            _, status, health, restarts, image, ports, privileged, network = raw
-            items[name] = {"status": status, "health": health, "restarts": int(restarts), "image": image}
-            bindings = json.loads(ports) or {}
-            exposed = any(b["HostIp"] not in ("127.0.0.1", "::1") for values in bindings.values() for b in (values or []))
-            unsafe = json.loads(privileged) or network == "host" or (name.endswith(("postgres", "redis")) and exposed)
-            checks.append(finding("isolation:" + name, "critical" if unsafe else "ok", {"unsafe": unsafe}))
-            checks.append(finding("container:" + name, "ok" if status == "running" and health in ("healthy", "none") else "critical",
-                                  {"status": status, "health": health}))
+        complete = True
+        legacy_roles = {"eduk12-prod-backend": "backend", "eduk12-prod-worker": "worker"}
+        for name in names:
+            try:
+                raw = command(["/usr/bin/docker", "inspect", "--format", template, name]).strip().split("|")
+                if len(raw) != 10:
+                    raise ValueError("container metadata")
+                _, status, health, restarts, image, ports, privileged, network, service, container_id = raw
+                role = roles.get(name, service if service in ("backend", "worker") else legacy_roles.get(name))
+                bindings = json.loads(ports) or {}
+                exposed = any(b["HostIp"] not in ("127.0.0.1", "::1") for values in bindings.values() for b in (values or []))
+                unsafe = json.loads(privileged) or network == "host" or (name.endswith(("postgres", "redis")) and exposed)
+                items[name] = {"id": container_id, "status": status, "health": health, "restarts": int(restarts), "image": image, "role": role}
+                checks.append(finding("isolation:" + name, "critical" if unsafe else "ok", {"unsafe": unsafe}))
+                checks.append(finding("container:" + name, "ok" if status == "running" and health in ("healthy", "none") else "critical",
+                                      {"status": status, "health": health}))
+            except Exception as exc:
+                complete = False
+                checks.append(finding("container:" + name, "critical", {"error_type": type(exc).__name__}))
         data["containers"] = items
-        matches = items["eduk12-prod-backend"]["image"] == items["eduk12-prod-worker"]["image"]
+        runtime = [item for item in items.values() if item["role"] in ("backend", "worker")]
+        matches = (complete and {item["role"] for item in runtime} == {"backend", "worker"}
+                   and len({item["image"] for item in runtime}) == 1)
         checks.append(finding("runtime_image_match", "ok" if matches else "critical", {"matches": matches}))
+        if not complete:
+            raise ValueError("incomplete container metadata")
     probe("collector:containers", containers)
 
     data["http"] = {}
@@ -275,6 +293,17 @@ def collect(config):
     return data, checks
 
 
+def restart_findings(current, previous):
+    checks = []
+    for name, item in current.items():
+        old = previous.get(name)
+        same_container = (old and item.get("id") and old.get("id") == item["id"]
+                          and old["image"] == item["image"])
+        delta = max(0, item["restarts"] - old["restarts"]) if same_container else 0
+        checks.append(finding("restarts:" + name, "warning" if delta > 0 else "ok", {"delta": delta}))
+    return checks
+
+
 def transitions(previous, checks, now, config):
     """Debounce outage/recovery; severity changes count as a new stable condition."""
     state, events = {}, []
@@ -353,11 +382,8 @@ def main():
                 checks.append(finding('collector:capacity_planning','critical',{'error_type':type(exc).__name__}))
         previous_file = state_dir / "state.json"
         previous = json.loads(previous_file.read_text()) if previous_file.exists() else {}
-        # Restart deltas refer to the same immutable container image, avoiding release resets.
-        for name, current in data.get("containers", {}).items():
-            old = previous.get("containers", {}).get(name)
-            delta = max(0, current["restarts"] - old["restarts"]) if old and old["image"] == current["image"] else 0
-            checks.append(finding("restarts:" + name, "warning" if delta >= 2 else "ok", {"delta": delta}))
+        # Replacements (even with the same image) start a new counter baseline.
+        checks.extend(restart_findings(data.get("containers", {}), previous.get("containers", {})))
         baseline = previous.get("integrity", {})
         integrity = {}
         for name in config["integrity_files"]:

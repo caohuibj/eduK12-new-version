@@ -104,7 +104,7 @@ export function fromEnvironment(base,head) {
  const sameBranch=p.branch&&p.branch===branch;
  if(spawnSync('git',['cat-file','-e',p.head+'^{commit}']).status!==0)execFileSync('git',['fetch','--no-tags','--depth=1','origin',p.head],{stdio:'pipe'});
  // Another branch has no claim; stale inputs on this branch stop without retest.
- if(!sameBranch && p.head!==head && spawnSync('git',['merge-base','--is-ancestor',p.head,head]).status!==0 && git('rev-parse',p.head+'^{tree}')!==git('rev-parse',head+'^{tree}')) return {checks:[]};
+ if(!sameBranch && p.head!==head && git('rev-parse',p.head+'^{tree}')!==git('rev-parse',head+'^{tree}')) return {checks:[]};
  return admit(JSON.parse(raw),process.env.HUI_LOCAL_VALIDATION_PUBLIC_KEY,base,head);
 }
 function runCommands(check,base,head) {
