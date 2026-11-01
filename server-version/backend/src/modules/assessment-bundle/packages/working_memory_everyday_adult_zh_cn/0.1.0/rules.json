@@ -1,0 +1,466 @@
+{
+  "version": "0.1.0",
+  "applicability": {
+    "op": "all",
+    "conditions": [
+      {
+        "op": "gte",
+        "evidenceKey": "context.age",
+        "value": 18
+      },
+      {
+        "op": "lte",
+        "evidenceKey": "context.age",
+        "value": 100
+      }
+    ]
+  },
+  "items": [
+    {
+      "ruleId": "spatial_record",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "spatial.trials"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "spatial.correct"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "空间序列｜这里记录按亮起顺序回忆的正式序列数和完全正确数。请结合本次长度范围与完成情况理解，不能把这一记录当作倒序操作或标准化能力排名。",
+      "evidenceKeys": [
+        "spatial.trials",
+        "spatial.correct"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "backward_record",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "backward.levels"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "backward.correct"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "倒背数字｜这里记录完整完成级数和完全正确序列数。冻结标准协议每级2试次；本草稿尚未显示派生序列总数与正确率，请勿把完成级数当作序列总数。",
+      "evidenceKeys": [
+        "backward.levels",
+        "backward.correct"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "everyday_record",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "gte",
+            "evidenceKey": "everyday.wm",
+            "value": 9
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "everyday.wm",
+            "value": 45
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "日常记忆组织｜ADEXI工作记忆九项合计范围9–45，较高表示本次报告的日常困难更多。这里保留合计，不改成官网均分；抑制维度在原14题单项报告中另行呈现。",
+      "evidenceKeys": [
+        "everyday.wm"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "wm1",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "everyday.wm"
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "everyday.wm",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "everyday.wm",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "spatial.trials",
+                "value": 2
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "spatial.correct",
+                "value": 0
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "backward.levels",
+                "value": 1
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "backward.correct",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "op": "gte",
+            "evidenceKey": "everyday.wm",
+            "value": 36
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "WM1｜日常记忆组织体验值得讨论。本次自评较多地报告了记住和组织信息的困难。两项任务提供的是各自协议中的事实，不能证明或否定这些体验。可以选一件最近需要反复确认步骤的事情，试着写成清单、设置提醒，再看看哪种支持最有帮助。",
+      "evidenceKeys": [
+        "spatial.trials",
+        "spatial.correct",
+        "backward.levels",
+        "backward.correct",
+        "everyday.wm"
+      ],
+      "supportRefs": [
+        "b15_design"
+      ]
+    },
+    {
+      "ruleId": "wm2",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "everyday.wm"
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "everyday.wm",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "everyday.wm",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "spatial.trials",
+                "value": 2
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "spatial.correct",
+                "value": 0
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "backward.levels",
+                "value": 1
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "backward.correct",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "op": "lte",
+            "evidenceKey": "everyday.wm",
+            "value": 18
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "WM2｜日常困难较少被报告。本次自评较少报告相关困难，仍请保留两项任务中的正确与错误记录；这不等于没有记忆问题。可以回想目前哪些提醒或安排已经在帮忙，在需要同时处理更多信息时继续使用。",
+      "evidenceKeys": [
+        "spatial.trials",
+        "spatial.correct",
+        "backward.levels",
+        "backward.correct",
+        "everyday.wm"
+      ],
+      "supportRefs": [
+        "b15_design"
+      ]
+    },
+    {
+      "ruleId": "wm3",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "present",
+                "evidenceKey": "spatial.trials"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "spatial.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.levels"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "backward.correct"
+              },
+              {
+                "op": "present",
+                "evidenceKey": "everyday.wm"
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "everyday.wm",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "everyday.wm",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "spatial.trials",
+                "value": 2
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "spatial.correct",
+                "value": 0
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "backward.levels",
+                "value": 1
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "backward.correct",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "op": "gt",
+            "evidenceKey": "everyday.wm",
+            "value": 18
+          },
+          {
+            "op": "lt",
+            "evidenceKey": "everyday.wm",
+            "value": 36
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "WM3｜连续体验画像。本次自评位于本包两个试验叙事锚点之间，不强行归入高低类型。可以从一个希望改善的多步骤情境开始：哪些信息最容易漏掉，能否拆短指令、减少同时处理的信息，并请对方确认下一步？",
+      "evidenceKeys": [
+        "spatial.trials",
+        "spatial.correct",
+        "backward.levels",
+        "backward.correct",
+        "everyday.wm"
+      ],
+      "supportRefs": [
+        "b15_design"
+      ]
+    },
+    {
+      "ruleId": "wm4",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "spatial.trials"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "spatial.trials"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "spatial.trials"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "spatial.correct"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "spatial.correct"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "spatial.correct"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "backward.levels"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "backward.levels"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "backward.levels"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "backward.correct"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "backward.correct"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "backward.correct"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "everyday.wm"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "everyday.wm"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "everyday.wm"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "WM4｜证据尚不完整。请先分别阅读已有来源；不补填缺失分数，也不形成跨方法结论。缺失、不适用或技术质量问题不代表能力较低。",
+      "evidenceKeys": [
+        "spatial.trials",
+        "spatial.correct",
+        "backward.levels",
+        "backward.correct",
+        "everyday.wm"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "scope",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "spatial.trials"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "spatial.correct"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "backward.levels"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "backward.correct"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "everyday.wm"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "两项任务与日常自评回答不同问题。不比较两任务谁更强，不相加为总工作记忆分，不把任务熟悉效应当作一般能力提升；这里的建议只是可尝试的生活支持。",
+      "evidenceKeys": [
+        "spatial.trials",
+        "spatial.correct",
+        "backward.levels",
+        "backward.correct",
+        "everyday.wm"
+      ],
+      "supportRefs": []
+    }
+  ]
+}

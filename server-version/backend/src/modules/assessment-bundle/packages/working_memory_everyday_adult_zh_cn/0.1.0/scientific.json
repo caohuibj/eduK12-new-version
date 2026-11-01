@@ -1,0 +1,22 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "B15任务与日常自评互补的确定性叙事草稿。设计日期不作为专家审核日期；工具证据与新组合证据分开，未建立常模、诊断、预测或联合效度。派生比例和按证据分组报告尚待共享接线。",
+  "references": [
+    {
+      "id": "b15_design",
+      "citation": "B15《工作记忆任务与日常执行》独立设计指导v1.0，受控来源已真实核验。WM1–WM4及.25/.75为本项目EXPERIMENTAL提案，不是原工具切点或独立专家批准。",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition"
+      ]
+    },
+    {
+      "id": "shared_design",
+      "citation": "《共享画像与实施规范》v1.0，受控来源已真实核验。保留原量尺、缺失与来源；不直接相加或推断任务与自评一致。",
+      "allowedClaims": [
+        "independent_summary",
+        "cross_source_condition"
+      ]
+    }
+  ]
+}

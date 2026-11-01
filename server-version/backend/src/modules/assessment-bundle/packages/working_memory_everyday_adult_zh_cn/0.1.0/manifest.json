@@ -1,0 +1,136 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "working_memory_everyday_adult_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "integrated",
+    "name": "工作记忆任务与日常执行｜成人描述性草稿",
+    "description": "Corsi顺序空间序列、倒背数字和ADEXI日常工作记忆体验并列。当前草稿保留原指标与固定叙事，完整连续证据面板仍在准备中。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18,
+      "subjectMaxAgeYears": 100
+    },
+    "slots": [
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "working_memory_everyday_adult_zh_cn_context",
+        "instrumentVersion": "0.1.0",
+        "respondentType": "SELF"
+      },
+      {
+        "slotKey": "spatial",
+        "unitType": "COGNITIVE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "corsi",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "trialCount",
+          "totalCorrectTrials",
+          "maxSpan"
+        ]
+      },
+      {
+        "slotKey": "backward",
+        "unitType": "COGNITIVE",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "digitbackward",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "completedLevelCount",
+          "totalCorrectTrials",
+          "maxSpan"
+        ]
+      },
+      {
+        "slotKey": "everyday",
+        "unitType": "SCALE",
+        "position": 3,
+        "required": true,
+        "instrumentKey": "adexi_v1",
+        "instrumentVersion": "2.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "working_memory"
+        ]
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "working_memory_everyday_adult_zh_cn_context",
+    "contextDefinitionVersion": "0.1.0",
+    "reportDefinitionKey": "working_memory_everyday_adult_zh_cn_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "corsi",
+        "digitbackward",
+        "adexi_v1"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "EXPERIMENTAL描述性开发草稿。WM1–WM4是围绕日常体验与证据覆盖的叙事，不是认知高低、心理类型、诊断、IQ、常模百分位或选拔依据。",
+      "Corsi采用顺序回忆，反映空间序列保持；倒背数字要求完全倒序。两任务的长度、难度与停止规则不同，不比较谁更强，也不相减或合并总分。最大完全正确长度仅按完整协议产生，不从不完整记录补造标准广度。",
+      "ADEXI施测完整14题；本包只读工作记忆九项合计9–45，较高表示报告的日常困难更多。抑制维度仍在原单项报告中，不重复加权，不改成均分。",
+      "日常量尺位置w=(WM−9)/36不是百分位；.25/.75仅为本包试验叙事锚点，不是原作者切点或患病概率。原工具没有分型，单项报告保持原状。",
+      "当前草稿只保留原指标和三段说明，尚未提供完整的序列数/正确率派生与分组数字面板。倒背的完成级数不可直接当作序列总数；本草稿不是完整设计已上线的证明。",
+      "跨方法解释需要三项来源有效。缺失、有限解释、无效和不适用分别处理；不补分，不把质量问题解释为能力较低，也不让自评与任务互相证明或否定。",
+      "重复测量须保持任务协议、材料、练习关系与设备条件，并记录重复暴露和熟悉效应。变化仅描述本协议表现，不能直接推断一般智力或日常迁移改善。",
+      "源工具发布与使用授权仍需按既有范围核对；倒背数字目前仍为草稿。本包不附第三方题本，不新增公开施测或报告分享权限。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": [
+    {
+      "slotKey": "spatial",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    },
+    {
+      "slotKey": "backward",
+      "configVersion": "1.0.0",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "profile": "standard"
+    }
+  ]
+}

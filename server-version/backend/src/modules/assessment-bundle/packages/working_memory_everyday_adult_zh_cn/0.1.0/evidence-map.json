@@ -1,0 +1,90 @@
+[
+  {
+    "evidenceKey": "context.age",
+    "slotKey": "context",
+    "selector": "subject_age_years",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "subject_age",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "spatial.trials",
+    "slotKey": "spatial",
+    "selector": "trialCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "spatial_sequence_trial_count",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "spatial.correct",
+    "slotKey": "spatial",
+    "selector": "totalCorrectTrials",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "spatial_sequence_correct_count",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "spatial.span",
+    "slotKey": "spatial",
+    "selector": "maxSpan",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "spatial_sequence_max_span",
+    "role": "SUPPORTING",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "backward.levels",
+    "slotKey": "backward",
+    "selector": "completedLevelCount",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "backward_completed_level_count",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "backward.correct",
+    "slotKey": "backward",
+    "selector": "totalCorrectTrials",
+    "valueType": "number",
+    "unit": "count",
+    "construct": "backward_sequence_correct_count",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "backward.span",
+    "slotKey": "backward",
+    "selector": "maxSpan",
+    "valueType": "number",
+    "unit": "level",
+    "construct": "backward_sequence_max_span",
+    "role": "SUPPORTING",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "everyday.wm",
+    "slotKey": "everyday",
+    "selector": "working_memory",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "everyday_working_memory_difficulties_sum",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

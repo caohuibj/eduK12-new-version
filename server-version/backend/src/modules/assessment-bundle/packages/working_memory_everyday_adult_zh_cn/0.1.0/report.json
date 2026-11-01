@@ -1,0 +1,70 @@
+{
+  "key": "working_memory_everyday_adult_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "spatial",
+      "kind": "conclusions",
+      "title": "空间序列｜顺序保持记录",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "spatial_record"
+      ]
+    },
+    {
+      "blockId": "backward",
+      "kind": "conclusions",
+      "title": "倒背数字｜倒序操作记录",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "backward_record"
+      ]
+    },
+    {
+      "blockId": "everyday",
+      "kind": "conclusions",
+      "title": "日常记忆组织｜ADEXI工作记忆合计9–45",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "everyday_record"
+      ]
+    },
+    {
+      "blockId": "reflection",
+      "kind": "conclusions",
+      "title": "把任务事实与日常体验并列理解",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "wm1",
+        "wm2",
+        "wm3"
+      ]
+    },
+    {
+      "blockId": "coverage",
+      "kind": "limitations",
+      "title": "证据覆盖与解释边界",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "wm4",
+        "scope"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "WM4｜证据尚不完整。保留已获准展示的独立结果，不补值或生成跨方法结论。",
+    "limited": "WM4｜部分来源只能有限解释。请先阅读可用单项记录，本次不据此形成跨方法结论。",
+    "unavailable": "WM4｜当前来源不满足组合解释条件；这不代表能力较低。年龄未知或不在18–100岁时，本版本不适用。"
+  }
+}
