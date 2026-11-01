@@ -1236,7 +1236,8 @@ jobs:
           RELEASE_TOOLING: ${{ needs.scope.outputs.scenario == 'release-tooling' }}
         shell: node {0}
         run: |
-          const config=process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src',...(process.env.BACKEND_API_FOCUS==='form-intake'?['.github/scripts/backend-api-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs']:[])]}:{paths:['server-version/frontend/src']};
+          const config=process.env.PUBLIC_PRESENTATION==='true'?{paths:['server-version/frontend/src','.github/scripts','server-version/scripts/release']}:process.env.RELEASE_TOOLING==='true'?{paths:['.github/scripts','server-version/scripts/release','server-version/backend/scripts','server-version/backend/src/scripts','server-version/scripts/cognitive']}:process.env.BACKEND_MODULES==='true'?{paths:['server-version/backend/src']}:{paths:['server-version/frontend/src']};
+          if(process.env.BACKEND_MODULES==='true'&&process.env.BACKEND_API_FOCUS==='form-intake')config.paths.push('.github/scripts/backend-api-scope.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs');
           require('node:fs').appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\n`);
       - name: bound selected cognitive analysis to task inputs and checker controls
         id: cognitive-codeql-config
