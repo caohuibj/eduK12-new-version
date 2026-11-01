@@ -1,4 +1,5 @@
 import {z} from 'zod'
+import {isFrozenAdultSelfReport} from './self-report-audience'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compileBundleRuntimeFromFrozenRead} from '../assessment-bundle/compile'
 import {computeReanalysisAggregateInputHash} from '../assessment-reanalysis/reanalysis'
@@ -23,7 +24,7 @@ export const surveyNativeSourceSchema=z.object({compositeId:z.string().guid(),de
 export type SurveyNativeSource=z.infer<typeof surveyNativeSourceSchema>
 /** Shared once in the existing immutable governed artifact/publication. No grant. */
 export type SurveyNativeBundle={schemaVersion:1;source:SurveyNativeSource;ownerId:string;definition:FrozenBundleProductionDefinitionV1;
- policies:Record<string,EffectiveScaleDisclosureSnapshot>;reportAudiences:Record<string,'student'|'researcher'|null>}
+ policies:Record<string,EffectiveScaleDisclosureSnapshot>;reportAudiences:Record<string,'student'|'researcher'|'parent'|'teacher'|null>}
 export type SurveyNativeReport={importId:string;definitionHash:string;status:'READY'|'UNAVAILABLE'|'FAILED';factsHash:string|null;
  views:{student:ProfileView|null;researcher:ProfileView|null};errorCode:string|null;
  derivedViews?:{student:DerivedBundleView|null;researcher:DerivedBundleView|null}}
@@ -33,6 +34,17 @@ export function nativeProfilePackage(native:SurveyNativeBundle){
  if(frozen.contentHash!==native.source.definitionHash||(pack?.schemaVersion!==2&&pack?.schemaVersion!==3))throw new Error('SURVEY_NATIVE_PROFILE_IDENTITY')
  if(pack.schemaVersion===3&&frozen.bundleSnapshot.slotBindings.some(s=>!['SCALE','FORM'].includes(s.unitType)))throw new Error('SURVEY_NATIVE_UNIT_UNSUPPORTED')
  return {frozen,pack}
+}
+/** Normalize only the consumer's participant lane; retain the actual source R
+ * audience in the frozen source and reportAudiences metadata unchanged. */
+export function surveyNativeFeedbackAudience(native:SurveyNativeBundle,slotKey:string,definition:ScaleDefinitionV2):'student'|'researcher'|null{
+ const recorded=native.reportAudiences[slotKey]
+ const {pack}=nativeProfilePackage(native)
+ if(pack.schemaVersion===2)return recorded==='student'||recorded==='researcher'?recorded:null
+ if(recorded!==definition.report.audienceContract?.audience)return null
+ if(recorded==='student')return recorded
+ return recorded===definition.report.audienceContract?.audience&&isFrozenAdultSelfReport({pack,slotKey,audience:'student',
+  contract:definition.report.audienceContract,sourceRespondentType:definition.respondentType,relationship:{respondentType:'SELF'}})?'student':null
 }
 /** Current release intersection can only remove data from the saved DTO. */
 export function restrictSavedDerivedView(pack:DerivedPackage,view:DerivedBundleView,allowed:ReadonlySet<string>):DerivedBundleView{
@@ -95,7 +107,9 @@ export function computeSurveyNativeReports(snapshot:Pick<ResearchFrozenPublicati
     const policies=new Map(Object.entries(native.policies).map(([slot,policy])=>{
      const capabilities=resolveAudienceDisclosure(policy.disclosure,audience==='student'?'subject':'researcher')
      // A raw-metric selection never upgrades a researcher-only or absent R.
-     if(policy.disposition==='UNKNOWN'||native.reportAudiences[slot]!==audience)for(const key of Object.keys(capabilities) as Array<keyof typeof capabilities>)capabilities[key]=false
+     const binding=p.slots.find(s=>s.slotKey===slot),unit=snapshot.units.find(u=>u.draftId===binding?.draftId&&u.instrumentKey===binding.instrumentKey)
+     const selected=unit?surveyNativeFeedbackAudience(native,slot,unit.compiledDefinition as ScaleDefinitionV2):null
+     if(policy.disposition==='UNKNOWN'||selected!==audience)for(const key of Object.keys(capabilities) as Array<keyof typeof capabilities>)capabilities[key]=false
      return [slot,capabilities] as const
     }))
     if(pack.schemaVersion===2&&profile)out.views[audience]=projectProfileView(profile,pack,policies,audience==='researcher',audience==='student'?'student':'admin')
