@@ -91,7 +91,12 @@ test('normal scheduler runs maintenance for pure attachment changes and keeps ap
   assert.match(lane,/node-version: '24\.21\.0'/);
   for(const file of ['core.test.mjs','cleanup-restore-container.test.mjs','test_*.py','ci-container-smoke.py'])
     assert.ok(lane.includes(file),file);
-  assert.doesNotMatch(lane,/npm ci|DATABASE_URL|COS_SECRET|BACKUP_ENCRYPTION_KEY/);
+  const routingInstall='npm ci --prefix .github/release-tools --ignore-scripts --no-audit --no-fund';
+  assert.equal(lane.split(routingInstall).length-1,1,'only the exact locked routing-tool install is allowed');
+  assert.ok(lane.includes(`      - name: prepare locked CI routing parser dependencies
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
+        run: ${routingInstall}`),'routing tools keep the existing qualification guards');
+  assert.doesNotMatch(lane.replace(routingInstall,''),/npm ci|DATABASE_URL|COS_SECRET|BACKUP_ENCRYPTION_KEY/);
   for(const name of ['ci-backend','ci-frontend'])
     assert.match(source(name),/npm audit --audit-level=high/);
 });
