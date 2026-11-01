@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "phq9_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "PHQ-9 简体中文研究工作译稿（AI 辅助，未验证）",
+      "abbreviation": "PHQ-9",
+      "instrumentFamily": "Patient Health Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "过去两周抑郁相关症状的自述出现频率；未经验证的中文研究译稿。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mental_health",
+        "depression"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅限原成人形式的研究文本审查；不代表本译稿已经适用于任何人群，禁止实际施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去两周里，以下问题困扰您的频率是多少？",
+      "requiredTraining": true,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "所选原版为九个计分症状题加一个不计分功能困难问题；此处仅目录元数据，不提供施测入口。",
+        "保留原题顺序、过去两周指导语和0–3锚点；不插入注意力题。",
+        "中文为AI辅助研究工作译稿，未经验证；独立平台指导语、安全可见性和真正不计分功能题表达尚待实现与审查。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅文本、计分和安全方案审查，不供实际施测。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "phq9-kroenke-2001-original-english",
+        "evidenceType": "CRITERION",
+        "population": "US adult primary-care / obstetrics-gynecology clinical samples; not this translation",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 6000,
+        "studyDesign": "Original English development study; criterion interview subgroup n=580. No exact-version Chinese translation validation.",
+        "rating": "UNKNOWN",
+        "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+        "doi": "10.1046/j.1525-1497.2001.016009606.x",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/11556941/",
+        "notes": "Original English evidence only. Does not approve this translation, diagnose a participant, or establish Chinese norms."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "New AI-assisted Simplified Chinese working translation from the licensed original English PHQ Screeners PDF; exact English/Chinese research materials are backed up in Notion and docs/scale-instruments/research-drafts/phq9/1.0.0/. Independent AI text review completed with revisions; not human review or developer endorsement.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "AI 辅助生成的简体中文研究工作译稿，尚未验证，未获得原开发者对本译稿的审校或认可。原始量表许可允许翻译，但不代表开发者认可本译稿。仅供文本、计分与安全方案审查，不供实际施测或临床使用。 AI_TEXT_REVIEW_COMPLETED_WITH_REVISIONS；human/expert review、cognitive debrief及心理测量验证未完成。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "PHQ-9 — AI-assisted Simplified Chinese research working translation (unvalidated)",
+      "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+      "url": "https://www.phqscreeners.com/images/sites/g/files/g10060481/f/201412/PHQ-9_English.pdf",
+      "publicationYear": 2001
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "PHQ-9 九题原始分（仅报告设计，未运行）"
+      ],
+      "limitations": [
+        "AI 辅助生成的简体中文研究工作译稿，尚未验证，未获得原开发者对本译稿的审校或认可。原始量表许可允许翻译，但不代表开发者认可本译稿。仅供文本、计分与安全方案审查，不供实际施测或临床使用。",
+        "只展示候选目录资料，不可开始、施测、生成实际报告或应用原英文阈值到中文译稿。",
+        "报告设计仅九题总分0–27；不计分功能题独立，缺答不影响完整九题总分。",
+        "无诊断、常模、百分位、筛查阳性或自杀风险等级；原英文阈值仅研究材料元数据。",
+        "现有score_only解释支持标准量表描述报告；qcReview可真实记录AI身份，不冒充人审；未生成scientificReview。",
+        "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
+      ],
+      "disclaimer": "仅研究候选，未注册可执行包，不可施测。AI工作译稿未验证，未获得原开发者审校或认可。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "LOCALIZATION_REVIEW_PENDING",
+      "INDEPENDENT_INSTRUCTIONS_PRESENTATION_REQUIRED",
+      "UNSCORED_IMPAIRMENT_REPRESENTATION_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING",
+      "IN_SESSION_SAFETY_AND_PRIVACY_REVIEW_REQUIRED"
+    ]
+  }
+}

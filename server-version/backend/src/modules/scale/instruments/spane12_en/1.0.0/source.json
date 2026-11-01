@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "spane12_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Scale of Positive and Negative Experience original English 12-item",
+      "abbreviation": "SPANE12_EN",
+      "instrumentFamily": "Scale of Positive and Negative Experience original English 12-item"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructDefinition": "Wellbeing self-report source only; not a diagnostic or K12-equivalent instrument.",
+      "constructOverlapTags": [
+        "spane12_en",
+        "source:eddiener",
+        "locale:en",
+        "population:adult_candidate",
+        "response:self",
+        "availability:catalog_only",
+        "rights:noncommercial_only",
+        "scoring:uninstalled",
+        "P:none",
+        "R:not_runtime"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Conservative adult project scope only; China K12 psychometric validity and language equivalence not established."
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Previous four weeks",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Catalog only: original copyrighted question wording and response anchors not distributed in public Git.",
+        "Twelve 1–5 frequency items: positive positions 1,3,5,7,10,12 and negative 2,4,6,8,9,11; sums 6–30 each, possible balance −24..24. Do not invent reversed total or missing rule.",
+        "Author only permits attributed non-commercial research use; unrestricted commercial deployment/public item reproduction not established.",
+        "No electronic administration or missing-data handling executed; time is an estimate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Non-commercial research candidate source, not validated local executable."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original English source metadata: https://eddiener.com/scale-of-positive-and-negative-experience-spane/; no original questionnaire copied into Git.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Translations require their own rights/validity records. No China K12 evidence."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "积极与消极体验量表（SPANE；英文12题目录候选）",
+      "citation": "Ed Diener and colleagues: https://eddiener.com/scale-of-positive-and-negative-experience-spane/",
+      "url": "https://eddiener.com/scale-of-positive-and-negative-experience-spane/",
+      "publicationYear": 2010
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "积极体验（仅报告规划）",
+        "消极体验（仅报告规划）",
+        "体验差值（仅规划，未启用）"
+      ],
+      "limitations": [
+        "英文原版12题，来源频率量尺为1–5；积极题位为1、3、5、7、10、12，消极题位为2、4、6、8、9、11。两组和分范围各6–30，差值范围−24至24；不另造反向总分或漏答规则。",
+        "仅保存英文原版的目录来源；未纳入原始题干或选项正文，未提供可执行题本、计分插件、参数P或运行报告R。",
+        "来源标注仅限署名的非商业学术研究使用；公开全文再分发和商业范围尚未确认，目录登记不构成施测或部署授权。",
+        "尚无目标中国教师或学生的常模、漏答规则或本版本适用性验证；不用于诊断。"
+      ],
+      "disclaimer": "仅目录来源候选，待审；尚未施测、计分或发布。题本仍为英文，中文预览不构成中文量表或实际报告。"
+    },
+    "blockers": [
+      "NONCOMMERCIAL_AUTHOR_RIGHTS",
+      "PUBLIC_QUESTION_ITEMS_REDISTRIBUTION_NOT_CLEARED",
+      "TARGET_K12_VALIDITY_MISSING",
+      "EXECUTABLE_C_S_P_R_NOT_INSTALLED"
+    ]
+  }
+}
