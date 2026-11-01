@@ -11,11 +11,23 @@ import {publishTrainingSourcesFixture} from '../fixtures/published-measurement'
 import {gonogoSequence} from '../../modules/cognitive/randomization'
 import {createTrialEnvelope} from '../../modules/cognitive/v2/trial-envelope'
 import * as security from '../../modules/cognitive/cognitive.security'
-import {listTrainingGroupReports,trainingGroupTools,generateTrainingGroupReport,readTrainingGroupReport} from '../../modules/training-analysis/group-report.service'
+import {listTrainingGroupReports,trainingGroupHistory,trainingGroupTools,generateTrainingGroupReport,readTrainingGroupReport} from '../../modules/training-analysis/group-report.service'
 import {trainingCognitiveGroupTaskKey} from '../../modules/training-analysis/group-source'
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL');if(!url)throw Error('isolated PostgreSQL required');requireIsolatedReleaseDatabase(url)
 afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
+
+async function findGroupTask(scope:Parameters<typeof listTrainingGroupReports>[0],taskId:string){
+ let beforeTaskId:string|undefined
+ do{
+  const page=await listTrainingGroupReports({...scope,beforeTaskId})
+  const task=page.tasks.find(row=>row.id===taskId)
+  if(task)return task
+  beforeTaskId=page.nextTaskId??undefined
+ }while(beforeTaskId)
+ return undefined
+}
+
 
 it('generates a disclosed standalone Cognitive course report and reopens its frozen version without reading result payloads',async()=>{
  const bootstrap=JSON.parse(readFileSync(process.env.TRAINING_STANDALONE_GROUP_BOOTSTRAP??'/tmp/training-native-bundle-group-bootstrap.json','utf8'))
@@ -34,7 +46,7 @@ it('generates a disclosed standalone Cognitive course report and reopens its fro
  const assignment=await db.cognitiveAssignment.findUniqueOrThrow({where:{id:fixture.assignmentId}})
  expect(assignment).toMatchObject({listedStandalone:true,courseId,status:'PUBLISHED',courseSnapshot:{id:courseId}})
  const scope={actor,courseId},taskId=trainingCognitiveGroupTaskKey(assignment.id)
- expect((await listTrainingGroupReports(scope)).tasks.some(task=>task.id===taskId)).toBe(true)
+ expect(await findGroupTask(scope,taskId)).toBeDefined()
  // Opening the source picker only reads assignment metadata, even before data exists.
  const pickerDecrypt=vi.spyOn(security,'decryptCognitivePayload')
  const tool=(await trainingGroupTools({...scope,taskId})).tools[0]
@@ -67,7 +79,7 @@ it('generates a disclosed standalone Cognitive course report and reopens its fro
  // Only the assignment report contract is decrypted. No session/result payloads.
  expect(readerDecrypt).toHaveBeenCalledTimes(1);readerDecrypt.mockRestore()
  await expect(readTrainingGroupReport({actor:{userId:participants[0].student,role:UserRole.STUDENT},courseId,taskId,artifactId:generated.artifactId})).rejects.toMatchObject({statusCode:404})
- expect((await listTrainingGroupReports(scope)).artifacts.some(row=>row.artifactId===generated.artifactId&&row.taskId===taskId)).toBe(true)
+ expect((await trainingGroupHistory({...scope,taskId})).artifacts.some(row=>row.artifactId===generated.artifactId)).toBe(true)
  writeFileSync('/tmp/training-standalone-cognitive-group-proof.json',JSON.stringify({passed:true,source:'native published standalone CognitiveAssignment',participantN:5,rt:{key:rt!.key,unit:rt!.unit,validN:rt!.validN,mean:rt!.mean},zeroMetric:zero!.key,sourcePickerDoesNotReadSessions:true,storedReadDoesNotDecryptResults:true,unfinishedRedoDoesNotChangeSnapshot:true,studentDenied:true,rawTrialsRescoredByReport:false,newSchema:false,productionAccessed:false},null,2))
 },90_000)
 
@@ -75,14 +87,14 @@ it('keeps an archived standalone task and its original version reachable while d
  const bootstrap=JSON.parse(readFileSync(process.env.TRAINING_STANDALONE_GROUP_BOOTSTRAP??'/tmp/training-native-bundle-group-bootstrap.json','utf8'))
  const fixture=JSON.parse(readFileSync(process.env.TRAINING_STANDALONE_GROUP_FIXTURE??'/tmp/training-standalone-cognitive-group-fixture.json','utf8'))
  const actor={userId:bootstrap.actor.userId,role:UserRole.TEACHER},courseId=bootstrap.course.id,taskId=trainingCognitiveGroupTaskKey(fixture.assignmentId),scope={actor,courseId}
- const pointer=(await listTrainingGroupReports(scope)).artifacts.find(row=>row.taskId===taskId)!
+ const pointer=(await trainingGroupHistory({...scope,taskId})).artifacts[0]
  expect(pointer).toBeDefined()
  const before=await readTrainingGroupReport({...scope,taskId,artifactId:pointer.artifactId})
  const assignment=await db.cognitiveAssignment.findUniqueOrThrow({where:{id:fixture.assignmentId}})
  if(assignment.status!=='ARCHIVED')await archiveAssignment(actor.userId,actor.role,assignment.id)
- const index=await listTrainingGroupReports(scope)
- expect(index.tasks.some(row=>row.id===taskId&&row.name.includes('只读'))).toBe(true)
- expect(index.artifacts.some(row=>row.artifactId===pointer.artifactId)).toBe(true)
+ const task=await findGroupTask(scope,taskId)
+ expect(task?.name).toContain('只读')
+ expect((await trainingGroupHistory({...scope,taskId})).artifacts.some(row=>row.artifactId===pointer.artifactId)).toBe(true)
  expect((await trainingGroupTools({...scope,taskId})).tools).toEqual([])
  expect(await readTrainingGroupReport({...scope,taskId,artifactId:pointer.artifactId})).toEqual(before)
  writeFileSync('/tmp/training-standalone-cognitive-group-archived-proof.json',JSON.stringify({passed:true,archivedTaskStillListed:true,oldSnapshotUnchanged:true,newGenerationUnavailable:true,productionAccessed:false},null,2))

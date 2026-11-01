@@ -463,11 +463,6 @@ jobs:
       - name: enforced production CSP browser acceptance
         if: matrix.group == 'security'
         run: |
-          if ! command -v ffmpeg >/dev/null; then
-            timeout -k 10s 120s sudo -n apt-get update -o Acquire::Retries=1
-            timeout -k 10s 180s sudo -n apt-get install -y --no-install-recommends ffmpeg
-          fi
-          ffmpeg -version >/dev/null
           node e2e/production-csp-browser.cjs
       - name: administrator virtual CTAP2, business identity and entry revocation browser acceptance
         if: (inputs.admin_permissions_functional || inputs.training_followup_functional) && matrix.group == 'security'

@@ -75,7 +75,7 @@ describe('explicit questionnaire measurement-instance service (mock DB and relea
  it('actual questionnaire publish reuses the same instance preparation before the publication service',async()=>{
   await publish(actor,current.id,{revision:3})
   expect(mocks.writer).toHaveBeenCalledExactlyOnceWith(mocks.db,'teacher','owned-wrapper')
-  expect(mocks.publishComposite).toHaveBeenCalledWith('teacher',UserRole.TEACHER,'questionnaire',mocks.db,new Map())
+   expect(mocks.publishComposite).toHaveBeenCalledWith('teacher',UserRole.TEACHER,'questionnaire',mocks.db,new Map(),undefined)
   expect(mocks.writer.mock.invocationCallOrder[0]).toBeLessThan(mocks.publishComposite.mock.invocationCallOrder[0])
  })
  it.each([{creator_id:'other'},{course_type:'LEGACY_COURSE'},{is_library:true}])('rejects current course outside owned Training scope %j',async change=>{

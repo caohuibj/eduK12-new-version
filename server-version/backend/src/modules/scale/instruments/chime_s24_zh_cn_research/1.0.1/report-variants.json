@@ -1,0 +1,410 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "chime_s24_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "dc57b509707b96d5c3af31d3a367f959112af060ad8ff624daefe0a1b3fc8eb2",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "external_awareness",
+          "internal_awareness",
+          "acting_awareness",
+          "thoughts_relativity",
+          "insightful_understanding",
+          "nonjudgmental_acceptance",
+          "nonreactive_decentering",
+          "openness",
+          "total"
+        ],
+        "scoreOrder": [
+          "external_awareness",
+          "internal_awareness",
+          "acting_awareness",
+          "thoughts_relativity",
+          "insightful_understanding",
+          "nonjudgmental_acceptance",
+          "nonreactive_decentering",
+          "openness",
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "external_awareness",
+            "headline": "留意周围的体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你是否留意周围的细节，例如经过树下时看到叶子的颜色，或在路上听到车辆的声音。留意并不要求一直保持警觉，也不意味着必须专门寻找特别的体验。环境是否安静、当时是否赶时间，都可能影响你怎么回答。可以回想一个熟悉的地方，看看自己平常会注意到什么，又常常略过什么。下一次路过时，给自己片刻时间，只留意一个自然出现的声音或颜色，然后继续手头的事情。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你今天留意到了身边哪一个平常容易忽略的细节？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次走过熟悉的地方时，留意一个自然出现的声音或颜色。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "internal_awareness",
+            "headline": "觉察内心的体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你能否察觉自己当时的感受，以及心情发生变化时是否注意到了。感受有时清楚，有时模糊，忙碌或疲惫也会让人暂时顾不上内心。回答反映的是你目前对自己的描述，不要求你随时准确说出每一种情绪。可以回想最近一次与人交谈，看看那时心里有什么变化。下一次谈话结束后，试着用一个平常的词描述当下感受；如果暂时说不清，也允许自己先停留在这种不确定中。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次心情变化，你是在什么时候注意到的？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次谈话后，试着用一个平常的词描述自己的感受。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "acting_awareness",
+            "headline": "专注正在做的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你做一件事时，注意力是否常常留在当下，还是容易被回忆、画面或别的念头带走。这一维度第8、9题按反向规则整理，分数越高，表示本次自述较常专注正在做的事、较少被回忆或其他念头带走。走神是许多人都会有的体验，并不凭一次回答就能判断注意能力。事情是否有趣、环境是否嘈杂、当时是否疲惫，也可能影响投入的程度。可以挑一段最近的阅读或工作，回想自己在什么时候发现已经走神。下一次发现分心时，轻轻指出眼前要做的一个步骤，再把注意力带回这一小步。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次发现自己走神时，当时在做什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件小事，只专注它当前的一步，走神后再回来。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "thoughts_relativity",
+            "headline": "看见想法的可变性",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你能否看见，想法和看法可能会变化，也可能没有完全反映事实。这不要求你否定自己的判断，而是给新的信息和不同的理解留一点空间。生活经验、当时的心情和别人提供的线索，都可能影响我们怎样理解事情。可以回想最近一次改变看法的经历，看看是什么新信息让你有所调整。遇到一个很确定的想法时，试着分别写下自己观察到的事实和对它的解释，再看看还有没有其他可能。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪一次新信息让你改变了原先的判断？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一个确定的想法分成观察到的事实和自己的解释。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "insightful_understanding",
+            "headline": "放宽对小事的看法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你发现自己把小问题想得太复杂、或无端为难自己时，是否能够稍微放宽看法，甚至会心一笑。这里的轻松不是要求你把真正的困难当作小事，也不要求在难受的时候强迫自己开心。不同处境下，幽默感和看事情的距离都可能变化。可以回想一件后来觉得没有那么严重的小事，看看当时自己最担心什么。下次遇到类似情形时，先问一问眼前最需要处理的具体事情是什么，再从一小步开始。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一件后来发现没有想象中严重的小事？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一个烦恼改写成眼前最需要处理的一件具体小事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonjudgmental_acceptance",
+            "headline": "善意地看待自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你面对生活起伏、错误和困难时，是否仍能以善意和理解看待自己。善待自己可以和承担责任、修正错误同时存在，不需要先证明自己做得足够好。习惯、压力和当时得到的支持，都可能影响这一点。可以想一想，当朋友遇到和你相似的困难时，你会怎样对他说话。下次自己出错时，试着用同样平实、尊重的语气说一句话，再选择一个能够补救或继续前进的小行动。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到同样困难的朋友，你会怎样回应他？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次出错时，先对自己说一句平实而尊重的话。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonreactive_decentering",
+            "headline": "与想法保持一点距离",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注当想法或情绪变得强烈时，你是否能稍微退后一点，注意到它们正在发生，而不是马上被卷进去。保持一点距离并不是压住情绪，也不是要求你立刻冷静或放弃行动。有时能够察觉到自己正被念头带走，本身就提供了一个停顿的机会。可以回想最近一个反复出现的念头，看看它怎样影响了自己的下一步。下次它出现时，试着说“我注意到自己有这个想法”，再决定眼下适合怎样回应。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪个念头最近常常影响你的下一步行动？"
+              },
+              {
+                "category": "strategy",
+                "text": "念头出现时，试说“我注意到自己有这个想法”，然后再决定行动。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "openness",
+            "headline": "面对不舒服的体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注面对不愉快情绪或疼痛感觉时，你是否常常想分散注意或赶快摆脱它们。人们在不同处境下会选择不同应对办法，暂时转移注意有时也能帮助继续生活，因此一次回答不能用来评价做法对错。这部分经过反向整理，更多表示较少急于避开这些体验，不意味着应忍受伤害或停止必要照护。可以观察一个轻微的不舒服，先辨认它是什么，再决定需要休息、求助，还是以合适方式继续手头的事。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "轻微不舒服出现时，你通常会怎样回应？"
+              },
+              {
+                "category": "strategy",
+                "text": "遇到轻微的不舒服时，先辨认它，再决定休息、求助或继续。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "total",
+            "headline": "整体正念体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "整体结果把不同方面的日常正念体验放在一起，帮助你回顾如何注意周围、觉察内心，以及怎样面对念头和不舒服。它是这次自我描述的整理，不是给一个人贴上“有正念”或“没正念”的标签，也不能代替实际生活中的了解。你在不同环境、不同日子里的体验可能不一样，总体均分也可能掩盖各方面的差别。可以从自己最感兴趣的一个方面开始，选一个容易做到的小行动，过一段时间再回顾它是否适合自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪一种日常体验最值得你接下来多留意一点？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个适合自己的小行动，在日常的一次停顿里试一试。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+          "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+          "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+          "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+        ],
+        "disclaimer": "用于成人回顾日常正念体验，不是考试或诊断。中文为平台独立工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and plain-language report preparation; not human expert approval",
+            "reviewedAt": "2026-10-26T05:56:22.935801Z",
+            "basis": "Karl et al. 2024 Supplementary Table S1; adult-only working scope. Technical student audience slot does not imply K12 applicability."
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "external_awareness",
+          "internal_awareness",
+          "acting_awareness",
+          "thoughts_relativity",
+          "insightful_understanding",
+          "nonjudgmental_acceptance",
+          "nonreactive_decentering",
+          "openness",
+          "total"
+        ],
+        "scoreOrder": [
+          "external_awareness",
+          "internal_awareness",
+          "acting_awareness",
+          "thoughts_relativity",
+          "insightful_understanding",
+          "nonjudgmental_acceptance",
+          "nonreactive_decentering",
+          "openness",
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "external_awareness",
+            "headline": "给周围留一眼，不给自己装全天雷达",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：留一点注意，不把生活改成正念打卡。\n\n八个侧面各三题、整体二十四题，统一方向后都用1–6均分；没有固定一周或一月窗口，也没有达标线。下面的例子帮你回顾，不是系统已经读出你的日常。\n\n周围体验这一项越大，表示更常留意颜色、声音或风和阳光等感觉。比如坐着时看到窗边光线变了，不需要同时把整个房间扫描一遍。\n\n自然留意到的可以保留，忙着做事时没注意，也不必补一份观察作业。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "只借一个小细节停一下：在安全、愿意时留意一个颜色或声音，再回到原来的事。不舒服就停，不用用时长证明认真。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "internal_awareness",
+            "headline": "内心可以先报“大概”，不必交精确答案",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "内心觉察三题均分1–6，越大表示更常注意到心情变化和当前感受，不是越会分析自己就越好。\n\n比如聊完才发现有点紧张，可以先知道这一点，不必马上找出全部原因。例子不代表系统已知道你的心情。\n\n已有好用的辨认方式继续用；混在一起、说不清也正常地留在“不清楚”，不用追问到把自己更弄累。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给感受起个暂用名：紧张、委屈，或“说不清”。愿意时再添一个需要，不要求精确命名，也不必公开给别人。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "acting_awareness",
+            "headline": "发现拐弯，就找一个接续点",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题统一计分方向后的均分为1–6，越大是较常专注、较少被回忆或别的念头带走，不是分心更频繁。它也不是注意力考试。\n\n假设读完一段才发现想了别的事，回到需要的地方，是一个接续动作。这里不是对你阅读习惯的判断。\n\n任务、疲劳和环境也会影响体验；已有省力安排可以保留，不必把每次走神登记成失败。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "给当前一步留个路标：写一句现在要完成什么，发现走神再从能接上的位置继续。确实累或要求不清时先调整条件，不追求脑子一刻也不拐弯。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "thoughts_relativity",
+            "headline": "想法可以有备选，不用把事实擦掉",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "三题均分1–6，越大表示更常知道想法可能不完全是事实、看法也能改变。不是让你永远怀疑自己。\n\n例如，消息没回时先想到“不重视我”，还可以留一句“原因未确定”。例子没替你认定真实关系。\n\n有新信息时调整看法可以保留；明确的伤害、风险或不公仍要认真对待，不靠换角度把它美化。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给一个判断留个问号：分开事实与解释，挑一个重要信息去核实。不是给每个念头开辩论赛，也不用逼自己相信相反的话。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "insightful_understanding",
+            "headline": "可以会心一笑，不必把难处当笑话",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一项三题均分1–6，越大表示更常发现自己把小事想重时，能松一点、带一点幽默看自己。不是“想得开”资格证。\n\n例如，反复修改一处不影响内容的格式，后来发现可以先完成。这里说的是小事，不是让真正的损失或伤害一笑了之。\n\n有用的轻松可以留下；笑不出来时，也不需要再批评自己缺少幽默感。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "问一句“小事最少要处理哪一步？”先到那里即可。事情若很重要，就找实际办法与支持，不把笑一笑当成必须的方法。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonjudgmental_acceptance",
+            "headline": "对事负责，不顺手给自己盖坏章",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "善意接纳三题均分1–6，越大表示更常在困难、错误中仍以理解对待自己，不是说所有行为都没关系。\n\n比如漏做一项事，可以补救，也可以不附赠一句“我总是很糟”。这是例子，不是系统查到了你的失误。\n\n已有公允语气就继续用；暂时很严厉时，也不用因“自我关怀没做好”再扣一次分。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "把“我真糟”拆回事实、影响和下一步。语气平实即可，不需要积极宣言；该修正的事照样修正，缺的协助照样可以问。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonreactive_decentering",
+            "headline": "念头来了，不一定要立刻按发送",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题均分1–6，越大表示更常自述看见想法和感受、留一点距离，不马上被带走。不是把内心关掉。\n\n例如，担心被误解，想马上发长消息解释，可以先确认事实与时机。这里是场景，不是对你行为的画像。\n\n有停顿就留住；很难停时可以找支持，不需要证明自己独自控制得住一切。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "strategy",
+                "text": "在安全且不耽误必要行动时，先说“我注意到这个念头”，再决定眼前需要的一步。它不是拖延处理现实问题的理由，也不要求念头马上消失。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "openness",
+            "headline": "开放不是硬扛，更不是忍痛比赛",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题反向后均分1–6，越大表示较少急于避开不愉快情绪或疼痛，不是更痛、也不是更能忍。\n\n比如有点烦躁时，先辨认，再选择休息或转移注意，都需要看当时处境。问卷没判定哪种办法永远正确。\n\n这里没有“必须面对到底”的任务。需要的照护、边界和现实安全，都不应该为了一个开放分数被拿掉。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "support",
+                "text": "轻微、愿意、安全时才试着辨认，随后可以休息、转移注意或求助；不舒服就停。疼痛与健康需要交给合适照护，不用靠承受更多来证明练习有效。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "total",
+            "headline": "总览不是九项通关图",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "二十四题总均分1–6，越大表示整体更常报告这些统一方向后的觉察与回应体验。它不是八侧面之外的新能力，也不是正念达标章。\n\n注意环境多、善待自己难，和其他组合可能算出相近均分。例子只是说明总数装不下所有细节，不是系统替你认定短板。\n\n能用的办法继续用，想了解的只挑一个；不需要把整张报告都练大，更不能用分数变化给方法判疗效。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "只给生活留一个试用位：选一件真实小事，试一个愿意的动作，看是否贴近需要。不合适可换、可跳过，不把报告变成新任务。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "各侧面仅3题，本独立中文稿尚未验证；不作强弱排名、诊断或练习疗效判断。"
+        ],
+        "disclaimer": "用于成人回顾日常正念体验，不是考试或诊断。中文为平台独立工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted editorial self-review for fun R1.2.0; not human expert approval",
+            "reviewedAt": "2026-10-29T16:18:04Z",
+            "basis": "本次AI文字自审对应chime_s24_zh_cn_research的趣味版R1.2.0：独立读取当前source题本、指导语、计分、参数、报告、受众与既有本地审计；核对真实分数范围/方向、固定解释与假设例子、可选行动、简短边界及未改动scoreKey/source/bands。仅作报告文字自审，不是人工专家、作者、译审或本地效度批准；未运行schema validator、计分器、golden、PG、报告渲染、CI或DB。"
+          }
+        }
+      }
+    }
+  ]
+}

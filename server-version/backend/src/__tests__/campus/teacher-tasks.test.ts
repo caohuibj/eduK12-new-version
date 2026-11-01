@@ -50,7 +50,7 @@ describe('Huischool teacher observer task boundary',()=>{
       "selected.status='ACTIVE'","organization_access_denies",
     ])expect(sql).toContain(expression)
     expect(sql).toContain('org.id=')
-    expect(mocks.official).toHaveBeenCalledWith('teacher-a',{runIds:['run-a'],preserveBoundSchoolContinuation:true})
+    expect(mocks.official).toHaveBeenCalledWith('teacher-a',{runIds:['run-a'],preserveBoundSchoolContinuation:true,includeCompletedSchoolFeedback:true})
     expect(JSON.stringify(result)).not.toMatch(/PRIVATE_LOGIN_NAME|subjectUserId|student-a|reportAttemptId/)
   })
   it('drops unrelated or teacher-to-teacher runs even if the generic inbox returns them',async()=>{

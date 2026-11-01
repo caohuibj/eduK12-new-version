@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "psyflex6_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 2,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "心理灵活性问卷（Psy-Flex，6题）— 中文工作译稿",
+      "abbreviation": "PSYFLEX-6-ZH-WORKING",
+      "instrumentFamily": "Psy-Flex (Gloster et al. 2021)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "过去七天内自述的心理灵活性：能否回到当下、容纳不舒服的经验、与妨碍性想法保持距离、保持稳定的自我感、按自己的价值决定精力投向、并投入有意义的事。六题分别对应 ACT 模型的六个核心过程，但**只输出一个总分**，不输出六个分量表（每题一过程，不足以构成可解释的分量表）。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:selfreg_executive",
+        "domain:wellbeing_strength",
+        "construct:psychological_flexibility",
+        "construct:act_hexaflex",
+        "construct:present_moment_awareness",
+        "construct:acceptance",
+        "construct:defusion",
+        "construct:self_as_context",
+        "construct:values",
+        "construct:committed_action",
+        "construct:state_last_seven_days",
+        "construct:not_trait_measure",
+        "construct:not_diagnostic",
+        "construct:not_ability",
+        "orientation:ACT",
+        "orientation:contextual_behavioral_science",
+        "orientation:not_therapy_specific",
+        "orientation:not_dbt_specific",
+        "population:adult_project_18_plus",
+        "population:not_k12_validated",
+        "population:not_chinese_validated",
+        "response:self",
+        "response:6_items",
+        "response:five_point_1_to_5",
+        "response:seldom_to_very_often",
+        "response:no_reverse_items",
+        "response:single_total_sum_6_to_30",
+        "response:no_subscales",
+        "response:recall_window_last_seven_days",
+        "response:complete_required_project_proposal",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_empirical_cutoffs",
+        "license:authorization_pending",
+        "license:author_contact_pending",
+        "license:risk_noted",
+        "license:official_chinese_version_exists_not_copied",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_work_translation",
+        "language_validation:expert_translation_review_pending",
+        "language_validation:cognitive_interviews_pending",
+        "language_validation:local_validation_pending",
+        "Psy-Flex",
+        "心理灵活性",
+        "ACT",
+        "接纳承诺疗法",
+        "活在当下",
+        "接纳",
+        "认知解离",
+        "价值",
+        "承诺行动",
+        "过去七天",
+        "中文工作译稿"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版面向成人（含大学生与社区/临床样本）。平台以18+作为保守项目边界；未建立中国人群验证，不外推中小学生。作答者即本人。"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去七天；作者问卷说明明确要求围绕最近七天的经历作答。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定官方问卷的六题原序，不重排、不加注意力题。",
+        "五档频率：1 极少如此 到 5 非常经常，中间档保留数字与中文标签。",
+        "无反向题；单一总分 = 六题求和，范围 6–30，不输出六个分量表。",
+        "**高分表示心理灵活性更高**，不是能力高低或临床判断；报告不得写成“越高越好”的价值判断。",
+        "「过去七天」为作者规定的回顾期，必须在指导语中完整呈现，不得删除或改成长时窗。",
+        "作者已发布官方中文版问卷，本题文为独立工作译稿，不复制其措辞，也不继承其验证。",
+        "complete_required 为项目保守缺答约定：缺任一题总分为 null，不补零、不插补。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版报告单因子结构与良好信度；独立中文工作稿未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助成人回顾自己过去七天的心理灵活状态；不作诊断、能力评价或疗效判断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "psyflex-gloster2021-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "原版开发样本为成人（含大学生与社区／临床样本）",
+        "ageRange": "原报告未给出精确年龄边界；平台以18+作为保守边界",
+        "locale": "en",
+        "territory": "CH",
+        "studyDesign": "Gloster 等 2021 报告 Psy-Flex 为6题单因子，五点频率，求和范围6–30，越高表示心理灵活性越高；后续研究报告信度良好。",
+        "rating": "MIXED",
+        "citation": "Gloster, A. T., Block, V. J., Klotsche, J., Villanueva, J., Rinner, M. T. B., Benoy, C., Walter, M., Karekla, M., & Bader, K. (2021). Psy-Flex: A contextually sensitive measure of psychological flexibility. Journal of Contextual Behavioral Science, 22, 13–23. https://doi.org/10.1016/J.JCBS.2021.09.001",
+        "doi": "10.1016/J.JCBS.2021.09.001",
+        "url": "https://doi.org/10.1016/J.JCBS.2021.09.001",
+        "notes": "题文取自作者官方 Psy-Flex 英文问卷 PDF（巴塞尔大学），并与 PMC11274342、HKMU 研究方案书两个独立来源互证；计分说明原文：Sum all 6 answers. The higher the sum, the higher the psychological flexibility.评为 MIXED 是因为原版证据为初步，且本中文工作稿无中国人群验证。"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.1",
+    "translationSource": "作者官方 Psy-Flex 英文问卷 PDF（巴塞尔大学）六题原文与五档频率锚点。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "平台独立中文工作译稿。作者已发布官方中文版问卷，本译稿不复制其措辞、不继承其验证结果。专家审校 PENDING、认知访谈与中国人群验证 NOT_ESTABLISHED。 1.0.1将最高频率中文选项由“总是如此”纠正为“非常经常”，对应原英文 very often；题文未改。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Psy-Flex: A contextually sensitive measure of psychological flexibility (6-item)",
+      "citation": "Gloster, A. T., Block, V. J., Klotsche, J., Villanueva, J., Rinner, M. T. B., Benoy, C., Walter, M., Karekla, M., & Bader, K. (2021). Psy-Flex: A contextually sensitive measure of psychological flexibility. Journal of Contextual Behavioral Science, 22, 13–23.",
+      "url": "https://doi.org/10.1016/J.JCBS.2021.09.001",
+      "publicationYear": 2021
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "心理灵活性总分（6题）"
+      ],
+      "limitations": [
+        "既有完整内容候选见 PR #379（333200ade0c6cb42130cbc052189ba9c64691a12）。本条仅登记已有目录与缺口，不复制题本、不替代原候选的审核或发布，不代表数据库已安装。",
+        "作者官方 PDF 未附明示许可，仅邀请反馈；未见再分发或商业使用授权。按项目政策记录为 authorization_pending + author_contact_pending，不作已授权主张，也不得据此商用。",
+        "这是独立中文工作译稿，尚未完成专家译审、认知访谈或中国人群验证。",
+        "原版面向成人样本，不外推中小学生。",
+        "没有中文常模、等级或百分位；本版本仅做 score_only 呈现，不给出切点。",
+        "高分只表示过去七天自述的心理灵活性更高，不代表能力、人格或心理健康水平。",
+        "作者官方 PDF 未附明示许可，授权状态未闭合，列为待办事项。"
+      ],
+      "disclaimer": "用于成人回顾过去七天的心理灵活状态，不作诊断、能力评价或疗效判断。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "EXISTING_PUBLIC_REDISTRIBUTION_HOLD",
+      "已有完整内容候选在 PR #379，尚未合入当前源码库；请沿原候选补齐可执行来源后入库。",
+      "原许可记录明确保留公开再分发 HOLD；请补确切授权依据或沿既有非公开草稿流程处理。"
+    ]
+  }
+}

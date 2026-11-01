@@ -6,6 +6,7 @@ vi.mock('../../modules/scale/library/standard-catalog-reader',()=>({readStandard
 vi.mock('../../modules/scale-library-governance/service',()=>({listEntries:mocks.entries}))
 import {readUnifiedCatalog} from '../../modules/scale-library-governance/unified-catalog'
 import {buildUnifiedScaleLibraryReadModel} from '../../modules/scale/library/catalog-only-read-model'
+import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
 const model=buildUnifiedScaleLibraryReadModel({viewerRole:'ADMIN',locale:'zh-CN',territory:'CN'})
 beforeEach(()=>{vi.resetAllMocks();mocks.actor.mockResolvedValue({systemAdmin:true,role:'ADMIN'});mocks.read.mockResolvedValue(model);mocks.entries.mockResolvedValue({list:[],hasMore:false})})
 describe('shared Training catalog discovery before pagination',()=>{
@@ -23,11 +24,22 @@ describe('shared Training catalog discovery before pagination',()=>{
   expect(mocks.read).toHaveBeenCalledTimes(1)
  })
  it('keeps registered origin independent of authorship and does not broaden an unknown tag',async()=>{
-  const first=await readUnifiedCatalog('system','TRAINING',{page:1,pageSize:25,origin:'STANDARD_REGISTRY',tags:['student_self_report']})
-  const second=await readUnifiedCatalog('system','TRAINING',{page:2,pageSize:25,origin:'STANDARD_REGISTRY',tags:['student_self_report']})
-  expect(first.list).toHaveLength(25);expect(second.list).toHaveLength(11)
-  expect(first.hasMore).toBe(true);expect(second.hasMore).toBe(false)
-  expect(first.list.every(row=>row.origin==='STANDARD_REGISTRY')).toBe(true)
+  const expected=listScaleInstrumentSources().filter(source=>source.catalog.construct.constructOverlapTags.includes('student_self_report'))
+   .map(source=>`${source.identity.instrumentKey}:${source.identity.instrumentVersion}`).sort()
+  expect(expected.length).toBeGreaterThan(25)
+  const identities:string[]=[]
+  for(let page=1;page<=Math.ceil(expected.length/25)+1;page++){
+   const result=await readUnifiedCatalog('system','TRAINING',{page,pageSize:25,origin:'STANDARD_REGISTRY',tags:['student_self_report']})
+   expect(result.list).toHaveLength(Math.max(0,Math.min(25,expected.length-(page-1)*25)))
+   expect(result.hasMore).toBe(page*25<expected.length)
+   for(const row of result.list){
+    expect(row.origin).toBe('STANDARD_REGISTRY')
+    if(row.exactVersion.origin==='STANDARD_REGISTRY')identities.push(`${row.exactVersion.instrumentKey}:${row.exactVersion.instrumentVersion}`)
+   }
+  }
+  expect(identities.slice().sort()).toEqual(expected)
+  expect(new Set(identities).size).toBe(expected.length)
+  expect(mocks.entries).not.toHaveBeenCalled()
   expect((await readUnifiedCatalog('system','TRAINING',{page:1,pageSize:25,tags:['PUBLIC']})).list).toEqual([])
  })
  it('checks the actor before reading source metadata or private entries',async()=>{

@@ -11,11 +11,12 @@ import {
 } from '../../modules/scale/library/scale-library-read-model'
 
 // Historical Wave 0 assertions deliberately exclude later content onboarding.
-const wave0 = new Set(['adexi_v1', 'who5', 'sdq_parent_zh_cn', 'sdq_teacher_zh_cn', 'texi_parent_zh_cn', 'texi_teacher_zh_cn'])
+const wave0 = new Set(['adexi_v1@2.0.0', 'who5@1.0.0', 'sdq_parent_zh_cn@1.0.0', 'sdq_teacher_zh_cn@1.0.0', 'texi_parent_zh_cn@1.0.0', 'texi_teacher_zh_cn@1.0.0'])
 const buildWave0ReadModel: typeof buildScaleLibraryReadModel = (...args) => {
   const model = buildScaleLibraryReadModel(...args)
-  expect(model.entries.every(isScaleLibraryPublicPayloadSafe)).toBe(true)
-  return { ...model, entries: model.entries.filter(entry => wave0.has(entry.identity.instrumentKey)) }
+  const entries = model.entries.filter(entry => wave0.has(`${entry.identity.instrumentKey}@${entry.identity.instrumentVersion}`))
+  expect(entries.every(isScaleLibraryPublicPayloadSafe)).toBe(true)
+  return { ...model, entries }
 }
 
 const NOW = '2026-09-07T00:00:00.000Z'

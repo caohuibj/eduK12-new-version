@@ -14,9 +14,14 @@ import { standardTripletCatalog } from '../../modules/survey/standard-triplet.se
 import { surveyLibraryCatalog } from '../../modules/survey/library-admin.service'
 import { listScaleInstrumentSources } from '../../modules/scale/onboarding/instrument-registry'
 import { buildUnifiedScaleLibraryReadModel } from '../../modules/scale/library/catalog-only-read-model'
+import { standardPolicyIdentity } from '../../modules/survey/tool-policy'
 
 const model = buildUnifiedScaleLibraryReadModel({ viewerRole: 'ADMIN', locale: 'zh-CN', territory: 'CN', nowIso: '2026-10-25T00:00:00.000Z' })
 const wave = model.entries.filter(entry => entry.construct.constructOverlapTags.includes('student_self_report'))
+const sourceVersionId = (identity: { instrumentKey: string; instrumentVersion: string }) => `${identity.instrumentKey}:${identity.instrumentVersion}`
+const studentVersions = listScaleInstrumentSources()
+  .filter(source => source.catalog.construct.constructOverlapTags.includes('student_self_report'))
+  .map(source => sourceVersionId(source.identity)).sort()
 const sqlText = (input: { strings?: readonly string[] } | readonly string[]) => (Array.isArray(input) ? input : (input as { strings: readonly string[] }).strings).join('?')
 
 beforeEach(() => {
@@ -28,12 +33,21 @@ beforeEach(() => {
 })
 
 describe('server-wide discovery before public-catalog pagination', () => {
-  it('keeps the #355 SDQ function fingerprint fix on unfiltered second pages after tag integration', async () => {
-    const standard = await standardTripletCatalog('system', 2)
-    const survey = await surveyLibraryCatalog('manager', 2)
+  it('keeps the #355 SDQ function fingerprint fix on its actual unfiltered pages after catalog expansion', async () => {
+    const sortedSourceIds = listScaleInstrumentSources().map(source => sourceVersionId(source.identity)).sort((a, b) => a.localeCompare(b))
+    const sortedModelIds = model.entries.map(entry => sourceVersionId(entry.identity)).sort((a, b) => a.localeCompare(b))
+    const sdqId = 'sdq_teacher_zh_cn:1.0.0'
+    const standardIndex = sortedSourceIds.indexOf(sdqId)
+    const surveyIndex = sortedModelIds.indexOf(sdqId)
+    expect(standardIndex).toBeGreaterThanOrEqual(25)
+    expect(surveyIndex).toBeGreaterThanOrEqual(25)
+    const standard = await standardTripletCatalog('system', Math.floor(standardIndex / 25) + 1)
+    const survey = await surveyLibraryCatalog('manager', Math.floor(surveyIndex / 25) + 1)
     expect(standard.list.length).toBeGreaterThan(0)
     expect(survey.list.length).toBeGreaterThan(0)
-    expect([...standard.list.map(row => row.toolKey), ...survey.list.map(row => row.exactVersion.origin === 'STANDARD_REGISTRY' ? row.exactVersion.instrumentKey : '')].some(key => key.includes('sdq'))).toBe(true)
+    expect(standard.list.some(row => row.toolKey === 'sdq_teacher_zh_cn' && row.instrumentVersion === '1.0.0')).toBe(true)
+    const sdq = survey.list.find(row => row.exactVersion.origin === 'STANDARD_REGISTRY' && sourceVersionId(row.exactVersion) === sdqId)
+    expect(sdq?.policyIdentity).toEqual(standardPolicyIdentity('sdq_teacher_zh_cn', '1.0.0'))
     expect(survey.list.every(row => Array.isArray(row.classificationTags))).toBe(true)
   })
   it('finds a standard version outside the original first page with an old tag ID and Chinese aliases', async () => {
@@ -47,16 +61,20 @@ describe('server-wide discovery before public-catalog pagination', () => {
     expect(result.list[0].classificationTags).toContainEqual({ id: 'student_self_report', label: '学生', facet: 'population' })
     expect(result.tagFacets.subject).toHaveLength(6)
   })
-  it('paginates all 36 matched standard versions without duplicates or missing versions', async () => {
-    const first = await standardTripletCatalog('system', 1, { tags: ['student_self_report'] })
-    const second = await standardTripletCatalog('system', 2, { tags: ['student_self_report'] })
-    expect(first.list).toHaveLength(25)
-    expect(first.hasMore).toBe(true)
-    expect(second.list).toHaveLength(11)
-    expect(second.hasMore).toBe(false)
-    expect(new Set([...first.list, ...second.list].map(row => row.toolKey)).size).toBe(36)
-    expect(second.tagFacets).toEqual(first.tagFacets)
-    expect((await standardTripletCatalog('system', 3, { tags: ['student_self_report'] })).list).toEqual([])
+  it('paginates every source-declared student standard version without duplicates or missing versions', async () => {
+    expect(studentVersions.length).toBeGreaterThan(25)
+    const identities: string[] = []
+    let facets: unknown
+    for (let page = 1; page <= Math.ceil(studentVersions.length / 25) + 1; page++) {
+      const result = await standardTripletCatalog('system', page, { tags: ['student_self_report'] })
+      expect(result.list).toHaveLength(Math.max(0, Math.min(25, studentVersions.length - (page - 1) * 25)))
+      expect(result.hasMore).toBe(page * 25 < studentVersions.length)
+      if (page === 1) facets = result.tagFacets
+      expect(result.tagFacets).toEqual(facets)
+      identities.push(...result.list.map(row => `${row.toolKey}:${row.instrumentVersion}`))
+    }
+    expect(identities.slice().sort()).toEqual(studentVersions)
+    expect(new Set(identities).size).toBe(studentVersions.length)
   })
   it('still refuses standard discovery before registry results when administrator authority fails', async () => {
     mocks.query.mockResolvedValue([])
@@ -75,15 +93,25 @@ describe('server-wide discovery before public-catalog pagination', () => {
     expect(mocks.manager).toHaveBeenCalledTimes(2)
     expect(mocks.query.mock.calls.some(([query]) => sqlText(query).includes('scale_library_entries'))).toBe(false)
   })
-  it('returns 25 plus 11 Survey matches and never fills a tag-filtered page with untagged authored tools', async () => {
+  it('returns every source-declared student Survey match without filling pages with untagged authored tools', async () => {
     mocks.readCatalog.mockResolvedValue({ ...model, entries: wave })
-    const first = await surveyLibraryCatalog('manager', 1, { tags: ['student_self_report'] })
-    const second = await surveyLibraryCatalog('manager', 2, { tags: ['student_self_report'] })
-    expect(first.list).toHaveLength(25)
-    expect(first.hasMore).toBe(true)
-    expect(second.list).toHaveLength(11)
-    expect(second.hasMore).toBe(false)
-    expect(new Set([...first.list, ...second.list].map(row => row.catalogId)).size).toBe(36)
+    expect(studentVersions.length).toBeGreaterThan(25)
+    const identities: string[] = []
+    let facets: unknown
+    for (let page = 1; page <= Math.ceil(studentVersions.length / 25) + 1; page++) {
+      const result = await surveyLibraryCatalog('manager', page, { tags: ['student_self_report'] })
+      expect(result.list).toHaveLength(Math.max(0, Math.min(25, studentVersions.length - (page - 1) * 25)))
+      expect(result.hasMore).toBe(page * 25 < studentVersions.length)
+      if (page === 1) facets = result.tagFacets
+      expect(result.tagFacets).toEqual(facets)
+      for (const row of result.list) {
+        expect(row.origin).toBe('STANDARD_REGISTRY')
+        expect(row.classificationTags).toContainEqual({ id: 'student_self_report', label: '学生', facet: 'population' })
+        if (row.exactVersion.origin === 'STANDARD_REGISTRY') identities.push(sourceVersionId(row.exactVersion))
+      }
+    }
+    expect(identities.slice().sort()).toEqual(studentVersions)
+    expect(new Set(identities).size).toBe(studentVersions.length)
     expect(mocks.query.mock.calls.some(([query]) => sqlText(query).includes('scale_library_entries'))).toBe(false)
   })
   it('reports an authored continuation even when standard matches fill exactly the last 25-row page', async () => {

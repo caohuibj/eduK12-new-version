@@ -132,14 +132,13 @@ describe('Cross-version disclosure admission: only comparable effective populati
     scenario:'TEACHER_ADULT_FORM_GROUP' as const,
     respondents:Array.from({length:10},(_,i)=>'user-'+i)}
   it('a previous enhanced release protects even when the new Run is Standard',async()=>{
-    const prior=base.respondents.slice(0,9).map(userId=>({runId:'old-run',userId}))
-    const query=vi.fn()
-      .mockResolvedValueOnce([{runId:'old-run',enhanced:true}])
-      .mockResolvedValueOnce(prior)
+    const query=vi.fn().mockResolvedValueOnce([
+      {key:'old-release',enhanced:true,n:9,shared:9},
+    ])
     await expect(assertTeacherComparableDisclosure({$queryRaw:query} as any,{
       ...base,enhanced:false,
     })).rejects.toMatchObject({code:'TEACHER_REPORT_EFFECTIVE_DIFFERENCING_BLOCKED'})
-    expect(query).toHaveBeenCalledTimes(2)
+    expect(query).toHaveBeenCalledTimes(1)
   })
   it('standard-to-standard does not enable expensive history expansion',async()=>{
     const query=vi.fn().mockResolvedValueOnce([{runId:'older',enhanced:false}])

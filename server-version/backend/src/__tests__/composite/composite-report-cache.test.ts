@@ -11,7 +11,7 @@ describe('encrypted report materialization boundary', () => {
     const policy = resolveLegacyScaleProjectionPolicy('unrecognized-standard', '1.0.0', 'STANDARD')
     const unit = { itemId: 'scale-1', type: 'SCALE', kind: 'scale', scaleId: 's', scaleCode: 'unrecognized-standard', scaleName: 'Restricted', result: null, scores: [{ key: 'secret', value: 77 }] }
     Object.defineProperty(unit, '__scaleProjectionPolicy', { value: policy, enumerable: false })
-    const report = { id: binding.attemptId, name: 'Fixture', unitReports: [unit], backgroundValues: [], completedAt: new Date(), totalTime: 1 }
+    const report = { id: binding.attemptId, name: 'Fixture', unitReports: [unit], backgroundValues: [], completedAt: new Date('2026-10-31T00:00:00.000Z'), totalTime: 1 }
     const encrypted = encryptCompositeCollectionReport(report, binding)
     expect(encrypted).not.toContain('secret')
     const restored = decryptCompositeCollectionReport(encrypted, binding)

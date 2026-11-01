@@ -10,6 +10,8 @@ import {assertEducationRunLibraryResources} from '../../modules/assessment-run/e
 import {readEducationLibraryUse} from '../../modules/scale-library-governance/education-use'
 import {lockEducationLibraryOrganization,readEducationLibraryRegisteredSource} from '../../modules/scale-library-governance/education-runtime-resources'
 import {assertCurrentRunManagerBoundary} from '../../modules/assessment-run/resourceBoundary'
+import {assertLibraryResourcesAuthority} from '../../modules/scale-library-governance/authority'
+vi.mock('../../modules/scale-library-governance/authority',()=>({assertLibraryResourcesAuthority:vi.fn()}))
 vi.mock('../../modules/scale-library-governance/education-use',()=>({readEducationLibraryUse:vi.fn()}))
 vi.mock('../../modules/scale-library-governance/education-runtime-resources',()=>({assertEducationLibraryReadCommitted:vi.fn(),lockEducationLibraryOrganization:vi.fn(),readEducationLibraryRegisteredSource:vi.fn()}))
 vi.mock('../../modules/assessment-run/resourceBoundary',()=>({assertCurrentRunManagerBoundary:vi.fn()}))
@@ -18,21 +20,41 @@ const uuid=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const origin=(n:number)=>({schemaVersion:1,adapterVersion:'1.0.0',entryId:uuid(n),product:'TEACHER',releaseId:uuid(100+n),contentHash:'a'.repeat(64),approvedSnapshotHash:'b'.repeat(64),sourceDefinitionHash:'c'.repeat(64),applicabilityHash:'d'.repeat(64),variantKey:'TEACHER:SELF',dependencies:[]})
 const ref=(n:number)=>({family:'SCALE',key:`library-scale:${uuid(n)}:TEACHER:TEACHER:SELF`,version:'1.0.0'})
 const input={organizationId:uuid(50),runId:uuid(51),actorUserId:uuid(52),purpose:'PUBLISH' as const,resources:[ref(2),ref(1)]}
-function db(domain='SCHOOL'){return {$queryRaw:vi.fn(async(query:any)=>{
+const useRow=(n:number)=>({id:uuid(200+n),entryId:uuid(n),releaseId:uuid(100+n),issuerId:uuid(300+n),authorityGrantId:uuid(400+n),version:1,scopeKind:'USER',expiresAt:null})
+function db(domain='SCHOOL',school=false){return {
+ user:{findUnique:vi.fn().mockResolvedValue({id:input.actorUserId,accountDomain:'SCHOOL',role:'TEACHER'})},
+ $queryRaw:vi.fn(async(query:any)=>{
  const sql=query.strings.join('')
- if(sql.includes('SELECT o.product_domain'))return [{domain,schoolCourseId:null,teacherEventId:uuid(53)}]
- if(sql.includes("entry->'libraryOrigin'")){const key=query.values.find((v:any)=>typeof v==='string'&&v.startsWith('library-scale:'));return [{origin:origin(key===ref(1).key?1:2)}]}
+ if(sql.includes('SELECT o.product_domain'))return [{domain,schoolCourseId:school?uuid(54):null,teacherEventId:school?null:uuid(53)}]
+ if(sql.includes("entry->'libraryOrigin'")){const key=query.values.find((v:any)=>typeof v==='string'&&v.startsWith('library-scale:'));return [{origin:{...origin(key===ref(2).key?2:1),...(school?{product:'SCHOOL'}:{})}}]}
+ if(sql.includes('WITH candidates AS MATERIALIZED (')&&sql.includes('FROM scale_library_use_grants g JOIN scale_library_entries e')
+  &&sql.includes('ORDER BY u.id FOR SHARE OF u')&&sql.includes('ORDER BY "issuerId","authorityGrantId" NULLS FIRST,"entryId",id')){
+  const selected=[1,2].filter(n=>query.values.includes(uuid(n)))
+  expect(query.values).toEqual([...selected.map(uuid),school?'SCHOOL':'TEACHER',input.organizationId,input.actorUserId])
+  return selected.map(useRow)
+ }
+ if(sql.includes('FROM scale_library_use_grants g JOIN scale_library_entries e')&&sql.includes('JOIN users issuer ON issuer.id=g.issuer_id')
+  &&sql.includes('ORDER BY g.entry_id,g.id FOR SHARE OF g')){
+  const selected=[1,2].filter(n=>query.values.includes(uuid(200+n)))
+  expect(query.values).toEqual([...selected.map(n=>uuid(200+n)),school?'SCHOOL':'TEACHER',input.organizationId,input.actorUserId])
+  return selected.map(useRow)
+ }
  if(sql.includes('SELECT status FROM huiteacher_evaluation_events'))return [{status:'OPEN'}]
  throw new Error('unanticipated query')
 })} as any}
-beforeEach(()=>vi.resetAllMocks())
+beforeEach(()=>{vi.resetAllMocks();vi.mocked(assertLibraryResourcesAuthority).mockResolvedValue(undefined as never)})
 describe('server-owned education library workflow context',()=>{
  it('selects all issuers before org, rechecks only those grants, and uses the same tx for manager checks',async()=>{
   const tx=db(),trace:string[]=[]
+  vi.mocked(assertLibraryResourcesAuthority).mockImplementation(async(_tx,issuerId,releases,capability,product,grantId)=>{
+   const n=issuerId===uuid(301)?1:2
+   expect(_tx).toBe(tx);expect(releases).toEqual([uuid(100+n)]);expect(capability).toBe('material.distribute');expect(product).toBe('TEACHER');expect(grantId).toBe(uuid(400+n))
+   trace.push(`select${n}`);return undefined as never
+  })
   vi.mocked(readEducationLibraryUse).mockImplementation(async(_tx,context,options)=>{
    const n=context.entryId===uuid(1)?1:2
-   trace.push(options?`recheck${n}`:`select${n}`)
-   if(options)expect(options.onlyGrantId).toBe(uuid(200+n))
+   trace.push(`recheck${n}`)
+   expect(options?.onlyGrantId).toBe(uuid(200+n))
    return {grantId:uuid(200+n)} as any
   })
   vi.mocked(lockEducationLibraryOrganization).mockImplementation(async()=>{trace.push('org')})
@@ -47,7 +69,8 @@ describe('server-owned education library workflow context',()=>{
    return {grantId:uuid(201)} as any
   })
   await expect(assertEducationRunLibraryResources(db(),{...input,resources:[ref(1)]})).rejects.toThrow('current selected grant revoked')
-  expect(readEducationLibraryUse).toHaveBeenCalledTimes(2)
+  expect(readEducationLibraryUse).toHaveBeenCalledTimes(1)
+  expect(readEducationLibraryUse).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({entryId:uuid(1)}),{onlyGrantId:uuid(201)})
   expect(readEducationLibraryRegisteredSource).not.toHaveBeenCalled()
  })
  it('rejects library resource use in a noneducation run without taking education locks',async()=>{
@@ -55,15 +78,8 @@ describe('server-owned education library workflow context',()=>{
   expect(lockEducationLibraryOrganization).not.toHaveBeenCalled()
  })
  it('rejects a teacher-population variant in the School edit and publication guards',async()=>{
-  const schoolOrigin={...origin(1),product:'SCHOOL'}
   const schoolRef={...ref(1),key:`library-scale:${uuid(1)}:SCHOOL:TEACHER:SELF`}
-  const tx={user:{findUnique:vi.fn().mockResolvedValue({id:input.actorUserId,accountDomain:'SCHOOL',role:'TEACHER'})},
-   $queryRaw:vi.fn(async(query:any)=>{
-    const sql=query.strings.join('')
-    if(sql.includes('SELECT o.product_domain'))return [{domain:'SCHOOL',schoolCourseId:uuid(54),teacherEventId:null}]
-    if(sql.includes("entry->'libraryOrigin'"))return [{origin:schoolOrigin}]
-    throw new Error('unanticipated School query')
-   })} as any
+  const tx=db('SCHOOL',true)
   vi.mocked(readEducationLibraryUse).mockResolvedValue({grantId:uuid(201)} as any)
   vi.mocked(readEducationLibraryRegisteredSource).mockResolvedValue({variantKey:'TEACHER:SELF',resourceEntry:{applicability:{subjectRoles:['TEACHER']}}} as any)
   for(const purpose of ['EDIT','PUBLISH'] as const){
@@ -73,7 +89,8 @@ describe('server-owned education library workflow context',()=>{
  })
  it('checks private ownership after all public issuers and current workflow without adding issuer locks',async()=>{
   const trace:string[]=[]
-  vi.mocked(readEducationLibraryUse).mockImplementation(async(_tx,_c,options)=>{trace.push(options?'recheck':'issuer');return {grantId:uuid(201)} as any})
+  vi.mocked(assertLibraryResourcesAuthority).mockImplementation(async()=>{trace.push('issuer');return undefined as never})
+  vi.mocked(readEducationLibraryUse).mockImplementation(async(_tx,_c,options)=>{expect(options?.onlyGrantId).toBe(uuid(201));trace.push('recheck');return {grantId:uuid(201)} as any})
   vi.mocked(lockEducationLibraryOrganization).mockImplementation(async()=>{trace.push('org')})
   vi.mocked(readEducationLibraryRegisteredSource).mockResolvedValue({variantKey:'TEACHER:SELF',resourceEntry:{applicability:{subjectRoles:['TEACHER']}}} as any)
   const context={entry:'TEACHER' as const,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL' as const}}

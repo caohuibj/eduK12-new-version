@@ -129,13 +129,19 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
       expect(result.decision.warnings.some((warning) => warning.includes('translation required'))).toBe(false)
     })
 
-    it('keeps unusable localization and respondent mismatch as deployment diagnostics', () => {
+    it('keeps pending review usable while retaining invalid localization and respondent diagnostics', () => {
+      const pendingManifest = localizationManifest({ reviewStatus: 'PENDING', reviewedAt: undefined })
       const pendingReview = gate({
-        localizationManifest: localizationManifest({ reviewStatus: 'PENDING', reviewedAt: undefined }),
+        localizationManifest: pendingManifest,
       })
       expect(pendingReview.decision.publishable).toBe(true)
-      expect(pendingReview.localizationUsable).toBe(false)
+      expect(pendingReview.localizationUsable).toBe(true)
       expect(pendingReview.decision.warnings.some((warning) => warning.includes('reviewStatus=PENDING'))).toBe(true)
+      expect(pendingManifest.reviewStatus).toBe('PENDING')
+
+      const wrongLocale = gate({ locale: 'en', localizationManifest: pendingManifest })
+      expect(wrongLocale.localizationUsable).toBe(false)
+      expect(wrongLocale.decision.warnings.some((warning) => warning.includes('targetLocale'))).toBe(true)
 
       const duplicatedRights = gate({
         localizationManifest: localizationManifest({ translationRightsStatus: 'DENIED' }),

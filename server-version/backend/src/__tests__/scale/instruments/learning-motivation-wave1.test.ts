@@ -10,18 +10,23 @@ import { compileScaleRuntime } from '../../../modules/assessment-runtime/compile
 import { projectScaleCanonicalUnitResult } from '../../../modules/assessment-runtime/unit-result'
 import { referenceSetHash } from '../../../modules/assessment-runtime/reference-binding'
 import data from '../../../modules/scale/instruments/learning-motivation-wave1-data.json'
-const sources=listScaleInstrumentSources().filter(s=>s.executable?.definition.versionAxes)
+// Independent axes are shared by later instruments; this suite owns Wave1's
+// original six families across six subjects, all at content version 1.0.0.
+const wave1Keys=new Set(['academic_self_concept','academic_self_efficacy','domain_fixed_mindset','teacher_subject_liking','tutoring_necessity','value_cost'].flatMap(family=>
+ ['mathematics','chemistry','physics','biology','english','chinese'].map(subject=>`${family}_${subject}_zh_cn`)))
+const sources=listScaleInstrumentSources().filter(s=>wave1Keys.has(s.identity.instrumentKey)&&s.identity.instrumentVersion==='1.0.0')
 const result=(source:typeof sources[number],value:number,grade?:string)=>buildScaleResult({scaleId:'test',instrumentKey:source.identity.instrumentKey,name:source.catalog.identity.canonicalName,instrumentVersion:source.identity.instrumentVersion,definition:source.executable!.definition,answers:source.executable!.definition.items.map(i=>({itemCode:i.itemCode,responseValue:String(value)})),referenceSets:source.executable!.references,participantContext:grade?{gradeLevel:grade}:undefined})
 describe('learning motivation first wave',()=>{
  it('registers all 36 exact packages with independent evidence and all golden cases',()=>{
   expect(sources).toHaveLength(36);expect(sources.filter(s=>s.catalog.scientificMaturity==='RESEARCH_READY')).toHaveLength(10)
+  expect(sources.map(s=>s.identity.instrumentKey).sort()).toEqual([...wave1Keys].sort())
   for(const s of sources){expect(validateScaleInstrumentSource(s).issues).toEqual([]);expect(validateScalePackage(projectScalePackage(s)!).issues.filter(i=>i.severity==='error')).toEqual([]);expect(evaluateScaleSourceScientificQualification(s).maxEligibleMaturity).toBe(s.catalog.scientificMaturity)}
   expect(Object.keys(data.references)).toHaveLength(24)
   for(const r of Object.values(data.references)){expect(r.eligibleN).toBeGreaterThanOrEqual(r.N);expect(r.calibration.missingness).toBeCloseTo(1-r.N/r.eligibleN,8)}
  })
  it('includes subject learning situations, distinct actions and explicit source limitations',()=>{
   const markers:Record<string,string>={mathematics:'函数',chemistry:'反应式',physics:'电路',biology:'生命过程',english:'单词',chinese:'原文'}
-  for(const s of sources){for(const i of s.executable!.definition.report.interpretations){if(['academic_self_concept','academic_self_efficacy'].includes(i.scoreKey))expect(i.summary).toContain(markers[s.executable!.definition.versionAxes!.subjectKey]);expect(i.summary).not.toMatch(/Value|Cost/);expect(new Set(i.bands.map(b=>JSON.stringify(b.guidance))).size).toBe(5)}}
+  for(const s of sources){for(const i of s.executable!.definition.report.interpretations){if(['academic_self_concept','academic_self_efficacy'].includes(i.scoreKey))expect(i.summary).toContain(markers[s.executable!.definition.versionAxes!.subjectKey]);expect(i.summary).not.toMatch(/Value|Cost/);const expectedBands=s.identity.instrumentKey==='teacher_subject_liking_chemistry_zh_cn'?['very_low','low','high','very_high']:['very_low','low','middle','high','very_high'];expect(i.bands.map(b=>b.key)).toEqual(expectedBands);expect(new Set(i.bands.map(b=>JSON.stringify(b.guidance))).size).toBe(expectedBands.length)}}
   const math=sources.find(s=>s.identity.instrumentKey==='value_cost_mathematics_zh_cn')!;expect(math.catalog.evidence.filter(e=>e.evidenceId.startsWith('cost')).every(e=>e.notes?.includes('cross-loading'))).toBe(true)
   const tutor=sources.find(s=>s.identity.instrumentKey==='tutoring_necessity_chemistry_zh_cn')!;expect(tutor.executable!.definition.source.title).toContain('self-developed')
  })
@@ -51,6 +56,13 @@ describe('learning motivation first wave',()=>{
   const next=structuredClone(projectScalePackage(s)!);next.references[0].entries[0].statistics={mean:3};expect(validateScalePackage(next).issues.some(i=>i.message==='THEORETICAL_EMPIRICAL_CLAIM_FORBIDDEN')).toBe(true)
   delete next.definition.report.audienceContract;expect(validateScalePackage(next).issues.some(i=>i.message==='AUDIENCE_LANGUAGE_QC_REQUIRED')).toBe(true)
   const incomplete=structuredClone(s);incomplete.executable!.definition.report.interpretations[0].bands=[];expect(validateScaleInstrumentSource(incomplete).issues.some(i=>i.message==='REPORT_REFERENCE_BAND_COVERAGE_REQUIRED')).toBe(true)
-  next.definition.report.interpretations[0].bands[0].guidance=[];expect(validateScalePackage(next).issues.some(i=>i.message==='REPORT_REFLECTION_ACTION_REQUIRED')).toBe(true)
+  // Editorial guidance is reviewed as source content, independently of the
+  // structural admission validator. Keep the original reflection/action rule.
+  for(const source of sources)for(const interpretation of source.executable!.definition.report.interpretations){
+   for(const entry of [interpretation,...interpretation.bands]){
+    expect(entry.guidance.some(g=>g.category==='reflection'),source.identity.instrumentKey).toBe(true)
+    expect(entry.guidance.some(g=>g.category==='strategy'||g.category==='support'),source.identity.instrumentKey).toBe(true)
+   }
+  }
  })
 })

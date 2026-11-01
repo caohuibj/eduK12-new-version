@@ -17,11 +17,14 @@ import { installPackage, publishPackage, changePackageStatus } from '../../modul
 import { BundleDefinitionProvider } from '../../modules/bundle-product/definition-provider'
 import { getExecutableScalePackage } from '../../modules/scale/onboarding/executable-registry'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
+import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
+import { getLegacyScaleCompatibilityProfile } from '../../modules/scale/policy/legacy-profile'
+import { activateScaleDeploymentRevision, readActiveScaleDeployment } from '../../modules/scale/deployment/repository'
 import { cognitiveSeeds } from '../../modules/cognitive/generated/seeds'
 import { requireCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../../modules/cognitive/profile-freeze'
 import { decryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
-import { integrationDatabaseUrl } from '../integration/integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
 
 vi.mock('node:crypto', async importOriginal => {
   const actual = await importOriginal<typeof import('node:crypto')>()
@@ -62,9 +65,10 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
   const reviewer = 'c4-reviewer-' + suffix, student = 'c4-student-' + suffix
   const secret = 'isolated-c4-review-key-' + suffix, oldKey = process.env.BUNDLE_REVIEW_SIGNING_KEY
   let db: PrismaClient, courseId: string
-  const scaleStatuses = new Map<string, any>(), configIds: string[] = []
+  const scaleStatuses = new Map<string, any>(), configIds: string[] = [], deploymentIds: string[] = []
   beforeAll(async () => {
     process.env.DATABASE_URL = url!; process.env.BUNDLE_PRODUCTS_ENABLED = 'true'; process.env.BUNDLE_REVIEW_SIGNING_KEY = secret
+    requireIsolatedReleaseDatabase(url!)
     db = new PrismaClient({ datasources: { db: { url } } })
     for (const [id, role] of [[actor.userId, 'ADMIN'], [reviewer, 'ADMIN'], [student, 'STUDENT']] as const) {
       await db.user.create({ data: { id, username: id, passwordHash: 'synthetic-only', role } })
@@ -85,6 +89,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       await db.compositeAssessment.deleteMany({ where: { id: { in: ids } } })
       await db.cognitiveAssignment.deleteMany({ where: { createdBy: actor.userId } })
       await db.cognitiveTestConfig.deleteMany({ where: { id: { in: configIds } } })
+      for (const id of deploymentIds) await db.$executeRaw`DELETE FROM scale_deployment_policies WHERE id=${id}::uuid`
       for (const [id, status] of scaleStatuses) await db.scale.update({ where: { id }, data: { status } })
       await db.scale.deleteMany({ where: { creatorId: actor.userId } })
       await db.course.deleteMany({ where: { creatorId: actor.userId } })
@@ -108,9 +113,26 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       const binding: { slotKey: string; resourceId?: string } = { slotKey: slot.slotKey }
       if (slot.unitType === 'SCALE') {
         const p = getExecutableScalePackage(slot.instrumentKey, slot.instrumentVersion)!
+        for (const reference of p.references) {
+          const where = { instrumentType_instrumentKey_referenceVersion: { instrumentType: 'SCALE' as const, instrumentKey: slot.instrumentKey, referenceVersion: reference.referenceVersion } }
+          const existing = await db.assessmentReferenceSet.findUnique({ where })
+          if (existing) expect(canonicalHash(existing.definition)).toBe(canonicalHash(reference))
+          else await db.assessmentReferenceSet.create({ data: { ...where.instrumentType_instrumentKey_referenceVersion, status: reference.status, definition: reference as any } })
+        }
         let row = await db.scale.findUnique({ where: { code: slot.instrumentKey } })
         if (row) { if (!scaleStatuses.has(row.id)) scaleStatuses.set(row.id, row.status); row = await db.scale.update({ where: { id: row.id }, data: { status: 'PUBLISHED' } }) }
         else row = await db.scale.create({ data: { code: slot.instrumentKey, name: slot.instrumentKey, creatorId: actor.userId, status: 'PUBLISHED', visibility: 'HIDDEN', instrumentClass: 'STANDARD', instrumentVersion: slot.instrumentVersion, definition: p.definition as any, definitionHash: hashScaleDefinition(p.definition), itemCount: p.definition.items.length, dimensionCount: p.definition.scoring.scores.length } })
+        // New STANDARD sources require an explicit synthetic deployment in
+        // addition to their published measurement and Training entry policy.
+        if (!getLegacyScaleCompatibilityProfile(slot.instrumentKey, slot.instrumentVersion) && !await readActiveScaleDeployment(db, row.id)) {
+          const runtimePolicy = getScaleInstrumentRuntimePolicy(slot.instrumentKey, slot.instrumentVersion)!
+          const id = randomUUID()
+          await db.$transaction(tx => activateScaleDeploymentRevision({ db: tx, id, scaleId: row!.id, createdByUserId: actor.userId,
+            policy: { schemaVersion: 2, revision: 1, locale: runtimePolicy.contentLocale, territory: 'CN', deploymentModes: ['STANDALONE', 'COMPOSITE'],
+              runtimePolicyHash: runtimePolicy.runtimePolicyHash, localizationVersion: getScaleInstrumentSource(slot.instrumentKey, slot.instrumentVersion)?.localization?.localizationVersion,
+              inFlightCompletion: 'FROZEN_DEADLINE', completionWindowMs: 86400000 } }))
+          deploymentIds.push(id)
+        }
         binding.resourceId = row.id
       } else if (slot.unitType === 'COGNITIVE') {
         const dep = pack.manifest.cognitiveDependencies.find(v => v.slotKey === slot.slotKey)!
@@ -146,15 +168,16 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       await (await import('../../modules/composite/final-submit.service')).submitCompositeFormSectionFinal({ attemptId, sectionId: section.id, userId: student, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: (started.attempt.currentItem as any).definitionHash,
         answers: section.items.map(i => { const key = frozen.bindings.context.find(c => c.itemId === i.id)!.contextKey; return { formItemId: i.id, value: fixture.context[key] == null ? '' : String(fixture.context[key]) } }) })
     }
+    const contextSnapshotHash = (await runtime.getAttemptState(attemptId, { userId: student })).contextSnapshotHash
     for (const slot of d.slots.filter(s => s.unitType !== 'FORM')) {
       const sample = fixture.slots[slot.slotKey], itemId = frozen.bindings.slots.find(b => b.slotKey === slot.slotKey)!.itemId
       if (sample.type === 'SCALE') {
         const child = await db.assessment.findFirstOrThrow({ where: { compositeAttemptId: attemptId, compositeItemId: itemId } })
-        await (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal({ assessmentId: child.id, userId: student, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: hashScaleDefinition(getExecutableScalePackage(slot.instrumentKey, slot.instrumentVersion)!.definition), contextSnapshotHash: null, answers: sample.answers as any })
+        await (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal({ assessmentId: child.id, userId: student, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: hashScaleDefinition(getExecutableScalePackage(slot.instrumentKey, slot.instrumentVersion)!.definition), contextSnapshotHash, answers: sample.answers as any })
       } else if (sample.type === 'COGNITIVE') {
         const child = await db.cognitiveSession.findFirstOrThrow({ where: { compositeAttemptId: attemptId, compositeItemId: itemId }, include: { assignment: true } })
         expect(child.randomSeed).toBe(fixture.randomSeed)
-        await (await import('../../modules/cognitive/final-submit.service')).submitCognitiveSessionFinal(student, { sessionId: child.id, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: child.assignment!.resolvedConfigHash!, contextSnapshotHash: null, trials: sample.trials as any })
+        await (await import('../../modules/cognitive/final-submit.service')).submitCognitiveSessionFinal(student, { sessionId: child.id, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: child.assignment!.resolvedConfigHash!, contextSnapshotHash, trials: sample.trials as any })
       } else {
         const child = await db.situationalAttempt.findFirstOrThrow({ where: { compositeAttemptId: attemptId, compositeItemId: itemId } })
         await (await import('../../modules/situational/situational-final-submit.service')).submitSituationalAttemptFinal({ attemptId: child.id, userId: student, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: child.definitionHash, instrumentVersion: child.instrumentVersion, compiledRuntimeHash: child.compiledRuntimeHash, scoringVersion: child.scoringVersion, responses: sample.responses as any, embedded: { compositeAttemptId: attemptId, compositeItemId: itemId, compositeSlotKey: compositeItemSlotKey(itemId, 'SITUATIONAL'), userId: student } })

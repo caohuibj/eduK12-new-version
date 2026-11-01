@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "erss19_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "baseContentHash": "d200e5e58c8c831c28abe034ee14064ba2982bce7813f79cbbda7200f1074186",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "scoreOrder": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "situation_modification",
+            "headline": "调整眼前的处境",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "情绪不舒服时，有时能先动一动眼前的处境：换个沟通方式、调整安排，或在合适的时候缓和气氛。这部分关注你是否会想到这种做法，不是说所有问题都能由你改变。很多限制来自工作、关系或环境，也需要别人一起参与。可以回想一次让自己紧绷的情境，分清哪些是暂时改不了的，哪些还有一点余地。先选择一个可行的小调整，比要求自己立刻开心更实际。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一个让你情绪起伏的情境里，什么还有一点可以调整的余地？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个自己确实能调整的小环节，试一次，再看看实际效果。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "attentional_deployment",
+            "headline": "让注意力换个落点",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "强烈情绪出现时，注意力有时会被牢牢拉住，也有时能先转向别的线索。这部分关注你平时怎样安放注意力，不是在要求逃避问题或假装没有情绪。暂时把目光移开，和以后再回来处理，可以同时存在。你可以观察什么时候换个落点让自己更有余地，什么时候反而把重要事情拖住。方法是否合适，要结合当时的任务和自己的感受，而不只是看用得多不多。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么时候转移注意力给了你缓冲，什么时候让事情一直悬着？"
+              },
+              {
+                "category": "strategy",
+                "text": "先做一个能暂时安顿自己的小动作，并约定什么时候回来处理重要的事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "cognitive_reappraisal",
+            "headline": "换个角度想一想",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "同一件事，换个角度理解，感受有时也会跟着变化。这部分关注你会不会尝试重新看待情境，不是要把坏事硬想成好事，也不是否认已经受到的影响。比如，先区分“我知道的事实”和“我猜测的意思”，可能让事情更清楚。可以挑一件负担较小的日常烦恼，试着找出另一个同样说得通的解释。是否有帮助，仍要看现实有没有支持这种理解。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "对最近的一件小烦恼，你知道哪些事实，又猜测了哪些意思？"
+              },
+              {
+                "category": "strategy",
+                "text": "写下一个同样有现实依据的其他解释，不强迫自己接受它。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "suppression",
+            "headline": "把情绪先留在心里",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有些场合，我们会先把情绪放在心里，没有马上表现出来。这样做可能是为了保护关系、争取时间，或因为当时不方便表达。这部分关注这种做法有多符合你，并不意味着表达越多越好，也不意味着少表达就是做错了。你可以留意，暂时不说之后，自己有没有找到合适的地方整理感受。需要时，可以选择一个安全的时机，向愿意倾听的人说一点，而不是一次交代所有事情。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "当你把感受留在心里时，之后通常怎样照顾这些感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一个安全、合适的时机，向信任的人表达一点真实感受。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+          "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+          "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+          "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+          "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+        ],
+        "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+            "reviewedAt": "2026-10-26T05:40:35.708Z",
+            "basis": "原作者2019论文Method / Measures / Emotion Regulation Strategies，按四类策略逐项完整列出19题；补充文件仅为领导情境与评分示例，不是另一个题本；来源研究边界如实记录，technical student audience slot does not imply K12 validation。"
+          }
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "scoreOrder": [
+          "situation_modification",
+          "attentional_deployment",
+          "cognitive_reappraisal",
+          "suppression"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "situation_modification",
+            "headline": "有时可以调一调现场，不必只让自己调心情",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这三题均分1–7，数字越大，表示更认同自己会或能通过改变情境来影响情绪，不是“现场掌控力”的分数。\n\n例如，谈话很紧绷时，换个安排、把要求说清，有时比对自己说“别难受”更贴近需要。如果这个办法适合你，可以看看哪一小处真有余地；没有决定权的部分，也可以请相关的人参与。题目里的幽默是一个例子，不是让你在任何场合都负责逗笑别人。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "给一个具体场景分两栏：我能协调什么、需要谁一起参与。不把整片现场都算成个人责任。"
+              },
+              {
+                "category": "environment",
+                "text": "选一处可协商的时间、沟通或负担安排试一试，再看是否合适；尊重他人的感受，不用玩笑盖过真正的问题。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "attentional_deployment",
+            "headline": "镜头可以暂时移开，重要的事不必就此消失",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这四题按原方向整理后均分1–7，数字越大，表示更认同能从强烈情绪移开注意、看向其他方面，不是更容易被情绪抓住。\n\n像把镜头暂时移向一件中性的事，有时能给谈话留缓冲。如果这个画面适合你，可以先换个落点，再看看是否想回到问题。移开不是永远删除；若一件重要事情一直被放在画面外，就可以重新商量处理方式。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "找一次“镜头移开”后的例子，看看它帮你缓了一下，还是让事情一直悬着，保留具体背景。"
+              },
+              {
+                "category": "strategy",
+                "text": "需要缓冲时选一个安全的暂时落点，并在合适时留一个回来处理的安排；不把暂时暂停变成必须立刻解决或永远不谈。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "cognitive_reappraisal",
+            "headline": "换镜头看，不等于给现实加美化滤镜",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这七题均分1–7，数字越大，表示更认同自己会或能通过不同理解来影响情绪，不保证新的解释就是事实。\n\n例如，一条简短回复可以有不同背景。如果你愿意换镜头，可以多看一个可能，但不必自动开上“其实都是好事”的滤镜。受影响的地方仍值得被认真看待；换角度是为了更清楚地理解与回应，不是为任何事情找借口。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把一件小事里的事实、猜测和另一个有依据的可能分别写下，未知的地方先留白。"
+              },
+              {
+                "category": "strategy",
+                "text": "看看哪个理解更符合事实、能带来什么可行回应，不以“必须感觉好一点”逼自己接受某个版本。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "suppression",
+            "headline": "表达的音量小，不代表心里的感受也小",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这五题均分1–7，数字越大，表示更认同不把积极或消极情绪表现出来，不是情绪更少或调节更优秀。\n\n有时把音量留低是为了安全、隐私或等待合适时机；有时也可能觉得一直没有地方说。如果这个比喻贴近你，可以看看这次是自己的选择，还是受到限制。没有哪一个音量适合所有场合，也不必为了报告强行公开自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回看一次把感受留在心里的时刻：当时为何没说，后来还有没有需要照顾的部分？不先给音量贴好坏标签。"
+              },
+              {
+                "category": "support",
+                "text": "愿意时找安全、合适且对方方便的表达机会，或者先留给自己的记录；你可以选择说多少，也可以暂时不说。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文是尚未验证的工作译稿，四类方式各自看，没有总分或个人优劣分档；用得多不一定更合适，也不能证明能力或效果，漏答不当最低分。"
+        ],
+        "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI editorial self-review; not human or author approval",
+            "reviewedAt": "2026-10-29T16:58:29Z",
+            "basis": "本次仅审读新R文字与当前源的构念、窗口、分数方向及适龄受众；不运行计分／报告测试，不构成人工译审、作者批准或心理测量验证。保留原自答受众及权限，不扩大适用范围。"
+          }
+        }
+      }
+    }
+  ]
+}

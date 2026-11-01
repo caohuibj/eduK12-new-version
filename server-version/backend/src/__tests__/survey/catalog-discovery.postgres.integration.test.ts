@@ -1,11 +1,13 @@
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {catalogDiscoveryRecords,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity} from '../../modules/survey/catalog-discovery'
+import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
 
-const databaseUrl=process.env.LIBRARY_DISCOVERY_TEST_DATABASE_URL
+const databaseUrl=integrationDatabaseUrl('LIBRARY_DISCOVERY_TEST_DATABASE_URL')
 let db:PrismaClient
 beforeAll(async()=>{
- if(!databaseUrl||!/^postgres(?:ql)?:\/\/postgres@127\.0\.0\.1:\d+\/postgres(?:\?|$)/.test(databaseUrl))throw new Error('LIBRARY_DISCOVERY_TEST_DATABASE_URL must name the task-owned loopback PostgreSQL fixture')
+ if(!databaseUrl)throw new Error('LIBRARY_DISCOVERY_TEST_DATABASE_URL must explicitly select an isolated test database')
+ requireIsolatedReleaseDatabase(databaseUrl)
  db=new PrismaClient({datasources:{db:{url:databaseUrl}}});await db.$connect()
 })
 afterAll(async()=>{await db?.$disconnect()})

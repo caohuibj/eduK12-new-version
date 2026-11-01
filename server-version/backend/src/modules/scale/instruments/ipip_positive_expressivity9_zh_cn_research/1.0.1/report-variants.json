@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+  "instrumentVersion": "1.0.1",
+  "baseContentHash": "7bdd3b63016b885b4da52a8bd1447f6e9b80a9e7bebcf85e6be6a5a6b341c6b7",
+  "baseParametersHash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379",
+  "variants": [
+    {
+      "key": "previous",
+      "title": "原报告",
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "ipip_positive_expressivity9"
+        ],
+        "scoreOrder": [
+          "ipip_positive_expressivity9"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。分数越高，表示你这次更认可通过笑声、表情或亲近动作表达积极感受的描述；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    },
+    {
+      "key": "fun",
+      "title": "趣味版",
+      "report": {
+        "reportVersion": "1.2.0",
+        "primaryScoreKeys": [
+          "ipip_positive_expressivity9"
+        ],
+        "scoreOrder": [
+          "ipip_positive_expressivity9"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "开心有很多种送达方式，不一定大声",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "一句带走的话：把心意送出去，也可以保留自己的表达节奏。\n\n把积极感受想成一张可选择寄出的明信片：有人当场笑出来，有人更喜欢一句谢谢或一条文字。这九题只汇总你对开心、亲近向外表达的通常自述，总分9–45；数值越大表示整体更认可这些表达，不是越高就越幸福或越受欢迎。\n\n假设朋友做了一件让你开心的事。明信片上可以写“谢谢你记得这件事”，不一定要拥抱、放声大笑，或把现场变热闹。亲近需要双方愿意，表达多一点或少一点，都不该变成关系考试。\n\n如果你已有自然舒服的方式，就按自己的节奏来；想试新方式时，也可以先问问对方愿不愿意接收。这个比喻是通用行动参考，不是分数已经测出你的快乐程度或社交能力。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "先决定这张明信片要不要寄：选一个真实感受，看看自己是想分享、想感谢，还是只想安静留着。没有必须公开的份额。"
+              },
+              {
+                "category": "strategy",
+                "text": "写一行具体内容：说一件让你开心或感到亲近的事，尽量用自己的话，不必表演成固定的热情样子。"
+              },
+              {
+                "category": "support",
+                "text": "选双方同意的投递方式：一句话、一条消息都可以；触碰和拥抱先确认意愿。对方或自己不想接触时，换一种方式，不把拒绝当成感情不足。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文版本还在研究完善，没有可用的人群分档或排名。九题需答完整才计算，漏答不是0分；表达多少也不代表快乐或关系质量。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN"
+        }
+      }
+    }
+  ]
+}

@@ -17,10 +17,11 @@ import {surveyGovernedToolsRouter,surveyGovernedUseRouter} from '../../modules/s
 import {surveyPlatformRouter} from '../../modules/survey/platform.routes'
 import {surveyBuilderRouter} from '../../modules/survey/builder.routes'
 import {requireIsolatedReleaseDatabase} from '../integration/integration-env'
+import {listScaleInstrumentSources} from '../../modules/scale/onboarding/instrument-registry'
 
 const password='synthetic-http-fixture-only'
 type Actor='system'|'manager'|'outsider'|'researcher'|'anonymous'
-type CatalogRow={id?:string;toolKey?:string;catalogId?:string;ref?:{sourceId:string};exactVersion?:{instrumentKey?:string};classificationTags?:Array<{id:string;label:string;facet:string}>;states?:{assignment:{ready:boolean}};authorization?:{useGrantStatus:string};state?:string;available?:boolean;unsupportedReason?:string}
+type CatalogRow={id?:string;toolKey?:string;instrumentVersion?:string;catalogId?:string;ref?:{sourceId:string};exactVersion?:{instrumentKey?:string};classificationTags?:Array<{id:string;label:string;facet:string}>;states?:{assignment:{ready:boolean}};authorization?:{useGrantStatus:string};state?:string;available?:boolean;unsupportedReason?:string}
 type CatalogPage={list:CatalogRow[];hasMore:boolean}
 type PreflightData={readOnly:boolean;facts:{scaleId:string|null};stages:Array<{key:string;state:string}>;targetUseGrant:string}
 const ids:Partial<Record<Actor,string>>={},tokens:Partial<Record<Actor,string>>={},usernames:Partial<Record<Actor,string>>={}
@@ -40,7 +41,7 @@ beforeAll(async()=>{
  const url=process.env.LIBRARY_MANAGEMENT_HTTP_TEST_DATABASE_URL
  if(!url||process.env.LIBRARY_MANAGEMENT_HTTP_ISOLATED!=='1')throw new Error('Explicit task-owned HTTP integration fixture required')
  requireIsolatedReleaseDatabase(url)
- if(!/^redis:\/\/127\.0\.0\.1:\d+$/.test(process.env.REDIS_URL??''))throw new Error('Task-owned loopback Redis required')
+ if(!/^redis:\/\/127\.0\.0\.1:\d+(?:\/\d+)?$/.test(process.env.REDIS_URL??''))throw new Error('Task-owned loopback Redis required')
  // The normal test runner bypasses these dynamic limiters. Activate their
  // unchanged production branches and assert the actual Redis-backed headers;
  // this isolated router harness is not production startup qualification.
@@ -94,10 +95,12 @@ describe('bounded library management HTTP contracts with real authentication and
   expect((await call('outsider',sources+'?kind=COGNITIVE')).status).toBe(403)
  })
  it('finds standard versions across pages using multiple AND facets and Chinese/original IDs',async()=>{
+  const expected=listScaleInstrumentSources().filter(source=>source.catalog.construct.constructOverlapTags.includes('student_self_report'))
+   .map(source=>source.identity.instrumentKey+':'+source.identity.instrumentVersion)
   const first=await call('system',standard+'/catalog?tags=student_self_report&page=1'),second=await call('system',standard+'/catalog?tags=student_self_report&page=2')
   expect(first.status).toBe(200);expect(second.status).toBe(200);expect(first.headers.get('ratelimit-limit')).toBe('90')
-  expect(first.data.list).toHaveLength(25);expect(first.data.hasMore).toBe(true);expect(second.data.list).toHaveLength(11);expect(second.data.hasMore).toBe(false)
-  expect(new Set([...first.data.list,...second.data.list].map(row=>row.toolKey)).size).toBe(36)
+  expect(first.data.list).toHaveLength(25);expect(first.data.hasMore).toBe(true);expect(second.data.list).toHaveLength(expected.length-25);expect(second.data.hasMore).toBe(false)
+  expect(new Set([...first.data.list,...second.data.list].map(row=>row.toolKey+':'+row.instrumentVersion))).toEqual(new Set(expected))
   const query=(keyword:string)=>standard+'/catalog?'+new URLSearchParams({keyword,tags:'value_cost,mathematics,student_self_report,language:zh-CN'})
   const chinese=await call('system',query('学生 数学')),original=await call('system',query('student_self_report mathematics'))
   expect(chinese.status).toBe(200);expect(original.status).toBe(200)
@@ -107,7 +110,9 @@ describe('bounded library management HTTP contracts with real authentication and
  })
  it('keeps unfiltered page two readable and reports actual missing installation/approval/grants consistently',async()=>{
   const page=await call('system',library+'/catalog?page=2')
-  expect(page.status).toBe(200);expect(page.data.list.some(row=>row.exactVersion?.instrumentKey?.includes('sdq'))).toBe(true)
+  expect(page.status).toBe(200);expect(page.data.list).toHaveLength(25)
+  const sdq=await call('system',library+'/catalog?keyword=sdq')
+  expect(sdq.status).toBe(200);expect(sdq.data.list.some(row=>row.exactVersion?.instrumentKey?.includes('sdq'))).toBe(true)
   const filtered=await call('system',library+'/catalog?'+new URLSearchParams({keyword:'学生 数学',tags:'value_cost,language:zh-CN'}))
   expect(filtered.status).toBe(200);expect(filtered.data.list).toHaveLength(1)
   const row=filtered.data.list[0];expect(row.states?.assignment.ready).toBe(false);expect(row.authorization?.useGrantStatus).toBe('NOT_EVALUATED')

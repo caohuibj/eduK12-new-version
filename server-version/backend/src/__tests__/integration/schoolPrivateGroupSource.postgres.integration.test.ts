@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {writeFileSync} from 'node:fs'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,it,expect} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
@@ -57,7 +58,9 @@ suite('School explicit group source / real publication only, not FINAL or group 
    resourceVersion:published.version,entryHash:canonicalHash(source.resourceEntry)}))
   expect(historical&&isSelfGroupV2Entry(historical)).toBe(true)
   await expect(db.$transaction(tx=>readFrozenCompositionIdentity(tx,{...published,organizationId:randomUUID()}))).rejects.toThrow('PRIVATE_COMPOSITION_EXECUTION_INVALID')
-  console.info(JSON.stringify({kind:'synthetic-publication-checkpoint',organizationId:f.organizationId,runId:f.runId,trackId:track.id,
-   fixedVersionId:fixed.id,participantUserId:f.participantUserId,publicationOnly:true,canonicalFinalInserted:false,groupReportGenerated:false}))
+  const checkpoint={kind:'synthetic-publication-checkpoint',organizationId:f.organizationId,runId:f.runId,trackId:track.id,
+   fixedVersionId:fixed.id,participantUserId:f.participantUserId,publicationOnly:true,canonicalFinalInserted:false,groupReportGenerated:false}
+  if(process.env.SCHOOL_GROUP_COMPOSITION_CHECKPOINT)writeFileSync(process.env.SCHOOL_GROUP_COMPOSITION_CHECKPOINT,JSON.stringify(checkpoint))
+  console.info(JSON.stringify(checkpoint))
  },120000)
 })

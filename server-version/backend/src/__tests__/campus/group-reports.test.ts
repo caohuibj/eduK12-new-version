@@ -2,7 +2,7 @@ import { beforeEach,describe,expect,it,vi } from 'vitest'
 
 const mock=vi.hoisted(()=>({
   context:vi.fn(),query:vi.fn(),spec:vi.fn(),listSpecs:vi.fn(),listSources:vi.fn(),
-  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),lock:vi.fn(),artifact:vi.fn(),
+  generate:vi.fn(),read:vi.fn(),cohort:vi.fn(),lock:vi.fn(),artifact:vi.fn(),leafContract:vi.fn(),
 }))
 vi.mock('../../config/database',()=>({prisma:{$queryRaw:mock.query}}))
 vi.mock('../../modules/campus/report-release-lock',()=>({
@@ -22,6 +22,10 @@ vi.mock('../../modules/reporting/cohort',()=>({readReportingCohort:mock.cohort})
 vi.mock('../../modules/reporting/artifact',()=>({readReportingArtifactRecord:mock.artifact}))
 vi.mock('../../modules/reporting/service',()=>({generateOrganizationGroupAnalysis:mock.generate}))
 vi.mock('../../modules/reporting/pr4Service',()=>({readOrganizationReportingArtifact:mock.read}))
+vi.mock('../../modules/reporting/governedDisclosure',async importOriginal=>({
+  ...await importOriginal<typeof import('../../modules/reporting/governedDisclosure')>(),
+  reportingLeafDisclosureContract:mock.leafContract,
+}))
 
 import {
   CAMPUS_GROUP_MIN_N,assertReviewedCampusGroupSpec,projectCampusGroupReport,projectCampusLeafGroupReport,assertCampusLeafGroupDifferencing,
@@ -138,11 +142,13 @@ describe('Huischool internal group reporting privacy boundary',()=>{
     const result=await generateCampusGroupReport({
       actor:admin as any,organizationId:org,runId:run,trackId:track,specId:spec,
     })
-    expect(mock.generate).toHaveBeenCalledWith({principal:{
-      userId:'school-admin',platformRole:'STANDARD',
-    },organizationId:org,runId:run,trackId:track,specId:spec})
+    expect(mock.generate).toHaveBeenCalledWith(expect.objectContaining({principal:{
+      userId:'school-admin',platformRole:'STANDARD',groupAudience:'ORGANIZATION',
+    },organizationId:org,runId:run,trackId:track,specId:spec}))
+    expect(mock.generate.mock.calls[0][0].cohortSelector).toBeUndefined()
+    expect(mock.generate.mock.calls[0][0].leaf).toBeUndefined()
     expect(mock.read).toHaveBeenCalledWith({principal:{
-      userId:'school-admin',platformRole:'STANDARD',
+      userId:'school-admin',platformRole:'STANDARD',groupAudience:'ORGANIZATION',
     },organizationId:org,artifactId:artifact})
     expect(result.state).toBe('READY')
     expect(mock.lock).toHaveBeenCalledWith(org,expect.any(Function))
@@ -267,10 +273,12 @@ const leaf={slotKey:'scale:a',unitType:'SCALE' as const,instrumentKey:'a',instru
 describe('School selected leaf and subgroup disclosure',()=>{
   beforeEach(()=>vi.clearAllMocks())
   it('permits an adequately separated subgroup, withholding a small difference across parent containers',async()=>{
+    mock.leafContract.mockResolvedValue({minimumRespondents:10})
     const members=Array.from({length:20},(_,i)=>({userId:`u${i}`}))
     const cohort={sourceRunId:run,sourceTrackId:track,members:members.slice(0,10)} as any
     mock.query.mockResolvedValueOnce([{priorN:20,shared:10,minimumN:10}])
     await expect(assertCampusLeafGroupDifferencing({organizationId:org,cohort,leaf})).resolves.toBeUndefined()
+    expect(mock.leafContract).toHaveBeenCalledWith(leaf)
     mock.query.mockResolvedValueOnce([{priorN:11,shared:10,minimumN:10}])
     await expect(assertCampusLeafGroupDifferencing({organizationId:org,cohort,leaf})).rejects.toMatchObject({code:'CAMPUS_GROUP_DIFFERENCING_WITHHELD'})
     const sql=mock.query.mock.calls[0][0].strings.join('')

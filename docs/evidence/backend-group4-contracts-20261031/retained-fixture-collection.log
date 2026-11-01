@@ -1,0 +1,4 @@
+src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts > School explicitly configured new SELF longitudinal source > publishes native T1/T2, saves real answers, reads both reports and rejects wrong or currently denied identity
+src/__tests__/integration/schoolPersonalLongitudinal.postgres.integration.test.ts > School explicitly configured new SELF longitudinal source > reads retained current SELF waves after source batching and rejects the Teacher entry for a student
+src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts > generates a disclosed standalone Cognitive course report and reopens its frozen version without reading result payloads
+src/__tests__/integration/trainingStandaloneCognitiveGroup.postgres.integration.test.ts > keeps an archived standalone task and its original version reachable while disabling generation
