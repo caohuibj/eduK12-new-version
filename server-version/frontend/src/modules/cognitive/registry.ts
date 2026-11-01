@@ -1,3 +1,4 @@
+import type { CognitiveReadinessProfile } from './core/readiness'
 import { cognitiveRunnerEntries } from './generated/runners'
 import type { CognitiveTaskProps } from './core/runner.types'
 
@@ -53,6 +54,8 @@ export interface CognitiveFrontendRegistryEntry {
   reportDefinition: ReportDefinition
   /** Memory 等自适应任务由任务本身决定何时完成。 */
   completionMode?: 'manual' | 'task'
+  /** Exact task-owned input/resume contract, projected through generated runners. */
+  readiness?: Omit<CognitiveReadinessProfile, 'testType' | 'engineVersion'>
 }
 
 const REGISTRY = new Map<string, CognitiveFrontendRegistryEntry>()
