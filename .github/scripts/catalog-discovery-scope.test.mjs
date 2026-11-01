@@ -26,9 +26,11 @@ test('temporary compilation recipe never edits the production Dockerfile or star
  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
  const job=ci.split('\n  catalog-discovery:\n')[1].split('\n  merge-gate:\n')[0];
  assert.match(job,/postgres:16\.15-bookworm/);assert.match(job,/LIBRARY_DISCOVERY_TEST_DATABASE_URL:/);
- assert.doesNotMatch(job,/migrate|seed|redis:|npm run build/);
+ const runtimeSchema=job.match(/      - name: prepare the isolated migrated schema for Bundle runtime contracts[\s\S]*?(?=      - name:)/)?.[0];
+ assert(runtimeSchema);assert.match(runtimeSchema,/if: needs.scope.outputs.bundle_runtime == 'true'/);assert.match(runtimeSchema,/run: npx prisma migrate deploy/);
+ assert.doesNotMatch(job.replace(runtimeSchema,''),/migrate|seed|redis:|npm run build/);
  const images=readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8');
- assert.match(images,/CATALOG_DISCOVERY: \$\{\{ inputs.catalog_discovery \}\}/);
+ assert.match(images,/CATALOG_DISCOVERY: \$\{\{ inputs.catalog_discovery \|\| inputs.cognitive_product \}\}/);
 });
 
 test('stale event base uses the actual matching merge parent only for a bounded catalog diff',()=>{

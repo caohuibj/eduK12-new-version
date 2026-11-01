@@ -45,7 +45,7 @@ test('existing jobs select this recipe without starting platform maintenance min
  }
  assert.deepEqual(selected,['catalog-discovery','frontend','docker','codeql']);
  assert.match(job('scope'),/catalogDiscoveryScope\(entries\)\|\|docs\|\|toolingOnly/);
- const backend=job('catalog-discovery');assert.match(backend,/BUNDLE_RUNTIME:/);assert.match(backend,/BUNDLE_PRODUCT_TEST_DATABASE_URL:/);assert.match(backend,/prisma db push --skip-generate/);assert.doesNotMatch(backend,/migrate deploy|db:seed|redis:|npm run build/);
+ const backend=job('catalog-discovery');assert.match(backend,/BUNDLE_RUNTIME:/);assert.match(backend,/BUNDLE_PRODUCT_TEST_DATABASE_URL:/);assert.match(backend,/prisma migrate deploy/);assert.doesNotMatch(backend,/db push|db:seed|redis:|npm run build/);
  assert.match(backend,/BUNDLE_RUNTIME==='true'\?'bundle-runtime-checks.json'/);assert.match(backend,/assert-release-test-report.mjs/);
  const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');assert.match(frontend,/if: inputs.bundle_runtime/);assert.match(frontend,/frontendChecks:files/);assert.match(frontend,/assert-release-test-report.mjs/);
 });
@@ -55,7 +55,7 @@ test('runtime recipe contains real bounded test files and leaves release content
  for(const file of [...checks.backendChecks.unitFiles,...checks.backendChecks.postgresFiles])assert(existsSync(new URL('server-version/backend/'+file,root)),file);
  for(const file of checks.frontendChecks)assert(existsSync(new URL('server-version/frontend/'+file,root)),file);
  assert(checks.backendChecks.unitFiles.some(f=>f.endsWith('/derived-core.test.ts')));assert(checks.backendChecks.unitFiles.some(f=>f.endsWith('/native-age-admission.test.ts')));
- assert(checks.backendChecks.postgresFiles.includes('src/__tests__/bundle-product/product.postgres.integration.test.ts'));
+ assert.deepEqual(checks.backendChecks.postgresFiles,['src/__tests__/bundle-onboarding/schema3-native-final.postgres.integration.test.ts']);
  assert.equal(checks.sources.some(f=>f.includes('/packages/')||f.includes('/instruments/')||f.includes('/prisma/')),false);
  assert.match(readFileSync(new URL('../../server-version/backend/scripts/bundle-content-check.ts',import.meta.url),'utf8'),/if \(errors.length\) throw new Error/);
 });

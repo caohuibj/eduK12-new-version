@@ -3800,10 +3800,10 @@ jobs:
         run: |
           npm ci
           npx prisma generate
-      - name: prepare the isolated schema for Bundle runtime contracts
+      - name: prepare the isolated migrated schema for Bundle runtime contracts
         if: needs.scope.outputs.bundle_runtime == 'true'
         working-directory: server-version/backend
-        run: npx prisma db push --skip-generate
+        run: npx prisma migrate deploy
       - name: changed image build controls
         if: needs.scope.outputs.bundle_family != 'true' && needs.scope.outputs.bundle_runtime != 'true'
         run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs

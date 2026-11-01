@@ -32,6 +32,7 @@
     "server-version/backend/src/modules/survey/flow.screen-out.service.ts",
     "server-version/backend/src/modules/survey/governed-package.reports.ts",
     "server-version/backend/src/modules/survey/governed-package.service.ts",
+    "server-version/backend/src/modules/survey/governed-tool.service.ts",
     "server-version/backend/src/modules/survey/governed-tool.trial.ts",
     "server-version/backend/src/modules/survey/measurement.result.ts",
     "server-version/backend/src/modules/survey/participant-feedback-response.ts",
@@ -63,7 +64,9 @@
     "server-version/frontend/src/modules/reporting/BundleDerivedReport.fixture.ts",
     "server-version/frontend/src/modules/reporting/BundleDerivedReport.test.tsx",
     "server-version/frontend/src/survey/StoredPackageReports.test.tsx",
-    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx"
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx",
+    "server-version/backend/src/__tests__/bundle-onboarding/fixtures/b10-installation-cases.json",
+    "server-version/backend/src/__tests__/bundle-onboarding/schema3-native-final.postgres.integration.test.ts"
   ],
   "documents": [
     "docs/development/b15-cognitive-disclosure-20261101.md",
@@ -75,7 +78,8 @@
     "docs/evidence/bundle-derived-adapters/adult-self-validation.json",
     "docs/evidence/bundle-derived-adapters/survey-cognitive-bridge.md",
     "docs/evidence/bundle-derived-adapters/survey-cognitive-validation.json",
-    "docs/evidence/bundle-derived-adapters/validation.json"
+    "docs/evidence/bundle-derived-adapters/validation.json",
+    "docs/evidence/bundle-derived-adapters/schema3-native-final.json"
   ],
   "controls": [
     ".github/config/bundle-runtime-checks.json",
@@ -84,7 +88,8 @@
     ".github/scripts/content-scope.mjs",
     ".github/scripts/merge-gate.mjs",
     ".github/workflows/ci.yml",
-    ".github/workflows/ci-frontend.yml"
+    ".github/workflows/ci-frontend.yml",
+    ".github/scripts/catalog-discovery-scope.test.mjs"
   ],
   "backendChecks": {
     "unitFiles": [
@@ -99,7 +104,7 @@
       "src/__tests__/bundle-onboarding/survey-cognitive-bundle.test.ts"
     ],
     "postgresFiles": [
-      "src/__tests__/bundle-product/product.postgres.integration.test.ts"
+      "src/__tests__/bundle-onboarding/schema3-native-final.postgres.integration.test.ts"
     ]
   },
   "frontendChecks": [
