@@ -1,0 +1,66 @@
+name: Cognitive product checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      COGNITIVE_PRODUCT_PLAN: ${{ inputs.plan }}
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: |
+            server-version/backend/package-lock.json
+            server-version/frontend/package-lock.json
+      - name: directed route and missing-check contract tests
+        run: node --test .github/scripts/cognitive-product.test.mjs
+      - name: install locked compiler and declaration dependencies without application hooks
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
+      - name: generate current Prisma types without accessing a database
+        working-directory: server-version/backend
+        env:
+          DATABASE_URL: postgresql://type_only:synthetic@127.0.0.1:1/no_database
+        run: npx prisma generate
+      - name: combined contract projection and one compile per application
+        run: node .github/scripts/cognitive-product-check.mjs
+      - name: bind compiled components with the existing artifact contract
+        run: |
+          node .github/scripts/ci-artifact.mjs write backend
+          node .github/scripts/ci-artifact.mjs write frontend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cognitive-product-${{ github.sha }}
+          path: cognitive-product-evidence/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist/
+          if-no-files-found: error
