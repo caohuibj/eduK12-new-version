@@ -3,6 +3,11 @@ import { render, screen } from '@testing-library/react'
 import ScaleUnitReportCard from '../ScaleUnitReportCard'
 
 describe('ScaleUnitReportCard PR6A null/zero and caveat contract', () => {
+  it('keeps independent support visible in an incomplete report with no score interpretation',()=>{
+    render(<ScaleUnitReportCard report={{type:'SCALE',kind:'scale',scaleId:'incomplete',scaleName:'症状自述',quality:{status:'invalid',flags:['missing_items','score_not_calculable']},scores:[],references:[],interpretations:[],caveats:[],disclaimer:'独立支持说明：第9题或总分不能判断个人自伤风险，未完成作答也可求助。',completedAt:null,totalTime:null}}/>)
+    expect(screen.getByTestId('scale-disclaimer')).toHaveTextContent('未完成作答也可求助')
+    expect(screen.queryByText('筛查阳性')).not.toBeInTheDocument()
+  })
   it('renders zero as a score, null as an em dash, and shared caveats/disclaimer', () => {
     render(<ScaleUnitReportCard report={{
       itemId: 'scale-item-1',

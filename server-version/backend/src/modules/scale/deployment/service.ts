@@ -2,6 +2,8 @@ import { scaleLocalizationReasons } from '../policy/localization'
 import type { Prisma, PrismaClient } from '@prisma/client'
 import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from '../onboarding/instrument-registry'
 import { getLegacyScaleCompatibilityProfile } from '../policy/legacy-profile'
+import {readImportedPolicySource} from '../component-import/native-source'
+import {compileScalePolicy} from '../policy/compile'
 import {
   evaluateScaleDeployment,
   type ScaleDeploymentDecisionV1,
@@ -83,8 +85,9 @@ export const resolveScaleStartDeployment = async (input: {
     }
   }
 
-  const source = getScaleInstrumentSource(input.scale.code, input.scale.instrumentVersion)
-  const runtimePolicy = getScaleInstrumentRuntimePolicy(input.scale.code, input.scale.instrumentVersion)
+  const codeSource=getScaleInstrumentSource(input.scale.code,input.scale.instrumentVersion)
+  const source = codeSource??await readImportedPolicySource(input.db,input.scale.id)
+  const runtimePolicy = codeSource?getScaleInstrumentRuntimePolicy(input.scale.code,input.scale.instrumentVersion):source?compileScalePolicy(source):undefined
   if (!source?.executable || !runtimePolicy) {
     return {
       kind: 'DENY',
@@ -121,7 +124,7 @@ export const resolveScaleStartDeployment = async (input: {
     }
   }
 
-  const reasons: string[] = scaleLocalizationReasons(source, deployment.policy)
+  const reasons: string[] = codeSource||source.localization?scaleLocalizationReasons(source, deployment.policy):[]
   if (source.executable.releaseStatus !== 'PUBLISHED') reasons.push('EXECUTABLE_NOT_PUBLISHED')
   if (deployment.policy.locale !== runtimePolicy.contentLocale) reasons.push('DEPLOYMENT_CONTENT_LOCALE_MISMATCH')
   const localizationVersion = source.localization?.localizationVersion

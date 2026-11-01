@@ -1,15 +1,11 @@
+import {ReportTemplateFields,type ReportTemplateDefinition as Template} from '../modules/assessment-core/report/ReportTemplateFields'
 import { SurveySectionHeader } from './SurveySectionHeader'
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { publishSurveyMeasurement } from './measurement-publication'
 import {FileText,ArrowDownRight} from 'lucide-react'
 import './survey-workspace-polish.css'
 
 export interface ReportLeaveRisk {dirty:boolean;pending:boolean;busy:boolean}
-type ReferenceKind='normative_distribution'|'criterion_threshold'|'descriptive_sample'|'theoretical_range'
-type Block={type:'TEXT';text:string}|{type:'METRIC';metricKey:string;label?:string;display:'RAW'|'REFERENCE_RESULT'}
-  |{type:'REFERENCE_BAND';metricKey:string;referenceKind:ReferenceKind;bandKey:string;text:string;guidance:string[]}
-  |{type:'ASSET';assetId:string;alt:string}|{type:'CHART';metricKeys:string[];style:'BAR'|'TABLE';caption?:string}
-type Template={title?:string;blocks:Block[];limitations:string[];disclaimer?:string}
 type Payload={measurementReleaseId:string;metricKeys:string[];audience:'student'|'parent'|'teacher'|'researcher';language:string;
   template:Template;assets:{assetId:string;sha256:string;mediaType:string;rightsStatus:'self_authored'|'authorized';rightsNote:string}[]}
 type Draft={id:string;report_key:string;version:string;revision:number;payload:Payload;state:'DRAFT'|'PUBLISHED';published_release_id:string|null}
@@ -19,7 +15,7 @@ type NativeInstrument={id:string;title:string;kind:string;status:string;revision
 type Scenario='INTERPRETABLE'|'NO_REFERENCE'|'INVALID'
 type Preview={synthetic:true;scenario:Scenario;revision:number;report:{title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}}
 type Create={requestId:string;reportKey:string;version:string;payload:Payload}
-const referenceLabels:Record<ReferenceKind,string>={normative_distribution:'常模分布',criterion_threshold:'准则阈值',descriptive_sample:'描述样本',theoretical_range:'理论范围'}
+
 const cookie=()=>document.cookie.split('; ').find(value=>value.startsWith('huisurvey_research_csrf='))?.split('=').slice(1).join('=')||''
 async function reportApi<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -54,10 +50,6 @@ function PreviewBlock({value}:{value:unknown}){
   return null
 }
 
-function ReportBlockPanel({plain,plainTitle,expanded,onExpand,heading,children}:{plain:boolean;plainTitle:string;expanded:boolean;onExpand:()=>void;heading:ReactNode;children:ReactNode}){
-  if(plain)return <><strong>{plainTitle}</strong>{children}</>
-  return <details className="survey-report-block" open={expanded} onToggle={event=>{if(event.currentTarget.open)onExpand()}}><summary className="survey-report-block-heading">{heading}</summary>{children}</details>
-}
 
 export type ReportTransport=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 export function SurveyReportStudio({instrumentTitles=[],projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange,transport=reportApi,basePath,nativePublishing=true,audiences=['researcher','student','parent','teacher'],recoveryKey}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void;transport?:ReportTransport;basePath?:string;nativePublishing?:boolean;audiences?:Payload['audience'][];recoveryKey?:string;instrumentTitles?:{id:string;title:string}[]}){
@@ -143,15 +135,6 @@ export function SurveyReportStudio({instrumentTitles=[],projectId,projectStatus=
     await create({requestId:crypto.randomUUID(),reportKey:selected.report_key,version:copyVersion.trim(),payload:structuredClone(selected.payload)})
   })}
   const change=(payload:Payload)=>{if(!selected||readOnly)return;setSelected({...selected,payload});setDirty(true);setPreview(null)}
-  const replaceBlock=(index:number,block:Block)=>{if(selected)change({...selected.payload,template:{...selected.payload.template,blocks:selected.payload.template.blocks.map((value,i)=>i===index?block:value)}})}
-  const addBlock=(type:'TEXT'|'METRIC'|'REFERENCE_BAND')=>{
-    if(!selected)return
-    const metricKey=selected.payload.metricKeys[0]||''
-    const block:Block=type==='TEXT'?{type,text:'新段落'}:type==='METRIC'?{type,metricKey,display:'RAW'}:
-      {type,metricKey,referenceKind:'descriptive_sample',bandKey:'',text:'',guidance:[]}
-    setExpandedBlock(selected.payload.template.blocks.length)
-    change({...selected.payload,template:{...selected.payload.template,blocks:[...selected.payload.template.blocks,block]}})
-  }
   const save=()=>{if(!selected||!dirty)return;const snapshot=selected;void run(async()=>{
     const row=await reportApi<Draft>(base+'/'+snapshot.id,'PATCH',{revision:snapshot.revision,payload:{...snapshot.payload,template:{...snapshot.payload.template,limitations:snapshot.payload.template.limitations.filter(line=>line.trim()),blocks:snapshot.payload.template.blocks.map(block=>block.type==='REFERENCE_BAND'?{...block,guidance:block.guidance.filter(line=>line.trim())}:block)}}})
     setSelected(row);setDirty(false);setPreview(null);setNotice('报告草稿已保存。');await afterWrite()
@@ -217,27 +200,7 @@ export function SurveyReportStudio({instrumentTitles=[],projectId,projectStatus=
           <label className="block">受众<select className="input block" value={selected.payload.audience} onChange={e=>change({...selected.payload,audience:e.target.value as Payload['audience']})}>
             {audiences.map(audience=><option key={audience} value={audience}>{{researcher:'研究者',student:'学生',parent:'家长',teacher:'教师'}[audience]}</option>)}</select></label>
           <label className="block">语言<input className="input block" maxLength={240} value={selected.payload.language} onChange={e=>change({...selected.payload,language:e.target.value})}/></label>
-          <p>可引用指标：{selected.payload.metricKeys.join('、')}。测量身份与指标集合随此草稿固定。</p>
-          {selected.payload.template.blocks.map((block,index)=><article key={index} className="border rounded p-3 space-y-2" aria-label={'报告区块 '+(index+1)}>
-            <ReportBlockPanel plain={!!basePath} plainTitle={'区块 '+(index+1)+' · '+block.type} expanded={expandedBlock===index} onExpand={()=>setExpandedBlock(index)} heading={<><strong>区块 {index+1} · {basePath?block.type:{TEXT:'文字段落',METRIC:'研究指标',REFERENCE_BAND:'参考解释',ASSET:'素材',CHART:'图表'}[block.type]}</strong><span className="survey-workflow-status">{['TEXT','METRIC','REFERENCE_BAND'].includes(block.type)?(basePath?'可编辑':'点击编辑'):'只读保留'}</span><span className="survey-report-block-snippet">{block.type==='TEXT'?block.text:block.type==='METRIC'?(block.label||block.metricKey):block.type==='REFERENCE_BAND'?(block.text||block.metricKey):block.type==='ASSET'?block.alt:block.caption||'图表区块'}</span></>}><div className="survey-report-block-body">
-            {block.type==='TEXT'?<label className="block">段落文字<textarea className="input block w-full" value={block.text} onChange={e=>replaceBlock(index,{...block,text:e.target.value})}/></label>:
-              block.type==='METRIC'||block.type==='REFERENCE_BAND'?<>
-                <label className="block">指标<select className="input block" value={block.metricKey} onChange={e=>replaceBlock(index,{...block,metricKey:e.target.value})}>{selected.payload.metricKeys.map(key=><option key={key} value={key}>{key}</option>)}</select></label>
-                {block.type==='METRIC'?<><label className="block">指标显示名称<input className="input block" value={block.label||''} onChange={e=>replaceBlock(index,{...block,label:e.target.value||undefined})}/></label>
-                  <p>显示：{block.display==='RAW'?'原始计分事实':'既有参考结果（保留原配置）'}；此处不能修改计分规则。</p></>:<>
-                  <label className="block">参考类型<select className="input block" value={block.referenceKind} onChange={e=>replaceBlock(index,{...block,referenceKind:e.target.value as ReferenceKind})}>{Object.entries(referenceLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
-                  <label className="block">参考分段标识<input className="input block" maxLength={240} value={block.bandKey} onChange={e=>replaceBlock(index,{...block,bandKey:e.target.value})}/></label>
-                  <p className="text-sm">填写已批准参考规则的精确分段标识；合成预览不证明真实参考存在或适用。</p>
-                  <label className="block">匹配时显示的文字<textarea className="input block w-full" value={block.text} onChange={e=>replaceBlock(index,{...block,text:e.target.value})}/></label>
-                  <label className="block">建议（每行一条）<textarea className="input block w-full" value={block.guidance.join('\n')} onChange={e=>replaceBlock(index,{...block,guidance:e.target.value.split('\n')})}/></label>
-                </>}
-              </>:<p>此 {block.type} 区块在当前编辑器中只读，保存和复制会原样保留。</p>}
-            {(block.type==='TEXT'||block.type==='METRIC'||block.type==='REFERENCE_BAND')&&<button type="button" className="btn-secondary" onClick={()=>{setExpandedBlock(0);change({...selected.payload,template:{...selected.payload.template,blocks:selected.payload.template.blocks.filter((_,i)=>i!==index)}})}}>删除区块 {index+1}</button>}
-          </div></ReportBlockPanel></article>)}
-          <div className="survey-report-add-blocks flex flex-wrap gap-2"><span>添加内容</span><button type="button" className="btn-secondary" onClick={()=>addBlock('TEXT')}>添加文字段落</button>
-            <button type="button" className="btn-secondary" onClick={()=>addBlock('METRIC')}>添加指标</button><button type="button" className="btn-secondary" onClick={()=>addBlock('REFERENCE_BAND')}>添加参考解释</button></div>
-          <label className="block">局限说明（每行一条）<textarea className="input block w-full" value={selected.payload.template.limitations.join('\n')} onChange={e=>change({...selected.payload,template:{...selected.payload.template,limitations:e.target.value.split('\n')}})}/></label>
-          <label className="block">免责声明<textarea className="input block w-full" value={selected.payload.template.disclaimer||''} onChange={e=>change({...selected.payload,template:{...selected.payload.template,disclaimer:e.target.value||undefined}})}/></label>
+          <ReportTemplateFields template={selected.payload.template} metricKeys={selected.payload.metricKeys} onChange={template=>change({...selected.payload,template})} plain={!!basePath} expandedBlock={expandedBlock} onExpandedBlockChange={setExpandedBlock}/>
           <div className="survey-workflow-save">{!basePath&&<span>{dirty?'内容有修改，请先保存':'当前内容已保存'}</span>}<button type="button" className="btn-primary" disabled={!dirty} onClick={save}>保存报告草稿</button></div>
         </fieldset>
         <aside className="survey-report-release" aria-label="报告预览与发布">

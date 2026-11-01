@@ -1,3 +1,4 @@
+import {standardNativeScaleJoin} from '../scale/component-import/native-source'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -108,7 +109,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    SELECT ${educationStandardHeaderColumns} FROM authorized_keys k
     JOIN survey_standard_releases s ON s.id=split_part(k.key,':',3) AND k.key='education-source:STANDARD_SCALE:'||s.id||':'||s.combination_hash
     JOIN measurement_content_releases m ON m.id=s.measurement_release->>'releaseId'
-    LEFT JOIN scales native ON native.code=s.snapshot->>'toolKey' AND native.instrument_version=s.snapshot->>'instrumentVersion' AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
+    LEFT JOIN scales native ON ${standardNativeScaleJoin('native','s')} AND native.status='PUBLISHED' AND native.instrument_class='STANDARD' AND native.library_entry_id IS NULL
     WHERE s.state='ONLINE' AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED' AND m.content_hash=s.measurement_release->>'contentHash'
    UNION ALL
    SELECT ${educationFormHeaderColumns} FROM authorized_keys k

@@ -18,6 +18,20 @@ const synthetic=()=>{
 }
 const band=(key:string)=>({key,label:'Synthetic '+key,summary:'Synthetic software fixture only.',guidance:[]})
 describe('new exact-combination report requirements',()=>{
+ it('checks declared template bands against the selected reference version and kind even for score-only definitions',()=>{
+  const {definition,references}=synthetic()
+  const template={blocks:[{type:'TEXT' as const,text:'Synthetic text stays visible'},{type:'REFERENCE_BAND' as const,metricKey:'total',referenceKind:'criterion_threshold' as const,bandKey:'low',text:'Synthetic band',guidance:[]}],limitations:[]}
+  expect(standardReportParameterBlockers(definition,references,true,template)).toEqual([])
+  template.blocks[1].bandKey='old'
+  expect(standardReportParameterBlockers(definition,references,true,template)).toEqual(['报告所需分档缺少选定参数支持：total/old'])
+  // A matching band on a different, unselected P version cannot satisfy R.
+  const unused=structuredClone(references[0]);unused.referenceVersion='unused-version';unused.entries[0].statistics.thresholds![0].key='old'
+  expect(standardReportParameterBlockers(definition,[...references,unused],true,template)).toEqual(['报告所需分档缺少选定参数支持：total/old'])
+  template.blocks[1].bandKey='low';definition.referencePolicy={type:'none'}
+  expect(standardReportParameterBlockers(definition,references,true,template)).toEqual(['报告所需分档缺少选定参数支持：total/low'])
+  definition.referencePolicy={type:'declared',selections:[{scoreKey:'total',referenceVersion:'synthetic-unit-only',referenceKind:'normative_distribution'}]}
+  expect(standardReportParameterBlockers(definition,references,true,template)).toEqual(['报告所需分档缺少选定参数支持：total/low'])
+ })
  it('permits explicit no-R or a score-only R without inventing missing threshold requirements',()=>{
   const {definition,references}=synthetic()
   expect(standardReportParameterBlockers(definition,references,false)).toEqual([])
