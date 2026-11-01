@@ -51,6 +51,16 @@ suite('registered intake through real PostgreSQL and HTTP authority', () => {
     }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
     return { status: r.status, body: await r.json() as any }
   }
+  it('previews all three repaired exact identities using real backend readiness', async () => {
+    const items = ['sentencecheck', 'visualwm', 'auditorynback'].map(testType => {
+      const seed = cognitiveSeeds.find(s => s.testType === testType && s.configVersion === '1.1.0')!
+      return { testType, configVersion: seed.configVersion, engineVersion: seed.engineVersion, scoringVersion: seed.scoringVersion }
+    })
+    const preview = await call('/preview', { schemaVersion: 1, items })
+    expect(preview.status).toBe(200)
+    expect(preview.body.data.rows.map((row: { action: string }) => row.action)).toEqual(['CREATE_DRAFT', 'CREATE_DRAFT', 'CREATE_DRAFT'])
+    expect(await db.cognitiveTestConfig.count({ where: { OR: items.map(({ testType, configVersion }) => ({ testType, configVersion })) } })).toBe(0)
+  })
   it('denies real current non-system role, expired step-up and unregistered exact version without writes', async () => {
     expect((await call('', undefined, 'teacher')).status).toBe(403)
     expect((await call('/install', input, 'system', 301)).status).toBe(403)
