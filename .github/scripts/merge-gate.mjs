@@ -1,3 +1,4 @@
+import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
 import {cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
 import {catalogDiscoveryScope,bundleRuntimeSelectionMatches} from './catalog-discovery-scope.mjs';
 import {cognitiveMixedProductScope, acceptanceFor} from './content-scope.mjs';
@@ -105,6 +106,7 @@ const acceptanceJobs = {
 };
 
 export function requiredChecks(needs, draft) {
+  if(needs.scope?.outputs?.application_route==='edge-config')return ['scope','edge-config'];
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='cognitive-product')return draft?['scope']:['scope','cognitive-product','docker','codeql'];
   if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
@@ -204,6 +206,7 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='edge-config'){if(draft||Object.entries(edgeConfigOutputs()).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');return [...new Set(failed)];}
   if(scope.application_route==='cognitive-product'){
     try{const p=JSON.parse(scope.cognitive_product_plan);
       if(p.schema!==1||p.route!=='cognitive-product'||!Array.isArray(p.files)||!p.files.length||!Array.isArray(p.required)||JSON.stringify(p.required)!==JSON.stringify(['cognitive-contracts','runner-scorer-freeze-intake','production-images','runtime-scans','sast'])||Object.entries(cognitiveProductOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');
@@ -558,6 +561,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='edge-config'&&!readEdgeScope(process.env.CI_BASE_SHA))failed.push('recomputed-edge-scope');
   if(needs.scope?.outputs?.scenario==='catalog-discovery'){const {changedEntries}=await import('./content-scope.mjs');const entries=changedEntries(process.env.CI_BASE_SHA);if(!catalogDiscoveryScope(entries))failed.push('recomputed-catalog-discovery');if(!bundleRuntimeSelectionMatches(entries,needs.scope.outputs))failed.push('recomputed-bundle-runtime');}
   if(needs.scope?.outputs?.application_route==='personal-tracking'){try{const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(needs.scope.outputs.personal_tracking_plan);const actual=personalTrackingReadyPlan(changedEntries(process.env.CI_BASE_SHA),process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),{event:process.env.CI_EVENT,branch:process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF,draft,forceFull:process.env.CI_FORCE_FULL==='true'});if(JSON.stringify(p)!==JSON.stringify(actual))failed.push('recomputed-personal-tracking-plan');}catch{failed.push('recomputed-personal-tracking-plan');}}
   if(needs.scope?.outputs?.personal_tracking_draft==='true'){

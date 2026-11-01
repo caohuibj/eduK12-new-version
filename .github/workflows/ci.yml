@@ -806,6 +806,22 @@ jobs:
         if: steps.scope.outputs.bundle_runtime == 'true'
         run: node --test .github/scripts/bundle-runtime-scope.test.mjs
 
+  edge-config:
+    name: edge / nginx configuration and proxy routing
+    needs: scope
+    if: ${{ github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'edge-config' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+      - name: Check bounded configuration routing
+        run: node --test .github/scripts/edge-config.test.mjs
+      - name: Parse candidate and exercise both upstream routes
+        run: bash .github/scripts/edge-config-smoke.sh
+
   maintenance:
     needs: scope
     if: ${{ needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.scenario != 'backend' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (needs.scope.outputs.personal_tracking_draft != 'true' && needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && ((needs.scope.outputs.maintenance == 'true' || needs.scope.outputs.scenario == 'platform' || needs.scope.outputs.scenario == 'dependencies') && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
@@ -3833,6 +3849,7 @@ jobs:
       && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
+    - edge-config
     - cognitive-product
     - catalog-discovery
     - personal-tracking
