@@ -2,7 +2,7 @@
 
 `adult_bedtime_sleep_zh_cn@0.1.0` 是新增 DRAFT / EXPERIMENTAL 内容包，面向18岁及以上成人非商业研究。仅复用 BPS9 与 SCI8 共17题；年龄确认及可选轮班、典型就寝时间、希望讨论的事情是独立不计分背景。没有修改任何叶工具、旧 Bundle、权限、引擎、界面、数据库或工作流。
 
-开工读取实际 main `74423a1c4b40f65c084797434aaa86271594e687`，查阅完整 B10 设计 v1.0 和共享画像实施规范；再次检索 packages/generated/legacy 与开放 PR 未发现此同组合。本文日期不表示人工专家或作者批准。
+开工读取实际 main `74423a1c4b40f65c084797434aaa86271594e687`，核对本Bundle产品需求与已有来源；再次检索 packages/generated/legacy 与开放 PR 未发现此同组合。本工程记录不表示人工专家或作者批准。
 
 ## 真实叶身份与适用边界
 
@@ -30,7 +30,7 @@ SCI来源的 `allowedCommercialNatures` 仅 `NON_COMMERCIAL`；本包 `nonCommer
 
 任一原分在中间区间时返回 `middle_or_mixed`，不选SL类型。原分有界检查防止越界事实命中模式。缺项停止联合叙事，保留允许展示的完整独立结果。年龄确认不成立或未知时沿既有 applicability 返回 UNAVAILABLE。
 
-已有 Profile v2 `dependencies.ts` 要求每个绑定都是题目均分，`profile/contract.ts` 的适用性仅有学生年级或 `ADULT_TEACHER`。成人SCI合计不满足该合同。本包据共享规范的回退要求采用已有 schema1 / `declarative-evidence-v1@1.0.0` 固定规则与报告，未伪装成教师包，也未改SCI聚合方式。**当前输出是原分证据＋SL/中间文本，不是物化的b/s数字、Profile v2匹配状态、相似度或新双轴图。** 现有证据块保留两条原量尺，固定卡提供“计划—实际—体验”的可选反思，不捏造计划时刻或日记。
+已有 Profile v2 `dependencies.ts` 要求每个绑定都是题目均分，`profile/contract.ts` 的适用性仅有学生年级或 `ADULT_TEACHER`。成人SCI合计不满足该合同。本包采用已有 schema1 / `declarative-evidence-v1@1.0.0` 固定规则与报告，未伪装成教师包，也未改SCI聚合方式。**当前输出是原分证据＋SL/中间文本，不是物化的b/s数字、Profile v2匹配状态、相似度或新双轴图。** 现有证据块保留两条原量尺，固定卡提供“计划—实际—体验”的可选反思，不捏造计划时刻或日记。
 
 已有v1谓词在质量为 `invalid` 时优先返回invalid状态。真实SCI缺答经叶工具会形成 `value.state=missing`、`value=null`、`quality=invalid`；本包保留这些不同事实，不改写来源。此路径命中通用 `invalid_core` 不完整/无效说明，并保留BPS独立摘要；不会生成SL或声称睡眠良好。包内missing fixture同时覆盖纯missing输入，invalid与not-applicable独立覆盖。没有为此新写状态机。
 
@@ -47,11 +47,13 @@ SCI来源的 `allowedCommercialNatures` 仅 `NON_COMMERCIAL`；本包 `nonCommer
 - 现有 `tsx src/scripts/bundle-onboarding.ts check src/modules/assessment-bundle/packages/adult_bedtime_sleep_zh_cn/0.1.0`：schema、四类fixtures、来源selector/type/unit依赖。
 - 15项定向组合检查：实际叶 `buildScaleResult` → `projectBundleScaleSource` → `mapDeclarativeEvidence` →冻结snapshot的既有规则；设计16/9与6命中SL3，反向端点、SCI0/32、四个含等号尾区、中间、真实SCI缺答及成人范围、错误来源版本拒绝、报告每条rule引用、非商业及真实C/P/R身份。
 - 既有生成器隔离生成及一致性检查：仅新增一条，旧包hash与历史文件不变。没有修改共享 `generated/packages.json`。
-- 包内容hash：`fc896e8759b882f3cf5f97f2cb24d44a5962e57911f1e2b5a35c40d548aaa85c`。
+- 上述执行时包内容hash：`fc896e8759b882f3cf5f97f2cb24d44a5962e57911f1e2b5a35c40d548aaa85c`。
 
 运行Node `v24.19.0` 低于仓库声明的24.21，故本记录是本地探索证据，非正式CI。没有运行数据库、安装、发布、权限或全产品生命周期、全量类型/构建、性能、灾备、合并或部署。
 
 首次范围检查发现交接文档放在 `docs/bundle-declarative-onboarding/`，该目录不属于现有被动工程记录白名单，因而content=false。只将本新增交接记录移到既有 `docs/development/` 范围后定向复核路由；不修改CI规则，不重跑已通过的包或计分验证。原范围失败不冒称成功。
+
+后续普通提交仅清理私人设计文件的名称、版本及日期引用，保留 `project_design` 引用标识、原创叙事性质、公开学术文献与实际产品版本。清理后包内容hash为 `cb1eb825c9dbf5348a1147876efbac334a9baa1a419c1fd72c58d37972735835`；只读取现有包解析器核对引用并计算身份，未重跑规则、计分或CI，也不把旧内容hash的运行记录改写成新hash已正式验收。旧提交及其历史引用未重写，不声称旧缓存已清除。
 
 **共享索引由集成线统一生成。** 当前Draft不单独覆盖共享注册产物；它尚未作为代码目录条目激活。合并各内容目录时沿现有生成器执行一次 `npm run bundle:manifest:generate` / `npm run bundle:manifest:check`。当前#494内容CI在Bundle变化时会执行manifest-check，因此索引汇合前不能把本Draft说成CI就绪或已注册。没有手工拼接generated JSON。
 
