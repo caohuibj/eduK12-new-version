@@ -2,6 +2,7 @@ import type { BundleEngineInputV1, BundleEngineResultV1 } from '../registry'
 import type { EvidenceItemV1 } from '../types'
 import { runBundleProfile } from '../profile/match'
 import { parseDeclarativePackage, type DeclarativePackage, type Condition } from './contract'
+import {computeDerivedValues,effectiveDerivedEvidence} from './derivations'
 export type Truth = true | false | 'unknown'
 export function evaluateCondition(c: Condition, evidence: EvidenceItemV1[]): Truth {
   if (c.op === 'all' || c.op === 'any') {
@@ -50,12 +51,26 @@ export function mapDeclarativeEvidence(input: BundleEngineInputV1): EvidenceItem
     // Package2 binds a strict generic item-mean scorer and classifies the
     // selected core scores. Another score's missingness cannot invalidate it.
     const perScore=pack.schemaVersion===2 && slot.unitType==='SCALE'
-    const quality = invalid || !perScore && source.qualityState==='invalid' ? 'invalid' as const : missing || score?.status==='not_calculable' ? 'unavailable' as const : !perScore && source.qualityState==='limited' || score?.status==='limited' ? 'limited' as const : 'interpretable' as const
+    const quality = pack.schemaVersion===3?derivedSourceQuality(source,score,missing,invalid)
+      : invalid || !perScore && source.qualityState==='invalid' ? 'invalid' as const : missing || score?.status==='not_calculable' ? 'unavailable' as const : !perScore && source.qualityState==='limited' || score?.status==='limited' ? 'limited' as const : 'interpretable' as const
     const kind = slot.unitType==='SCALE' ? 'SCALE_SCORE' as const : slot.unitType==='COGNITIVE' ? 'COGNITIVE_METRIC' as const : 'SITUATIONAL_METRIC' as const
     return { evidenceKey:mapping.evidenceKey, constructKey:mapping.construct, role:mapping.role,
       source:kind==='SCALE_SCORE'?{kind,slotKey:slot.slotKey,scoreKey:mapping.selector,sourceResultHash:source.sourceResultHash}:{kind,slotKey:slot.slotKey,metricKey:mapping.selector,sourceResultHash:source.sourceResultHash},
       value:invalid?{state:'invalid' as const}:missing?{state:'missing' as const}:{state:'present' as const,value:raw as number|string|boolean,unit:mapping.unit},quality,criterionBandKey:score?.criterionBandKey??null }
   })
+}
+/** New declarations may preserve an independently complete score when another
+ * score is missing. Unknown/global quality failures remain failures. Canonical
+ * adapters already carry these original flags; no new trust/hash scheme. */
+function derivedSourceQuality(source:{qualityState:string},score:{status:string}|undefined,missing:boolean,invalid:boolean):EvidenceItemV1['quality'] {
+  if(invalid)return 'invalid'
+  const flags=(source as {profileIdentity?:{qualityFlags?:unknown}}).profileIdentity?.qualityFlags
+  const missingOnly=Array.isArray(flags)&&flags.length>0&&flags.every(f=>['missing_items','score_not_calculable','insufficient_items'].includes(f))
+  if(source.qualityState==='invalid'&&!missingOnly)return 'invalid'
+  if(missing||score?.status==='not_calculable'||source.qualityState==='unavailable')return 'unavailable'
+  if(score?.status==='limited'||source.qualityState==='limited'&&!missingOnly)return 'limited'
+  if(score&&score.status!=='calculated')return 'invalid'
+  return 'interpretable'
 }
 function runRules(input: BundleEngineInputV1,pack:DeclarativePackage): BundleEngineResultV1 {
   if (pack.manifest.definition.bundleKey!==input.snapshot.bundleKey || pack.manifest.definition.bundleVersion!==input.snapshot.bundleVersion) throw new Error('DECLARATIVE_PACKAGE_IDENTITY_MISMATCH')
@@ -92,4 +107,17 @@ export function runProfileEvidence(input:BundleEngineInputV1):BundleEngineResult
   // Native Profile states remain available even when the core evidence abstains.
   return {kind:'COMPUTED',payload:{schemaVersion:'declarative-profile-report-v1',status:profile.state,
     conclusions:(base.payload as {conclusions:unknown[]}).conclusions,profile,modifiers}}
+}
+
+/** New exact version only. Existing V1/V2 dispatch and output stay untouched. */
+export function runDerivedEvidence(input:BundleEngineInputV1):BundleEngineResultV1 {
+  const pack=parseDeclarativePackage(input.declarativePackage)
+  if(pack.schemaVersion!==3)throw new Error('DECLARATIVE_ENGINE_PACKAGE_VERSION_MISMATCH')
+  const evidence=effectiveDerivedEvidence(pack,input.evidence),result=runRules({...input,evidence},pack)
+  if(result.kind==='UNAVAILABLE')return result
+  const conclusions=(result.payload as {conclusions:Array<{ruleId:string}>}).conclusions
+  return {kind:'COMPUTED',payload:{schemaVersion:'declarative-derived-report-v1',status:'declarative',
+    identity:{bundleKey:pack.manifest.definition.bundleKey,bundleVersion:pack.manifest.definition.bundleVersion,engineVersion:'1.2.0',mappingVersion:pack.rules.version,templateVersion:pack.report.version},
+    conclusions,derived:computeDerivedValues(pack,evidence,conclusions.map(c=>c.ruleId)),
+  }}
 }

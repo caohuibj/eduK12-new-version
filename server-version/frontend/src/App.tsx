@@ -13,6 +13,7 @@ const Portal = React.lazy(() => import('./pages/Portal'))
 import SurveyAdminOrigin from './components/app-shell/SurveyAdminOrigin'
 import AdminAccess from './admin/AdminAccess'
 const AdminPermissions = React.lazy(() => import('./admin/AdminPermissions'))
+const CognitiveIntake = React.lazy(() => import('./admin/CognitiveIntake'))
 const AdminEntrances = React.lazy(() => import('./admin/AdminEntrances'))
 const AdminKeyEnrollment = React.lazy(() => import('./admin/AdminKeyEnrollment'))
 const AdminLogin = React.lazy(() => import('./pages/AdminLogin'))
@@ -113,6 +114,7 @@ const ClassroomAnswer = React.lazy(() => import('./pages/student/ClassroomAnswer
 const ClassroomEnter = React.lazy(() => import('./pages/student/ClassroomEnter'))
 const AnonymousStudyPage = React.lazy(() => import('./pages/public/AnonymousStudyPage'))
 const CompositeAssessmentPage = React.lazy(() => import('./modules/composite/CompositeAssessmentPage'))
+const ChildCognitiveControlPage = React.lazy(() => import('./pages/relational/ChildCognitiveControlPage'))
 const CompositeReportPage = React.lazy(() => import('./modules/composite/CompositeReportPage'))
 const ParentHome = React.lazy(() => import('./pages/parent/ParentHome'))
 const ParentLinksPage = React.lazy(() => import('./pages/parent/ParentLinksPage'))
@@ -282,6 +284,7 @@ function AppRoutes() {
           <Route path="/organization-invitations" element={<RelationalProtectedRoute><OrganizationInvitationPage /></RelationalProtectedRoute>} />
 
           {/* Relational product routes reuse the same Composite/Cognitive/Situational runners. */}
+          <Route path="/relational/child-control" element={<RelationalProtectedRoute><ChildCognitiveControlPage /></RelationalProtectedRoute>} />
           <Route
             path="/relational/tasks"
             element={<LegacyRelationalTasksRoute><RelationalTasksPage /></LegacyRelationalTasksRoute>}
@@ -425,6 +428,7 @@ function AppRoutes() {
           <Route path="/admin/security/enroll" element={<AdminKeyEnrollment/>}/>
           <Route path="/admin/scale-library-governance" element={<AdminAccess><ScaleLibraryGovernance/></AdminAccess>}/>
           <Route path="/admin/system" element={<AdminAccess system><SystemAdminHome/></AdminAccess>}/>
+          <Route path="/admin/cognitive-intake" element={<AdminAccess system><CognitiveIntake/></AdminAccess>}/>
           <Route path="/admin/system/survey-audit" element={<AdminAccess system><SurveySystemAdmin/></AdminAccess>}/>
           <Route path="/admin/survey-system" element={<AdminAccess system><Navigate to="/admin/system/survey-audit" replace/></AdminAccess>}/>
           <Route path="/admin/permissions" element={<AdminAccess system><AdminPermissions/></AdminAccess>}/>

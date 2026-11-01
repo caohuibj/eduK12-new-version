@@ -1,4 +1,7 @@
+import {loadBundleCognitiveDisclosures} from './cognitive-disclosure'
 import { projectProfileScaleSource } from '../assessment-bundle/profile/sources'
+import { isFrozenAdultSelfReport } from './self-report-audience'
+import { projectDerivedBundleView, type DerivedBundleView } from '../assessment-bundle/onboarding/derived-report'
 import { projectProfileView,isAdultSelfBundleReport } from '../assessment-bundle/profile/report'
 import type { ProfileResult } from '../assessment-bundle/profile/match'
 import type { DisclosureCapabilitiesV1 } from '../scale/policy/types'
@@ -23,7 +26,7 @@ import type { BundleReportAudienceV1 } from '../assessment-bundle/types'
 import { computeReanalysisAggregateInputHash, runExplicitBundleReanalysis } from '../assessment-reanalysis/reanalysis'
 import { readFrozenBundleProductionDefinition, freezeBundleProductionDefinition, type BundleDefinitionProvider } from './definition-provider'
 import { readInstance, owner, type BundleActor } from './service'
-import { compositeBadRequest, compositeConflict, compositeNotFound } from '../composite/composite.errors'
+import { compositeBadRequest, compositeConflict, compositeNotFound, compositeForbidden } from '../composite/composite.errors'
 
 const terminal = (status: string) => status === 'READY' || status === 'UNAVAILABLE'
 async function inputs(attemptId: string) {
@@ -39,7 +42,7 @@ async function inputs(attemptId: string) {
     if (!payload?.envelope) throw new Error('BUNDLE_CANONICAL_SOURCE_MISSING')
     const value = { slotKey: slot.slotKey, expectedInstrumentKey: slot.instrumentKey, expectedInstrumentVersion: slot.instrumentVersion, envelope: payload.envelope }
     if (slot.unitType === 'COGNITIVE') cognitive.push(projectBundleCognitiveSourceFromCanonicalBridge(value))
-    else if (slot.unitType === 'SCALE') scale.push(frozen.declarativePackage?.schemaVersion===2?projectProfileScaleSource(value):projectBundleScaleSourceFromCanonicalBridge(value))
+    else if (slot.unitType === 'SCALE') scale.push(frozen.declarativePackage && frozen.declarativePackage.schemaVersion>=2?projectProfileScaleSource(value):projectBundleScaleSourceFromCanonicalBridge(value))
     else situational.push(projectBundleSituationalSourceFromCanonicalBridge(value))
   }
   const values = contextValues(bindings.context, input.payloads.flatMap(v => v.facts?.items ?? []))
@@ -89,7 +92,8 @@ export async function processAnalysis(id: string) {
     const payloadEncrypted = encryptCognitivePayload(facts), factsHash = canonicalHash(facts)
     const profile=target.declarativePackage?.schemaVersion===2 && facts.enginePayload.kind==='COMPUTED'
       ? (facts.enginePayload.payload as {profile:ProfileResult}).profile:null
-    const unavailable=profile?['INVALID','INSUFFICIENT','NOT_APPLICABLE'].includes(profile.state):facts.enginePayload.kind==='UNAVAILABLE' || ['invalid','unavailable'].includes(facts.quality.overall)
+    const derived=target.declarativePackage?.schemaVersion===3
+    const unavailable=profile?['INVALID','INSUFFICIENT','NOT_APPLICABLE'].includes(profile.state):facts.enginePayload.kind==='UNAVAILABLE' || !derived && ['invalid','unavailable'].includes(facts.quality.overall)
     await prisma.$transaction(async tx => {
       // Match FINAL's lock order: parent first; never acquire Unit locks from analysis.
       await tx.$queryRaw`SELECT id FROM composite_assessment_attempts WHERE id = ${row.attemptId} FOR UPDATE`
@@ -121,7 +125,8 @@ export async function processInitial(attemptId: string) {
   }
 }
 
-export async function readReport(attemptId: string, audience: BundleReportAudienceV1, analysisId?: string, db:Prisma.TransactionClient=prisma) {
+export async function readReport(attemptId: string, audience: BundleReportAudienceV1, analysisId?: string, db:Prisma.TransactionClient=prisma,
+  selection?:{availableEvidenceKeys:ReadonlySet<string>}) {
   const parent = await db.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, include: { compositeAssessment: { include: { bundleInstance: true } } } })
   const instance = parent?.compositeAssessment.bundleInstance
   if (!parent || !instance) throw compositeNotFound('Bundle 报告不存在')
@@ -130,14 +135,18 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
   if (!row) throw compositeNotFound('分析记录不存在')
   const target = readFrozenBundleProductionDefinition(decryptCognitivePayload(row.targetDefinitionEncrypted))
   if (target.contentHash !== row.targetDefinitionHash) throw compositeConflict('报告定义校验失败')
-  let view: ReturnType<typeof projectBundleAudienceView> | null = null
+  // A child cross-source reanalysis must check every observer's current consent
+  // and frozen disclosure, which this single-attempt reader does not possess.
+  if (target.crossMethodSources) throw compositeForbidden('请从所属儿童评估轮次读取跨报告者报告')
+  let view: (ReturnType<typeof projectBundleAudienceView> & {derivedView?:DerivedBundleView|null}) | null = null
   if (terminal(row.status)) {
     const facts = validateBundleReportFacts(decryptCognitivePayload(row.payloadEncrypted!))
     if (canonicalHash(facts) !== row.factsHash || facts.identity.snapshotHash !== target.bundleSnapshot.snapshotHash) throw compositeConflict('报告快照校验失败')
     view = projectBundleAudienceView(facts, audience)
     const {bindings} = readInstance(instance)
-    const scaleAdmissions = await db.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}})
+    const scaleAdmissions = await db.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true,respondentType:true,subjectUserId:true,respondentUserId:true}})
     let restrictSummary = false
+    let restrictQuality = false
     const profilePolicies=new Map<string,DisclosureCapabilitiesV1|null>()
     for (const binding of bindings.slots.filter(slot => slot.unitType === 'SCALE')) {
       let policy = binding.scaleDisclosure
@@ -151,12 +160,15 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
           const runtime = (await loadFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted,db))
           if (runtime.schemaVersion === 2) policy = scaleProjectionPolicyFromCompiled(runtime.compiledPolicy)
           frozenReportAudience=runtime.definition.report.audienceContract?.audience
-          adultSelfReport=isAdultSelfBundleReport(target.declarativePackage,runtime.definition.report.audienceContract,audience)
+          const contract=runtime.definition.report.audienceContract
+          adultSelfReport=isAdultSelfBundleReport(target.declarativePackage,contract,audience)
+            || isFrozenAdultSelfReport({pack:target.declarativePackage,slotKey:binding.slotKey,audience,contract,
+              sourceRespondentType:runtime.definition.respondentType,relationship:admission})
         }
       } catch { policy = denyAllScaleProjectionPolicy() }
       const capabilities = policy && policy.disposition !== 'UNKNOWN'
         ? resolveAudienceDisclosure(policy.disclosure, audience === 'student' ? 'subject' : audience === 'parent' ? 'respondent' : audience === 'admin' ? 'researcher' : 'teacher') : null
-      if(target.declarativePackage?.schemaVersion===2 && capabilities && frozenReportAudience &&
+      if(target.declarativePackage && target.declarativePackage.schemaVersion>=2 && capabilities && frozenReportAudience &&
         !adultSelfReport && frozenReportAudience!==(audience==='student'||audience==='parent'?'student':audience==='teacher'?'teacher':null))capabilities.individualInterpretations=false
       profilePolicies.set(binding.slotKey,capabilities)
       for (let i=0;i<facts.evidence.length;i++) {
@@ -167,17 +179,41 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
         if (!capabilities?.resultQualityDetails) view.evidence[i].quality = 'unavailable'
       }
       if (!capabilities?.individualInterpretations || !capabilities?.scoreDerivedLabels) restrictSummary = true
+      if (!capabilities?.resultQualityDetails) restrictQuality = true
+    }
+    if(target.declarativePackage?.schemaVersion===3){
+      const cognitive=await loadBundleCognitiveDisclosures(db,{parent,bindings,pack:target.declarativePackage,facts,audience})
+      for(const [slotKey,disclosure]of cognitive){
+        profilePolicies.set(slotKey,disclosure.capabilities)
+        for(let i=0;i<facts.evidence.length;i++){
+          const evidence=facts.evidence[i]
+          if(evidence.source.kind!=='COGNITIVE_METRIC'||evidence.source.slotKey!==slotKey)continue
+          if(!disclosure.capabilities.numericScores||!disclosure.metricKeys.has(evidence.source.metricKey))view.evidence[i].value={state:'redacted'}
+          view.evidence[i].criterionBandKey=null
+          if(!disclosure.capabilities.resultQualityDetails)view.evidence[i].quality='unavailable'
+        }
+        if(!disclosure.capabilities.individualInterpretations)restrictSummary=true
+        if(!disclosure.capabilities.resultQualityDetails)restrictQuality=true
+      }
     }
     if (restrictSummary) {
       view.engineSummary = {engineKey:facts.enginePayload.engineKey,engineVersion:facts.enginePayload.engineVersion,kind:facts.enginePayload.kind}
       view.recommendations = []
       view.quality = {overall:'unavailable',notes:[]}
     }
+    if(target.declarativePackage?.schemaVersion===3&&restrictQuality)view.quality={overall:'unavailable',notes:[]}
     if(target.declarativePackage?.schemaVersion===2 && facts.enginePayload.kind==='COMPUTED'){
       const payload=facts.enginePayload.payload as {profile:ProfileResult}
       view.profileView=projectProfileView(payload.profile,target.declarativePackage,profilePolicies,audience==='admin',audience)
       // Core-only classification is independent of auxiliary quality. ProfileView
       // supplies its own state; do not leak the full engine payload or modifier text.
+    }
+    if(target.declarativePackage?.schemaVersion===3 && facts.enginePayload.kind==='COMPUTED'){
+      const visible=new Set(view.evidence.filter(e=>e.value.state!=='redacted').map(e=>e.evidenceKey))
+      const available=new Set(facts.evidence.filter(e=>e.role==='CONTEXT'||visible.has(e.evidenceKey)&&
+        (!selection||selection.availableEvidenceKeys.has(e.evidenceKey))).map(e=>e.evidenceKey))
+      view.derivedView=projectDerivedBundleView({pack:target.declarativePackage,payload:facts.enginePayload.payload,evidence:facts.evidence,
+        policies:profilePolicies,availableEvidenceKeys:available,audience})
     }
   if (view && target.declarativePackage && target.declarativePackage.schemaVersion===1 && facts?.enginePayload.kind === 'COMPUTED') {
     const payload = facts.enginePayload.payload as { conclusions?: Array<{ ruleId: string; text: string; evidenceKeys: string[] }> }

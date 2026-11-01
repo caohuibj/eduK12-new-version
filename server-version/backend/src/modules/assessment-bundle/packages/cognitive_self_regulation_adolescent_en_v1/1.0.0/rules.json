@@ -1,0 +1,587 @@
+{
+  "version": "1.0.0",
+  "items": [
+    {
+      "ruleId": "task_reaction",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.d_prime"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "Go/No-Go观察的是：该出手时作答、该停时克制。误按次数要对应No-Go试次，遗漏率要对应Go试次；d′帮助描述本次规则辨别，不能单独作为自控能力等级。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "gonogo.omission_rate",
+        "gonogo.d_prime"
+      ],
+      "supportRefs": [
+        "project_protocol"
+      ]
+    },
+    {
+      "ruleId": "task_attention",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "cpt.d_prime"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.rt_icv"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "CPT-X观察的是一段连续活动中的目标辨别和反应稳定性。请一起看遗漏、误报与反应时变异；遗漏只对应目标试次，不能用全部试次作分母。",
+      "evidenceKeys": [
+        "cpt.d_prime",
+        "cpt.omission_rate",
+        "cpt.commission_rate",
+        "cpt.rt_icv"
+      ],
+      "supportRefs": [
+        "project_protocol"
+      ]
+    },
+    {
+      "ruleId": "task_interference",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "flanker.flanker_effect_ms"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker.congruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker.incongruent_accuracy"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "Flanker观察的是周围箭头与目标不一致时的干扰。毫秒差值保留正负，并与两条件准确率一起看；较快反应可能伴随错误，单个差值不能判定能力高低。",
+      "evidenceKeys": [
+        "flanker.flanker_effect_ms",
+        "flanker.congruent_accuracy",
+        "flanker.incongruent_accuracy"
+      ],
+      "supportRefs": [
+        "project_protocol"
+      ]
+    },
+    {
+      "ruleId": "daily_self_report",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "texi.working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "texi.inhibition"
+          }
+        ]
+      },
+      "kind": "independent_summary",
+      "text": "TEXI来自你对日常生活的回顾：工作记忆9题、抑制与自我调节11题，各为1–5题均分。高分表示你报告的困难较多，不能看成学习能力或智力分数。",
+      "evidenceKeys": [
+        "texi.working_memory",
+        "texi.inhibition"
+      ],
+      "supportRefs": [
+        "texi_2020",
+        "texi_scoring"
+      ]
+    },
+    {
+      "ruleId": "methods_complement",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.d_prime"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.d_prime"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "cpt.rt_icv"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker.flanker_effect_ms"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker.congruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "flanker.incongruent_accuracy"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "texi.working_memory"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "texi.inhibition"
+          }
+        ]
+      },
+      "kind": "joint_conclusion",
+      "text": "这次有了两种视角：有明确规则的任务表现，以及你对平时学习和生活的体验。它们帮助提出观察问题，不能互相换算；即使数字看起来不同，也不说明谁不诚实或谁的结果错误。可以回想睡眠、干扰、任务兴趣和当时状态，挑一个具体场景继续观察。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "gonogo.omission_rate",
+        "gonogo.d_prime",
+        "cpt.d_prime",
+        "cpt.omission_rate",
+        "cpt.commission_rate",
+        "cpt.rt_icv",
+        "flanker.flanker_effect_ms",
+        "flanker.congruent_accuracy",
+        "flanker.incongruent_accuracy",
+        "texi.working_memory",
+        "texi.inhibition"
+      ],
+      "supportRefs": [
+        "toplak_2013"
+      ]
+    },
+    {
+      "ruleId": "action_pause",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "texi.inhibition"
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "下次开始功课前，先说清“什么时候开始、什么时候暂停”。为手机设一个固定位置，先做一个短步骤；一周后回顾是否更容易开始和停下。这里提供可尝试的学习策略，不保证训练某项能力。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "texi.inhibition"
+      ],
+      "supportRefs": [
+        "project_protocol"
+      ]
+    },
+    {
+      "ruleId": "action_steps",
+      "when": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "present",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "present",
+            "evidenceKey": "texi.working_memory"
+          }
+        ]
+      },
+      "kind": "cross_source_condition",
+      "text": "把一项较长作业写成两三个清楚步骤，一次只展开当前步骤。中途分心后先查看清单再继续，并记录哪个环境更容易回到任务。",
+      "evidenceKeys": [
+        "cpt.omission_rate",
+        "texi.working_memory"
+      ],
+      "supportRefs": [
+        "project_protocol"
+      ]
+    },
+    {
+      "ruleId": "gonogo_missing",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "gonogo.omission_rate"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "gonogo.d_prime"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "Go/No-Go有指标缺失，只保留已获得的信息；不能把缺失填成零或据此生成完整跨方法解释。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "gonogo.omission_rate",
+        "gonogo.d_prime"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "gonogo_invalid",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "invalid",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "gonogo.omission_rate"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "gonogo.d_prime"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "Go/No-Go有指标不可解释；请查看原工具质量说明，本来源不参与跨方法解释。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "gonogo.omission_rate",
+        "gonogo.d_prime"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "gonogo_not_applicable",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "not_applicable",
+            "evidenceKey": "gonogo.commission_rate"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "gonogo.omission_rate"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "gonogo.d_prime"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "Go/No-Go本来源不适用；不使用另一年龄或报告者版本填补。",
+      "evidenceKeys": [
+        "gonogo.commission_rate",
+        "gonogo.omission_rate",
+        "gonogo.d_prime"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "cpt_missing",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "cpt.d_prime"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "cpt.commission_rate"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "cpt.rt_icv"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "CPT-X有指标缺失，只保留已获得的信息；不能把缺失填成零或据此生成完整跨方法解释。",
+      "evidenceKeys": [
+        "cpt.d_prime",
+        "cpt.omission_rate",
+        "cpt.commission_rate",
+        "cpt.rt_icv"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "cpt_invalid",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "invalid",
+            "evidenceKey": "cpt.d_prime"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "cpt.commission_rate"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "cpt.rt_icv"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "CPT-X有指标不可解释；请查看原工具质量说明，本来源不参与跨方法解释。",
+      "evidenceKeys": [
+        "cpt.d_prime",
+        "cpt.omission_rate",
+        "cpt.commission_rate",
+        "cpt.rt_icv"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "cpt_not_applicable",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "not_applicable",
+            "evidenceKey": "cpt.d_prime"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "cpt.omission_rate"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "cpt.commission_rate"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "cpt.rt_icv"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "CPT-X本来源不适用；不使用另一年龄或报告者版本填补。",
+      "evidenceKeys": [
+        "cpt.d_prime",
+        "cpt.omission_rate",
+        "cpt.commission_rate",
+        "cpt.rt_icv"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "flanker_missing",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "flanker.flanker_effect_ms"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "flanker.congruent_accuracy"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "flanker.incongruent_accuracy"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "Flanker有指标缺失，只保留已获得的信息；不能把缺失填成零或据此生成完整跨方法解释。",
+      "evidenceKeys": [
+        "flanker.flanker_effect_ms",
+        "flanker.congruent_accuracy",
+        "flanker.incongruent_accuracy"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "flanker_invalid",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "invalid",
+            "evidenceKey": "flanker.flanker_effect_ms"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "flanker.congruent_accuracy"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "flanker.incongruent_accuracy"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "Flanker有指标不可解释；请查看原工具质量说明，本来源不参与跨方法解释。",
+      "evidenceKeys": [
+        "flanker.flanker_effect_ms",
+        "flanker.congruent_accuracy",
+        "flanker.incongruent_accuracy"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "flanker_not_applicable",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "not_applicable",
+            "evidenceKey": "flanker.flanker_effect_ms"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "flanker.congruent_accuracy"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "flanker.incongruent_accuracy"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "Flanker本来源不适用；不使用另一年龄或报告者版本填补。",
+      "evidenceKeys": [
+        "flanker.flanker_effect_ms",
+        "flanker.congruent_accuracy",
+        "flanker.incongruent_accuracy"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "texi_missing",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "missing",
+            "evidenceKey": "texi.working_memory"
+          },
+          {
+            "op": "missing",
+            "evidenceKey": "texi.inhibition"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "TEXI自评有指标缺失，只保留已获得的信息；不能把缺失填成零或据此生成完整跨方法解释。",
+      "evidenceKeys": [
+        "texi.working_memory",
+        "texi.inhibition"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "texi_invalid",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "invalid",
+            "evidenceKey": "texi.working_memory"
+          },
+          {
+            "op": "invalid",
+            "evidenceKey": "texi.inhibition"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "TEXI自评有指标不可解释；请查看原工具质量说明，本来源不参与跨方法解释。",
+      "evidenceKeys": [
+        "texi.working_memory",
+        "texi.inhibition"
+      ],
+      "supportRefs": []
+    },
+    {
+      "ruleId": "texi_not_applicable",
+      "when": {
+        "op": "any",
+        "conditions": [
+          {
+            "op": "not_applicable",
+            "evidenceKey": "texi.working_memory"
+          },
+          {
+            "op": "not_applicable",
+            "evidenceKey": "texi.inhibition"
+          }
+        ]
+      },
+      "kind": "limitation",
+      "text": "TEXI自评本来源不适用；不使用另一年龄或报告者版本填补。",
+      "evidenceKeys": [
+        "texi.working_memory",
+        "texi.inhibition"
+      ],
+      "supportRefs": []
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -142,7 +143,7 @@ export async function completeTemplate(userId:string,id:string,revision:number){
   await authorizeToolOwner(tx,userId)
   return view(await ownedTemplate(tx,userId,id))
 })}
-export async function catalogTemplates(userId:string,page:number){return prisma.$transaction(async tx=>{await authorizeToolOwner(tx,userId);return researcherCatalog(tx,userId,page)})}
+export async function catalogTemplates(userId:string,page:number,filters:CatalogDiscoveryFilters={}){return prisma.$transaction(async tx=>{await authorizeToolOwner(tx,userId);return researcherCatalog(tx,userId,page,filters)})}
 export async function inspectTemplate(userId:string,id:string,answers?:PreviewAnswers){return prisma.$transaction(async tx=>{
   await authorizeToolOwner(tx,userId);const row=await ownedTemplate(tx,userId,id)
   if(row.kind==='COMPOSITION'){const units=await resolveItems(tx,userId,compositionDefinition.parse(row.definition).items,true);return {ok:true,issues:[],unitCount:units.length,revision:row.revision}}

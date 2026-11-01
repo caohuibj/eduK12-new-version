@@ -57,6 +57,8 @@ const CompositeAssessmentContent: React.FC = () => {
     ['/organization-tasks', '/my-assessments'].includes(
       new URLSearchParams(window.location.search).get('returnTo') ?? '',
     )
+  const childTask = relationalMode && new URLSearchParams(location.search).get('returnTo') === '/relational/child-control'
+  const relationalReturn = childTask ? '/relational/child-control' : organizationTask ? '/my-assessments' : '/relational/tasks'
   const token = params.token || ''
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -125,7 +127,7 @@ const CompositeAssessmentContent: React.FC = () => {
   const goReport = (id: string, courseId?: string) => {
     if (pageSignal().aborted) return
     if (relationalMode) {
-      navigate(organizationTask ? '/my-assessments' : '/relational/tasks')
+      navigate(relationalReturn)
       return
     }
     navigate(
@@ -372,9 +374,7 @@ const CompositeAssessmentContent: React.FC = () => {
             ? studyReturn
             : '/'
           : relationalMode
-            ? organizationTask
-              ? '/my-assessments'
-              : '/relational/tasks'
+            ? relationalReturn
             : '/student',
       )
       return
@@ -517,7 +517,7 @@ const CompositeAssessmentContent: React.FC = () => {
   if (!state) return <ProductPage width="reading"><ProductStatus
     kind="warning"
     title={error?.includes('最大次数') ? '本次测评的参与次数已用尽' : '暂时无法进入测评'}
-    actions={<><Link className="hui-button hui-button--secondary" to={relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : learner.enabled ? learner.backHref : '/student'}>{learner.enabled ? learner.backLabel : '返回任务列表'}</Link>
+    actions={<><Link className="hui-button hui-button--secondary" to={relationalMode ? relationalReturn : learner.enabled ? learner.backHref : '/student'}>{learner.enabled ? learner.backLabel : '返回任务列表'}</Link>
       {existingReportId && <ProductButton variant="primary" onClick={() => goReport(existingReportId)}>查看已有结果</ProductButton>}
       {!error?.includes('最大次数') && <ProductButton onClick={() => params.attemptId ? void loadAttempt(params.attemptId) : void start()}>重新加载</ProductButton>}
     </>}

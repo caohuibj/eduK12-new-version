@@ -1,3 +1,4 @@
+import {BundleDerivedReport,isDerivedBundleView,type DerivedBundleView} from '../modules/reporting/BundleDerivedReport'
 import {SurveyPersonalChanges} from './SurveyPersonalChanges'
 import BundleProfileSummary,{type BundleProfileView} from '../pages/bundle/BundleProfileSummary'
 import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
@@ -47,7 +48,7 @@ type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;r
 type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
-type NativeFeedback={importId:string;title:string;status:string;factsHash:string|null;profileView:BundleProfileView|null}
+type NativeFeedback={importId:string;title:string;status:string;factsHash:string|null;profileView:BundleProfileView|null;derivedView?:DerivedBundleView|null}
 type General={nativeBundles?:NativeFeedback[];kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
   idempotent?:boolean;generalReceipt?:unknown;participantFeedbackReceipt?:unknown}
@@ -98,7 +99,7 @@ function firstFinalParticipantFeedback(result:FinalResponse,attemptId:string):Ge
     return true
   })
   const native=receipt.nativeBundles
-  if(native!==undefined&&(!Array.isArray(native)||native.some(v=>!v||typeof v!=='object'||typeof v.importId!=='string'||typeof v.title!=='string'||typeof v.status!=='string'||(v.factsHash!==null&&typeof v.factsHash!=='string')||(v.profileView!==null&&(!v.profileView||typeof v.profileView!=='object'||v.profileView.schemaVersion!=='bundle-profile-view-v1'||!Array.isArray(v.profileView.constructs)||!Array.isArray(v.profileView.actions))))))return null
+  if(native!==undefined&&(!Array.isArray(native)||native.some(v=>!v||typeof v!=='object'||typeof v.importId!=='string'||typeof v.title!=='string'||typeof v.status!=='string'||(v.factsHash!==null&&typeof v.factsHash!=='string')||(v.profileView!==null&&(!v.profileView||typeof v.profileView!=='object'||v.profileView.schemaVersion!=='bundle-profile-view-v1'||!Array.isArray(v.profileView.constructs)||!Array.isArray(v.profileView.actions)))||(v.derivedView!==undefined&&v.derivedView!==null&&!isDerivedBundleView(v.derivedView)))))return null
   return valid?{...general,kind:'DESCRIPTIVE',pending:receipt.pending,measurements:receipt.measurements as ParticipantFeedback[],...(native?{nativeBundles:native as NativeFeedback[]}:{})}:null
 }
 const feedbackQualityText=(value:string)=>({interpretable:'本次结果可作参考',limited:'本次结果仅供有限参考',invalid:'本次作答不足以形成有效解释'} as Record<string,string>)[value]??'本次结果暂无法解释'
@@ -1195,7 +1196,7 @@ export default function SurveyPublicApp(){
             </section>)}
           </article>)}
         </section>}
-        {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
+        {general.nativeBundles?.map(bundle=><section key={bundle.importId} aria-label="整体理论报告"><h2>{bundle.title}</h2>{bundle.derivedView?<BundleDerivedReport view={bundle.derivedView}/>:bundle.profileView?<BundleProfileSummary view={bundle.profileView}/>:<p>综合结果暂不可用；单项作答已保存。</p>}</section>)}
         <p className="survey-completion-time">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         {info.project.collectionMode==='LINKED_WAVES'&&completion&&<SurveyPersonalChanges publicId={publicId} attemptId={completion.attemptId} proof={completion.proof}/>}
         {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">

@@ -18,9 +18,11 @@ export function createEducationAssessmentResourceAdapter(api:EducationApi,produc
   return {directory:run+'/assessment-resources',tracks:run+'/tracks'}
  }
  return {
-  async list(scope,cursor){
+  async list(scope,cursor,filters={}){
    const path=paths(scope),query=new URLSearchParams({...(product==='TEACHER'?{runId:scope.runId}:{}),expectedVersion:String(scope.expectedVersion)})
    if(cursor){if(!uuid.test(cursor))throw Error('目录分页位置无效，请重新读取目录。');query.set('cursor',cursor)}
+   if(filters.keyword?.trim())query.set('keyword',filters.keyword.trim())
+   if(filters.tags?.length)query.set('tags',filters.tags.join(','))
    const data=await api<EducationAssessmentDirectory>(path.directory+'?'+query)
    assertEducationAssessmentDirectory(data,scope)
    return data

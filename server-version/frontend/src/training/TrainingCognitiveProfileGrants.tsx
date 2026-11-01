@@ -3,12 +3,16 @@ import {useAuth} from '../contexts/AuthContext'
 import {eligibleGrantTeachers,materialGrantApi} from '../api/materialGrants'
 import {cognitiveProfileGrantsApi as api,validCognitiveProfilePending,sameCognitiveProfileOperation,type CognitiveProfileChoice,type CognitiveProfileUse,type CognitiveProfilePending} from '../api/cognitiveProfileGrants'
 import type {User} from '../types'
+import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import {EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,catalogQuery} from '../api/catalogDiscovery'
 const label=(p:string)=>p==='experience'?'体验报告':p==='research'?'科研报告':'正式报告'
 const message=(e:unknown)=>e instanceof Error?e.message:'请求未完成，请回读原结果。'
 const localDate=(d:Date)=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)
 export default function TrainingCognitiveProfileGrants(){const {user}=useAuth();return user?<Workspace key={user.id} actorId={user.id}/>:null}
 export function Workspace({actorId}:{actorId:string}){
  const [choices,setChoices]=useState<CognitiveProfileChoice[]>([]),[page,setPage]=useState(1),[hasMore,setHasMore]=useState(false),[teachers,setTeachers]=useState<User[]>([])
+ const [filters,setFilters]=useState({...EMPTY_CATALOG_FILTERS}),[applied,setApplied]=useState({...EMPTY_CATALOG_FILTERS}),[facets,setFacets]=useState(EMPTY_CATALOG_FACETS)
  const [choiceKey,setChoiceKey]=useState(''),[userId,setUserId]=useState(''),[uses,setUses]=useState<CognitiveProfileUse[]>([]),[usesReady,setUsesReady]=useState(false)
  const [preview,setPreview]=useState<Awaited<ReturnType<typeof api.preview>>['data']|null>(null)
  const [name,setName]=useState(''),[from,setFrom]=useState(localDate(new Date())),[until,setUntil]=useState(''),[reason,setReason]=useState('')
@@ -21,14 +25,14 @@ export function Workspace({actorId}:{actorId:string}){
   try{const raw=sessionStorage.getItem(storageKey),p=raw?JSON.parse(raw):null;if(p&&!validCognitiveProfilePending(p))throw Error('原认知授权请求不完整，请核对审计后处理。');setPending(p);setStorageReady(true)}catch(e){setStorageError(message(e))}
   return()=>{alive.current=false}
  },[storageKey])
- useEffect(()=>{let active=true;setLoading(true);setError('')
-  void Promise.all([api.catalog(page),materialGrantApi.listTeachers()]).then(([catalog,users])=>{
+ useEffect(()=>{let active=true;setLoading(true);setError('');setChoices([])
+  void Promise.all([api.catalog(page,applied),materialGrantApi.listTeachers()]).then(([catalog,users])=>{
    if(!active)return
    if(catalog.code!==0||!catalog.data||!Array.isArray(catalog.data.list)||users.code!==0||!users.data||users.data.total!==users.data.list.length)throw Error('配置或接收者名单不完整，请重新读取。')
-   setChoices(catalog.data.list);setHasMore(catalog.data.hasMore);setTeachers(eligibleGrantTeachers(users.data.list))
+   setChoices(catalog.data.list);setHasMore(catalog.data.hasMore);setTeachers(eligibleGrantTeachers(users.data.list));setFacets(catalog.data.tagFacets??EMPTY_CATALOG_FACETS)
   }).catch(e=>{if(active)setError(message(e))}).finally(()=>{if(active)setLoading(false)})
   return()=>{active=false}
- },[page,reload])
+ },[page,reload,applied])
  useEffect(()=>{let active=true;setUsesReady(false);setUses([]);setPreview(null);setError('')
   if(!choice)return
   void api.preview(choice).then(r=>{if(!active)return;if(r.code!==0||!r.data||r.data.artifactHash!==choice.artifactHash||r.data.reportStyle.profile!==choice.profile)throw Error(r.message||'所选报告来源不可用');setPreview(r.data)}).catch(e=>{if(active)setError(message(e))})
@@ -69,14 +73,16 @@ export function Workspace({actorId}:{actorId:string}){
  }
  return <section className="training-accounts training-resources-panel" aria-label="固定认知配置授权">
   <h2>固定认知配置</h2><p>选择已批准的测验配置和报告，使用者建任务时直接使用。调整仅影响后续绑定，历史作答和报告保留。</p>
+  <CatalogDiscoveryFilters label="固定认知配置检索" filters={filters} facets={facets} onChange={setFilters} disabled={loading||busy||Boolean(pending)} onApply={value=>{setChoiceKey('');setPreview(null);setUses([]);setUsesReady(false);setName('');setReason('');setPage(1);setApplied({...value,keyword:value.keyword.trim()})}}/>
   {storageError&&<p role="alert">{storageError}</p>}{error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {pending&&<aside aria-label="原认知配置请求"><p>有一项结果待核对，请先读取原请求。</p><details><summary>请求详情</summary><code>{pending.body.requestId}</code></details>
    <button disabled={busy} onClick={()=>void recover()}>回读原请求</button>{absent&&<button disabled={busy} onClick={()=>void send(pending,true)}>重试同一请求</button>}</aside>}
   {loading?<p role="status">正在读取配置…</p>:<>
    <label>测验与报告<select value={choiceKey} disabled={busy||Boolean(pending)} onChange={e=>{setChoiceKey(e.target.value);setName('');setReason('')}}><option value="">选择已批准配置</option>{choices.map(c=><option key={c.artifactHash} value={c.artifactHash}>{c.title} · {label(c.profile)}{c.available?'':'（暂不可用）'}</option>)}</select></label>
-   {!choices.length&&<p>尚无可选的精确认知配置；请由系统管理员核对素材装载和入口批准。</p>}
+   {!choices.length&&<p>{catalogQuery(1,applied)!=='page=1'?'没有匹配的固定认知配置，可调整条件或清除筛选。':'尚无可选的精确认知配置；请由系统管理员核对素材装载和入口批准。'}</p>}
    <div><button disabled={busy||Boolean(pending)||page===1} onClick={()=>{setPage(p=>p-1);setChoiceKey('')}}>上一页</button><span>第 {page} 页</span><button disabled={busy||Boolean(pending)||!hasMore} onClick={()=>{setPage(p=>p+1);setChoiceKey('')}}>下一页</button></div>
    {choice&&<>
+    <p>认知测验 · {label(choice.profile)}</p><CatalogClassificationTags tags={choice.classificationTags}/>
     {preview&&<section aria-label="报告预览"><h3>{preview.reportStyle.title}</h3><p>{label(preview.reportStyle.profile)}</p><p>主要内容：{preview.reportStyle.headline.map(m=>m.label).join('、')}</p><p>详细内容：{preview.reportStyle.detail.map(m=>m.label).join('、')}</p>{preview.reportStyle.caveats.map(c=><p key={c}>{c}</p>)}<p>{preview.reportStyle.disclaimer}</p><p>此处预览报告结构，实际结果由作答产生。</p></section>}
     <label>接收培训师<select value={userId} disabled={busy||Boolean(pending)} onChange={e=>setUserId(e.target.value)}><option value="">选择合格培训师</option>{teachers.map(t=><option key={t.id} value={t.id}>{t.nickname||t.username}</option>)}</select></label>
     {usesReady&&old&&<p>当前指定：{old.configurationName} · {label(old.profile)}。保存将建立新修订并撤销原使用权。</p>}

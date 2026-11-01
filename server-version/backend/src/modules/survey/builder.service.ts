@@ -1,3 +1,4 @@
+import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {recheckCatalogSjtSourceAuthority} from './catalog.sources'
 import {assertNotTechnicalPackageGrant} from './governed-package.service'
 import { previewScaleRawScoreFeedback } from '../scale/raw-score-feedback-preview'
@@ -280,9 +281,9 @@ export async function applySurveyImport(userId:string,projectId:string,id:string
   })
 }
 
-export async function listResearcherCatalog(userId:string,projectId:string,page:number){
+export async function listResearcherCatalog(userId:string,projectId:string,page:number,filters:CatalogDiscoveryFilters={}){
   return prisma.$transaction(async tx=>{await authorizedProject(tx,userId,projectId,false)
-    return researcherCatalog(tx,userId,page)})
+    return researcherCatalog(tx,userId,page,filters)})
 }
 export async function importCatalogDraft(userId:string,projectId:string,grantId:string,input:{requestId:string;instrumentKey:string;title:string}){
   return prisma.$transaction(async tx=>{

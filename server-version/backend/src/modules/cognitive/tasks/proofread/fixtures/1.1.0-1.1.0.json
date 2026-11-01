@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "proofread",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.1.0"
+  },
+  "provenance": "Hand-computed: 2/4 correct, 3 answered, 1 error, 1 timeout; median(500,700)=600 ms. Original project-authored items.; G1 preserved scored input/result and added empty/insufficient rejection cases required by existing main fixture contract.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "proofread-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "pf2-01",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "itemId": "pf2-02",
+              "responseIndex": 2,
+              "rtMs": 700,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "itemId": "pf2-03",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "itemId": "pf2-04",
+              "responseIndex": null,
+              "rtMs": null,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 50,
+        "showProductIndex": false,
+        "metrics": {
+          "accuracy": 0.5,
+          "correctCount": 2,
+          "answeredCount": 3,
+          "errorCount": 1,
+          "timeoutCount": 1,
+          "medianRtMs": 600,
+          "validRtCount": 2
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "noResponses": false,
+          "insufficientValidRt": false,
+          "lowAccuracy": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "proofread-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "proofread v1.1 expects exactly 4 contiguous trials"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "proofread-zh-v1.1.0",
+          "fixationMs": 400,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 300,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemId": "pf2-01",
+              "responseIndex": 3,
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "proofread v1.1 expects exactly 4 contiguous trials"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+diff --git a/server-version/frontend/src/pages/bundle/bundle-evidence-display.ts b/server-version/frontend/src/pages/bundle/bundle-evidence-display.ts
+--- a/server-version/frontend/src/pages/bundle/bundle-evidence-display.ts
++++ b/server-version/frontend/src/pages/bundle/bundle-evidence-display.ts
+@@ -1,3 +1,5 @@
++import { CHILD_BUNDLE_DISPLAYS } from './bundle-child-evidence-display'
++
+ export type BundleEvidence = {
+   evidenceKey: string
+   constructKey: string
+@@ -12,3 +14,4 @@
+ const displays: Record<string, MetricDisplay> = {
++  ...CHILD_BUNDLE_DISPLAYS,
+   'gonogo.commission_rate': { label: 'Go/No-Go · No-Go 误按率', sourceKind: 'COGNITIVE_METRIC', range: { min: 0, max: 1 }, ratio: true, denominator: 'gonogo.nogo_trial_count', note: '分母是不应按键的 No-Go 试次。' },
+   'gonogo.omission_rate': { label: 'Go/No-Go · Go 遗漏率', sourceKind: 'COGNITIVE_METRIC', range: { min: 0, max: 1 }, ratio: true, denominator: 'gonogo.go_trial_count', note: '分母是应按键的 Go 试次。' },
+diff --git a/server-version/frontend/src/pages/bundle/BundleEvidencePanels.tsx b/server-version/frontend/src/pages/bundle/BundleEvidencePanels.tsx
+--- a/server-version/frontend/src/pages/bundle/BundleEvidencePanels.tsx
++++ b/server-version/frontend/src/pages/bundle/BundleEvidencePanels.tsx
+@@ -29,3 +29,3 @@
+-    {known.some(item => item.sourceKind === 'SCALE_SCORE') && <ReportSection title="日常生活中的体验" eyebrow="自评问卷" description="各分量表保留自己的原始端点；条的位置不是同龄排名。">
++    {known.some(item => item.sourceKind === 'SCALE_SCORE') && <ReportSection title="日常生活中的体验与观察" eyebrow="问卷来源" description="各来源保留自己的原始端点；条的位置不是同龄排名。">
+       <div className="space-y-4">{known.filter(item => item.sourceKind === 'SCALE_SCORE').map(card)}</div>
+     </ReportSection>}

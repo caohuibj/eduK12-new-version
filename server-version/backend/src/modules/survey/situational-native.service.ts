@@ -92,7 +92,7 @@ async function verifiedFlowPrefix(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
   const lockedPriorAnswers=await readSurveyTaskLockedAnswers(tx,{projectId:known.projectId,waveId:known.waveId,
     attemptId:known.attemptId,publicationId:known.publicationId},fail)
   try{
-    const prefix=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,lockedPriorAnswers,runtime.assignment)
+    const prefix=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,lockedPriorAnswers,runtime.assignment,runtime.attempt.startedAt)
     if(canonicalHash(prefix)!==own!.surveyLockedAnswersHash)fail(409,'情境化前置答案与冻结路径不一致')
   }catch(error){if(error instanceof SurveyCognitiveError)fail(error.statusCode,error.message);throw error}
   return lockedPriorAnswers
@@ -121,7 +121,7 @@ export async function startSurveySituational(proof:SurveyTaskProof,slotKey:strin
     let locked:Record<string,unknown>|undefined
     try{
       if(runtime.publication.flow){
-        locked=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,priorAnswers,assignment)
+        locked=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,priorAnswers,assignment,runtime.attempt.startedAt)
       }else{
         const index=runtime.publication.units.findIndex(unit=>unit.instrumentKey===slotKey)
         await assertSurveyPriorCognitiveCompleted(tx,{projectId:known.projectId,waveId:known.waveId,

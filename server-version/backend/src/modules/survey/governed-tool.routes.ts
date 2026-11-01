@@ -33,6 +33,8 @@ surveyGovernedToolsRouter.get('/catalog',handle(req=>service.governedCatalog(req
 surveyGovernedToolsRouter.get('/native-bundles/:id',handle(req=>service.previewSurveyNativeSource(req.user!.userId,uuid.parse(req.params.id))))
 surveyGovernedToolsRouter.get('/components',handle(req=>service.governedComponentOptions(req.user!.userId,page.parse(req.query.page),search.parse(req.query.q))))
 surveyGovernedToolsRouter.get('/versions/:id',handle(req=>service.governedDetail(req.user!.userId,uuid.parse(req.params.id))))
+// Pending content intake only. Existing approval/trial writes retain step-up below.
+surveyGovernedToolsRouter.post('/submissions/original-form',handle(req=>service.submitOriginalForm(req.user!.userId,req.body)))
 surveyGovernedToolsRouter.use(requireRecentAdminKey)
 const originalSjt=z.object({requestId:uuid,toolKey:z.string().regex(/^[a-z][a-z0-9_-]{0,100}$/),version,title:text,definition:z.record(z.string(),z.unknown()),statement:reason,parameterReleaseId:uuid.nullable().optional(),report:z.object({version,template:reportTemplateSchema}).strict().nullable(),reference:metadata}).strict()
 surveyGovernedToolsRouter.post('/original-sjt/preview',handle(req=>service.previewOriginalSjt(req.user!.userId,originalSjt.parse(req.body),req.user!)))

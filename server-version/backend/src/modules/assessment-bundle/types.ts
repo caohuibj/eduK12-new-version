@@ -52,6 +52,13 @@ export interface BundleSlotDefinitionV1 {
   respondentType: BundleRespondentTypeV1
   /** SCALE score keys or COGNITIVE metric keys. FORM omits this. */
   valueSelectors?: string[]
+  /** Optional source-owned START context; delivery mode remains independent. */
+  admissionContext?: {
+    assessmentContext: string
+    requirements: Array<{ contextKey: string; allowedValues?: Array<string | number | boolean> }>
+    /** Collect this declared string field through the existing DOB context path. */
+    birthYearMonthContextKey?: string
+  }
 }
 
 export interface BundlePopulationConstraintV1 {

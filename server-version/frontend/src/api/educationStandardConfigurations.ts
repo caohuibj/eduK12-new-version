@@ -1,8 +1,9 @@
 import {sessionFetch} from './client'
+import type {CatalogClassificationTag} from './catalogDiscovery'
 export type EducationManagerProduct='HUISCHOOL'|'HUITEACHER'
 export type EducationConfigurationChoice={id:string;title:string;toolKey:string;instrumentVersion:string;combinationHash:string;
  versions:Record<'CONTENT'|'PARAMETERS'|'REPORT',string>;authorities:Array<{id:string;version:number;validFrom:string;expiresAt:string}>;
- assignable:boolean;unavailableReason:string|null}
+ assignable:boolean;unavailableReason:string|null;classificationTags?:CatalogClassificationTag[]}
 export type EducationUseIssue={requestId:string;userId:string;combinationHash:string;authorityGrantId:string;expectedAuthorityVersion:number;
  validFrom:string;expiresAt:string;configurationName:string;replaces?:{grantId:string;expectedVersion:number;reason:string}}
 export type EducationUseRevoke={requestId:string;expectedVersion:number;reason:string}

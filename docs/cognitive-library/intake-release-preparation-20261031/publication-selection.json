@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "cognitive-content-ready-20261031",
+  "configs": [
+    {
+      "testType": "numberline",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "arithverify",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sizecongruity",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "delaydiscount",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "gamblingdeck",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "symbolmatch",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "runningspan",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "sentencecheck",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "seqlearn",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "timecopy",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "letternumseries",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "semanticfluency",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "cancellation",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "trustgame",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "ufov",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "pursuitrotor",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "visualwm",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "maze",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.1"
+    },
+    {
+      "testType": "auditoryrt",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    },
+    {
+      "testType": "auditorynback",
+      "configVersion": "1.0.1",
+      "engineVersion": "1.0.1",
+      "scoringVersion": "1.0.0"
+    }
+  ]
+}

@@ -57,7 +57,20 @@ const slotSchema = z.object({
   instrumentVersion: exactVersion,
   respondentType: z.enum(['SELF', 'PARENT', 'TEACHER']),
   valueSelectors: z.array(nonEmpty).optional(),
-}).strict()
+  admissionContext: z.object({
+    assessmentContext: nonEmpty,
+    requirements: z.array(z.object({
+      contextKey: z.string().regex(/^[a-z][a-z0-9_]*$/),
+      allowedValues: z.array(z.union([z.string(), z.number().finite(), z.boolean()])).min(1).optional(),
+    }).strict()).min(1).max(32),
+    birthYearMonthContextKey: z.string().regex(/^[a-z][a-z0-9_]*$/).optional(),
+  }).strict().optional(),
+}).strict().superRefine((slot, ctx) => {
+  if (!slot.admissionContext) return
+  if (slot.unitType !== 'SCALE' || new Set(slot.admissionContext.requirements.map(r => r.contextKey)).size !== slot.admissionContext.requirements.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['admissionContext'], message: 'START context requires a SCALE slot and unique context references' })
+  }
+})
 
 export const assessmentBundleDefinitionSchema = z.object({
   schemaVersion: z.literal(ASSESSMENT_BUNDLE_DEFINITION_SCHEMA),

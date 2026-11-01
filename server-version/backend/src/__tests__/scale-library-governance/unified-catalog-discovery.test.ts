@@ -15,13 +15,19 @@ describe('shared Training catalog discovery before pagination',()=>{
   expect(result.list).toHaveLength(1)
   expect(result.list[0].exactVersion).toMatchObject({instrumentKey:'value_cost_mathematics_zh_cn',instrumentVersion:'1.0.0'})
   expect(result.list[0].authorization).toMatchObject({mechanism:'DEPLOYMENT_AND_USE_GRANT',useGrantStatus:'NOT_EVALUATED',requiresRuntimeCheck:true})
-  expect(mocks.entries).not.toHaveBeenCalled()
+  expect(mocks.entries).toHaveBeenCalledWith('system',undefined,{offset:0,limit:24,keyword:'学生 数学',tags:['value_cost','language:zh-CN']},'TRAINING')
   expect(result.hasMore).toBe(false)
  })
  it('passes private-source keywords to the existing visibility-scoped query before its LIMIT',async()=>{
   await readUnifiedCatalog('actor','TRAINING',{page:2,pageSize:25,keyword:'private synthetic',origin:'AUTHORED'})
   expect(mocks.entries).toHaveBeenCalledWith('actor',undefined,{offset:25,limit:25,keyword:'private synthetic'},'TRAINING')
   expect(mocks.read).toHaveBeenCalledTimes(1)
+ })
+ it('keeps tagged authored versions in the existing permission-scoped page',async()=>{
+  mocks.entries.mockResolvedValue({list:[{id:'own-entry',releaseId:'exact-release',metadata:{title:'自编量表'},status:'ACTIVE',supportedEntrypoints:['TRAINING'],compatibilityReasons:{},classificationTags:[{id:'population:teacher',label:'教师',facet:'population'}]}],hasMore:false})
+  const result=await readUnifiedCatalog('system','TRAINING',{page:2,pageSize:25,origin:'AUTHORED',tags:['population:teacher']})
+  expect(mocks.entries).toHaveBeenCalledWith('system',undefined,{offset:25,limit:25,tags:['population:teacher']},'TRAINING')
+  expect(result.list[0]).toMatchObject({origin:'AUTHORED',exactVersion:{entryId:'own-entry',releaseId:'exact-release'},classificationTags:[{id:'population:teacher',label:'教师',facet:'population'}],authorization:{mechanism:'LIBRARY_USE_GRANT',requiresRuntimeCheck:true,useGrantStatus:'NOT_EVALUATED'}})
  })
  it('keeps registered origin independent of authorship and does not broaden an unknown tag',async()=>{
   const expected=listScaleInstrumentSources().filter(source=>source.catalog.construct.constructOverlapTags.includes('student_self_report'))

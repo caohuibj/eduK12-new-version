@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "semanticfluency",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreSemanticfluencyV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "durationMs": 45000,
+          "stimulusSetVersion": "semanticfluency-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "category": "animals",
+              "responses": [
+                "猫",
+                " 狗 ",
+                "猫",
+                "飞行水壶"
+              ],
+              "responseDurationMs": 45000,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "category": "fruits",
+              "responses": [
+                "苹果",
+                "香蕉"
+              ],
+              "responseDurationMs": 44000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 67,
+        "metrics": {
+          "uniqueValidCount": 4,
+          "uniqueValidPerTrial": 2,
+          "intrusionRate": 0.1667,
+          "duplicateRate": 0.1667,
+          "emptyTrialCount": 0
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientResponses": false,
+          "excessiveIntrusions": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "durationMs": 45000,
+          "stimulusSetVersion": "semanticfluency-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "semanticfluency v1 expects exactly 2 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 2,
+          "durationMs": 45000,
+          "stimulusSetVersion": "semanticfluency-zh-v1.0.0",
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "category": "animals",
+              "responses": [
+                "猫",
+                " 狗 ",
+                "猫",
+                "飞行水壶"
+              ],
+              "responseDurationMs": 45000,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "semanticfluency v1 expects exactly 2 trials, got 1"
+    }
+  ]
+}

@@ -112,7 +112,7 @@ it('offers version updates only for own published tools and creates a draft thro
 })
 it('searches and filters through the server, resets paging and does not mount governance until requested',async()=>{
  show();await screen.findByText('暂无符合条件的工具');expect(mocks.governance).not.toHaveBeenCalled()
- fireEvent.change(screen.getByLabelText('检索工具'),{target:{value:'认知'}});fireEvent.submit(screen.getByRole('search'))
+ fireEvent.change(screen.getByRole('searchbox',{name:'关键词'}),{target:{value:'认知'}});fireEvent.submit(screen.getByRole('search'))
  await waitFor(()=>expect(mocks.get).toHaveBeenLastCalledWith('/training-workspace/tools',expect.objectContaining({params:expect.objectContaining({keyword:'认知',page:1})})))
  fireEvent.change(screen.getByLabelText('资源来源'),{target:{value:'granted'}})
  await waitFor(()=>expect(mocks.get).toHaveBeenLastCalledWith('/training-workspace/tools',expect.objectContaining({params:expect.objectContaining({source:'granted'})})))

@@ -1,0 +1,44 @@
+{
+  "key": "child_cognitive_control_parent_teacher_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "task_evidence",
+      "kind": "evidence",
+      "title": "任务与日常观察分别阅读",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "observations",
+      "kind": "conclusions",
+      "title": "跨方法理解与可尝试的策略",
+      "audience": [
+        "student",
+        "parent",
+        "teacher",
+        "admin"
+      ],
+      "ruleIds": [
+        "gonogo_observation",
+        "flanker_observation",
+        "task_reflection",
+        "parent_chexi_observation",
+        "parent_chexi_complementary",
+        "teacher_chexi_observation",
+        "teacher_chexi_complementary"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "缺少任务结果，保留已完成工具的独立报告。",
+    "limited": "部分记录质量有限，仅解释有依据的部分。",
+    "unavailable": "缺少年龄或超出本草稿年龄范围，不能生成本任务组件解释。"
+  }
+}
