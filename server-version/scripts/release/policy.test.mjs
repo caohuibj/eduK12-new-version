@@ -1,5 +1,12 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {classify,portalBoundary,loginBoundary,toolingOnly,imageBuildOnly} from './policy.mjs';
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
+test('generated Web inventory and maintenance parser preparation use tooling without admitting application or scientific inputs',()=>{
+ const inventory='docs/miniprogram-v2/web-feature-inventory.json';
+ const entries=[regular('.github/workflows/ci-maintenance.yml'),regular(inventory)];
+ assert.equal(toolingOnly(entries),true);
+ for(const file of ['docs/miniprogram-v2/unknown.json','server-version/frontend/src/App.tsx','server-version/backend/src/modules/bundle-product/service.ts','server-version/backend/src/modules/assessment-bundle/packages/new/1.0.0/manifest.json','server-version/backend/package-lock.json'])assert.equal(toolingOnly([...entries,regular(file)]),false,file);
+ for(const change of [{newMode:'120000'},{newMode:'100755'},{status:'D',newMode:'000000'},{status:'R'}])assert.equal(toolingOnly([entries[0],{...regular(inventory),...change}]),false);
+});
 const css='server-version/frontend/src/training/training-workspace-refresh.css';
 const auth='server-version/backend/src/controllers/authController.ts';
 const root=new URL('../../',import.meta.url);
