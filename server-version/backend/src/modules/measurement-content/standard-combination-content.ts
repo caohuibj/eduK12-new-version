@@ -7,6 +7,7 @@ import {referenceEntryKey} from './reference-candidate'
 import {DECLARATIVE_REPORT_GENERATOR} from './report-renderer'
 import type {FrozenReferencePolicy} from './reference-policy'
 import type {ExactStandardCombination} from './standard-combination-source'
+import {selectedStandardReport} from './standard-combination'
 
 type Measurement=Extract<StoredRelease,{layer:'MEASUREMENT'}>
 type Pointer={releaseId:string;contentHash:string}
@@ -22,7 +23,7 @@ export function standardCombinationContentInputs(row:ExactStandardCombination,me
     evidence:{sourceVersion:set.referenceVersion,parameterVersion:t.parts.PARAMETERS.version}}}
   return {input,entries,sourceVersion:set.referenceVersion}
  })
- const report:ReleaseInput|null=t.template===null?null:{...base,layer:'REPORT',key:'standard-combination-report:'+row.id+(audience==='teacher'?'':':'+audience),
+ const report:ReleaseInput|null=t.template===null?null:{...base,assetRefs:selectedStandardReport(t.parts.REPORT.payload).assetRefs,layer:'REPORT',key:'standard-combination-report:'+row.id+(audience==='teacher'?'':':'+audience),
   version:canonicalHash({parameters:t.parts.PARAMETERS.hash,report:t.parts.REPORT.hash}),provenance,
   content:{projectionVersion:1,measurements:[pointer],metricKeys:t.definition.scoring.scores.map(s=>s.key),audience,
    language:t.definition.versionAxes?.locale??'und',generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:t.template}}

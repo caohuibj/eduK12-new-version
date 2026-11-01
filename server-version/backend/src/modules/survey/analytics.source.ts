@@ -38,7 +38,7 @@ const nativeMissingMeanings={NOT_SHOWN:'根据冻结科学路径未呈现',SHOWN
 export interface ResearchRawCodebook {
   missingMeanings?:Readonly<Partial<Record<MissingReason,string>>>
   /** Author-only metadata; raw export remains under existing owner/MFA scope. */
-  purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'
+  purpose?: 'CONTENT' | 'UNSCORED' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'
   attentionTarget?: string
   variantConfiguration?:SurveyVariantConfiguration
   sourceProvenance?:ResearchFrozenUnit['sourceProvenance']

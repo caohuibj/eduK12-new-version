@@ -1,0 +1,197 @@
+{
+  "kind": "unsigned_local_execution_not_CI",
+  "base": "24061f5e349d1f8df34b0ed5dd99a33e3014da8c",
+  "executions": [
+    {
+      "artifact": "unscored-backend-v2.json",
+      "sha256": "6725b4d3fe2c9839dbdd8f36177685fea370f12abfd0c4860108679709f90d00",
+      "qualifiedEnvironment": true,
+      "node": "24.21.0",
+      "passed": 5,
+      "failed": 1,
+      "filtered": 19,
+      "cases": [
+        {
+          "name": "unscored quality items excludes quality responses from transformed item scores, sums, means, denominators and feedback",
+          "status": "passed"
+        },
+        {
+          "name": "unscored quality items rejects scoring references even when authoring validation is bypassed",
+          "status": "passed"
+        },
+        {
+          "name": "unscored standard single-choice supplement validates a STANDARD supplement and never creates an item score or denominator for it",
+          "status": "passed"
+        },
+        {
+          "name": "unscored standard single-choice supplement rejects scoring/transform misuse and keeps the existing STANDARD quality-item restriction",
+          "status": "passed"
+        },
+        {
+          "name": "unscored standard single-choice supplement retains the typed answer through canonical Survey FINAL without scoring it, including an omitted optional answer",
+          "status": "failed"
+        },
+        {
+          "name": "unscored standard single-choice supplement keeps support outside interpretation gating when a symptom is missing and does not invent an intent/risk label",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "artifact": "unscored-backend-v3-failed-case-only.json",
+      "sha256": "124ec5620e23e6257122c07435185a0fcee0c01b15ea022b6eef671d2d28dc72",
+      "qualifiedEnvironment": true,
+      "node": "24.21.0",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 3,
+      "cases": [
+        {
+          "name": "unscored standard single-choice supplement retains the typed answer through canonical Survey FINAL without scoring it, including an omitted optional answer",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "artifact": "unscored-export-v1.json",
+      "sha256": "b27ec2d5ffb4902e2753d6232961b4f9c8e02509b01381c38b6dfeb1f577ef24",
+      "qualifiedEnvironment": true,
+      "node": "24.21.0",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "name": "unscored standard single-choice supplement labels an unscored raw answer in the existing research export rather than presenting it as a content score",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "artifact": "unscored-frontend-v1.json",
+      "sha256": "ece29007ed39a41fa43742ab6dc16bb6ace763efe4b7d07a52d2ad1e126af4ee",
+      "qualifiedEnvironment": false,
+      "node": "24.19.0",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 57,
+      "cases": [
+        {
+          "name": "Survey Scale participant one-by-one delivery keeps frozen support visible while skipping an optional question without fabricating an answer",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary questionnaire block instructions keeps scale support outside collapsed campus instructions with an unanswered optional supplement",
+          "status": "passed"
+        },
+        {
+          "name": "ScaleUnitReportCard PR6A null/zero and caveat contract keeps independent support visible in an incomplete report with no score interpretation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "artifact": "unscored-frontend-v2.json",
+      "sha256": "99202b1ca0fac56c1fd68e0135e8815adc8c6f23fc6a8f810fcede385a8e506c",
+      "qualifiedEnvironment": true,
+      "node": "24.21.0",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 57,
+      "cases": [
+        {
+          "name": "Survey Scale participant one-by-one delivery keeps frozen support visible while skipping an optional question without fabricating an answer",
+          "status": "passed"
+        },
+        {
+          "name": "ordinary questionnaire block instructions keeps scale support outside collapsed campus instructions with an unanswered optional supplement",
+          "status": "passed"
+        },
+        {
+          "name": "ScaleUnitReportCard PR6A null/zero and caveat contract keeps independent support visible in an incomplete report with no score interpretation",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "finalUniqueQualifiedCases": {
+    "backendNew": 5,
+    "backendExistingAffectedRegression": 2,
+    "frontendNew": 3
+  },
+  "types": {
+    "backend": "exit0 after unchanged main Prisma client regeneration; original stale-client failure retained",
+    "frontendApp": "exit0; Cognitive types not rerun because unchanged"
+  },
+  "inputs": [
+    {
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "sha256": "6f1e9f1992c4393dfe10b89ee2d65d87bffe5b81713a1b9d6bad2cf08fc5799d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "sha256": "7d56b8f5532b07135b1e3f5eed2a3e50dfd6edb99a5acb0d5e704aa6e8821a53"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/analytics.raw-export.ts",
+      "sha256": "e7758226e83d9e7996b4d1e9057c8d7ff246eb50316e831b4c00f0c8e1375bcf"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/analytics.source.ts",
+      "sha256": "64d33b2aecbb21dde5122fbe6e50a98ee40a7a495e5c3ad5918884ec6da7a141"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyTimedScale.tsx",
+      "sha256": "148d1e3df81d9b9ccf655e43bd4a57e52fc307f68fecd89a695481d3fd2913a2"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/unscored-supplement.test.ts",
+      "sha256": "6c1b0638a0482be770d7a9bd075dfeb30d985a7f2bd30bb520f9dd28844f4a2a"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyTimedScale.test.tsx",
+      "sha256": "4e0d57f957c7697ad67c71cf403175f5c11efdae7bb82eb27a72568994b23aa0"
+    },
+    {
+      "path": "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "sha256": "da2286065f25ef612da0001631750b5cdddf3b8cae1c825514285066c5e13cf6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/__tests__/ScaleUnitReportCard.test.tsx",
+      "sha256": "24417c98c11a6f1e42a618e6ba53120386bbbf1c76892f4050db64cacbdcdbe4"
+    }
+  ],
+  "privateExactPHQValidation": {
+    "artifact": "unscored-private-affected-validation.json",
+    "checkCount": 6,
+    "status": "passed"
+  },
+  "isolatedDraftRevision": {
+    "artifact": "unscored-draft-revision-readback.json",
+    "revisionBefore": 1,
+    "revisionAfter": 2,
+    "items": 10,
+    "scoringMembers": 9,
+    "formalReleases": 0,
+    "approvedDrafts": 0,
+    "notProduction": true
+  },
+  "retainedFailures": [
+    "Unsupported --minWorkers CLI option: no cases executed",
+    "Canonical all-at-once fixture initially selected one-by-one without timing; only failing case retried",
+    "Initial frontend Node24.19.0 run retained as nonqualified environment",
+    "Stale generated Prisma client lacked unchanged main longitudinal fields; regenerated client then one type retry"
+  ],
+  "notExecuted": [
+    "Previous104 intake checks",
+    "CI",
+    "Build",
+    "Full browser journeys",
+    "Production queries or writes",
+    "APPROVE",
+    "Publish",
+    "Grant",
+    "Merge",
+    "Deployment"
+  ]
+}

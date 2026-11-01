@@ -4,7 +4,8 @@ vi.mock('../../config/database',()=>({prisma:{$queryRaw:h.query,$executeRaw:h.wr
 vi.mock('../../modules/measurement-content/repository',async importOriginal=>({
   ...await importOriginal<typeof import('../../modules/measurement-content/repository')>(),getContentReleaseBatch:h.batch,
 }))
-import {standardTripletDetail} from '../../modules/survey/standard-triplet.service'
+import {prisma} from '../../config/database'
+import {previewStandardTriplet,standardTripletDetail} from '../../modules/survey/standard-triplet.service'
 import {combinationFixture} from '../measurement-content/standard-combination.fixture'
 
 beforeEach(()=>{
@@ -34,6 +35,8 @@ describe('existing system management detail exposes the common exact-version map
       measurement:{status:'PUBLISHED'},consumers:{TRAINING:{sourceAdapter:'NOT_CONNECTED'},SURVEY:{targetUseGrant:'NOT_EVALUATED'}}})
     expect(h.batch).toHaveBeenCalledExactlyOnceWith(expect.any(Object),[f.measurement.releaseId])
     expect(result.history[0]).toMatchObject({id:f.row.id,state:'ONLINE',reference:f.row.reference})
+    expect(result.reference).toEqual(f.row.reference)
+    expect(result.selection).toEqual({toolKey:f.row.tool_key,...Object.fromEntries(Object.values(f.row.snapshot.parts).map(p=>[p.axis,p.hash]))})
     expect(result.trials).toEqual([]);expect(h.write).not.toHaveBeenCalled()
   })
   it('does not query content records or snapshots when the system role is refused',async()=>{
@@ -66,5 +69,11 @@ describe('existing system management detail exposes the common exact-version map
     h.history=[history().row];h.batch.mockRejectedValue(new Error('CONTENT_RELEASE_HASH_MISMATCH'))
     await expect(standardTripletDetail('system','synthetic-standard','1.0.0')).rejects.toThrow('CONTENT_RELEASE_HASH_MISMATCH')
     expect(h.write).not.toHaveBeenCalled()
+  })
+  it('still rejects a new preview when the exact selected versions are unavailable',async()=>{
+    const f=history();h.history=[f.row]
+    const selection=Object.fromEntries(Object.values(f.row.snapshot.parts).map(p=>[p.axis,p.hash])) as Record<'CONTENT'|'PARAMETERS'|'REPORT',string>
+    await expect(previewStandardTriplet(prisma,'system',{toolKey:f.row.tool_key,...selection})).rejects.toMatchObject({statusCode:409})
+    expect(h.batch).not.toHaveBeenCalled();expect(h.write).not.toHaveBeenCalled()
   })
 })

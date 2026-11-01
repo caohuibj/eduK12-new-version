@@ -1,12 +1,20 @@
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {RefreshCw} from 'lucide-react'
-import {standardRequest,type StandardOnboardingEntry,type StandardOnboardingStatusPage} from '../../api/surveyStandard'
+import {standardRequest,type StandardOnboardingEntry,type StandardOnboardingStatusPage,type StandardOnboardingTarget} from '../../api/surveyStandard'
 
 const reviewLabels:Record<string,string>={APPROVED:'已批准',COMPLETED:'已完成',PENDING:'待审核',RETURNED:'已退回',NOT_ESTABLISHED:'尚未建立',LOCALIZATION_MISSING:'缺少本地化清单'}
 const maturityLabels:Record<string,string>={PILOT:'试用',RESEARCH_READY:'研究就绪',RESEARCH_GRADE:'研究级'}
 const entryLabels:Record<string,string>={APPROVED:'准入已批准',RETURNED:'已退回，禁止新增使用',PENDING:'待决定'}
+const gapLabels:Record<string,string>={
+ EXECUTABLE_NOT_REGISTERED:'尚未登记完整可执行内容。请补齐真实题本、选项及计分资料后，通过已有导入流程保存草稿。',
+ RIGHTS_FOR_DIGITAL_REPUBLICATION_UNKNOWN:'数字呈现或公开再分发的授权范围尚未明确，请核对现有许可资料。',
+ EXACT_CHINESE_ITEMS_NOT_LICENSED_FOR_PUBLIC_SOURCE:'精确中文题文的公开源码许可尚未确认，请补充经许可的版本。',
+ SCORING_MISSING_RULE_NOT_VERIFIED:'计分或缺失作答规则尚未核实，不能按猜测补成可执行量表。',
+ EXISTING_PUBLIC_REDISTRIBUTION_HOLD:'原许可记录保留公开再分发 HOLD；请核对确切授权依据，不能视为已经获准公开。',
+ VERSIONED_SCORER_NOT_REGISTERED:'所需版本的专用计分器尚未安装登记，单独导入 JSON 不能补齐。',
+}
 
-export default function StandardOnboardingStatus(){
+export default function StandardOnboardingStatus({onOpenWorkspace}:{onOpenWorkspace?:(target:StandardOnboardingTarget,workspace:'import'|'drafts')=>void}={}){
  const [rows,setRows]=useState<StandardOnboardingEntry[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[keyword,setKeyword]=useState('')
  const requestVersion=useRef(0),appliedQuery=useRef('')
  const [cursors,setCursors]=useState<Array<string|null>>([null]),[pageIndex,setPageIndex]=useState(0),[nextCursor,setNextCursor]=useState<string|null>(null)
@@ -49,8 +57,12 @@ export default function StandardOnboardingStatus(){
     <p>以上为该量表版本的状态；内容、参数与报告的批准组合仍须单独审核和试运行，入口使用权仍须另行分配。</p>
     {row.blockers.length>0?<div className="sys-message"><h4>待处理事项</h4><ul>{row.blockers.map(code=>{
      const action=row.nextActions.find(item=>item.code===code)
-     return <li key={code}>{action?<><strong>{action.stage}</strong> · 责任角色：{action.owner}<p>{action.next}</p></>:<p>请由平台管理员核对该项阻断及所需资料。</p>}<details className="sys-technical"><summary>阻断标识</summary><code>{code}</code></details></li>
+     return <li key={code}>{action?<><strong>{action.stage}</strong> · 责任角色：{action.owner}<p>{action.next}</p></>:<p>{/[\u3400-\u9fff]/.test(code)?code:gapLabels[code]??'该项缺口尚无中文说明，请核对来源资料及下方标识。'}</p>}<details className="sys-technical"><summary>阻断标识</summary><code>{code}</code></details></li>
     })}</ul></div>:<p>当前未列出内容阻断；这不代替组合批准、试运行及入口授权。</p>}
+    {onOpenWorkspace&&<div className="system-actions"><p>目录记录不会自动生成可编辑草稿。按待办补齐内容后导入，或查找之前保存的草稿继续处理。</p>
+     <button type="button" onClick={()=>onOpenWorkspace({instrumentKey:row.instrumentKey,instrumentVersion:row.instrumentVersion,name:row.name},'import')}>补齐内容并导入</button>
+     <button type="button" onClick={()=>onOpenWorkspace({instrumentKey:row.instrumentKey,instrumentVersion:row.instrumentVersion,name:row.name},'drafts')}>查找已有草稿</button>
+    </div>}
    </article>)}</div>
    {!rows.length&&<p>{appliedQuery.current?'没有符合检索条件的精确版本。':pageIndex?'本页没有接入记录，请返回上一页或刷新。':'尚无标准量表接入记录。'}</p>}
    <nav aria-label="接入状态分页"><button type="button" disabled={!pageIndex||loading} onClick={previous}>上一页</button><button type="button" disabled={!nextCursor||loading} onClick={next}>下一页</button></nav>
