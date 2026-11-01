@@ -86,7 +86,7 @@ export function WordanalogyTaskV11({ taskContext, trialIndex, onTrialComplete }:
 
   if (!sequence) return <div role="alert" className="card p-6">题目版本或题量与当前题库不匹配，测验尚未开始。请返回并联系管理员。</div>
   if (trialIndex >= config.totalTrials) return <div role="status" className="card p-6 text-center">正式作答已保存，请使用页面上的“完成测评”按钮确认提交。</div>
-  if (phase === 'instruction') return <CognitiveTaskIntro title="言语类比推理" description={<p>每题先读清前一对词的关系，再选择与后一对最匹配的选项。</p>} hint={<p>按数字键 1–4 或点击选项。先准确理解，再在每题 {config.timeoutMs / 1000} 秒内作答；超时会记为未作答。练习使用独立题目，不计分。正式共 {config.totalTrials} 题。</p>} onAction={() => { setPracticeChoice(null); setStage('fixation'); setPhase('practice') }} />
+  if (phase === 'instruction') return <CognitiveTaskIntro title="言语类比推理" description={<><p>每题先读清前一对词的关系，再选择与后一对最匹配的选项。</p><p>整理“雨衣—防雨、手套—保暖”这样的词语时，先抓用途而不是只看词长或熟悉程度。 这次任务只记录本次作答表现。</p></>} hint={<p>按数字键 1–4 或点击选项。先准确理解，再在每题 {config.timeoutMs / 1000} 秒内作答；超时会记为未作答。练习使用独立题目，不计分。正式共 {config.totalTrials} 题。</p>} onAction={() => { setPracticeChoice(null); setStage('fixation'); setPhase('practice') }} />
   const item = phase === 'practice' ? practice : current
   if (!item) return <div className="card p-6" role="status">本次题目已作答完毕，正在结束测验。</div>
   return <CognitiveFocusStage ariaLabel="言语类比推理"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8">

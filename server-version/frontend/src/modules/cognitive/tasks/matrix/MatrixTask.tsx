@@ -94,7 +94,7 @@ export const MatrixTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialInd
     return (
       <CognitiveTaskIntro
         title="矩阵规则推理"
-        description="观察前两行的变化规律，选择最适合填入第三行问号的图形。"
+        description={<><p>观察前两行的变化规律，选择最适合填入第三行问号的图形。</p><p>整理一盒彩色积木时，可能先看颜色交替，再看形状顺序；找到一个线索后，还要用另一行核对。 这次任务只记录本次作答表现。</p></>}
         hint={<>本任务依赖视觉规则归纳；正式题目不会提示设计难度。内部生成题目；练习至少答对 3 / 4。</>}
         onAction={startPractice}
       />
