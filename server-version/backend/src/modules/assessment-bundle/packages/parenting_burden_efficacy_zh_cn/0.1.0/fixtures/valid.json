@@ -1,0 +1,61 @@
+{
+  "values": {
+    "subject_age_years": {
+      "state": "present",
+      "value": 35
+    },
+    "parent_caregiver_confirmed": {
+      "state": "present",
+      "value": true
+    },
+    "child_lives_with_parent": {
+      "state": "present",
+      "value": true
+    },
+    "pba_total": {
+      "state": "present",
+      "value": 111
+    },
+    "pba_exhaustion": {
+      "state": "present",
+      "value": 45
+    },
+    "pba_contrast": {
+      "state": "present",
+      "value": 28
+    },
+    "pba_fed_up": {
+      "state": "present",
+      "value": 24
+    },
+    "pba_distancing": {
+      "state": "present",
+      "value": 14
+    },
+    "bpses_total": {
+      "state": "present",
+      "value": 21
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "methods",
+    "pba_summary",
+    "bpses_summary",
+    "pba_exhaustion",
+    "pba_contrast",
+    "pba_fed_up",
+    "pba_distancing",
+    "pa2"
+  ],
+  "expectedDerived": {
+    "scalars": {
+      "burden_position": 0.8043478260869565,
+      "efficacy_position": 0.8
+    },
+    "theme": {
+      "state": "MATCHED",
+      "profileId": "pa2"
+    }
+  }
+}
