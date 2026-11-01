@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "task": "sharegame",
+  "order": 111,
+  "identities": [
+    {
+      "testType": "sharegame",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "order": 111
+    },
+    {
+      "testType": "sharegame",
+      "engineVersion": "2.0.0",
+      "scoringVersion": "2.0.0",
+      "order": 111
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "executionEntries"
+  },
+  "frontend": [
+    {
+      "testType": "sharegame",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/sharegame/sharegame.registry.ts",
+      "export": "sharegameRegistryEntry"
+    },
+    {
+      "testType": "sharegame",
+      "engineVersion": "2.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/sharegame/sharegame.registry.ts",
+      "export": "sharegameRegistryEntryV2"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      111,
+      111,
+      111
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/tasks/sharegame/__tests__/SharegameTask.test.tsx",
+      "src/modules/cognitive/tasks/sharegame/__tests__/prng.test.ts"
+    ]
+  }
+}

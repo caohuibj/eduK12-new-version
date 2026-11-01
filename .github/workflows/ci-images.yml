@@ -3,6 +3,12 @@ name: CI production image step
 on:
   workflow_call:
     inputs:
+      cognitive_product:
+        type: boolean
+        default: false
+      cognitive_product_plan:
+        type: string
+        default: ''
       catalog_discovery:
         type: boolean
         default: false
@@ -88,6 +94,8 @@ jobs:
         working-directory: server-version
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ inputs.cognitive_product && '0' || '1' }}
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
@@ -118,6 +126,12 @@ jobs:
         with:
           version: v0.70.0
           cache: false
+      - name: recheck actual Cognitive product scope before selecting its compile path
+        if: inputs.cognitive_product
+        working-directory: .
+        env:
+          COGNITIVE_PRODUCT_PLAN: ${{ inputs.cognitive_product_plan }}
+        run: node .github/scripts/cognitive-product-check.mjs plan
       - name: validate compose
         run: docker compose config --format json > /tmp/eduk12-compose-config.json
       - name: assert prelaunch resource and HTTPS contract
@@ -130,7 +144,7 @@ jobs:
         env:
           FRONTEND_ONLY: ${{ inputs.frontend_only }}
           BACKEND_ONLY: ${{ inputs.backend_only }}
-          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery }}
+          CATALOG_DISCOVERY: ${{ inputs.catalog_discovery || inputs.cognitive_product }}
         run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
       - name: verify production Nginx static asset MIME and security headers
         if: inputs.backend_only != true

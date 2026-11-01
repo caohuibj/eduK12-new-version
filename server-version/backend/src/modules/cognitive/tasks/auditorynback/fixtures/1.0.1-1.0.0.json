@@ -1,0 +1,931 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "auditorynback",
+    "engineVersion": "1.0.1",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreAuditorynbackV1 at task authoring time (2026-10-31); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "nLevel": 2,
+          "totalTrials": 24,
+          "targetRatio": 0.3,
+          "stimulusMs": 500,
+          "isiMs": 1500,
+          "toneFrequenciesHz": [
+            262,
+            330,
+            392
+          ],
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialIndex": 4,
+              "toneIndex": 1,
+              "responded": true,
+              "rtMs": 480,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "trialIndex": 5,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "trialIndex": 6,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 690,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "trialIndex": 7,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "trialIndex": 8,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "trialIndex": 9,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "trialIndex": 10,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "trialIndex": 11,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 560,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "trialIndex": 12,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "trialIndex": 13,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 600,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "trialIndex": 14,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "trialIndex": 15,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 640,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "trialIndex": 16,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "trialIndex": 17,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "trialIndex": 18,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "trialIndex": 19,
+              "toneIndex": 1,
+              "responded": true,
+              "rtMs": 480,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "trialIndex": 20,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 520,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "trialIndex": 21,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "trialIndex": 22,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 560,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "trialIndex": 23,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 600,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 57,
+        "metrics": {
+          "dPrime": 2.2783,
+          "hitRate": 0.8889,
+          "falseAlarmRate": 0.0769,
+          "medianHitRtMs": 560,
+          "matchCount": 9,
+          "nonmatchCount": 13
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientTargets": false,
+          "excessiveOmissions": false,
+          "floorPerformance": false,
+          "ceilingPerformance": false,
+          "stimulusEchoMismatch": false,
+          "audioEnvironmentUnverified": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "nLevel": 2,
+          "totalTrials": 24,
+          "targetRatio": 0.3,
+          "stimulusMs": 500,
+          "isiMs": 1500,
+          "toneFrequenciesHz": [
+            262,
+            330,
+            392
+          ],
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "auditorynback v1 expects exactly 24 trials, got 0"
+    },
+    {
+      "name": "echo-drift",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "nLevel": 2,
+          "totalTrials": 24,
+          "targetRatio": 0.3,
+          "stimulusMs": 500,
+          "isiMs": 1500,
+          "toneFrequenciesHz": [
+            262,
+            330,
+            392
+          ],
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialIndex": 4,
+              "toneIndex": 1,
+              "responded": true,
+              "rtMs": 480,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "trialIndex": 5,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "trialIndex": 6,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 690,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "trialIndex": 7,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "trialIndex": 8,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "trialIndex": 9,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "trialIndex": 10,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "trialIndex": 11,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 560,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "trialIndex": 12,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "trialIndex": 13,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 600,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "trialIndex": 14,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "trialIndex": 15,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 640,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "trialIndex": 16,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "trialIndex": 17,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "trialIndex": 18,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "trialIndex": 19,
+              "toneIndex": 1,
+              "responded": true,
+              "rtMs": 480,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "trialIndex": 20,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 520,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "trialIndex": 21,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "trialIndex": 22,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 560,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "trialIndex": 23,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 600,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 57,
+        "metrics": {
+          "dPrime": 2.2783,
+          "hitRate": 0.8889,
+          "falseAlarmRate": 0.0769,
+          "medianHitRtMs": 560,
+          "matchCount": 9,
+          "nonmatchCount": 13
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientTargets": false,
+          "excessiveOmissions": false,
+          "floorPerformance": false,
+          "ceilingPerformance": false,
+          "stimulusEchoMismatch": true,
+          "audioEnvironmentUnverified": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "randomSeed": "fixture-seed",
+        "config": {
+          "nLevel": 2,
+          "totalTrials": 24,
+          "targetRatio": 0.3,
+          "stimulusMs": 500,
+          "isiMs": 1500,
+          "toneFrequenciesHz": [
+            262,
+            330,
+            392
+          ],
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "trialIndex": 1,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "trialIndex": 2,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "trialIndex": 3,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 9
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "trialIndex": 4,
+              "toneIndex": 1,
+              "responded": true,
+              "rtMs": 480,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "trialIndex": 5,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "trialIndex": 6,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 690,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "trialIndex": 7,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "trialIndex": 8,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "trialIndex": 9,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "trialIndex": 10,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "trialIndex": 11,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 560,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "trialIndex": 12,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "trialIndex": 13,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 600,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "trialIndex": 14,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "trialIndex": 15,
+              "toneIndex": 2,
+              "responded": true,
+              "rtMs": 640,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "trialIndex": 16,
+              "toneIndex": 2,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "trialIndex": 17,
+              "toneIndex": 1,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "trialIndex": 18,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "trialIndex": 19,
+              "toneIndex": 1,
+              "responded": true,
+              "rtMs": 480,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "trialIndex": 20,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 520,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "trialIndex": 21,
+              "toneIndex": 0,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "trialIndex": 22,
+              "toneIndex": 0,
+              "responded": true,
+              "rtMs": 560,
+              "interrupted": false,
+              "audioLatencyMs": null
+            }
+          }
+        ]
+      },
+      "expectedError": "auditorynback v1 expects exactly 24 trials, got 23"
+    }
+  ]
+}

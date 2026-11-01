@@ -217,7 +217,7 @@ export const WordlistTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="中文词表自由回忆" description={<p>请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。</p>} hint={<><p>练习需要至少 3 / 4 轮达到基本熟悉；正式结果只描述本次作答，不进行繁简转换、同义词匹配或模糊纠错。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro title="中文词表自由回忆" description={(taskContext.config.report as { reportVersion?: string } | undefined)?.reportVersion === '3.0.0' ? (<p>请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。像过一会儿回想购物清单，这里记录每轮实际回忆出的目标词，不判断你是否健忘。</p>) : (<p>请记住逐词出现的中文词，并在每轮用键盘自由输入你记得的词。可以按 Enter 把输入加入列表。</p>)} hint={<><p>练习需要至少 3 / 4 轮达到基本熟悉；正式结果只描述本次作答，不进行繁简转换、同义词匹配或模糊纠错。</p></>} onAction={startPractice} />
     )
   }
 

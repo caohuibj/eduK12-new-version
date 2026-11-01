@@ -1,3 +1,5 @@
+import { cognitiveRunnerEntries } from '../generated/runners'
+
 export type CognitiveTaskCategory =
   | 'fixed-trial'
   | 'timed-response'
@@ -80,10 +82,20 @@ const PROFILE_BY_IDENTITY = new Map(
   COGNITIVE_READINESS_PROFILES.map((entry) => [`${entry.testType}/${entry.engineVersion}`, entry] as const),
 )
 
+// New identities carry their contract in their existing registry entry. Registration
+// alone is not a readiness declaration; unknown or undeclared identities stay absent.
+const DECLARED_PROFILE_BY_IDENTITY = new Map(
+  cognitiveRunnerEntries.filter(entry => entry.readiness).map(entry => [
+    `${entry.testType}/${entry.engineVersion}`,
+    { ...entry.readiness!, testType: entry.testType, engineVersion: entry.engineVersion } as CognitiveReadinessProfile,
+  ] as const),
+)
+
 export const resolveCognitiveReadinessProfile = (
   testType: string,
   engineVersion: string,
 ): CognitiveReadinessProfile | undefined => PROFILE_BY_IDENTITY.get(`${testType}/${engineVersion}`)
+  ?? DECLARED_PROFILE_BY_IDENTITY.get(`${testType}/${engineVersion}`)
 
 export const usesGlobalKeyboardCapture = (testType: string, engineVersion: string) => (
   resolveCognitiveReadinessProfile(testType, engineVersion)?.globalKeyboardCapture === true

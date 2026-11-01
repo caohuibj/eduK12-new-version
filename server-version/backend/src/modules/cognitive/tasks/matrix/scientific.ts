@@ -16,3 +16,5 @@ export const scientificGovernance: CognitiveGovernanceV1[] = [
     "evidence": []
   }
 ]
+
+scientificGovernance.push({...scientificGovernance[0],engineVersion:'1.1.0',scoringVersion:'1.0.0',knownLimitations:[...scientificGovernance[0].knownLimitations,'独立练习消除已见缺口答案复用，不构成本项目信效度或独立题目数量证明。']})

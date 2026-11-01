@@ -1,3 +1,4 @@
+import {cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
 import {catalogDiscoveryScope} from './catalog-discovery-scope.mjs';
 import {cognitiveMixedProductScope, acceptanceFor} from './content-scope.mjs';
 import {execFileSync} from 'node:child_process';
@@ -5,9 +6,15 @@ import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 import {readCognitiveIntakeDiff} from './cognitive-intake-scope.mjs';
 import {groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
-export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd()}={}) {
+export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=false}={}) {
   const actual=readCognitiveIntakeDiff(base,head,{cwd});
   const scope=needs.scope?.outputs||{};
+  if(scope.application_route==='cognitive-product'){
+    const read=ref=>file=>{try{return execFileSync('git',['show',ref+':'+file],{cwd,encoding:'utf8',stdio:['ignore','pipe','ignore']});}catch{return null;}};
+    const p=cognitiveProductPlan(actual.entries,base,head,read(head),read(base));
+    if(!p||Object.entries(cognitiveProductOutputs(p)).some(([k,v])=>scope[k]!==String(v)))return ['recomputed-cognitive-product'];
+    return requiredChecks(needs,draft).filter(name=>needs[name]?.result!=='success');
+  }
   if(!actual.selected && scope.cognitive_intake_light!=='true') {
     const readHead = file => {try{return execFileSync('git',['show',head+':'+file],{cwd,encoding:'utf8'});}catch{return null;}};
     if (cognitiveMixedProductScope(actual.entries, readHead, file=>{try{return execFileSync('git',['show',base+':'+file],{cwd,encoding:'utf8',stdio:['ignore','pipe','ignore']});}catch{return null;}})) {
@@ -99,6 +106,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='cognitive-product')return draft?['scope']:['scope','cognitive-product','docker','codeql'];
   if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
   if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
@@ -196,6 +204,12 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='cognitive-product'){
+    try{const p=JSON.parse(scope.cognitive_product_plan);
+      if(p.schema!==1||p.route!=='cognitive-product'||!Array.isArray(p.files)||!p.files.length||!Array.isArray(p.required)||JSON.stringify(p.required)!==JSON.stringify(['cognitive-contracts','runner-scorer-freeze-intake','production-images','runtime-scans','sast'])||Object.entries(cognitiveProductOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');
+    }catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='personal-tracking'){try{const p=JSON.parse(scope.personal_tracking_plan);if(p.route!=='personal-tracking'||p.draft!==draft)failed.push('scope');}catch{failed.push('scope');}return [...new Set(failed)];}
   if(scope.application_route==='group-report-draft'){
     try{const p=JSON.parse(scope.group_report_plan);if(!draft||p.preflightOnly!==true||p.route!=='group-report-draft'||Object.entries(groupReportDraftOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
@@ -775,7 +789,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     try {
       const {execFileSync}=await import('node:child_process');
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-      failed.push(...recheckCognitiveIntake(needs,{base:process.env.CI_BASE_SHA,head}));
+      failed.push(...recheckCognitiveIntake(needs,{base:process.env.CI_BASE_SHA,head,draft:process.env.IS_DRAFT==='true'}));
     } catch {failed.push('recomputed-cognitive-intake');}
   }
   if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {

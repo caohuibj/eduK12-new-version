@@ -1,0 +1,17 @@
+# 八项题库的最小集成接线
+
+唯一基础为PR477@605a3a5f5a03e23da442f0e17a6fb9486870e8dd。每组只交付自己的任务、schema/scorer、局部测试和说明；G1统一生成与汇总，不纳入PR441其余四项、IRT/CAT、native或其他技术储备。
+
+沿当前task-package机制发现任务，再调用既有manifest generator生成execution、catalog、seeds、presentation、scientific、identities及前端runners七个投影。每个新修订精确身份与其config/profile/report/fixture一致。旧身份保留为非推荐，新增DRAFT配置才进入推荐安装候选；不直接安装或公开发布。
+
+原题库的bank-meta依赖不在PR477。G1/G2/G3保留各自已说明的只读来源附注；按G4的固定依赖，另取#441精确原件banks/bank-meta.ts单一schema模块，Git blob为95130326bf51eedb09097b81ee67f5bf8333b388。没有取入其他题库平台、IRT/CAT或授权系统。该原模块的可选字段及release helper不新增主线发布调用或门禁，当前安装/发布继续复用既有链。
+
+管理员候选源在PR478直接来自generated seeds与registry推荐标记，不另加八项硬编码资格名单。新任务本身满足核心readiness才可安装DRAFT；安装不等同授权、发布或生产可用。其12项旧缺口说明会按已注册task ID过滤，不修改冻结PR478。本批尚未收齐前不将整批计为8项已完成。
+
+## 当前交接状态
+
+G1两项已修订并完成其定向核验。G2@649c9e84399186dfcc05d79fc1c35f4919f5a73d已取入，补齐实际恢复路径及套件登记；母线独立逐题复核已给有限GO，可纳入候选，仍非真实施测或最终发布验收。
+
+G3@8b1882ccad2708ec15e2c750a8cb8826ee4f9bd5仅取seriescomplete专属32文件，包含99150e51的报告修订；数列接线与fixture缺口已收口。cogest此前算术36题池已撤回；最新461a5f28的真实生活量级估算36题已获母线有限GO，最终3b9727d0已完成既有DRAFT状态交接，本树取入其cogest专属文件。G4@be62376d7b0f592206b51cb109c372671e1d3687已取入并完成真实依赖、旧推荐关闭、三处内容补修及工程接线，母线局部独审GO。现阶段本树八项可纳源码DRAFT候选；不称八项完成，不安装、发布或激活CI。
+
+固定题数新entry复用manual完成模式；精确readiness声明随各任务已有registry进入generated projection，resolver只消费显式声明，继续保持restart-required。只增registry可选类型与现有readiness resolver两处公共接线，不改CognitiveRunner/controller，不新增平台或审批名单。实际宿主契约与宿主11个不同用例记录见host-integration-review.md。
