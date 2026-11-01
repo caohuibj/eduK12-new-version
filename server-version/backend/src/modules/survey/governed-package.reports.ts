@@ -17,7 +17,8 @@ export async function persistGovernedPackageReports(tx:Prisma.TransactionClient,
   const components=p.slots.map(s=>{const u=input.snapshot.units.find(u=>u.draftId===s.draftId&&u.instrumentKey===s.instrumentKey);if(!u)throw new Error('组合报告固定组件缺失');return {slotKey:s.slotKey,unit:{ref:{kind:u.kind},displayDefinition:u.displayDefinition}}})
   const report=p.report?renderPackageReport(p.report,components,input.calculated,Object.fromEntries(p.slots.map(s=>[s.slotKey,s.instrumentKey]))):null
   const saved=input.calculated.nativeBundleReports?.find(r=>r.importId===p.importId)
-  const nativeBundle=p.nativeBundle?{status:saved?.status??'FAILED',profileView:saved?.views.researcher??null,factsHash:saved?.factsHash??null}:undefined
+  const nativeBundle=p.nativeBundle?{status:saved?.status??'FAILED',profileView:saved?.views.researcher??null,factsHash:saved?.factsHash??null,
+    ...(saved?.derivedViews?{derivedView:saved.derivedViews.researcher}: {})}:undefined
   const value={schemaVersion:2,budgetVersion:PACKAGE_REPORT_BUDGET_VERSION,packageTitle:p.title,packageVersionHash:p.hash,reportVersion:p.report?.version??p.nativeBundle!.definition.reportDefinition.version,sourceFinalHash:input.sourceFinalHash,report,...(nativeBundle?{nativeBundle}:{})}
   bytes+=jsonBytes(value);assertPackageReportBytes(bytes,'生成合计')
   const hash=canonicalHash(value),cipher=encryptUnifiedRuntimePayload(value)
