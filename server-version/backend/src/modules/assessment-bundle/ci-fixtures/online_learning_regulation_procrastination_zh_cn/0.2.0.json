@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {
+    "subject_age_years": 20,
+    "university_student_confirmed": true,
+    "course_id": "synthetic-course-b14",
+    "course_mode": "online",
+    "learning_stage": "synthetic-week-4",
+    "birth_year_month": "2006-11"
+  },
+  "slots": {
+    "srlo": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "SRLO_01",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "4"
+        }
+      ]
+    },
+    "ips": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "IPS_01",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "IPS_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPS_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPS_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPS_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPS_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPS_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPS_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPS_09",
+          "responseValue": "1"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "ol2",
+    "negative_emotion_meaning",
+    "reading_boundaries"
+  ]
+}

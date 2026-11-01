@@ -1,0 +1,143 @@
+{
+  "scope": "parenting_burden_efficacy_zh_cn@0.1.0",
+  "base": "74423a1c4b40f65c084797434aaa86271594e687",
+  "node": "v24.21.0",
+  "synthetic": true,
+  "checks": [
+    "28 real synthetic answers score to PBA111/BPSES21",
+    "raw pair 0/25 => pa1",
+    "raw pair 111/21 => pa2",
+    "raw pair 138/5 => pa3",
+    "raw pair 0/5 => pa4",
+    "raw pair 34/20 => pa1",
+    "raw pair 35/20 => middle_continuous",
+    "raw pair 103/20 => middle_continuous",
+    "raw pair 104/20 => pa2",
+    "raw pair 34/10 => pa4",
+    "raw pair 34/11 => middle_continuous",
+    "raw pair 104/19 => middle_continuous",
+    "raw pair 104/20 => pa2",
+    "raw pair 69/15 => middle_continuous",
+    "context adult_age_years inapplicable",
+    "context parent_caregiver_confirmed inapplicable",
+    "context child_lives_with_parent inapplicable",
+    "child age cannot replace adult age",
+    "quality limited cancels joint but retains BPSES summary",
+    "quality invalid cancels joint but retains BPSES summary",
+    "missing PBA cancels joint and preserves other result",
+    "out of range cancels joint",
+    "both leaf scorers preserve complete_required when answers are missing",
+    "source identity mismatch rejected",
+    "existing source policies preserve the report limitation"
+  ],
+  "passed": 25,
+  "reportDisplay": "PARTIAL: shared core helper supports owned SELF narrative; actual C saved participant reader with the real PBA ADULT_SELF/parent source retains numbers but WITHHOLDS theme. Survey parent-source audience retention gap found by code inspection; no full report-exit closure claimed.",
+  "notRun": [
+    "DB installation/publication",
+    "browser report display",
+    "whole-platform tests"
+  ],
+  "failures": [],
+  "history": [
+    {
+      "stage": "local synthetic harness",
+      "result": "FAIL",
+      "reason": "Synthetic answer values were numbers; both existing sources require string response codes. Fixture corrected to exact source encodings."
+    },
+    {
+      "stage": "local harness projection adapter",
+      "result": "FAIL",
+      "reason": "Scorer output uses key; Bundle projection uses scoreKey. Corrected the test adapter."
+    },
+    {
+      "stage": "local missing-answer assertion",
+      "result": "FAIL",
+      "reason": "Harness incorrectly expected PBA scorer to throw on omitted answer. Existing scorer returns not_calculable with null total; assertion corrected without changing source policy or scorer."
+    },
+    {
+      "stage": "local bounded checks",
+      "result": "PASS",
+      "reason": "25 assertions passed, including 24 distinct checks (one repeated PA2 boundary). No CI runs have executed."
+    }
+  ],
+  "reuseBoundary": "Only report wording/block grouping changed after bounded score checks; scoring, conditions, evidence identity/type and source inputs unchanged. Selected package validation executed after that report edit; no whole-platform or source golden suites.",
+  "harnessSHA256": "de680b96a756a953089368c6899b70da7ef92d0b544215b0ac34fc436f76b503",
+  "ciStatus": "Current schema3 revision: NOTRUN, dependent shared core not in main. Historical run 41281071115 passed only head59674da3d774beea297d09588347ab960b68892a. Dependency update uses skip-ci; no manual workflow dispatch.",
+  "ciFailureRounds": 0,
+  "finalFreezeCheck": {
+    "ok": true,
+    "snapshotFamily": "ASSESSMENT_BUNDLE",
+    "snapshotVersion": 3,
+    "snapshotHash": "7dadf4d0e146f61c109db90ccbd9d9b238c4939f68fe30660771181cbd5e459e"
+  },
+  "previousSelectedPackageCheck": {
+    "ok": true,
+    "packages": [
+      {
+        "key": "parenting_burden_efficacy_zh_cn",
+        "hash": "d233f0b0a9a6d5bcf39ab56576123f4d97fee422633e0965840ee1800774bc77"
+      }
+    ]
+  },
+  "referenceCleanup": "Removed private design file version/date metadata from project-authored citation and narrative documentation. No scoring, applicability, selectors, rules, report, fixtures, source policies or runtime changes. Existing generator reparsed content and regenerated index; score/boundary checks not repeated.",
+  "previousV1ContentHash": "a914e52a1fd227efd8f875db446b487d45d641b48667ce708a053842cd583205",
+  "currentContentHash": "d031c234090faa8c6f9a3598e64af7c47135d7c85da91185aac21e7b78dd5374",
+  "schema3": {
+    "packageSchemaVersion": 3,
+    "engineVersion": "1.2.0",
+    "sharedDependencies": {
+      "A": "d5f10b96710bda704ce722ef4860adcf1c1aab0d",
+      "B": "ae20aab4c5cdb347f714e60bfce6740ebbf086b7",
+      "C": "45449e9aa8b1d583868247cfd06b81f81ce7d5c7"
+    },
+    "isolatedCoreCombinationHead": "77474d6c4883076f61f55011c8a60e386f8e304a",
+    "localOverlay": "Only this package JSON changed after the recorded combination head; shared sources were not edited. No core changes pushed with this PR.",
+    "packageCheck": {
+      "ok": true,
+      "packages": [
+        {
+          "key": "parenting_burden_efficacy_zh_cn",
+          "hash": "d031c234090faa8c6f9a3598e64af7c47135d7c85da91185aac21e7b78dd5374"
+        }
+      ]
+    },
+    "passedTests": 6,
+    "failedTests": 0,
+    "checks": [
+      {
+        "name": "maps the two original SUM scales to exact direct coordinates and links only the four intended corners",
+        "status": "passed"
+      },
+      {
+        "name": "projects eight Chinese-labelled rows and four explicit panels without duplicating or adding original scores",
+        "status": "passed"
+      },
+      {
+        "name": "retains independent numeric rows while missing, invalid, inapplicable or limited axes abstain",
+        "status": "passed"
+      },
+      {
+        "name": "intersects actual numeric and quality permissions without changing leaf label or material capabilities",
+        "status": "passed"
+      },
+      {
+        "name": "reproduces the current shared C adult-parent audience gap using this real source identity and saved report reader",
+        "status": "passed"
+      },
+      {
+        "name": "uses the existing subject-age context contract and leaves only the intentional DRAFT publication blocker",
+        "status": "passed"
+      }
+    ],
+    "testSourceSHA256": "b55941df637d2423bb19979409085947c67480fcd06bfc97a44fc2fd3009984b",
+    "scope": "New mappings and report boundaries only; prior leaf scoring and old golden suites not rerun. Saved reader test uses synthetic persistence/runtime-load doubles and actual frozen source audience contracts.",
+    "expectedValid": {
+      "burden_position": 0.8043478260869565,
+      "efficacy_position": 0.8,
+      "coreTheme": "pa2",
+      "currentCSavedReaderTheme": "WITHHELD"
+    },
+    "ageContext": "Aligned draft field with existing required subject_age_years; provider returns only intentional BUNDLE_NOT_PUBLISHED for DRAFT. No new gate.",
+    "registry": "No shared generated index diff; integration owner regenerates using existing generator on combined tree."
+  }
+}

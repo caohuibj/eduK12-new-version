@@ -1,0 +1,127 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "adult_interests_exploration_zh_cn",
+    "bundleVersion": "0.2.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "成人兴趣与探索方式",
+    "description": "18岁以上成人102题自我探索：保留ORVIS八域1–5原均分和独立IPIP认知需求10–50原总分，以精确最高集合、连续图谱和固定活动建议支持自主探索。中文工作译稿；组合为实验性描述。另有出生年月背景字段用于既有成人准入。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "ANONYMOUS_SELF",
+      "TEACHER_ASSIGNMENT"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18
+    },
+    "slots": [
+      {
+        "slotKey": "orvis",
+        "unitType": "SCALE",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "orvis92_zh_cn_research",
+        "instrumentVersion": "1.0.1",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "leadership",
+          "organization",
+          "altruism",
+          "creativity",
+          "analysis",
+          "production",
+          "adventure",
+          "erudition"
+        ],
+        "admissionContext": {
+          "assessmentContext": "adult_self_exploration",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
+      },
+      {
+        "slotKey": "nfc",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "ipip_nfc10_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "need_for_cognition"
+        ],
+        "admissionContext": {
+          "assessmentContext": "adult_self_exploration",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
+      },
+      {
+        "slotKey": "background",
+        "unitType": "FORM",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "adult_interests_exploration_zh_cn_context",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF"
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.2.0"
+    },
+    "contextDefinitionKey": "adult_interests_exploration_zh_cn_context",
+    "contextDefinitionVersion": "1.0.0",
+    "reportDefinitionKey": "adult_interests_exploration_zh_cn_report",
+    "reportDefinitionVersion": "0.2.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": false,
+      "instrumentKeys": []
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "适用范围为18岁及以上成人自我探索，18岁是项目保守范围。102题核心仅含ORVIS92与IPIP-NFC10，不含5DCR。",
+      "八域表示本次对活动的自述喜欢程度，不是能力、适合职业、招聘资格或心理诊断；没有常模、百分位、职业匹配率或总兴趣分。",
+      "ORVIS八域直接读取原量表1–5均分，不重复除以题数、不按不同题数的总分排名；NFC独立读取10–50原总分，不改变兴趣图谱。",
+      "两份简体中文均为独立、未验证的工作译稿，尚待译审与本地效度研究；英文IPIP公共领域来源不意味着本译稿获得原作者认可。",
+      "宽广兴趣／当前兴趣较淡仅为本项目预先声明的探索提示：八域分别都≥4／都≤2，不是原作者阈值、常模分档或稳定人格类型，可与其他描述并存。",
+      "原工具按complete_required处理缺题，属于项目默认规则，不冒称作者缺失标准；本包不补零、不插补、不重算题目。只解释已有且质量允许的独立结果。",
+      "组合解释及探索活动为项目原创固定模板，未开展联合验证，不替代咨询、实际活动体验或个人决策。",
+      "最高方向使用八域未经显示舍入的原均分：所有精确并列均保留。它只是本量表内的相对喜欢程度；不强制选择单一方向，小分差不是显著差异。NFC不参与最高集合。",
+      "最高集合与宽广／较淡提示可以并存；本包不套用二维互斥画像或匹配率。出生年月只用于既有成人范围与准入检查，不在本报告展示。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": [],
+  "packageSchemaVersion": 3
+}

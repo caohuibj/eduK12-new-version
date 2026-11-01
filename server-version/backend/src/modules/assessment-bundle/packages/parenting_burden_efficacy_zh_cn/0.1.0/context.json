@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "parenting_burden_efficacy_zh_cn_context",
+  "contextDefinitionVersion": "0.1.0",
+  "fields": [
+    {
+      "contextKey": "subject_age_years",
+      "required": true,
+      "valueType": "number"
+    },
+    {
+      "contextKey": "parent_caregiver_confirmed",
+      "required": true,
+      "valueType": "boolean"
+    },
+    {
+      "contextKey": "child_lives_with_parent",
+      "required": true,
+      "valueType": "boolean"
+    },
+    {
+      "contextKey": "birth_year_month",
+      "required": true,
+      "valueType": "string"
+    }
+  ]
+}

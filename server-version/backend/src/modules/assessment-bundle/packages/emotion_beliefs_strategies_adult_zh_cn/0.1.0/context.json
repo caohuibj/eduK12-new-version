@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "contextDefinitionKey": "emotion_beliefs_strategies_adult_zh_cn_context",
+  "contextDefinitionVersion": "0.1.0",
+  "fields": [
+    {
+      "contextKey": "adult_18_plus",
+      "required": true,
+      "valueType": "boolean"
+    }
+  ]
+}

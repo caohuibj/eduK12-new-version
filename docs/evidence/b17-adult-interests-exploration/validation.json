@@ -1,0 +1,84 @@
+{
+  "base": "74423a1c4b40f65c084797434aaa86271594e687",
+  "package": "adult_interests_exploration_zh_cn",
+  "version": "0.1.0",
+  "status": "PASS",
+  "fixtureCount": 4,
+  "checks": [
+    "inclusive 4/2 presentation thresholds; nearby values do not cross",
+    "NFC 10/50 retains all eight original means and interest interpretations; no ranking claim",
+    "missing supporting NFC preserves complete ORVIS theme",
+    "missing core suppresses only dependent theme; independent results survive",
+    "invalid core is distinct from low preference",
+    "not_applicable remains distinct from missing",
+    "zero/out-of-range results excluded from their interpretation without coercion",
+    "one 102-answer synthetic source-to-map-to-rule smoke: means 3 and NFC 30, no second division",
+    "existing leaf score contracts/counts/reversal checked without leaf changes",
+    "report preserves eight-domain section order/counts, self/admin audiences, exact rule/report references"
+  ],
+  "axes": [
+    {
+      "slot": "orvis",
+      "instrumentKey": "orvis92_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "referencePolicy": {
+        "type": "none"
+      },
+      "defaultReportVersion": "1.1.0",
+      "locale": "zh-CN",
+      "localizationVersion": "1.0.0",
+      "parts": [
+        {
+          "axis": "CONTENT",
+          "version": "1.0.1:1.0.0",
+          "hash": "a44d801a210146ec892dd775fe060bdca41d3cd0c7ecca0251814a9b7fccb8ce"
+        },
+        {
+          "axis": "PARAMETERS",
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379"
+        },
+        {
+          "axis": "REPORT",
+          "version": "1.1.0",
+          "hash": "d0da88aa6220d31621b617293df79d98e645fbf094faa96798f097dd4c3e8716"
+        }
+      ]
+    },
+    {
+      "slot": "nfc",
+      "instrumentKey": "ipip_nfc10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "referencePolicy": {
+        "type": "none"
+      },
+      "defaultReportVersion": "1.1.0",
+      "locale": "zh-CN",
+      "localizationVersion": "1.0.0",
+      "parts": [
+        {
+          "axis": "CONTENT",
+          "version": "1.0.0:1.0.0",
+          "hash": "12d62646f9e28fb576a8aaa4f677b8c5ab2964c379a6d956fea1cbf13de384a3"
+        },
+        {
+          "axis": "PARAMETERS",
+          "version": "none-v1",
+          "hash": "635725d40ea9016d340f4b9d4b9640a656079abfa676eef2d328f598bce72379"
+        },
+        {
+          "axis": "REPORT",
+          "version": "1.1.0",
+          "hash": "322868de07f029343fcd7cdb7577fd9c4fe96b1d2f09d60660d5c1f72dc5407b"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Synthetic local checks only; no DB installation, FINAL journey, publication, deployment or production qualification.",
+    "IN1/IN2 maxima/ties not executed: existing V1 supports evidence-to-constant comparisons only. Continuous scores retained.",
+    "Existing V1 evidence cards use construct keys and sort evidence by key; eight named narrative sections preserve design order. No new chart or UI."
+  ]
+}

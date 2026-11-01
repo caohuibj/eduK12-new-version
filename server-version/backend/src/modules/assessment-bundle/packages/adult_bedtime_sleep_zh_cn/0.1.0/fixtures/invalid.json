@@ -1,0 +1,31 @@
+{
+  "values": {
+    "adult": {
+      "state": "present",
+      "value": true
+    },
+    "bps": {
+      "state": "present",
+      "value": 1.7777777777777777
+    },
+    "sci": {
+      "state": "invalid"
+    }
+  },
+  "expectedRuleIds": [
+    "bps_summary",
+    "invalid_core",
+    "method_scope"
+  ],
+  "expectedKind": "COMPUTED",
+  "expectedDerived": {
+    "scalars": {
+      "b": 0.19444444444444442,
+      "s": null
+    },
+    "theme": {
+      "state": "INVALID",
+      "profileId": null
+    }
+  }
+}

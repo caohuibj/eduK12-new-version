@@ -1,0 +1,51 @@
+{
+  "values": {
+    "subject_age_years": {
+      "state": "present",
+      "value": 35
+    },
+    "parent_caregiver_confirmed": {
+      "state": "present",
+      "value": true
+    },
+    "child_lives_with_parent": {
+      "state": "present",
+      "value": true
+    },
+    "pba_total": {
+      "state": "missing"
+    },
+    "pba_exhaustion": {
+      "state": "missing"
+    },
+    "pba_contrast": {
+      "state": "missing"
+    },
+    "pba_fed_up": {
+      "state": "missing"
+    },
+    "pba_distancing": {
+      "state": "missing"
+    },
+    "bpses_total": {
+      "state": "present",
+      "value": 21
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "methods",
+    "bpses_summary",
+    "pba_total_missing"
+  ],
+  "expectedDerived": {
+    "scalars": {
+      "burden_position": null,
+      "efficacy_position": 0.8
+    },
+    "theme": {
+      "state": "INSUFFICIENT",
+      "profileId": null
+    }
+  }
+}

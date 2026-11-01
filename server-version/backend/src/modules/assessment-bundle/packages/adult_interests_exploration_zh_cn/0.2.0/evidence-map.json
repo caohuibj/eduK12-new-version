@@ -1,0 +1,112 @@
+[
+  {
+    "evidenceKey": "orvis.leadership",
+    "slotKey": "orvis",
+    "selector": "leadership",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.leadership",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.organization",
+    "slotKey": "orvis",
+    "selector": "organization",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.organization",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.altruism",
+    "slotKey": "orvis",
+    "selector": "altruism",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.altruism",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.creativity",
+    "slotKey": "orvis",
+    "selector": "creativity",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.creativity",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.analysis",
+    "slotKey": "orvis",
+    "selector": "analysis",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.analysis",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.production",
+    "slotKey": "orvis",
+    "selector": "production",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.production",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.adventure",
+    "slotKey": "orvis",
+    "selector": "adventure",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.adventure",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "orvis.erudition",
+    "slotKey": "orvis",
+    "selector": "erudition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "interests.erudition",
+    "role": "PRIMARY",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "nfc.need_for_cognition",
+    "slotKey": "nfc",
+    "selector": "need_for_cognition",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "exploration.need_for_cognition",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "context.birth_year_month",
+    "slotKey": "background",
+    "selector": "birth_year_month",
+    "valueType": "string",
+    "unit": "context",
+    "construct": "background.birth_year_month",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

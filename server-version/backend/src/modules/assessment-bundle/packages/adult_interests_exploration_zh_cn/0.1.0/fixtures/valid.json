@@ -1,0 +1,53 @@
+{
+  "values": {
+    "orvis.leadership": {
+      "state": "present",
+      "value": 3
+    },
+    "orvis.organization": {
+      "state": "present",
+      "value": 3
+    },
+    "orvis.altruism": {
+      "state": "present",
+      "value": 3
+    },
+    "orvis.creativity": {
+      "state": "present",
+      "value": 4
+    },
+    "orvis.analysis": {
+      "state": "present",
+      "value": 4
+    },
+    "orvis.production": {
+      "state": "present",
+      "value": 3
+    },
+    "orvis.adventure": {
+      "state": "present",
+      "value": 3
+    },
+    "orvis.erudition": {
+      "state": "present",
+      "value": 3
+    },
+    "nfc.need_for_cognition": {
+      "state": "present",
+      "value": 38
+    }
+  },
+  "expectedRuleIds": [
+    "interest_01_leadership",
+    "interest_02_organization",
+    "interest_03_altruism",
+    "interest_04_creativity",
+    "interest_05_analysis",
+    "interest_06_production",
+    "interest_07_adventure",
+    "interest_08_erudition",
+    "exploration_plan",
+    "nfc_exploration"
+  ],
+  "expectedKind": "COMPUTED"
+}

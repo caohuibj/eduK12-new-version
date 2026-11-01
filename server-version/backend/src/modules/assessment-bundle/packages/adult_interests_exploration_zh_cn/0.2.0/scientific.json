@@ -1,0 +1,27 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "18岁及以上成人自我探索；分别报告ORVIS八域活动兴趣与IPIP认知需求，不合成总分。八域原均分直接传递，精确最高集合保留所有并列；IN3/IN4为非排他项目探索提示。原研究不验证本中文译稿或本组合；无职业匹配、能力、诊断或常模声明。",
+  "references": [
+    {
+      "id": "orvis_original",
+      "citation": "Pozzebon, J. A., Visser, B. A., Ashton, M. C., Lee, K., & Goldberg, L. R. (2010). Psychometric characteristics of a public-domain self-report measure of vocational interests: The Oregon Vocational Interest Scales. Journal of Personality Assessment, 92(2), 168–174. https://ipip.ori.org/newORVISSurvey.htm （公开原始英文题本；不复制论文排版，不作为中文或组合验证。）",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "ipip_nfc_source",
+      "citation": "International Personality Item Pool. Need for Cognition, 10-item key. https://www.ipip.ori.org/newSingleConstructsKey.htm （公开英文题本／计分键；中文为独立未验证工作译稿，沿用叶工具原始来源记录，不将其他长版NFC文献等同于本10题版本。）",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "b17_design",
+      "citation": "项目原创B17固定探索建议及非排他呈现主题。内部项目设计，原始资料指针保留于私有交接记录；不是心理测量验证论文或开放许可声明。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    }
+  ]
+}

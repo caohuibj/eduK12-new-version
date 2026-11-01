@@ -1,0 +1,101 @@
+[
+  {
+    "evidenceKey": "pba_total",
+    "slotKey": "pba",
+    "selector": "parental_burnout",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "parenting.burden",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "pba_exhaustion",
+    "slotKey": "pba",
+    "selector": "exhaustion",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "parenting.burden",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "pba_contrast",
+    "slotKey": "pba",
+    "selector": "contrast_previous_self",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "parenting.burden",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "pba_fed_up",
+    "slotKey": "pba",
+    "selector": "fed_up",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "parenting.burden",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "pba_distancing",
+    "slotKey": "pba",
+    "selector": "emotional_distancing",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "parenting.burden",
+    "role": "SUPPORTING",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "bpses_total",
+    "slotKey": "bpses",
+    "selector": "total",
+    "valueType": "number",
+    "unit": "points",
+    "construct": "parenting.efficacy",
+    "role": "PRIMARY",
+    "direction": "higher",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "subject_age_years",
+    "slotKey": "context",
+    "selector": "subject_age_years",
+    "valueType": "number",
+    "unit": "context",
+    "construct": "parenting.applicability",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "parent_caregiver_confirmed",
+    "slotKey": "context",
+    "selector": "parent_caregiver_confirmed",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "parenting.applicability",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  },
+  {
+    "evidenceKey": "child_lives_with_parent",
+    "slotKey": "context",
+    "selector": "child_lives_with_parent",
+    "valueType": "boolean",
+    "unit": "context",
+    "construct": "parenting.applicability",
+    "role": "CONTEXT",
+    "direction": "neutral",
+    "qualityPolicy": "interpretable_only"
+  }
+]

@@ -1,0 +1,74 @@
+{
+  "values": {
+    "online_academic_self_efficacy": {
+      "state": "present",
+      "value": 4
+    },
+    "online_intrinsic_motivation": {
+      "state": "present",
+      "value": 4
+    },
+    "online_extrinsic_motivation": {
+      "state": "present",
+      "value": 4
+    },
+    "online_negative_achievement_emotion": {
+      "state": "present",
+      "value": 4
+    },
+    "planning_time_management": {
+      "state": "present",
+      "value": 2
+    },
+    "metacognition": {
+      "state": "present",
+      "value": 4
+    },
+    "study_environment": {
+      "state": "present",
+      "value": 4
+    },
+    "online_effort_regulation": {
+      "state": "present",
+      "value": 5.75
+    },
+    "online_social_support": {
+      "state": "present",
+      "value": 4
+    },
+    "online_task_strategies": {
+      "state": "present",
+      "value": 4
+    },
+    "procrastination": {
+      "state": "present",
+      "value": 38
+    },
+    "subject_age_years": {
+      "state": "present",
+      "value": 20
+    },
+    "university_student_confirmed": {
+      "state": "present",
+      "value": false
+    },
+    "course_id": {
+      "state": "present",
+      "value": "synthetic-course-b14"
+    },
+    "course_mode": {
+      "state": "present",
+      "value": "online"
+    },
+    "learning_stage": {
+      "state": "present",
+      "value": "synthetic-week-4"
+    },
+    "birth_year_month": {
+      "state": "present",
+      "value": "2006-11"
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "UNAVAILABLE"
+}

@@ -1,0 +1,107 @@
+{
+  "status": "PASS",
+  "node": "v24.21.0",
+  "content": "online_learning_regulation_procrastination_zh_cn@0.2.0",
+  "dependencies": {
+    "B": "ae20aab4c5cdb347f714e60bfce6740ebbf086b7",
+    "A": "d5f10b96710bda704ce722ef4860adcf1c1aab0d",
+    "C": "45449e9aa8b1d583868247cfd06b81f81ce7d5c7"
+  },
+  "checks": {
+    "existingPackageFixtures": 4,
+    "sourceDependencies": "PASS; exact ranges mean1..7 / sum9..45",
+    "startMapping": "PASS; required course references and explicit canonical DOB field",
+    "rows": 13,
+    "panels": 5,
+    "cornerMiddleZeroCases": [
+      {
+        "effort": 5.5,
+        "ips": 18,
+        "positions": [
+          0.75,
+          0.25
+        ],
+        "theme": "MATCHED",
+        "id": "ol1"
+      },
+      {
+        "effort": 5.5,
+        "ips": 36,
+        "positions": [
+          0.75,
+          0.75
+        ],
+        "theme": "MATCHED",
+        "id": "ol2"
+      },
+      {
+        "effort": 2.5,
+        "ips": 36,
+        "positions": [
+          0.25,
+          0.75
+        ],
+        "theme": "MATCHED",
+        "id": "ol3"
+      },
+      {
+        "effort": 2.5,
+        "ips": 18,
+        "positions": [
+          0.25,
+          0.25
+        ],
+        "theme": "MATCHED",
+        "id": "ol4"
+      },
+      {
+        "effort": 4,
+        "ips": 27,
+        "positions": [
+          0.5,
+          0.5
+        ],
+        "theme": "BOUNDARY",
+        "id": null
+      },
+      {
+        "effort": 1,
+        "ips": 9,
+        "positions": [
+          0,
+          0
+        ],
+        "theme": "MATCHED",
+        "id": "ol4"
+      }
+    ],
+    "missingCore": "INSUFFICIENT; valid d and independent rows retained",
+    "invalidCore": "INVALID; no clipping; IPS retained",
+    "missingAuxiliary": "only own row unavailable; OL2 retained",
+    "negativeEmotion7": "more distress; no better-regulation interpretation",
+    "frozenDisclosure": "original labels=false retained; revoked individual interpretation withholds theme; no admin block expansion"
+  },
+  "notRun": [
+    "leaf scorers/golden reruns",
+    "A/B/C suites or types",
+    "DB import",
+    "real FINAL/report outlet journey",
+    "browser",
+    "CI",
+    "production"
+  ],
+  "validationCheckout": "7def34986ffa15fb96a79eb29e07795e4ec10d17",
+  "validationCheckoutNote": "temporary local integration of existing B14 content with exact B/A/C dependency commits; new package JSON overlaid; never pushed as the content branch",
+  "latestMainUnionGeneration": {
+    "main": "8ae80a2323fddee756f521f9aff126b09f49f548",
+    "mainPackages": 12,
+    "unionPackages": 14,
+    "originalMainPackagesUnchanged": true,
+    "runtimeIntegrationConflictsNotResolvedHere": [
+      "server-version/backend/src/modules/bundle-product/analysis.ts",
+      "server-version/backend/src/modules/bundle-product/service.ts",
+      "server-version/frontend/src/pages/bundle/BundleReport.tsx"
+    ],
+    "scope": "generator/source data only; earlier mapping/projection checks retain pre-merge validation identity"
+  }
+}

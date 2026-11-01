@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {
+    "adult_confirmed": true,
+    "birth_year_month": "1996-01",
+    "shift_work": "no"
+  },
+  "slots": {
+    "bedtime": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "BPS_01",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BPS_02",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BPS_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BPS_04",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BPS_05",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BPS_06",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BPS_07",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BPS_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BPS_09",
+          "responseValue": "5"
+        }
+      ]
+    },
+    "sleep": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "SCI8_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SCI8_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SCI8_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SCI8_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SCI8_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SCI8_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SCI8_07",
+          "responseValue": "0"
+        },
+        {
+          "itemCode": "SCI8_08",
+          "responseValue": "0"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "bps_summary",
+    "sci_summary",
+    "sl3",
+    "method_scope"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "package": "adult_interests_exploration_zh_cn",
+  "bundleVersion": "0.2.0",
+  "schemaVersion": 3,
+  "engineVersion": "1.2.0",
+  "status": "PASS",
+  "checks": [
+    "Exact leaf identity/range/mean-vs-sum dependencies",
+    "Two original-scale panels, nine Chinese rows, correct domain order and item counts",
+    "Frozen exact maximum set: unique, exact ties, near ties without rounding",
+    "NFC10/50 leaves ORVIS means and maximum set unchanged",
+    "IN3/IN4 independent themes coexist with all-eight maximum ties",
+    "Missing ORVIS suppresses maximum only, retaining valid original rows/NFC; invalid0 is not low interest",
+    "A-declared birth-year-month START mapping only; no birth value in DTO/HTML",
+    "C shared-renderer SSR: nine original-range tracks, Chinese maxima, separate NFC; no raw leaf rescoring"
+  ],
+  "reportedValueCount": 9,
+  "scoreItems": 102,
+  "backgroundFields": 1,
+  "maximumKeys": [
+    "orvis.creativity",
+    "orvis.analysis"
+  ],
+  "themeModel": null,
+  "scope": "Package-specific synthetic frozen-score/DTO/render checks only; no production, DB installation, FINAL journey or complete outlet qualification.",
+  "runtimeComposition": {
+    "B": "ae20aab4c5cdb347f714e60bfce6740ebbf086b7",
+    "A": "d5f10b96710bda704ce722ef4860adcf1c1aab0d",
+    "C": "45449e9aa8b1d583868247cfd06b81f81ce7d5c7",
+    "localHead": "d99118c11b755f064aa00cb66d622e17676d9852",
+    "localTree": "027c4a07f61fb30958547ad0ffe878f21be32bce"
+  },
+  "packageFixtureCheck": {
+    "status": "PASS",
+    "fixtures": 4,
+    "contentHash": "aeb92a40588796daa759d657be62daf262cb318c801a2aedb9e10ed6b61071f3"
+  },
+  "displayCheck": {
+    "runner": "existing frontend Vitest/Vite CSS pipeline",
+    "testFiles": 1,
+    "passed": 1,
+    "exitCode": 0,
+    "logSha256": "5eaef98045f7593273cb983479449d3bf513468a7b23c0d9547bccaba2d60ea1"
+  },
+  "initialDisplayAttempt": {
+    "status": "FAILED_BEFORE_EXECUTING_VECTOR_CHECKS",
+    "reason": "Direct Node SSR could not import the existing report CSS; no product code changed. Only the display harness moved to existing Vite/Vitest."
+  },
+  "globalRegistration": "Not changed by this content revision; integration owner must generate the union index after shared core is integrated."
+}

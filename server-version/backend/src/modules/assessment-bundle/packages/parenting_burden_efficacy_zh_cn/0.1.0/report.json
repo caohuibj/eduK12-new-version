@@ -1,0 +1,213 @@
+{
+  "key": "parenting_burden_efficacy_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "raw_results",
+      "kind": "evidence",
+      "title": "你描述的亲职负担与养育信心",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pba_summary",
+        "bpses_summary"
+      ],
+      "rowKeys": [
+        "pba_total_row",
+        "bpses_total_row"
+      ]
+    },
+    {
+      "blockId": "support_theme",
+      "kind": "conclusions",
+      "title": "可考虑的支持方向（实验性）",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pa1",
+        "pa2",
+        "pa3",
+        "pa4",
+        "middle_continuous"
+      ],
+      "rowKeys": [
+        "burden_position_row",
+        "efficacy_position_row"
+      ]
+    },
+    {
+      "blockId": "pba_facets",
+      "kind": "evidence",
+      "title": "亲职负担的四个侧面（已包含在总分中）",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pba_exhaustion",
+        "pba_contrast",
+        "pba_fed_up",
+        "pba_distancing"
+      ],
+      "rowKeys": [
+        "pba_exhaustion_row",
+        "pba_contrast_row",
+        "pba_fed_up_row",
+        "pba_distancing_row"
+      ]
+    },
+    {
+      "blockId": "methods_limits",
+      "kind": "limitations",
+      "title": "适用范围与结果说明",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "pba_total_missing",
+        "pba_total_invalid",
+        "pba_total_not_applicable",
+        "pba_total_out_of_range",
+        "bpses_total_missing",
+        "bpses_total_invalid",
+        "bpses_total_not_applicable",
+        "bpses_total_out_of_range",
+        "methods"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "核心结果缺失时，不生成联合支持主题；仍可查看有效的独立结果。",
+    "limited": "有限质量的结果不参与联合支持主题，请结合独立结果的质量说明理解。",
+    "unavailable": "不能生成联合支持主题。请确认受测者是18岁以上家长或主要照顾者本人，至少一名子女同住，且两项结果完整有效；子女年龄不作为受测者年龄。 当前报告披露策略也可能尚不展示规则叙事；不应因此推断个人状态异常。"
+  },
+  "narrativeContent": "BUNDLE_OWNED_SELF",
+  "rows": [
+    {
+      "rowKey": "pba_total_row",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "pba_total"
+      },
+      "label": "亲职负担（PBA-23）",
+      "unit": "sum",
+      "range": {
+        "min": 0,
+        "max": 138
+      },
+      "itemCount": 23,
+      "order": 0,
+      "timeframe": "原版未指定固定回忆窗口，依既有题本作答"
+    },
+    {
+      "rowKey": "bpses_total_row",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "bpses_total"
+      },
+      "label": "养育信心（BPSES-5）",
+      "unit": "sum",
+      "range": {
+        "min": 5,
+        "max": 25
+      },
+      "itemCount": 5,
+      "order": 1,
+      "timeframe": "原版未指定固定回忆窗口，依既有题本作答"
+    },
+    {
+      "rowKey": "burden_position_row",
+      "valueRef": {
+        "kind": "derived",
+        "key": "burden_position"
+      },
+      "label": "亲职负担的量尺位置（非百分位）",
+      "unit": "position",
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "order": 2
+    },
+    {
+      "rowKey": "efficacy_position_row",
+      "valueRef": {
+        "kind": "derived",
+        "key": "efficacy_position"
+      },
+      "label": "养育信心的量尺位置（非百分位）",
+      "unit": "position",
+      "range": {
+        "min": 0,
+        "max": 1
+      },
+      "order": 3
+    },
+    {
+      "rowKey": "pba_exhaustion_row",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "pba_exhaustion"
+      },
+      "label": "养育中的筋疲力尽",
+      "unit": "sum",
+      "range": {
+        "min": 0,
+        "max": 54
+      },
+      "itemCount": 9,
+      "order": 4,
+      "timeframe": "原版未指定固定回忆窗口，依既有题本作答"
+    },
+    {
+      "rowKey": "pba_contrast_row",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "pba_contrast"
+      },
+      "label": "与过去自己的反差",
+      "unit": "sum",
+      "range": {
+        "min": 0,
+        "max": 36
+      },
+      "itemCount": 6,
+      "order": 5,
+      "timeframe": "原版未指定固定回忆窗口，依既有题本作答"
+    },
+    {
+      "rowKey": "pba_fed_up_row",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "pba_fed_up"
+      },
+      "label": "对亲职角色的厌倦",
+      "unit": "sum",
+      "range": {
+        "min": 0,
+        "max": 30
+      },
+      "itemCount": 5,
+      "order": 6,
+      "timeframe": "原版未指定固定回忆窗口，依既有题本作答"
+    },
+    {
+      "rowKey": "pba_distancing_row",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "pba_distancing"
+      },
+      "label": "养育中的情感疏离",
+      "unit": "sum",
+      "range": {
+        "min": 0,
+        "max": 18
+      },
+      "itemCount": 3,
+      "order": 7,
+      "timeframe": "原版未指定固定回忆窗口，依既有题本作答"
+    }
+  ]
+}

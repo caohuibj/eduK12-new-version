@@ -1,0 +1,114 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "bundleKey": "online_learning_regulation_procrastination_zh_cn",
+    "bundleVersion": "0.1.0",
+    "status": "DRAFT",
+    "category": "scale_self",
+    "name": "在线学习自我调节与拖延｜研究草稿",
+    "description": "并置同一在线/混合课程的SRLO十维自述与IPS9一般拖延习惯，提供项目理论锚点下的讨论主题；非诊断，非已验证画像。",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "initiationModes": [
+      "TEACHER_ASSIGNMENT",
+      "STUDENT_COURSE"
+    ],
+    "population": {
+      "subjectPopulation": "adult",
+      "subjectMinAgeYears": 18,
+      "subjectMaxAgeYears": 22
+    },
+    "slots": [
+      {
+        "slotKey": "srlo",
+        "unitType": "SCALE",
+        "position": 0,
+        "required": true,
+        "instrumentKey": "srlo44_zh_cn_research",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "online_academic_self_efficacy",
+          "online_intrinsic_motivation",
+          "online_extrinsic_motivation",
+          "online_negative_achievement_emotion",
+          "planning_time_management",
+          "metacognition",
+          "study_environment",
+          "online_effort_regulation",
+          "online_social_support",
+          "online_task_strategies"
+        ]
+      },
+      {
+        "slotKey": "ips",
+        "unitType": "SCALE",
+        "position": 1,
+        "required": true,
+        "instrumentKey": "ips9_2021_zh_cn",
+        "instrumentVersion": "1.0.0",
+        "respondentType": "SELF",
+        "valueSelectors": [
+          "irrational_procrastination"
+        ]
+      },
+      {
+        "slotKey": "context",
+        "unitType": "FORM",
+        "position": 2,
+        "required": true,
+        "instrumentKey": "online_learning_regulation_procrastination_zh_cn_context",
+        "instrumentVersion": "0.1.0",
+        "respondentType": "SELF"
+      }
+    ],
+    "engine": {
+      "key": "declarative-evidence-v1",
+      "version": "1.0.0"
+    },
+    "contextDefinitionKey": "online_learning_regulation_procrastination_zh_cn_context",
+    "contextDefinitionVersion": "0.1.0",
+    "reportDefinitionKey": "online_learning_regulation_procrastination_zh_cn_report",
+    "reportDefinitionVersion": "0.1.0",
+    "publicationRequirements": {
+      "scientificGate": true,
+      "rightsGate": true,
+      "languageGate": true,
+      "reportGate": true,
+      "safetyGate": false,
+      "nonCommercialOnly": false
+    },
+    "rightsRequirements": {
+      "required": true,
+      "instrumentKeys": [
+        "srlo44_zh_cn_research",
+        "ips9_2021_zh_cn"
+      ]
+    },
+    "safetyCapability": {
+      "safetyCapable": false,
+      "productionTriggerEnabled": false
+    },
+    "limitations": [
+      "研究草稿，仅面向18–22岁、当前正在修读同一门大学在线或混合课程的本人。课程ID、授课方式和学习阶段必填，不据缺失信息默认适用。",
+      "SRLO44为独立中文工作译稿，人工译审、认知访谈及中国人群验证仍待完成；十维均分分别理解，不生成44题总分或两个上位总分。",
+      "IPS9沿用2021中文九题版的一般任务习惯指导语、2/6/9反向和9–45总分；与课程特定SRLO并置，不冒称IPS已获得同课程专用验证。",
+      "讨论主题OL1–OL4采用项目理论锚点：r=(努力调节均分−1)/6，d=(IPS总分−9)/36；≤0.25和≥0.75不是作者截点、常模、百分位或已验证自然类别。",
+      "规则直接在原量尺作等价比较：努力调节≤2.5或≥5.5，IPS≤18或≥36；中间结果保留连续信息，不硬分型，也不将计划维度替代努力调节。",
+      "负性学习情绪越多表示报告更多难受与压力，不是更好的调节；外在动机也不统一代表好坏。不作诊断、能力排名、成绩预测或干预效果承诺。",
+      "当前模板显示原始总分/均分及换算公式；没有实现个体r/d数值轴图、十维分组布局或画像卡，不以公式文字冒称这些功能完成。",
+      "本包保持DRAFT。叶工具课程场景admission、V1综合解释受源标签权限连带抑制及按维度保留有效结果的共享缺口尚待处理；不能据本包解析成功宣称已可投放或报告可见。",
+      "纵向比较须同课程及同阶段；课程任务变化可能影响回答。未提供成绩、活动日志或任务完成率不使量表作答无效。缺失不补零，零不等于空值；不使用中位数二分或推断缺失分数。"
+    ]
+  },
+  "files": {
+    "evidence": "evidence-map.json",
+    "rules": "rules.json",
+    "report": "report.json",
+    "scientific": "scientific.json",
+    "publication": "publication.json",
+    "context": "context.json"
+  },
+  "cognitiveDependencies": []
+}

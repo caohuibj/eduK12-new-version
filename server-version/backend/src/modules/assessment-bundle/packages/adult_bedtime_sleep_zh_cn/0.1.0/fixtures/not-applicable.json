@@ -1,0 +1,18 @@
+{
+  "values": {
+    "adult": {
+      "state": "present",
+      "value": false
+    },
+    "bps": {
+      "state": "present",
+      "value": 1.7777777777777777
+    },
+    "sci": {
+      "state": "present",
+      "value": 6
+    }
+  },
+  "expectedRuleIds": [],
+  "expectedKind": "UNAVAILABLE"
+}

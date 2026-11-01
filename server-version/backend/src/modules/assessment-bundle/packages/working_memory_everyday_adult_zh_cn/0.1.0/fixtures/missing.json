@@ -1,0 +1,50 @@
+{
+  "values": {
+    "context.age": {
+      "state": "present",
+      "value": 30
+    },
+    "spatial.trials": {
+      "state": "present",
+      "value": 12
+    },
+    "spatial.correct": {
+      "state": "present",
+      "value": 8
+    },
+    "spatial.span": {
+      "state": "present",
+      "value": 8
+    },
+    "backward.levels": {
+      "state": "present",
+      "value": 6
+    },
+    "backward.correct": {
+      "state": "missing"
+    },
+    "backward.span": {
+      "state": "present",
+      "value": 7
+    },
+    "everyday.wm": {
+      "state": "present",
+      "value": 36
+    }
+  },
+  "expectedRuleIds": [
+    "spatial_record",
+    "everyday_record",
+    "wm4",
+    "scope"
+  ],
+  "expectedKind": "COMPUTED",
+  "expectedDerived": {
+    "scalars": {
+      "spatial.ratio": 0.6666666666666666,
+      "backward.trials": 12,
+      "backward.ratio": null,
+      "everyday.position": 0.75
+    }
+  }
+}

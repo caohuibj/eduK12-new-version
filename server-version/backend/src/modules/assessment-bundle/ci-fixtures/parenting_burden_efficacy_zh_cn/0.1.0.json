@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {
+    "subject_age_years": 35,
+    "parent_caregiver_confirmed": true,
+    "child_lives_with_parent": true,
+    "birth_year_month": "1991-11"
+  },
+  "slots": {
+    "pba": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "EX1",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX2",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX3",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX4",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX5",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX6",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX7",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX8",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "EX9",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "CO1",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "CO2",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "CO3",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "CO4",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "CO5",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "CO6",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "FU1",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "FU2",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "FU3",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "FU4",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "FU5",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ED1",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ED2",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "ED3",
+          "responseValue": "4"
+        }
+      ]
+    },
+    "bpses": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "BPSES_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "4"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "methods",
+    "pba_summary",
+    "bpses_summary",
+    "pba_exhaustion",
+    "pba_contrast",
+    "pba_fed_up",
+    "pba_distancing",
+    "pa2"
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "key": "adult_interests_exploration_zh_cn_report",
+  "version": "0.2.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "continuous_scores",
+      "kind": "evidence",
+      "title": "兴趣八域：1–5原均分",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [],
+      "rowKeys": [
+        "orvis_leadership",
+        "orvis_organization",
+        "orvis_altruism",
+        "orvis_creativity",
+        "orvis_analysis",
+        "orvis_production",
+        "orvis_adventure",
+        "orvis_erudition"
+      ],
+      "maxSetKeys": [
+        "interest_max"
+      ]
+    },
+    {
+      "blockId": "interest_leadership",
+      "kind": "conclusions",
+      "title": "1. 带领与影响（12题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_01_leadership"
+      ]
+    },
+    {
+      "blockId": "interest_organization",
+      "kind": "conclusions",
+      "title": "2. 组织与安排（13题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_02_organization"
+      ]
+    },
+    {
+      "blockId": "interest_altruism",
+      "kind": "conclusions",
+      "title": "3. 助人与照顾（13题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_03_altruism"
+      ]
+    },
+    {
+      "blockId": "interest_creativity",
+      "kind": "conclusions",
+      "title": "4. 艺术与创作（14题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_04_creativity"
+      ]
+    },
+    {
+      "blockId": "interest_analysis",
+      "kind": "conclusions",
+      "title": "5. 分析与探究（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_05_analysis"
+      ]
+    },
+    {
+      "blockId": "interest_production",
+      "kind": "conclusions",
+      "title": "6. 动手与自然（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_06_production"
+      ]
+    },
+    {
+      "blockId": "interest_adventure",
+      "kind": "conclusions",
+      "title": "7. 运动与冒险（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_07_adventure"
+      ]
+    },
+    {
+      "blockId": "interest_erudition",
+      "kind": "conclusions",
+      "title": "8. 语言与阅读（10题）",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "interest_08_erudition"
+      ]
+    },
+    {
+      "blockId": "exploration_style",
+      "kind": "conclusions",
+      "title": "独立的认知需求：10–50原总分",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "nfc_exploration"
+      ],
+      "rowKeys": [
+        "nfc_total"
+      ]
+    },
+    {
+      "blockId": "exploration_themes",
+      "kind": "conclusions",
+      "title": "可选的探索提示",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "theme_broad",
+        "theme_subdued"
+      ]
+    },
+    {
+      "blockId": "next_steps",
+      "kind": "conclusions",
+      "title": "选两条方向做一次小尝试",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "exploration_plan"
+      ]
+    },
+    {
+      "blockId": "limitations",
+      "kind": "limitations",
+      "title": "结果范围与待补信息",
+      "audience": [
+        "student",
+        "admin"
+      ],
+      "ruleIds": [
+        "state_missing",
+        "state_invalid",
+        "state_not_applicable",
+        "state_out_of_range"
+      ]
+    }
+  ],
+  "states": {
+    "missing": "部分结果缺失；独立结果可保留，不补零或推断缺失部分。",
+    "limited": "部分结果质量有限；只保留质量允许的独立解释。",
+    "unavailable": "当前没有足够可解释的结果；不生成画像或以零分代替。"
+  },
+  "narrativeContent": "BUNDLE_OWNED_SELF",
+  "rows": [
+    {
+      "rowKey": "orvis_leadership",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.leadership"
+      },
+      "label": "带领与影响",
+      "unit": "mean",
+      "order": 0,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 12,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_organization",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.organization"
+      },
+      "label": "组织与安排",
+      "unit": "mean",
+      "order": 1,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 13,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_altruism",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.altruism"
+      },
+      "label": "助人与照顾",
+      "unit": "mean",
+      "order": 2,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 13,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_creativity",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.creativity"
+      },
+      "label": "艺术与创作",
+      "unit": "mean",
+      "order": 3,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 14,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_analysis",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.analysis"
+      },
+      "label": "分析与探究",
+      "unit": "mean",
+      "order": 4,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 10,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_production",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.production"
+      },
+      "label": "动手与自然",
+      "unit": "mean",
+      "order": 5,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 10,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_adventure",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.adventure"
+      },
+      "label": "运动与冒险",
+      "unit": "mean",
+      "order": 6,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 10,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "orvis_erudition",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "orvis.erudition"
+      },
+      "label": "语言与阅读",
+      "unit": "mean",
+      "order": 7,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "itemCount": 10,
+      "timeframe": "活动喜欢程度；原版未规定固定回顾时段"
+    },
+    {
+      "rowKey": "nfc_total",
+      "valueRef": {
+        "kind": "evidence",
+        "key": "nfc.need_for_cognition"
+      },
+      "label": "认知需求",
+      "unit": "sum",
+      "order": 8,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "itemCount": 10,
+      "timeframe": "通常的思考与阅读感受；原版未规定固定回顾时段"
+    }
+  ]
+}
