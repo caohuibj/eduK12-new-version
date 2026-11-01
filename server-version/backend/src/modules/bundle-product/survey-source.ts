@@ -43,8 +43,16 @@ export async function freezeSurveyNativeSource(tx:Prisma.TransactionClient,actor
   if(!component||component.unit.ref.kind!=='FORM')fail('SURVEY_NATIVE_CONTEXT_BINDING')
   const form=assertSurveyDraft('FORM',component!.unit.displayDefinition,true) as FormDraft
   const question=form.pages.flatMap(p=>p.questions).find(q=>q.itemKey===mapping!.itemKey)
-  // Initially support declared numeric Context only; no arbitrary raw-answer inference.
-  if(field.valueType!=='number'||!question||!question.required||question.displayIf||question.type!=='NUMBER')fail('SURVEY_NATIVE_CONTEXT_TYPE')
+  if(pack.schemaVersion===2){
+   // Preserve the original V2 numeric-only admission contract.
+   if(field.valueType!=='number'||!question||!question.required||question.displayIf||question.type!=='NUMBER')fail('SURVEY_NATIVE_CONTEXT_TYPE')
+  }else{
+   if(!question||field.required&&!question.required||question.displayIf)fail('SURVEY_NATIVE_CONTEXT_TYPE')
+   const q=question!,options=q.options.map(o=>o.optionKey).sort()
+   if(field.valueType==='number'?q.type!=='NUMBER':field.valueType==='boolean'?q.type!=='SINGLE'||options.join('|')!=='false|true':
+     field.valueType==='enum'?q.type!=='SINGLE'||options.join('|')!==[...(field.enumValues??[])].sort().join('|'):
+     !['SHORT_TEXT','LONG_TEXT'].includes(q.type))fail('SURVEY_NATIVE_CONTEXT_TYPE')
+  }
  }
  return native
 }

@@ -39,6 +39,21 @@ export async function readEducationNativeBundleFeedback(input:{attemptId:string;
   const hidden={schemaVersion:1 as const,kind:'NATIVE_BUNDLE_FEEDBACK' as const,status:'WITHHELD',title:frozen.reportDefinition.title,profileView:null}
   if(!pack)return hidden
   const required=pack.schemaVersion===2?pack.profile.bindings.map(core=>pack.evidence.find(e=>e.evidenceKey===core.evidenceKey)!):pack.evidence.filter(e=>e.role!=='CONTEXT')
+  const permitted=(evidence:typeof required[number])=>{
+    const binding=bindings.slots.find(slot=>slot.slotKey===evidence.slotKey)
+    return !!binding&&input.availableItemIds.has(binding.itemId)&&input.metricKeys.has(evidence.selector)
+      &&(input.metricKeysByItem===undefined||input.metricKeysByItem.get(binding.itemId)?.has(evidence.selector)===true)
+  }
+  if(pack.schemaVersion===3){
+    // This is an additional current unit/metric intersection, after the saved
+    // report's frozen admission policy. Never reconstruct a withheld result.
+    const available=required.filter(permitted)
+    if(!available.length)return hidden
+    const {readReport}=await import('./analysis')
+    const keys=new Set(available.map(e=>e.evidenceKey))
+    const saved=await readReport(input.attemptId,'student',undefined,input.db,{availableEvidenceKeys:keys})
+    return {...hidden,status:saved.status,factsHash:saved.factsHash,derivedView:saved.view?.derivedView??null}
+  }
   if(required.some(evidence=>{
     const binding=bindings.slots.find(slot=>slot.slotKey===evidence.slotKey)
     return !binding||!input.availableItemIds.has(binding.itemId)||!input.metricKeys.has(evidence.selector)

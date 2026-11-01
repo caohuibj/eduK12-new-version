@@ -1,0 +1,111 @@
+{
+  "coreBase": "4379ce8431dc53ac0960ea68dd2ae8f330fc61a7",
+  "repositoryBase": "fadc877e922773bb92c33cdc955ee68c886be06e",
+  "behaviorChecks": {
+    "passed": 28,
+    "failed": 0,
+    "backend": 16,
+    "frontend": 12
+  },
+  "localOnly": true,
+  "formalCi": "not activated",
+  "logs": [
+    {
+      "name": "derived-adapters-first.log",
+      "sha256": "a58bec47b90754a28b6916a48deab0efe69a9fc46e08552880edccf518ef0bb3",
+      "bytes": 246
+    },
+    {
+      "name": "derived-saved-read-first.log",
+      "sha256": "0f4ee23a466897ac5d4ede412d055bf684b1aebade00c22e622ab17976939f2e",
+      "bytes": 242
+    },
+    {
+      "name": "derived-release-intersection.log",
+      "sha256": "c496eccf98c78eee1282ec92f44d9a6b807e6afa07c43445be73c328e92790eb",
+      "bytes": 254
+    },
+    {
+      "name": "derived-ui-first.log",
+      "sha256": "7b3d3a63ef37688bf5575c691f0039e89ff79dc2a56b95a734fce91d9c75155e",
+      "bytes": 250
+    },
+    {
+      "name": "derived-survey-ui-first.log",
+      "sha256": "7260add712557c7fe1cd4bc53001aa6a9441ab3d1b59bb107adecb137c3ff5d2",
+      "bytes": 262
+    },
+    {
+      "name": "derived-backend-types-first.log",
+      "sha256": "6523a3c3059ef670f7c23f6c67d299df4da3c6999c3c927d45720319067abe80",
+      "bytes": 46110
+    },
+    {
+      "name": "derived-backend-types-corrected.log",
+      "sha256": "3a82892aa656d8ea832cc085a1a679f310f600ed9693da471881056910154246",
+      "bytes": 42
+    },
+    {
+      "name": "derived-quality-ceiling.log",
+      "sha256": "642caa9007f6c5df820f3b5cd6d08c4d2ec55e09181d90eb510a97d5dbe827d6",
+      "bytes": 254
+    },
+    {
+      "name": "derived-saved-read-final.log",
+      "sha256": "e651ab6d98464a978de584df7751da547a47892c23475ba2c01ecb519e14b949",
+      "bytes": 242
+    },
+    {
+      "name": "derived-ui-lint-corrected.log",
+      "sha256": "4f0809ab247d8e58206e3b3d960a0e2b97bb4723d3f01813a73893e937c76d93",
+      "bytes": 723
+    },
+    {
+      "name": "derived-backend-types-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "derived-frontend-types-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "backendTypecheck": {
+    "initialDiagnostics": 68,
+    "correctedDiagnostics": 0,
+    "roots": 9,
+    "closureFiles": 2066,
+    "environmentRepair": "Generated existing Prisma5.22 client from unchanged pinned schema; included original Express declarations."
+  },
+  "limitations": [
+    "No actual PG/FINAL/user journey qualification.",
+    "Survey schema3 accepts Scale/Form only; no automatic Cognitive disclosure.",
+    "Package owners must declare schema3 versions explicitly.",
+    "Core owner must preserve resultQualityDetails ceiling in optional row.quality."
+  ],
+  "frontendTypecheck": {
+    "command": "tsc -p tsconfig.app.json --noEmit",
+    "started": "2026-11-01T07:01:00.787Z",
+    "completed": "2026-11-01T07:01:47.456Z",
+    "exitCode": 0,
+    "signal": null,
+    "diagnosticOutputBytes": 0
+  },
+  "frontendLint": {
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 2,
+    "initialAttempt": {
+      "exitCode": 2,
+      "reason": "Command ran from repository root instead of frontend config directory."
+    }
+  },
+  "nativeReaderReview": "Preserved legacy summary/quality ceiling; reran only its two affected reader cases, then added one isolated quality-ceiling case.",
+  "finalNativeReaderTypecheck": {
+    "roots": 5,
+    "closureFiles": 2064,
+    "diagnostics": 0,
+    "exitCode": 0
+  }
+}
