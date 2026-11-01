@@ -33,6 +33,7 @@ import { resolveScaleStartDeployment } from './deployment/service'
 import type { ScaleDeploymentModeV1 } from './policy/deployment'
 import { evaluateInstrumentEligibility, SCALE_ELIGIBILITY_EVALUATOR_VERSION } from './policy/eligibility'
 import type { FrozenEligibilityDecisionV1, ScalePolicyRespondentType } from './policy/types'
+import { loadBundleScaleStartContext, type BundleScaleStartContext } from '../bundle-product/start-context'
 
 const COMPILED_RUNTIME_HASH = /^[0-9a-f]{64}$/
 type Db = PrismaClient | Prisma.TransactionClient
@@ -128,6 +129,7 @@ export type CompositeScaleAdmissionParent = {
   frozenActiveSlotSetEncrypted: string | null
   frozenActiveSlotSetHash: string | null
   compositeAssessment: {
+    productKind?: string
     creationKey?: string | null
     formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
   }
@@ -320,12 +322,14 @@ export const createScaleAdmissionForRuntime = async (input: {
   respondentUserId?: string | null
   trainingTiming?: TrainingTimingSnapshot
   legacyRequiresContext?: boolean
+  bundleContext?: BundleScaleStartContext
 }): Promise<VersionedFrozenUnitAdmission> => {
   if (input.runtime.instrumentKey !== input.scale.code || input.runtime.instrumentVersion !== input.scale.instrumentVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时身份不匹配', 409)
   }
 
   if (input.runtime.schemaVersion === 1) {
+    if (input.bundleContext) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '声明测量情境的量表需要版本化准入策略', 409)
     return createFrozenUnitAdmission({
       attemptEpoch: input.attemptEpoch,
       ...(input.trainingTiming ? {trainingTiming:input.trainingTiming} : {}),
@@ -366,7 +370,7 @@ export const createScaleAdmissionForRuntime = async (input: {
         ? ageMonthsAt(input.contextValues.birthYearMonth, new Date(input.contextFrozenAt)) : undefined,
       gradeLevel: input.contextValues?.gradeLevel,
     },
-    assessmentContext: input.requestedMode,
+    assessmentContext: input.bundleContext?.assessmentContext ?? input.requestedMode,
     availableContextKeys: availableContextKeys(input.contextValues),
   })
   if (resolvedRespondentType !== 'SELF' && policyRequiresContext(input.runtime)
@@ -412,6 +416,7 @@ export const createScaleAdmissionForRuntime = async (input: {
     ? null
     : `ELIGIBILITY_${eligibility.outcome}:${eligibility.reasons.map((reason) => reason.code).join(',')}`
 
+  const frozenContextValues = input.bundleContext ? { ...input.contextValues, bundleContext: input.bundleContext } : input.contextValues
   return createFrozenUnitAdmissionV2({
     attemptEpoch: input.attemptEpoch,
     ...(input.trainingTiming ? {trainingTiming:input.trainingTiming} : {}),
@@ -420,7 +425,7 @@ export const createScaleAdmissionForRuntime = async (input: {
     parent: input.parent,
     requiresContext: policyRequiresContext(input.runtime),
     contextSnapshotHash: input.contextSnapshotHash,
-    contextValues: input.contextValues,
+    contextValues: frozenContextValues,
     governance: {
       status: eligibility.outcome === 'ELIGIBLE' ? 'READY' : 'HOLD',
       holdReason,
@@ -669,6 +674,7 @@ const activateUnstoredScaleAdmission = async (
     const legacyRequiresContext = hasContextSection(loaded.compositeAssessment.formSections)
     const context = readCompositeAttemptContext(loaded)
     if (context.decryptError) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '人口学上下文无法读取，请联系管理员', 500)
+    const bundleContext = await loadBundleScaleStartContext(db, loaded, row.compositeItemId, row.scale.code, row.scale.instrumentVersion, context.context?.values ?? null)
     const snapshot = await createScaleAdmissionForRuntime({
       db,
       attemptEpoch: row.attemptEpoch,
@@ -687,6 +693,7 @@ const activateUnstoredScaleAdmission = async (
       },
       runtime,
       requestedMode: 'COMPOSITE',
+      ...(bundleContext ? { bundleContext } : {}),
       ...(loaded.trainingTimingSnapshot ? {trainingTiming:readTrainingTimingSnapshot(loaded.trainingTimingSnapshot)!} : {}),
       contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
