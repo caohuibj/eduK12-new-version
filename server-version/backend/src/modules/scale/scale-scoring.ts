@@ -10,6 +10,7 @@ import {
   type ScaleScoreDefinition,
   type ScaleTransform,
 } from './scale-definition'
+import { SPANE_SCORER_KEY, spane12BalanceScorer } from './packages/spane12-balance-scorer'
 
 /** A persisted answer. The response value is deliberately not a score. */
 export interface ScaleAnswer {
@@ -96,7 +97,7 @@ export interface ScaleCustomScorerOutput {
 
 export type ScaleCustomScorer = (input: ScaleCustomScorerInput) => ScaleCustomScorerOutput
 
-const customScorerRegistry = new Map<string, ScaleCustomScorer>()
+const customScorerRegistry = new Map<string, ScaleCustomScorer>([[SPANE_SCORER_KEY, spane12BalanceScorer]])
 
 export const registerScaleCustomScorer = (key: string, scorer: ScaleCustomScorer): void => {
   if (customScorerRegistry.has(key)) throw new Error(`Scale custom scorer already registered: ${key}`)
