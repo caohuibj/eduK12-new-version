@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {classify,portalBoundary,loginBoundary,toolingOnly} from './policy.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {classify,portalBoundary,loginBoundary,toolingOnly,imageBuildOnly} from './policy.mjs';
 const regular=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
 const css='server-version/frontend/src/training/training-workspace-refresh.css';
 const auth='server-version/backend/src/controllers/authController.ts';
@@ -45,6 +45,22 @@ test('image tooling preserves the existing executable script without admitting c
  const files=[script,...['.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml'].map(regular)];
  assert.equal(toolingOnly(files),true);
  for(const extra of [{...script,newMode:'100644'},{...script,status:'A',oldMode:'000000'},{...script,newMode:'120000'},{...script,file:'.github/scripts/unknown-images.sh'}])assert.equal(toolingOnly([...files,extra]),false);
+});
+test('image build tooling requires the complete bounded diff and unchanged regular modes',()=>{
+ const inputs=['.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml','server-version/frontend/Dockerfile','server-version/backend/Dockerfile'].map(regular);
+ const script={...regular('.github/scripts/build-ci-images.sh'),oldMode:'100755',newMode:'100755'};
+ for(const input of [...inputs,script])assert.equal(imageBuildOnly([input]),true,input.file);
+ const controls=['AGENTS.md','docs/release/README.md','.github/workflows/ci.yml','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/local-validation.mjs','server-version/scripts/release/policy.mjs'].map(regular);
+ assert.equal(imageBuildOnly([...inputs,script,...controls]),true);
+ assert.equal(toolingOnly([...inputs,script,...controls]),true);
+ assert.equal(imageBuildOnly(controls),false);
+ for(const file of ['server-version/frontend/src/main.tsx','server-version/backend/src/modules/campus/service.ts','server-version/backend/package-lock.json','.github/release-tools/package-lock.json','server-version/backend/prisma/schema.prisma','server-version/backend/prisma/migrations/example/migration.sql','server-version/scripts/release/executor.py','server-version/docker-compose.yml','server-version/ops/nginx/nginx.production.conf','server-version/backend/src/__tests__/cognitive/product.test.ts','.github/scripts/unknown-images.mjs']){
+  assert.equal(imageBuildOnly([...inputs,regular(file)]),false,file);
+  assert.equal(toolingOnly([...inputs,regular(file)]),false,file);
+ }
+ for(const change of [{status:'A',oldMode:'000000'},{status:'D',newMode:'000000'},{newMode:'100755'},{newMode:'120000'},{oldMode:'120000'}]){
+  const changed={...inputs[0],...change};assert.equal(imageBuildOnly([changed]),false);assert.equal(toolingOnly([changed]),false);
+ }
 });
 
 

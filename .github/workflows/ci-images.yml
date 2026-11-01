@@ -12,6 +12,15 @@ on:
       backend_only:
         type: boolean
         default: false
+      debian_mirror:
+        type: string
+        default: deb.debian.org
+      npm_registry:
+        type: string
+        default: https://registry.npmjs.org
+      alpine_mirror:
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       frontend_only:
@@ -22,6 +31,18 @@ on:
         type: boolean
         default: false
         description: 'Build/scan backend and worker only'
+      debian_mirror:
+        type: string
+        default: deb.debian.org
+        description: 'Explicit Debian mirror host; retain official default unless selected'
+      npm_registry:
+        type: string
+        default: https://registry.npmjs.org
+        description: 'Explicit HTTPS npm registry for image builds'
+      alpine_mirror:
+        type: string
+        default: ''
+        description: 'Optional HTTPS Alpine repository prefix; empty retains official repositories'
 
 permissions:
   contents: read
@@ -39,6 +60,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
+      DEBIAN_MIRROR: ${{ inputs.debian_mirror || 'deb.debian.org' }}
+      NPM_REGISTRY: ${{ inputs.npm_registry || 'https://registry.npmjs.org' }}
+      ALPINE_MIRROR: ${{ inputs.alpine_mirror || '' }}
       JWT_SECRET: ci-jwt-secret-123456789012345678901234
       DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
