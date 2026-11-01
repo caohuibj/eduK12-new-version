@@ -53,4 +53,5 @@ it('masks legacy summary quality when a frozen admission policy forbids its deta
  expect(report.view?.quality).toEqual({overall:'unavailable',notes:[]})
  expect(report.view?.evidence.find(e=>e.evidenceKey==='ase.efficacy')?.quality).toBe('unavailable')
  expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')?.value).toBe(2.2)
+ expect(report.view?.derivedView?.rows.find(r=>r.rowKey==='ase')).not.toHaveProperty('quality')
 })

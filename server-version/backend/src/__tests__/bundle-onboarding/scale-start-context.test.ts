@@ -20,7 +20,7 @@ const scene = 'UNIVERSITY_ONLINE_OR_BLENDED_CURRENT_COURSE'
 const policyHash = canonicalHash({ synthetic: 'course-start-policy' })
 const demographic = { birthYearMonth: '2006-11', ageMonthsAtFreeze: 240, ageYearsAtFreeze: 20 }
 
-function fixture() {
+function fixture(schemaVersion: 1 | 3 = 1) {
   const raw = authoringFixture()
   raw.manifest.definition.contextDefinitionKey = 'course_context'
   raw.manifest.definition.contextDefinitionVersion = '1.0.0'
@@ -40,6 +40,13 @@ function fixture() {
     { contextKey: 'university_student', required: true, valueType: 'boolean' },
     { contextKey: 'birth_year_month', required: true, valueType: 'string' },
   ] }
+  if (schemaVersion === 3) {
+    raw.schemaVersion = 3
+    raw.manifest.packageSchemaVersion = 3
+    raw.manifest.definition.engine.version = '1.2.0'
+    raw.rules.derivations = []
+    raw.report.rows = []
+  }
   const p = parseDeclarativePackage(raw), frozen = freezeBundleProductionDefinition(packageEntry(p), { frozenAt: at, sourceReference: 'synthetic-source' })
   const bindings = { schemaVersion: 1, slots: [{ slotKey: 'source', itemId: 'scale-item', unitType: 'SCALE' }],
     context: raw.context.fields.map((f: any) => ({ contextKey: f.contextKey, valueType: f.valueType, itemId: 'form-' + f.contextKey })) }
@@ -70,6 +77,13 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs())
 
 describe('source-owned course context into Scale START (synthetic persistence)', () => {
+  it('carries schema3 slot context through the frozen package into leaf START', async () => {
+    const f = fixture(3), context = await f.read(), admission = await f.admit(context)
+    expect(f.frozen.declarativePackage?.schemaVersion).toBe(3)
+    expect(f.frozen.bundleSnapshot.bundleDefinition.engine.version).toBe('1.2.0')
+    expect(parseFrozenUnitAdmissionV2(admission).contextValues).toMatchObject({ ...demographic, bundleContext: { assessmentContext: scene, facts: context!.facts } })
+    expect(admission.governance.status).toBe('READY')
+  })
   it('reads accepted frozen facts, separates COMPOSITE deployment, and freezes the exact context with real DOB eligibility', async () => {
     const f = fixture(), context = await f.read(), admission = await f.admit(context)
     expect(deployment).toHaveBeenCalledWith(expect.objectContaining({ requestedMode: 'COMPOSITE' }))
