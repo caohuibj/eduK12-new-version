@@ -34,7 +34,7 @@
     ]
   },
   "presentation": {
-    "file": "participant-presentation.ts",
+    "file": "participant-presentation-r2.ts",
     "export": "participantPresentations"
   },
   "scientific": {
