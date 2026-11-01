@@ -136,6 +136,7 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='composite-csv-memory')return ['scope','composite-csv-memory','codeql'];
   if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
   if(draft&&scope.personal_tracking_draft==='true')return ['scope','pr-light-backend','pr-light-frontend'];
+  if(scope.scenario === 'catalog-discovery') return ['scope','catalog-discovery','frontend','docker','codeql'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
