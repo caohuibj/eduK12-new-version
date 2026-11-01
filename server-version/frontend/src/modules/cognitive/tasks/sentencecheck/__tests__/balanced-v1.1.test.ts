@@ -4,6 +4,7 @@ import { buildSentencecheckTrialsV11 } from '../generator-v1.1'
 import { buildSentencecheckTrialsV11 as backendTrials } from '../../../../../../../backend/src/modules/cognitive/tasks/sentencecheck/generator-v1.1'
 import { scoreSentencecheckV11, sentencecheckConfigV11Schema } from '../../../../../../../backend/src/modules/cognitive/tasks/sentencecheck/scoring-v1.1'
 import { scoreSentencecheckV1 } from '../../../../../../../backend/src/modules/cognitive/scoring/sentencecheck.v1'
+import { sentencecheckTrialSchema, type SentencecheckTrial } from '../../../../../../../backend/src/modules/cognitive/schemas/sentencecheck.trial'
 import { executionEntries } from '../../../../../../../backend/src/modules/cognitive/tasks/sentencecheck/package'
 import legacyFixture from '../../../../../../../backend/src/modules/cognitive/tasks/sentencecheck/fixtures/1.0.1-1.0.0.json'
 import currentFixture from '../../../../../../../backend/src/modules/cognitive/tasks/sentencecheck/fixtures/1.1.0-1.1.0.json'
@@ -18,14 +19,14 @@ const makeInput = () => ({
   config,
   randomSeed: 'crossed-conditions',
   trials: buildSentencecheckTrialsV11('crossed-conditions', 12, 0.5, 0.5).map(({ sentence: _sentence, ...stimulus }, trialIndex) => ({
-    trialIndex, payload: { ...stimulus, response: truthOf({ ...stimulus, sentence: '' }) as boolean | null,
-      rtMs: (stimulus.negated ? 800 : 500) as number | null, interrupted: false },
+    trialIndex, payload: sentencecheckTrialSchema.parse({ ...stimulus, response: truthOf({ ...stimulus, sentence: '' }) as boolean | null,
+      rtMs: (stimulus.negated ? 800 : 500) as number | null, interrupted: false }),
   })),
 })
 
-const actualValueOf = (trial: SentencecheckStimulus): string => trial.questionKind === 'shape'
-    ? { circle: '圆形', square: '方形', triangle: '三角形' }[trial.shape]
-    : { red: '红色', blue: '蓝色', green: '绿色', yellow: '黄色' }[trial.color]
+const actualValueOf = (trial: SentencecheckStimulus): SentencecheckTrial['askedValue'] => trial.questionKind === 'shape'
+    ? ({ circle: '圆形', square: '方形', triangle: '三角形' } as const)[trial.shape]
+    : ({ red: '红色', blue: '蓝色', green: '绿色', yellow: '黄色' } as const)[trial.color]
 const truthOf = (trial: SentencecheckStimulus): boolean => {
   const actual = actualValueOf(trial)
   return trial.negated ? trial.askedValue !== actual : trial.askedValue === actual
@@ -98,7 +99,7 @@ describe('sentencecheck condition identity boundary', () => {
     const truth = truthOf(stimulus)
     condition.negated = !condition.negated
     const actual = actualValueOf(stimulus)
-    const other = condition.questionKind === 'shape' ? ['圆形', '方形', '三角形'] : ['红色', '蓝色', '绿色', '黄色']
+    const other = condition.questionKind === 'shape' ? ['圆形', '方形', '三角形'] as const : ['红色', '蓝色', '绿色', '黄色'] as const
     condition.askedValue = truth !== condition.negated ? actual : other.find((value) => value !== actual)!
     expect(() => scoreSentencecheckV1(conditionTamper)).not.toThrow()
     expect(() => scoreSentencecheckV11(conditionTamper)).toThrow('does not match the frozen regeneration')
