@@ -148,7 +148,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
 
   if (phase === 'instruction') {
     return (
-      <CognitiveTaskIntro title="概率反馈与规则反转" description={<p>每个试次请选择左侧或右侧符号，并根据反馈逐渐发现当前规则。规则会在中途反转。</p>} hint={<><p>练习至少完成 3 / 4；练习不计入正式结果。结果不用于人格或风险判断。</p></>} onAction={startPractice} />
+      <CognitiveTaskIntro title="概率反馈与规则反转" description={<p>每题请选择左侧或右侧符号，根据多次反馈找出当前较有利的符号。较有利的符号也可能偶尔得到负反馈；规则会在中途反转。</p>} hint={<><p>练习至少完成 3 / 4；练习不计入正式结果。结果不用于人格或风险判断。</p></>} onAction={startPractice} />
     )
   }
 
