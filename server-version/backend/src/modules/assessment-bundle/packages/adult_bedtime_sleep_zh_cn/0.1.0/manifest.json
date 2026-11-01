@@ -38,7 +38,16 @@
         "respondentType": "SELF",
         "valueSelectors": [
           "bedtime_procrastination"
-        ]
+        ],
+        "admissionContext": {
+          "assessmentContext": "adult_sleep_reflection",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
       },
       {
         "slotKey": "sleep",
@@ -50,7 +59,16 @@
         "respondentType": "SELF",
         "valueSelectors": [
           "sleep_condition"
-        ]
+        ],
+        "admissionContext": {
+          "assessmentContext": "adult_sleep_reflection",
+          "requirements": [
+            {
+              "contextKey": "birth_year_month"
+            }
+          ],
+          "birthYearMonthContextKey": "birth_year_month"
+        }
       }
     ],
     "engine": {

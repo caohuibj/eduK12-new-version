@@ -28,6 +28,11 @@
       "contextKey": "discussion_focus",
       "required": false,
       "valueType": "string"
+    },
+    {
+      "contextKey": "birth_year_month",
+      "required": true,
+      "valueType": "string"
     }
   ]
 }
