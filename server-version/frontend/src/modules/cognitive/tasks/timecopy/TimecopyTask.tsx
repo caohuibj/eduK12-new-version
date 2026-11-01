@@ -25,10 +25,12 @@ export const TimecopyTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
   const [practiceAttempt, setPracticeAttempt] = useState(1)
   const [practiceFeedback, setPracticeFeedback] = useState<string | null>(null)
   const [formalFeedback, setFormalFeedback] = useState<string | null>(null)
+  const [saveFailed, setSaveFailed] = useState(false)
   const [barFill, setBarFill] = useState(false)
   const interruptedRef = useRef(false)
   const reproduceStartRef = useRef<number | null>(null)
   const submittingRef = useRef(false)
+  const pendingPayloadRef = useRef<TimecopyTrialPayload | null>(null)
   const targets = useMemo(
     () => buildTimecopyTargets(taskContext.randomSeed, totalTrials, targetMinMs, targetMaxMs),
     [taskContext.randomSeed, totalTrials, targetMinMs, targetMaxMs]
@@ -53,6 +55,28 @@ export const TimecopyTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
     return () => { window.clearTimeout(startTimer); window.clearTimeout(doneTimer) }
   }, [phase, step, trialIndex, activeTarget])
 
+  const persistFormal = useCallback(async (payload: TimecopyTrialPayload) => {
+    if (submittingRef.current) return
+    submittingRef.current = true
+    pendingPayloadRef.current = payload
+    setSaveFailed(false)
+    setFormalFeedback('正在保存本次记录…'); setStep('feedback')
+    try {
+      const accepted = await onTrialComplete(payload)
+      if (accepted === false) {
+        setFormalFeedback('保存失败，请重试保存本次记录。无需重新复制。')
+        setSaveFailed(true)
+        return
+      }
+      pendingPayloadRef.current = null
+    } catch {
+      setFormalFeedback('保存失败，请重试保存本次记录。无需重新复制。')
+      setSaveFailed(true)
+      return
+    } finally { submittingRef.current = false }
+    if (trialIndex + 1 >= totalTrials) await onTaskComplete?.()
+  }, [onTrialComplete, trialIndex, totalTrials, onTaskComplete])
+
   const finishReproduction = useCallback(async (responseMs: number) => {
     const clamped = Math.min(maxResponseMs, Math.max(0, responseMs))
     if (phase === 'practice') {
@@ -64,20 +88,14 @@ export const TimecopyTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
       )
       setStep('feedback'); return
     }
-    if (phase !== 'formal' || submittingRef.current) return
-    submittingRef.current = true
+    if (phase !== 'formal' || pendingPayloadRef.current || submittingRef.current) return
     const payload: TimecopyTrialPayload = {
       targetMs: currentTrial!.targetMs,
       responseMs: clamped,
       interrupted: interruptedRef.current,
     }
-    setFormalFeedback('已记录，下一题准备中'); setStep('feedback')
-    try {
-      const accepted = await onTrialComplete(payload)
-      if (accepted === false) { setFormalFeedback('提交失败，请重试当前试次'); setStep('ready'); return }
-      if (trialIndex + 1 >= totalTrials) await onTaskComplete?.()
-    } finally { submittingRef.current = false }
-  }, [phase, currentTrial, onTrialComplete, trialIndex, totalTrials, onTaskComplete, maxResponseMs])
+    await persistFormal(payload)
+  }, [phase, currentTrial, persistFormal, maxResponseMs])
 
   useEffect(() => {
     if (phase !== 'formal') return
@@ -119,5 +137,5 @@ export const TimecopyTask: React.FC<CognitiveTaskProps> = ({ taskContext, trialI
 
   if (!currentTrial) return <div className="card p-8 text-center text-gray-500">正在生成结果…</div>
 
-  return <CognitiveFocusStage ariaLabel="时间间隔复制正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{(step === 'watch' || step === 'ready') && <><div className="pt-4"><ProgressBar fill={barFill} target={activeTarget} /></div><p className="text-gray-600 pt-3">{step === 'watch' ? '记住光条亮了多久…' : '光条已结束'}</p></>}{step === 'ready' && <button type="button" className="btn-primary mt-3" onClick={handleStart}>开始复制</button>}{step === 'reproducing' && <><div className="h-24 flex items-center justify-center"><span className="h-6 w-6 rounded-full bg-sky-400 animate-pulse" aria-hidden="true" /></div><button type="button" className="btn-primary" onClick={handleStop}>结束复制</button></>}{step === 'feedback' && <div className="h-16 pt-4 text-xl font-semibold text-gray-700">{formalFeedback}</div>}{step === 'ready' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">凭感觉复制同样的时长 · 不看表</p></div></CognitiveFocusStage>
+  return <CognitiveFocusStage ariaLabel="时间间隔复制正式测验"><div className="card mx-auto max-w-2xl p-5 text-center sm:p-8"><div className="text-sm text-gray-500">第 {trialIndex + 1} / {totalTrials} 题</div>{(step === 'watch' || step === 'ready') && <><div className="pt-4"><ProgressBar fill={barFill} target={activeTarget} /></div><p className="text-gray-600 pt-3">{step === 'watch' ? '记住光条亮了多久…' : '光条已结束'}</p></>}{step === 'ready' && <button type="button" className="btn-primary mt-3" onClick={handleStart}>开始复制</button>}{step === 'reproducing' && <><div className="h-24 flex items-center justify-center"><span className="h-6 w-6 rounded-full bg-sky-400 animate-pulse" aria-hidden="true" /></div><button type="button" className="btn-primary" onClick={handleStop}>结束复制</button></>}{step === 'feedback' && <><div className="h-16 pt-4 text-xl font-semibold text-gray-700">{formalFeedback}</div>{saveFailed && pendingPayloadRef.current && <button type="button" className="btn-secondary mt-3" onClick={() => { const payload = pendingPayloadRef.current; if (payload) void persistFormal(payload) }}>重试保存</button>}</>}{step === 'ready' && formalFeedback && <p className="mt-2 text-sm text-amber-600">{formalFeedback}</p>}<p className="text-xs text-gray-400 mt-4">凭感觉复制同样的时长 · 不看表</p></div></CognitiveFocusStage>
 }
