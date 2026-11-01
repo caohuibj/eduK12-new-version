@@ -22,7 +22,7 @@ it('teaches on the separate practice sequence then plays and saves the fixed-cou
  }
  await act(async()=>{})
  const sequence=generateAuditoryNbackFixedSequence(context.randomSeed,22,2,.3,5)
- expect(audio.play.mock.calls.at(-1)?.[1]).toBe(config.toneFrequenciesHz[sequence[0]])
+ expect(audio.play.mock.calls[audio.play.mock.calls.length - 1]?.[1]).toBe(config.toneFrequenciesHz[sequence[0]])
  expect(save).not.toHaveBeenCalled()
  await act(async()=>{vi.advanceTimersByTime(500)})
  await act(async()=>{vi.advanceTimersByTime(1500)})
