@@ -1,0 +1,56 @@
+{
+  "key": "online_learning_regulation_procrastination_zh_cn_report",
+  "version": "0.1.0",
+  "locale": "zh-CN",
+  "blocks": [
+    {
+      "blockId": "core",
+      "kind": "conclusions",
+      "title": "努力调节与拖延：一个可讨论的主题",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "ol1",
+        "ol2",
+        "ol3",
+        "ol4",
+        "continuous"
+      ]
+    },
+    {
+      "blockId": "evidence",
+      "kind": "evidence",
+      "title": "独立原分：SRLO十维均分1–7；IPS总分9–45。r=(努力调节−1)/6，d=(IPS−9)/36，仅为理论量尺位置。",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    },
+    {
+      "blockId": "emotion",
+      "kind": "conclusions",
+      "title": "单独理解负性学习情绪",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": [
+        "negative_emotion_meaning"
+      ]
+    },
+    {
+      "blockId": "scope",
+      "kind": "limitations",
+      "title": "适用范围与当前草稿边界",
+      "audience": [
+        "student"
+      ],
+      "ruleIds": []
+    }
+  ],
+  "states": {
+    "missing": "用于当前讨论的信息不完整，不补零或强行分型。请分别查看已有单项结果；当前V1按维度保留解释的能力尚待共享接线。",
+    "limited": "本次结果存在质量限制，暂不根据组合推断个人特征。",
+    "unavailable": "当前版本、适用条件、结果质量或已冻结披露条件不足以提供综合解释；不代表学习能力低。"
+  }
+}

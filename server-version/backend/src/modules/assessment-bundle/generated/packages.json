@@ -1783,6 +1783,1208 @@
     }
   },
   {
+    "schemaVersion": 1,
+    "manifest": {
+      "definition": {
+        "schemaVersion": 1,
+        "bundleKey": "online_learning_regulation_procrastination_zh_cn",
+        "bundleVersion": "0.1.0",
+        "status": "DRAFT",
+        "category": "scale_self",
+        "name": "在线学习自我调节与拖延｜研究草稿",
+        "description": "并置同一在线/混合课程的SRLO十维自述与IPS9一般拖延习惯，提供项目理论锚点下的讨论主题；非诊断，非已验证画像。",
+        "respondentTypes": [
+          "SELF"
+        ],
+        "initiationModes": [
+          "TEACHER_ASSIGNMENT",
+          "STUDENT_COURSE"
+        ],
+        "population": {
+          "subjectPopulation": "adult",
+          "subjectMinAgeYears": 18,
+          "subjectMaxAgeYears": 22
+        },
+        "slots": [
+          {
+            "slotKey": "srlo",
+            "unitType": "SCALE",
+            "position": 0,
+            "required": true,
+            "instrumentKey": "srlo44_zh_cn_research",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "online_academic_self_efficacy",
+              "online_intrinsic_motivation",
+              "online_extrinsic_motivation",
+              "online_negative_achievement_emotion",
+              "planning_time_management",
+              "metacognition",
+              "study_environment",
+              "online_effort_regulation",
+              "online_social_support",
+              "online_task_strategies"
+            ]
+          },
+          {
+            "slotKey": "ips",
+            "unitType": "SCALE",
+            "position": 1,
+            "required": true,
+            "instrumentKey": "ips9_2021_zh_cn",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "irrational_procrastination"
+            ]
+          },
+          {
+            "slotKey": "context",
+            "unitType": "FORM",
+            "position": 2,
+            "required": true,
+            "instrumentKey": "online_learning_regulation_procrastination_zh_cn_context",
+            "instrumentVersion": "0.1.0",
+            "respondentType": "SELF"
+          }
+        ],
+        "engine": {
+          "key": "declarative-evidence-v1",
+          "version": "1.0.0"
+        },
+        "contextDefinitionKey": "online_learning_regulation_procrastination_zh_cn_context",
+        "contextDefinitionVersion": "0.1.0",
+        "reportDefinitionKey": "online_learning_regulation_procrastination_zh_cn_report",
+        "reportDefinitionVersion": "0.1.0",
+        "publicationRequirements": {
+          "scientificGate": true,
+          "rightsGate": true,
+          "languageGate": true,
+          "reportGate": true,
+          "safetyGate": false,
+          "nonCommercialOnly": false
+        },
+        "rightsRequirements": {
+          "required": true,
+          "instrumentKeys": [
+            "srlo44_zh_cn_research",
+            "ips9_2021_zh_cn"
+          ]
+        },
+        "safetyCapability": {
+          "safetyCapable": false,
+          "productionTriggerEnabled": false
+        },
+        "limitations": [
+          "研究草稿，仅面向18–22岁、当前正在修读同一门大学在线或混合课程的本人。课程ID、授课方式和学习阶段必填，不据缺失信息默认适用。",
+          "SRLO44为独立中文工作译稿，人工译审、认知访谈及中国人群验证仍待完成；十维均分分别理解，不生成44题总分或两个上位总分。",
+          "IPS9沿用2021中文九题版的一般任务习惯指导语、2/6/9反向和9–45总分；与课程特定SRLO并置，不冒称IPS已获得同课程专用验证。",
+          "讨论主题OL1–OL4采用项目理论锚点：r=(努力调节均分−1)/6，d=(IPS总分−9)/36；≤0.25和≥0.75不是作者截点、常模、百分位或已验证自然类别。",
+          "规则直接在原量尺作等价比较：努力调节≤2.5或≥5.5，IPS≤18或≥36；中间结果保留连续信息，不硬分型，也不将计划维度替代努力调节。",
+          "负性学习情绪越多表示报告更多难受与压力，不是更好的调节；外在动机也不统一代表好坏。不作诊断、能力排名、成绩预测或干预效果承诺。",
+          "当前模板显示原始总分/均分及换算公式；没有实现个体r/d数值轴图、十维分组布局或画像卡，不以公式文字冒称这些功能完成。",
+          "本包保持DRAFT。叶工具课程场景admission、V1综合解释受源标签权限连带抑制及按维度保留有效结果的共享缺口尚待处理；不能据本包解析成功宣称已可投放或报告可见。",
+          "纵向比较须同课程及同阶段；课程任务变化可能影响回答。未提供成绩、活动日志或任务完成率不使量表作答无效。缺失不补零，零不等于空值；不使用中位数二分或推断缺失分数。"
+        ]
+      },
+      "files": {
+        "evidence": "evidence-map.json",
+        "rules": "rules.json",
+        "report": "report.json",
+        "scientific": "scientific.json",
+        "publication": "publication.json",
+        "context": "context.json"
+      },
+      "cognitiveDependencies": []
+    },
+    "evidence": [
+      {
+        "evidenceKey": "online_academic_self_efficacy",
+        "slotKey": "srlo",
+        "selector": "online_academic_self_efficacy",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_academic_self_efficacy",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "online_intrinsic_motivation",
+        "slotKey": "srlo",
+        "selector": "online_intrinsic_motivation",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_intrinsic_motivation",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "online_extrinsic_motivation",
+        "slotKey": "srlo",
+        "selector": "online_extrinsic_motivation",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_extrinsic_motivation",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "online_negative_achievement_emotion",
+        "slotKey": "srlo",
+        "selector": "online_negative_achievement_emotion",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_negative_achievement_emotion",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "planning_time_management",
+        "slotKey": "srlo",
+        "selector": "planning_time_management",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.planning_time_management",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "metacognition",
+        "slotKey": "srlo",
+        "selector": "metacognition",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.metacognition",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "study_environment",
+        "slotKey": "srlo",
+        "selector": "study_environment",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.study_environment",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "online_effort_regulation",
+        "slotKey": "srlo",
+        "selector": "online_effort_regulation",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_effort_regulation",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "online_social_support",
+        "slotKey": "srlo",
+        "selector": "online_social_support",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_social_support",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "online_task_strategies",
+        "slotKey": "srlo",
+        "selector": "online_task_strategies",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.online_task_strategies",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "procrastination",
+        "slotKey": "ips",
+        "selector": "irrational_procrastination",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "online_learning.procrastination",
+        "role": "PRIMARY",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "subject_age_years",
+        "slotKey": "context",
+        "selector": "subject_age_years",
+        "valueType": "number",
+        "unit": "context",
+        "construct": "context.subject_age_years",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "university_student_confirmed",
+        "slotKey": "context",
+        "selector": "university_student_confirmed",
+        "valueType": "boolean",
+        "unit": "context",
+        "construct": "context.university_student_confirmed",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "course_id",
+        "slotKey": "context",
+        "selector": "course_id",
+        "valueType": "string",
+        "unit": "context",
+        "construct": "context.course_id",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "course_mode",
+        "slotKey": "context",
+        "selector": "course_mode",
+        "valueType": "string",
+        "unit": "context",
+        "construct": "context.course_mode",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "learning_stage",
+        "slotKey": "context",
+        "selector": "learning_stage",
+        "valueType": "string",
+        "unit": "context",
+        "construct": "context.learning_stage",
+        "role": "CONTEXT",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      }
+    ],
+    "rules": {
+      "version": "0.1.0",
+      "applicability": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "subject_age_years",
+                "value": 18
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "subject_age_years",
+                "value": 22
+              }
+            ]
+          },
+          {
+            "op": "eq",
+            "evidenceKey": "university_student_confirmed",
+            "value": true
+          },
+          {
+            "op": "ne",
+            "evidenceKey": "course_id",
+            "value": ""
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "eq",
+                "evidenceKey": "course_mode",
+                "value": "online"
+              },
+              {
+                "op": "eq",
+                "evidenceKey": "course_mode",
+                "value": "blended"
+              }
+            ]
+          },
+          {
+            "op": "ne",
+            "evidenceKey": "learning_stage",
+            "value": ""
+          }
+        ]
+      },
+      "items": [
+        {
+          "ruleId": "ol1",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 7
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "procrastination",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "procrastination",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "online_effort_regulation",
+                "value": 5.5
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "procrastination",
+                "value": 18
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "OL1｜较多努力调节、较少拖延的讨论主题。你报告较多在干扰或困难中继续投入的做法，也较少报告拖延习惯。可以留意哪些安排有助于开始与持续，选一项愿意保留的做法。这是项目理论参照，不是能力等级。",
+          "evidenceKeys": [
+            "online_effort_regulation",
+            "procrastination"
+          ],
+          "supportRefs": [
+            "b14_design"
+          ]
+        },
+        {
+          "ruleId": "ol2",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 7
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "procrastination",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "procrastination",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "online_effort_regulation",
+                "value": 5.5
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "procrastination",
+                "value": 36
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "OL2｜调节努力与拖延并存的讨论主题。你既报告了继续投入的努力，也报告了较多拖延。两者可以同时存在，不必理解成自相矛盾或懒惰。可先回想一次迟迟未开始的任务，区分要求不清、任务过大、时间不足或其他现实阻碍，再选一个可以试的小起点。",
+          "evidenceKeys": [
+            "online_effort_regulation",
+            "procrastination"
+          ],
+          "supportRefs": [
+            "b14_design"
+          ]
+        },
+        {
+          "ruleId": "ol3",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 7
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "procrastination",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "procrastination",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "online_effort_regulation",
+                "value": 2.5
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "procrastination",
+                "value": 36
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "OL3｜较少调节做法、较多拖延的讨论主题。当前报告较少在干扰中继续投入的做法，同时有较多拖延。可以把一项课程任务缩小到几分钟可开始的一步，并了解能否获得更安静的环境或同伴帮助；这不说明你缺乏能力。",
+          "evidenceKeys": [
+            "online_effort_regulation",
+            "procrastination"
+          ],
+          "supportRefs": [
+            "b14_design"
+          ]
+        },
+        {
+          "ruleId": "ol4",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 7
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "procrastination",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "procrastination",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "online_effort_regulation",
+                "value": 2.5
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "procrastination",
+                "value": 18
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "OL4｜两方面都较少报告的讨论主题。你较少报告这些调节做法，也较少报告拖延。可以先结合当前课程负荷和学习阶段理解，不据此推断投入不足或能力高低。若目前安排适合自己，可保留；任务变化后再观察。",
+          "evidenceKeys": [
+            "online_effort_regulation",
+            "procrastination"
+          ],
+          "supportRefs": [
+            "b14_design"
+          ]
+        },
+        {
+          "ruleId": "continuous",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "online_effort_regulation",
+                    "value": 7
+                  },
+                  {
+                    "op": "gte",
+                    "evidenceKey": "procrastination",
+                    "value": 9
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "procrastination",
+                    "value": 45
+                  }
+                ]
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "any",
+                  "conditions": [
+                    {
+                      "op": "all",
+                      "conditions": [
+                        {
+                          "op": "all",
+                          "conditions": [
+                            {
+                              "op": "gte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 1
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 7
+                            },
+                            {
+                              "op": "gte",
+                              "evidenceKey": "procrastination",
+                              "value": 9
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "procrastination",
+                              "value": 45
+                            }
+                          ]
+                        },
+                        {
+                          "op": "gte",
+                          "evidenceKey": "online_effort_regulation",
+                          "value": 5.5
+                        },
+                        {
+                          "op": "lte",
+                          "evidenceKey": "procrastination",
+                          "value": 18
+                        }
+                      ]
+                    },
+                    {
+                      "op": "all",
+                      "conditions": [
+                        {
+                          "op": "all",
+                          "conditions": [
+                            {
+                              "op": "gte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 1
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 7
+                            },
+                            {
+                              "op": "gte",
+                              "evidenceKey": "procrastination",
+                              "value": 9
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "procrastination",
+                              "value": 45
+                            }
+                          ]
+                        },
+                        {
+                          "op": "gte",
+                          "evidenceKey": "online_effort_regulation",
+                          "value": 5.5
+                        },
+                        {
+                          "op": "gte",
+                          "evidenceKey": "procrastination",
+                          "value": 36
+                        }
+                      ]
+                    },
+                    {
+                      "op": "all",
+                      "conditions": [
+                        {
+                          "op": "all",
+                          "conditions": [
+                            {
+                              "op": "gte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 1
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 7
+                            },
+                            {
+                              "op": "gte",
+                              "evidenceKey": "procrastination",
+                              "value": 9
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "procrastination",
+                              "value": 45
+                            }
+                          ]
+                        },
+                        {
+                          "op": "lte",
+                          "evidenceKey": "online_effort_regulation",
+                          "value": 2.5
+                        },
+                        {
+                          "op": "gte",
+                          "evidenceKey": "procrastination",
+                          "value": 36
+                        }
+                      ]
+                    },
+                    {
+                      "op": "all",
+                      "conditions": [
+                        {
+                          "op": "all",
+                          "conditions": [
+                            {
+                              "op": "gte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 1
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "online_effort_regulation",
+                              "value": 7
+                            },
+                            {
+                              "op": "gte",
+                              "evidenceKey": "procrastination",
+                              "value": 9
+                            },
+                            {
+                              "op": "lte",
+                              "evidenceKey": "procrastination",
+                              "value": 45
+                            }
+                          ]
+                        },
+                        {
+                          "op": "lte",
+                          "evidenceKey": "online_effort_regulation",
+                          "value": 2.5
+                        },
+                        {
+                          "op": "lte",
+                          "evidenceKey": "procrastination",
+                          "value": 18
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "kind": "cross_source_condition",
+          "text": "本次两项核心结果未同时落入预设角落，不选定单一讨论主题。可分别看努力调节均分与拖延总分，再结合自己的课程体验理解；不必把连续差异硬分成一种类型。",
+          "evidenceKeys": [
+            "online_effort_regulation",
+            "procrastination"
+          ],
+          "supportRefs": [
+            "b14_design"
+          ]
+        },
+        {
+          "ruleId": "negative_emotion_meaning",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "online_negative_achievement_emotion",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "online_negative_achievement_emotion",
+                "value": 7
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "“学习时的难受与压力”均分越大，表示这次报告更多负性学习体验；它不是更好的自我调节，也不构成疾病诊断。可先辨认最难承受的课程要求，需要时向老师、同学或学校支持服务说明具体困难。",
+          "evidenceKeys": [
+            "online_negative_achievement_emotion"
+          ],
+          "supportRefs": [
+            "srlo_corrected"
+          ]
+        }
+      ]
+    },
+    "report": {
+      "key": "online_learning_regulation_procrastination_zh_cn_report",
+      "version": "0.1.0",
+      "locale": "zh-CN",
+      "blocks": [
+        {
+          "blockId": "core",
+          "kind": "conclusions",
+          "title": "努力调节与拖延：一个可讨论的主题",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "ol1",
+            "ol2",
+            "ol3",
+            "ol4",
+            "continuous"
+          ]
+        },
+        {
+          "blockId": "evidence",
+          "kind": "evidence",
+          "title": "独立原分：SRLO十维均分1–7；IPS总分9–45。r=(努力调节−1)/6，d=(IPS−9)/36，仅为理论量尺位置。",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": []
+        },
+        {
+          "blockId": "emotion",
+          "kind": "conclusions",
+          "title": "单独理解负性学习情绪",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": [
+            "negative_emotion_meaning"
+          ]
+        },
+        {
+          "blockId": "scope",
+          "kind": "limitations",
+          "title": "适用范围与当前草稿边界",
+          "audience": [
+            "student"
+          ],
+          "ruleIds": []
+        }
+      ],
+      "states": {
+        "missing": "用于当前讨论的信息不完整，不补零或强行分型。请分别查看已有单项结果；当前V1按维度保留解释的能力尚待共享接线。",
+        "limited": "本次结果存在质量限制，暂不根据组合推断个人特征。",
+        "unavailable": "当前版本、适用条件、结果质量或已冻结披露条件不足以提供综合解释；不代表学习能力低。"
+      }
+    },
+    "scientific": {
+      "maturity": "EXPERIMENTAL",
+      "scope": "B14为18–22岁大学同一在线/混合课程的项目理论讨论模型；不是验证画像、自然类别、常模、诊断或因果干预。其他九维仅独立解释，不参与核心主题。",
+      "references": [
+        {
+          "id": "b14_design",
+          "citation": "B14项目理论设计及共享实施规范。原件为私有设计资料；本候选实现已确认的项目理论锚点及可选行动，不是作者截点、常模或已验证分类。",
+          "allowedClaims": [
+            "cross_source_condition",
+            "independent_summary"
+          ]
+        },
+        {
+          "id": "srlo_corrected",
+          "citation": "Broadbent, Panadero, Lodge, & Fuller-Tyszkiewicz. The self-regulation for learning online (SRL-O) questionnaire. DOI:10.1007/s11409-022-09319-6；勘误DOI:10.1007/s11409-022-09323-w。复用b92c69aefa2472775fa7ee86b9c208366886c908修正后Table8工作译稿、十维均分与来源说明；CC BY 4.0，翻译非官方中文。",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        },
+        {
+          "id": "ips_2021",
+          "citation": "Shaw & Zhang (2021), DOI:10.3389/fpsyg.2021.768581。复用ips9_2021_zh_cn C1.0.0/S1.0.0/R1.1.0；反向2/6/9。一般拖延习惯，不改为已验证课程专用工具。",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        }
+      ]
+    },
+    "fixtures": {
+      "valid": {
+        "values": {
+          "online_academic_self_efficacy": {
+            "state": "present",
+            "value": 4
+          },
+          "online_intrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_extrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_negative_achievement_emotion": {
+            "state": "present",
+            "value": 4
+          },
+          "planning_time_management": {
+            "state": "present",
+            "value": 2
+          },
+          "metacognition": {
+            "state": "present",
+            "value": 4
+          },
+          "study_environment": {
+            "state": "present",
+            "value": 4
+          },
+          "online_effort_regulation": {
+            "state": "present",
+            "value": 5.75
+          },
+          "online_social_support": {
+            "state": "present",
+            "value": 4
+          },
+          "online_task_strategies": {
+            "state": "present",
+            "value": 4
+          },
+          "procrastination": {
+            "state": "present",
+            "value": 38
+          },
+          "subject_age_years": {
+            "state": "present",
+            "value": 20
+          },
+          "university_student_confirmed": {
+            "state": "present",
+            "value": true
+          },
+          "course_id": {
+            "state": "present",
+            "value": "synthetic-course-b14"
+          },
+          "course_mode": {
+            "state": "present",
+            "value": "online"
+          },
+          "learning_stage": {
+            "state": "present",
+            "value": "synthetic-week-4"
+          }
+        },
+        "expectedRuleIds": [
+          "ol2",
+          "negative_emotion_meaning"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "missing": {
+        "values": {
+          "online_academic_self_efficacy": {
+            "state": "present",
+            "value": 4
+          },
+          "online_intrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_extrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_negative_achievement_emotion": {
+            "state": "present",
+            "value": 4
+          },
+          "planning_time_management": {
+            "state": "present",
+            "value": 2
+          },
+          "metacognition": {
+            "state": "present",
+            "value": 4
+          },
+          "study_environment": {
+            "state": "present",
+            "value": 4
+          },
+          "online_effort_regulation": {
+            "state": "missing"
+          },
+          "online_social_support": {
+            "state": "present",
+            "value": 4
+          },
+          "online_task_strategies": {
+            "state": "present",
+            "value": 4
+          },
+          "procrastination": {
+            "state": "missing"
+          },
+          "subject_age_years": {
+            "state": "present",
+            "value": 20
+          },
+          "university_student_confirmed": {
+            "state": "present",
+            "value": true
+          },
+          "course_id": {
+            "state": "present",
+            "value": "synthetic-course-b14"
+          },
+          "course_mode": {
+            "state": "present",
+            "value": "online"
+          },
+          "learning_stage": {
+            "state": "present",
+            "value": "synthetic-week-4"
+          }
+        },
+        "expectedRuleIds": [
+          "negative_emotion_meaning"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "invalid": {
+        "values": {
+          "online_academic_self_efficacy": {
+            "state": "present",
+            "value": 4
+          },
+          "online_intrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_extrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_negative_achievement_emotion": {
+            "state": "present",
+            "value": 4
+          },
+          "planning_time_management": {
+            "state": "present",
+            "value": 2
+          },
+          "metacognition": {
+            "state": "present",
+            "value": 4
+          },
+          "study_environment": {
+            "state": "present",
+            "value": 4
+          },
+          "online_effort_regulation": {
+            "state": "invalid"
+          },
+          "online_social_support": {
+            "state": "present",
+            "value": 4
+          },
+          "online_task_strategies": {
+            "state": "present",
+            "value": 4
+          },
+          "procrastination": {
+            "state": "invalid"
+          },
+          "subject_age_years": {
+            "state": "present",
+            "value": 20
+          },
+          "university_student_confirmed": {
+            "state": "present",
+            "value": true
+          },
+          "course_id": {
+            "state": "present",
+            "value": "synthetic-course-b14"
+          },
+          "course_mode": {
+            "state": "present",
+            "value": "online"
+          },
+          "learning_stage": {
+            "state": "present",
+            "value": "synthetic-week-4"
+          }
+        },
+        "expectedRuleIds": [
+          "negative_emotion_meaning"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "not-applicable": {
+        "values": {
+          "online_academic_self_efficacy": {
+            "state": "present",
+            "value": 4
+          },
+          "online_intrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_extrinsic_motivation": {
+            "state": "present",
+            "value": 4
+          },
+          "online_negative_achievement_emotion": {
+            "state": "present",
+            "value": 4
+          },
+          "planning_time_management": {
+            "state": "present",
+            "value": 2
+          },
+          "metacognition": {
+            "state": "present",
+            "value": 4
+          },
+          "study_environment": {
+            "state": "present",
+            "value": 4
+          },
+          "online_effort_regulation": {
+            "state": "present",
+            "value": 5.75
+          },
+          "online_social_support": {
+            "state": "present",
+            "value": 4
+          },
+          "online_task_strategies": {
+            "state": "present",
+            "value": 4
+          },
+          "procrastination": {
+            "state": "present",
+            "value": 38
+          },
+          "subject_age_years": {
+            "state": "present",
+            "value": 20
+          },
+          "university_student_confirmed": {
+            "state": "present",
+            "value": false
+          },
+          "course_id": {
+            "state": "present",
+            "value": "synthetic-course-b14"
+          },
+          "course_mode": {
+            "state": "present",
+            "value": "online"
+          },
+          "learning_stage": {
+            "state": "present",
+            "value": "synthetic-week-4"
+          }
+        },
+        "expectedRuleIds": [],
+        "expectedKind": "UNAVAILABLE"
+      }
+    },
+    "publication": {
+      "requestedStatus": "DRAFT"
+    },
+    "context": {
+      "schemaVersion": 1,
+      "contextDefinitionKey": "online_learning_regulation_procrastination_zh_cn_context",
+      "contextDefinitionVersion": "0.1.0",
+      "fields": [
+        {
+          "contextKey": "subject_age_years",
+          "required": true,
+          "valueType": "number"
+        },
+        {
+          "contextKey": "university_student_confirmed",
+          "required": true,
+          "valueType": "boolean"
+        },
+        {
+          "contextKey": "course_id",
+          "required": true,
+          "valueType": "string"
+        },
+        {
+          "contextKey": "course_mode",
+          "required": true,
+          "valueType": "enum",
+          "enumValues": [
+            "online",
+            "blended"
+          ]
+        },
+        {
+          "contextKey": "learning_stage",
+          "required": true,
+          "valueType": "string"
+        }
+      ]
+    }
+  },
+  {
     "schemaVersion": 2,
     "manifest": {
       "definition": {

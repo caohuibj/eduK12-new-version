@@ -1,0 +1,28 @@
+{
+  "maturity": "EXPERIMENTAL",
+  "scope": "B14为18–22岁大学同一在线/混合课程的项目理论讨论模型；不是验证画像、自然类别、常模、诊断或因果干预。其他九维仅独立解释，不参与核心主题。",
+  "references": [
+    {
+      "id": "b14_design",
+      "citation": "B14项目理论设计及共享实施规范。原件为私有设计资料；本候选实现已确认的项目理论锚点及可选行动，不是作者截点、常模或已验证分类。",
+      "allowedClaims": [
+        "cross_source_condition",
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "srlo_corrected",
+      "citation": "Broadbent, Panadero, Lodge, & Fuller-Tyszkiewicz. The self-regulation for learning online (SRL-O) questionnaire. DOI:10.1007/s11409-022-09319-6；勘误DOI:10.1007/s11409-022-09323-w。复用b92c69aefa2472775fa7ee86b9c208366886c908修正后Table8工作译稿、十维均分与来源说明；CC BY 4.0，翻译非官方中文。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    },
+    {
+      "id": "ips_2021",
+      "citation": "Shaw & Zhang (2021), DOI:10.3389/fpsyg.2021.768581。复用ips9_2021_zh_cn C1.0.0/S1.0.0/R1.1.0；反向2/6/9。一般拖延习惯，不改为已验证课程专用工具。",
+      "allowedClaims": [
+        "independent_summary"
+      ]
+    }
+  ]
+}
