@@ -1,0 +1,29 @@
+{
+  "kind": "UNSIGNED_LOCAL_ARTIFACT_CHECKS",
+  "baseline": "d7d43535c8eac445918ae113a43b1cc04032d310",
+  "python": "3.13.5",
+  "execution": "current isolated conversation container",
+  "results": [
+    {"test": "__main__.ContentChecks.test_01_inventory", "status": "PASS", "seconds": 3.4211999945910065e-05},
+    {"test": "__main__.ContentChecks.test_02_forms_have_no_scoring_or_report", "status": "PASS", "seconds": 0.00019031799990898435},
+    {"test": "__main__.ContentChecks.test_03_form_keys_limits_and_conditions", "status": "PASS", "seconds": 0.00023619599994617602},
+    {"test": "__main__.ContentChecks.test_04_scale_native_shape_and_references", "status": "PASS", "seconds": 6.086200005483988e-05},
+    {"test": "__main__.ContentChecks.test_05_rtop_original_partition_and_ranges", "status": "PASS", "seconds": 3.498299997772847e-05},
+    {"test": "__main__.ContentChecks.test_06_teach_nine_scores_no_total", "status": "PASS", "seconds": 1.3239999930192425e-05},
+    {"test": "__main__.ContentChecks.test_07_teach_behavior_identity_and_na", "status": "PASS", "seconds": 2.4076000045170076e-05},
+    {"test": "__main__.ContentChecks.test_08_teach_snapshot_windows_and_missing", "status": "PASS", "seconds": 1.4552000038747792e-05},
+    {"test": "__main__.ContentChecks.test_09_licc_is_original_four_area_form", "status": "PASS", "seconds": 5.0286000032429e-05},
+    {"test": "__main__.ContentChecks.test_10_recipes_resolve_known_content", "status": "PASS", "seconds": 1.6635000065434724e-05},
+    {"test": "__main__.ContentChecks.test_11_teach_segments_do_not_merge", "status": "PASS", "seconds": 9.534000014355115e-06},
+    {"test": "__main__.ContentChecks.test_12_missing_binding_refused", "status": "PASS", "seconds": 0.00010537900004692347},
+    {"test": "__main__.ContentChecks.test_13_synthetic_binding_shape_and_distinct_blocks", "status": "PASS", "seconds": 0.00023534500007826864},
+    {"test": "__main__.ContentChecks.test_14_wrong_source_kind_refused", "status": "PASS", "seconds": 4.467799999474664e-05},
+    {"test": "__main__.ContentChecks.test_15_deterministic_files_and_hashes", "status": "PASS", "seconds": 0.007266226999945502}
+  ],
+  "inputs": {
+    "build_pack.py": "f56286233fd4d7f6b1c04a33d89fe4fa39cd70888ff7b8f4d95a0adebd57e9b0",
+    "teach-data.json": "0b94f3f643b235e09b08a2598a94c283d466fff238be2780563edfaa6abaa7ec",
+    "test_pack.py": "a2e0a5b84f962af2378191869e0e6aee343e985b380ab1ce1db9d1da6b1364f0"
+  },
+  "notExecuted": ["native TypeScript/Zod validators", "native scoreScale golden cases", "database install/publication", "browser", "formal CI", "production"]
+}
