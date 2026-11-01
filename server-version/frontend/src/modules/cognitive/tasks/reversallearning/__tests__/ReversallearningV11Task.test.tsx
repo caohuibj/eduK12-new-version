@@ -16,7 +16,7 @@ const enterFormal = () => {
   fireEvent.click(screen.getByText('开始正式测验'))
 }
 
-afterEach(() => { cleanup(); vi.useRealTimers() })
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers() })
 describe('reversal C1.1 participant feedback and research preparation', () => {
   it.each(['correct-but-unrewarded', 'incorrect'])('uses the identical negative message for %s and keeps it visible for 500 ms', async mode => {
     vi.useFakeTimers()
@@ -42,6 +42,41 @@ describe('reversal C1.1 participant feedback and research preparation', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(1) })
     expect(onTrialComplete).toHaveBeenCalledOnce()
     expect(onTrialComplete.mock.calls[0][0].choice).toBe(choice)
+  })
+
+  it('keeps the original absolute deadline after a page interruption and refuses a late choice', async () => {
+    vi.useFakeTimers()
+    const onTrialComplete = vi.fn().mockResolvedValue(true)
+    render(<ReversallearningTask taskContext={context()} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    enterFormal()
+    await act(async () => { await vi.advanceTimersByTimeAsync(1900) })
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    fireEvent(document, new Event('visibilitychange'))
+    await act(async () => { await vi.advanceTimersByTimeAsync(100) })
+    expect(screen.getByText('超时未选择')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '左侧符号' }))
+    await act(async () => { await vi.advanceTimersByTimeAsync(500) })
+    expect(onTrialComplete).toHaveBeenCalledOnce()
+    expect(onTrialComplete).toHaveBeenCalledWith({ choice: null, rtMs: null, interrupted: true })
+  })
+
+  it('retries saving the first choice and RT without allowing a different answer after feedback', async () => {
+    vi.useFakeTimers()
+    const onTrialComplete = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+    render(<ReversallearningTask taskContext={context()} trialIndex={0} onTrialComplete={onTrialComplete} />)
+    enterFormal()
+    await act(async () => { await vi.advanceTimersByTimeAsync(200) })
+    fireEvent.click(screen.getByRole('button', { name: '左侧符号' }))
+    await act(async () => { await vi.advanceTimersByTimeAsync(500) })
+    expect(onTrialComplete).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: '右侧符号' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: '右侧符号' }))
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000) })
+    fireEvent.click(screen.getByRole('button', { name: '重试保存本次选择' }))
+    await act(async () => {})
+    expect(onTrialComplete).toHaveBeenCalledTimes(2)
+    expect(onTrialComplete.mock.calls[0][0]).toEqual({ choice: 'left', rtMs: 200, interrupted: false })
+    expect(onTrialComplete.mock.calls[1][0]).toEqual(onTrialComplete.mock.calls[0][0])
   })
 
   it('runs all 30 local acquisition-only research practice trials without inventing an accuracy gate', () => {
