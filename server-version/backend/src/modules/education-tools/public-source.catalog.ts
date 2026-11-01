@@ -1,3 +1,5 @@
+import {catalogDiscoveryRecords,importedStandardDiscoveryRecords,discoveryJoin,discoverySqlFilter,discoveryFacets,sjtMetadataTagIds,jsonTagIds} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,matchesCatalogDiscovery,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -21,8 +23,8 @@ import {parseEducationPackageKey} from './package-reference.contracts'
 
 const key=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null)
 const useKey=z.string().max(240).refine(value=>parseEducationPublicSourceKey(value)!==null||parseEducationPackageKey(value)!==null)
-export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
-type EducationPublicCatalogCard={catalogKey:string;kind:'SCALE'|'FORM'|'COGNITIVE'|'SJT';sourceProvider:EducationPublicSourceHeader['kind'];sourceId:string;
+export const educationPublicCatalogQuery=z.object({cursor:key.optional(),kind:z.enum(['SCALE','FORM','COGNITIVE','SJT']).optional(),q:z.string().trim().max(160).optional(),...catalogDiscoveryQueryFields,responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
+type EducationPublicCatalogCard={classificationTags?:CatalogClassificationTag[];catalogKey:string;kind:'SCALE'|'FORM'|'COGNITIVE'|'SJT';sourceProvider:EducationPublicSourceHeader['kind'];sourceId:string;
  contentHash:string;artifactHash?:string;profile?:'experience'|'standard'|'research';title:string;language:string|null;versions:EducationPublicSourceHeader['versions'];requiredContextKeys:string[];referenceContextKeys:string[];
  sourceLabel:string;allowedActions:string[];runtimeStatus:string;canEditOriginal:false;canDistribute:false;unavailableReason?:string;
  authorizationMode?:'LEGACY';configurationName?:string;selectedBinding?:ReturnType<typeof selectedConfigurationPointer>}
@@ -92,10 +94,11 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
  const respondent=administration.responseMode==='SELF'?'SELF':administration.responseMode==='PARENT_REPORT'?'PARENT':administration.responseMode==='TEACHER_REPORT'?'TEACHER':'OBSERVER'
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
+  const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(tx)]
   // Deduplicate grant keys before the PK joins and paginate/search real source
   // headers in this single statement. No page-size sparse post-filter, no full
   // bodies, deep ancestry reads or per-card runtime materialization.
-  const candidates=await tx.$queryRaw<Array<EducationPublicSourceHeader&SelectedCatalogFacts>>(Prisma.sql`WITH authorized_grants AS (
+  const candidates=await tx.$queryRaw<Array<EducationPublicSourceHeader&SelectedCatalogFacts&{classificationTags:CatalogClassificationTag[]}>>(Prisma.sql`WITH authorized_grants AS (
    SELECT g.id,g.subject_id,g.issuer_id,g.resource_keys,g.version,g.valid_from,g.expires_at,typed.actor_id,typed.metadata
    FROM content_capability_grants g LEFT JOIN assessment_management_events typed ON typed.id=g.id AND typed.action=${EDUCATION_STANDARD_USE_ACTION}
    WHERE g.subject_id=${c.principal.userId} AND g.product=${c.entry} AND g.scope_kind='ORGANIZATION' AND g.scope_id=${c.organizationId}
@@ -128,10 +131,18 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
     JOIN LATERAL ${educationSjtHeaderSources(Prisma.sql`ARRAY[split_part(k.key,':',3)]`)} ON sjt_source.id=split_part(k.key,':',3)
     JOIN measurement_content_releases m ON m.id=sjt_source.measurement_release_id AND k.key='education-source:SJT_RELEASE:'||sjt_source.id||':'||m.content_hash
     WHERE m.layer='MEASUREMENT' AND m.family='SJT' AND m.status='PUBLISHED' AND m.scope->>'kind'='PLATFORM'
-  ), page AS (SELECT * FROM sources
+  ), classified AS (SELECT sources.*,discovery.tags AS "classificationTags",discovery.ids,discovery.terms FROM sources
+   LEFT JOIN survey_standard_releases standard ON sources.kind='STANDARD_SCALE' AND standard.id=sources.id
+   LEFT JOIN cognitive_test_configs cognitive ON sources.kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE') AND cognitive.id=sources.id
+   LEFT JOIN sjt_author_releases sjt ON sources.kind='SJT_RELEASE' AND sjt.id=sources.id
+   LEFT JOIN static_sjt_measurement_mappings static_sjt ON sources.kind='SJT_RELEASE' AND static_sjt.id=sources.id
+   LEFT JOIN survey_governed_tools form ON sources.kind='FORM' AND form.id=sources.id
+   ${discoveryJoin(records,{kind:Prisma.sql`CASE WHEN sources.kind='STANDARD_SCALE' THEN 'SCALE' WHEN sources.kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE') THEN 'COGNITIVE' WHEN sources.kind='SJT_RELEASE' THEN 'SJT' ELSE 'FORM' END`,key:Prisma.sql`COALESCE(standard.tool_key,cognitive.test_type,sjt.instrument_key,static_sjt.instrument_key)`,version:Prisma.sql`COALESCE(standard.snapshot->>'instrumentVersion',sjt.instrument_version,static_sjt.instrument_version)`,engine:Prisma.sql`cognitive.engine_version`,scoring:Prisma.sql`cognitive.scoring_version`},Prisma.sql`CASE WHEN sources.kind='FORM' THEN ${jsonTagIds(Prisma.sql`form.reference#>'{metadata,tags}'`)} WHEN sources.kind='SJT_RELEASE' THEN ${sjtMetadataTagIds(Prisma.sql`sjt.package->'definition'`)} ELSE '[]'::jsonb END`)}
+  ), page AS (SELECT classified.* FROM classified CROSS JOIN LATERAL (SELECT classified.ids,classified.terms) discovery
    WHERE (${input.cursor??null}::text IS NULL OR key COLLATE "C">${input.cursor??null} COLLATE "C")
     AND (${input.kind??null}::text IS NULL OR (${input.kind}='COGNITIVE' AND kind IN ('COGNITIVE_CONFIG','COGNITIVE_PROFILE')) OR kind=${input.kind==='SCALE'?'STANDARD_SCALE':input.kind==='COGNITIVE'?'COGNITIVE_CONFIG':input.kind==='SJT'?'SJT_RELEASE':'FORM'})
-    AND (${input.q??''}='' OR strpos(lower(title),lower(${input.q??''}))>0 OR EXISTS(SELECT 1 FROM authorized_grants named WHERE key=ANY(named.resource_keys) AND strpos(lower(named.metadata->>'configurationName'),lower(${input.q??''}))>0))
+    AND ${discoverySqlFilter([Prisma.sql`title`],input)}
+    AND (${input.q??''}='' OR ${discoverySqlFilter([Prisma.sql`title`],{keyword:input.q})} OR EXISTS(SELECT 1 FROM authorized_grants named WHERE key=ANY(named.resource_keys) AND strpos(lower(named.metadata->>'configurationName'),lower(${input.q??''}))>0))
    ORDER BY key COLLATE "C" LIMIT 41), shown_page AS (SELECT * FROM page ORDER BY key COLLATE "C" LIMIT 40), typed_page_grants AS (
     SELECT g.* FROM authorized_grants g WHERE g.actor_id IS NOT NULL AND EXISTS(SELECT 1 FROM shown_page p WHERE p.key=ANY(g.resource_keys))
     ORDER BY g.id LIMIT 129
@@ -144,7 +155,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
     FROM page ORDER BY key COLLATE "C"`)
   const selected=candidates.slice(0,40)
   const configured=await selectedEducationCatalogChoices(tx,c,selected)
-  return {list:selected.flatMap<EducationPublicCatalogCard>(header=>{
+  return {tagFacets:discoveryFacets(records),list:selected.flatMap<EducationPublicCatalogCard>(header=>{
    const declaration=header.kind==='FORM'?educationApplicabilitySchema.safeParse(header.applicability):null
    const native=['COGNITIVE_CONFIG','COGNITIVE_PROFILE','SJT_RELEASE'].includes(header.kind)
    const applicable=native?administration.responseMode==='SELF'&&['participant_self_report',c.entry==='SCHOOL'?'student_self_report':'teacher_self_report'].includes(header.nativeRespondentType??''):administration.responseMode==='EXPERT_REPORT'?supportsExpertSource(header.expertApplicability,administration)
@@ -156,7 +167,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    const contextUnavailable=['STUDENT_REPORT','EXPERT_REPORT'].includes(administration.responseMode)&&requiredContextKeys.length>0
    const summary:EducationPublicCatalogCard={
    catalogKey:header.key,kind:header.kind==='STANDARD_SCALE'?'SCALE':['COGNITIVE_CONFIG','COGNITIVE_PROFILE'].includes(header.kind)?'COGNITIVE':header.kind==='SJT_RELEASE'?'SJT':'FORM',sourceProvider:header.kind==='COGNITIVE_PROFILE'?'COGNITIVE_CONFIG':header.kind,sourceId:header.id,contentHash:header.kind==='COGNITIVE_PROFILE'?header.versions.measurementHash!:header.hash,...(header.kind==='COGNITIVE_PROFILE'?{artifactHash:header.hash,profile:header.versions.profile}:{}),
-   title:header.title,language:header.language,versions:header.versions,requiredContextKeys,referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
+   classificationTags:header.classificationTags,title:header.title,language:header.language,versions:header.versions,requiredContextKeys,referenceContextKeys:header.referenceContextKeys,sourceLabel:'获授权公共固定版本',
    allowedActions:applicable&&!contextUnavailable?['REFERENCE_FIXED_VERSION']:[],runtimeStatus:native?'CHECK_EXACT_NATIVE_AT_FREEZE':header.kind==='FORM'?'CHECK_EXACT_FORM_AT_FREEZE':header.nativeAvailable?'CHECK_EXACT_STANDARD_AT_FREEZE':'NATIVE_UNAVAILABLE',canEditOriginal:false,canDistribute:false,
    ...(native&&!applicable?{unavailableReason:'认知与 SJT 仅支持原生本人作答，不能用于他评。'}:{}),
    ...(header.kind==='STANDARD_SCALE'&&!applicable?{unavailableReason:header.nativeAvailable?'该版本未声明支持当前作答方式。':'原生量表尚未安装或已停止使用；授权不会创建执行程序。'}:{}),
@@ -164,7 +175,7 @@ export async function listEducationPublicSources(c:PrivateToolContext,raw:unknow
    ...(contextUnavailable?{unavailableReason:administration.responseMode==='EXPERT_REPORT'?'该版本需要受评教师的个人背景；当前专家观察不能用专家背景代替，原版内容与参数保持不变。':'该版本需要受评教师的个人背景才能计分，当前学生评教暂不支持。原版内容与参数保持不变。'}:{}),
    }
    const choices=configured.choices.get(header.key)??[]
-   const titleMatches=!input.q||header.title.toLowerCase().includes(input.q.toLowerCase())
+   const titleMatches=matchesCatalogDiscovery([header.title],header.classificationTags,{keyword:input.q})
    const exact=choices.filter(choice=>titleMatches||choice.configurationName?.toLowerCase().includes(input.q!.toLowerCase())).map(choice=>({...summary,catalogKey:header.key+':use:'+choice.selectedBinding.authorizationId,
     configurationName:choice.configurationName??header.title,selectedBinding:choice.selectedBinding,
     ...(choice.ambiguous?{allowedActions:[],unavailableReason:'存在多条同名或未命名配置，请管理员明确使用配置名称。'}:{})}))

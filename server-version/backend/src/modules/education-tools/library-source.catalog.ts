@@ -1,3 +1,5 @@
+import {catalogDiscoveryRecords,discoveryFacets,discoveryJoin,discoverySqlFilter} from '../survey/catalog-discovery'
+import {catalogDiscoveryQueryFields,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -10,8 +12,8 @@ import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {educationCompositionResponseModeSchema,educationCompositionAdministrationForEntry} from './private-tool.composition-contracts'
 import {expertTargetKindSchema} from './expert-observation.contract'
 
-export const educationLibraryCatalogQuery=z.object({cursor:z.string().guid().optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional()}).strict()
-type Header={entryId:string;releaseId:string;contentHash:string;snapshotHash:string;title:string;sourceProduct:string;version:string;
+export const educationLibraryCatalogQuery=z.object({cursor:z.string().guid().optional(),q:z.string().trim().max(160).optional(),responseMode:educationCompositionResponseModeSchema.optional(),targetKind:expertTargetKindSchema.optional(),...catalogDiscoveryQueryFields}).strict()
+type Header={classificationTags?:CatalogClassificationTag[];entryId:string;releaseId:string;contentHash:string;snapshotHash:string;title:string;sourceProduct:string;version:string;
  language:string|null;nativeReportVersion:string|null;compatible:boolean;dependencies:Array<{releaseId:string;contentHash:string;layer:string;version:string}>}
 const libraryHeaderFields=(entry:'SCHOOL'|'TEACHER',responseMode:unknown='SELF',targetKind?:unknown)=>Prisma.sql`e.id AS "entryId",e.release_id AS "releaseId",m.content_hash AS "contentHash",
  s.snapshot_hash AS "snapshotHash",s.snapshot->>'title' AS title,s.product AS "sourceProduct",m.version,
@@ -29,7 +31,7 @@ const libraryHeaderFields=(entry:'SCHOOL'|'TEACHER',responseMode:unknown='SELF',
    OR stop.target_kind='TRAINING_SCALE' AND EXISTS(SELECT 1 FROM scales installed WHERE installed.library_entry_id=e.id AND installed.id=stop.target_id))) AS compatible,
  (SELECT COALESCE(jsonb_agg(jsonb_build_object('releaseId',dep.id,'contentHash',dep.content_hash,'layer',dep.layer,'version',dep.version) ORDER BY dep.id),'[]')
   FROM measurement_content_releases dep WHERE dep.id=ANY(s.dependency_release_ids)) AS dependencies`
-const projectLibraryHeader=(row:Header)=>({catalogKey:`education-library-source:${row.entryId}:${row.snapshotHash}`,kind:'SCALE' as const,
+const projectLibraryHeader=(row:Header)=>({classificationTags:row.classificationTags??[],catalogKey:`education-library-source:${row.entryId}:${row.snapshotHash}`,kind:'SCALE' as const,
  sourceProvider:'LIBRARY_SCALE' as const,sourceId:row.entryId,contentHash:row.snapshotHash,measurement:{releaseId:row.releaseId,contentHash:row.contentHash},
  title:row.title,sourceProduct:row.sourceProduct,language:row.language,versions:{content:row.version,
   parameters:row.dependencies.filter(d=>d.layer==='REFERENCE').map(d=>d.version).join('、')||null,
@@ -131,11 +133,13 @@ export async function listEducationLibrarySources(c:PrivateToolContext,raw:unkno
  const administration=educationCompositionAdministrationForEntry(c.entry,input.responseMode,input.targetKind)
  return prisma.$transaction(async tx=>{
   await authorizePrivateTool(tx,c)
-  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT ${libraryHeaderFields(c.entry,administration.responseMode,input.targetKind)}
+  const rows=await tx.$queryRaw<Header[]>(Prisma.sql`SELECT discovery.tags AS "classificationTags",${libraryHeaderFields(c.entry,administration.responseMode,input.targetKind)}
    FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id AND s.status='APPROVED'
    JOIN measurement_content_releases m ON m.id=e.release_id AND m.layer='MEASUREMENT' AND m.family='SCALE' AND m.status='PUBLISHED'
+   LEFT JOIN scales source ON s.product='TRAINING' AND source.id=s.source_id AND source.creator_id=s.author_id
+   ${discoveryJoin([],{kind:Prisma.sql`NULL`,key:Prisma.sql`NULL`,version:Prisma.sql`NULL`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`},Prisma.sql`to_jsonb(source.tags)`)}
    WHERE e.status='ACTIVE' AND (${input.cursor??null}::text IS NULL OR e.id>${input.cursor??null})
-    AND (${input.q??''}='' OR strpos(lower(s.snapshot->>'title'),lower(${input.q??''}))>0)
+    AND ${discoverySqlFilter([Prisma.sql`s.snapshot->>'title'`],{...input,keyword:[input.q,input.keyword].filter(Boolean).join(' ')})}
     AND EXISTS(SELECT 1 FROM scale_library_use_grants g WHERE g.entry_id=e.id AND g.product=${c.entry}
      AND g.organization_id=${c.organizationId} AND g.status='ACTIVE'
      AND ((g.scope_kind='USER' AND g.user_id=${c.principal.userId}) OR (g.scope_kind='ORGANIZATION' AND g.user_id IS NULL)))
@@ -143,7 +147,7 @@ export async function listEducationLibrarySources(c:PrivateToolContext,raw:unkno
   const scanned=rows.slice(0,120),allowed=await readEducationLibrarySourceUses(tx,c,scanned.map(row=>row.entryId))
   const visible=scanned.filter(row=>allowed.has(row.entryId)),selected=visible.slice(0,40)
   const moreVisible=visible.length>40,moreCandidates=rows.length>120
-  return {list:selected.map(projectLibraryHeader),
+  return {tagFacets:discoveryFacets(catalogDiscoveryRecords()),list:selected.map(projectLibraryHeader),
    nextCursor:moreVisible?selected.at(-1)!.entryId:moreCandidates?scanned.at(-1)!.entryId:null}
  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }

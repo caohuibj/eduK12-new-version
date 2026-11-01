@@ -21,6 +21,7 @@ import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
+import {catalogClassificationTags} from '../scale/library/catalog-discovery'
 
 export type BundleActor = { userId: string; role: UserRole }
 export const author = (actor: BundleActor) => {
@@ -221,7 +222,7 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       let allowed = true
       let publicationBlockers: string[] = []
       try { await eligible(actor, definition.bundleKey, definition.bundleVersion) } catch (error: any) { allowed = false; publicationBlockers = [error.message] }
-      return { ...definition, ...(allowed && entry.declarativePackage ? { status: 'PUBLISHED' } : {}), canInstantiate: allowed && process.env.BUNDLE_PRODUCTS_ENABLED === 'true',
+      return { ...definition,classificationTags:catalogClassificationTags({}, {population:{respondentTypes:definition.respondentTypes,minAge:definition.population.subjectMinAgeYears,maxAge:definition.population.subjectMaxAgeYears}}), ...(allowed && entry.declarativePackage ? { status: 'PUBLISHED' } : {}), canInstantiate: allowed && process.env.BUNDLE_PRODUCTS_ENABLED === 'true',
         publicationBlockers }
     }))
   }

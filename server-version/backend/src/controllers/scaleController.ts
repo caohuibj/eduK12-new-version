@@ -1,4 +1,6 @@
 import { ScaleLibraryError } from '../modules/scale-library-governance/contracts'
+import {catalogDiscoveryRecords,importedStandardDiscoveryRecords} from '../modules/survey/catalog-discovery'
+import {catalogTagsFromIds,catalogTagFacets} from '../modules/scale/library/catalog-discovery'
 import {canReadLibraryScale} from '../modules/scale-library-governance/readers'
 import { setScalePublicDelivery } from '../modules/scale/scale-public-delivery'
 import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
@@ -153,12 +155,13 @@ export const scaleController = {
       // Opt-in directory DTO; default authoring/list clients retain their full
       // contract. Resolve current visibility above for both paths, unchanged.
       if (req.query.view === 'training-catalog') {
+        const records=[...catalogDiscoveryRecords(),...await importedStandardDiscoveryRecords(prisma)]
         const [list, total] = await Promise.all([
           prisma.scale.findMany({
             where,
             select: {
               id: true, name: true, code: true, instrumentVersion: true,
-              instrumentClass: true, libraryEntryId: true, status: true, description: true,
+              instrumentClass: true, libraryEntryId: true, status: true, description: true,tags:true,
             },
             orderBy: { createdAt: 'desc' },
             skip: pagination.skip,
@@ -166,7 +169,7 @@ export const scaleController = {
           }),
           prisma.scale.count({ where }),
         ])
-        return success(res, buildPaginatedResult(list, total, pagination))
+        return success(res, {...buildPaginatedResult(list.map(row=>({...row,classificationTags:[...new Map([...catalogTagsFromIds(row.tags??[]),...(records.find(record=>record.kind==='SCALE'&&record.key===row.code&&record.version===row.instrumentVersion)?.tags??[])].map(tag=>[tag.id,tag])).values()]})), total, pagination),tagFacets:catalogTagFacets(records.filter(record=>record.kind==='SCALE').map(record=>record.tags))})
       }
 
       // 并行查询量表列表和总数

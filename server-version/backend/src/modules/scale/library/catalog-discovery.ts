@@ -49,11 +49,22 @@ const languageLabels: Record<string, string> = { 'zh-CN': '简体中文', 'zh-TW
 const namespaces:Record<string,CatalogTagFacet>={domain:'domain',construct:'construct',orientation:'orientation',population:'population',response:'response',use:'use',license:'license',language_validation:'language',language:'language',subject:'subject'}
 const dictionary:Record<string,{label:string;axis:string}>=sourceTagLabels
 const classification=(id:string):{label:string;facet:CatalogTagFacet}=>{
+  if(Object.prototype.hasOwnProperty.call(domains,id))return {label:domains[id],facet:'domain'}
+  if(id.startsWith('sjt-construct:'))return {label:id.slice(14),facet:'construct'}
+  if(id.startsWith('respondent:'))return {label:respondentLabels[id.slice(11)]??id.slice(11),facet:'population'}
+  if(id.startsWith('language:'))return {label:languageLabels[id.slice(9)]??id.slice(9),facet:'language'}
+  const age=/^age:(\d+(?:\.\d+)?)?-(\d+(?:\.\d+)?)?$/.exec(id)
+  if(age&&(age[1]||age[2]))return {label:!age[1]?age[2]+'岁及以下':!age[2]?age[1]+'岁及以上':age[1]+'–'+age[2]+'岁',facet:'population'}
   if(Object.prototype.hasOwnProperty.call(labels,id))return labels[id]
   const term=Object.prototype.hasOwnProperty.call(dictionary,id)?dictionary[id]:undefined
   const namespace=term?.axis??id.split(':')[0]
   return {label:term?.label??id,facet:Object.prototype.hasOwnProperty.call(namespaces,namespace)?namespaces[namespace]:'other'}
 }
+
+/** Reuse the source dictionary for existing free tags, without inferring new
+ * applicability or requiring a tool to be classified before publication. */
+export const catalogTagsFromIds=(ids:readonly string[]=[])=>[...new Set(ids)].map(id=>({id,...classification(id)}))
+export const catalogTagDictionary=()=>Object.fromEntries([...new Set([...Object.keys(dictionary),...Object.keys(labels),...Object.keys(domains),...Object.keys(respondentLabels).map(id=>'respondent:'+id),...Object.keys(languageLabels).map(id=>'language:'+id)])].map(id=>[id,classification(id)]))
 
 export function catalogClassificationTags(construct: { constructOverlapTags?: readonly string[]; primaryDomain?: string }, metadata: ClassificationMetadata = {}): CatalogClassificationTag[] {
   const result = [...new Set(construct.constructOverlapTags ?? [])].map(id => ({

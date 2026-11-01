@@ -28,7 +28,7 @@ const pagination = z.object({ page: z.coerce.number().int().min(1).max(500).defa
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), handle(req => service.available(req.user!.userId)))
 // The same current 21B entry distribution authority; no course approval route.
 router.get('/standard-combinations/catalog',authenticate,platformSurveyOriginGuard,
-  handle(req=>trainingStandardManagementCatalog(req.user!.userId,req.query.page)))
+  handle(req=>trainingStandardManagementCatalog(req.user!.userId,req.query)))
 router.get('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
   handle(req=>trainingStandardManagementGrants(req.user!.userId,req.params.combinationId,req.query)))
 router.get('/standard-combinations/:combinationId/use-requests/:requestId',authenticate,platformSurveyOriginGuard,(req,res,next)=>{res.setHeader('Cache-Control','no-store');next()},

@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {schoolTrackingOptions,createNextSchoolTrackingActivity,removeSchoolTrackingDraftSource} from './personal-tracking'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
@@ -43,7 +44,7 @@ router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/asse
   authenticateSchool,wrap(async(req,res)=>{
     const scope=runPath.parse(req.params)
     await assertCampusActivityRunEditor({actor:req.user!,...scope})
-    const query=z.object({expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional()}).strict().parse(req.query)
+    const query=z.object({expectedVersion:z.coerce.number().int().min(1).max(Number.MAX_SAFE_INTEGER),cursor:uuid.optional(),...catalogDiscoveryQueryFields}).strict().parse(req.query)
     return success(res,await listEducationAssessmentResources({product:'SCHOOL',...scope,workflowId:scope.courseId,...query,actor:req.user!}))
   })
 )
