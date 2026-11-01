@@ -113,6 +113,18 @@ describe('versioned derived Bundle core',()=>{
     const raw=rawPackage();raw.report.blocks[0].audience=['teacher'];const hidden=project(parseDeclarativePackage(raw) as DerivedPackage)
     expect(hidden.rows).toEqual([]);expect(hidden.conclusions).toEqual([]);expect(hidden.theme).toBeNull()
   })
+  it('omits protected quality for any row dependency and for hidden numeric inputs',()=>{
+    const pack=checked(),e=evidence(pack),policies=new Map(pack.manifest.definition.slots.map(s=>[s.slotKey,{...caps}]))
+    e.find(e=>e.evidenceKey==='r')!.quality='limited'
+    policies.get('strategies')!.resultQualityDetails=false
+    policies.get('task')!.resultQualityDetails=false
+    const out=project(pack,e,{policies})
+    expect(out.rows.find(r=>r.rowKey==='c_row')?.quality).toBe('interpretable')
+    for(const key of ['r_row','r_axis','n_row','accuracy_row'])expect(out.rows.find(r=>r.rowKey===key)).not.toHaveProperty('quality')
+    expect(out.rows.find(r=>r.rowKey==='r_row')).toMatchObject({state:'present',value:39/7})
+    const available=new Set(pack.evidence.map(e=>e.evidenceKey));available.delete('c')
+    expect(project(pack,e,{availableEvidenceKeys:available}).rows.find(r=>r.rowKey==='c_row')).not.toHaveProperty('quality')
+  })
   it('refuses scripts, unknown inputs, chains, context arithmetic and cross-source maximum sets',()=>{
     for(const mutate of [(p:any)=>p.rules.derivations.push({key:'evil',op:'eval',code:'process.exit()'}),(p:any)=>p.rules.derivations[0].input='unknown',(p:any)=>p.rules.derivations[0].input='n',(p:any)=>p.rules.derivations[4].inputs[0]='nfc',(p:any)=>p.report.blocks[0].rowKeys.push('unknown')]){const p=rawPackage();mutate(p);expect(()=>parseDeclarativePackage(p)).toThrow()}
     const p=rawPackage();p.evidence[0].role='CONTEXT';expect(()=>parseDeclarativePackage(p)).toThrow()
