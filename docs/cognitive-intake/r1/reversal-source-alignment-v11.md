@@ -37,3 +37,7 @@
 - 初次后端用例加载/定向types因把当前Zod4当Zod3使用innerType失败，未运行cases；已用当前安装库支持的safeExtend复用原strict schema及原refine，定向2 cases实际通过。修后后端任务依赖闭包types为0诊断。前端首次定向types误用solution tsconfig（无jsx/target）失败，改用实际tsconfig.app.json并纳入项目既有vite-env声明后，发现并修正本组浏览器timer ref的number/Node.Timeout类型，最终前端依赖闭包types为0诊断。不将初次失败改写为通过。
 - 本地计时为fake-timer组件合同，不是真设备/真人500毫秒校准；未执行数据库、全量业务回归、完整CI、安装或生产操作。
 - task-package增加新身份和前端导出，**共享generated由D统一生成/合成**，本分支未改。R1报告分支与本片的reversallearning participant-presentation入口有明确合成点：保留本片两C身份与旧原件，再将R1文字分别绑定对应C/P；研究30题/2秒说明仅属于新C。不能机械用R1旧单身份入口覆盖新版。
+
+## C1.1独审反例修复
+
+新增2个定向反例先红后绿：1.9秒切页改变interrupted后，仍按原试次起点在2秒截止，不重开整2秒，晚点击不改变超时null；看到反馈后保存false时锁定第一次choice/RT/interrupted，只提供“重试保存本次选择”，不再重新选择或重算RT。两个用例修前实际失败，修后2 PASS，其余未变用例不为凑数重跑。旧C保持原调度及保存失败行为。新R明确正式2秒、练习自定步速，500毫秒为正式反馈调度下限，不能称实机校准通过。

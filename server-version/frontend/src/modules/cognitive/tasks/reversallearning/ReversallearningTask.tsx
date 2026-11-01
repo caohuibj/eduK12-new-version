@@ -5,6 +5,7 @@ import { reversallearningSequence, type ReversallearningTrialSpec } from '../sha
 
 type Phase = 'instruction' | 'practice' | 'practice-feedback' | 'practice-result' | 'formal'
 type Choice = 'left' | 'right'
+type FormalPayload = { choice: Choice | null; rtMs: number | null; interrupted: boolean }
 
 const PRACTICE = reversallearningSequence('reversallearning-practice-v1.0.0', 4, 2, 2, 0.8)
 
@@ -52,6 +53,10 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
   const [feedback, setFeedback] = useState('')
   const [interrupted, setInterrupted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
+  const pendingPayloadRef = useRef<FormalPayload | null>(null)
+  const savingRef = useRef(false)
+  const interruptedRef = useRef(false)
   const [completionPending, setCompletionPending] = useState(false)
   const startedAtRef = useRef(0)
   const respondedRef = useRef(false)
@@ -64,6 +69,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
     if (phase !== 'formal') return
     startedAtRef.current = performance.now()
     respondedRef.current = false
+    if (revised) { pendingPayloadRef.current = null; savingRef.current = false; interruptedRef.current = false; setSaveFailed(false) }
     setFeedback('')
     setSubmitting(false)
   }, [phase, trialIndex])
@@ -71,23 +77,28 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
   useEffect(() => {
     if (phase !== 'formal') return
     const onVisibilityChange = () => {
-      if (document.hidden) setInterrupted(true)
+      if (document.hidden) { interruptedRef.current = true; setInterrupted(true) }
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
     return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [phase])
 
-  const submitFormal = useCallback(async (choice: Choice | null, rtMs: number | null, timedOut = false) => {
-    if (phase !== 'formal' || respondedRef.current || submitting || completionRequestedRef.current) return
+  const submitFormal = useCallback(async (choice: Choice | null, rtMs: number | null, timedOut = false, retry = false) => {
+    if (phase !== 'formal' || submitting || completionRequestedRef.current) return
+    if (revised ? savingRef.current || (pendingPayloadRef.current !== null && !retry) : respondedRef.current) return
+    const firstSave = !revised || pendingPayloadRef.current === null
+    if (revised && firstSave) pendingPayloadRef.current = { choice, rtMs, interrupted: interruptedRef.current || timedOut }
+    const payload = revised ? pendingPayloadRef.current! : { choice, rtMs, interrupted: interrupted || timedOut }
     respondedRef.current = true
+    if (revised) { savingRef.current = true; setSaveFailed(false) }
     setSubmitting(true)
     try {
-      if (revised) await new Promise<void>(resolve => { feedbackTimerRef.current = window.setTimeout(resolve, 500) })
-      const accepted = await onTrialComplete({ choice, rtMs, interrupted: interrupted || timedOut })
+      if (revised && firstSave) await new Promise<void>(resolve => { feedbackTimerRef.current = window.setTimeout(resolve, 500) })
+      const accepted = await onTrialComplete({ ...payload })
       if (accepted === false) {
-        respondedRef.current = false
+        if (revised) { setSaveFailed(true); setFeedback('保存尚未确认，请重试保存本次选择。答案和用时已固定。') }
+        else { respondedRef.current = false; setFeedback('提交未成功，请重新选择；请勿重复点击。') }
         setSubmitting(false)
-        setFeedback('提交未成功，请重新选择；请勿重复点击。')
         return
       }
       if (trialIndex + 1 >= sequence.length) {
@@ -98,18 +109,22 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
         setInterrupted(false)
       }
     } catch {
-      respondedRef.current = false
+      if (revised) {
+        if (completionRequestedRef.current) setFeedback('答案已保存，请重试完成测评。')
+        else { setSaveFailed(true); setFeedback('网络暂时不可用，请重试保存本次选择。答案和用时已固定。') }
+      } else { respondedRef.current = false; setFeedback('网络暂时不可用，请重试本题。') }
       setSubmitting(false)
-      setFeedback('网络暂时不可用，请重试本题。')
-    }
+    } finally { if (revised) savingRef.current = false }
   }, [interrupted, onTaskComplete, onTrialComplete, phase, sequence.length, submitting, trialIndex, revised])
 
   useEffect(() => {
-    if (phase !== 'formal') return
+    if (phase !== 'formal' || (revised && pendingPayloadRef.current !== null)) return
+    // C1.1 keeps one trial onset even when interruption/save state changes callbacks.
+    const remainingMs = revised ? Math.max(0, startedAtRef.current + trialTimeoutMs - performance.now()) : trialTimeoutMs
     const timer = window.setTimeout(() => {
       if (revised && !respondedRef.current) setFeedback('超时未选择')
       void submitFormal(null, null, true)
-    }, trialTimeoutMs)
+    }, remainingMs)
     return () => window.clearTimeout(timer)
   }, [phase, submitFormal, trialIndex, trialTimeoutMs, revised])
 
@@ -141,7 +156,9 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
 
   const handleFormalChoice = (choice: Choice) => {
     if (!formalSpec || submitting || respondedRef.current) return
-    const rtMs = Math.max(0, Math.round(performance.now() - startedAtRef.current))
+    const elapsedMs = performance.now() - startedAtRef.current
+    if (revised && elapsedMs >= trialTimeoutMs) { setFeedback('超时未选择'); void submitFormal(null, null, true); return }
+    const rtMs = Math.max(0, Math.round(elapsedMs))
     setFeedback(feedbackFor(formalSpec, choice, rewardProbability, revised))
     void submitFormal(choice, rtMs)
   }
@@ -209,6 +226,7 @@ export const ReversallearningTask: React.FC<CognitiveTaskProps> = ({
           )
         })}
       </div>
+      {revised && saveFailed && <button type="button" disabled={submitting} onClick={() => void submitFormal(null, null, false, true)} className="btn-secondary mt-5">重试保存本次选择</button>}
       {feedback && <p className="mt-5 text-sm text-amber-700">{feedback}</p>}
       {phase === 'formal' && interrupted && <p className="mt-3 text-xs text-amber-700">检测到页面切换，中断状态会随正式试次提交。</p>}
       {phase === 'formal' && completionPending && onTaskComplete && <button type="button" onClick={retryCompletion} className="btn-secondary mt-5">重试完成测评</button>}
