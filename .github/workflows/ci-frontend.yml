@@ -3,6 +3,9 @@ name: CI frontend component
 on:
   workflow_call:
     inputs:
+      catalog_discovery:
+        type: boolean
+        default: false
       survey_selection:
         type: boolean
         default: false
@@ -102,13 +105,24 @@ jobs:
         if: inputs.survey_selection != true && inputs.affected_only != true
         run: npm test
       - name: dependency-related frontend tests
-        if: inputs.affected_only
+        if: inputs.affected_only && inputs.catalog_discovery != true
         run: |
           npm test -- --changed "$CI_BASE_SHA" --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/frontend-affected.json"
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
           const report=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/frontend-affected.json','utf8'));
           if(report.success!==true||!(report.numPassedTests>0)||report.numFailedTests!==0)throw Error('Affected frontend tests missing or failed');
+          JS
+      - name: affected catalog selectors and paging contracts
+        if: inputs.catalog_discovery
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const checks=JSON.parse(readFileSync('../../.github/config/catalog-discovery-checks.json','utf8'));
+          const files=checks.tests.filter(f=>f.startsWith('server-version/frontend/')).map(f=>f.slice('server-version/frontend/'.length));
+          execFileSync('npm',['test','--',...files,'--reporter=default','--reporter=json','--outputFile=/tmp/catalog-frontend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['../backend/scripts/assert-release-test-report.mjs','/tmp/catalog-frontend.json',...files],{stdio:'inherit'});
           JS
       - name: affected Wave selector and direct consumers
         if: inputs.survey_selection

@@ -1173,12 +1173,13 @@ jobs:
     # Run independently; the aggregate still requires both successful jobs.
     needs: scope
     name: frontend (lint + types + selected tests)
-    if: ${{ needs.scope.outputs.scenario != 'backend' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))) }}
+    if: ${{ (needs.scope.outputs.scenario != 'catalog-discovery' || github.event.pull_request.draft == false) && (needs.scope.outputs.scenario != 'backend' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (!cancelled() && ((needs.scope.outputs.frontend_affected == 'true' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'frontend-test' && github.event_name == 'pull_request') || (needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && (needs.scope.outputs.frontend == 'true' || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
+      catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
 
   browser:
     name: browser (seeded Situational Bundle + static visual acceptance)
@@ -1202,6 +1203,7 @@ jobs:
     with:
       frontend_only: ${{ needs.scope.outputs.frontend == 'true' || needs.scope.outputs.dependencies_frontend_only == 'true' }}
       backend_only: ${{ needs.scope.outputs.scenario == 'backend' }}
+      catalog_discovery: ${{ needs.scope.outputs.scenario == 'catalog-discovery' }}
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
 
   codeql:
@@ -3654,12 +3656,76 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+  catalog-discovery:
+    name: catalog query and permission contracts
+    needs: scope
+    if: ${{ needs.scope.outputs.scenario == 'catalog-discovery' && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CI: 'true'
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      LIBRARY_DISCOVERY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      JWT_SECRET: ci-jwt-secret-123456789012345678901234
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      UPLOAD_DIR: /tmp/catalog-ci-uploads
+      COGNITIVE_MODULE_ENABLED: 'true'
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: canvas dependency prerequisites
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: locked test dependencies and Prisma client
+        working-directory: server-version/backend
+        run: |
+          npm ci
+          npx prisma generate
+      - name: changed image build controls
+        run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs
+      - name: existing catalog unit and temporary-table PostgreSQL contracts
+        working-directory: server-version/backend
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          const {backendChecks}=JSON.parse(readFileSync('../../.github/config/catalog-discovery-checks.json','utf8'));
+          const files=[...backendChecks.unitFiles,...backendChecks.postgresFiles];
+          execFileSync('npm',['test','--',...files,'--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/tmp/catalog-backend.json'],{stdio:'inherit'});
+          execFileSync(process.execPath,['scripts/assert-release-test-report.mjs','/tmp/catalog-backend.json',...files],{stdio:'inherit'});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: catalog-query-${{ github.sha }}
+          path: /tmp/catalog-backend.json
+          if-no-files-found: error
+          retention-days: 3
+
   merge-gate:
     name: ${{ (((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
       || github.ref_name == 'fix/runtime-time-and-validation-20261025') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
       && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
+    - catalog-discovery
     - personal-tracking
     - survey-governance
     - post356

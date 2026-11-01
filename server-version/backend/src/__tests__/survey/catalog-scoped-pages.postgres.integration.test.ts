@@ -1,5 +1,6 @@
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
 import {Prisma,PrismaClient,UserRole} from '@prisma/client'
+import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
 
 vi.mock('../../config/database',()=>({prisma:{materialGrant:{findMany:async()=>[{resourceId:'granted'}]}}}))
 vi.mock('../../modules/survey/standard-triplet.catalog',async original=>({...await original<object>(),readOnlineStandardSnapshot:vi.fn(async()=>({definitionDigest:'exact-imported-digest'}))}))
@@ -13,8 +14,9 @@ import {catalogTagFacets,type CatalogClassificationTag} from '../../modules/scal
 
 let db:PrismaClient
 beforeAll(async()=>{
- const url=process.env.LIBRARY_DISCOVERY_TEST_DATABASE_URL
- if(!url||!/^postgres(?:ql)?:\/\/postgres@127\.0\.0\.1:\d+\/postgres(?:\?|$)/.test(url))throw Error('Task-owned PostgreSQL fixture required')
+ const url=integrationDatabaseUrl('LIBRARY_DISCOVERY_TEST_DATABASE_URL')
+ if(!url)throw Error('Explicit isolated PostgreSQL fixture required')
+ requireIsolatedReleaseDatabase(url)
  db=new PrismaClient({datasources:{db:{url}}});await db.$connect()
 })
 afterAll(async()=>{await db?.$disconnect()})

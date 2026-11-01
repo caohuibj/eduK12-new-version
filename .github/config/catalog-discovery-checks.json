@@ -120,10 +120,5 @@
     "database": "temporary tables only; isolated postgres16 service; no migrations, seed or Redis",
     "compile": "reuse production backend Docker build, no separate tsc build"
   },
-  "reuseBoundary": "Previously passed assertions are not execution success of a new workflow; preserve failure continuations. Existing admission helpers are candidate-bound and cannot admit this patch as-is.",
-  "integrationMissing": [
-    "Wire catalog-discovery query proof job into ci.yml and merge-gate needs; until then it is a required missing job, never success.",
-    "ci-frontend.yml affected_only still executes tests: accept reviewed existing evidence or select only missing assertions; do not silently skip or replay every case.",
-    "ci-images.yml still calls backend npm run build with full content onboarding; reuse its production builder and existing applicable compilation, exclude unchanged content qualification."
-  ]
+  "reuseBoundary": "Reuse existing manual HTTP/page evidence. The explicitly selected automated unit/PG/React cases run once in this formal CI, as authorized; no new historical-admission mechanism."
 }
