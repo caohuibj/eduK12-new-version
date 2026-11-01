@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "context": {},
+  "slots": {
+    "orvis": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "ORVIS_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_09",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_10",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_11",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_12",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_13",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_14",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_15",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_16",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_17",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_18",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_19",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_20",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_21",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_22",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_23",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_24",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_25",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_26",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_27",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_28",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_29",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_30",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_31",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_32",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_33",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_34",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_35",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_36",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_37",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_38",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_39",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_40",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_41",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_42",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_43",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_44",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_45",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_46",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_47",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_48",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_49",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_50",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_51",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_52",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_53",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_54",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_55",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_56",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_57",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_58",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_59",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_60",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_61",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_62",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_63",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_64",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_65",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_66",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_67",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_68",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_69",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_70",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_71",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_72",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_73",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_74",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_75",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_76",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_77",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_78",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_79",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_80",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_81",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_82",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_83",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_84",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_85",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_86",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_87",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_88",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_89",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_90",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_91",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "ORVIS_92",
+          "responseValue": "3"
+        }
+      ]
+    },
+    "nfc": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "IPIP_NFC10_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_09",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_NFC10_10",
+          "responseValue": "3"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "interest_01_leadership",
+    "interest_02_organization",
+    "interest_03_altruism",
+    "interest_04_creativity",
+    "interest_05_analysis",
+    "interest_06_production",
+    "interest_07_adventure",
+    "interest_08_erudition",
+    "exploration_plan",
+    "nfc_exploration"
+  ]
+}

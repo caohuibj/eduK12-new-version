@@ -4,6 +4,1646 @@
     "manifest": {
       "definition": {
         "schemaVersion": 1,
+        "bundleKey": "adult_interests_exploration_zh_cn",
+        "bundleVersion": "0.1.0",
+        "status": "DRAFT",
+        "category": "scale_self",
+        "name": "成人兴趣与探索方式",
+        "description": "18岁以上成人102题自我探索：保留ORVIS八域连续均分及独立的IPIP认知需求总分，以固定活动建议支持自主探索。中文工作译稿；组合为实验性描述。",
+        "respondentTypes": [
+          "SELF"
+        ],
+        "initiationModes": [
+          "ANONYMOUS_SELF",
+          "TEACHER_ASSIGNMENT"
+        ],
+        "population": {
+          "subjectPopulation": "adult",
+          "subjectMinAgeYears": 18
+        },
+        "slots": [
+          {
+            "slotKey": "orvis",
+            "unitType": "SCALE",
+            "position": 0,
+            "required": true,
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.1",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "leadership",
+              "organization",
+              "altruism",
+              "creativity",
+              "analysis",
+              "production",
+              "adventure",
+              "erudition"
+            ]
+          },
+          {
+            "slotKey": "nfc",
+            "unitType": "SCALE",
+            "position": 1,
+            "required": true,
+            "instrumentKey": "ipip_nfc10_zh_cn_research",
+            "instrumentVersion": "1.0.0",
+            "respondentType": "SELF",
+            "valueSelectors": [
+              "need_for_cognition"
+            ]
+          }
+        ],
+        "engine": {
+          "key": "declarative-evidence-v1",
+          "version": "1.0.0"
+        },
+        "contextDefinitionKey": null,
+        "contextDefinitionVersion": null,
+        "reportDefinitionKey": "adult_interests_exploration_zh_cn_report",
+        "reportDefinitionVersion": "0.1.0",
+        "publicationRequirements": {
+          "scientificGate": true,
+          "rightsGate": true,
+          "languageGate": true,
+          "reportGate": true,
+          "safetyGate": false,
+          "nonCommercialOnly": false
+        },
+        "rightsRequirements": {
+          "required": false,
+          "instrumentKeys": []
+        },
+        "safetyCapability": {
+          "safetyCapable": false,
+          "productionTriggerEnabled": false
+        },
+        "limitations": [
+          "适用范围为18岁及以上成人自我探索，18岁是项目保守范围。102题核心仅含ORVIS92与IPIP-NFC10，不含5DCR。",
+          "八域表示本次对活动的自述喜欢程度，不是能力、适合职业、招聘资格或心理诊断；没有常模、百分位、职业匹配率或总兴趣分。",
+          "ORVIS八域直接读取原量表1–5均分，不重复除以题数、不按不同题数的总分排名；NFC独立读取10–50原总分，不改变兴趣图谱。",
+          "两份简体中文均为独立、未验证的工作译稿，尚待译审与本地效度研究；英文IPIP公共领域来源不意味着本译稿获得原作者认可。",
+          "宽广兴趣／当前兴趣较淡仅为本项目预先声明的探索提示：八域分别都≥4／都≤2，不是原作者阈值、常模分档或稳定人格类型，可与其他描述并存。",
+          "本版保留连续结果与固定探索建议，不自动给出唯一最高／并列最高画像（IN1／IN2）；现有声明式条件不支持域间比较。请保留全部分数，自主选择方向，细微分差不解释为显著差异。",
+          "原工具按complete_required处理缺题，属于项目默认规则，不冒称作者缺失标准；本包不补零、不插补、不重算题目。只解释已有且质量允许的独立结果。",
+          "组合解释及探索活动为项目原创固定模板，未开展联合验证，不替代咨询、实际活动体验或个人决策。"
+        ]
+      },
+      "files": {
+        "evidence": "evidence-map.json",
+        "rules": "rules.json",
+        "report": "report.json",
+        "scientific": "scientific.json",
+        "publication": "publication.json"
+      },
+      "cognitiveDependencies": []
+    },
+    "evidence": [
+      {
+        "evidenceKey": "orvis.leadership",
+        "slotKey": "orvis",
+        "selector": "leadership",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.leadership",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.organization",
+        "slotKey": "orvis",
+        "selector": "organization",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.organization",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.altruism",
+        "slotKey": "orvis",
+        "selector": "altruism",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.altruism",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.creativity",
+        "slotKey": "orvis",
+        "selector": "creativity",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.creativity",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.analysis",
+        "slotKey": "orvis",
+        "selector": "analysis",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.analysis",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.production",
+        "slotKey": "orvis",
+        "selector": "production",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.production",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.adventure",
+        "slotKey": "orvis",
+        "selector": "adventure",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.adventure",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "orvis.erudition",
+        "slotKey": "orvis",
+        "selector": "erudition",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "interests.erudition",
+        "role": "PRIMARY",
+        "direction": "neutral",
+        "qualityPolicy": "interpretable_only"
+      },
+      {
+        "evidenceKey": "nfc.need_for_cognition",
+        "slotKey": "nfc",
+        "selector": "need_for_cognition",
+        "valueType": "number",
+        "unit": "points",
+        "construct": "exploration.need_for_cognition",
+        "role": "SUPPORTING",
+        "direction": "higher",
+        "qualityPolicy": "interpretable_only"
+      }
+    ],
+    "rules": {
+      "version": "0.1.0",
+      "items": [
+        {
+          "ruleId": "interest_01_leadership",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.leadership",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.leadership",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "带领与影响（12题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：带领讨论或组织一次小活动，留意自己喜欢的是推动事情、协调人，还是表达想法。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.leadership"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_02_organization",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.organization",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.organization",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "组织与安排（13题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：整理一次活动的时间、材料和步骤，体验把事情安排清楚的过程。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.organization"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_03_altruism",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.altruism",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.altruism",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "助人与照顾（13题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：参加一次自愿服务或支持他人的小任务，观察哪些互动让你愿意继续。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.altruism"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_04_creativity",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.creativity",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.creativity",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "艺术与创作（14题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：做一个小作品，例如文字、图像或设计草图，看看自己是否喜欢反复试做。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.creativity"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_05_analysis",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.analysis",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.analysis",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "分析与探究（10题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：选一个好奇的问题，查两份资料或做一个小观察，记录你还想追问什么。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.analysis"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_06_production",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.production",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.production",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "动手与自然（10题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：在安全条件下体验制作、维修、种植或户外观察，留意喜欢的具体环节。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.production"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_07_adventure",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.adventure",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.adventure",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "运动与冒险（10题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：选择符合自身条件、有人指导且风险可控的运动或新体验，不用靠冒险证明兴趣。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.adventure"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "interest_08_erudition",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.erudition",
+                "value": 1
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.erudition",
+                "value": 5
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "语言与阅读（10题，1–5均分）：分数描述你本次对这类活动的喜欢程度。可以用一次小体验了解自己：读一篇感兴趣的文章、练习一种表达或了解一种文化，记录想继续接触的主题。这些活动是可选例子，不根据分数替你指定职业。",
+          "evidenceKeys": [
+            "orvis.erudition"
+          ],
+          "supportRefs": [
+            "orvis_original",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "nfc_exploration",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "gte",
+                "evidenceKey": "nfc.need_for_cognition",
+                "value": 10
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "nfc.need_for_cognition",
+                "value": 50
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "认知需求（10题，10–50原总分）：数值越大，表示这次更认可复杂思考、挑战性阅读与理解信息的相关描述。它不测智力，也不等于纯粹学习动机。探索时可按自己的兴趣与精力选择短体验、例子演示，或多查一步资料；不用追求更难。这个分数不改变八域兴趣、不决定活动难度或职业匹配。",
+          "evidenceKeys": [
+            "nfc.need_for_cognition"
+          ],
+          "supportRefs": [
+            "ipip_nfc_source",
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "theme_broad",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.leadership",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.leadership",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.organization",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.organization",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.altruism",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.altruism",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.creativity",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.creativity",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.analysis",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.analysis",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.production",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.production",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.adventure",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.adventure",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.erudition",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.erudition",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.leadership",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.organization",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.altruism",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.creativity",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.analysis",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.production",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.adventure",
+                "value": 4
+              },
+              {
+                "op": "gte",
+                "evidenceKey": "orvis.erudition",
+                "value": 4
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "八类活动本次都得到较积极的回应：你可以同时对很多方向感兴趣。先自主挑两项各试一次，再比较具体体验；不必立刻缩成一个职业。 这只是本项目的实验性探索提示，不是原作者分档或固定类型。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition"
+          ],
+          "supportRefs": [
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "theme_subdued",
+          "when": {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.leadership",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.leadership",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.organization",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.organization",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.altruism",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.altruism",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.creativity",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.creativity",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.analysis",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.analysis",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.production",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.production",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.adventure",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.adventure",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.erudition",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.erudition",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.leadership",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.organization",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.altruism",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.creativity",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.analysis",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.production",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.adventure",
+                "value": 2
+              },
+              {
+                "op": "lte",
+                "evidenceKey": "orvis.erudition",
+                "value": 2
+              }
+            ]
+          },
+          "kind": "independent_summary",
+          "text": "本次八类活动的喜欢程度都较低：这只能说明这组活动当前没有明显吸引你。可以从熟悉的小活动或观察开始，也可暂缓探索，考虑机会、疲劳和题目语境；不能据此判断没有兴趣、能力或动力。 这只是本项目的实验性探索提示，不是原作者分档或固定类型。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition"
+          ],
+          "supportRefs": [
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "exploration_plan",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.leadership",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.leadership",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.organization",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.organization",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.altruism",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.altruism",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.creativity",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.creativity",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.analysis",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.analysis",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.production",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.production",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.adventure",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.adventure",
+                    "value": 5
+                  }
+                ]
+              },
+              {
+                "op": "all",
+                "conditions": [
+                  {
+                    "op": "gte",
+                    "evidenceKey": "orvis.erudition",
+                    "value": 1
+                  },
+                  {
+                    "op": "lte",
+                    "evidenceKey": "orvis.erudition",
+                    "value": 5
+                  }
+                ]
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "先看八域全貌，再由你选择两条想了解的方向。如果多个方向同样吸引你，请全部保留；小分差不表示显著差异。可以各用20分钟做一次小活动、访谈一位实践者，或试听一节课程，记下“哪部分想继续、哪部分不想”。一周后按真实体验调整，无需用问卷替自己作最终选择。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition"
+          ],
+          "supportRefs": [
+            "b17_design"
+          ]
+        },
+        {
+          "ruleId": "state_missing",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.leadership"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.organization"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.altruism"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.creativity"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.analysis"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.production"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.adventure"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "orvis.erudition"
+              },
+              {
+                "op": "missing",
+                "evidenceKey": "nfc.need_for_cognition"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "部分原工具结果尚未提供；缺失不是0分，也不以其余分数代填。仍可查看质量允许的独立结果，涉及不完整八域的主题暂不生成。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition",
+            "nfc.need_for_cognition"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "state_invalid",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.leadership"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.organization"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.altruism"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.creativity"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.analysis"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.production"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.adventure"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "orvis.erudition"
+              },
+              {
+                "op": "invalid",
+                "evidenceKey": "nfc.need_for_cognition"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "部分输入被原工具或当前结果标为无效；它不会参与探索解释。其他质量允许的独立结果可以保留，不能把无效结果当作兴趣低。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition",
+            "nfc.need_for_cognition"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "state_not_applicable",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.leadership"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.organization"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.altruism"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.creativity"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.analysis"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.production"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.adventure"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "orvis.erudition"
+              },
+              {
+                "op": "not_applicable",
+                "evidenceKey": "nfc.need_for_cognition"
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "部分结果明确标为不适用，与漏答及0分不同；相应解释不生成。请按原工具适用范围查看其余结果。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition",
+            "nfc.need_for_cognition"
+          ],
+          "supportRefs": []
+        },
+        {
+          "ruleId": "state_out_of_range",
+          "when": {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.leadership",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.leadership",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.organization",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.organization",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.altruism",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.altruism",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.creativity",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.creativity",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.analysis",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.analysis",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.production",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.production",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.adventure",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.adventure",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "orvis.erudition",
+                "value": 1
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "orvis.erudition",
+                "value": 5
+              },
+              {
+                "op": "lt",
+                "evidenceKey": "nfc.need_for_cognition",
+                "value": 10
+              },
+              {
+                "op": "gt",
+                "evidenceKey": "nfc.need_for_cognition",
+                "value": 50
+              }
+            ]
+          },
+          "kind": "limitation",
+          "text": "至少一个输入超出原工具分数范围，相关解释已抑制。请由管理员核对原结果；不截断、不补零，也不把异常值当作兴趣高低。",
+          "evidenceKeys": [
+            "orvis.leadership",
+            "orvis.organization",
+            "orvis.altruism",
+            "orvis.creativity",
+            "orvis.analysis",
+            "orvis.production",
+            "orvis.adventure",
+            "orvis.erudition",
+            "nfc.need_for_cognition"
+          ],
+          "supportRefs": []
+        }
+      ]
+    },
+    "report": {
+      "key": "adult_interests_exploration_zh_cn_report",
+      "version": "0.1.0",
+      "locale": "zh-CN",
+      "blocks": [
+        {
+          "blockId": "continuous_scores",
+          "kind": "evidence",
+          "title": "本次连续结果：兴趣八域为1–5均分；认知需求为10–50总分",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": []
+        },
+        {
+          "blockId": "interest_leadership",
+          "kind": "conclusions",
+          "title": "1. 带领与影响（12题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_01_leadership"
+          ]
+        },
+        {
+          "blockId": "interest_organization",
+          "kind": "conclusions",
+          "title": "2. 组织与安排（13题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_02_organization"
+          ]
+        },
+        {
+          "blockId": "interest_altruism",
+          "kind": "conclusions",
+          "title": "3. 助人与照顾（13题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_03_altruism"
+          ]
+        },
+        {
+          "blockId": "interest_creativity",
+          "kind": "conclusions",
+          "title": "4. 艺术与创作（14题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_04_creativity"
+          ]
+        },
+        {
+          "blockId": "interest_analysis",
+          "kind": "conclusions",
+          "title": "5. 分析与探究（10题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_05_analysis"
+          ]
+        },
+        {
+          "blockId": "interest_production",
+          "kind": "conclusions",
+          "title": "6. 动手与自然（10题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_06_production"
+          ]
+        },
+        {
+          "blockId": "interest_adventure",
+          "kind": "conclusions",
+          "title": "7. 运动与冒险（10题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_07_adventure"
+          ]
+        },
+        {
+          "blockId": "interest_erudition",
+          "kind": "conclusions",
+          "title": "8. 语言与阅读（10题）",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "interest_08_erudition"
+          ]
+        },
+        {
+          "blockId": "exploration_style",
+          "kind": "conclusions",
+          "title": "探索方式：把思考倾向作为独立参考",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "nfc_exploration"
+          ]
+        },
+        {
+          "blockId": "exploration_themes",
+          "kind": "conclusions",
+          "title": "可选的探索提示",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "theme_broad",
+            "theme_subdued"
+          ]
+        },
+        {
+          "blockId": "next_steps",
+          "kind": "conclusions",
+          "title": "选两条方向做一次小尝试",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "exploration_plan"
+          ]
+        },
+        {
+          "blockId": "limitations",
+          "kind": "limitations",
+          "title": "结果范围与待补信息",
+          "audience": [
+            "student",
+            "admin"
+          ],
+          "ruleIds": [
+            "state_missing",
+            "state_invalid",
+            "state_not_applicable",
+            "state_out_of_range"
+          ]
+        }
+      ],
+      "states": {
+        "missing": "部分结果缺失；独立结果可保留，不补零或推断缺失部分。",
+        "limited": "部分结果质量有限；只保留质量允许的独立解释。",
+        "unavailable": "当前没有足够可解释的结果；不生成画像或以零分代替。"
+      }
+    },
+    "scientific": {
+      "maturity": "EXPERIMENTAL",
+      "scope": "18岁及以上成人自我探索；分别报告ORVIS八域活动兴趣和IPIP认知需求，不合成总分。原研究不验证本中文译稿或本组合。IN3/IN4只作非排他实验性提示；IN1/IN2域间最高值规则未实现，保留连续结果及固定探索模板。",
+      "references": [
+        {
+          "id": "orvis_original",
+          "citation": "Pozzebon, J. A., Visser, B. A., Ashton, M. C., Lee, K., & Goldberg, L. R. (2010). Psychometric characteristics of a public-domain self-report measure of vocational interests: The Oregon Vocational Interest Scales. Journal of Personality Assessment, 92(2), 168–174. https://ipip.ori.org/newORVISSurvey.htm （公开原始英文题本；不复制论文排版，不作为中文或组合验证。）",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        },
+        {
+          "id": "ipip_nfc_source",
+          "citation": "International Personality Item Pool. Need for Cognition, 10-item key. https://www.ipip.ori.org/newSingleConstructsKey.htm （公开英文题本／计分键；中文为独立未验证工作译稿，沿用叶工具原始来源记录，不将其他长版NFC文献等同于本10题版本。）",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        },
+        {
+          "id": "b17_design",
+          "citation": "项目原创B17固定探索建议及非排他呈现主题，实施设计v1.0与共享画像实施规范v1.0（2026）。内部项目设计，原始资料指针保留于私有交接记录；不是心理测量验证论文或开放许可声明。",
+          "allowedClaims": [
+            "independent_summary"
+          ]
+        }
+      ]
+    },
+    "fixtures": {
+      "valid": {
+        "values": {
+          "orvis.leadership": {
+            "state": "present",
+            "value": 3
+          },
+          "orvis.organization": {
+            "state": "present",
+            "value": 3
+          },
+          "orvis.altruism": {
+            "state": "present",
+            "value": 3
+          },
+          "orvis.creativity": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.analysis": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.production": {
+            "state": "present",
+            "value": 3
+          },
+          "orvis.adventure": {
+            "state": "present",
+            "value": 3
+          },
+          "orvis.erudition": {
+            "state": "present",
+            "value": 3
+          },
+          "nfc.need_for_cognition": {
+            "state": "present",
+            "value": 38
+          }
+        },
+        "expectedRuleIds": [
+          "interest_01_leadership",
+          "interest_02_organization",
+          "interest_03_altruism",
+          "interest_04_creativity",
+          "interest_05_analysis",
+          "interest_06_production",
+          "interest_07_adventure",
+          "interest_08_erudition",
+          "exploration_plan",
+          "nfc_exploration"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "missing": {
+        "values": {
+          "orvis.leadership": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.organization": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.altruism": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.creativity": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.analysis": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.production": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.adventure": {
+            "state": "present",
+            "value": 4
+          },
+          "orvis.erudition": {
+            "state": "present",
+            "value": 4
+          },
+          "nfc.need_for_cognition": {
+            "state": "missing"
+          }
+        },
+        "expectedRuleIds": [
+          "interest_01_leadership",
+          "interest_02_organization",
+          "interest_03_altruism",
+          "interest_04_creativity",
+          "interest_05_analysis",
+          "interest_06_production",
+          "interest_07_adventure",
+          "interest_08_erudition",
+          "exploration_plan",
+          "theme_broad",
+          "state_missing"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "invalid": {
+        "values": {
+          "orvis.leadership": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.organization": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.altruism": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.creativity": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.analysis": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.production": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.adventure": {
+            "state": "present",
+            "value": 2
+          },
+          "orvis.erudition": {
+            "state": "present",
+            "value": 2
+          },
+          "nfc.need_for_cognition": {
+            "state": "invalid"
+          }
+        },
+        "expectedRuleIds": [
+          "interest_01_leadership",
+          "interest_02_organization",
+          "interest_03_altruism",
+          "interest_04_creativity",
+          "interest_05_analysis",
+          "interest_06_production",
+          "interest_07_adventure",
+          "interest_08_erudition",
+          "exploration_plan",
+          "theme_subdued",
+          "state_invalid"
+        ],
+        "expectedKind": "COMPUTED"
+      },
+      "not-applicable": {
+        "values": {
+          "orvis.leadership": {
+            "state": "not_applicable"
+          },
+          "orvis.organization": {
+            "state": "not_applicable"
+          },
+          "orvis.altruism": {
+            "state": "not_applicable"
+          },
+          "orvis.creativity": {
+            "state": "not_applicable"
+          },
+          "orvis.analysis": {
+            "state": "not_applicable"
+          },
+          "orvis.production": {
+            "state": "not_applicable"
+          },
+          "orvis.adventure": {
+            "state": "not_applicable"
+          },
+          "orvis.erudition": {
+            "state": "not_applicable"
+          },
+          "nfc.need_for_cognition": {
+            "state": "not_applicable"
+          }
+        },
+        "expectedRuleIds": [
+          "state_not_applicable"
+        ],
+        "expectedKind": "COMPUTED"
+      }
+    },
+    "publication": {
+      "requestedStatus": "DRAFT"
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "manifest": {
+      "definition": {
+        "schemaVersion": 1,
         "bundleKey": "example_descriptive_v1",
         "bundleVersion": "1.0.0",
         "status": "DRAFT",
