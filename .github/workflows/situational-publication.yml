@@ -71,6 +71,17 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
+          # Tool-only changes are checked by the existing release-tools recipe.
+          # Content/review/runtime/dependency changes cannot enter this boundary.
+          if node --input-type=module <<'JS'
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          import {toolingOnly} from './server-version/scripts/release/policy.mjs';
+          process.exitCode=toolingOnly(changedEntries(process.env.BASE_SHA,'HEAD'))?0:1;
+          JS
+          then
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           relevant=false
           while IFS= read -r file; do
             case "$file" in
