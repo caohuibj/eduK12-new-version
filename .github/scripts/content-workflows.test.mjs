@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const scopes = JSON.parse(fs.readFileSync(new URL('../config/acceptance-scopes.json', import.meta.url), 'utf8'));
@@ -78,7 +79,22 @@ test('content declarations keep pure schema/fixture/reference checks without dat
   const ci=source('ci'),content=source('scale-onboarding-boundary');
   assert.match(job(ci,'content'),/scale-onboarding-boundary.yml/);
   for(const command of ["run(['check',dir])",'scale:onboarding:check','situational:contracts','cognitive:onboarding-check'])assert.ok(content.includes(command),command);
-  for(const name of ['backend','pr-light-backend','post-merge-smoke'])assert.match(job(name==='backend'?source('ci-backend'):ci,name),/scripts\/bundle-content-check.ts/,name);
+  for(const name of ['backend','pr-light-backend','post-merge-smoke']){
+    const block=job(name==='backend'?source('ci-backend'):ci,name);
+    assert.match(block,/import \{verifyHistory\} from '\.\/scripts\/bundle-content-check\.ts'/,name);
+    assert.match(block,name==='backend'?/verifyHistory\(base\)/:/verifyHistory\(process\.env\.BUNDLE_CONTENT_BASE_SHA\)/,name);
+    assert.match(block,/npm run build/,name);
+    assert.doesNotMatch(block,/npx tsx scripts\/bundle-content-check\.ts/,name);
+  }
+  const scripts=JSON.parse(fs.readFileSync('server-version/backend/package.json','utf8')).scripts;
+  assert.match(scripts.build,/bundle:manifest:check.*bundle:declarations:check/);
+  assert.match(scripts['bundle:declarations:check'],/bundle-onboarding\.ts check-public$/);
+  const inline=job(source('ci-backend'),'backend').match(/node --import tsx --input-type=module <<'JS'\n([\s\S]*?)\n\s+JS/)[1].replace(/^\s*import[^\n]*\n/gm,'');
+  const run=(env,git)=>{let checked;runInNewContext(inline,{process:{env},execFileSync:git,verifyHistory:base=>{if(!base)throw Error('BUNDLE_BASE_SHA_REQUIRED');checked=base;}});return checked;};
+  const provided='a'.repeat(40),mergeBase='b'.repeat(40);
+  assert.equal(run({BUNDLE_CONTENT_BASE_SHA:provided},()=>{throw Error('No fallback for supplied base');}),provided);
+  assert.equal(run({GITHUB_EVENT_NAME:'workflow_dispatch'},(command,args)=>{assert.equal(command,'git');assert.equal(JSON.stringify(args),JSON.stringify(['merge-base','HEAD','origin/main']));return mergeBase+'\n';}),mergeBase);
+  assert.throws(()=>run({},()=>{throw Error('No fallback outside manual dispatch');}),/BUNDLE_BASE_SHA_REQUIRED/);
   const boundary=job(content,'boundary');
   assert.doesNotMatch(boundary,/services:|postgres:|redis:|db:migrate|prisma generate|tsc --noEmit|src\/__tests__|--verify-reviews --base.*\n.*--no-file-parallelism/);
   assert.match(boundary,/--tasks "\$tasks"/);

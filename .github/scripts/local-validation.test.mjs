@@ -32,6 +32,11 @@ test('valid signed local success is admitted, not re-executed',()=>fixture(({bas
  assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/REUSED local check/);
  // Fixture has none of the real test scripts: success proves no test command ran.
 }));
+test('backend compile workflow selects its existing Bundle declaration contract once',()=>fixture(({base,head})=>{
+ const commands=recipe('release-tools',base,head),selected=commands.filter(argv=>argv.includes('.github/scripts/content-workflows.test.mjs'));
+ assert.equal(selected.length,1);assert(selected[0].some(arg=>arg.startsWith('--test-name-pattern=^content declarations keep pure')));
+ assert(!commands.flat().some(arg=>['build','db:migrate','--all','prisma'].includes(arg)));
+},'.github/workflows/ci-backend.yml'));
 test('missing key, tampering, failure, missing command and wrong identity are rejected',()=>fixture(({base,head,payload})=>{
  const signed=seal(payload,keys.privateKey);assert.throws(()=>authenticate(signed,''));
  const tampered=structuredClone(signed);tampered.payload.head='0'.repeat(40);assert.throws(()=>authenticate(tampered,pub));
