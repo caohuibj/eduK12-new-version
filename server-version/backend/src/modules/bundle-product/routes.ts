@@ -2,7 +2,8 @@ import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {getPaginationParams} from '../../utils/pagination'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
-import { authenticate, requireTeacher, requireAdmin } from '../../middleware/auth'
+import { authenticate, requireTeacher } from '../../middleware/auth'
+import { requireSystemAdmin } from '../admin-permissions/guards'
 import { prisma } from '../../config/database'
 import { success, error } from '../../utils/response'
 import { bundleProductService, bundleDefinitionProvider } from './service'
@@ -17,12 +18,13 @@ const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, 
     return next(e)
   }
 }
-router.use(authenticate, requireTeacher)
-router.get('/admin/definitions', requireAdmin, handle(req => authoring.listPackageDrafts(prisma, req.user!)))
-router.post('/admin/preview', requireAdmin, handle(async req => authoring.previewPackage(req.user!, req.body)))
-router.post('/admin/definitions', requireAdmin, handle(req => authoring.savePackage(prisma, req.user!, req.body)))
-router.get('/admin/definitions/:key/:version', requireAdmin, handle(req => authoring.getPackageDraft(prisma, req.user!, req.params.key, req.params.version)))
-router.post('/admin/definitions/:key/:version/approve', requireAdmin, handle(req => authoring.approvePackage(prisma, req.user!, req.params.key, req.params.version, req.body)))
+router.use(authenticate)
+router.get('/admin/definitions', requireSystemAdmin, handle(req => authoring.listPackageDrafts(prisma, req.user!)))
+router.post('/admin/preview', requireSystemAdmin, handle(async req => authoring.previewPackage(req.user!, req.body)))
+router.post('/admin/definitions', requireSystemAdmin, handle(req => authoring.savePackage(prisma, req.user!, req.body)))
+router.get('/admin/definitions/:key/:version', requireSystemAdmin, handle(req => authoring.getPackageDraft(prisma, req.user!, req.params.key, req.params.version)))
+router.post('/admin/definitions/:key/:version/approve', requireSystemAdmin, handle(req => authoring.approvePackage(prisma, req.user!, req.params.key, req.params.version, req.body)))
+router.use(requireTeacher)
 const refreshCatalog = async (_req: Request, _res: Response, next: NextFunction) => { try { await authoring.refreshPublishedPackages(prisma, bundleDefinitionProvider); next() } catch (error) { next(error) } }
 router.get('/catalog', refreshCatalog, handle(req => req.query.view==='training-catalog'?bundleProductService.catalog(req.user!,{pagination:getPaginationParams(req),filters:z.object({...catalogDiscoveryQueryFields,status:z.string().trim().max(24).optional()}).parse(req.query)}):bundleProductService.catalog(req.user!)))
 router.get('/', handle(req => bundleProductService.list(req.user!)))
