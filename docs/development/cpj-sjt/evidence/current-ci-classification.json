@@ -1,0 +1,43 @@
+{
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "case": "actual staged base diff",
+  "fileCount": 276,
+  "result": {
+    "maintenance": false,
+    "documentation": false,
+    "content": true,
+    "frontend": false,
+    "presentation": false,
+    "domains": [
+      "situational"
+    ]
+  },
+  "negativeCases": [
+    {
+      "path": "server-version/backend/src/modules/situational/situation-scoring.ts",
+      "content": false
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/cpj-cj01-sd-baseline/0.4.3/helper.ts",
+      "content": false
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "content": false
+    }
+  ],
+  "route": "existing situational content; no CI edits",
+  "expectedJobs": [
+    "scope",
+    "assessment content / boundary",
+    "Situational publication integrity / publication",
+    "CI merge gate"
+  ],
+  "notSelected": [
+    "pr-light-backend",
+    "pr-light-frontend",
+    "full backend",
+    "browser",
+    "Docker"
+  ]
+}

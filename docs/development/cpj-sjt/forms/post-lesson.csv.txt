@@ -1,0 +1,6 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+TEXT,本次记录编号/专题与行为指标编号/证据编号（无课前课中表也可填写；只选一条行为判断）,false,,,,,,,,,,,,,
+SINGLE,证据来源,false,本人现场记录||获授权的观察记录||教师自报或回忆||暂不明确,,,,,,,,,,,,
+SINGLE,本次证据判断（非分数）,false,有支持证据||有相反证据||证据混合||材料不足||本次不适用||暂不判断,,,,,,,,,,,,
+LONG_TEXT,哪项事实支持判断？还不能判断什么？如只有自报请注明。,false,,,,,,,,,,,,,
+LONG_TEXT,可选：下一次只尝试一个什么动作？需要什么支持，用什么证据复查？,false,,,,,,,,,,,,,

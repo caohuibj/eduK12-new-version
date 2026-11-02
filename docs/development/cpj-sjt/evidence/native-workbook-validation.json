@@ -1,0 +1,820 @@
+{
+  "results": [
+    {
+      "name": "cpj-cj01-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "e721be232327016a9520eac617de75609d51d69e24c8c0df65b5472c69e91c87",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t01_a_explicit_action",
+          "label": "cpj_t01_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t01_b_explicit_action",
+          "label": "cpj_t01_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj01-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "a0c4ff5bc399a948117e1fd14df77dfcf17281db0467a88d8edaf9eac340b430",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t01_a_explicit_action",
+          "label": "cpj_t01_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t01_b_explicit_action",
+          "label": "cpj_t01_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj02-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "f6cf73b545169c5a3c1363fa4d2d933d8b7792a66f250f51ef331891200d995a",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t01_a_explicit_action",
+          "label": "cpj_t01_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t01_b_explicit_action",
+          "label": "cpj_t01_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj02-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "e5b8db01786dd6febe24632b00ff87cd921a8dd6e8c2a71746e9555eef791834",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t01_a_explicit_action",
+          "label": "cpj_t01_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t01_b_explicit_action",
+          "label": "cpj_t01_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj03-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "e744826ecda41ee1667988506e5bd0ac63cab54be83edc5365749940880d4352",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t02_a_explicit_action",
+          "label": "cpj_t02_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t02_b_explicit_action",
+          "label": "cpj_t02_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj03-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "a4af9487bffe7ce6614a22ac09049a0fd67d2426142e9b20c99a691f7373d3fa",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t02_a_explicit_action",
+          "label": "cpj_t02_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t02_b_explicit_action",
+          "label": "cpj_t02_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj04-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "815534e28c969f4243c7cad7331c3bd8fc467c13f1d2f9045d778b0e3ab9bc02",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t02_a_explicit_action",
+          "label": "cpj_t02_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t02_b_explicit_action",
+          "label": "cpj_t02_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj04-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "c400912cb5b64749e10ca9ea835fe2c91964e91321ef902b18336f180fad1d8e",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t02_a_explicit_action",
+          "label": "cpj_t02_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t02_b_explicit_action",
+          "label": "cpj_t02_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj05-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "335518b0323d2f4348c0d57eda197ff5b19d2133c1f9df47329e4e81941a3dc6",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t03_a_explicit_action",
+          "label": "cpj_t03_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t03_b_explicit_action",
+          "label": "cpj_t03_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj05-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "4041fc06d2901bcabccd9244af3fd92c2d90b6bcc35b6dd447b76752f3553aa6",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t03_a_explicit_action",
+          "label": "cpj_t03_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t03_b_explicit_action",
+          "label": "cpj_t03_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj06-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "d0696beac5c2998eb81b13a29df1514412cac8477ba01d74f390102beccf47a8",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t03_a_explicit_action",
+          "label": "cpj_t03_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t03_b_explicit_action",
+          "label": "cpj_t03_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj06-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "983a1359b8654d2e224678b595d70141b0d162e5937500fc6acb117c8416b2d8",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t03_a_explicit_action",
+          "label": "cpj_t03_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t03_b_explicit_action",
+          "label": "cpj_t03_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj07-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "41b331b575371d58ee5767f5db93f13babf93f608e214ce1eb660d7ce94ef971",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t04_a_explicit_action",
+          "label": "cpj_t04_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t04_b_explicit_action",
+          "label": "cpj_t04_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj07-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "752f112015c4c0552d9b3b36eed1ebe0aa6d22b39b1b4d2a16cf35e31060c064",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t04_a_explicit_action",
+          "label": "cpj_t04_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t04_b_explicit_action",
+          "label": "cpj_t04_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj08-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "e1d344e67a4828f2148085c89cc574dce949f50bf5d9f4044f8a0305014096ed",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t04_a_explicit_action",
+          "label": "cpj_t04_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t04_b_explicit_action",
+          "label": "cpj_t04_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj08-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "db202a1d037edcf479397ddfb9190164e9a030dd289541c16b167ae1bef134f8",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t04_a_explicit_action",
+          "label": "cpj_t04_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t04_b_explicit_action",
+          "label": "cpj_t04_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj09-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "b133f88bcd70cd8169888d971057e016a3d6eed4901e5e31c7a72cb54534307b",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t05_a_explicit_action",
+          "label": "cpj_t05_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t05_b_explicit_action",
+          "label": "cpj_t05_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj09-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "46152095f56a4849b2a357dc8a0006e559c340b5a9a4d519435c1e1c04fca336",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t05_a_explicit_action",
+          "label": "cpj_t05_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t05_b_explicit_action",
+          "label": "cpj_t05_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj10-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "8672d2d9752d820852314fed25b1aafab276f20ee17856b3e55e049fb6ce57b2",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t05_a_explicit_action",
+          "label": "cpj_t05_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t05_b_explicit_action",
+          "label": "cpj_t05_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj10-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "495cc2d0fa6996974327c1f8f196d47b08319ace6f4ff5f0143520a069c22910",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t05_a_explicit_action",
+          "label": "cpj_t05_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t05_b_explicit_action",
+          "label": "cpj_t05_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj11-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "b746b7dbe931552fe82f305b207ebdc158ea0f7fee558a41fd878a1639846665",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t06_a_explicit_action",
+          "label": "cpj_t06_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t06_b_explicit_action",
+          "label": "cpj_t06_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj11-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "7e18040052a3da94a8b4a7072dfd25d9fb01dba194eb0484ea7f5db2925e5b59",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t06_a_explicit_action",
+          "label": "cpj_t06_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t06_b_explicit_action",
+          "label": "cpj_t06_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj12-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "ec7bd8c3e3879ac1bbb2b455464f069d644573132bfc1b1aeb1f50f88e34f6ea",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t06_a_explicit_action",
+          "label": "cpj_t06_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t06_b_explicit_action",
+          "label": "cpj_t06_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj12-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "7cc1a6dcae8ca8ee868f49517e94462349d05272dac60ed3beb3eb8491045a00",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t06_a_explicit_action",
+          "label": "cpj_t06_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t06_b_explicit_action",
+          "label": "cpj_t06_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj13-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "fab19816bf0ef7800da444e9e110abaf6b1b844e87a9f8df198312b1224aedac",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t07_a_explicit_action",
+          "label": "cpj_t07_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t07_b_explicit_action",
+          "label": "cpj_t07_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj13-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "f7837827a9515b34afe8618b2492a0a8d2ea1a323fc35cca9c603b65357da39c",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t07_a_explicit_action",
+          "label": "cpj_t07_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t07_b_explicit_action",
+          "label": "cpj_t07_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj14-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "92394d4026982f110a073eb0a2f3fd6914e03782aeb94b65f98cc8933322313e",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t07_a_explicit_action",
+          "label": "cpj_t07_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t07_b_explicit_action",
+          "label": "cpj_t07_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj14-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "fb8cec41f90713cd14a601e0f6cd14d1fd1435249ab567ebddcf09bd39e283c2",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t07_a_explicit_action",
+          "label": "cpj_t07_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t07_b_explicit_action",
+          "label": "cpj_t07_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj15-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "f6ff922788853d57742cd9a530adc4af9c0dd63d959189962436a50c7c87bd87",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t08_a_explicit_action",
+          "label": "cpj_t08_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t08_b_explicit_action",
+          "label": "cpj_t08_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj15-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "0e1b8b9ae0a6845af3df1da46d229d7399a8b30173a55988c7241b92738b136a",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t08_a_explicit_action",
+          "label": "cpj_t08_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t08_b_explicit_action",
+          "label": "cpj_t08_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj16-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "e81b2c3d967938ed5288b6803149e4fb30087174a3842319f663231b6cf25bdd",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t08_a_explicit_action",
+          "label": "cpj_t08_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t08_b_explicit_action",
+          "label": "cpj_t08_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj16-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "187d134b546af83a0247b894822e4e0be0673c0ef98d0698accb76b86aa301ad",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t08_a_explicit_action",
+          "label": "cpj_t08_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t08_b_explicit_action",
+          "label": "cpj_t08_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj17-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "87d141261d28b6771921ca8c127120ed671401920c6e6658bbf9427d4e5652a2",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t09_a_explicit_action",
+          "label": "cpj_t09_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t09_b_explicit_action",
+          "label": "cpj_t09_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj17-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "65b800757e99275ef619ef4accd0564af83c01135a7a5417a26f45ada269c164",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t09_a_explicit_action",
+          "label": "cpj_t09_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t09_b_explicit_action",
+          "label": "cpj_t09_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj18-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "767896e2fce8bde75776625505cac423a149ddb1af34d923258a2a1c620322ab",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t09_a_explicit_action",
+          "label": "cpj_t09_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t09_b_explicit_action",
+          "label": "cpj_t09_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj18-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "1d84f81837a232f63abf218b42c9a2219af80e74347441224aee8a037bb37f47",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t09_a_explicit_action",
+          "label": "cpj_t09_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t09_b_explicit_action",
+          "label": "cpj_t09_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj19-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "848cff31d64269fd392adbcf385754e3e3e9c34cbf293dbaba1990cbb0c3ff53",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t10_a_explicit_action",
+          "label": "cpj_t10_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t10_b_explicit_action",
+          "label": "cpj_t10_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj19-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "5f781c445b3b5d3e40003de6acf5a6c6de7b40c26af552b113deac9511f154ea",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t10_a_explicit_action",
+          "label": "cpj_t10_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t10_b_explicit_action",
+          "label": "cpj_t10_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj20-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "7de3e466535e3ce56c3c0aef9a14da1647cd8f9358b90399f11af27628bb1e48",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t10_a_explicit_action",
+          "label": "cpj_t10_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t10_b_explicit_action",
+          "label": "cpj_t10_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj20-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "029dbb50368eb5139f8602408e18fb5fbbf68ba94720d0ad8f2b4501d82f3e7a",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t10_a_explicit_action",
+          "label": "cpj_t10_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t10_b_explicit_action",
+          "label": "cpj_t10_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj21-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "91a2d54da1dea9f96c8395e8a27ab6db368b98d6ae2ad2858e2594fd1133bb73",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t11_a_explicit_action",
+          "label": "cpj_t11_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t11_b_explicit_action",
+          "label": "cpj_t11_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj21-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "135da06c25757f067d4a9d580edc69b8860a12c6fad0bebadc69216b750efd9e",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t11_a_explicit_action",
+          "label": "cpj_t11_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t11_b_explicit_action",
+          "label": "cpj_t11_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj22-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "c30d1f90fa2acd00a2b383bfc9c7257a4093061dce9b2acdbb6767b57b4278f0",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t11_a_explicit_action",
+          "label": "cpj_t11_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t11_b_explicit_action",
+          "label": "cpj_t11_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj22-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "83d3958d14b2806893f2e4491200b69e9bfd0301b885179feda3b4b22b55b272",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t11_a_explicit_action",
+          "label": "cpj_t11_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t11_b_explicit_action",
+          "label": "cpj_t11_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj23-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "541857f835bf3b5bbd843cad28ece6dbe15a94b7ffc06af62f69c02ce932eba6",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t12_a_explicit_action",
+          "label": "cpj_t12_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t12_b_explicit_action",
+          "label": "cpj_t12_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj23-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "12c40c35e6bf204e7b82a6b754cc291177b0221702095b4fb7f1d74b2510b85b",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t12_a_explicit_action",
+          "label": "cpj_t12_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t12_b_explicit_action",
+          "label": "cpj_t12_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj24-sd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "73e221bb78c5bd314bf73a0fee9914f5af8210d370994bb4d2371a3cc9519e2e",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t12_a_explicit_action",
+          "label": "cpj_t12_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t12_b_explicit_action",
+          "label": "cpj_t12_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    },
+    {
+      "name": "cpj-cj24-wd-baseline.xlsx",
+      "status": "PASS_NATIVE_WORKBOOK_ROUNDTRIP_EXACT_DIGEST",
+      "contentDigest": "ac5a11be7ec8deabea784220e5bf6e4a8912c39406c6dcbfe20af531b51dc619",
+      "tags": [
+        {
+          "id": "sjt-construct:cpj_t12_a_explicit_action",
+          "label": "cpj_t12_a_explicit_action",
+          "facet": "construct"
+        },
+        {
+          "id": "sjt-construct:cpj_t12_b_explicit_action",
+          "label": "cpj_t12_b_explicit_action",
+          "facet": "construct"
+        }
+      ]
+    }
+  ]
+}
