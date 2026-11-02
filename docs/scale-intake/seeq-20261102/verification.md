@@ -21,6 +21,10 @@ node --import tsx scripts/scale-intake-selected-check.ts
 
 首错：`BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape`，来自 `checkSelectedBuiltinDependencies`。该未改文件的静态工厂形状无法被当前checker解析；失败在全局内建组合依赖扫描，未声称其不受影响扫描已成功。没有修改checker、扩展CI或启动全平台验收。随后只针对本候选做可回读的导入/预览诊断，输出单独标明 `SCOPED_DIAGNOSTIC_PASSED_NOT_FULL_INTAKE_CLI`；不能用它替代正式检查结果。
 
-CI未激活：仓库AGENTS要求先读[CI常见错误清单](https://app.notion.com/p/404d27635a388186ac80de3593da05a5)。当前Notion fetch在提供link_id后返回 `Unknown tool({"name":"notion.fetch"})`，未读到页面。此为连接工具不可用，不是权限审批拒绝、不是CI失败，也未向Notion写入内容。Draft提交含 `[skip ci]`，不自行运行workflow_dispatch。后续激活前需恢复清单读取、审阅精确base/head/tree与轻量route；既有本地CLI错误仍须定位后定向处理，不能把更宽泛全量路线作为默认替代。
+CI未激活；不存在CI通过资格。前轮`link_id`误填，曾返回Unknown tool；改用真实Hui连接后对指定页面得到404。随后通过现有Qiang连接成功读取仓库[CI常见错误清单](https://app.notion.com/p/404d27635a388186ac80de3593da05a5)，页面读取障碍已解除，不能继续称Notion全局不可用。未向Notion写入内容。清单要求主线dot独立复核精确候选后决定激活；本次不自行扩大CI范围。提交中的`[skip ci]`只表示未执行，不冒作检查通过，也不覆盖本地CLI失败。
+
+本次适用清单：CI-004（checker范围，FAIL：完整CLI静态解析失败，尚无完整成功）；CI-007（生成索引，PASS：原生成器检查一致，后续仅候选blocker文字及文档变化不改索引）；CI-018（范围/证据复用，按每次source变化重绑诊断，不套旧通过）；CI-019（首错遮蔽，完整CLI内建依赖扫描失败，后续未完成不外推）；CI-020（精确base/head/tree与本地/CI身份，候选准备供主线独立复核）。未改schema、锁定依赖、计分或运行器；不增加全量验证。
+
+后续修订去除“缺独立施测验证”作为目录preview blocker；两项无分表单也去除“计分手册缺失”blocker。限制仍在说明中披露。许可、未准备可执行内容及无分表单原锚点缺失仍真实待办。修订后选中source诊断另存`validation-followup.json`，不覆盖原始执行记录；完整CLI既有错误不原样重跑。
 
 尚未完成：公开题文/数字施测授权、精确题本计分手册与反应格式、独立施测证据、生产/管理员自建排重、可作答包、C/P/R冻结、真实学生/教师报告渲染、隔离库实际导入、CI成功。开发库未入、生产未入，无合并、无部署。管理员后续动作详见README。
