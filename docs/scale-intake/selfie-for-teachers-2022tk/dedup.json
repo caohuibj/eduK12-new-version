@@ -250,6 +250,11 @@
     "openPRsInspected": 71,
     "openPRIdentityMatches": [],
     "checkedAt": "2026-11-02",
-    "productionAndAdminCustom": "NOT_QUERIED"
+    "productionAndAdminCustom": "NOT_QUERIED",
+    "additionalMainAlignment": {
+      "base": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+      "change": "Massachusetts DESE unrelated new content; generated index rebuilt retaining all declarations",
+      "identityMatches": []
+    }
   }
 }
