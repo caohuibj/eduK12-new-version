@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-11-02T01:49:08.768Z",
+  "key": "efl_tqs_ghasemi_teacher_self_en",
+  "version": "1.0.0",
+  "schema": "PASS",
+  "registry": "PASS",
+  "preview": "PASS_NO_ACTIVATION",
+  "constructLeads": 4,
+  "registeredChildScales": 0,
+  "actualItemTexts": 0,
+  "scoringExecutions": 0,
+  "actualDBImports": 0,
+  "blockers": [
+    "COMPLETE_ITEM_TO_FACTOR_KEY_NOT_ACQUIRED",
+    "FINAL_57_ITEM_WORDING_NOT_ACQUIRED",
+    "RESPONDENT_RESPONSE_ANCHORS_AND_CODING_NOT_ACQUIRED",
+    "SCORING_REVERSE_MISSING_CONTRACT_NOT_ACQUIRED"
+  ],
+  "reportReview": "12 project-original draft contexts manually reviewed; not runtime report validation",
+  "notTested": [
+    "native item administration",
+    "score ranges/reverse/missing",
+    "DB import",
+    "Chinese form validity",
+    "production duplicates",
+    "independent human/scientific approval"
+  ]
+}

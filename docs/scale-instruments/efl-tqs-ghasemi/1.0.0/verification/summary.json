@@ -1,0 +1,46 @@
+{
+  "status": "PASS_CATALOG_PREPARATION_ONLY",
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "scope": "One mother research catalog candidate plus generated index, missing-material requests and original report drafting notes",
+  "completed": {
+    "schemaRegistry": "PASS1",
+    "nativeCandidatePreview": "PASS_NO_ACTIVATION",
+    "reportedCountArithmetic": "62 minus5 equals57; not evidence of item text",
+    "fourConstructLeads": "Unregistered, unknown itemCount/key; no fake child scales",
+    "generatedIndex": "PASS",
+    "reportDraft": "12 hypothetical contexts manually reviewed; no runtime individual report"
+  },
+  "checkLocation": "local catalog preview; GitHub selected content route after Draft creation; no full platform build",
+  "budget": "light content route ~5min; no database run with invented content",
+  "fixedInputs": {
+    "backendLockSHA256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "prismaSchemaSHA256": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "dependencyReuse": "existing backend node_modules, unchanged lock; temporary symlink removed before commit"
+  },
+  "commands": [
+    "npm run scale:instruments:generate --prefix server-version/backend",
+    "copy verification/verify.ts.txt to .efl-tqs-check.ts at repository root; run existing backend tsx; remove temporary copy",
+    "npm run scale:instruments:check --prefix server-version/backend",
+    "SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<actual HEAD> node --import ./server-version/backend/node_modules/tsx/dist/loader.mjs server-version/backend/scripts/scale-intake-selected-check.ts",
+    "same base/head: node .github/scripts/scale-intake-scope.mjs"
+  ],
+  "failuresRetained": [
+    {
+      "action": "ad hoc landing-page link inspection helper",
+      "error": "Python bs4 unavailable",
+      "correction": "used standard-library HTMLParser; no dependency added; link inventory completed"
+    }
+  ],
+  "notExecuted": [
+    "native Scale/Form/DB import: final wording and anchors missing",
+    "score/reverse/missing boundary execution: no operational contract",
+    "runtime original report verification",
+    "production/admin tool dedup",
+    "Chinese instrument translation",
+    "independent human review",
+    "full platform tests: unaffected",
+    "merge/deploy"
+  ],
+  "commonCIFailureContext": "coordinator supplied #551 buffered source and #556 factory parser fixes already in base; no shared CI changes, no retry of old parser run",
+  "ci": "Local success is not formal CI, rights adjudication or scientific validation."
+}
