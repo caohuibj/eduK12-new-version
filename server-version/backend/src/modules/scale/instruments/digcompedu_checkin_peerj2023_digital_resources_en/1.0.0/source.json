@@ -1,0 +1,560 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "digcompedu_checkin_peerj2023_digital_resources_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DigCompEdu Check-In｜数字资源｜教师自评｜高教英文2023（PeerJ2024）",
+      "abbreviation": "DCE-CI",
+      "instrumentFamily": "DigCompEdu Check-In / PeerJ2024 published higher-education English survey dated 2023-06-02"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "Digital Resources: self-reported digital teaching engagement/practice in the published higher-education survey. Area raw sum, not observed competence or teaching quality.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:digital_resources"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Adults teaching in higher/further education. Source study: health-sciences faculty; this separated area has no independently established administration validation. Not a school/student or validated Chinese version."
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Current practice; long-term professional goals (no fixed retrospective day window).",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Keep source order and all five item-specific options. Score options in printed ascending order 0,1,2,3,4.",
+        "Prefer all six areas in original 22-item order; separated-area validity is not established.",
+        "Complete-case raw sum only. Any missing/invalid answer yields no area score; no imputation. This missingness policy is a project choice.",
+        "Do not derive global A1–C2 levels from an area or from this combination; no cross-tool total.",
+        "Estimated time is a project estimate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Developmental reflection on self-reported practice; area separation not independently validated."
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Source study concerns higher-education health-sciences faculty, not K12 or an objectively measured performance test."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_digital_resources_en-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_digital_resources_en-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "digcompedu_checkin_peerj2023_digital_resources_en-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2024 Ersoy et al., PeerJ, https://doi.org/10.7717/peerj.18456 ; survey Supplemental Information 1 https://doi.org/10.7717/peerj.18456/supp-1 ; CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Original framework: Redecker, C. (2017), edited by Punie, Y., European Framework for the Digital Competence of Educators: DigCompEdu, European Commission JRC, doi:10.2760/159770. This package extracts the published higher-education English survey; area separation, complete-case scoring policy and project feedback are adaptations. Layout, compulsory background fields and email collection are not reproduced. No author/European Commission endorsement implied.",
+      "This public source does not itself create deployment/use grants. Existing recipient and release permissions remain required."
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "DigCompEdu Check-In: Digital Resources / PeerJ2024 higher-education survey",
+        "citation": "Ersoy et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ 12:e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, form timestamp 2023-06-02.",
+        "url": "https://doi.org/10.7717/peerj.18456/supp-1",
+        "publicationYear": 2024
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2024 Ersoy et al., PeerJ, https://doi.org/10.7717/peerj.18456 ; survey Supplemental Information 1 https://doi.org/10.7717/peerj.18456/supp-1 ; CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Original framework: Redecker, C. (2017), edited by Punie, Y., European Framework for the Digital Competence of Educators: DigCompEdu, European Commission JRC, doi:10.2760/159770. This package extracts the published higher-education English survey; area separation, complete-case scoring policy and project feedback are adaptations. Layout, compulsory background fields and email collection are not reproduced. No author/European Commission endorsement implied."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "item_05",
+          "options": [
+            {
+              "value": "0",
+              "label": "I only rarely use the internet to find resources",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "I use search engines and resource platforms to find relevant resources",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "I evaluate and select resources on the basis of their suitability for my learner group",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "I compare resources using a range of relevant criteria, e.g. reliability, quality, fit, design, interactivity, appeal",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "I advise colleagues on suitable resources and search strategies",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_06",
+          "options": [
+            {
+              "value": "0",
+              "label": "I do not create my own digital resources",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "I do create lecture notes or reading lists with a computer, but then I print them",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "I create digital presentations, but not much more",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "I create and modify different types of resources",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "I set up and adapt complex, interactive resources",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "key": "item_07",
+          "options": [
+            {
+              "value": "0",
+              "label": "I do not need to do that, because the department takes care of this",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "I avoid storing personal data electronically",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "I protect some personal data",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "I password protect files with personal data",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "I comprehensively protect personal data, e.g. combining hard-to-guess passwords with encryption and frequent software updates",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DCE_CI_05",
+          "content": "I use different Internet sites and search strategies to find and select a range of different digital resources",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "item_05",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_06",
+          "content": "I create my own digital resources and modify existing ones to adapt them to my needs",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "item_06",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCE_CI_07",
+          "content": "I effectively protect sensitive content, e.g. exams, students' grades, personal data",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "item_07",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "DCE_CI_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCE_CI_07",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "digital_resources",
+            "type": "dimension",
+            "label": "Digital Resources (area raw sum)",
+            "description": "3 item-specific 0–4 responses summed without reversing; range 0–12. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCE_CI_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCE_CI_07",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "digital_resources"
+        ],
+        "scoreOrder": [
+          "digital_resources"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "digital_resources",
+            "headline": "Digital Resources: reflect on your current practice",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "These answers describe your own perception of practice in digital resources. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Review one resource for fit, accessibility, copyright and data protection before reusing it."
+              },
+              {
+                "category": "environment",
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+        ],
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "digcompedu_checkin_peerj2023_digital_resources_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_07",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "digital_resources": 0
+          },
+          "totalScoreKeys": [
+            "digital_resources"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCE_CI_07",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "digital_resources": 12
+          },
+          "totalScoreKeys": [
+            "digital_resources"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "DCE_CI_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCE_CI_07",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "digital_resources": 3
+          },
+          "totalScoreKeys": [
+            "digital_resources"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "DCE_CI_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DCE_CI_06",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "digital_resources": null
+          },
+          "totalScoreKeys": [
+            "digital_resources"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "digital_resources": null
+          },
+          "totalScoreKeys": [
+            "digital_resources"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Please consider where you stand in view of the following long-term goals. The answer options are organised by increasing level of engagement. Please choose the option that best reflects your current practice. This is the Digital Resources area of the published higher-education survey. Each item has its own five options; keep their order. All area items are needed for a descriptive raw sum. Prefer the full 22-item sequence. This is developmental self-reflection, not an observed competence test.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "First three sentences condensed from the source area instructions; remaining administration, scoring and limitation wording added by the project."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Ersoy et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ 12:e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, form timestamp 2023-06-02.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Published English source retained, not a Chinese translation. Mechanical PDF missing-letter repairs and area extraction documented in item-map.json; no separate-area validity claim."
+  }
+}
