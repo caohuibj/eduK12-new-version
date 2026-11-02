@@ -233,31 +233,39 @@ import { SCALE_INSTRUMENT_SOURCE as source229 } from '../instruments/teacher_sub
 import { SCALE_INSTRUMENT_SOURCE as source230 } from '../instruments/texi_parent_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source231 } from '../instruments/texi_self_en/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source232 } from '../instruments/texi_teacher_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source233 } from '../instruments/tipi_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source234 } from '../instruments/tses12_2024_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source235 } from '../instruments/tses12_en_2024/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source236 } from '../instruments/tses24_2024_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source237 } from '../instruments/tses24_en/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source238 } from '../instruments/tses24_zh_hant/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source239 } from '../instruments/tswq_en/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source240 } from '../instruments/tswq_zh_cn/1.0.1/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source241 } from '../instruments/tutoring_necessity_biology_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source242 } from '../instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source243 } from '../instruments/tutoring_necessity_chinese_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source244 } from '../instruments/tutoring_necessity_english_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source245 } from '../instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source246 } from '../instruments/tutoring_necessity_physics_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source247 } from '../instruments/uwes3_en/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source248 } from '../instruments/uwes9_2004_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source249 } from '../instruments/uwes9_en/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source250 } from '../instruments/value_cost_biology_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source251 } from '../instruments/value_cost_chemistry_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source252 } from '../instruments/value_cost_chinese_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source253 } from '../instruments/value_cost_english_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source254 } from '../instruments/value_cost_mathematics_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source255 } from '../instruments/value_cost_physics_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source256 } from '../instruments/who5/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source257 } from '../instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source233 } from '../instruments/timss2023_disorderly_behavior_mathematics_g4_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source234 } from '../instruments/timss2023_disorderly_behavior_mathematics_g8_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source235 } from '../instruments/timss2023_disorderly_behavior_science_g4_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source236 } from '../instruments/timss2023_disorderly_behavior_science_g8_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source237 } from '../instruments/timss2023_instructional_clarity_mathematics_g4_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source238 } from '../instruments/timss2023_instructional_clarity_mathematics_g8_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source239 } from '../instruments/timss2023_instructional_clarity_science_g4_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source240 } from '../instruments/timss2023_instructional_clarity_science_g8_student_us_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source241 } from '../instruments/tipi_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source242 } from '../instruments/tses12_2024_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source243 } from '../instruments/tses12_en_2024/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source244 } from '../instruments/tses24_2024_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source245 } from '../instruments/tses24_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source246 } from '../instruments/tses24_zh_hant/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source247 } from '../instruments/tswq_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source248 } from '../instruments/tswq_zh_cn/1.0.1/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source249 } from '../instruments/tutoring_necessity_biology_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source250 } from '../instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source251 } from '../instruments/tutoring_necessity_chinese_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source252 } from '../instruments/tutoring_necessity_english_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source253 } from '../instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source254 } from '../instruments/tutoring_necessity_physics_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source255 } from '../instruments/uwes3_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source256 } from '../instruments/uwes9_2004_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source257 } from '../instruments/uwes9_en/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source258 } from '../instruments/value_cost_biology_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source259 } from '../instruments/value_cost_chemistry_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source260 } from '../instruments/value_cost_chinese_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source261 } from '../instruments/value_cost_english_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source262 } from '../instruments/value_cost_mathematics_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source263 } from '../instruments/value_cost_physics_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source264 } from '../instruments/who5/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source265 } from '../instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument'
 import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
@@ -523,4 +531,12 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source255,
   source256,
   source257,
+  source258,
+  source259,
+  source260,
+  source261,
+  source262,
+  source263,
+  source264,
+  source265,
 ]
