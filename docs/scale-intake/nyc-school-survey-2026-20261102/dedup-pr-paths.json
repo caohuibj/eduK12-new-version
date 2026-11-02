@@ -1,0 +1,269 @@
+{
+  "recordKind": "read_only_pr_path_audit_not_complete_content_or_database_dedup",
+  "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "openPRCount": 26,
+  "instrumentPathPRCount": 13,
+  "fullPathList": "Inspected using gh api pagination; original retained in task temporary research directory. Hashes bind sorted path lists, not file contents.",
+  "pullRequests": [
+    {
+      "headRefName": "content/cpj-sjt-pilot-20261102",
+      "headRefOid": "0ef13277b8634dcde2fa2e7446486a13c61206b5",
+      "number": 539,
+      "title": "content(sjt): CPJ-SJT 课堂观察原生试用题库与发布清单",
+      "nycPathMatches": [],
+      "fileCount": 277,
+      "instrumentPathCount": 144,
+      "sortedPathListSHA256": "4ea49dcb27405a3394aaac697c6eda7f4621eb64f4ed49bb4338cabeb6bbd1d5"
+    },
+    {
+      "headRefName": "fix/direct-audit-confirmed-20261101",
+      "headRefOid": "c6c415436ed3ff6f3de2cdf320b7c160cc4fd489",
+      "number": 538,
+      "title": "fix: align resource projections and current authorization (#530–#536)",
+      "nycPathMatches": [],
+      "fileCount": 33,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "cca96d06463257ec86190926bf6d1f3c343adedd418e88e28664fa759fbf6d87"
+    },
+    {
+      "headRefName": "content/tosa-teacher-wd-042",
+      "headRefOid": "46ff029d9cca20b221208e85257b5fa482eaefa3",
+      "number": 537,
+      "title": "content(sjt): TOSA 教师担责 0.4.2 试用候选与入库清单",
+      "nycPathMatches": [],
+      "fileCount": 17,
+      "instrumentPathCount": 3,
+      "sortedPathListSHA256": "19b94b405b86e69d41ac7c072b49911854caa8bf877563e9da3a0a2409106ede"
+    },
+    {
+      "headRefName": "fix/frontend-nginx-main-20261101",
+      "headRefOid": "cff8728f67818a28b9ab0a2189c30040470dbd6b",
+      "number": 529,
+      "title": "fix(frontend): version the container Nginx main configuration",
+      "nycPathMatches": [],
+      "fileCount": 5,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "305cc3c0eccda8c0c722b6c20ebc9e2de283471eabf762b1517653d20a5fce47"
+    },
+    {
+      "headRefName": "loadtest-20261101",
+      "headRefOid": "70a6b3bc54e30c95c35733a705c6350f929d2a6d",
+      "number": 515,
+      "title": "loadtest-20261101: 压测工具与容量基线报告（无生产改动）",
+      "nycPathMatches": [],
+      "fileCount": 6,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "26a27ed5e6ee3020fa6ea473e7cac9d0aa5404fa2f0a4bd5d82baa72c11783a3"
+    },
+    {
+      "headRefName": "ui/cua-deep-pages-20261101",
+      "headRefOid": "290aa955a3445bcb0b519829423e626d044a2fc1",
+      "number": 491,
+      "title": "fix(ui): Training 深层报告主题与空状态 [skip ci]",
+      "nycPathMatches": [],
+      "fileCount": 4,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "d526d0f3ba10f461362f7693744f2c8fab2a7e75bcb8a1faf921d703e22b58e0"
+    },
+    {
+      "headRefName": "ui/cua-catalog-review-20261101",
+      "headRefOid": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28",
+      "number": 489,
+      "title": "fix(ui): 目录主题与 Training 深色编制可读性 [skip ci]",
+      "nycPathMatches": [],
+      "fileCount": 3,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "df9f545be1fa40fc8aa02f1d430083370fe1c28c2da7b02814f2d2d69d0ddfec"
+    },
+    {
+      "headRefName": "ui/cua-admin-review-20261101",
+      "headRefOid": "0c526f0529ab47c0054f9470d0bb9217e1d787a5",
+      "number": 488,
+      "title": "fix(admin): 区分草稿列表读取失败与空目录",
+      "nycPathMatches": [],
+      "fileCount": 3,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "55d0c127b4713b4150718ec76caa7dbb5f5d91280f00b0a9af2c2dba3df3a9a6"
+    },
+    {
+      "headRefName": "reports/cognitive-47-polish-20261101",
+      "headRefOid": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8",
+      "number": 482,
+      "title": "认知47项：版本化报告与模式修订",
+      "nycPathMatches": [],
+      "fileCount": 310,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "1d4567438a4708892317e82e40bda91365af787f757c505ac4a6a0a7493582f8"
+    },
+    {
+      "headRefName": "cognitive/twelve-new-tasks-20261028",
+      "headRefOid": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5",
+      "number": 441,
+      "title": "feat(cognitive): 32 个新认知测验 + 智力评估路线图 v2.0 实施（阶段一 PR0-PR3 + 阶段二工程侧 PR4-PR7）",
+      "nycPathMatches": [],
+      "fileCount": 693,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "a82d0398af0212a41c52762a166c91f42e9e4bd0a99da47e569c6e146a55bf57"
+    },
+    {
+      "headRefName": "feat/scale-intake-cumulative-20261030",
+      "headRefOid": "0f8057fa75bcb89215275f6ad7695f189fcf0e65",
+      "number": 413,
+      "title": "feat(scale): cumulative reviewed Scale intake — keep open until all batches finish",
+      "nycPathMatches": [],
+      "fileCount": 15,
+      "instrumentPathCount": 8,
+      "sortedPathListSHA256": "56e735cbfe5e9d4bd20900a93a129cf9bd713c175d32f75f871d296292907db6"
+    },
+    {
+      "headRefName": "fix/scale-frozen-instruction-import-20261030",
+      "headRefOid": "4d79bc45d607f8e771eccfacc49a7558b8a3985e",
+      "number": 412,
+      "title": "fix(scale): break frozen instruction schema import cycle",
+      "nycPathMatches": [],
+      "fileCount": 1,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "d7355cdce23f11260df2f6d056303eb7d473eb82046a346ff37f44a2fd39fcea"
+    },
+    {
+      "headRefName": "feat/jdr-report-locale-gate-20261030",
+      "headRefOid": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d",
+      "number": 397,
+      "title": "fix(scale): decouple report language from questionnaire locale",
+      "nycPathMatches": [],
+      "fileCount": 2,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "f917ce94fbd17f1f94e0a7270616dcf99953b5b14cc9331233047ccf08b9c1da"
+    },
+    {
+      "headRefName": "work/scale-test-anxiety-intake-20261029",
+      "headRefOid": "5454a7d7630a4ccb7125d0c621fa10317dc6924f",
+      "number": 383,
+      "title": "draft(scale): intake CTAS-12 zh-CN, TAS-37 zh-CN and CTAS-2 en",
+      "nycPathMatches": [],
+      "fileCount": 5,
+      "instrumentPathCount": 3,
+      "sortedPathListSHA256": "5fdff3a81d8148a17e2e36d06b29df2bd639a18b1e5a865e52124f212c4205ea"
+    },
+    {
+      "headRefName": "integration/scale-26-b0-main-20261028",
+      "headRefOid": "333200ade0c6cb42130cbc052189ba9c64691a12",
+      "number": 379,
+      "title": "feat(scale): integrate 26 validated instrument packages, version metadata and respondent reports",
+      "nycPathMatches": [],
+      "fileCount": 272,
+      "instrumentPathCount": 99,
+      "sortedPathListSHA256": "f1266d71aa5147ab5172628cd4a48f12105e5a4d92186842183ed2ee1846beea"
+    },
+    {
+      "headRefName": "content/scale-content-batch3-20261028",
+      "headRefOid": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792",
+      "number": 375,
+      "title": "content(scale): audit candidate queue and prepare 17 versioned packages [skip ci]",
+      "nycPathMatches": [],
+      "fileCount": 374,
+      "instrumentPathCount": 75,
+      "sortedPathListSHA256": "8767a4d92b72ace319bca6d37a89a5e639bd93b72050cdef2be276a3ea095592"
+    },
+    {
+      "headRefName": "content/scale-ipip-batch2-20261028",
+      "headRefOid": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53",
+      "number": 373,
+      "title": "content(scale): audit three IPIP packages and bind traced instructions [skip ci]",
+      "nycPathMatches": [],
+      "fileCount": 61,
+      "instrumentPathCount": 6,
+      "sortedPathListSHA256": "21c3592b259473cbfaca899ba18c25301e77f59a86d89fb67b5851cbf7159979"
+    },
+    {
+      "headRefName": "content/scale-ipip-batch1-20261028",
+      "headRefOid": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+      "number": 371,
+      "title": "content(scale): audit and intake three IPIP packages [skip ci]",
+      "nycPathMatches": [],
+      "fileCount": 208,
+      "instrumentPathCount": 7,
+      "sortedPathListSHA256": "daec916144e3de5c2a4352de05bb6b3c6177b6faf7e50ae3f15d35a6c5c914aa"
+    },
+    {
+      "headRefName": "content/scale-bps9-intake-20261028",
+      "headRefOid": "bfd6dcbca24567219ec24979481f3da8e0137984",
+      "number": 370,
+      "title": "content(scale): bind BPS9 instruction and verify isolated intake [skip ci]",
+      "nycPathMatches": [],
+      "fileCount": 66,
+      "instrumentPathCount": 4,
+      "sortedPathListSHA256": "95af9af916eab571c02260d7b76a2d510ccc508db991b9edc092240b8d20c8b2"
+    },
+    {
+      "headRefName": "feat/dot-cognitive-content-integration-20261028",
+      "headRefOid": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+      "number": 368,
+      "title": "WIP: integrate existing cognitive candidates and repair report structure",
+      "nycPathMatches": [],
+      "fileCount": 2101,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "1c15d9a79ffbbcc49e365ac2a1d6133b1119968a392d2ad93c3fc4e8c63001e2"
+    },
+    {
+      "headRefName": "content/scale-structural-batch1-20261028",
+      "headRefOid": "8e4440cac46086f73390f8774c40853beb9a6ddd",
+      "number": 367,
+      "title": "feat(scale): onboard ARS30 and improve scale report presentation",
+      "nycPathMatches": [],
+      "fileCount": 136,
+      "instrumentPathCount": 4,
+      "sortedPathListSHA256": "bb1308e92f86ed0258a8dddb87c03c5550b5c07742132bc376d0e925b793c93a"
+    },
+    {
+      "headRefName": "release/dbt-wccl59-v1-0-2-20261027",
+      "headRefOid": "e2b23122e1a41f52f61719fdd31a6daf338b97e1",
+      "number": 362,
+      "title": "content(scale): approve DBT-WCCL59 zh-CN v1.0.2 as noncommercial publication candidate",
+      "nycPathMatches": [],
+      "fileCount": 9,
+      "instrumentPathCount": 4,
+      "sortedPathListSHA256": "e2d719271055a6371f491f9d753137d6a0e8282270a7d4153843f08d8a327e81"
+    },
+    {
+      "headRefName": "cognitive-next-three-core-20261026",
+      "headRefOid": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+      "number": 360,
+      "title": "feat(cognitive): expand reviewed cognitive content candidates",
+      "nycPathMatches": [],
+      "fileCount": 1269,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "b93f58411ffc249704fbb4e8b83158088162ff7b8d5db7c281eab6a826f68d74"
+    },
+    {
+      "headRefName": "public-library/cognitive-20261022",
+      "headRefOid": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+      "number": 330,
+      "title": "Public cognitive library: staged Simon source-only materials",
+      "nycPathMatches": [],
+      "fileCount": 15,
+      "instrumentPathCount": 0,
+      "sortedPathListSHA256": "b24d9fe92c99d8e5829eb5e869da1354fc5af11ba0a8f4d4d770edadeab9ed5a"
+    },
+    {
+      "headRefName": "public-library/sjt-20261022",
+      "headRefOid": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+      "number": 329,
+      "title": "Public SJT library: staged E-SPIN bilingual research materials",
+      "nycPathMatches": [],
+      "fileCount": 62,
+      "instrumentPathCount": 6,
+      "sortedPathListSHA256": "24d81640c89d7c0747818ca22690c70ca54a1052aece1ffdc685debef25258b6"
+    },
+    {
+      "headRefName": "public-library/scales-20261022",
+      "headRefOid": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "number": 328,
+      "title": "Public scale library: construct classification foundation and staged imports",
+      "nycPathMatches": [],
+      "fileCount": 73,
+      "instrumentPathCount": 10,
+      "sortedPathListSHA256": "65eb5ef2e825ff8f2d49c85c4170a7ee4028d2b18d920c2334b61e0df7e1d5e0"
+    }
+  ]
+}
