@@ -1,0 +1,71 @@
+[
+  {
+    "instrumentKey": "selfie4t_2022tk_32_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "CATALOG_ONLY",
+    "administrable": false,
+    "goldenCases": 0,
+    "scoringExecutions": 0,
+    "issues": []
+  },
+  {
+    "instrumentKey": "selfie4t_2022tk_assessment_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 10,
+    "scoringExecutions": 13,
+    "referencePolicy": "none",
+    "issues": []
+  },
+  {
+    "instrumentKey": "selfie4t_2022tk_digital_resources_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 10,
+    "scoringExecutions": 15,
+    "referencePolicy": "none",
+    "issues": []
+  },
+  {
+    "instrumentKey": "selfie4t_2022tk_empowering_learners_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 10,
+    "scoringExecutions": 14,
+    "referencePolicy": "none",
+    "issues": []
+  },
+  {
+    "instrumentKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 10,
+    "scoringExecutions": 16,
+    "referencePolicy": "none",
+    "issues": []
+  },
+  {
+    "instrumentKey": "selfie4t_2022tk_professional_engagement_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 10,
+    "scoringExecutions": 19,
+    "referencePolicy": "none",
+    "issues": []
+  },
+  {
+    "instrumentKey": "selfie4t_2022tk_teaching_learning_en_teacher_self",
+    "instrumentVersion": "1.0.0",
+    "status": "DRAFT",
+    "administrationEligibility": "not-evaluated",
+    "goldenCases": 10,
+    "scoringExecutions": 15,
+    "referencePolicy": "none",
+    "issues": []
+  }
+]
