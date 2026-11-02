@@ -26,6 +26,29 @@
       "name": "teacher/student report editorial content check",
       "status": "ASSISTANT_EDITORIAL_REVIEW",
       "scope": "Teacher growth normal/difficult/insufficient examples; group disclosure conditional; student completion/support text does not release scores; no diagnosis/ranking/importance-times-deficit or runtime R claim. Not human scientific/QC approval."
+    },
+    {
+      "name": "exact committed diff route dry read",
+      "status": "PASS",
+      "exitCode": 0,
+      "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+      "head": "94b9434a8dcc565003e9c716571498426db47f2a",
+      "route": {
+        "scenario": "documentation",
+        "documentation": true,
+        "content": false,
+        "frontend_build": false,
+        "codeql": false,
+        "scale_intake_light": false,
+        "application_route": "legacy"
+      },
+      "boundary": "Local classifier result only, not formal CI qualification;8 ordinary documentation files, no native content or executable tests."
+    },
+    {
+      "name": "git diff --cached --check",
+      "status": "PASS",
+      "exitCode": 0,
+      "scope": "Eight staged passive documents before content commit."
     }
   ],
   "notionChecklist": {
@@ -119,5 +142,7 @@
       "sha256": "d57f1e048d385a2a944ca8a13e7ee64fc7a2e63e0e3c9c743f9a218064ca1b82"
     }
   ],
-  "evidenceReuse": "A later validation-only metadata update does not alter these7 inspected document inputs. Exact head/tree and routing output recorded after commit."
+  "evidenceReuse": "A later validation-only metadata update does not alter these7 inspected document inputs. Exact head/tree and routing output recorded after commit.",
+  "checkedContentHead": "94b9434a8dcc565003e9c716571498426db47f2a",
+  "checkedContentTree": "57bcdde822238152a58cb538db83f616b61a5a36"
 }
