@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "schemaAndCsvStatus": "passed before earlier harness failure; not rerun",
+  "optionalFields": [
+    40,
+    3
+  ],
+  "csvRoundtrip": 40,
+  "missingAllOptional": 40,
+  "missingIsBlocking": false,
+  "numericOptionScores": 0,
+  "runtime": "Existing FORM normalization only, no scale scorer"
+}

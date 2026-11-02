@@ -1,8 +1,8 @@
 {
-  "status": "PREPARATION_VALIDATED_CATALOG_ONLY_NOT_INSTALLED",
+  "status": "CONTENT_AND_NATIVE_UNSCORED_FORMS_VALIDATED_NOT_PUBLICLY_INSTALLED",
   "baseline": "adad907a4",
   "checkedOn": "2026-11-02",
-  "scope": "9 source identities; 1 original 40-item parent metadata plus 8 octant candidates",
+  "scope": "9 source identities + 2 native unscored forms + ordinary 43-field form combination",
   "checks": {
     "source_schema_and_catalog": {
       "status": "PASSED_ASSERTIONS_IN_FAILED_HARNESS",
@@ -48,12 +48,12 @@
       "status": "PASS",
       "command": "tsx scripts/generate-scale-instruments.ts --check"
     },
-    "real_isolated_db_import": "NOT_RUN_CATALOG_ONLY",
+    "real_isolated_db_import": "PASS_FOR_NATIVE_UNSCORED_FORMS_ONLY; scored scale sources remain CATALOG_ONLY",
     "buildScaleResult": "NOT_RUN_NO_EXECUTABLE_DEFINITION",
     "runtime_report_projection": "NOT_RUN_NO_RUNTIME_R",
     "formal_ci": {
       "status": "NOT_RUN",
-      "reason": "Draft content candidate uses [skip ci]; no merge qualification claimed. AGENTS.md requires reading Notion CI checklist before activation; Notion fetch returned Unknown tool (not an approval denial). No CI intentionally activated."
+      "reason": "No CI pass claimed. AGENTS.md requires Notion CI checklist before activation; notion.fetch and notion.search both returned Unknown tool. Content-only scope checked locally; skip-ci commit preserves pending state."
     },
     "production_or_admin_created_dedup": "NOT_QUERIED",
     "notion_ci_checklist": {
@@ -62,6 +62,33 @@
       "action": "notion.fetch with link_id",
       "result": "Mcp -32001 Unknown tool notion.fetch",
       "pending": "Read checklist before any later CI activation; no page write attempted."
+    },
+    "native_forms": {
+      "schema_and_csv": "PASS_ASSERTIONS_BEFORE_FIRST_HARNESS_FAILURE",
+      "nativeDefinitionFiles": [
+        "observation-form.native.json",
+        "context-form.native.json"
+      ],
+      "optionalItemCounts": [
+        40,
+        3
+      ],
+      "csvRoundtripItems": 40,
+      "normalization": "PASS_ASSERTIONS_BEFORE_FIRST_PERSISTENCE_ADAPTER_FAILURE; empty/partial optional answers accepted, missing details retained as SHOWN_MISSING",
+      "persistence": "PASS_FRESH_SERVICE_IMPORT_RESUMED_FROM_READBACK",
+      "services": [
+        "createFormTemplate",
+        "addItem",
+        "importFormTemplate"
+      ],
+      "receipt": "isolated-form-import-receipt.json",
+      "realDatabase": true,
+      "database": "Disposable loopback PostgreSQL16.15, current schema via prisma db push, no migration replay",
+      "templates": "40-item observation + 3-item context, private DRAFT",
+      "ordinaryCombination": "43 FORM items / 2 sections, private DRAFT",
+      "reportMode": "COLLECTION_ONLY",
+      "scoring": "NONE",
+      "cleanup": "Container and volume removed after successful readback"
     }
   },
   "failureHistory": [
@@ -79,6 +106,16 @@
       "action": "local harness second run",
       "status": "FAILED_HARNESS_ASSERTION",
       "reason": "Exact zero expected from floating point sum; actual 1.1102230246251565e-16. Nine source/install-preflight cases and item mapping had completed; preserved as individual passed assertions inside failed invocation. Supplemental math/report validation uses 1e-12 tolerance, justified by six-decimal published weights; no source or engine changed."
+    },
+    {
+      "action": "native form static harness",
+      "status": "FAILED_HARNESS_ASSERTION",
+      "reason": "Expected empty missing[] for optional unanswered items. Existing normalizer accepts them and retains 40 SHOWN_MISSING records. Corrected only affected normalization assertions; schema/CSV cases not rerun."
+    },
+    {
+      "action": "native form persistence adapter",
+      "status": "FAILED_INPUT_SCHEMA_BEFORE_ITEM_WRITE",
+      "reason": "addItem.formDefinition omits itemKey because service allocates stable keys. Removed supplied itemKey; queried existing synthetic owner and empty template, then resumed instead of creating duplicate. No runtime/schema changes."
     }
   ],
   "environment": {
@@ -101,7 +138,8 @@
       "zod": true,
       "@prisma/client": true,
       "prisma": true
-    }
+    },
+    "prismaClient": "Generated from this worktree schema into an isolated local dependency overlay; shared @prisma/client was copied, not mutated."
   },
   "sha256": {
     "server-version/backend/src/modules/scale/instruments/qti_sun2018_dissatisfied_zh_cn/1.0.0/source.json": "4d89e7888ce9bb98dfeb9f59ee5dfc0245b36fd2c9ea55746b99cc9ab3943f50",
@@ -115,12 +153,19 @@
     "server-version/backend/src/modules/scale/instruments/qti_sun2018_directing_zh_cn/1.0.0/source.json": "541f91e4878b0c4100042b650d3ec42b0313b5baf2ee432b83f169b849898530",
     "docs/scale-intake/qti-sun2018-zh-cn/item-preparation.json": "3ba375a8c3b99572e1238daa4c811e5e523cba3d63ff0f6c923598ad2508c6a6",
     "docs/scale-intake/qti-sun2018-zh-cn/scoring-preparation.json": "089c6993351c2c0a74c124c89daf61abcd1b8641fcd3f5b9c5cad2244160ebf9",
-    "docs/scale-intake/qti-sun2018-zh-cn/report-examples.json": "baaec3d5b67e8437689fd80d46f7d086009f40ec7e97116f334fd0eb7cde2e95"
+    "docs/scale-intake/qti-sun2018-zh-cn/report-examples.json": "baaec3d5b67e8437689fd80d46f7d086009f40ec7e97116f334fd0eb7cde2e95",
+    "docs/scale-intake/qti-sun2018-zh-cn/observation-form.native.json": "6e7e94d9988bb230015e10f09f4b469fd85cf9938cd4b83a0615845e9ec8fe8d",
+    "docs/scale-intake/qti-sun2018-zh-cn/context-form.native.json": "7209f0a2503b94b8477c812fb4a897d033713e5b11088573454ef7dbf84e2b79",
+    "docs/scale-intake/qti-sun2018-zh-cn/form-manifest.json": "9feee7c1254f379da7931204535ba9f2c57e5ae1c04bce4daad641c7c4542857",
+    "docs/scale-intake/qti-sun2018-zh-cn/observation-form-import-csv.txt": "3b6b48683a9db0c5bea649321da4693bdcbc849ada55d554ba1fcd7411f8126d",
+    "docs/scale-intake/qti-sun2018-zh-cn/isolated-form-import-receipt.json": "988e9be86cabed33b25a0d1c623f9cda7936e11c6a10d7629a9bd35e40f718ab",
+    "docs/scale-intake/qti-sun2018-zh-cn/native-form-validation.json": "430a1e0e056939fc833476c21f9605840522e96f499a6854bdeb46dc89284f46"
   },
   "installState": {
-    "development": "NOT_INSTALLED",
-    "production": "NOT_TOUCHED",
-    "candidate": "CATALOG_ONLY"
+    "development": "NO_PERSISTENT_INSTALL",
+    "isolatedValidation": "2 private DRAFT forms + 43-field ordinary combination imported/read back; disposable database destroyed afterward",
+    "scoredScaleCandidates": "CATALOG_ONLY",
+    "production": "NOT_TOUCHED"
   },
   "blockers": [
     "Exact Chinese response anchors, intermediate labels, numeric coding and full instructions absent from article",
@@ -128,5 +173,11 @@
     "Agency/Communion normalization/scale coding not fully specified",
     "Cross-octant frozen permutation not prepared; can use existing fixed display after protocol confirmed",
     "Independent octant administration validity not established; full 40-item administration remains preferred"
-  ]
+  ],
+  "publication": {
+    "branch": "feat/qti-sun2018-zh-20261102",
+    "draftPr": "https://github.com/caohuibj/eduK12-new-version/pull/545",
+    "status": "DRAFT_CREATED_AFTER_NEW_EXPLICIT_AUTHORIZATION",
+    "priorDenial": "Prior automatic-review PR denial preserved; new explicit batch yes authorization permitted one retry after no-PR readback. Retry succeeded."
+  }
 }
