@@ -7,7 +7,7 @@ import { standaloneAdmissionPersistence } from '../scale/scale-admission.service
 import { freezeScaleRuntimeAtAttemptStart,persistFrozenScaleRuntimeSnapshot,
   loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { submitScaleAssessmentFinal,type FinalScaleAnswerInput } from '../scale/scale-final-submit.service'
-import { releasedTeacherScaleEntry } from './scaleLicense.service'
+import { releasedTeacherScaleEntry, releasedPersonalTeacherScaleEntries } from './scaleLicense.service'
 
 export class TeacherPersonalAssessmentError extends Error{
   constructor(public readonly code:string,public readonly statusCode=409){
@@ -73,12 +73,10 @@ export async function listPersonalTeacherScales(userId:string){
         AND grant_row."status"='ACTIVE'
       ORDER BY r."id" LIMIT 51
     `
-    const available=[]
-    for(const row of list.slice(0,50)){
-      await releasedTeacherScaleEntry(tx,{family:'SCALE',key:row.key,version:row.version})
-      available.push({resourceId:row.resourceId,title:row.title,version:row.version,
-        scientificMaturity:'PILOT' as const,reportMode:'PERSONAL_ONLY' as const})
-    }
+    const visible=list.slice(0,50)
+    await releasedPersonalTeacherScaleEntries(tx,visible.map(row=>({family:'SCALE',key:row.key,version:row.version})))
+    const available=visible.map(row=>({resourceId:row.resourceId,title:row.title,version:row.version,
+      scientificMaturity:'PILOT' as const,reportMode:'PERSONAL_ONLY' as const}))
     return {list:available,truncated:list.length>50}
   })
 }

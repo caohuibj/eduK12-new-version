@@ -1,4 +1,4 @@
-import { availableSjtPackages, projectSjtReleaseStatus } from '../modules/situational/authoring/service'
+import { availableSjtPackages, projectSjtReleaseStatus, projectSjtReleaseStatuses } from '../modules/situational/authoring/service'
 import { exportSituationalResearchAttempt } from '../modules/situational/situation-research-export'
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
@@ -156,10 +156,10 @@ export const situationalController = {
     try {
       if (req.query.view === 'summary') {
         const data = await listSituationalHistorySummaries(req.user!.userId)
-        return success(res, { ...data, list: await Promise.all(data.list.map(row => projectSjtReleaseStatus(row))) })
+        return success(res, { ...data, list: await projectSjtReleaseStatuses(data.list) })
       }
       const data=await listSituationalHistory(req.user!.userId)
-      return success(res,{...data,list:await Promise.all(data.list.map(row=>projectSjtReleaseStatus(row)))})
+      return success(res,{...data,list:await projectSjtReleaseStatuses(data.list)})
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化测评历史失败')
     }
