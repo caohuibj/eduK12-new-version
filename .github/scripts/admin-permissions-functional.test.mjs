@@ -19,7 +19,7 @@ const workflow=name=>readFileSync(new URL(`../workflows/${name}.yml`,import.meta
 const job=(source,name)=>source.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:/)[0]||'';
 const acceptance=['media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'];
 const functionalChecks=['scope','maintenance','miniprogram','backend','backend-regression','frontend','browser','docker',
-  'frontend-build','accept-visual','codeql','accept-media','accept-ui','accept-ops'];
+  'backend-regression-reuse','frontend-build','accept-visual','codeql','accept-media','accept-ui','accept-ops'];
 function needsFor(){
   const selected=['media2','video_core','media7','situational_video','situational_branching'];
   const outputs={...Object.fromEntries(acceptance.map(key=>[key,key==='perf_smoke'?'false':'true'])),
@@ -28,8 +28,9 @@ function needsFor(){
     media_selection:JSON.stringify(selected),media_groups:JSON.stringify(mediaPlan(selected)),
     training_functional_only:'false',training_functional_plan:'null',run_performance_tests:'false',
     admin_permissions_functional_only:'true',admin_permissions_functional_plan:JSON.stringify(plan())};
-  const needs={scope:{outputs,result:'success'},'accept-perf':{result:'skipped'}};
-  for(const name of functionalChecks.filter(name=>name!=='scope'))needs[name]={result:'success'};
+  const needs={scope:{outputs,result:'success'},'accept-perf':{result:'skipped'},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
+  for(const name of functionalChecks.filter(name=>name!=='scope'&&name!=='backend-regression-reuse'))needs[name]={result:'success'};
   return needs;
 }
 

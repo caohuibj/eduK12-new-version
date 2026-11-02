@@ -154,11 +154,12 @@ test('frontend version lock source and sibling tests use full frontend checks wi
 test('frontend dependency workflow dispatch agrees with the aggregate and frontend-only image target',()=>{
   const ci=source('ci');
   for(const draft of [true,false]){
-    const needs={scope:{result:'success',outputs:{...outputs(),application_route:'legacy',dependencies_frontend_only:'true'}}};
+    const needs={scope:{result:'success',outputs:{...outputs(),application_route:'legacy',dependencies_frontend_only:'true'}},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     const github={event_name:'pull_request',ref_name:'feature/dependencies',event:{pull_request:{draft,number:1,head:{ref:'feature/dependencies'}}}};
     for(const name of ['maintenance','backend','backend-regression','frontend','frontend-build','docker']){
       const expr=job(ci,name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
-      const selected=new Function('needs','github','vars','cancelled','fromJSON',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse);
+      const selected=new Function('needs','github','vars','cancelled','fromJSON','always',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse,()=>true);
       assert.equal(Boolean(selected),['frontend','frontend-build','docker'].includes(name),name+' draft='+draft);
     }
     const expr=job(ci,'docker').match(/frontend_only: \$\{\{ (.+) \}\}/)[1];

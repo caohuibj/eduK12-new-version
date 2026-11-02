@@ -24,7 +24,7 @@ const followupPlan = () => validateTrainingFollowup(followupEntries(), followupC
 const workflow = name => readFileSync(new URL(`../workflows/${name}.yml`, import.meta.url), 'utf8');
 const job = (source, name) => source.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:/)[0] || '';
 const acceptance = ['media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'];
-const functionalChecks = ['scope','maintenance','miniprogram','backend','backend-regression','frontend','browser','docker',
+const functionalChecks = ['scope','maintenance','miniprogram','backend','backend-regression','backend-regression-reuse','frontend','browser','docker',
   'frontend-build','accept-visual','codeql','accept-media','accept-ui','accept-ops'];
 function needsFor(functional = true) {
   const selected = ['media2','video_core','media7','situational_video','situational_branching'];
@@ -37,8 +37,9 @@ function needsFor(functional = true) {
     training_functional_only: String(functional), run_performance_tests: String(!functional),
     training_functional_plan: JSON.stringify(functional ? plan() : null),
   };
-  const needs = { scope: { outputs, result: 'success' }, 'accept-perf': { result: functional ? 'skipped' : 'success' } };
-  for (const name of functionalChecks.filter(name => name !== 'scope')) needs[name] = { result: 'success' };
+  const needs = { scope: { outputs, result: 'success' }, 'accept-perf': { result: functional ? 'skipped' : 'success' },
+    'backend-regression-reuse': { result: 'success', outputs: { reuse_backend_regression: 'false' } } };
+  for (const name of functionalChecks.filter(name => name !== 'scope' && name !== 'backend-regression-reuse')) needs[name] = { result: 'success' };
   return needs;
 }
 

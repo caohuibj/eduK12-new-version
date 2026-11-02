@@ -317,7 +317,8 @@ test('media probes and grouped execution share scenarios, fresh databases and ex
 
 test('frontend compilation and checks are separate while both remain required',()=>{
   const ci=source('ci'),front=job(source('ci-frontend'),'frontend');
-  for(const name of ['backend','backend-regression','codeql','frontend-build']) assert.match(job(ci,name),/needs: scope/);
+  for(const name of ['backend','codeql','frontend-build']) assert.match(job(ci,name),/needs: scope/);
+  assert.match(job(ci,'backend-regression'),/needs: \[scope, backend-regression-reuse\]/);
   assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);assert.match(front,/full frontend tests/);
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
   assert.match(front,/defaults:\n      run:\n        working-directory: server-version\/frontend\n/);
@@ -356,7 +357,8 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-maintenance'),/inputs\.step_probe == 'maintenance'/);
   assert.match(job(ci,'probe-maintenance'),/uses: \.\/\.github\/workflows\/ci-maintenance\.yml/);
   assert.match(source('ci-frontend'),/runs-on: ubuntu-24\.04/);
-  for(const name of ['backend','backend-regression','codeql']) assert.match(job(ci,name),/needs: scope/);
+  for(const name of ['backend','codeql']) assert.match(job(ci,name),/needs: scope/);
+  assert.match(job(ci,'backend-regression'),/needs: \[scope, backend-regression-reuse\]/);
 });
 
 test('different component probes have independent concurrency groups while same-route updates cancel stale runs', () => {
@@ -477,7 +479,7 @@ test('light test-only route never starts unrelated builds, scans or platform smo
     // These existing job predicates use JavaScript-compatible boolean syntax.
     // Check the complete condition, including leading exact-route exclusions;
     // a textual prefix cannot establish that a later OR does not bypass it.
-    const allowed=new Function('needs','github','vars','cancelled',`return (${expression});`);
+    const allowed=new Function('needs','github','vars','cancelled','always',`return (${expression});`);
     let platformReachable=false;
     for(const event of ['pull_request','push','workflow_dispatch']) for(const draft of [false,true])
       for(const force of ['false','true']) for(const frontend of ['false','true']) {
@@ -487,9 +489,10 @@ test('light test-only route never starts unrelated builds, scans or platform smo
           repository:'caohuibj/eduK12-new-version',
           event:{pull_request:{draft,number:379,head:{ref:'feature/ci-synthetic',
             repo:{full_name:'caohuibj/eduK12-new-version'}}}}},vars={CI_FORCE_FULL:force};
-        assert.equal(allowed({scope:{outputs}},github,vars,()=>false),false,
+        const needs={scope:{result:'success',outputs},'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
+        assert.equal(allowed(needs,github,vars,()=>false,()=>true),false,
           name+' must exclude frontend-test for every event/draft/force/frontend context');
-        platformReachable||=allowed({scope:{outputs:{...outputs,scenario:'platform'}}},github,vars,()=>false);
+        platformReachable||=allowed({...needs,scope:{result:'success',outputs:{...outputs,scenario:'platform',application_route:'legacy'}}},github,vars,()=>false,()=>true);
       }
     assert.equal(platformReachable,true,name+' must still admit its ordinary platform work');
   }

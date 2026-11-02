@@ -41,11 +41,12 @@ test('backend module workflow removes only unrelated outer frontend and acceptan
   const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
   for(const draft of [true,false]){
     const outputs=scopeOutputs('false','false','false',{scenario:'backend',application_route:'legacy'});
-    const needs={scope:{result:'success',outputs}};
+    const needs={scope:{result:'success',outputs},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     const github={event_name:'pull_request',ref_name:'feature/backend',event:{pull_request:{draft,number:1,head:{ref:'feature/backend'}}}};
     for(const name of ['maintenance','pr-light-backend','pr-light-frontend','backend','backend-regression','frontend','frontend-build','browser','backend-browser-build','miniprogram','docker','post-merge-smoke']){
       const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
-      const actual=new Function('needs','github','vars','cancelled','fromJSON',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse);
+      const actual=new Function('needs','github','vars','cancelled','fromJSON','always',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,JSON.parse,()=>true);
       assert.equal(Boolean(actual),draft?name==='pr-light-backend':['backend','backend-regression','docker'].includes(name),name+' draft='+draft);
     }
   }
@@ -101,11 +102,12 @@ test('affected frontend workflow conditions agree with the existing merge jobs',
   const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
   for(const draft of [true,false]){
     const outputs=scopeOutputs('false','false','true',{scenario:'frontend',frontend_affected:'true',application_route:'legacy'});
-    const needs={scope:{outputs,result:'success'},'frontend-build':{result:'success'},'backend-browser-build':{result:'success'}};
+    const needs={scope:{outputs,result:'success'},'frontend-build':{result:'success'},'backend-browser-build':{result:'success'},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     const github={event_name:'pull_request',ref_name:'feature/local-page',event:{pull_request:{draft,number:1,head:{ref:'feature/local-page'}}}};
     for(const name of ['frontend','frontend-build','pr-light-frontend','backend-browser-build','browser','docker','post-merge-smoke']){
       const expr=block(name).match(/^    if: \$\{\{ (.+) \}\}$/m)[1];
-      const selected=new Function('needs','github','vars','cancelled',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false);
+      const selected=new Function('needs','github','vars','cancelled','always',`return (${expr})`)(needs,github,{CI_FORCE_FULL:'false'},()=>false,()=>true);
       assert.equal(Boolean(selected),name==='frontend'||name==='docker'&&!draft,name+' draft='+draft);
     }
   }
@@ -166,6 +168,7 @@ test('personal tracking Draft reuses existing producers without qualifying Ready
   assert.ok(failedChecks({...needs,'pr-light-backend':{result:'skipped'}},true).includes('pr-light-backend'));
   assert.ok(failedChecks(needs,false).includes('scope'));
   assert.ok(requiredChecks({scope:{outputs:{...scope,personal_tracking_draft:'false'}}},false).includes('backend-regression'));
+  assert.match(readFileSync('.github/workflows/ci.yml','utf8').split('\n  backend-regression-reuse:\n')[1],/personal_tracking_draft != 'true'/);
 });
 test('Training personal tracking selects the same bounded Draft producers and refuses unrelated writes',()=>{
   const entry=file=>({file,status:'A',oldMode:'000000',newMode:'100644'});
@@ -624,7 +627,8 @@ test('actual Git diffs select different documentation, presentation, content, fr
         for(const k of Object.keys(acceptanceFor([])))assert.equal(output[k],false,k);
       }
       const outputs=Object.fromEntries(Object.entries(output).map(([key,value])=>[key,String(value)]));
-      const needs={scope:{result:'success',outputs}};
+      const needs={scope:{result:'success',outputs},
+        'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
       for(const name of requiredChecks(needs,false)) needs[name]={...needs[name],result:'success'};
       assert.deepEqual(failedChecks(needs,false),[],file);
       assert.deepEqual(JSON.parse(output.docker_runner),['ubuntu-24.04']);
@@ -688,7 +692,8 @@ test('image build tooling gate requires real Docker success only on Ready and re
       assert(failedChecks({...needs,[name]:{...needs[name],result}},draft).includes(name),name+':'+result);
     for(const image_build of ['yes','',true])assert(failedChecks({...needs,scope:{...needs.scope,outputs:{...needs.scope.outputs,image_build}}},draft).includes('scope'));
   }
-  const mixed={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'platform',image_build:'true'})}};
+  const mixed={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'platform',image_build:'true'})},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
   assert(failedChecks(mixed,false).includes('scope'));
 });
 
@@ -697,7 +702,8 @@ test('image build tooling workflow selects existing tools Docker and CodeQL with
   const block=name=>ci.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
   const names=['maintenance','backend','backend-regression','frontend-build','frontend','browser','docker','codeql','miniprogram','accept-media','accept-ui','accept-visual','accept-perf','accept-ops','release-tools'];
   for(const draft of [true,false])for(const imageBuild of [true,false]){
-    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:String(imageBuild),application_route:'legacy'})}};
+    const needs={scope:{result:'success',outputs:scopeOutputs('false','false','false',{scenario:'release-tooling',image_build:String(imageBuild),application_route:'legacy'})},
+      'backend-regression-reuse':{result:'skipped',outputs:{reuse_backend_regression:'false'}}};
     for(const name of [...names,'backend-browser-build'])needs[name]={result:'skipped'};
     const github={event_name:'pull_request',ref_name:'build-inputs',event:{pull_request:{draft,number:1,head:{ref:'build-inputs'}}}};
     for(const name of names){
@@ -765,7 +771,8 @@ test('Cognitive full scope scans every path for native, unsafe, duplicate and no
 });
 test('Cognitive mixed full gate retains generated checks and rejects failed, missing or skipped qualification',()=>{
   const outputs=scopeOutputs('false','false','false',{scenario:'platform',application_route:'legacy',frontend_build:'true',cognitive:'true',cognitive_intake_light:'false'});
-  const needs={scope:{result:'success',outputs}};
+  const needs={scope:{result:'success',outputs},
+    'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
   const required=requiredChecks(needs,false);
   for(const name of ['backend','backend-regression','frontend','browser','docker','codeql'])assert(required.includes(name),name);
   for(const name of required)needs[name]={...needs[name],result:'success'};
@@ -787,7 +794,8 @@ test('Cognitive mixed with image inputs selects full route and gate recomputes i
     const dockerfile='server-version/frontend/Dockerfile';mkdirSync(dirname(join(dir,dockerfile)),{recursive:true});writeFileSync(join(dir,dockerfile),'FROM node:24\n');commit();const head=git('rev-parse','HEAD');
     const output=JSON.parse(execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:dir,encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_FORCE_FULL:'false',CI_PR_REPOSITORY:'fixture/repo',GITHUB_REPOSITORY:'fixture/repo',GITHUB_OUTPUT:''}}));
     assert.equal(output.scenario,'platform');assert.equal(output.cognitive_intake_light,false);assert.equal(output.cognitive,true);assert.equal(output.image_build,false);
-    const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(output).map(([k,v])=>[k,String(v)]))}};
+    const needs={scope:{result:'success',outputs:Object.fromEntries(Object.entries(output).map(([k,v])=>[k,String(v)]))},
+      'backend-regression-reuse':{result:'success',outputs:{reuse_backend_regression:'false'}}};
     for(const name of requiredChecks(needs,false))needs[name]={...needs[name],result:'success'};
     assert.deepEqual(recheckCognitiveIntake(needs,{base,head,cwd:dir}),[]);
     assert(recheckCognitiveIntake({...needs,backend:{result:'failure'}},{base,head,cwd:dir}).includes('backend'));

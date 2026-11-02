@@ -1372,7 +1372,7 @@ jobs:
   backend-regression-reuse:
     name: verify historical backend regression checkpoint
     needs: scope
-    if: ${{ github.event_name == 'pull_request' && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario == 'platform' && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event_name == 'pull_request' && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario == 'platform' && needs.scope.outputs.personal_tracking_draft != 'true' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     timeout-minutes: 6
     permissions:
@@ -3122,4 +3122,3 @@ jobs:
         path: ${{ runner.temp }}/pr356/results/merge-admission
         if-no-files-found: warn
         retention-days: 7
-

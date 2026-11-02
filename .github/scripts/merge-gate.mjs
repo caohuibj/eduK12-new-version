@@ -212,8 +212,9 @@ export function requiredChecks(needs, draft) {
 
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
-  const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
-  if(scope.application_route==='legacy'&&scope.scenario==='platform'){
+  const required = requiredChecks(needs, draft);
+  const failed = required.filter(name => needs[name]?.result !== 'success');
+  if(required.includes('backend-regression-reuse')){
     const reuse=needs['backend-regression-reuse'];
     if(!['true','false'].includes(reuse?.outputs?.reuse_backend_regression))failed.push('backend-regression-reuse-output');
     if(reuse?.outputs?.reuse_backend_regression==='true'
