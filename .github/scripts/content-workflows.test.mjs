@@ -255,6 +255,36 @@ test('browser build restore retries retain exact-run authority and fail closed',
   }
 });
 
+test('new release consumers retain explicit DB opt-ins and an independent empty intake fixture', () => {
+  const regression = job(source('ci-backend-regression'), 'backend-regression');
+  const service = 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public';
+  for (const key of ['CHILD_CROSS_METHOD_TEST_DATABASE_URL', 'COGNITIVE_ASSIGNMENT_INTEGRATION_DB_URL'])
+    assert.ok(regression.includes(`${key}: ${service}`));
+  const fixture = 'cognitive_admin_intake_ci_test';
+  const clone = `createdb -U ptool --template=ptool --owner=ptool ${fixture}`;
+  assert.ok(regression.indexOf(clone) > 0);
+  assert.ok(regression.indexOf(clone) < regression.indexOf('name: seed reference and configuration data'));
+  const steps = regression.split('      - name: ');
+  const intake = steps.find(step => step.startsWith('Cognitive admin intake on its own empty migrated database\n'));
+  assert.ok(intake);
+  assert.ok(intake.includes('ADMIN_AUTH_ORIGIN: http://localhost:5174'));
+  assert.ok(intake.includes("steps.empty-fixtures.outcome == 'success'"));
+  const target = `postgresql://ptool:ptool123@localhost:5432/${fixture}?schema=public`;
+  for (const key of ['DATABASE_URL', 'COGNITIVE_INSTALL_TEST_DATABASE_URL']) assert.ok(intake.includes(`${key}: ${target}`));
+  const file = 'src/__tests__/cognitive/admin-intake.postgres.integration.test.ts';
+  const report = '/tmp/eduk12-cognitive-admin-intake-vitest.json';
+  assert.ok(steps.find(step => step.startsWith('full functional regression\n')).includes(`--exclude=${file}`));
+  assert.ok(intake.includes(`npm test -- ${file} --no-file-parallelism`));
+  assert.ok(intake.includes(`assert-release-test-report.mjs ${report} ${file}`));
+  for (const start of ['clear reports from previous', 'preserve all disjoint', 'upload vitest report artifact']) {
+    const step = steps.find(step => step.startsWith(start));
+    assert.ok(step?.includes(report), start);
+  }
+  const required = steps.find(step => step.startsWith('hosted critical integration suites must not skip\n'));
+  for (const suite of [file, 'src/__tests__/cognitive/assignment-publication-race.postgres.integration.test.ts',
+    'src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts']) assert.ok(required.includes(suite));
+});
+
 test('parent authority has draft unit coverage and non-skipping full integration gates', () => {
   const ci = source('ci');
   assert.match(job(ci, 'pr-light-backend'), /vitest run src\/__tests__\/parent-portal/);
