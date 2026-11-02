@@ -258,7 +258,7 @@ test('browser build restore retries retain exact-run authority and fail closed',
 test('new release consumers retain explicit DB opt-ins and an independent empty intake fixture', () => {
   const regression = job(source('ci-backend-regression'), 'backend-regression');
   const service = 'postgresql://ptool:ptool123@localhost:5432/ptool?schema=public';
-  for (const key of ['CHILD_CROSS_METHOD_TEST_DATABASE_URL', 'COGNITIVE_ASSIGNMENT_INTEGRATION_DB_URL'])
+  for (const key of ['CHILD_CROSS_METHOD_TEST_DATABASE_URL', 'COGNITIVE_ASSIGNMENT_INTEGRATION_DB_URL', 'BUNDLE_JSON_ROUNDTRIP_TEST_DATABASE_URL'])
     assert.ok(regression.includes(`${key}: ${service}`));
   const fixture = 'cognitive_admin_intake_ci_test';
   const clone = `createdb -U ptool --template=ptool --owner=ptool ${fixture}`;
@@ -282,7 +282,8 @@ test('new release consumers retain explicit DB opt-ins and an independent empty 
   }
   const required = source('ci-backend-regression').split('      - name: ').find(step => step.startsWith('hosted critical integration suites must not skip\n'));
   for (const suite of [file, 'src/__tests__/cognitive/assignment-publication-race.postgres.integration.test.ts',
-    'src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts']) assert.ok(required.includes(suite));
+    'src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts',
+    'src/__tests__/bundle-onboarding/package-json-roundtrip.postgres.integration.test.ts']) assert.ok(required.includes(suite));
 });
 
 test('parent authority has draft unit coverage and non-skipping full integration gates', () => {
