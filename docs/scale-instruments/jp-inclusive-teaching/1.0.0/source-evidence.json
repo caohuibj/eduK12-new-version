@@ -1,0 +1,290 @@
+{
+  "checkedAt": "2026-11-02T01:41:39.533921+00:00",
+  "baseMain": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "citation": "深沢和彦・河村茂雄 (2020). インクルーシブ指導行動自己評定尺度（小学校版）の開発. 学級経営心理学研究, 9, 7–17. doi:10.34318/jacmp.9.0_7",
+  "primarySources": [
+    {
+      "url": "https://doi.org/10.34318/jacmp.9.0_7",
+      "status": "Japanese/English landing metadata read; final Japanese full article downloaded/read"
+    },
+    {
+      "url": "https://www.jstage.jst.go.jp/article/jacmp/9/0/9_7/_pdf/-char/ja",
+      "fileBytes": 1043201,
+      "sha256": "ced5c733b33f61bee0622b288e10663784ea9656a85325a626509161160fd2d2",
+      "status": "Method, final Table2, score aggregation and limitations reviewed; PDF/text kept outside public Git tree"
+    },
+    {
+      "url": "https://www.jstage.jst.go.jp/static/pages/TermsAndPolicies/ForIndividuals/-char/en",
+      "section": "I Article2; II Use of materials",
+      "status": "Rights holder approval required for republication, translation, commercial use and compilation into databases unless a separate license applies."
+    },
+    {
+      "url": "https://www.jstage.jst.go.jp/article/jacmp/9/0/9_7/_article/-char/ja",
+      "status": "HTML copyright metadata:2020 日本学級経営心理学会; no Creative Commons license located."
+    },
+    {
+      "url": "https://www.jacmp.jp/journal/%E6%8A%95%E7%A8%BF%E3%83%BB%E5%9F%B7%E7%AD%86%E3%81%AB%E3%81%82%E3%81%A3%E3%81%A6.htm",
+      "status": "Publisher guideline access HTTP403; no bypass attempted"
+    },
+    {
+      "url": "https://waseda.repo.nii.ac.jp/records/58730",
+      "status": "Author institution repository search record located; direct read429; no license inferred from repository availability"
+    }
+  ],
+  "finalItemKeySource": "Original Table2 p11, PDF page index4. Three factors4+4+4; not initial137 or intermediate21 items.",
+  "scoreSource": "p12: simple addition of item scores for original whole scale and subscales. No reverse recoding specified in final item set.",
+  "correction": "Landing lists bibliography correction2021-02-16, not a new2021 scale version.",
+  "deduplication": {
+    "queries": [
+      "jacmp.9.0_7",
+      "9_7/_article",
+      "インクルーシブ指導行動",
+      "Fukasawa",
+      "深沢",
+      "Inclusive Teaching Behavior Self-Evaluation"
+    ],
+    "instrumentDeclarations": 258,
+    "sourceJson": 235,
+    "mainHits": [],
+    "openPRCount": 54,
+    "openPRHeads": [
+      {
+        "number": 573,
+        "head": "c04150f7143351b0416f1db5bebd65c6ab09dbdd"
+      },
+      {
+        "number": 572,
+        "head": "609d2082f452246d7329290745da067290f4c89b"
+      },
+      {
+        "number": 571,
+        "head": "c400e983540bca0c3e6a33a6ae4f955474cac573"
+      },
+      {
+        "number": 570,
+        "head": "b50487aea0e9347fd7c7dde34940476cd2ec5e0f"
+      },
+      {
+        "number": 569,
+        "head": "2a5e57fadbc5b578594b2feb0ab661578e2de379"
+      },
+      {
+        "number": 568,
+        "head": "9643f01c4cc4449650d7a543ea07755b889273b0"
+      },
+      {
+        "number": 567,
+        "head": "f5997fffcb4f551059a2c9e5b02d57d27f96e591"
+      },
+      {
+        "number": 566,
+        "head": "227e2b1a492904da3364aeaa96351f9f76fde763"
+      },
+      {
+        "number": 565,
+        "head": "7cbe81a72623cc65a80c45217447e43364c3e285"
+      },
+      {
+        "number": 564,
+        "head": "3a1ffc3c26063f24129e1c6c9995f3743bcc02d0"
+      },
+      {
+        "number": 563,
+        "head": "61f999db2414bebeea8ad1781439d541933cbf85"
+      },
+      {
+        "number": 562,
+        "head": "239576c9aa4a5294c2a7b1a4b24c204357377f80"
+      },
+      {
+        "number": 561,
+        "head": "80f44193c09d61841b40c1707a1323c1552a01cb"
+      },
+      {
+        "number": 560,
+        "head": "fb17b18d5804bce4a550dc53b1d33c3a069dbed6"
+      },
+      {
+        "number": 559,
+        "head": "87fbe2eefd34aa79fc8983d8c5a2c726b667aa25"
+      },
+      {
+        "number": 558,
+        "head": "5e57ff4fa40d0b462bc9aee69facd3dd6c8b8b9d"
+      },
+      {
+        "number": 557,
+        "head": "0a0cd827f92e445b4bb56d775a82e05bebc36437"
+      },
+      {
+        "number": 555,
+        "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b"
+      },
+      {
+        "number": 554,
+        "head": "84b802dd591ef623e615194552c800e2f7b78862"
+      },
+      {
+        "number": 553,
+        "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7"
+      },
+      {
+        "number": 552,
+        "head": "51569d88e26ef7d9c58ef93cca206c451159673d"
+      },
+      {
+        "number": 550,
+        "head": "21162f30b500011c6b3e9f296fad0d0545b58755"
+      },
+      {
+        "number": 548,
+        "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a"
+      },
+      {
+        "number": 547,
+        "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8"
+      },
+      {
+        "number": 546,
+        "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb"
+      },
+      {
+        "number": 545,
+        "head": "783729150611c865cf753bff408288a39a141c6d"
+      },
+      {
+        "number": 544,
+        "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1"
+      },
+      {
+        "number": 543,
+        "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078"
+      },
+      {
+        "number": 542,
+        "head": "2426aee58647236dd6084845ea834f23a95c6b17"
+      },
+      {
+        "number": 541,
+        "head": "e70c178a2a939fb6e495336f017908eec00a149e"
+      },
+      {
+        "number": 540,
+        "head": "4a6193ba5005e266925b6fe726fca3cda6f7e5db"
+      },
+      {
+        "number": 529,
+        "head": "cff8728f67818a28b9ab0a2189c30040470dbd6b"
+      },
+      {
+        "number": 515,
+        "head": "70a6b3bc54e30c95c35733a705c6350f929d2a6d"
+      },
+      {
+        "number": 491,
+        "head": "290aa955a3445bcb0b519829423e626d044a2fc1"
+      },
+      {
+        "number": 489,
+        "head": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28"
+      },
+      {
+        "number": 488,
+        "head": "0c526f0529ab47c0054f9470d0bb9217e1d787a5"
+      },
+      {
+        "number": 482,
+        "head": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8"
+      },
+      {
+        "number": 441,
+        "head": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5"
+      },
+      {
+        "number": 413,
+        "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65"
+      },
+      {
+        "number": 412,
+        "head": "4d79bc45d607f8e771eccfacc49a7558b8a3985e"
+      },
+      {
+        "number": 397,
+        "head": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d"
+      },
+      {
+        "number": 383,
+        "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f"
+      },
+      {
+        "number": 379,
+        "head": "333200ade0c6cb42130cbc052189ba9c64691a12"
+      },
+      {
+        "number": 375,
+        "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792"
+      },
+      {
+        "number": 373,
+        "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53"
+      },
+      {
+        "number": 371,
+        "head": "75b956cbd4c45f75beee606fb53257494adc1ca0"
+      },
+      {
+        "number": 370,
+        "head": "bfd6dcbca24567219ec24979481f3da8e0137984"
+      },
+      {
+        "number": 368,
+        "head": "1388d5db6f845b8d907f0e4090e4fd727aea8926"
+      },
+      {
+        "number": 367,
+        "head": "8e4440cac46086f73390f8774c40853beb9a6ddd"
+      },
+      {
+        "number": 362,
+        "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1"
+      },
+      {
+        "number": 360,
+        "head": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2"
+      },
+      {
+        "number": 330,
+        "head": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a"
+      },
+      {
+        "number": 329,
+        "head": "a5effd7f86249a77b7c82606130e5db6f89aae45"
+      },
+      {
+        "number": 328,
+        "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+      }
+    ],
+    "openPRTitleBranchPathsHits": [],
+    "productionDB": "NOT_ACCESSED",
+    "administratorCustomTools": "NOT_VERIFIED",
+    "limits": "Main complete source text and open PR metadata/paths examined; no exhaustive cross-language semantic item-equivalence guarantee.",
+    "representativeFinalItemPhraseSearch": {
+      "phrasesChecked": 5,
+      "hits": [],
+      "scope": "main source.json and instrument.ts; no full-text payload copied into public evidence"
+    }
+  },
+  "remainingBlockers": [
+    "Written scope allowing platform use/compilation and allowed public redistribution, plus translation rights if needed. No original items or article are pushed."
+  ],
+  "notBlockers": [
+    "Lack of norms is not a reason to discard valid source SUM scoring.",
+    "Lack of independent child-administration validation is disclosed, not an automatic unscored-Form gate."
+  ],
+  "preservedPreviousHeads": {
+    "massDESE": "2c69a375498b971941aa689ddbf6d684a5b1ab4e",
+    "DMEEClassT": "3a1ffc3c26063f24129e1c6c9995f3743bcc02d0",
+    "TFALS": "227e2b1a492904da3364aeaa96351f9f76fde763"
+  }
+}

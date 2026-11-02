@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "family": "日本融合教学行为自评 / Fukasawa–Kawamura 2020",
+  "projectVersion": "1.0.0",
+  "sourceLanguage": "ja",
+  "sourcePublicationYear": 2020,
+  "familyTag": "family:jp-itbs",
+  "tags": [
+    "family:jp-itbs",
+    "role:teacher_self",
+    "stage:primary",
+    "lang:ja",
+    "version:2020",
+    "use:reflection",
+    "status:pilot",
+    "license:pending"
+  ],
+  "tagPersistence": "PLANNED_EXISTING_TAGS_API_NOT_WRITTEN",
+  "status": "CATALOG_ONLY_RIGHTS_PENDING",
+  "parts": [
+    {
+      "key": "jp_itbs_general_teacher_self_ja",
+      "version": "1.0.0",
+      "label": "全体対応",
+      "projectChineseLabel": "全体支持",
+      "itemCount": 4,
+      "table2OriginalIds": [
+        6,
+        7,
+        3,
+        2
+      ],
+      "score": {
+        "aggregation": "sum",
+        "range": [
+          4,
+          16
+        ],
+        "direction": "higher_is_more",
+        "reverseItems": []
+      }
+    },
+    {
+      "key": "jp_itbs_bridging_teacher_self_ja",
+      "version": "1.0.0",
+      "label": "架け橋対応",
+      "projectChineseLabel": "桥接支持",
+      "itemCount": 4,
+      "table2OriginalIds": [
+        9,
+        8,
+        10,
+        11
+      ],
+      "score": {
+        "aggregation": "sum",
+        "range": [
+          4,
+          16
+        ],
+        "direction": "higher_is_more",
+        "reverseItems": []
+      }
+    },
+    {
+      "key": "jp_itbs_individual_teacher_self_ja",
+      "version": "1.0.0",
+      "label": "個別対応",
+      "projectChineseLabel": "个别支持",
+      "itemCount": 4,
+      "table2OriginalIds": [
+        15,
+        16,
+        20,
+        21
+      ],
+      "score": {
+        "aggregation": "sum",
+        "range": [
+          4,
+          16
+        ],
+        "direction": "higher_is_more",
+        "reverseItems": []
+      }
+    }
+  ],
+  "scoringContract": {
+    "nativePlan": "existing generic SUM scorer; no new engine",
+    "originalWhole12Range": [
+      12,
+      48
+    ],
+    "originalWhole12Total": "Supported by original paper; only from original whole instrument, never a sum across tools or repeated child administrations.",
+    "missing": "Paper excluded incomplete teacher records; no validated partial-score imputation provided. Planned complete_required is a conservative project rule, not an author missing-data manual.",
+    "responseCodeRange": [
+      1,
+      4
+    ],
+    "anchors": "Exact Japanese labels read in methods; not reproduced here. Lowest choice expresses an intention conditional on available capacity rather than never doing the behavior.",
+    "cutoffs": [],
+    "normsInstalled": false
+  },
+  "optionalComposite": {
+    "kind": "COLLECTION",
+    "status": "PLANNED_NOT_CREATED",
+    "policy": "Choose original full12 once or selected child scales; avoid duplicate items. Composite has no new aggregate total.",
+    "crossToolTotal": false
+  },
+  "unscoredFormCandidates": [
+    {
+      "kind": "background_descriptive",
+      "status": "METADATA_ONLY_NOT_CREATED",
+      "scope": "Original factual background/experience/training questions, optional after permission and relevance/privacy review; no scoring report"
+    }
+  ],
+  "actualImport": {
+    "catalogDeclarations": 3,
+    "scales": 0,
+    "forms": 0,
+    "questionnaires": 0,
+    "developmentDB": "NOT_WRITTEN",
+    "productionDB": "NOT_ACCESSED"
+  },
+  "translation": "No Chinese item translation created; future translation uses distinct identity/version."
+}

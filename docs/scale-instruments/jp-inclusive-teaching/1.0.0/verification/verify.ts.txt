@@ -1,0 +1,32 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import {strict as assert} from 'node:assert'
+import {scaleInstrumentSourceV1Schema} from './server-version/backend/src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from './server-version/backend/src/modules/scale/onboarding/validate-instrument'
+import {getScaleInstrumentSource,getScaleInstrumentRuntimePolicy} from './server-version/backend/src/modules/scale/onboarding/instrument-registry'
+import {previewScaleInstrument} from './server-version/backend/src/modules/scale/onboarding/preview'
+import {scoreScale,ScaleAnswerValidationError} from './server-version/backend/src/modules/scale/scale-scoring'
+import {buildScaleResult} from './server-version/backend/src/modules/scale/scale-result'
+import {scaleDefinitionSchema} from './server-version/backend/src/modules/scale/scale-definition'
+// Copy to .jp-inclusive-check.ts in repo root, run backend tsx, then remove the temporary copy.
+// No copyrighted source item/anchor text, no original scale installation, no DB.
+const root=path.resolve('docs/scale-instruments/jp-inclusive-teaching/1.0.0')
+const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'))
+assert.equal(m.parts.length,3);assert.deepEqual(m.parts.map((p:any)=>p.itemCount),[4,4,4])
+assert.equal(new Set(m.parts.flatMap((p:any)=>p.table2OriginalIds)).size,12)
+assert(m.tags.length<=10&&m.tags.every((s:string)=>s.length<=20));assert(m.tags.includes('family:jp-itbs'))
+const catalog=[]
+for(const p of m.parts){const s=getScaleInstrumentSource(p.key,p.version);assert(s);scaleInstrumentSourceV1Schema.parse(s);assert(validateScaleInstrumentSource(s).valid);assert.equal(s.executable,undefined);assert.equal(getScaleInstrumentRuntimePolicy(p.key,p.version),undefined)
+ const v=previewScaleInstrument({instrumentKey:p.key,instrumentVersion:p.version,locale:'ja',territory:'JP',commercialNature:'COMMERCIAL',deploymentModes:['STANDALONE']});assert(v.sourceValidation.ok);assert.equal(v.allowActivation,false);assert.equal(v.executable,null);assert(v.blockers.includes('RIGHTSHOLDER_PERMISSION_FOR_REUSE_TRANSLATION_DATABASE_NOT_ESTABLISHED'));catalog.push({key:p.key,schema:'PASS',registry:'PASS',preview:'NO_ACTIVATION'})}
+const keys=['general','bridging','individual'];const codes=m.parts.flatMap((p:any)=>p.table2OriginalIds.map((id:number)=>'synthetic_position_'+id))
+const scoreKeys=[...keys,'whole12']
+const d=scaleDefinitionSchema.parse({schemaVersion:2,respondentType:'synthetic_contract_only',source:{title:'Synthetic numeric contract fixture; not an administrable instrument'},license:{status:'self_authored',redistribution:'allowed',note:'Synthetic positions only; no source question or anchor text'},display:{randomizeItems:false},responseSets:[{key:'technical_1_4',options:[1,2,3,4].map(n=>({value:n,label:'Technical option '+n,score:n}))}],items:codes.map((c:string,i:number)=>({itemCode:c,content:'Synthetic position '+i+'; never administer',type:'single',required:true,sortOrder:i,responseSetKey:'technical_1_4',randomizeOptions:false})),scoring:{scoringVersion:'fixture-1',defaultMissingPolicy:{type:'complete_required'},itemRules:codes.map((c:string)=>({itemCode:c,transform:{type:'identity'}})),scores:[...keys.map((k,i)=>({key:k,type:'dimension',label:k,direction:'higher_is_more',canonical:false,source:{type:'items',aggregation:'sum',items:codes.slice(i*4,i*4+4).map((c:string)=>({itemCode:c,weight:1}))}})),{key:'whole12',type:'total',label:'whole12 technical sum',direction:'higher_is_more',canonical:true,source:{type:'items',aggregation:'sum',items:codes.map((c:string)=>({itemCode:c,weight:1}))}}]},report:{reportVersion:'fixture-draft-1',audienceContract:{schemaVersion:1,respondent:'ADULT_SELF',audience:'teacher',locale:'zh-CN'},primaryScoreKeys:keys,scoreOrder:scoreKeys,interpretations:keys.map(k=>({scoreKey:k,headline:'教师自述行为反思',source:{type:'score_only'},summary:'这只是合成合同检查；实际反馈需结合真实作答及情境，不用于绩效排名。',guidance:[],bands:[]})),limitations:['Synthetic numeric contract only; original scale rights and installation pending.'],disclaimer:'No original items. Never administer this fixture.'},referencePolicy:{type:'none'}})
+const results=[]
+for(const [scenario,values,expected] of [['low',codes.map(()=>1),[4,4,4,12]],['high',codes.map(()=>4),[16,16,16,48]],['mixed',codes.map((_:string,i:number)=>i%4+1),[10,10,10,30]],['missing',[],[null,null,null,null]]] as const){
+ const answers=values.map((n:number,i:number)=>({itemCode:codes[i],responseValue:n}));const s=scoreScale(d,answers);assert.deepEqual(s.scores.map(x=>x.value),expected);assert.deepEqual(s.scores.map(x=>x.range),[{min:4,max:16},{min:4,max:16},{min:4,max:16},{min:12,max:48}]);assert(s.scores.every(x=>!x.prorated))
+ const r=buildScaleResult({scaleId:'synthetic-not-a-database-id',instrumentKey:'synthetic_jp_itbs_contract',name:'Never administer synthetic fixture',instrumentVersion:'fixture-1',definition:d,answers});assert.equal(r.method.reportAudience,'teacher');assert.equal(r.referenceVersions,undefined);assert.equal(r.references.length,0);assert(r.interpretations.every(x=>x.label===null));if(scenario==='missing'){assert.equal(r.quality.status,'invalid');assert.equal(r.interpretations.length,0)}else assert.equal(r.interpretations.length,3)
+ results.push({scenario,values:s.scores.map(x=>x.value),quality:s.quality.status,nativeReportInterpretations:r.interpretations.length})
+}
+for(const bad of [0,5,'1'])assert.throws(()=>scoreScale(d,[{itemCode:codes[0],responseValue:bad}]),ScaleAnswerValidationError)
+const partial=scoreScale(d,codes.slice(1).map((c:string)=>({itemCode:c,responseValue:4})));assert.equal(partial.scores[0].value,null);assert.equal(partial.scores[3].value,null);assert(partial.quality.flags.includes('missing_items'))
+fs.writeFileSync(path.join(root,'verification/contract-check.json'),JSON.stringify({checkedAt:new Date().toISOString(),catalog,numericFixture:{status:'PASS_SYNTHETIC_ONLY_NOT_INSTRUMENT_VALIDATION',results,invalidZeroFiveAndTypeMismatch:'REJECTED',oneMissing:'affected dimension and original whole12 unavailable; no imputation'},reportDraftCases:9,actualInstrumentDBImports:0,rightsApproval:false},null,2)+'\n');console.log(JSON.stringify({catalog:catalog.length,numericFixture:'PASS_SYNTHETIC_ONLY',dbImport:0}))

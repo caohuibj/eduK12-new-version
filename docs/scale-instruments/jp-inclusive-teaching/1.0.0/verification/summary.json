@@ -1,0 +1,50 @@
+{
+  "status": "PASS_LIMITED_PREPARATION",
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "scope": "3 metadata catalog declarations, generated index, source/score/report preparation evidence",
+  "checksCompleted": {
+    "candidateSchemaRegistryPreview": "PASS3; no executable or activation",
+    "existingScorerWithSyntheticPositions": "PASS low/high/mixed/missing; partial missing; invalid0/5/type mismatch rejected",
+    "nativeReportWithSyntheticPositions": "PASS teacher audience, no normative label, absent scores suppress interpretations; not original instrument validation",
+    "generatedIndexFreshness": "PASS"
+  },
+  "fixedInputHashes": {
+    "backendPackageLock": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "prismaSchema": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0"
+  },
+  "commands": [
+    "npm run scale:instruments:generate --prefix server-version/backend",
+    "copy verification/verify.ts.txt to .jp-inclusive-check.ts at repository root; run backend tsx; remove temporary copy",
+    "npm run scale:instruments:check (backend cwd)",
+    "SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<actual HEAD> node --import ./server-version/backend/node_modules/tsx/dist/loader.mjs server-version/backend/scripts/scale-intake-selected-check.ts",
+    "same base/head: node .github/scripts/scale-intake-scope.mjs"
+  ],
+  "failures": [],
+  "sourceAccessLimitations": [
+    "publisher guideline direct HTTP403",
+    "author repository direct429; no retry/bypass"
+  ],
+  "notExecuted": [
+    "actual instrument DB import: reuse/database permission pending",
+    "original item/scoring/report installation",
+    "Chinese original-item translation",
+    "full frontend/backend/platform suite: unaffected",
+    "production/admin custom-tool dedup",
+    "independent human/scientific approval",
+    "merge/deployment"
+  ],
+  "ciPlan": {
+    "route": "isolated Scale declaration content route",
+    "expectedJobs": [
+      "classify changed content",
+      "assessment content / scale-intake",
+      "publication integrity",
+      "existing summary gate"
+    ],
+    "location": "local content preview and synthetic boundary fixture; existing GitHub automatic selected checker after Draft",
+    "budget": "~5min light route; no unrelated application tests",
+    "commonFailureContext": "coordinator supplied #551 buffered source reading and #556 CHEXI factory parser fixes; both in pinned main. Generated index checked against complete worktree; no shared CI edits.",
+    "noClaim": "Local result is not formal CI, rights approval, scientific validation or actual instrument import."
+  },
+  "dependencies": "Reused existing backend node_modules via temporary symlink; unchanged lock/schema; symlink removed before commit."
+}
