@@ -77,5 +77,7 @@
   "rights": "CC BY 4.0 article/Table4; preserve attribution and THIRD_PARTY_LICENSE.md",
   "visibility": "Existing authorization and publication rules only; no automatic access to individual student answers for teachers. Do not promise anonymity absent actual delivery configuration.",
   "combination": "Optional context form plus full observation form through existing ordinary questionnaire form-template import. No SCALE item or cross-tool score.",
-  "validation": "Existing services imported both forms and ordinary combination into disposable PG and read them back; database destroyed after validation. No persistent/public installation."
+  "validation": "Existing services imported both forms and ordinary combination into disposable PG and read them back; database destroyed after validation. No persistent/public installation.",
+  "parentIsProvenanceOnly": true,
+  "registeredScaleSources": 0
 }

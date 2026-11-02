@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "node": "v24.21.0",
+  "validation": "Current definition/CSV/optional-answer contract only; no database or scoring rerun",
+  "forms": [
+    {
+      "file": "observation-form.native.json",
+      "count": 40,
+      "optional": true,
+      "optionScores": 0,
+      "emptyMissing": 40,
+      "partialAccepted": true
+    },
+    {
+      "file": "context-form.native.json",
+      "count": 3,
+      "optional": true,
+      "optionScores": 0,
+      "emptyMissing": 3,
+      "partialAccepted": true
+    }
+  ],
+  "csvPromptAndOrderParity": 40,
+  "originalHead": "783729150611c865cf753bff408288a39a141c6d",
+  "unchangedDefinitionFiles": true,
+  "unchangedCoreAndSchemaRelativeToOriginal": true,
+  "legacyDatabaseEvidence": "Historical Node24.19 receipt retained with limitation; not persistent installation"
+}

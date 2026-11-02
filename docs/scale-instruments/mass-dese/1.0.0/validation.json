@@ -1,0 +1,258 @@
+{
+  "checkedAt": "2026-11-02T00:32:28.430Z",
+  "scope": "12 new catalog-only identities; existing native source schema, validation, preview and catalog read model",
+  "results": [
+    {
+      "key": "mass_dese_student_standard_g3_5_en",
+      "sourceSHA256": "74b4f4a80ceba95c020ebf1ae647c80403cb6ab3dd001363c07f66117a956b57",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "CURRENT_40_ITEMS_VS_LEGACY_46_ITEM_NOTES",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_short_g3_5_en",
+      "sourceSHA256": "d6e70c37405be77817b5c661bc7aa3df793e0afcb1362646c9dd7131c31cb06b",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_mini_i_g3_5_en",
+      "sourceSHA256": "4d93642b25843ac8e5af8a264b5e375e49562c97e3757963bcbf428780fe5d1e",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_mini_ii_g3_5_en",
+      "sourceSHA256": "0f7464c24a27c7334564787c5ba70fb57840c740b9402bd873d7015a5b22a3a0",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_mini_i_ii_g3_5_en",
+      "sourceSHA256": "c1af3dfcaf827b056b33ab63954ece84c04a0ca43097f32abb4ed51125bc1d62",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_standard_g6_12_en",
+      "sourceSHA256": "c2e634646347e3167d6392e5686389c2d92d58a780d786929008854b8a64cfa9",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_short_g6_12_en",
+      "sourceSHA256": "f139a43fc66a7d610c29f8ecaddb48b7c016249cbea611ce0103c2f48e2a3c04",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_mini_i_g6_12_en",
+      "sourceSHA256": "650f17281208dd9ebaa2fad31d5e0f15fe3c28b7fa3f851fb74dd3c96d4abc06",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_mini_ii_g6_12_en",
+      "sourceSHA256": "0410f3e3f17a602d39d01a5da254a2497bc0e4292ead63c0c38337a37afb0fb3",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_student_mini_i_ii_g6_12_en",
+      "sourceSHA256": "d382079a9b3e0985eed6d961c0397d1064737519a6b3bcea4686d8f3f42777ab",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ]
+    },
+    {
+      "key": "mass_dese_staff_standard_adult_en",
+      "sourceSHA256": "42d1337dedca233d11491a7ef58867d4f1ca081c1b89de44522db28ebc4f81c0",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED"
+      ]
+    },
+    {
+      "key": "mass_dese_staff_short_adult_en",
+      "sourceSHA256": "73a95bc7aa656337d433e0109fd9c1c669cbf6062585d5ebaf32676eaf9c1dbf",
+      "schema": "PASS",
+      "registered": true,
+      "previewActivation": false,
+      "libraryAvailable": false,
+      "scoringRuntime": false,
+      "reportEligible": false,
+      "rightsEvaluated": false,
+      "blockers": [
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED"
+      ]
+    }
+  ],
+  "scoringFixtures": "NOT_RUN_NO_EXECUTABLE",
+  "reportRuntime": "NOT_RUN_NO_EXECUTABLE_REPORT",
+  "databaseImport": "NOT_ATTEMPTED_CATALOG_ONLY_NO_RUNTIME_POLICY",
+  "productionDedup": "NOT_VERIFIED",
+  "reportCopyReview": {
+    "type": "manual_content_review",
+    "runtimeExecuted": false,
+    "file": "report-examples.md",
+    "reviewedCases": [
+      "student grades 3–5: ordinary/lower experience/insufficient evidence",
+      "student grades 6–12: ordinary/lower experience/insufficient evidence",
+      "teacher authorized aggregate: ordinary/lower experience/insufficient evidence",
+      "K–2 discussion: no scoring",
+      "optional comments: no scoring",
+      "Staff respondent versus administrator target distinguished"
+    ],
+    "limitations": "No real recipients, reports, scores or database objects created; examples are uninstalled copy, not R version or score bands."
+  },
+  "commands": [
+    {
+      "command": "tsx /tmp/mass-dese/validate.ts",
+      "exitCode": 0,
+      "purpose": "Existing schema/source validation, registry identity, preview and catalog-only read model for 12 new candidates; exact sourceSHA256 retained per child."
+    },
+    {
+      "command": "npm run scale:instruments:check",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run scale:onboarding:check",
+      "exitCode": 0
+    }
+  ]
+}

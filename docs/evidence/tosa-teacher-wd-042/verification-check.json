@@ -1,0 +1,89 @@
+{
+  "executedAt": "2026-11-02T00:04:12.078Z",
+  "baseline": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "node": "v24.21.0",
+  "identity": {
+    "instrumentKey": "tosa-teacher-wd-full",
+    "instrumentVersion": "0.4.2"
+  },
+  "definitionHash": "1eed4542e585f9b8aa3a37ac78da29ef61163b16d5f3d98b4acc6bce9fe5935e",
+  "publicationContentDigest": "2e164231c0f77c7483f9c23dc8235b84a27704b3906c3ef344a1bbe94a805aec",
+  "scoringVersion": "tosa-observable-0.4.1",
+  "reportVersion": "tosa-formative-0.4.2",
+  "representativeScoring": {
+    "baselineGolden": "synthetic-full-cover-001",
+    "metricCount": 212,
+    "feedbackPresent": true,
+    "cases": [
+      {
+        "choice": "DECLINED",
+        "affectedMetricsNull": 13,
+        "otherMotherMetricsUnchanged": true
+      },
+      {
+        "choice": "UNABLE_TO_JUDGE",
+        "affectedMetricsNull": 13,
+        "otherMotherMetricsUnchanged": true
+      }
+    ]
+  },
+  "surveyNativeHeader": {
+    "definitionProtocolAccepted": true,
+    "draftHeaderRejected": true
+  },
+  "tagCount": 212,
+  "permissions": {
+    "realDatabaseActors": true,
+    "realServiceGuards": true,
+    "noRegistryMocks": true,
+    "httpMfaCeremony": false,
+    "adminPrepare": true,
+    "denied": [
+      {
+        "case": "ordinary teacher cannot prepare",
+        "code": "操作者会话已失效，请重新登录",
+        "status": 403
+      },
+      {
+        "case": "stale administrator proof",
+        "code": "内容授权变更需要最近的管理员双因素验证",
+        "status": 403
+      },
+      {
+        "case": "wrong token version",
+        "code": "操作者会话已失效，请重新登录",
+        "status": 403
+      },
+      {
+        "case": "missing exact measurement capability",
+        "code": "CONTENT_AUTHORITY_DENIED",
+        "status": null
+      },
+      {
+        "case": "DRAFT cannot publish even with exact system capability",
+        "code": "CONTENT_STATIC_SJT_SOURCE_NOT_PUBLISHED",
+        "status": 409
+      },
+      {
+        "case": "DRAFT cannot start as published static source",
+        "code": "CONTENT_STATIC_SJT_SOURCE_NOT_PUBLISHED",
+        "status": 409
+      }
+    ]
+  },
+  "history": {
+    "beforeDigest": "2374c12dbe3f72fe48af67bbd3ef4ab09997a7053ae8ef9a40ffa73f91f597d2",
+    "afterDigest": "2374c12dbe3f72fe48af67bbd3ef4ab09997a7053ae8ef9a40ffa73f91f597d2",
+    "attemptCount": 26,
+    "rawCount": 25,
+    "mappingCount": 17,
+    "releaseCount": 0,
+    "unchanged": true
+  },
+  "publication": "DRAFT; no measurement release created",
+  "limits": [
+    "Service-level synthetic session proof; no HTTP/MFA acceptance",
+    "Production publication and product-specific library distribution pending independent human review and real administrator actions",
+    "All golden/schema governance checks assigned to native content CI, not duplicated locally"
+  ]
+}

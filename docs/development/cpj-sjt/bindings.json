@@ -1,0 +1,649 @@
+{
+  "schema": "CPJ_BINDING_MANIFEST_V1",
+  "candidate": "48 tools: 47 effective 0.4.2; CJ01 SD effective 0.4.3; original 0.4.2 all preserved",
+  "sourceCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "C": {
+    "layer": "MEASUREMENT",
+    "version": "0.4.2",
+    "nativeReleaseIds": [
+      {
+        "key": "cpj-cj01-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "b0aedb7a68cd5f210e3b28ec86feee2cc466a967a377c9911eaf8b562bb58101",
+        "contentDigest": "e721be232327016a9520eac617de75609d51d69e24c8c0df65b5472c69e91c87"
+      },
+      {
+        "key": "cpj-cj01-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "f20688614e76a552141ae3faa24d60d7794e86ec2ef33b30f74a7527ddf56b92",
+        "contentDigest": "a0c4ff5bc399a948117e1fd14df77dfcf17281db0467a88d8edaf9eac340b430"
+      },
+      {
+        "key": "cpj-cj02-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "a4b423df3a1cb27d74ab57dea771078a761885cb4b97d60ea0c12e2898abf778",
+        "contentDigest": "f6cf73b545169c5a3c1363fa4d2d933d8b7792a66f250f51ef331891200d995a"
+      },
+      {
+        "key": "cpj-cj02-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "8bde386235ebcef04efca54db584a61b67cb44c1bf24aaec9e4cf49599747a58",
+        "contentDigest": "e5b8db01786dd6febe24632b00ff87cd921a8dd6e8c2a71746e9555eef791834"
+      },
+      {
+        "key": "cpj-cj03-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "89121d1b9390e49fdba952ec9288390d0dd8d9410e865abfcea2a24868285a6e",
+        "contentDigest": "e744826ecda41ee1667988506e5bd0ac63cab54be83edc5365749940880d4352"
+      },
+      {
+        "key": "cpj-cj03-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "36e5858adabba79e83c6a303807fd6ba64cf0a233a9d7e09150a878189ec0716",
+        "contentDigest": "a4af9487bffe7ce6614a22ac09049a0fd67d2426142e9b20c99a691f7373d3fa"
+      },
+      {
+        "key": "cpj-cj04-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "0e10be168a5c1a265d02a96c461fbbd5fbd4752c03f503fc6b18a59843d16cda",
+        "contentDigest": "815534e28c969f4243c7cad7331c3bd8fc467c13f1d2f9045d778b0e3ab9bc02"
+      },
+      {
+        "key": "cpj-cj04-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "1c9a03deae7ec44dffd249d62c8ea9c279d90123324e94849bbcc49c53d29213",
+        "contentDigest": "c400912cb5b64749e10ca9ea835fe2c91964e91321ef902b18336f180fad1d8e"
+      },
+      {
+        "key": "cpj-cj05-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "3baaa71f9d1195a7419d19f6c11a85c85bd3c2658fcb0f73b54f9e82d37eaa92",
+        "contentDigest": "335518b0323d2f4348c0d57eda197ff5b19d2133c1f9df47329e4e81941a3dc6"
+      },
+      {
+        "key": "cpj-cj05-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "c5ea0bf475ad9e9d859d9dbac3844fe492063fcfa19f03adb46fa9adb48c779b",
+        "contentDigest": "4041fc06d2901bcabccd9244af3fd92c2d90b6bcc35b6dd447b76752f3553aa6"
+      },
+      {
+        "key": "cpj-cj06-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "c3cb2ace418181020a60afcd73b09aa923b5ff169b3220b258900682efcbb1a0",
+        "contentDigest": "d0696beac5c2998eb81b13a29df1514412cac8477ba01d74f390102beccf47a8"
+      },
+      {
+        "key": "cpj-cj06-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "7b5741992d2706c23f49680dd8c4c9006a9c11d37f07aa04ffb1320c8ce413e3",
+        "contentDigest": "983a1359b8654d2e224678b595d70141b0d162e5937500fc6acb117c8416b2d8"
+      },
+      {
+        "key": "cpj-cj07-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "6876ea12adc1c39d9d5664ca49231d6074c19d8dad4d0668ebf7005d9c69b1f4",
+        "contentDigest": "41b331b575371d58ee5767f5db93f13babf93f608e214ce1eb660d7ce94ef971"
+      },
+      {
+        "key": "cpj-cj07-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "955fdcb8a8c657a2f323bfeb6f1c45e5b990a02a03349ddae26217917b74f2aa",
+        "contentDigest": "752f112015c4c0552d9b3b36eed1ebe0aa6d22b39b1b4d2a16cf35e31060c064"
+      },
+      {
+        "key": "cpj-cj08-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "760cc768bced28861868e383847fde40cf3cc1a9505d817fa4c987c2ce14539d",
+        "contentDigest": "e1d344e67a4828f2148085c89cc574dce949f50bf5d9f4044f8a0305014096ed"
+      },
+      {
+        "key": "cpj-cj08-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "e1c22a984dcb4801c8d45058c5c5c16f3962067ad2dbb6f879f7acb2c3144d09",
+        "contentDigest": "db202a1d037edcf479397ddfb9190164e9a030dd289541c16b167ae1bef134f8"
+      },
+      {
+        "key": "cpj-cj09-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "82814037e951a32d9022e6294f12cb5a5aac68875eb33324d6d265a8be082622",
+        "contentDigest": "b133f88bcd70cd8169888d971057e016a3d6eed4901e5e31c7a72cb54534307b"
+      },
+      {
+        "key": "cpj-cj09-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "828f58921390e5dcb6e7e9b931cfc9d5888bc3c1e42615cf6337f6b1f0686c64",
+        "contentDigest": "46152095f56a4849b2a357dc8a0006e559c340b5a9a4d519435c1e1c04fca336"
+      },
+      {
+        "key": "cpj-cj10-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "6413bd34daaee07256f5caf0dc3e50bee51957d950872001ff04ea706d73e648",
+        "contentDigest": "8672d2d9752d820852314fed25b1aafab276f20ee17856b3e55e049fb6ce57b2"
+      },
+      {
+        "key": "cpj-cj10-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "56c9ec58c41e089ac5eacc0abd78782255293535e1a243ce3babc628f285c395",
+        "contentDigest": "495cc2d0fa6996974327c1f8f196d47b08319ace6f4ff5f0143520a069c22910"
+      },
+      {
+        "key": "cpj-cj11-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "e78fbbf4cb2f59464650e6c7a05c0dc41173f9292d05797de9e030976ab57fba",
+        "contentDigest": "b746b7dbe931552fe82f305b207ebdc158ea0f7fee558a41fd878a1639846665"
+      },
+      {
+        "key": "cpj-cj11-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "1fb391fa501ca56db80beacd4c9f4a67c583711832440edf9f5daaf3c918ba42",
+        "contentDigest": "7e18040052a3da94a8b4a7072dfd25d9fb01dba194eb0484ea7f5db2925e5b59"
+      },
+      {
+        "key": "cpj-cj12-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "bbb3b226b2a917abbf1b934b9ba22a099b24781d64168919fe9d8f98192b1141",
+        "contentDigest": "ec7bd8c3e3879ac1bbb2b455464f069d644573132bfc1b1aeb1f50f88e34f6ea"
+      },
+      {
+        "key": "cpj-cj12-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "5cc9dd77666030714eac41b8a8e3f35c63c89170ca67d46b3e4273b354fb76ca",
+        "contentDigest": "7cc1a6dcae8ca8ee868f49517e94462349d05272dac60ed3beb3eb8491045a00"
+      },
+      {
+        "key": "cpj-cj13-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "645930ef23f29b142f0c0a28808801fc7967f8009cec95ae82420bcc1952abfd",
+        "contentDigest": "fab19816bf0ef7800da444e9e110abaf6b1b844e87a9f8df198312b1224aedac"
+      },
+      {
+        "key": "cpj-cj13-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "2ee8f66b9229bed6bef6eae6bc018961c5630b2cbd8a7fc303efafc1cdd254d0",
+        "contentDigest": "f7837827a9515b34afe8618b2492a0a8d2ea1a323fc35cca9c603b65357da39c"
+      },
+      {
+        "key": "cpj-cj14-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "0cdf23767e9edcca84a02efd175991b0d9a1881b7f1496a24f3f9824ac3ac197",
+        "contentDigest": "92394d4026982f110a073eb0a2f3fd6914e03782aeb94b65f98cc8933322313e"
+      },
+      {
+        "key": "cpj-cj14-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "1e903882b327d4be5d44fae42e5d7d95662a9f1d696bb6eb0142ae7469ab06fb",
+        "contentDigest": "fb8cec41f90713cd14a601e0f6cd14d1fd1435249ab567ebddcf09bd39e283c2"
+      },
+      {
+        "key": "cpj-cj15-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "2c65cde417afb88f4facb38fe6a65637b46232c6d0f99a58d41403401931d0ef",
+        "contentDigest": "f6ff922788853d57742cd9a530adc4af9c0dd63d959189962436a50c7c87bd87"
+      },
+      {
+        "key": "cpj-cj15-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "8e32f7dd8184da33c16cbaf33b9d8291c67153b1a6d0674fa4ad6c54a2c0c3fb",
+        "contentDigest": "0e1b8b9ae0a6845af3df1da46d229d7399a8b30173a55988c7241b92738b136a"
+      },
+      {
+        "key": "cpj-cj16-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "0d19bead5f550d466f88bda0f17a811334de2c030b4b0d1088f88452dd1e53a9",
+        "contentDigest": "e81b2c3d967938ed5288b6803149e4fb30087174a3842319f663231b6cf25bdd"
+      },
+      {
+        "key": "cpj-cj16-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "f339ddc7c8d41cbcd542c1ad3eac22a847b58bc741b6989c7cfd328833b79ba0",
+        "contentDigest": "187d134b546af83a0247b894822e4e0be0673c0ef98d0698accb76b86aa301ad"
+      },
+      {
+        "key": "cpj-cj17-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "f7174105a63cba0fdb5c43e814283eb6f5d60c5914940d86c6a6e4706b1ba811",
+        "contentDigest": "87d141261d28b6771921ca8c127120ed671401920c6e6658bbf9427d4e5652a2"
+      },
+      {
+        "key": "cpj-cj17-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "a67ef1f972afeec1850129b9a910b3c37bfaf58f540117e506cceec11e5a64cc",
+        "contentDigest": "65b800757e99275ef619ef4accd0564af83c01135a7a5417a26f45ada269c164"
+      },
+      {
+        "key": "cpj-cj18-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "82cd127f0100c653fba8dd146c3df0e1d3959c9332940e0cdbad5a56b27a7d99",
+        "contentDigest": "767896e2fce8bde75776625505cac423a149ddb1af34d923258a2a1c620322ab"
+      },
+      {
+        "key": "cpj-cj18-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "0fb311d8055fb05dc43568f01a28ce859828fe6eb837c5d1d1271e0cdd6eb3db",
+        "contentDigest": "1d84f81837a232f63abf218b42c9a2219af80e74347441224aee8a037bb37f47"
+      },
+      {
+        "key": "cpj-cj19-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "07374fea1b5cb531f2802e8da7841789b9ac3878a2d6cbe8f4cbf73c125a8da7",
+        "contentDigest": "848cff31d64269fd392adbcf385754e3e3e9c34cbf293dbaba1990cbb0c3ff53"
+      },
+      {
+        "key": "cpj-cj19-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "8a234422a7346a0bb639dd6b3f29c1b5b124034f5089ce86ea9a947a84b3b0c5",
+        "contentDigest": "5f781c445b3b5d3e40003de6acf5a6c6de7b40c26af552b113deac9511f154ea"
+      },
+      {
+        "key": "cpj-cj20-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "6fc9a7cbe6cdf8e5ef77bccfd23482025edd977c02bf8f9aa9a83996e268942f",
+        "contentDigest": "7de3e466535e3ce56c3c0aef9a14da1647cd8f9358b90399f11af27628bb1e48"
+      },
+      {
+        "key": "cpj-cj20-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "f08c801d346b782f7d7180de042c79cd925527ad1419ed00418a20da72ee5754",
+        "contentDigest": "029dbb50368eb5139f8602408e18fb5fbbf68ba94720d0ad8f2b4501d82f3e7a"
+      },
+      {
+        "key": "cpj-cj21-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "cbfe862d3e9762427932101e622d0f6213bcc1a97d18ddc9c3cd0d118b22618e",
+        "contentDigest": "91a2d54da1dea9f96c8395e8a27ab6db368b98d6ae2ad2858e2594fd1133bb73"
+      },
+      {
+        "key": "cpj-cj21-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "8529d2ca5149484b509de7677658e5c57655cb88abbe5ffe652b039f61c185b1",
+        "contentDigest": "135da06c25757f067d4a9d580edc69b8860a12c6fad0bebadc69216b750efd9e"
+      },
+      {
+        "key": "cpj-cj22-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "b46531b783a798e3edcf9e11f5479bf2ed9f25fe622072c902e8a26a7c8e83bb",
+        "contentDigest": "c30d1f90fa2acd00a2b383bfc9c7257a4093061dce9b2acdbb6767b57b4278f0"
+      },
+      {
+        "key": "cpj-cj22-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "8ed5f749ee51b981792335b6aa92877fa862ec89aeed2b3e87d37cd230a239ba",
+        "contentDigest": "83d3958d14b2806893f2e4491200b69e9bfd0301b885179feda3b4b22b55b272"
+      },
+      {
+        "key": "cpj-cj23-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "e43f09edf001c33ae9c15dbe190c826e652e9d3e6efee20519de9f4bdd60e294",
+        "contentDigest": "541857f835bf3b5bbd843cad28ece6dbe15a94b7ffc06af62f69c02ce932eba6"
+      },
+      {
+        "key": "cpj-cj23-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "241256b5e1a9d4cffa5e0fa2bfd96192ca6c37acc000c9838ae000b179b20407",
+        "contentDigest": "12c40c35e6bf204e7b82a6b754cc291177b0221702095b4fb7f1d74b2510b85b"
+      },
+      {
+        "key": "cpj-cj24-sd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "7302a72038c7b48d6bb8f400851bf962ba570d82da35c3f9b948608f3194ad63",
+        "contentDigest": "73e221bb78c5bd314bf73a0fee9914f5af8210d370994bb4d2371a3cc9519e2e"
+      },
+      {
+        "key": "cpj-cj24-wd-baseline",
+        "version": "0.4.2",
+        "definitionHash": "758e854b53abf9e039b3006384bd2eb3888d4893985789d91948677008eee8ba",
+        "contentDigest": "ac5a11be7ec8deabea784220e5bf6e4a8912c39406c6dcbfe20af531b51dc619"
+      }
+    ],
+    "scoreModel": "AUTHOR_KEY_SUM",
+    "scoringVersion": "author-key-sum-v1",
+    "metricMeaning": "explicit_action_counts_only"
+  },
+  "P": {
+    "layer": "REFERENCE",
+    "status": "NONE",
+    "referencePolicy": "none",
+    "norms": null,
+    "cutoffs": null
+  },
+  "R": {
+    "reportVersion": "sjt-narrative-v1",
+    "contentVersion": "0.4.2",
+    "binding": "Frozen in native sjtAuthorRelease.package and contentDigest; no independent REPORT release created in current uploader",
+    "independentReportReleaseId": null,
+    "metricBindings": "Two topic-specific *_explicit_count keys for each tool; report fragments bind exact questionKey/optionKey; no norm binding"
+  },
+  "authorization": {
+    "licenseStatus": "unknown",
+    "redistribution": "restricted",
+    "productionAuthorization": "PENDING_HUMAN_ADMINISTRATOR",
+    "developmentAuthorizationPolicy": null,
+    "developmentReview": "Synthetic distinct accounts only, not human approval"
+  },
+  "formTiming": "24 separate optional POST_FINAL_REFLECTION forms; original R1 probes retained as research materials",
+  "productionWrites": 0,
+  "representativeOverride": {
+    "key": "cpj-cj01-sd-baseline",
+    "version": "0.4.3",
+    "contentDigest": "6ec455da80e9022547e9e99b5ee0f8e7fc379dc0e3eff2abb2e5fbd71f1433f5",
+    "definitionHash": "ac9b766eb543f6fceb3af1746d9a702bd93130d2cf224df143fe8f2bc1930ab3",
+    "measurementHash": "77acc022edf5f73ea3533448ca7189112541f66f9ca00015c899090d75ddf2d3",
+    "scope": {
+      "kind": "PLATFORM",
+      "owner": "synthetic author; no production identity"
+    },
+    "authorizationPolicy": null,
+    "scoringVersion": "author-key-sum-v1",
+    "reportVersion": "sjt-narrative-v1",
+    "license": {
+      "note": "私有原稿v0.2→文字修订v0.3→内容编码v0.4；24个母情境独立选用。本库为原创候选自述来源，授权状态待人工核对；不公开再分发。",
+      "status": "unknown",
+      "redistribution": "restricted"
+    },
+    "metrics": [
+      {
+        "key": "T01_A_explicit_count",
+        "construct": "cpj_t01_a_explicit_action",
+        "direction": "descriptive"
+      },
+      {
+        "key": "T01_B_explicit_count",
+        "construct": "cpj_t01_b_explicit_action",
+        "direction": "descriptive"
+      }
+    ]
+  },
+  "productionReleaseIds": "Allocated by static-sjt prepare/publish after independent human review; no production IDs supplied",
+  "finalInstallRoute": "CODE_REGISTRY_DRAFT; do not additionally upload the same keys",
+  "registryPublicationDigests": [
+    {
+      "key": "cpj-cj01-sd-baseline",
+      "version": "0.4.3",
+      "definitionHash": "ac9b766eb543f6fceb3af1746d9a702bd93130d2cf224df143fe8f2bc1930ab3",
+      "registryPublicationContentDigest": "7298f8f813e70b0f4d6d739289e55c6cded2bf57811f86adef51399c553246c1"
+    },
+    {
+      "key": "cpj-cj01-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "f20688614e76a552141ae3faa24d60d7794e86ec2ef33b30f74a7527ddf56b92",
+      "registryPublicationContentDigest": "5ee596d6fcfd13fa02bd33ab132a86531be831f36391a34a0a60d7c129411275"
+    },
+    {
+      "key": "cpj-cj02-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "a4b423df3a1cb27d74ab57dea771078a761885cb4b97d60ea0c12e2898abf778",
+      "registryPublicationContentDigest": "8b3fa54b43e471f2a56df39296c5d29ca9466bd0b09def1439f370c6c728771e"
+    },
+    {
+      "key": "cpj-cj02-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "8bde386235ebcef04efca54db584a61b67cb44c1bf24aaec9e4cf49599747a58",
+      "registryPublicationContentDigest": "8cda031863a0df8f6cf22b4b65e70cc399ec69fb0c3b545194152b7a0ea7a2b8"
+    },
+    {
+      "key": "cpj-cj03-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "89121d1b9390e49fdba952ec9288390d0dd8d9410e865abfcea2a24868285a6e",
+      "registryPublicationContentDigest": "ebea5b502e94b3c4b821a4c820f0efa7dd553951fa369ee19daebc2d9b0da986"
+    },
+    {
+      "key": "cpj-cj03-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "36e5858adabba79e83c6a303807fd6ba64cf0a233a9d7e09150a878189ec0716",
+      "registryPublicationContentDigest": "1e812576ffadd41472caf8165954dc3ea30fb3c9727485601b6b59bd4da1480e"
+    },
+    {
+      "key": "cpj-cj04-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "0e10be168a5c1a265d02a96c461fbbd5fbd4752c03f503fc6b18a59843d16cda",
+      "registryPublicationContentDigest": "1604c873e22bf9eeb6287507b33fb826ff282d05478195b0441dd61cd5ec8000"
+    },
+    {
+      "key": "cpj-cj04-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "1c9a03deae7ec44dffd249d62c8ea9c279d90123324e94849bbcc49c53d29213",
+      "registryPublicationContentDigest": "b8a447add5992f976fb9b53b791eeb70ea7900e9c950fe673eced928a0fb8354"
+    },
+    {
+      "key": "cpj-cj05-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "3baaa71f9d1195a7419d19f6c11a85c85bd3c2658fcb0f73b54f9e82d37eaa92",
+      "registryPublicationContentDigest": "b0b6ad103742b0065175b84d3da8b26642e1c118f45c463d7fe0f6bb60ef0001"
+    },
+    {
+      "key": "cpj-cj05-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "c5ea0bf475ad9e9d859d9dbac3844fe492063fcfa19f03adb46fa9adb48c779b",
+      "registryPublicationContentDigest": "e16298ff255ca2c35f6527996ac20f02d725e38ec4cdc61c5c37fb59221847cd"
+    },
+    {
+      "key": "cpj-cj06-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "c3cb2ace418181020a60afcd73b09aa923b5ff169b3220b258900682efcbb1a0",
+      "registryPublicationContentDigest": "24e9ba188a881e7a23795f4da1a8ab08b0a5610235516336ab3ae20126ced7c5"
+    },
+    {
+      "key": "cpj-cj06-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "7b5741992d2706c23f49680dd8c4c9006a9c11d37f07aa04ffb1320c8ce413e3",
+      "registryPublicationContentDigest": "8f4734b3442a029c73b862161a5f9049351e3e6e1f5c13545465bc6f7761e67a"
+    },
+    {
+      "key": "cpj-cj07-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "6876ea12adc1c39d9d5664ca49231d6074c19d8dad4d0668ebf7005d9c69b1f4",
+      "registryPublicationContentDigest": "f36b9bc4e29aba33ed0e60c1814243b823f936bac360faf104c8557c1a637cfd"
+    },
+    {
+      "key": "cpj-cj07-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "955fdcb8a8c657a2f323bfeb6f1c45e5b990a02a03349ddae26217917b74f2aa",
+      "registryPublicationContentDigest": "3afc0c2d193fe07c4533fbd2890c6b8e7ecd6bf49fce5c9071ddad7cfb74d447"
+    },
+    {
+      "key": "cpj-cj08-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "760cc768bced28861868e383847fde40cf3cc1a9505d817fa4c987c2ce14539d",
+      "registryPublicationContentDigest": "211b423eb29e1211052b0ace5522735b8f2df59a4be771e3b80907ac5129dd10"
+    },
+    {
+      "key": "cpj-cj08-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "e1c22a984dcb4801c8d45058c5c5c16f3962067ad2dbb6f879f7acb2c3144d09",
+      "registryPublicationContentDigest": "4184bd39066a46adf62757c0bf4f82f21fe716fda93c414ac2c6a1689237c7d8"
+    },
+    {
+      "key": "cpj-cj09-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "82814037e951a32d9022e6294f12cb5a5aac68875eb33324d6d265a8be082622",
+      "registryPublicationContentDigest": "848b74de4f397f2d8428036a2bbbbf9336114cb68c0c67944675ef648a461ee8"
+    },
+    {
+      "key": "cpj-cj09-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "828f58921390e5dcb6e7e9b931cfc9d5888bc3c1e42615cf6337f6b1f0686c64",
+      "registryPublicationContentDigest": "1453fa1e82b9cfa11642f1c53b855248176bd5bda3606525bd2ec3c27f9a0afb"
+    },
+    {
+      "key": "cpj-cj10-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "6413bd34daaee07256f5caf0dc3e50bee51957d950872001ff04ea706d73e648",
+      "registryPublicationContentDigest": "6e793b05744ae36a1f570318a79b5fa4cdf287a9b72a06a8bf55ffb27ed2bd69"
+    },
+    {
+      "key": "cpj-cj10-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "56c9ec58c41e089ac5eacc0abd78782255293535e1a243ce3babc628f285c395",
+      "registryPublicationContentDigest": "958c5379ccc5ac516f3cb9b90f7bd41f012e7af7afb9b10aa15c79107a5a5f64"
+    },
+    {
+      "key": "cpj-cj11-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "e78fbbf4cb2f59464650e6c7a05c0dc41173f9292d05797de9e030976ab57fba",
+      "registryPublicationContentDigest": "8a186a8cbb1bea83d12c724a2db99f30a0ee06aa246a8c318f3f9515722afbd2"
+    },
+    {
+      "key": "cpj-cj11-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "1fb391fa501ca56db80beacd4c9f4a67c583711832440edf9f5daaf3c918ba42",
+      "registryPublicationContentDigest": "7679198a3662bcffc95fb241f76495a729668653af65038e7908bc3408c96b9f"
+    },
+    {
+      "key": "cpj-cj12-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "bbb3b226b2a917abbf1b934b9ba22a099b24781d64168919fe9d8f98192b1141",
+      "registryPublicationContentDigest": "0e066f216679489714210b140edd1c7dac6a26bac9081c586bb435f7ae5cd8b3"
+    },
+    {
+      "key": "cpj-cj12-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "5cc9dd77666030714eac41b8a8e3f35c63c89170ca67d46b3e4273b354fb76ca",
+      "registryPublicationContentDigest": "b150dda4941d990bb67d27d992ce84dc77609510a27e019145e787236eafaf64"
+    },
+    {
+      "key": "cpj-cj13-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "645930ef23f29b142f0c0a28808801fc7967f8009cec95ae82420bcc1952abfd",
+      "registryPublicationContentDigest": "a9641f87e68e5564fb56186a7debdb3b31a17bcf9dbf9a355f4addcece9f19a5"
+    },
+    {
+      "key": "cpj-cj13-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "2ee8f66b9229bed6bef6eae6bc018961c5630b2cbd8a7fc303efafc1cdd254d0",
+      "registryPublicationContentDigest": "0e3d5a4116ca73536042c6adbd1faf77fcf2d54091141fb313e21d54e5ad0406"
+    },
+    {
+      "key": "cpj-cj14-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "0cdf23767e9edcca84a02efd175991b0d9a1881b7f1496a24f3f9824ac3ac197",
+      "registryPublicationContentDigest": "f6b920e56e3185a986d91acd0934a4884d295d108fb70e6ba46b68695fdb8ace"
+    },
+    {
+      "key": "cpj-cj14-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "1e903882b327d4be5d44fae42e5d7d95662a9f1d696bb6eb0142ae7469ab06fb",
+      "registryPublicationContentDigest": "6e63ba80ce51f50bb64ebeab4ae9ce523ec41b30cea78432682f653d350170cd"
+    },
+    {
+      "key": "cpj-cj15-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "2c65cde417afb88f4facb38fe6a65637b46232c6d0f99a58d41403401931d0ef",
+      "registryPublicationContentDigest": "5babc32dc5261f43c33e8b7203b6fdadcf78049f22b4f4d0523d7fa1db864d79"
+    },
+    {
+      "key": "cpj-cj15-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "8e32f7dd8184da33c16cbaf33b9d8291c67153b1a6d0674fa4ad6c54a2c0c3fb",
+      "registryPublicationContentDigest": "d06b14ba93ae306327dea4248e91470d657bc8ed956578e5d5b3a32c36ff31ee"
+    },
+    {
+      "key": "cpj-cj16-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "0d19bead5f550d466f88bda0f17a811334de2c030b4b0d1088f88452dd1e53a9",
+      "registryPublicationContentDigest": "190e71a612a753e086def1b6dd4fbc3f9728b95fd1edb7b3206eace3d97af198"
+    },
+    {
+      "key": "cpj-cj16-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "f339ddc7c8d41cbcd542c1ad3eac22a847b58bc741b6989c7cfd328833b79ba0",
+      "registryPublicationContentDigest": "c189b0f92771c4a55142d332409a414fac5833ad606e4101c8c8795bdbc07d33"
+    },
+    {
+      "key": "cpj-cj17-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "f7174105a63cba0fdb5c43e814283eb6f5d60c5914940d86c6a6e4706b1ba811",
+      "registryPublicationContentDigest": "63a2f3b3b8e386cd4f6f54d3a02e09848edb678332e090ae73bdacbfde5a94b3"
+    },
+    {
+      "key": "cpj-cj17-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "a67ef1f972afeec1850129b9a910b3c37bfaf58f540117e506cceec11e5a64cc",
+      "registryPublicationContentDigest": "828c3b301c2f17103a15f160c248ad6c1db6b6ca3ba7e924439f848e74c55737"
+    },
+    {
+      "key": "cpj-cj18-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "82cd127f0100c653fba8dd146c3df0e1d3959c9332940e0cdbad5a56b27a7d99",
+      "registryPublicationContentDigest": "43b62890e87bca7be4036dca3fa94084239280299cbb8cfa6999122df00831f9"
+    },
+    {
+      "key": "cpj-cj18-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "0fb311d8055fb05dc43568f01a28ce859828fe6eb837c5d1d1271e0cdd6eb3db",
+      "registryPublicationContentDigest": "54c07ba4f5038443e41c5f3e7f193e34b9d99304a00a1ee2b387329d42b2481d"
+    },
+    {
+      "key": "cpj-cj19-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "07374fea1b5cb531f2802e8da7841789b9ac3878a2d6cbe8f4cbf73c125a8da7",
+      "registryPublicationContentDigest": "61a3a3cc6bfb6338c310998e56e04a90e3955142975635b0dd233d3f2e4c57bb"
+    },
+    {
+      "key": "cpj-cj19-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "8a234422a7346a0bb639dd6b3f29c1b5b124034f5089ce86ea9a947a84b3b0c5",
+      "registryPublicationContentDigest": "3546987465adf2753e6ee3b14ebcfd237cbd2686f5ddd2a598d8f2d91fa8ed0a"
+    },
+    {
+      "key": "cpj-cj20-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "6fc9a7cbe6cdf8e5ef77bccfd23482025edd977c02bf8f9aa9a83996e268942f",
+      "registryPublicationContentDigest": "cf8ce07b4b31480018df12286f49efa641a15c3ac946773aaade34cc47041412"
+    },
+    {
+      "key": "cpj-cj20-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "f08c801d346b782f7d7180de042c79cd925527ad1419ed00418a20da72ee5754",
+      "registryPublicationContentDigest": "4122f7d8c90c966ed87d4f4b293a77ba178e8f65489f582fe0a6e6cde1bfc2e3"
+    },
+    {
+      "key": "cpj-cj21-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "cbfe862d3e9762427932101e622d0f6213bcc1a97d18ddc9c3cd0d118b22618e",
+      "registryPublicationContentDigest": "75c1227136acf138ded4da177d5e6ebf0455b605c76375375fc7ce6022d5c440"
+    },
+    {
+      "key": "cpj-cj21-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "8529d2ca5149484b509de7677658e5c57655cb88abbe5ffe652b039f61c185b1",
+      "registryPublicationContentDigest": "437f4c03805df967557480c1ebfba7cc41681713d59fefc0f3e0186d7cebb793"
+    },
+    {
+      "key": "cpj-cj22-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "b46531b783a798e3edcf9e11f5479bf2ed9f25fe622072c902e8a26a7c8e83bb",
+      "registryPublicationContentDigest": "9f71e88631c7e945a74aa7d79a0cbba8c174b4ffc8390b6d7eb4a15e4baa2ea0"
+    },
+    {
+      "key": "cpj-cj22-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "8ed5f749ee51b981792335b6aa92877fa862ec89aeed2b3e87d37cd230a239ba",
+      "registryPublicationContentDigest": "3ee4322b3e00e63050da9ca83488a8c7457377756e811c8addc79e2ca459f282"
+    },
+    {
+      "key": "cpj-cj23-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "e43f09edf001c33ae9c15dbe190c826e652e9d3e6efee20519de9f4bdd60e294",
+      "registryPublicationContentDigest": "68ad570b42370af4afceb2ecb5de5ced1ba99b07159ba795510fa3c42ce8f648"
+    },
+    {
+      "key": "cpj-cj23-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "241256b5e1a9d4cffa5e0fa2bfd96192ca6c37acc000c9838ae000b179b20407",
+      "registryPublicationContentDigest": "eaf6abdb99545b08ef03a85a12d5ee68d136dfc863b77bc6ad7be9dee3e2e2a9"
+    },
+    {
+      "key": "cpj-cj24-sd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "7302a72038c7b48d6bb8f400851bf962ba570d82da35c3f9b948608f3194ad63",
+      "registryPublicationContentDigest": "ad65811a030805b69bf5d1accb1aa1a584d79f5dd77c8bda12602de2a9973276"
+    },
+    {
+      "key": "cpj-cj24-wd-baseline",
+      "version": "0.4.2",
+      "definitionHash": "758e854b53abf9e039b3006384bd2eb3888d4893985789d91948677008eee8ba",
+      "registryPublicationContentDigest": "8bc70680edfa357eccf09b502df1bf4a964bb5c87d626c7f7f457911379b35ac"
+    }
+  ],
+  "historicalUploadBindingOnly": true
+}
