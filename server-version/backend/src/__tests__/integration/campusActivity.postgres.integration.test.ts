@@ -392,6 +392,104 @@ suite('Huischool Activity lifecycle, independent training boundary and task gate
     expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list).toHaveLength(0)
   })
 
+  it('DA-S02 stops fresh text submissions on current School product revocation and permits restored access without rewriting receipts',async()=>{
+    const f=await fixture()
+    const activity=await createCampusActivity({actor:f.admin,organizationId:f.organizationId,
+      title:'当前产品授权文本任务',purpose:'STUDENT_WELLBEING'})
+    const scope={actor:f.admin,organizationId:f.organizationId,courseId:activity.id}
+    const entitlementWhere={organizationId_product:{organizationId:f.organizationId,product:'HUISCHOOL'}}
+    const stops=[
+      {name:'School subscription suspension',
+        stop:()=>db.educationProductEntitlement.update({where:entitlementWhere,data:{status:'SUSPENDED',suspendedAt:new Date()}}),
+        restore:()=>db.educationProductEntitlement.update({where:entitlementWhere,data:{status:'ACTIVE',suspendedAt:null}})},
+      {name:'organization suspension',
+        stop:()=>db.organization.update({where:{id:f.organizationId},data:{status:'SUSPENDED'}}),
+        restore:()=>db.organization.update({where:{id:f.organizationId},data:{status:'ACTIVE'}})},
+      ...['*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'].map(permission=>{
+        const id=randomUUID()
+        return {name:permission,
+          stop:()=>db.organizationAccessDeny.create({data:{id,organizationId:f.organizationId,
+            userId:f.student.userId,permission,reason:'Synthetic fresh-task access stop',deniedByUserId:f.admin.userId}}),
+          restore:()=>db.organizationAccessDeny.update({where:{id},data:{liftedAt:new Date(),liftedByUserId:f.admin.userId}})}
+      }),
+    ]
+    const historyTask=await addCampusActivityTask({...scope,kind:'ASSIGNMENT',title:'已完成文本任务'})
+    const teacherDenyTask=await addCampusActivityTask({...scope,kind:'ASSIGNMENT',title:'独立 School 文本任务'})
+    const freshTasks=[]
+    for(const stop of stops)freshTasks.push(await addCampusActivityTask({...scope,kind:'ASSIGNMENT',title:stop.name}))
+    await allocateCampusActivityParticipants({...scope,classUnitIds:[f.classUnitId],requestKey:randomUUID(),expectedVersion:1})
+    await changeCampusActivityStatus({...scope,action:'SUBMIT',expectedVersion:1})
+    await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:2})
+    const submit=async(taskId:string,content:string,key?:string)=>{
+      let status=200,value:any
+      const res={status(code:number){status=code;return res},json(payload:any){value=payload;return res}} as unknown as Response
+      const req={user:f.student,params:{id:taskId},body:{content,expectedRevision:0},header:()=>key} as unknown as Request
+      await assignmentController.submit(req,res)
+      return {status,value}
+    }
+    const historyKey=randomUUID(),historyContent='Synthetic original text final'
+    expect((await submit(historyTask.id,historyContent,historyKey)).status).toBe(200)
+    const history=await db.submission.findUniqueOrThrow({where:{assignmentId_studentId:{
+      assignmentId:historyTask.id,studentId:f.student.userId}}})
+    const receipt=await db.submissionIdempotencyReceipt.findFirstOrThrow({where:{submissionId:history.id}})
+    // A Teacher-only stop must not remove this independent School product use.
+    const teacherDeny=await db.organizationAccessDeny.create({data:{id:randomUUID(),organizationId:f.organizationId,
+      userId:f.student.userId,permission:'HUITEACHER_ACCESS',reason:'Synthetic other-product stop',deniedByUserId:f.admin.userId}})
+    expect(await hasActiveCourseMembership(activity.id,f.student.userId)).toBe(true)
+    expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list.some(row=>row.id===teacherDenyTask.id)).toBe(true)
+    expect((await submit(teacherDenyTask.id,'Synthetic School-only text')).status).toBe(200)
+    await db.organizationAccessDeny.update({where:{id:teacherDeny.id},data:{liftedAt:new Date(),liftedByUserId:f.admin.userId}})
+    for(const [index,stop] of stops.entries()){
+      const task=freshTasks[index]
+      // Establish valid authority before the stop, as for an already-open tab.
+      expect(await hasActiveCourseMembership(activity.id,f.student.userId),stop.name).toBe(true)
+      await stop.stop()
+      try{
+        expect(await hasActiveCourseMembership(activity.id,f.student.userId),stop.name).toBe(false)
+        expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list,stop.name).toHaveLength(0)
+        expect((await submit(task.id,'Synthetic rejected fresh text')).status,stop.name).toBe(403)
+        // Bypass the application preflight to exercise the deployed DB trigger.
+        await expect(db.submission.create({data:{assignmentId:task.id,studentId:f.student.userId,
+          content:'Synthetic delayed direct text write',status:'SUBMITTED'}})).rejects.toThrow('campus assignment is not currently authorized')
+        expect(await db.submission.count({where:{assignmentId:task.id,studentId:f.student.userId}})).toBe(0)
+        // A stop blocks collection/replay through this entry, not stored history.
+        expect((await submit(historyTask.id,historyContent,historyKey)).status,stop.name).toBe(403)
+        expect(await db.submission.findUniqueOrThrow({where:{id:history.id}})).toEqual(history)
+        expect(await db.submissionIdempotencyReceipt.findUniqueOrThrow({where:{id:receipt.id}})).toEqual(receipt)
+      }finally{await stop.restore()}
+      expect(await hasActiveCourseMembership(activity.id,f.student.userId),stop.name).toBe(true)
+      expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list.some(row=>row.id===task.id),stop.name).toBe(true)
+      expect((await submit(task.id,'Synthetic permitted restored text')).status,stop.name).toBe(200)
+    }
+    const replay=await submit(historyTask.id,historyContent,historyKey)
+    expect(replay).toMatchObject({status:200,value:{code:0,data:{id:history.id}}})
+    expect(await db.submission.findUniqueOrThrow({where:{id:history.id}})).toEqual(history)
+    expect(await db.submissionIdempotencyReceipt.findUniqueOrThrow({where:{id:receipt.id}})).toEqual(receipt)
+    expect(await db.submissionHistory.count({where:{submissionId:history.id}})).toBe(0)
+  })
+
+  it('DA-S02 preserves Training enrollment and fresh text submissions without a School subscription',async()=>{
+    const teacher=await db.user.create({data:{username:userName('training_teacher_'),passwordHash:'synthetic-only',
+      accountDomain:'TRAINING',role:UserRole.TEACHER}})
+    const student=await db.user.create({data:{username:userName('training_student_'),passwordHash:'synthetic-only',
+      accountDomain:'TRAINING',role:UserRole.STUDENT}})
+    const course=await db.course.create({data:{title:'Synthetic Training text course',courseCode:userName('training_text_'),
+      creatorId:teacher.id,courseType:'TRAINING_COURSE'}})
+    const enrollment=await db.courseStudent.create({data:{courseId:course.id,studentId:student.id,status:'ACTIVE'}})
+    expect(await hasActiveCourseMembership(course.id,student.id)).toBe(true)
+    await db.courseStudent.update({where:{id:enrollment.id},data:{status:'APPROVED'}})
+    expect(await hasActiveCourseMembership(course.id,student.id)).toBe(true)
+    expect(await db.$queryRaw`SELECT campus_submission_is_authorized(${course.id},${student.id}) AS allowed`).toEqual([{allowed:true}])
+    const task=await db.assignment.create({data:{courseId:course.id,title:'Synthetic Training practice',status:'PUBLISHED'}})
+    let status=200,value:any
+    const res={status(code:number){status=code;return res},json(payload:any){value=payload;return res}} as unknown as Response
+    const req={user:{...actor(student),accountDomain:'TRAINING'},params:{id:task.id},
+      body:{content:'Synthetic Training text',expectedRevision:0},header:()=>undefined} as unknown as Request
+    await assignmentController.submit(req,res)
+    expect(status).toBe(200)
+    expect(value).toMatchObject({code:0,data:{assignmentId:task.id,studentId:student.id,status:'SUBMITTED'}})
+  })
+
   it('does not disclose CAMPUS Activity assignments, checkins or tags to a legacy platform ADMIN',async()=>{
     const f=await fixture()
     const activity=await createCampusActivity({

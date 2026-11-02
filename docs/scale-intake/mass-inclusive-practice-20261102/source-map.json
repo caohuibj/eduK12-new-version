@@ -1,0 +1,122 @@
+{
+  "partAItemPrompts": [
+    "Educator—Name/Title:",
+    "Primary Evaluator—Name/Title:",
+    "Supervising Evaluator, if any—Name/Title/Role in evaluation:",
+    "School(s):",
+    "What are my sources of evidence?",
+    "What student needs do I want to address this year based on this evidence?",
+    "What practices will best help me address those needs?",
+    "How I do know that these practices are effective?",
+    "What supports do I expect ALL students to need?",
+    "What supports do I expect SOME students to need?",
+    "What supports do I expect A FEW students to need?",
+    "Team, if applicable:",
+    "List Team Members below:",
+    "Educator—Name/Title:",
+    "What are my areas of strength around inclusive practice?",
+    "What aspects of Social Emotional Learning do I want to develop this year?",
+    "What aspects of Positive Behavior Interventions and Supports do I want to develop this year?",
+    "What aspects of Universal Design for Learning do I want to develop this year?",
+    "What supports do I expect SOME students to need?",
+    "What supports do I expect A FEW students to need?",
+    "Team, if applicable:",
+    "List Team Members below:"
+  ],
+  "partAOriginalReflectionPrompts": [
+    "What are my sources of evidence?",
+    "What student needs do I want to address this year based on this evidence?",
+    "What practices will best help me address those needs?",
+    "How I do know that these practices are effective?",
+    "What supports do I expect ALL students to need?",
+    "What supports do I expect SOME students to need?",
+    "What supports do I expect A FEW students to need?",
+    "What are my areas of strength around inclusive practice?",
+    "What aspects of Social Emotional Learning do I want to develop this year?",
+    "What aspects of Positive Behavior Interventions and Supports do I want to develop this year?",
+    "What aspects of Universal Design for Learning do I want to develop this year?",
+    "What supports do I expect SOME students to need?",
+    "What supports do I expect A FEW students to need?"
+  ],
+  "partBLabels": [
+    "Child and Adolescent Development (I-A-2)",
+    "Variety of Assessment Methods (I-B-1)",
+    "Adjustment to Practice (I-B-2)",
+    "Meeting Diverse Needs (II-A-3)",
+    "Safe Learning Environment (II-B-1)",
+    "Access to Knowledge (II-D-3)",
+    "Two Way Communication (III-C-1)",
+    "Reflective Practice (IV-A-1)",
+    "Shared Responsibility (IV-E-1)"
+  ],
+  "partBStandards": [
+    "Standard I: Curriculum, Planning, and Assessment",
+    "Standard I: Curriculum, Planning, and Assessment",
+    "Standard I: Curriculum, Planning, and Assessment",
+    "Standard II: Teaching All Students",
+    "Standard II: Teaching All Students",
+    "Standard II: Teaching All Students",
+    "Standard III: Family and Community Engagement",
+    "Standard IV: Professional Culture",
+    "Standard IV: Professional Culture"
+  ],
+  "partBDescriptors": [
+    [
+      "Demonstrates knowledge of the developmental levels of students in the classroom and the different ways these students learn by providing differentiated learning experiences that enable all students to progress toward meeting intended outcomes.",
+      "Designs the developmentally appropriate learning environment to support all students’ learning by facilitating various learning activities, integrating multiple opportunities for student action and expression, and collaboration with peers."
+    ],
+    [
+      "Designs and administers a variety of informal and formal methods and assessments, including common interim assessments, to measure each student’s learning, growth, and progress toward achieving state/local standards.",
+      "Conducts frequent checks for student understanding and uses data to drive instruction",
+      "Provides multiple and varied options for student communication and expression to demonstrate understanding and build fluency"
+    ],
+    [
+      "Organizes and analyzes results from a variety of assessments to determine progress toward intended outcomes and uses these findings to adjust practice and identify and/or implement appropriate differentiated interventions and enhancements for students.",
+      "Ensures assessments are accessible such that all students’ knowledge can be demonstrated and accurately captured",
+      "Provides frequent and varied feedback and positive reinforcement to student responses"
+    ],
+    [
+      "Uses appropriate practices, including tiered instruction and scaffolds, to accommodate differences in learning styles, needs, interests, and levels of readiness, including those of students with disabilities and English learners.",
+      "Identifies and removes curricular and/or instructional barriers to student learning",
+      "Familiarizes themselves with student learning profiles (IEPs, 504s, WIDA report cards) and uses information to guide instruction",
+      "Utilizes evidence based practices and district supports (UDL, PBIS, SEL, SEI, DCAP)"
+    ],
+    [
+      "Uses rituals, routines, and appropriate responses that create and maintain a safe physical and intellectual environment.",
+      "Promotes academic risk taking",
+      "Utilizes preventative measures to minimize behaviors that interfere with learning.",
+      "Fosters collaboration and community by creating an accepting and supportive classroom climate that is sensitive to individual learner profiles",
+      "Creates a nonthreatening, positive, and academically rigorous atmosphere and integrated with other important initiatives"
+    ],
+    [
+      "Consistently adapts instruction, materials, and assessments to make challenging material accessible to all students, including English learners and students with disabilities.",
+      "Presents curriculum content through multiple means and provides scaffolds and supports for metacognitive processing"
+    ],
+    [
+      "Regularly uses two-way communication with families about student performance and learning and responds promptly and carefully to communications from families.",
+      "Establishes a welcoming and family friendly classroom",
+      "Utilizes multiple means of communication to reach all families",
+      "Is sensitive to cultural and other demographic considerations when communicating with families"
+    ],
+    [
+      "Regularly reflects on the effectiveness of lessons, units, and interactions with students, both individually and with colleagues, and uses insights gained to improve practice and student learning.",
+      "Utilizes a variety of approaches to gather information, analyze data, examine issues, set meaningful goals, and develop new approaches in order to improve inclusive practices",
+      "Regularly assesses all student performance to determine effectiveness of instructional practice"
+    ],
+    [
+      "Within and beyond the classroom, consistently reinforces school-wide behavior and learning expectations for all students, and contributes to their learning by sharing responsibility for meeting their needs.",
+      "Collaborates with others to ensure alignment of instructional plans and academic expectations",
+      "Collaborates with others to align practices, routines, and vocabulary for behavior",
+      "Shares and discusses student data and problem solves collaboratively"
+    ]
+  ],
+  "hiddenAdministratorLabelsExcluded": true,
+  "visibleTeacherPagesInspected": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "sourceOptions": "Yes/no/partial",
+  "wordingNote": "Original How I do know typo and learning styles phrase retained; no fixed learning-style diagnosis or matching advice is supported."
+}

@@ -1,0 +1,365 @@
+{
+  "baseCommit": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "source": {
+    "doi": "10.1163/23641177-BJA10012",
+    "onlinePublication": "2020-12-16",
+    "sourceArticle": "https://brill.com/view/journals/apse/6/2/article-p480_10.xml?language=en",
+    "readableFullPaperCopy": "https://www.researchgate.net/publication/347669053_Teacher_Competency_in_Competency-Focused_Science_Teaching_in_the_South_Korean_Context_Teacher_Self-Assessment_Instrument_Development_and_Application",
+    "crossrefLicense": "https://creativecommons.org/licenses/by/4.0/",
+    "articleLicenseStatementRead": true,
+    "fullAppendixBRead": true,
+    "publishedEnglishItems": 54,
+    "originalKoreanSurveyObtained": false,
+    "publisherPdfBytesObtained": false,
+    "normalization": "PDF layout hyphenation, line breaks and ligatures normalized; item codes, wording and Appendix B factor order retained.",
+    "responseBasis": "Methods §3.1: five positions, 1=rarely, 5=always; intermediate verbal labels not published.",
+    "missingPolicyBasis": "Project complete-case rule; not represented as author missing-data algorithm."
+  },
+  "dedup": {
+    "registeredVersionsAtBase": 258,
+    "sourceJsonAtBase": 235,
+    "matchedExistingItemsAfterCasePunctuationNormalization": 0,
+    "checkedNewItems": 54,
+    "repositoryNameDoiAuthorSearch": "no matches",
+    "openPrsChecked": 45,
+    "openPrMatches": [],
+    "openPrErrors": [],
+    "limitations": [
+      "Visible GitHub patches may be truncated.",
+      "No production or administrator-authored DB duplicate check.",
+      "Semantic equivalence under unrelated names is not ruled out by exact wording checks."
+    ]
+  },
+  "validation": {
+    "initialNativeSelectedCheck": {
+      "node": "v24.19.0",
+      "results": [
+        {
+          "instrumentKey": "kstc2020_slp_environment_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_slp_content_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_slp_cognition_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_stp_inquiry_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_stp_everyday_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_stp_engagement_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_stp_assessment_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_spd_new_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        },
+        {
+          "instrumentKey": "kstc2020_spd_traditional_teacher_en",
+          "instrumentVersion": "1.0.0",
+          "status": "DRAFT",
+          "administrationEligibility": "not-evaluated",
+          "goldenCases": 4,
+          "scoringExecutions": 6,
+          "referencePolicy": "none",
+          "issues": []
+        }
+      ]
+    },
+    "initialCheckReportVersion": "1.0.0",
+    "currentReportVersion": "1.0.1",
+    "reuseBoundary": "C/P and all 54 item texts/weights unchanged; R1.0.1 adds factor-specific micro-actions. Final same-head formal check remains required.",
+    "initialLocalFailures": [
+      {
+        "phase": "tool invocation",
+        "cause": "tsx run from repo root instead of backend dependency root",
+        "resolution": "use backend working directory; no dependency or code change"
+      },
+      {
+        "phase": "golden fixture keys",
+        "cause": "expected.totalScoreKeys was incorrectly assumed to mean cross-factor totals; existing checker uses it as the emitted score-key list",
+        "resolution": "set each fixture to the sole factor key; retained mean/missing assertions and no composite total"
+      }
+    ],
+    "isolatedNativeImport": {
+      "status": "ISOLATED_NATIVE_DRAFT_IMPORT_AND_READBACK_PASSED",
+      "databaseTarget": "127.0.0.1:55448/kstc2020_intake",
+      "syntheticOnly": true,
+      "productionAccess": false,
+      "records": [
+        {
+          "key": "kstc2020_slp_environment_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 10,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "967062baf697097c4c511ce22f50316b9b4e34fe5be51c487e686a8b5fc87530",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_slp_content_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 4,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "8897b1c1a17eb06198bef60e58dd7c4a8a90d790d9dd7687f722880bdcdbd642",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_slp_cognition_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 3,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "06d41ff420008aa936e2435400ddf1db7574d2de43255d1a8d5e8017f9b37c86",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_stp_inquiry_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 14,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "aff5679b12bc8aa6a5935599e8cdae23fa2884cc20474e65f02b4c01d7ad7ea6",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_stp_everyday_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 7,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "6432069f14a55c054b9f6e20237fd222fe031e6dc3b902294f9dc785222e1674",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_stp_engagement_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 6,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "76184a83a4825c400744dc2b80e60b7333de2679b46bbc9a0153e2d6354ee807",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_stp_assessment_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 3,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "ad42a83497b3d1d05b6cdb89bd811805d3473699b739efa9147b350e4a2d6fca",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_spd_new_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 3,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "abddd591801e044ba7dd583d028a1633966c386625beabbbbf28449102a65734",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        },
+        {
+          "key": "kstc2020_spd_traditional_teacher_en",
+          "C": "1.0.0",
+          "P": "1.0.0",
+          "R": "1.0.1",
+          "itemCount": 4,
+          "status": "DRAFT",
+          "visibility": "HIDDEN",
+          "definitionHash": "24896ce8ffcdaf8e75ba55c0ce9f08a4acc8ebd0a230bef05692df17273d6683",
+          "familyTagPresent": true,
+          "axisSnapshotCount": 2
+        }
+      ],
+      "reports": [
+        {
+          "key": "kstc2020_slp_environment_teacher_en",
+          "scenario": "frequent_self_report",
+          "quality": "interpretable",
+          "value": 5,
+          "interpretations": 1,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_slp_environment_teacher_en",
+          "scenario": "difficult_or_less_frequent",
+          "quality": "interpretable",
+          "value": 1,
+          "interpretations": 1,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_slp_environment_teacher_en",
+          "scenario": "insufficient_information",
+          "quality": "invalid",
+          "value": null,
+          "interpretations": 0,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_stp_inquiry_teacher_en",
+          "scenario": "frequent_self_report",
+          "quality": "interpretable",
+          "value": 5,
+          "interpretations": 1,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_stp_inquiry_teacher_en",
+          "scenario": "difficult_or_less_frequent",
+          "quality": "interpretable",
+          "value": 1,
+          "interpretations": 1,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_stp_inquiry_teacher_en",
+          "scenario": "insufficient_information",
+          "quality": "invalid",
+          "value": null,
+          "interpretations": 0,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_spd_new_teacher_en",
+          "scenario": "frequent_self_report",
+          "quality": "interpretable",
+          "value": 5,
+          "interpretations": 1,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_spd_new_teacher_en",
+          "scenario": "difficult_or_less_frequent",
+          "quality": "interpretable",
+          "value": 1,
+          "interpretations": 1,
+          "references": 0,
+          "reportAudience": "teacher"
+        },
+        {
+          "key": "kstc2020_spd_new_teacher_en",
+          "scenario": "insufficient_information",
+          "quality": "invalid",
+          "value": null,
+          "interpretations": 0,
+          "references": 0,
+          "reportAudience": "teacher"
+        }
+      ],
+      "activationRows": 0,
+      "materialGrants": 0
+    },
+    "reportRevision": "Existing native materializer applied an R1.0.1 revision to nine hidden draft rows, preserving all nine earlier R1.0.0 snapshots; eighteen snapshots total.",
+    "materializer": "src/modules/scale/onboarding/materialize.ts; no install/activation or human review forged",
+    "metadataTags": "Ordinary Scale.tags field set from the existing source constructOverlapTags after materialization in the isolated DB.",
+    "formalCi": "NOT_YET_ACTIVATED_AT_PREPARATION",
+    "production": "NOT_ACCESSED_NOT_WRITTEN",
+    "applicationDevelopmentDatabase": "NOT_ACCESSED; only task-owned isolated synthetic PostgreSQL",
+    "finalSourceStructure": "PASS: nine R1.0.1 sources parsed and validated with executeGoldenCases=false; no scoring replay",
+    "generatedRegistry": "PASS: all 258 baseline identities retained, exactly nine KSTC identities added by official generator",
+    "newMainSourceReuse": "Source instrument subtree unchanged between initial baseline and latest main; reuse item duplicate check and immutable source inputs."
+  },
+  "versions": {
+    "C": "1.0.0",
+    "P": "1.0.0",
+    "R": "1.0.1"
+  },
+  "forms": {
+    "nativeOriginalForms": 0,
+    "reason": "All 54 published Appendix B items belong to scored factors; original demographic question wording is not supplied. No additional original form inferred."
+  },
+  "publicationBase": "826f8e2ee5171acfff644efdd9e8527d41a8238f"
+}

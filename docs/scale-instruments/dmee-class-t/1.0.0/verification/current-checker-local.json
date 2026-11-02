@@ -1,0 +1,83 @@
+{
+  "builtinDependencies": [],
+  "bundleDependencies": [],
+  "status": "SCALE_INTAKE_SELECTED_PASSED",
+  "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "head": "e3d85131bcbcf44a3442f83ad5ef506e0b0e8959",
+  "checked": 8,
+  "results": [
+    {
+      "instrumentKey": "dmee_class_t_application_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_assessment_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_differentiation_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_learning_environment_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_modeling_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_orientation_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_questioning_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "dmee_class_t_structuring_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    }
+  ],
+  "boundary": "content-contract-only; generator checked separately; no scientific, copyright, publication or deployment approval"
+}

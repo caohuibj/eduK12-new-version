@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-11-02T01:16:34.785Z",
+  "baseSha": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "database": {
+    "name": "eduk12_mass_inclusive_verify_20261102",
+    "host": "127.0.0.1",
+    "kind": "new_empty_isolated_local_database",
+    "migrationDeploy": "PASS",
+    "rows": {
+      "total": 2,
+      "pending": 2,
+      "family_tagged": 2
+    },
+    "productionConnected": false
+  },
+  "nativeImport": "submitOriginalForm -> governedDetail",
+  "forms": 2,
+  "fields": 40,
+  "scenarios": 8,
+  "negativeCases": [
+    "text over 2000 characters",
+    "invalid status option",
+    "numeric choice",
+    "unknown field in both forms",
+    "non-system-admin import denied"
+  ],
+  "idempotency": "PASS_no_duplicate",
+  "runtimeScore": "NONE",
+  "runtimeReport": "NONE",
+  "state": "SUBMITTED_not_approved_not_online_no_grants",
+  "familyTagQuery": "PASS_existing_reference_metadata_annotations_tags",
+  "uiFamilyFacet": "NOT_CLAIMED_existing_importer_does_not_project_free_tags",
+  "sourceVerification": "13 reflection prompts; 9 descriptors/example groups and visible teacher labels checked against official PDF and matching DOCX; administrative context fields copied; signatures excluded explicitly",
+  "reportCopyReview": "manual_source_and_recipient_scope_review_no_runtime_report_created",
+  "fullPlatformChecks": "NOT_RUN_unaffected_content_only",
+  "officialCI": "NOT_RUN_NOT_CLAIMED",
+  "inputs": {
+    "batch.json": "69f10fcc2010eaa2013ed66f2efb129f83d924ce8f9da3e6752a661dca4c37ff",
+    "source-map.json": "b5d60120573c817a5693d1fbca644e7e31e737765b0c968af7334c9706f05087",
+    "forms/mass_inclusive_practice_part_a_en.json": "77b58afc33b49ec159724ecd89bbc7993d202b303871d86a05c8bab13e24477b",
+    "forms/mass_inclusive_practice_part_b_en.json": "a7aa2af87413ff1f35dbff670bca93608f169547d8a753e6b3b069dc5ab583b5"
+  },
+  "runtimeInputs": {
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": "76f68b15bd6aab2044ad80b9357337b741d166ddecd5c2b21fc08365b025daa9",
+    "server-version/backend/src/modules/survey/final.compute.ts": "2cfd50b03964bb511e2b4d476d35375e38537b16e558ba949d7840b1954e2c23",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591"
+  },
+  "verificationScript": {
+    "path": "/tmp/mass-inclusive-verification.mts",
+    "sha256": "b53e1e62a0e7013cb120095c977c766cc64da3172e3579dec74d365f9e3b17ca"
+  },
+  "nodeVersion": "v24.21.0",
+  "receipts": [
+    {
+      "key": "mass_inclusive_practice_part_a_en",
+      "id": "ed12e861-ac29-5564-b507-cbb88076d733",
+      "state": "SUBMITTED",
+      "version": "0.1.0",
+      "itemCount": 22,
+      "snapshotHash": "b00a8383135c00c0798ad266bd213e7e2bc641d81e0621e67cfe306a79f12677",
+      "definitionDigest": "82d5795e075bf93fe24cfa35a4141fe0c036e3f10526bd046cbfba8d3c25d74d",
+      "scoringDigest": null,
+      "parameters": null,
+      "report": null,
+      "sourceMapping": "PASS",
+      "tagsPersisted": true
+    },
+    {
+      "key": "mass_inclusive_practice_part_b_en",
+      "id": "104c6589-695b-550a-8dc9-20e2a1df9d7f",
+      "state": "SUBMITTED",
+      "version": "0.1.0",
+      "itemCount": 18,
+      "snapshotHash": "f34d2a9c5f8734bd6837de78da402f00a9653cb477cb880148df9c17e7bd1604",
+      "definitionDigest": "2fa4d8377b306c4c1f80c95dd139f20bb089c124bf263a42f7a7753754f0e862",
+      "scoringDigest": null,
+      "parameters": null,
+      "report": null,
+      "sourceMapping": "PASS",
+      "tagsPersisted": true
+    }
+  ]
+}

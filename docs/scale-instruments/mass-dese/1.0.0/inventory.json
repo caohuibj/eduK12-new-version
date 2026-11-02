@@ -1,0 +1,364 @@
+{
+  "motherTool": "Massachusetts DESE",
+  "motherKey": "mass_dese",
+  "manifestVersion": "1.0.0",
+  "children": [
+    {
+      "key": "mass_dese_student_standard_g3_5_en",
+      "name": "Massachusetts DESE｜Standard｜3–5年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g3-5standard-form.docx",
+      "numberedItems": 40,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "CURRENT_40_ITEMS_VS_LEGACY_46_ITEM_NOTES",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_standard_g3_5_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_short_g3_5_en",
+      "name": "Massachusetts DESE｜Short｜3–5年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g3-5short-form.docx",
+      "numberedItems": 20,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_short_g3_5_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_mini_i_g3_5_en",
+      "name": "Massachusetts DESE｜Mini Standard I｜3–5年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g3-5mini-form-i.docx",
+      "numberedItems": 8,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_mini_i_g3_5_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_mini_ii_g3_5_en",
+      "name": "Massachusetts DESE｜Mini Standard II｜3–5年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g3-5mini-form-ii.docx",
+      "numberedItems": 10,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_mini_ii_g3_5_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_mini_i_ii_g3_5_en",
+      "name": "Massachusetts DESE｜Mini Standard I & II｜3–5年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g3-5mini-form-i-ii.docx",
+      "numberedItems": 12,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_mini_i_ii_g3_5_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_standard_g6_12_en",
+      "name": "Massachusetts DESE｜Standard｜6–12年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g6-12standard-form.docx",
+      "numberedItems": 45,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_standard_g6_12_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_short_g6_12_en",
+      "name": "Massachusetts DESE｜Short｜6–12年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g6-12short-form.docx",
+      "numberedItems": 20,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_short_g6_12_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_mini_i_g6_12_en",
+      "name": "Massachusetts DESE｜Mini Standard I｜6–12年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g6-12mini-form-i.docx",
+      "numberedItems": 8,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_mini_i_g6_12_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_mini_ii_g6_12_en",
+      "name": "Massachusetts DESE｜Mini Standard II｜6–12年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g6-12mini-form-ii.docx",
+      "numberedItems": 10,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_mini_ii_g6_12_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_student_mini_i_ii_g6_12_en",
+      "name": "Massachusetts DESE｜Mini Standard I & II｜6–12年级｜学生",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "g6-12mini-form-i-ii.docx",
+      "numberedItems": 12,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+        "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+        "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+        "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_student_mini_i_ii_g6_12_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_staff_standard_adult_en",
+      "name": "Massachusetts DESE｜Standard｜教职工｜教师/教职工",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "staff-standard-form.docx",
+      "numberedItems": 65,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_staff_standard_adult_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    },
+    {
+      "key": "mass_dese_staff_short_adult_en",
+      "name": "Massachusetts DESE｜Short｜教职工｜教师/教职工",
+      "catalogVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "status": "CATALOG_ONLY",
+      "officialFile": "staff-short-form.docx",
+      "numberedItems": 35,
+      "optionalUnscoredComment": true,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "SCORING_AND_REPORT_NOT_INSTALLED",
+        "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED"
+      ],
+      "unscoredCommentFormCandidate": {
+        "key": "mass_dese_staff_short_adult_en_comments",
+        "status": "METADATA_ONLY",
+        "scoring": "none",
+        "report": "descriptive_only_if_existing_authorization_allows",
+        "contentVersion": null,
+        "scoringParameterVersion": null,
+        "reportVersion": null
+      }
+    }
+  ],
+  "unscoredFormCandidates": [
+    {
+      "key": "mass_dese_k2_discussion_en",
+      "name": "Massachusetts DESE｜讨论提纲｜K–2｜学生口述/主持人记录",
+      "officialFile": "k-2-discussion-protocol.docx",
+      "status": "METADATA_ONLY",
+      "scoring": "none",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null,
+      "blockers": [
+        "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED"
+      ],
+      "promptCount": 6,
+      "report": "descriptive_discussion_notes_only_if_authorized"
+    }
+  ],
+  "note": "规划清单，不是新runtime或数据库payload；子项组合仅使用已有普通组合问卷。"
+}

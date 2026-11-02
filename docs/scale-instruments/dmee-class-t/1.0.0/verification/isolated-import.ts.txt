@@ -1,0 +1,42 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import {strict as assert} from 'node:assert'
+import {randomUUID,createHash} from 'node:crypto'
+import {prisma} from '/workspace/dmee-class-t/server-version/backend/src/config/database'
+import {create,addItem,detail} from '/workspace/dmee-class-t/server-version/backend/src/modules/questionnaire-product/service'
+import {updateCatalogTags} from '/workspace/dmee-class-t/server-version/backend/src/modules/training-catalog/tags'
+import {validateFormDefinition} from '/workspace/dmee-class-t/server-version/backend/src/modules/assessment-core/form/definition'
+import {normalizeFormAnswers} from '/workspace/dmee-class-t/server-version/backend/src/modules/assessment-core/form/runtime'
+import {normalizeTypedCompositeSection} from '/workspace/dmee-class-t/server-version/backend/src/modules/assessment-runtime/typed-form'
+import {mapCompositeSection} from '/workspace/dmee-class-t/server-version/backend/src/modules/assessment-runtime/form-section-definition'
+const root='/workspace/dmee-class-t/docs/scale-instruments/dmee-class-t/1.0.0'
+async function main(){
+ const url=new URL(process.env.DATABASE_URL!);assert.equal(url.hostname,'127.0.0.1');assert.equal(url.port,'55441');assert.equal(url.pathname,'/dmee_isolated');assert.equal(process.env.NODE_ENV,'test')
+ const db=await prisma.$queryRaw<Array<{db:string}>>`SELECT current_database() as db`;assert.equal(db[0].db,'dmee_isolated')
+ const actor={userId:randomUUID(),role:'TEACHER' as const};await prisma.user.create({data:{id:actor.userId,username:'dmee_isolated_'+actor.userId,passwordHash:'synthetic-not-a-login-hash',role:'TEACHER',accountDomain:'TRAINING'}})
+ const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));const results=[]
+ for(const form of manifest.forms){
+  const bytes=fs.readFileSync(path.join(root,form.path));assert.equal(createHash('sha256').update(bytes).digest('hex'),form.sha256)
+  const checked=validateFormDefinition(JSON.parse(bytes.toString()),{forPreview:true});assert(checked.definition);assert(checked.issues.every(i=>i.severity!=='error'),JSON.stringify(checked.issues))
+  const d=checked.definition,qs=d.pages.flatMap(p=>p.questions);assert.equal(qs.length,form.itemCount);assert(qs.every(q=>!q.required&&q.options.every(o=>o.score===undefined)))
+  const empty=normalizeFormAnswers(d,{});assert.deepEqual(empty.rawAnswers,{});assert.equal(empty.missing.length,qs.length)
+  const low=Object.fromEntries(qs.map(q=>[q.itemKey,'frequency_1'])),high=Object.fromEntries(qs.map(q=>[q.itemKey,'frequency_7']));assert.equal(Object.keys(normalizeFormAnswers(d,low).rawAnswers).length,qs.length);assert.equal(Object.keys(normalizeFormAnswers(d,high).rawAnswers).length,qs.length)
+  assert.throws(()=>normalizeFormAnswers(d,{[qs[0].itemKey]:0}));assert.throws(()=>normalizeFormAnswers(d,{[qs[0].itemKey]:'frequency_8'}))
+  const created:any=await create(actor,{requestId:randomUUID(),name:form.name,description:'Source: Dierendonck (2023), doi:10.3389/feduc.2023.1281431 and supplement S1/S5. CC BY 4.0. Unscored descriptive author-English-translation pilot. '+form.key,instruction:d.pages[0].description,questionnaireType:'GENERAL',publicEnabled:false})
+  const id=created.id;assert(id);let revision=created.revision
+  for(const q of qs){const {itemKey,...definition}=q;await addItem(actor,id,{revision,item:{type:'FORM',formType:'likert',formLabel:q.prompt,required:false,formDefinition:definition}});revision++}
+  await updateCatalogTags(actor,id,{kind:'COLLECTION',tags:form.tags,expectedTags:[]})
+  const row:any=await prisma.compositeAssessment.findUniqueOrThrow({where:{id},include:{items:{orderBy:{position:'asc'}},formSections:{orderBy:{position:'asc'},include:{items:{orderBy:{formSectionPosition:'asc'}}}}}})
+  assert.equal(row.status,'DRAFT');assert.equal(row.publicEnabled,false);assert.equal(row.productKind,'QUESTIONNAIRE');assert.deepEqual(row.tags,form.tags);assert.equal(row.items.length,qs.length);assert(row.items.every((i:any)=>i.type==='FORM'&&i.scaleId===null));assert.equal(row.reportPackageKey,null);assert.equal(row.analysisProtocolKey,null)
+  assert.deepEqual(row.items.map((i:any)=>i.formLabel),qs.map(q=>q.prompt));assert(row.items.every((i:any)=>i.formDefinition.options.every((o:any)=>o.score===undefined)))
+  const sections=row.formSections.map(mapCompositeSection);let persistedChoiceChecks=0
+  for(const section of sections){
+   const normalized=normalizeTypedCompositeSection(section.items,new Map(section.items.map((i:any)=>[i.id,{value:'frequency_1'}])));assert([...normalized.values()].every((x:any)=>x.normalizedValue==='frequency_1'));persistedChoiceChecks+=normalized.size
+   const absent=normalizeTypedCompositeSection(section.items,new Map());assert([...absent.values()].every((x:any)=>x.normalizedValue===null&&x.state==='SHOWN_MISSING'))
+  }
+  assert.equal(persistedChoiceChecks,qs.length);const visible:any=await detail(actor,id);assert.equal(visible.reportMode,'COLLECTION_ONLY')
+  results.push({key:form.key,id,payloadSHA256:form.sha256,definitionDigest:checked.digest,itemCount:qs.length,status:row.status,tags:row.tags,publicEnabled:false,nativeCreateAddRead:'PASS',tagsNativeCASReadback:'PASS',persistedQuestionOrderAndLabels:'PASS',lowHighSevenPointChoices:'PASS',blankRemainsMissing:'PASS',rejectZeroAndOutOfRange:'PASS',typedStoredAnswerRoundTrip:'PASS',reportMode:visible.reportMode,score:null,parameterVersion:null,reportVersion:null})
+ }
+ const report={checkedAt:new Date().toISOString(),base:'adad907a4b68606ce71bb1a4f2d7c511c872c715',database:'isolated PostgreSQL 16.15; loopback 55441; db dmee_isolated; prepared with current Prisma db push, not a migration/release validation',actor:'synthetic teacher fixture; not a human reviewer or production account',operations:'existing questionnaire-product create/addItem/detail; existing updateCatalogTags; existing Form validator and normalizers',results,scopeLimitations:['No production/database access','No publication, participant start, FINAL or real teacher/student answers','No ESEM scoring, factor means or overall score','No new permissions, runtime, tags engine or database schema','Catalog qualification and report-copy checks recorded separately','Isolated database later removed; installation demonstration does not mean persistent development catalog publication']};fs.writeFileSync(path.join(root,'verification/isolated-import.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({installedIsolatedDrafts:results.length,itemCount:results.reduce((a,b)=>a+b.itemCount,0),tagsReadback:true,published:false,productionWrites:false}))
+}
+main().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await prisma.$disconnect();process.exit(process.exitCode??0)})

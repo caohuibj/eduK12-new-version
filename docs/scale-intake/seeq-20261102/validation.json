@@ -1,0 +1,128 @@
+{
+  "status": "SCOPED_DIAGNOSTIC_PASSED_NOT_FULL_INTAKE_CLI",
+  "head": "23fbab029e587620e759a410adcde82b2b20886c",
+  "checked": 10,
+  "results": [
+    {
+      "instrumentKey": "seeq_ll9515_learning_value_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_enthusiasm_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_organization_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_group_interaction_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_individual_rapport_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_breadth_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_examinations_grading_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_assignments_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_workload_difficulty_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    },
+    {
+      "instrumentKey": "seeq_ll9515_overall_evaluation_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": [],
+      "registryDiscovered": true,
+      "previewActivationAllowed": false,
+      "installRejectedBeforeDatabase": true
+    }
+  ],
+  "omitted": "Global builtin dependency scan was not repeated; unchanged child-chexi factory-shape failure remains a native CLI blocker. No live or isolated DB contacted; no scoring, real report or installation performed."
+}

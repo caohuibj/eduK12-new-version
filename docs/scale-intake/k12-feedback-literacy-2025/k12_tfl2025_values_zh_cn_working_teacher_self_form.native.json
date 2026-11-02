@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "v_reflection",
+      "title": "中国K12反馈素养｜反馈价值无分反思｜教师自评｜项目中文工作译文",
+      "description": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "questions": [
+        {
+          "itemKey": "v1",
+          "type": "LONG_TEXT",
+          "prompt": "V1: 我不把反馈视为简单的判断，而把它看作教师个人成长与发展的机会。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v2",
+          "type": "LONG_TEXT",
+          "prompt": "V2: 我相信建设性反馈有助于营造积极的学习环境。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v3",
+          "type": "LONG_TEXT",
+          "prompt": "V3: 我相信反馈能够促进学生的自主性和自我调节学习。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v4",
+          "type": "LONG_TEXT",
+          "prompt": "V4: 我相信让学生参与反馈能够增强他们的学习动机。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v5",
+          "type": "LONG_TEXT",
+          "prompt": "V5: 我认为反馈会影响学生的情绪。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v6",
+          "type": "LONG_TEXT",
+          "prompt": "V6: 我相信反馈能让学生接受挑战并获得成长。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v7",
+          "type": "LONG_TEXT",
+          "prompt": "V7: 在提供建设性反馈时，我认为使用适当的语言和语气很重要。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v8",
+          "type": "LONG_TEXT",
+          "prompt": "V8: 我认为与学生建立信任关系，会让他们更愿意接纳反馈。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}

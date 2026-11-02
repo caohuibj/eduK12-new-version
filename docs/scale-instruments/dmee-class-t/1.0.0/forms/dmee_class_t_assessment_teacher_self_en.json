@@ -1,0 +1,419 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "dmee_class_t_assessment_teacher_self_en",
+      "title": "Assessment",
+      "description": "Teacher self-reflection using the author’s English translations from Table S1. Choose the frequency that describes your practice. There are no teacher grades or performance rankings. You may leave items blank when you cannot describe them. No fixed recall window was specified in the published item table. This unscored form does not reproduce the paper’s ESEM factor scores. Do not enter pupils’ names or identifiable cases. Platform guidance is newly written and is not the original administration script.",
+      "questions": [
+        {
+          "itemKey": "dmee_en_item_45",
+          "type": "LIKERT",
+          "prompt": "My assessments are truly formative for the students.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_46",
+          "type": "LIKERT",
+          "prompt": "I analyze the most common mistakes made during assessments in order to identify precisely what needs to be worked on as a priority with all or some of the students.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_47",
+          "type": "LIKERT",
+          "prompt": "I observe the students while they are doing a particular task in class and give them direct feedback on their work.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_48",
+          "type": "LIKERT",
+          "prompt": "After each assessment, I provide feedback to the students on which aspects they have mastered well and on which aspects they need to make further efforts.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_49",
+          "type": "LIKERT",
+          "prompt": "After each assessment, I give additional explanations to students who are struggling.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_50",
+          "type": "LIKERT",
+          "prompt": "After each assessment, I design remedial activities (set up a corrective procedure) for students in difficulty.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_51",
+          "type": "LIKERT",
+          "prompt": "I adapt evaluations to match students’ abilities (by proposing different questions or by modulating my level of requirement).",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_52",
+          "type": "LIKERT",
+          "prompt": "I assess the progress of weak students.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_53",
+          "type": "LIKERT",
+          "prompt": "I analyze data about students' academic progress.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_54",
+          "type": "LIKERT",
+          "prompt": "I evaluate the effectiveness of teaching adjustments (e.g. monitor subsequent achievement and progress).",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_55",
+          "type": "LIKERT",
+          "prompt": "I use students’ data to make decisions about teaching adjustments.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    }
+  ]
+}
