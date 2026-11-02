@@ -395,7 +395,12 @@ export const getAssignmentForTeacher = async (userId: string, role: UserRole, id
 
 /** 学生侧详情（D3 §13）：只回 metadata，**不返回实际运行 config JSON**。 */
 export const getAssignmentForStudent = async (userId: string, id: string) => {
-  const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id }, include: { config: true, course: true } })
+  const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id }, select: {
+    id: true, courseId: true, title: true, instruction: true, status: true, listedStandalone: true,
+    opensAt: true, dueAt: true, required: true, publishedAt: true,
+    config: { select: { id: true, testType: true, configVersion: true, name: true, engineVersion: true, scoringVersion: true } },
+    course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
+  } })
   if (!assignment) throw NOT_FOUND('CognitiveAssignment not found')
   if (assignment.status !== 'PUBLISHED' || !assignment.courseId || isCompositeWrapper(assignment) || assignment.course?.isLibrary) {
     throw NOT_FOUND('CognitiveAssignment not found')

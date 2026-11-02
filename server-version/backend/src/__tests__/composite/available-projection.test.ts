@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { gzipSync } from 'node:zlib'
 
 const { db } = vi.hoisted(() => {
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
@@ -40,7 +41,7 @@ const fixture = (override: Record<string, unknown> = {}) => ({
 })
 // Model Prisma's select instead of returning full rows regardless of projection.
 const project = (row: Record<string, any>, select: Record<string, any>) => Object.fromEntries(
-  Object.entries(select).map(([key, value]) => [key, value === true || !value.select ? row[key]
+  Object.entries(select).filter(([, value]) => value !== false).map(([key, value]) => [key, value === true || !value.select ? row[key]
     : Array.isArray(row[key]) ? row[key].map((child: any) => project(child, value.select))
       : row[key] == null ? row[key] : project(row[key], value.select)]))
 let source: ReturnType<typeof fixture>[]
@@ -88,5 +89,48 @@ describe('student available projection', () => {
     expect(getFrozenPackageSlotLabels).toHaveBeenCalledTimes(475)
     expect(db.compositeAssessment.findMany).toHaveBeenCalledTimes(1)
     expect(db.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(1)
+  })
+})
+
+
+describe('opt-in student catalog summary', () => {
+  it('retains card state and all rows without loading or decoding detail payloads', async () => {
+    source = Array.from({ length: 475 }, (_, i) => fixture({ id: 'assessment-' + i }))
+    db.compositeAssessmentAttempt.findMany.mockResolvedValue([
+      { id: 'active', compositeAssessmentId: 'assessment-0', status: 'IN_PROGRESS', progress: 12, taskSatisfaction: null, cognitiveSessions: [] },
+      { id: 'finished', compositeAssessmentId: 'assessment-1', status: 'COMPLETED', progress: 100, taskSatisfaction: 'SATISFIED', cognitiveSessions: [] },
+    ])
+    const detail = await listAvailableForStudent('student', 0, 'course')
+    vi.mocked(getFrozenPackageSlotLabels).mockClear()
+    const summary = await listAvailableForStudent('student', 0, 'course', true)
+    const cards = (rows: any[]) => rows.map(({ instruction, items, units, formSections, ...card }) => card)
+    expect(cards(summary)).toEqual(cards(detail))
+    expect(summary).toHaveLength(475)
+    expect(summary.every(row => row.items.length === 0 && row.units.length === 0 && row.formSections.length === 0 && row.instruction === null)).toBe(true)
+    expect(getFrozenPackageSlotLabels).not.toHaveBeenCalled()
+    const select = db.compositeAssessment.findMany.mock.calls.at(-1)![0].select
+    expect(select.reportPackageSnapshotEncrypted).toBe(false)
+    expect(select.instruction).toBe(false)
+    expect(select.items.select.scale).toBe(false)
+    expect(select.items.select.cognitiveAssignment).toBe(false)
+    expect(select.formSections).toEqual({ select: { id: true } })
+    expect(select.trainingFlowDraft).toBe(true)
+    expect(select.trainingFlowFrozen).toBe(true)
+    expect(select.trainingFlowDigest).toBe(true)
+    expect(select.trainingVariantFrozen).toBe(true)
+    const bytes = (rows: unknown) => ({ json: Buffer.byteLength(JSON.stringify(rows)), gzip: gzipSync(JSON.stringify(rows)).byteLength })
+    expect(bytes(summary).gzip).toBeLessThan(bytes(detail).gzip)
+    console.info('COMPOSITE_SUMMARY_BYTES', JSON.stringify({ rows: 475, detail: bytes(detail), summary: bytes(summary), source: 'synthetic rows, not production timing' }))
+  })
+  it('does not broaden membership or hide flow/variant state in summary mode', async () => {
+    source = [fixture({ trainingFlowFrozen: {} }), fixture({ id: 'variant', trainingVariantFrozen: {} })]
+    const rows = await listAvailableForStudent('student', 0, 'course', true)
+    expect(rows[0].estimatedModules).toBeNull()
+    expect(rows[1]).toMatchObject({ weightedVariants: true, estimatedModules: 3 })
+    expect(db.courseStudent.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { studentId: 'student', status: { in: ['ACTIVE', 'APPROVED'] }, courseId: 'course' } }))
+    db.courseStudent.findMany.mockResolvedValue([])
+    db.compositeAssessment.findMany.mockClear()
+    expect(await listAvailableForStudent('student', 0, 'denied', true)).toEqual([])
+    expect(db.compositeAssessment.findMany).not.toHaveBeenCalled()
   })
 })

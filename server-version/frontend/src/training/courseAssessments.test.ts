@@ -78,7 +78,7 @@ describe('course-scope measurement projection', () => {
     expect(myCognitive).toHaveBeenCalledWith(course)
     expect(get).toHaveBeenCalledWith('/scales/available', { params: { courseId: course } })
     expect(myCognitive).toHaveBeenCalledTimes(1)
-    expect(get).toHaveBeenCalledWith('/composite-assessments/available', { params: { courseId: course } })
+    expect(get).toHaveBeenCalledWith('/composite-assessments/available', { params: { courseId: course, view: 'summary' } })
     expect(get).toHaveBeenCalledWith('/courses/my/tasks?page=1&pageSize=100&courseId=' + encodeURIComponent(course))
   })
 

@@ -2,7 +2,7 @@ import { listOwnTeacherScaleTasks } from '../../modules/huiteacher/scaleRuntime.
 import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
-import { beforeAll,afterAll,describe,expect,it } from 'vitest'
+import { beforeAll,afterAll,describe,expect,it,vi } from 'vitest'
 import {
   integrationDatabaseUrl,requireIsolatedReleaseDatabase,
 } from './integration-env'
@@ -17,7 +17,7 @@ import {
   descriptiveResourceEntry,
 } from '../../modules/assessment-run/registeredResources'
 import {
-  changeTeacherScaleLicense,assertTeacherScaleRunUse,
+  changeTeacherScaleLicense,assertTeacherScaleRunUse,releasedPersonalTeacherScaleEntries,
 } from '../../modules/huiteacher/scaleLicense.service'
 import { changeTeacherPersonalGrant } from '../../modules/huiteacher/personalScaleGrant.service'
 import {listPersonalTeacherScales,startPersonalTeacherScale,readOwnPersonalTeacherScale,
@@ -371,6 +371,14 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     })
     const listed=await listPersonalTeacherScales(independent.id)
     expect(listed.list.some(x=>x.resourceId===resource.id)).toBe(true)
+    const query=vi.fn(db.$queryRaw.bind(db))
+    const exactRef={family:'SCALE',key:resource.resource_key,version:resource.resource_version}
+    const batch=await releasedPersonalTeacherScaleEntries({$queryRaw:query} as any,Array.from({length:50},()=>exactRef))
+    expect(batch).toHaveLength(50)
+    expect(batch.every(row=>row.id===resource.id)).toBe(true)
+    expect(query).toHaveBeenCalledTimes(1)
+    await expect(releasedPersonalTeacherScaleEntries(db,[{...exactRef,version:'missing-version'}])).rejects.toMatchObject({code:'HUITEACHER_SCALE_RELEASE_INVALID'})
+
     const startedPersonal=await startPersonalTeacherScale({
       userId:independent.id,resourceId:resource.id,
     })

@@ -2305,7 +2305,8 @@ export const disableAccessToken = async (userId: string, role: UserRole, composi
   await prisma.compositeAssessmentAccessToken.update({ where: { id: tokenId }, data: { isActive: false } })
 }
 
-export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string) => {
+export const listAvailableForStudent = async (userId: string, now = Date.now(), courseId?: string, summary = false) => {
+  // Catalog consumers opt in; older detail consumers keep their original response.
   const memberships = await prisma.courseStudent.findMany({ where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, ...(courseId ? { courseId } : {}) }, select: { courseId: true } })
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
@@ -2326,14 +2327,14 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       code: true,
       name: true,
       description: true,
-      instruction: true,
+      instruction: !summary,
       status: true,
       opensAt: true,
       expiresAt: true,
       maxAttempts: true,
       reportPackageKey: true,
       reportPackageVersion: true,
-      reportPackageSnapshotEncrypted: true,
+      reportPackageSnapshotEncrypted: !summary,
       trainingVariantFrozen: true,
       // Missing markers mean UNKNOWN, not legacy. Keep every marker loaded.
       ...TRAINING_FLOW_DEFINITION_SELECT,
@@ -2344,15 +2345,14 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
           id: true,
           type: true,
           position: true,
-          scale: { select: { name: true } },
-          cognitiveAssignment: { select: { title: true } },
-          formLabel: true,
+          scale: summary ? false : { select: { name: true } },
+          cognitiveAssignment: summary ? false : { select: { title: true } },
+          formLabel: !summary,
         },
       },
-      formSections: {
-        orderBy: { position: 'asc' },
-        include: { items: { select: { id: true, contextKey: true } } },
-      },
+      formSections: summary
+        ? { select: { id: true } }
+        : { orderBy: { position: 'asc' }, include: { items: { select: { id: true, contextKey: true } } } },
     },
   })
   const attemptRows = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: list.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true, cognitiveSessions: { select: { status: true, frozenAdmissionSnapshotHash: true } } } })
@@ -2392,7 +2392,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     const latestSatisfiedAttempt = compositeAttempts.find(isTaskSatisfied) ?? null
     const sections = item.formSections ?? []
     const hasTrainingFlow = hasTrainingFlowDefinitionMarkers(item)
-    const hideUnits = item.trainingVariantFrozen != null || hasTrainingFlow
+    const hideUnits = summary || item.trainingVariantFrozen != null || hasTrainingFlow
     const nonFormItems = item.items.filter((child: any) => child.type !== 'FORM')
     // Reuse one frozen-package decode for both projections. Hidden candidate
     // unions need only their count; never decode labels or build their units.
@@ -2422,7 +2422,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       code: item.code,
       name: item.name,
       description: item.description,
-      instruction: item.instruction,
+      instruction: summary ? null : item.instruction,
       deliveryMode: 'FINAL_ONLY' as const,
       estimatedModules: hasTrainingFlow ? null : nonFormItems.length + sections.length,
       course: item.course,
