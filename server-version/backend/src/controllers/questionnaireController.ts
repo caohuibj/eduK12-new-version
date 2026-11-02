@@ -6,7 +6,7 @@ import { assertScaleContextCollectable } from '../modules/scale/policy/context-p
 import { Request, Response } from 'express'
 import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
 import { success, error, forbidden, notFound, completionBusy, assessmentSubmitBusy, instrumentError, unauthorized } from '../utils/response'
-import { UserRole } from '../types'
+import { CourseStudentStatus, UserRole } from '../types'
 import { canUseScale } from '../services/materialGrant'
 import { logger } from '../utils/logger'
 import { z } from 'zod'
@@ -297,6 +297,7 @@ export const questionnaireController = {
   async detail(req: Request, res: Response) {
     try {
       const { id } = req.params
+      const studentView = req.user?.role === UserRole.STUDENT
 
       const questionnaire = await prisma.questionnaire.findFirst({
         where: { id, type: 'COURSE' },
@@ -327,12 +328,24 @@ export const questionnaireController = {
             },
           },
           courseQuestionnaires: {
+            ...(studentView ? {
+              where: {
+                course: {
+                  students: {
+                    some: {
+                      studentId: req.user!.userId,
+                      status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+                    },
+                  },
+                },
+              },
+            } : {}),
             include: {
               course: {
                 select: {
                   id: true,
                   title: true,
-                  courseCode: true,
+                  courseCode: !studentView,
                 },
               },
             },
@@ -370,14 +383,44 @@ export const questionnaireController = {
       }
 
       // Student responses receive only runner metadata and a safe definition
-      // projection; scoring, transforms and report rules stay server-side.
-      if (req.user?.role === UserRole.STUDENT) {
+      // projection. A questionnaire's visibility never grants access to another
+      // linked course or its enrollment credential.
+      if (studentView) {
         return success(res, {
-          ...finalOnlyEnvelope,
+          id: questionnaire.id,
+          code: questionnaire.code,
+          name: questionnaire.name,
+          description: questionnaire.description,
+          instruction: questionnaire.instruction,
+          status: questionnaire.status,
+          type: questionnaire.type,
+          visibility: questionnaire.visibility,
+          estimatedTime: questionnaire.estimatedTime,
+          tags: questionnaire.tags,
+          creatorId: questionnaire.creatorId,
+          createdAt: questionnaire.createdAt,
+          updatedAt: questionnaire.updatedAt,
+          creator: {
+            id: questionnaire.creator.id,
+            username: questionnaire.creator.username,
+            nickname: questionnaire.creator.nickname,
+          },
           questionnaireScales: questionnaire.questionnaireScales.map((entry: any) => ({
-            ...entry,
+            id: entry.id,
+            questionnaireId: entry.questionnaireId,
+            scaleId: entry.scaleId,
+            position: entry.position,
             scale: questionnaireScaleRunner(entry.scale),
           })),
+          courseQuestionnaires: questionnaire.courseQuestionnaires.map(({ courseId, course }) => ({
+            courseId,
+            course: { id: course.id, title: course.title },
+          })),
+          _count: { assessments: questionnaire._count.assessments },
+          deliveryMode: 'FINAL_ONLY' as const,
+          attemptEpoch: 1,
+          formSections,
+          units: contentUnits,
         })
       }
 

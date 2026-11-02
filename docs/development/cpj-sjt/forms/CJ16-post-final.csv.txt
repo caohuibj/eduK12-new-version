@@ -1,0 +1,4 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+SINGLE,可选课后回顾（已看反馈）：同一问题再次出现时，你最容易怎样解释？,false,学生没有认真看反馈||练习量还不够||反馈没有触及真正困难||目前需要更多证据再判断||其他||无法判断||不愿回答,,,,,,,,,,,,
+LONG_TEXT,原选择保护了什么目标？有哪些代价或现实限制？,false,,,,,,,,,,,,,
+LONG_TEXT,哪一项新证据会使你改变？下一课愿意试的一小步是什么？如何确认是否有帮助？,false,,,,,,,,,,,,,

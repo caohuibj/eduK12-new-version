@@ -6,12 +6,71 @@ import {tmpdir} from 'node:os';
 import {join,dirname} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {selectScaleIntake,readScaleIntakeDiff,scaleIntakeToolingChanged} from './scale-intake-scope.mjs';
-import {classifyChanges} from './content-scope.mjs';
-import {requiredChecks,failedChecks} from './merge-gate.mjs';
+import {classifyChanges,contentCodeqlRequired} from './content-scope.mjs';
+import {requiredChecks,failedChecks,recheckContentSast} from './merge-gate.mjs';
+import {renderManifest} from '../../server-version/backend/scripts/generate-situational-instruments.mjs';
 import {componentFingerprint} from '../../server-version/scripts/release/policy.mjs';
 const file='server-version/backend/src/modules/scale/instruments/test_scale/1.0.0/instrument.ts';
 const add=f=>({file:f,status:'A',oldMode:'000000',newMode:'100644'});
 const mod=f=>({...add(f),status:'M',oldMode:'100644'});
+const scaleIndex='server-version/backend/src/modules/scale/onboarding/instruments.generated.ts';
+const json=file.replace('instrument.ts','source.json');
+const wrapperText="import type { ScaleInstrumentSourceV1 } from '../../../onboarding/types'; import source from './source.json'; export const SCALE_INSTRUMENT_SOURCE = source as unknown as ScaleInstrumentSourceV1;";
+const renderScaleInstrumentManifest=paths=>paths.map((path,i)=>`import { SCALE_INSTRUMENT_SOURCE as source${i} } from '${path}';`).join('\n')+"\nimport type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types';\nexport const GENERATED_EXECUTABLE_SCALE_PACKAGES: readonly ScalePackageV2[] = [];\nexport const GENERATED_SCALE_SCORER_PLUGINS: readonly VersionedScorerRegistration[] = [];\nexport const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV1[] = ["+paths.map((_,i)=>'source'+i).join(',')+"];\n";
+const declarationFixture=()=>{
+ const files={[file]:wrapperText,[json]:JSON.stringify({identity:{instrumentKey:'test_scale',instrumentVersion:'1.0.0'}}),[scaleIndex]:renderScaleInstrumentManifest(['../instruments/test_scale/1.0.0/instrument'])};
+ const previous={[scaleIndex]:renderScaleInstrumentManifest([])};
+ const readers={readHeadFile:path=>files[path],readBaseFile:path=>previous[path],listHeadFiles:()=>Object.keys(files).filter(path=>path!==scaleIndex).map(file=>({file,mode:'100644'})),listBaseFiles:()=>[]};
+ return {files,readers,entries:[add(file),add(json),mod(scaleIndex)]};
+};
+
+test('proven JSON wrappers and canonical registry select real content without blanket SAST',()=>{
+ const {files,readers,entries}=declarationFixture();
+ assert.equal(contentCodeqlRequired(entries,readers),false);
+ assert.equal(recheckContentSast({scope:{outputs:{codeql:'false'}},content:{result:'success'}},entries,readers).length,0);
+ for(const result of ['failure','skipped','cancelled',undefined])assert(recheckContentSast({scope:{outputs:{codeql:'false'}},content:{result}},entries,readers).includes('content'));
+ assert(recheckContentSast({scope:{outputs:{codeql:'true'}},content:{result:'success'}},entries,readers).includes('recomputed-content-sast'));
+ files[scaleIndex]+='\nexport const run = () => fetch("https://example.invalid");';
+ assert.equal(contentCodeqlRequired(entries,readers),true);
+ assert(recheckContentSast({scope:{outputs:{codeql:'false'}},content:{result:'success'}},entries,readers).includes('recomputed-content-sast'));
+});
+
+test('unknown syntax imports functions custom scorers modes and mixed controls retain SAST',()=>{
+ for(const changed of [wrapperText+'export const extra=1;',wrapperText.replace('source as unknown','source.map(x=>x) as unknown'),wrapperText+'export function score(){}',wrapperText.replace("import source from './source.json'","import source from './runtime'"),wrapperText+'import "./runtime";',wrapperText+'const broken = {']){
+  const {files,readers,entries}=declarationFixture();files[file]=changed;assert.equal(contentCodeqlRequired(entries,readers),true,changed);
+ }
+ for(const executable of [{definition:{scoring:{scorerKey:'custom'}}},{scorerPlugins:[{key:'custom'}]}]){
+  const {files,readers,entries}=declarationFixture();files[json]=JSON.stringify({identity:{instrumentKey:'test_scale',instrumentVersion:'1.0.0'},executable});assert.equal(contentCodeqlRequired(entries,readers),true);
+ }
+ const {readers,entries}=declarationFixture();
+ for(const extra of ['.github/workflows/ci.yml','server-version/backend/src/controllers/test.ts','server-version/backend/src/modules/scale/instruments/test_scale/1.0.0/scorer.ts'])assert.equal(contentCodeqlRequired([...entries,mod(extra)],readers),true);
+ for(const mode of ['120000','100755'])assert.equal(contentCodeqlRequired([{...entries[0],newMode:mode},...entries.slice(1)],readers),true);
+ assert.equal(contentCodeqlRequired(entries,{...readers,listHeadFiles:()=>readers.listHeadFiles().map(row=>({...row,mode:row.file===json?'120000':row.mode}))}),true);
+});
+
+test('canonical registries cannot introduce an executable source through an unchanged-path claim',()=>{
+ const {files,readers}=declarationFixture();
+ assert.equal(contentCodeqlRequired([mod(scaleIndex)],readers),false);
+ files[file]='export const SCALE_INSTRUMENT_SOURCE = buildSource();';
+ assert.equal(contentCodeqlRequired([mod(scaleIndex)],readers),true);
+ assert.equal(contentCodeqlRequired([mod(scaleIndex)],{...readers,readBaseFile:()=>undefined}),true);
+});
+
+test('SJT canonical JSON registry and native bundle Form data remain declarations, drift does not',()=>{
+ const root='server-version/backend/src/modules/situational/instruments/example/1.0.0/',index='server-version/backend/src/modules/situational/onboarding/instruments.generated.ts';
+ const files=Object.fromEntries(['instrument','publication','scientific'].map(name=>[root+name+'.json','{}']));
+ files[index]=renderManifest([{relative:'example/1.0.0'}]);
+ const readers={readHeadFile:file=>files[file],readBaseFile:()=>renderManifest([]),listHeadFiles:()=>Object.keys(files).filter(file=>file!==index).map(file=>({file,mode:'100644'})),listBaseFiles:()=>[]};
+ const entries=Object.keys(files).map(add);
+ assert.equal(contentCodeqlRequired(entries,readers),false);
+ const form='server-version/backend/src/modules/assessment-bundle/packages/example/1.0.0/context.json';files[form]='{}';
+ assert.equal(contentCodeqlRequired([...entries,add(form)],readers),false);
+ files[index]+='\nrun();';assert.equal(contentCodeqlRequired(entries,readers),true);
+ const injected="x'; globalThis.pwned=true; void '",badRoot=root.replace('/example/','/'+injected+'/');
+ const bad=Object.fromEntries(['instrument','publication','scientific'].map(name=>[badRoot+name+'.json','{}']));
+ bad[index]=renderManifest([{relative:injected+'/1.0.0'}]);
+ assert.equal(contentCodeqlRequired(Object.keys(bad).map(add),{...readers,readHeadFile:file=>bad[file],listHeadFiles:()=>Object.keys(bad).filter(file=>file!==index).map(file=>({file,mode:'100644'}))}),true);
+});
 test('inline and JSON-backed declarations share one selected identity, normal metadata and generated index',()=>{
  const e=[add(file),add(file.replace('instrument.ts','source.json')),add(file.replace('instrument.ts','THIRD_PARTY_LICENSE.md')),
   mod('server-version/backend/src/modules/scale/onboarding/instruments.generated.ts'),add('docs/scale-intake/batch/record.json'),add('docs/scale-intake/batch/receipt.txt')];
@@ -61,7 +120,7 @@ test('dependency preparation and selected tooling tests use the same exact input
  const workflow=readFileSync(new URL('../workflows/ci-release-tools.yml',import.meta.url),'utf8');
  assert.ok(recipe.includes('scaleIntakeToolingChanged(files)'));assert.ok(workflow.includes('scaleIntakeToolingChanged(files)'));
 });
-test('only the two exact Scale CI tools are excluded from application fingerprints',()=>{
+test('only the exact registered Scale CI tools are excluded from application fingerprints',()=>{
  const dir=mkdtempSync(join(tmpdir(),'scale-tool-fingerprint-')),original=process.cwd();
  const git=(...args)=>execFileSync('git',args,{cwd:dir,encoding:'utf8'}).trim();
  const put=(p,content)=>{mkdirSync(dirname(join(dir,p)),{recursive:true});writeFileSync(join(dir,p),content);};

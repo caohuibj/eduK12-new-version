@@ -1,0 +1,892 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "qti_sun2018_observation",
+      "title": "课堂观察记录（不计分）",
+      "description": "这是一份不计分的课堂观察记录，帮助你记录自己愿意提供的课堂经历。请只围绕本次指定的同一位老师和课堂填写。每题可选“我观察到过”“我暂未观察到”或“我不确定或不便回答”，也可以跳过；不必补写细节或真实姓名。这些选项由项目自拟，记录是否观察到，不表示行为频率；本表不是原QTI五点量表，不计算八维、Agency、Communion或教师好坏。反馈的接收者、匿名及可见范围以本次既有安排为准；若可见范围不清楚，可以暂不填写。",
+      "questions": [
+        {
+          "itemKey": "qti_sun2018_o3_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…上的课让人愉快。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o7_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…严厉处罚学生。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o8_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…很严格。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o8_05",
+          "type": "SINGLE",
+          "prompt": "这位老师…强制学生按照其要求去做。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o1_05",
+          "type": "SINGLE",
+          "prompt": "这位老师…掌控学生何时能够讲话。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o6_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…满腹牢骚。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_05",
+          "type": "SINGLE",
+          "prompt": "这位老师…根据学生的意见改变主意。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o2_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…令人敬重。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o3_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…幽默风趣。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…顺应学生的要求。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o8_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…强制课堂保持安静。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o3_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…满面笑容。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o6_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…说话不算话。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o2_05",
+          "type": "SINGLE",
+          "prompt": "这位老师…很好地掌控课堂。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o7_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…用惩罚来威胁学生。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o2_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…能抓住学生的注意力。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…课上学生有很大自由。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…容忍学生的很多行为。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o2_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…很可靠。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o1_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…对课堂上的一切了如指掌。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o1_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…对学生的领导力强。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_06",
+          "type": "SINGLE",
+          "prompt": "这位老师…课上学生的错误可以被放过。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o3_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…愿意倾听学生的心声。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_07",
+          "type": "SINGLE",
+          "prompt": "这位老师…课上学生可以做自己想做的事。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o1_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…掌控学生课上的各种行为。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o8_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…要求学生服从他。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o5_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…容易被学生捉弄。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o8_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…对学生要求非常高。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o7_05",
+          "type": "SINGLE",
+          "prompt": "这位老师…令人害怕。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o5_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…课上学生可以开小差。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o6_03",
+          "type": "SINGLE",
+          "prompt": "这位老师…推卸责任。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o7_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…容易发火。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o5_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…被学生牵着鼻子走。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o5_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…对纪律要求低。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o1_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…有威信。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o6_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…容易和学生起冲突。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o7_02",
+          "type": "SINGLE",
+          "prompt": "这位老师…强行占用课余时间。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o2_01",
+          "type": "SINGLE",
+          "prompt": "这位老师…处事公正。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o4_04",
+          "type": "SINGLE",
+          "prompt": "这位老师…可以和他/她开玩笑。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "qti_sun2018_o6_05",
+          "type": "SINGLE",
+          "prompt": "这位老师…猜疑学生。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "observed",
+              "label": "我观察到过"
+            },
+            {
+              "optionKey": "not_observed",
+              "label": "我暂未观察到"
+            },
+            {
+              "optionKey": "unsure",
+              "label": "我不确定或不便回答"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    }
+  ]
+}
