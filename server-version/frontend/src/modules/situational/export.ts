@@ -1,6 +1,8 @@
 import type { SituationalAttemptResponse, SituationalScientificContext } from './types'
 
 export interface SituationalExportPayload {
+  mode?: 'UNSCORED'
+  responseStatus?: 'COMPLETE' | 'NONANSWER'
   narrative?: NonNullable<SituationalAttemptResponse['result']>['narrative']
   model?: NonNullable<SituationalAttemptResponse['result']>['model']
   scientificContext: SituationalScientificContext
@@ -25,6 +27,7 @@ export interface SituationalExportPayload {
 }
 
 export const buildSituationalExportPayload = (data: SituationalAttemptResponse): SituationalExportPayload => ({
+  ...(data.result?.mode === 'UNSCORED' ? { mode: data.result.mode, responseStatus: data.result.responseStatus } : {}),
   scientificContext: data.instrument.scientificContext ?? { scientificMaturity: 'PILOT', governanceRevision: null, scope: null, evidenceDigest: null, provenance: 'LEGACY_MISSING' },
   instrumentKey: data.attempt.instrumentKey,
   instrumentVersion: data.attempt.instrumentVersion,
@@ -70,6 +73,7 @@ export const buildSituationalCsv = (data: SituationalAttemptResponse): string =>
     ['quality.status', payload.quality.status],
     ['quality.flags', payload.quality.flags.join('|')],
     ['referencePolicy', payload.referencePolicy],
+    ...(payload.mode ? [['mode', payload.mode], ['responseStatus', payload.responseStatus]] : []),
     ['disclaimer', payload.disclaimer],
     [],
     ...(payload.narrative ? [['paragraph'], ...payload.narrative.paragraphs.map(p=>[p])] : [

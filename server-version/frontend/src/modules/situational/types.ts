@@ -218,11 +218,13 @@ export interface SituationalMetric {
 }
 
 export interface SituationalResult {
+  mode?: 'UNSCORED'
+  responseStatus?: 'COMPLETE' | 'NONANSWER'
   narrative?: { version: 'sjt-narrative-v1'; paragraphs: string[] }
   model?: { modelKey: string; modelVersion: string; scoringVersion: string; parameterSetHash?: string }
   metrics: SituationalMetric[]
   quality: {
-    status: 'interpretable' | 'limited' | 'invalid'
+    status: 'interpretable' | 'limited' | 'invalid' | 'unscored'
     flags: string[]
   }
 }

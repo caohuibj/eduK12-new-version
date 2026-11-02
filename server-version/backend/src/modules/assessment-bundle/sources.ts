@@ -494,6 +494,7 @@ export const projectBundleScaleSourceFromCanonicalBridge = (input: {
   expectedInstrumentVersion: string
   envelope: CanonicalUnitResultEnvelopeV1
 }): BundleFrozenScaleSourceV1 => {
+  if (input.envelope.core.quality.status === 'unscored') return bundleContractFail('SOURCE_IDENTITY_MISMATCH', 'Unscored observations cannot enter a scored Bundle')
   const bridge = input.envelope.bundleBridge
   if (!bridge?.scores) {
     return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 缺少 Scale bundleBridge：${input.slotKey}`)
@@ -522,6 +523,7 @@ export const projectBundleCognitiveSourceFromCanonicalBridge = (input: {
   expectedInstrumentVersion: string
   envelope: CanonicalUnitResultEnvelopeV1
 }): BundleFrozenCognitiveSourceV1 => {
+  if (input.envelope.core.quality.status === 'unscored') return bundleContractFail('SOURCE_IDENTITY_MISMATCH', 'Unscored observations cannot enter a scored Bundle')
   const bridge = input.envelope.bundleBridge
   if (!bridge || bridge.metrics === undefined || typeof bridge.hasReferenceNorms !== 'boolean') {
     return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 缺少 Cognitive bundleBridge：${input.slotKey}`)
@@ -556,6 +558,7 @@ export const projectBundleSituationalSourceFromCanonicalBridge = (input: {
   expectedInstrumentVersion: string
   envelope: CanonicalUnitResultEnvelopeV1
 }): BundleFrozenSituationalSourceV1 => {
+  if (input.envelope.core.quality.status === 'unscored') return bundleContractFail('SOURCE_IDENTITY_MISMATCH', 'Unscored observations cannot enter a scored Bundle')
   if (input.envelope.core.unitType !== 'SITUATIONAL') {
     return bundleContractFail('SOURCE_IDENTITY_MISMATCH', `Canonical envelope 必须是 Situational：${input.slotKey}`)
   }

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "scientificMaturity": "PILOT",
+  "governanceRevision": 1,
+  "changeReason": "原创CJX01显式无分运行候选；保留三轮路径与U/N，未提供评分键或科学批准。",
+  "claimScope": null,
+  "evidence": [],
+  "knownLimitations": [
+    "研究候选，待独立内容审阅、适龄/专业理解核查与真实试点；无专家键、动作分、常模或绩效切点。",
+    "同一母情境三轮是相关路径；SD与WD独立，不作差或解释为诚实度。",
+    "公共数据、任务材料和时间可行性仍需内容试测核查。"
+  ]
+}

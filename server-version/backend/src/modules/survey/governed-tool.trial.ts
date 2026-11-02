@@ -98,7 +98,15 @@ export function computeGovernedTrial(a:GovernedArtifact,toolId:string,index:numb
  // The same controlled child scorer and parent FINAL closure, without creating a human Attempt.
  const calculated=verifySurveyFinalPublication(publication,canonicalHash(publication))!.compute(answers,null,undefined,'FINAL',Object.keys(timings).length?timings:undefined,cognitive,native,new Date(frozenAt))
  if(a.nativeBundle){calculated.nativeBundleReports=computeSurveyNativeReports(publication,calculated);if(calculated.nativeBundleReports.some(r=>r.status==='FAILED'))throw new Error('原生整包综合报告试运行失败')}
- for(const unit of calculated.units)if(unit.kind!=='FORM'&&!resultMetrics(unit).some(m=>m.value!==null))throw new Error('试运行没有生成有效评分指标：'+unit.instrumentKey)
+ for(const unit of calculated.units){
+  const source=units.find(source=>source.instrumentKey===unit.instrumentKey)
+  if(source?.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
+   &&(source.compiledDefinition as {scoring?:{mode?:string}}).scoring?.mode==='UNSCORED'){
+   const result=unit.privateScoring as import('../situational/situation-scoring').SituationalResultV1
+   if(result.mode!=='UNSCORED'||result.quality.status!=='unscored'||result.responseStatus!=='COMPLETE'
+    ||result.metrics.length!==0||!result.narrative?.paragraphs.length||!('nativeReference' in unit))throw new Error('未计分情境试运行缺少原生路径回执：'+unit.instrumentKey)
+  }else if(unit.kind!=='FORM'&&!resultMetrics(unit).some(m=>m.value!==null))throw new Error('试运行没有生成有效评分指标：'+unit.instrumentKey)
+ }
  const report=a.unit?renderGovernedUnitReport(a,calculated.units[0]):a.packageReport?renderPackageReport(a.packageReport,a.components,calculated,Object.fromEntries(entries.map(c=>[c.slotKey,c.slotKey]))):null
  if((a.report||a.packageReport)&&!report)throw new Error('已配置报告但试运行没有生成报告')
  const result={synthetic:true,caseIndex:index,answers,rawCognitive,rawNative,calculated,report}

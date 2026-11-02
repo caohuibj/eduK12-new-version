@@ -68,6 +68,7 @@ async function checkReferences(db: Db, input: PreparedRelease, purpose: 'NEW_ADM
       throw new ContentReleaseError('CONTENT_MEASUREMENT_REFERENCE_MISMATCH')
     }
     assertMeasurementDependency(target.status, purpose)
+    if (input.layer === 'REPORT' && (input.content.resultMode === 'UNSCORED') !== (target.content.resultMode === 'UNSCORED')) throw new ContentReleaseError('CONTENT_REPORT_RESULT_MODE_MISMATCH')
     const keys = new Set(target.content.metrics.map(m => m.metricKey))
     const requested = input.layer === 'REFERENCE' ? input.content.entries.map(e => e.metricKey) : input.layer === 'REPORT' ? input.content.metricKeys : []
     if (requested.some(key => !keys.has(key))) throw new ContentReleaseError('CONTENT_UNKNOWN_METRIC')

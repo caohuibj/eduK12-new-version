@@ -1,4 +1,5 @@
 import { validateSjtOnlineMetadata, type SjtOnlineMetadata } from './authoring/online'
+import { buildSjtNarrative } from './authoring/narrative'
 import { scoreSituationalModel, assertSituationalScorerAvailable } from './situation-model-resolver'
 import type { SituationDefinitionV1, DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
@@ -126,6 +127,12 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
   situationPackage.goldenCases.forEach((fixture, index) => {
     try {
       const output = scoreGoldenCase(situationPackage.definition, fixture)
+      if (situationPackage.definition.scoring.mode === 'UNSCORED') {
+        const path = deriveAuthoritativeSituationalTrajectory(situationPackage.definition, fixture.responses)
+        const narrative = buildSjtNarrative(situationPackage.definition, fixture.responses)
+        const actual = { nodeKeys: path.nodeKeys, sceneKeys: path.sceneKeys, terminalNodeKey: path.terminalNodeKey, responseStatus: output.responseStatus, paragraphs: narrative?.paragraphs }
+        if (!fixture.expected.unscored || JSON.stringify(actual) !== JSON.stringify(fixture.expected.unscored)) issues.push({ path: `goldenCases.${index}.unscored`, message: 'Unscored golden must exactly assert reached path, terminal, nonanswer state and selected narrative', severity: 'error' })
+      } else if (fixture.expected.unscored) issues.push({ path: `goldenCases.${index}.unscored`, message: 'Scored golden cannot claim unscored output', severity: 'error' })
       if (output.quality.status !== fixture.expected.quality) {
         issues.push({ path: `goldenCases.${index}.quality`, message: `golden case ${fixture.name} 的 quality 不匹配`, severity: 'error' })
       }

@@ -130,7 +130,7 @@ const assertSituationalCapabilities = (runtime: CompiledInstrumentRuntimeV1): vo
   const expected = {
     standalone: true,
     embedded: true,
-    aggregateEligible: true,
+    aggregateEligible: runtime.scorerKey !== 'situational.unscored',
     collectionFacts: false,
     supported: true,
   }

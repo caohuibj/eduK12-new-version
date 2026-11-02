@@ -23,7 +23,7 @@ export async function bindGovernedToolContent(tx:Prisma.TransactionClient,unit:R
   for(const e of entries)binding.referencePolicy.choices.push({releaseId:reference.releaseId,contentHash:reference.contentHash,entryKey:referenceEntryKey(e.definition),priority:0,metricKey:e.metricKey,referenceKind:e.referenceKind})
  }
  if(a.report){
-  const report=await publishContentRelease(tx,{layer:'REPORT',family:measurement.family,key:'survey-governed-report:'+measurement.releaseId,version:canonicalHash(a.report),scope:measurement.scope,sourceReleaseId:null,assetRefs:[],provenance:{approvedToolId:row.id,approvedHash:row.snapshot_hash,toolReference:row.reference},content:{projectionVersion:1,measurements:[pointer],metricKeys:measurement.content.metrics.map(m=>m.metricKey),audience:a.report.audience??'researcher',language:measurement.content.locale,generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:a.report.template}},actor)
+  const report=await publishContentRelease(tx,{layer:'REPORT',family:measurement.family,key:'survey-governed-report:'+measurement.releaseId,version:canonicalHash(a.report),scope:measurement.scope,sourceReleaseId:null,assetRefs:[],provenance:{approvedToolId:row.id,approvedHash:row.snapshot_hash,toolReference:row.reference},content:{projectionVersion:1,measurements:[pointer],...(measurement.content.resultMode==='UNSCORED'?{resultMode:'UNSCORED'}:{}),metricKeys:measurement.content.metrics.map(m=>m.metricKey),audience:a.report.audience??'researcher',language:measurement.content.locale,generatorVersion:DECLARATIVE_REPORT_GENERATOR,template:a.report.template}},actor)
   binding.reportRelease={releaseId:report.releaseId,contentHash:report.contentHash}
  }
  unit.contentSelection=binding

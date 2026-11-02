@@ -1,0 +1,5888 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "u4-cjx01-wd",
+    "instrumentVersion": "0.3.0"
+  },
+  "catalogOrder": 1101,
+  "definition": {
+    "schemaVersion": 2,
+    "respondentType": "teacher_self_report",
+    "source": {
+      "title": "CJX01 不收家庭数据，任务还有意义吗？｜WD｜未计分选择回顾候选",
+      "url": "https://docs.google.com/document/d/1yds8s1qzjKwoq4yzFLBM4bqwG-gNG3Y3RC6hj0xFttM/edit"
+    },
+    "license": {
+      "status": "self_authored",
+      "redistribution": "restricted",
+      "note": "用户自研研究候选；本地整理不授予公开再分发权。"
+    },
+    "sampling": {
+      "strategy": "BRANCH_REACHABLE"
+    },
+    "scenes": [
+      {
+        "sceneKey": "R1",
+        "title": "下一步怎样同时保留目标和可参与性？",
+        "sortOrder": 0,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "角色与目标：你任教初中统计单元，36名学生，要让学生用平均数和中位数解释两组数据的差异，并说明比较的限制。你可替换本节活动，但不能额外要求家庭披露信息。\n情境：原任务让学生收集家庭某项消费支出。一些学生说不愿公开，另一些人问“换成虚构数字还有什么用”。你有一份与任何家庭无关的练习数据，剩12分钟。学生是否理解统计量的解释意义尚不清楚。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X1A",
+                "label": "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。"
+              },
+              {
+                "optionKey": "X1B",
+                "label": "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。"
+              },
+              {
+                "optionKey": "X1C",
+                "label": "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。"
+              },
+              {
+                "optionKey": "X1D",
+                "label": "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "R2A",
+        "title": "有了公共数据，计算却未必带来意义",
+        "sortOrder": 1,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "进入条件：R1为A或C。展示刚选的完整行动后再给信息：学生已使用公共数据。有的算出两个统计量，却说不清它们分别说明什么；一名学生问“怎样选一个就能证明哪组更好？”剩7分钟。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X2AA",
+                "label": "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。"
+              },
+              {
+                "optionKey": "X2AB",
+                "label": "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。"
+              },
+              {
+                "optionKey": "X2AC",
+                "label": "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。"
+              },
+              {
+                "optionKey": "X2AD",
+                "label": "先保证两种计算方法正确，解释与比较限制放到课后讨论。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "R2B",
+        "title": "选择了计算或问题讨论，如何回到本课目标？",
+        "sortOrder": 2,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "进入条件：R1为B或D。展示实际选择，不声称另一个动作已完成。新信息：课堂仍有学生追问统计量怎样帮助比较。现有材料主要是计算答案或拟调查问题，还不足以判断能否解释差异。剩7分钟。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X2BA",
+                "label": "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。"
+              },
+              {
+                "optionKey": "X2BB",
+                "label": "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。"
+              },
+              {
+                "optionKey": "X2BC",
+                "label": "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。"
+              },
+              {
+                "optionKey": "X2BD",
+                "label": "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "R3A1",
+        "title": "已经收集解释，但出现了判断边界",
+        "sortOrder": 3,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "进入条件：R2A为A或C。学生交了短解释，部分把某个统计量较高直接写成“整组每个人都更高”。还有3分钟，不能逐一面谈。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X3A1A",
+                "label": "给一个能推翻“每个人都更高”的数据反例，让全班只修订这句话的范围。"
+              },
+              {
+                "optionKey": "X3A1B",
+                "label": "先展示一份准确解释供全班比较，原回答留到下一课逐步修订。"
+              },
+              {
+                "optionKey": "X3A1C",
+                "label": "请学生在原解释后补一句不能据此判断什么，收作本课出口证据。"
+              },
+              {
+                "optionKey": "X3A1D",
+                "label": "优先完成本节收束，把误解类型记录下来，下一课用新数据再检查。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "R3A2",
+        "title": "计算完成，独立解释仍不清楚",
+        "sortOrder": 4,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "进入条件：R2A为B或D。学生完成了示范后的计算或继续练习，计算记录较完整；本课还没有足够的独立解释证据。剩3分钟。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X3A2A",
+                "label": "让每人选择一个统计结果，写它能回答刚才问题的哪一部分。"
+              },
+              {
+                "optionKey": "X3A2B",
+                "label": "教师总结两个统计量的意义，让学生在下次课开头再独立解释。"
+              },
+              {
+                "optionKey": "X3A2C",
+                "label": "以一份新但已算好统计量的数据收集一句判断，检查能否迁移解释。"
+              },
+              {
+                "optionKey": "X3A2D",
+                "label": "请学生自评今天哪一部分尚不明白，按回报选择下节复习重点。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "R3B1",
+        "title": "回到解释，但可参与条件并不一致",
+        "sortOrder": 5,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "进入条件：R2B为A或C。简短口头追问显示，有些学生能解释比较，却难以写成长句；另一些人写得流畅却把样本结论推广到所有家庭。剩3分钟。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X3B1A",
+                "label": "允许用标注图或短句回应同一比较问题，重点核对结论范围。"
+              },
+              {
+                "optionKey": "X3B1B",
+                "label": "保留现有回答，先按书面解释完整程度整理，下节再补充其他表达证据。"
+              },
+              {
+                "optionKey": "X3B1C",
+                "label": "展示一句过度推广的匿名结论，让学生改成这份数据能够支持的说法。"
+              },
+              {
+                "optionKey": "X3B1D",
+                "label": "先集中讲清样本范围，暂不增加学生作答，下一课换任务检查。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "R3B2",
+        "title": "本课证据不足，怎样安排下一步？",
+        "sortOrder": 6,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "进入条件：R2B为B或D。本节主要完成计算或问题讨论，学生愿意参与，但还不能据此判断是否理解统计解释。剩3分钟。教师手边有公共练习数据及已算好的平均数和中位数，可直接展示。"
+        },
+        "primaryConstruct": "T01",
+        "secondaryConstructs": [
+          "T05",
+          "T09"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "decision",
+            "purpose": "BEHAVIOR_TENDENCY",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "在这些条件下，你现实中最可能先做哪一步？",
+            "options": [
+              {
+                "optionKey": "X3B2A",
+                "label": "预告下一课用共同公共数据作独立解释，把本课记录仅用于选择起点。"
+              },
+              {
+                "optionKey": "X3B2B",
+                "label": "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。"
+              },
+              {
+                "optionKey": "X3B2C",
+                "label": "替换最后一个总结问题，让学生用已给统计量写一句有限的比较结论。"
+              },
+              {
+                "optionKey": "X3B2D",
+                "label": "请学生各选一个不需私人信息的问题，下节再决定哪些能检验共同目标。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "flow": {
+      "strategy": "BRANCHING_DAG_V1",
+      "entryNodeKey": "R1",
+      "nodes": [
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R1",
+          "sceneKey": "R1",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R1",
+          "stepKey": "R1",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X1A",
+                "nextNodeKey": "R2A"
+              },
+              {
+                "optionKey": "X1B",
+                "nextNodeKey": "R2B"
+              },
+              {
+                "optionKey": "X1C",
+                "nextNodeKey": "R2A"
+              },
+              {
+                "optionKey": "X1D",
+                "nextNodeKey": "R2B"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R2A",
+          "sceneKey": "R2A",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R2",
+          "stepKey": "R2A",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X2AA",
+                "nextNodeKey": "R3A1"
+              },
+              {
+                "optionKey": "X2AB",
+                "nextNodeKey": "R3A2"
+              },
+              {
+                "optionKey": "X2AC",
+                "nextNodeKey": "R3A1"
+              },
+              {
+                "optionKey": "X2AD",
+                "nextNodeKey": "R3A2"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R2B",
+          "sceneKey": "R2B",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R2",
+          "stepKey": "R2B",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X2BA",
+                "nextNodeKey": "R3B1"
+              },
+              {
+                "optionKey": "X2BB",
+                "nextNodeKey": "R3B2"
+              },
+              {
+                "optionKey": "X2BC",
+                "nextNodeKey": "R3B1"
+              },
+              {
+                "optionKey": "X2BD",
+                "nextNodeKey": "R3B2"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3A1",
+          "sceneKey": "R3A1",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R3",
+          "stepKey": "R3A1",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X3A1A",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3A1B",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3A1C",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3A1D",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3A2",
+          "sceneKey": "R3A2",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R3",
+          "stepKey": "R3A2",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X3A2A",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3A2B",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3A2C",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3A2D",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3B1",
+          "sceneKey": "R3B1",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R3",
+          "stepKey": "R3B1",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X3B1A",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3B1B",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3B1C",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3B1D",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3B2",
+          "sceneKey": "R3B2",
+          "motherSceneKey": "CJX01",
+          "roundKey": "R3",
+          "stepKey": "R3B2",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "decision",
+              "measurementRole": "RAW_ONLY",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "decision",
+            "branches": [
+              {
+                "optionKey": "X3B2A",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3B2B",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3B2C",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "X3B2D",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          },
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "decision"
+              ]
+            }
+          ]
+        },
+        {
+          "nodeType": "TERMINAL",
+          "nodeKey": "END"
+        }
+      ]
+    },
+    "scoring": {
+      "scoringVersion": "unscored-path-v1",
+      "choiceScores": [],
+      "publishedMetrics": [],
+      "mode": "UNSCORED"
+    },
+    "report": {
+      "reportVersion": "0.3.0",
+      "primaryMetricKeys": [],
+      "metricOrder": [],
+      "interpretations": [],
+      "limitations": [
+        "研究候选，待独立内容审阅、适龄/专业理解核查与真实试点；无专家键、动作分、常模或绩效切点。",
+        "同一母情境三轮是相关路径；SD与WD独立，不作差或解释为诚实度。",
+        "公共数据、任务材料和时间可行性仍需内容试测核查。"
+      ],
+      "disclaimer": "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。",
+      "narrative": {
+        "version": "sjt-narrative-v1",
+        "fragments": [
+          {
+            "sceneKey": "R1",
+            "channelKey": "decision",
+            "optionKey": "X1A",
+            "text": "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1",
+            "channelKey": "decision",
+            "optionKey": "X1B",
+            "text": "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1",
+            "channelKey": "decision",
+            "optionKey": "X1C",
+            "text": "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1",
+            "channelKey": "decision",
+            "optionKey": "X1D",
+            "text": "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A",
+            "channelKey": "decision",
+            "optionKey": "X2AA",
+            "text": "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A",
+            "channelKey": "decision",
+            "optionKey": "X2AB",
+            "text": "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A",
+            "channelKey": "decision",
+            "optionKey": "X2AC",
+            "text": "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A",
+            "channelKey": "decision",
+            "optionKey": "X2AD",
+            "text": "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B",
+            "channelKey": "decision",
+            "optionKey": "X2BA",
+            "text": "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B",
+            "channelKey": "decision",
+            "optionKey": "X2BB",
+            "text": "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B",
+            "channelKey": "decision",
+            "optionKey": "X2BC",
+            "text": "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B",
+            "channelKey": "decision",
+            "optionKey": "X2BD",
+            "text": "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1",
+            "channelKey": "decision",
+            "optionKey": "X3A1A",
+            "text": "给一个能推翻“每个人都更高”的数据反例，让全班只修订这句话的范围。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1",
+            "channelKey": "decision",
+            "optionKey": "X3A1B",
+            "text": "先展示一份准确解释供全班比较，原回答留到下一课逐步修订。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1",
+            "channelKey": "decision",
+            "optionKey": "X3A1C",
+            "text": "请学生在原解释后补一句不能据此判断什么，收作本课出口证据。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1",
+            "channelKey": "decision",
+            "optionKey": "X3A1D",
+            "text": "优先完成本节收束，把误解类型记录下来，下一课用新数据再检查。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2",
+            "channelKey": "decision",
+            "optionKey": "X3A2A",
+            "text": "让每人选择一个统计结果，写它能回答刚才问题的哪一部分。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2",
+            "channelKey": "decision",
+            "optionKey": "X3A2B",
+            "text": "教师总结两个统计量的意义，让学生在下次课开头再独立解释。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2",
+            "channelKey": "decision",
+            "optionKey": "X3A2C",
+            "text": "以一份新但已算好统计量的数据收集一句判断，检查能否迁移解释。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2",
+            "channelKey": "decision",
+            "optionKey": "X3A2D",
+            "text": "请学生自评今天哪一部分尚不明白，按回报选择下节复习重点。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1",
+            "channelKey": "decision",
+            "optionKey": "X3B1A",
+            "text": "允许用标注图或短句回应同一比较问题，重点核对结论范围。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1",
+            "channelKey": "decision",
+            "optionKey": "X3B1B",
+            "text": "保留现有回答，先按书面解释完整程度整理，下节再补充其他表达证据。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1",
+            "channelKey": "decision",
+            "optionKey": "X3B1C",
+            "text": "展示一句过度推广的匿名结论，让学生改成这份数据能够支持的说法。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1",
+            "channelKey": "decision",
+            "optionKey": "X3B1D",
+            "text": "先集中讲清样本范围，暂不增加学生作答，下一课换任务检查。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2",
+            "channelKey": "decision",
+            "optionKey": "X3B2A",
+            "text": "预告下一课用共同公共数据作独立解释，把本课记录仅用于选择起点。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2",
+            "channelKey": "decision",
+            "optionKey": "X3B2B",
+            "text": "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2",
+            "channelKey": "decision",
+            "optionKey": "X3B2C",
+            "text": "替换最后一个总结问题，让学生用已给统计量写一句有限的比较结论。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2",
+            "channelKey": "decision",
+            "optionKey": "X3B2D",
+            "text": "请学生各选一个不需私人信息的问题，下节再决定哪些能检验共同目标。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2",
+            "channelKey": "decision",
+            "optionKey": "U",
+            "text": "信息不足，无法判断",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2",
+            "channelKey": "decision",
+            "optionKey": "N",
+            "text": "不愿回答本情境",
+            "kind": "ACTION"
+          }
+        ],
+        "comparisons": []
+      }
+    },
+    "referencePolicy": {
+      "type": "none"
+    }
+  },
+  "goldenCases": [
+    {
+      "name": "path-X1A-X2AA-X3A1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "给一个能推翻“每个人都更高”的数据反例，让全班只修订这句话的范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AA-X3A1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "先展示一份准确解释供全班比较，原回答留到下一课逐步修订。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AA-X3A1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "请学生在原解释后补一句不能据此判断什么，收作本课出口证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AA-X3A1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "优先完成本节收束，把误解类型记录下来，下一课用新数据再检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AA-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AA-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AB-X3A2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "让每人选择一个统计结果，写它能回答刚才问题的哪一部分。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AB-X3A2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "教师总结两个统计量的意义，让学生在下次课开头再独立解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AB-X3A2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "以一份新但已算好统计量的数据收集一句判断，检查能否迁移解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AB-X3A2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "请学生自评今天哪一部分尚不明白，按回报选择下节复习重点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AB-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AB-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AC-X3A1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "给一个能推翻“每个人都更高”的数据反例，让全班只修订这句话的范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AC-X3A1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "先展示一份准确解释供全班比较，原回答留到下一课逐步修订。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AC-X3A1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "请学生在原解释后补一句不能据此判断什么，收作本课出口证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AC-X3A1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "优先完成本节收束，把误解类型记录下来，下一课用新数据再检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AC-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AC-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AD-X3A2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "让每人选择一个统计结果，写它能回答刚才问题的哪一部分。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AD-X3A2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "教师总结两个统计量的意义，让学生在下次课开头再独立解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AD-X3A2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "以一份新但已算好统计量的数据收集一句判断，检查能否迁移解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AD-X3A2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "请学生自评今天哪一部分尚不明白，按回报选择下节复习重点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AD-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-X2AD-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1A-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1A"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "改用公共练习数据，先提出一个全班共同要回答的比较问题，个人家庭信息不再收集。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BA-X3B1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "允许用标注图或短句回应同一比较问题，重点核对结论范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BA-X3B1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "保留现有回答，先按书面解释完整程度整理，下节再补充其他表达证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BA-X3B1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "展示一句过度推广的匿名结论，让学生改成这份数据能够支持的说法。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BA-X3B1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "先集中讲清样本范围，暂不增加学生作答，下一课换任务检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BA-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BA-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BB-X3B2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "预告下一课用共同公共数据作独立解释，把本课记录仅用于选择起点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BB-X3B2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BB-X3B2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "替换最后一个总结问题，让学生用已给统计量写一句有限的比较结论。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BB-X3B2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "请学生各选一个不需私人信息的问题，下节再决定哪些能检验共同目标。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BB-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BB-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BC-X3B1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "允许用标注图或短句回应同一比较问题，重点核对结论范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BC-X3B1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "保留现有回答，先按书面解释完整程度整理，下节再补充其他表达证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BC-X3B1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "展示一句过度推广的匿名结论，让学生改成这份数据能够支持的说法。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BC-X3B1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "先集中讲清样本范围，暂不增加学生作答，下一课换任务检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BC-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BC-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BD-X3B2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "预告下一课用共同公共数据作独立解释，把本课记录仅用于选择起点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BD-X3B2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BD-X3B2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "替换最后一个总结问题，让学生用已给统计量写一句有限的比较结论。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BD-X3B2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "请学生各选一个不需私人信息的问题，下节再决定哪些能检验共同目标。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BD-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-X2BD-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1B-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1B"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "取消家庭调查，说明统计量在考试中的用途，先完成原定计算练习。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AA-X3A1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "给一个能推翻“每个人都更高”的数据反例，让全班只修订这句话的范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AA-X3A1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "先展示一份准确解释供全班比较，原回答留到下一课逐步修订。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AA-X3A1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "请学生在原解释后补一句不能据此判断什么，收作本课出口证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AA-X3A1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "优先完成本节收束，把误解类型记录下来，下一课用新数据再检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AA-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AA-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AA"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "选取两个统计量给出不同印象的例子，让学生写一句解释为什么判断会不同。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AB-X3A2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "让每人选择一个统计结果，写它能回答刚才问题的哪一部分。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AB-X3A2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "教师总结两个统计量的意义，让学生在下次课开头再独立解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AB-X3A2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "以一份新但已算好统计量的数据收集一句判断，检查能否迁移解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AB-X3A2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "请学生自评今天哪一部分尚不明白，按回报选择下节复习重点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AB-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AB-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AB"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先用教师示范说明两个统计量的不同用途，再让学生完成一题相似计算。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AC-X3A1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "给一个能推翻“每个人都更高”的数据反例，让全班只修订这句话的范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AC-X3A1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "先展示一份准确解释供全班比较，原回答留到下一课逐步修订。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AC-X3A1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "请学生在原解释后补一句不能据此判断什么，收作本课出口证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AC-X3A1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "X3A1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "优先完成本节收束，把误解类型记录下来，下一课用新数据再检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AC-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AC-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AC"
+        },
+        {
+          "sceneKey": "R3A1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "让学生选一个统计量回应刚才的问题，并写明它能说明和不能说明什么。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AD-X3A2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "让每人选择一个统计结果，写它能回答刚才问题的哪一部分。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AD-X3A2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "教师总结两个统计量的意义，让学生在下次课开头再独立解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AD-X3A2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "以一份新但已算好统计量的数据收集一句判断，检查能否迁移解释。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AD-X3A2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "X3A2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "请学生自评今天哪一部分尚不明白，按回报选择下节复习重点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AD-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-X2AD-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "X2AD"
+        },
+        {
+          "sceneKey": "R3A2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "R3A2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A",
+            "R3A2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "先保证两种计算方法正确，解释与比较限制放到课后讨论。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1C-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1C"
+        },
+        {
+          "sceneKey": "R2A",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2A",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2A"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "使用同一份公共数据，让学生在两个可行的比较问题中选择一个，并说明为什么想回答它。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BA-X3B1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "允许用标注图或短句回应同一比较问题，重点核对结论范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BA-X3B1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "保留现有回答，先按书面解释完整程度整理，下节再补充其他表达证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BA-X3B1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "展示一句过度推广的匿名结论，让学生改成这份数据能够支持的说法。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BA-X3B1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "先集中讲清样本范围，暂不增加学生作答，下一课换任务检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BA-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BA-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BA"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "用公共数据给一项无需额外计算的比较，让每人说明一个统计量支持怎样的判断。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BB-X3B2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "预告下一课用共同公共数据作独立解释，把本课记录仅用于选择起点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BB-X3B2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BB-X3B2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "替换最后一个总结问题，让学生用已给统计量写一句有限的比较结论。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BB-X3B2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "请学生各选一个不需私人信息的问题，下节再决定哪些能检验共同目标。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BB-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BB-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BB"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "保留今天计算或问题筛选的安排，明确把统计解释列为下一课首项任务。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BC-X3B1A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "允许用标注图或短句回应同一比较问题，重点核对结论范围。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BC-X3B1B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "保留现有回答，先按书面解释完整程度整理，下节再补充其他表达证据。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BC-X3B1C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "展示一句过度推广的匿名结论，让学生改成这份数据能够支持的说法。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BC-X3B1D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "X3B1D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "先集中讲清样本范围，暂不增加学生作答，下一课换任务检查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BC-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BC-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BC"
+        },
+        {
+          "sceneKey": "R3B1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "把一个学生问题改写成不涉及家庭信息的比较问题，给出两个统计结果，让学生据此解释。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BD-X3B2A",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2A"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "预告下一课用共同公共数据作独立解释，把本课记录仅用于选择起点。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BD-X3B2B",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2B"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BD-X3B2C",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2C"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "替换最后一个总结问题，让学生用已给统计量写一句有限的比较结论。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BD-X3B2D",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "X3B2D"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "COMPLETE",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "请学生各选一个不需私人信息的问题，下节再决定哪些能检验共同目标。",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BD-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-X2BD-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "X2BD"
+        },
+        {
+          "sceneKey": "R3B2",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "R3B2",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B",
+            "R3B2"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "先请学生讨论什么问题值得调查，以提高参与意愿，统计解释暂不展开。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-X1D-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "X1D"
+        },
+        {
+          "sceneKey": "R2B",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "R2B",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1",
+            "R2B"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "本节先讨论哪些调查问题不需暴露隐私，把实际数据分析推迟到下一课。",
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-U",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "信息不足，无法判断",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    },
+    {
+      "name": "path-N",
+      "responses": [
+        {
+          "sceneKey": "R1",
+          "channelKey": "decision",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "unscored",
+        "metricKeys": [],
+        "metrics": {},
+        "unscored": {
+          "nodeKeys": [
+            "R1",
+            "END"
+          ],
+          "sceneKeys": [
+            "R1"
+          ],
+          "terminalNodeKey": "END",
+          "responseStatus": "NONANSWER",
+          "paragraphs": [
+            "不愿回答本情境",
+            "本报告仅回顾本次给定情境中实际作出的选择，未计分；不代表适切性、教师能力或真实课堂效果。U/N是非回答，不作能力判断。反思为独立可选表单。"
+          ]
+        }
+      }
+    }
+  ]
+}

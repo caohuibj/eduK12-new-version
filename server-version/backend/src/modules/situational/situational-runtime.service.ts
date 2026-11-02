@@ -351,7 +351,7 @@ export const situationalAttemptForResponse = (
       instrumentVersion: row.instrumentVersion,
       attemptNo: row.attemptNo,
       status: row.status,
-      ...(snapshot.online && stored ? { taskSatisfaction: onlineSituationalCanonicalTaskSatisfaction(stored.canonicalResult.core), taskSatisfied: onlineSituationalCanonicalTaskSatisfaction(stored.canonicalResult.core) === 'SATISFIED' } : {}),
+      ...((snapshot.online || snapshot.definition.scoring.mode === 'UNSCORED') && stored ? { taskSatisfaction: onlineSituationalCanonicalTaskSatisfaction(stored.canonicalResult.core), taskSatisfied: onlineSituationalCanonicalTaskSatisfaction(stored.canonicalResult.core) === 'SATISFIED' } : {}),
       deliveryMode: row.deliveryMode,
       runtimeGeneration: row.runtimeGeneration,
       attemptEpoch: row.attemptEpoch,

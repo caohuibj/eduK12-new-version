@@ -1,3 +1,4 @@
+import { isUnscoredSituational } from '../situational/situation-definition'
 import { scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import {
   hashSituationRuntimeDefinition,
@@ -279,7 +280,8 @@ export const compileSituationRuntime = (input: {
     direction: metric.direction,
     role: metric.role,
   })))
-  const qualityDefinitions = compileQuality([
+  const unscored = isUnscoredSituational(definition)
+  const qualityDefinitions = compileQuality(unscored ? [{ key: 'unscored', label: '未计分', description: '仅记录实际选择；回答完整性不代表能力。' }] : [
     { key: 'interpretable', label: '可解释', description: '结果满足情境化测评定义的解释条件。' },
     { key: 'limited', label: '有限', description: '结果可计算但解释受到数据质量限制。' },
     { key: 'invalid', label: '无效', description: '结果不满足可解释条件。' },
@@ -293,7 +295,7 @@ export const compileSituationRuntime = (input: {
     // Definition-content identity is authoritative: a caller may provide the
     // expected hash for verification, but can never override the definition.
     sourceDefinitionHash: computedDefinitionHash,
-    scorerKey: 'situational.default',
+    scorerKey: unscored ? 'situational.unscored' : 'situational.default',
     scorerVersion: definition.scoring.scoringVersion,
     metricDefinitions,
     qualityDefinitions,
@@ -307,7 +309,7 @@ export const compileSituationRuntime = (input: {
     runtimeCapabilities: {
       standalone: true,
       embedded: true,
-      aggregateEligible: true,
+      aggregateEligible: !unscored,
       collectionFacts: false,
       supported: true,
     },

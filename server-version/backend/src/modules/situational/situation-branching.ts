@@ -5,6 +5,9 @@ import { validateSituationalScientificDesign } from './situation-scientific-vali
 import {
   runnerSituationDefinition,
   situationDefinitionSchema,
+  isUnscoredSituational,
+  unscoredSituationalScoringSchema,
+  unscoredSituationalReportSchema,
   situationalMeasurementSceneSchema,
   situationalOpaqueKeySchema,
   validateSituationDefinition,
@@ -117,6 +120,18 @@ export const situationDefinitionV2Schema = situationDefinitionSchema.extend({
   sampling: situationalBranchSamplingSchema,
   flow: situationalBranchFlowSchema,
   researchAssignment: researchAssignmentSchema.optional(),
+  scoring: z.union([
+    situationDefinitionSchema.shape.scoring,
+    unscoredSituationalScoringSchema,
+  ]),
+  report: z.union([situationDefinitionSchema.shape.report, unscoredSituationalReportSchema]),
+}).superRefine((definition, ctx) => {
+  const scoringSchema = isUnscoredSituational(definition) ? unscoredSituationalScoringSchema : situationDefinitionSchema.shape.scoring
+  const scoring = scoringSchema.safeParse(definition.scoring)
+  if (!scoring.success) for (const issue of scoring.error.issues) ctx.addIssue({ ...issue, path: ['scoring', ...issue.path] })
+  const reportSchema = isUnscoredSituational(definition) ? unscoredSituationalReportSchema : situationDefinitionSchema.shape.report
+  const report = reportSchema.safeParse(definition.report)
+  if (!report.success) for (const issue of report.error.issues) ctx.addIssue({ ...issue, path: ['report', ...issue.path] })
 })
 export type SituationDefinitionV2 = z.infer<typeof situationDefinitionV2Schema>
 
@@ -209,7 +224,8 @@ export const validateBranchingSituationDefinition = (
   }
 
   const definition = parsed.data
-  const commonValidation = validateSituationDefinition(asScoredV1Definition(definition), { ...options, allowMeasurementBundle: true })
+  const unscored = isUnscoredSituational(definition)
+  const commonValidation = validateSituationDefinition(unscored ? asV1Definition(definition) : asScoredV1Definition(definition), { ...options, allowMeasurementBundle: true, allowUnscored: unscored })
   // Expert models own construct × response mappings; retain common report/media/identity gates.
   if (definition.scoring.model && definition.scoring.model.modelKey !== 'PROVISIONAL_SCALAR') {
     commonValidation.issues = commonValidation.issues.filter(i => !(i.path.startsWith('scoring.choiceScores') || i.path.startsWith('scoring.publishedMetrics') && !i.path.endsWith('.key') || /scenes\.\d+\.channels/.test(i.path)))

@@ -133,6 +133,9 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
   if(pkg.definition.schemaVersion===1)return adaptNativeCatalogSjt(ref,title,pkg,validation.definitionHash)
   const d=pkg.definition as SituationDefinitionV2
   if(d.researchAssignment)fail('SOURCE_SJT_RESEARCH_CAPTURE_UNSUPPORTED')
+  // Explicit unscored tools only use the shared native staged protocol; never
+  // translate raw choices into the historical scalar/online answer adapters.
+  if(d.scoring.mode==='UNSCORED')return adaptNativeCatalogSjt(ref,title,pkg,validation.definitionHash)
   const model=d.scoring.model
   if(!model||!['AUTHOR_KEY_SUM','EXPERT_KEY'].includes(model.modelKey)||model.modelVersion!=='1')throw new CatalogSourceError('SOURCE_SJT_MODEL_UNSUPPORTED')
   if(pkg.online){

@@ -63,7 +63,7 @@ export type OrdinaryNativeSituationalReport={itemId:string;type:'SITUATIONAL';ki
  instrumentKey:string;instrumentVersion:string;scoringVersion:string;metrics:Array<z.infer<typeof situationalMetric>>;
  metricOrder:string[];interpretations:Array<{metricKey:string;headline:string;summary:string}>;disclaimer:string;
  scientificContext:ReturnType<typeof frozenSituationalScientificProjection>;limitations:string[];
- qualityState:'interpretable'|'limited'|'invalid';qualityFlags:string[];completedAt:string;totalTime:number|null;
+ qualityState:'interpretable'|'limited'|'invalid'|'unscored';qualityFlags:string[];completedAt:string;totalTime:number|null;
  narrative?:{version:'sjt-narrative-v1';paragraphs:string[]}}
 export type OrdinaryNativeFeedback={nativeCognitiveReport?:ThreeLayerReport;nativeSituationalReport?:OrdinaryNativeSituationalReport}
 type Input={identity:FrozenCompositionIdentity;parent:OrdinaryStoredContent&{id:string;attemptEpoch:number;contextSnapshotHash:string|null};

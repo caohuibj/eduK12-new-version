@@ -265,6 +265,8 @@ export const situationDefinitionSchema = z.object({
   sampling: situationalSamplingSchema,
   scenes: z.array(situationalSceneSchema).min(1),
   scoring: z.object({
+    // Omitted on existing definitions: never add a default to historical hashes.
+    mode: z.enum(['SCORED', 'UNSCORED']).optional(),
     scoringVersion: z.string().min(1),
     model: scoringModelSchema.optional(),
     choiceScores: z.array(choiceContributionSchema).default([]),
@@ -283,6 +285,21 @@ export const situationDefinitionSchema = z.object({
 })
 export type SituationDefinitionV1 = z.infer<typeof situationDefinitionSchema>
 
+export const isUnscoredSituational = (definition: Pick<SituationDefinitionV1, 'scoring'>): boolean => definition.scoring.mode === 'UNSCORED'
+
+/** Internal V2 validation projection; V1's public nonempty metric schema stays intact. */
+export const unscoredSituationalScoringSchema = situationDefinitionSchema.shape.scoring.extend({
+  mode: z.literal('UNSCORED'),
+  model: z.never().optional(),
+  choiceScores: z.array(choiceContributionSchema).max(0),
+  publishedMetrics: z.array(situationalMetricDefinitionSchema).max(0),
+})
+export const unscoredSituationalReportSchema = situationDefinitionSchema.shape.report.extend({
+  primaryMetricKeys: z.array(z.string()).max(0),
+  metricOrder: z.array(z.string()).max(0),
+  interpretations: z.array(interpretationSchema).max(0),
+})
+
 export interface DefinitionIssue {
   path: string
   message: string
@@ -294,6 +311,8 @@ export interface SituationDefinitionValidationOptions {
   requireGoldenFixture?: boolean
   hasGoldenFixture?: boolean
   allowMeasurementBundle?: boolean
+  /** Only the V2 validator may validate the explicit unscored projection. */
+  allowUnscored?: boolean
 }
 
 const hasText = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
@@ -302,7 +321,9 @@ export const validateSituationDefinition = (
   value: unknown,
   options: SituationDefinitionValidationOptions = {},
 ): { definition?: SituationDefinitionV1; issues: DefinitionIssue[] } => {
-  const schema = options.allowMeasurementBundle ? situationDefinitionSchema.extend({ scenes: z.array(situationalMeasurementSceneSchema).min(1) }) : situationDefinitionSchema
+  const schema = options.allowUnscored
+    ? situationDefinitionSchema.extend({ scenes: z.array(situationalMeasurementSceneSchema).min(1), scoring: unscoredSituationalScoringSchema, report: unscoredSituationalReportSchema })
+    : options.allowMeasurementBundle ? situationDefinitionSchema.extend({ scenes: z.array(situationalMeasurementSceneSchema).min(1) }) : situationDefinitionSchema
   const parsed = schema.safeParse(value)
   if (!parsed.success) {
     return {
@@ -312,6 +333,8 @@ export const validateSituationDefinition = (
 
   const definition = parsed.data
   const issues: DefinitionIssue[] = []
+  const unscored = options.allowUnscored === true && isUnscoredSituational(definition)
+  if (isUnscoredSituational(definition) && !unscored) issues.push({ path: 'scoring.mode', message: 'UNSCORED requires the V2 contract', severity: 'error' })
   // V2 calls this validator on an internal scalar projection, then owns model validation.
   if (!options.allowMeasurementBundle && definition.scoring.model) {
     const model = definition.scoring.model
@@ -363,7 +386,7 @@ export const validateSituationDefinition = (
       if (channel.responseType === 'FREE_TEXT' || channel.responseType === 'SINGLE_CHOICE' && channel.options.some(o => o.nonanswerReason)) {
         if (!options.allowMeasurementBundle) issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}`, message: 'Text and explicit nonanswers require V2', severity: 'error' })
       }
-      if (!channel.scoredConstruct || !declaredConstructs.has(channel.scoredConstruct)) {
+      if (!unscored && (!channel.scoredConstruct || !declaredConstructs.has(channel.scoredConstruct))) {
         issues.push({
           path: `scenes.${sceneIndex}.channels.${channelIndex}.scoredConstruct`,
           message: `计分构念 ${channel.scoredConstruct} 未在场景的 primary/secondary constructs 中声明`,
@@ -405,6 +428,7 @@ export const validateSituationDefinition = (
     contributionKeys.add(contributionKey)
   })
   channelByPair.forEach((channel, pairKey) => {
+    if (unscored) return
     if (channel.responseType !== 'SINGLE_CHOICE') return
     channel.options.forEach((option) => {
       if (!contributionKeys.has(`${pairKey}:${option.optionKey}`)) {
@@ -474,6 +498,7 @@ export const validateSituationDefinition = (
   })
   definition.scenes.forEach((scene, sceneIndex) => {
     scene.channels.forEach((channel, channelIndex) => {
+      if (unscored) return
       const cellKey = `${channel.scoredConstruct}:${channel.channelKey}`
       if (!metricCells.has(cellKey)) {
         issues.push({ path: `scenes.${sceneIndex}.channels.${channelIndex}`, message: `场景通道没有对应的发布 metric：${cellKey}`, severity: 'error' })
