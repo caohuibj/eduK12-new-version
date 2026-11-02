@@ -1,0 +1,283 @@
+{
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "checkedAt": "2026-11-02T01:20:50.870795+00:00",
+  "method": "Full main modules and intake notes; open PR names and provided patches. Missing patches not read as full files. Production/admin custom tools not checked.",
+  "mainMatches": [],
+  "openPRs": [
+    {
+      "number": 561,
+      "files": 8,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 560,
+      "files": 76,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 559,
+      "files": 32,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 558,
+      "files": 26,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 557,
+      "files": 5,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 555,
+      "files": 71,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 554,
+      "files": 35,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 553,
+      "files": 28,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 552,
+      "files": 16,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 550,
+      "files": 24,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 549,
+      "files": 4,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 548,
+      "files": 16,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 547,
+      "files": 14,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 546,
+      "files": 13,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 545,
+      "files": 40,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 544,
+      "files": 23,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 543,
+      "files": 82,
+      "matches": [],
+      "patchesUnavailable": 1
+    },
+    {
+      "number": 542,
+      "files": 37,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 541,
+      "files": 31,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 540,
+      "files": 27,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 539,
+      "files": 277,
+      "matches": [],
+      "patchesUnavailable": 102
+    },
+    {
+      "number": 537,
+      "files": 17,
+      "matches": [],
+      "patchesUnavailable": 1
+    },
+    {
+      "number": 529,
+      "files": 5,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 515,
+      "files": 6,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 491,
+      "files": 4,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 489,
+      "files": 3,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 488,
+      "files": 3,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 482,
+      "files": 310,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 441,
+      "files": 693,
+      "matches": [],
+      "patchesUnavailable": 2
+    },
+    {
+      "number": 413,
+      "files": 15,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 412,
+      "files": 1,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 397,
+      "files": 2,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 383,
+      "files": 5,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 379,
+      "files": 272,
+      "matches": [],
+      "patchesUnavailable": 29
+    },
+    {
+      "number": 375,
+      "files": 374,
+      "matches": [],
+      "patchesUnavailable": 75
+    },
+    {
+      "number": 373,
+      "files": 61,
+      "matches": [],
+      "patchesUnavailable": 5
+    },
+    {
+      "number": 371,
+      "files": 208,
+      "matches": [],
+      "patchesUnavailable": 86
+    },
+    {
+      "number": 370,
+      "files": 66,
+      "matches": [],
+      "patchesUnavailable": 20
+    },
+    {
+      "number": 368,
+      "files": 2101,
+      "matches": [],
+      "patchesUnavailable": 446
+    },
+    {
+      "number": 367,
+      "files": 136,
+      "matches": [],
+      "patchesUnavailable": 46
+    },
+    {
+      "number": 362,
+      "files": 9,
+      "matches": [],
+      "patchesUnavailable": 1
+    },
+    {
+      "number": 360,
+      "files": 1269,
+      "matches": [],
+      "patchesUnavailable": 302
+    },
+    {
+      "number": 330,
+      "files": 15,
+      "matches": [],
+      "patchesUnavailable": 0
+    },
+    {
+      "number": 329,
+      "files": 62,
+      "matches": [],
+      "patchesUnavailable": 1
+    },
+    {
+      "number": 328,
+      "files": 73,
+      "matches": [],
+      "patchesUnavailable": 2
+    }
+  ],
+  "priorLocalTFAPS": {
+    "commit": "21d8cece647002e2cba9a36632954330db2a00c6",
+    "runtimeRegistered": false,
+    "tenOriginalItemHashesAvailable": true
+  }
+}
