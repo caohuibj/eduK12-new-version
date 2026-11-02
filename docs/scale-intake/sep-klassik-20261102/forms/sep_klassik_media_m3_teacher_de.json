@@ -1,0 +1,360 @@
+{
+  "requestId": "9ad676f0-3f8f-51b1-afe6-e8f86f4a8369",
+  "toolKey": "sep_klassik_media_m3_teacher_de",
+  "version": "0.1.0",
+  "title": "SEP-Klassik｜媒介教育·呈现｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "sep_klassik_media_m3_teacher_de",
+        "title": "Präsentieren",
+        "description": "Source: Institut für Schulqualität des Landes Berlin e.V. (ISQ), Bausteine SEP-Klassik Medienbildung Sek I, RLP 1-10, Niveaustufe D — teacher column, PDF p.4. CC BY-NC-SA 4.0, https://creativecommons.org/licenses/by-nc-sa/4.0/. Digitale Übertragung für nichtkommerzielle Reflexion; unveränderte deutsche Itemtexte, freiwillige Antworten, keine Punktwerte. Änderungen: Modultrennung, technische Itemschlüssel, optionale Antworten und Verweigerung. Kein validierter chinesischer Fragebogen. Inwieweit treffen die folgenden Aussagen auf diesen Unterricht zu? Grundlage: Basiscurriculum Medienbildung, Niveaustufe D; die Nutzung analoger oder digitaler Medien allein ist keine Qualitätseinschätzung. Antwortanker sind in der passenden offiziellen Vorschau geprüft.",
+        "questions": [
+          {
+            "itemKey": "sep_media_3_1",
+            "type": "SINGLE",
+            "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, unterschiedliche Möglichkeiten zur Präsentation zu nutzen (z. B. Plakat, Präsentationssoftware).",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_2",
+            "type": "SINGLE",
+            "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht die Vor- und Nachteile unterschiedlicher Möglichkeiten zur Präsentation kennen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_3",
+            "type": "SINGLE",
+            "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler Kriterien für eine gute Präsentation kennen und anzuwenden.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_4",
+            "type": "SINGLE",
+            "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, passende Elemente (z. B. Text, Bild, Video) für ihre Präsentation auszuwählen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_5",
+            "type": "SINGLE",
+            "prompt": "In meinem Unterricht präsentieren die Schülerinnen und Schüler ihre Arbeitsergebnisse in Form mediengestützter Präsentationen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_6",
+            "type": "SINGLE",
+            "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, ihren Mitschülerinnen und -schülern kriterienorientiert Rückmeldung zu ihren Präsentationen zu geben und diese auch selbst anzunehmen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_7",
+            "type": "SINGLE",
+            "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, das Urheberrecht von lizenzierten Inhalten (Texte, Audio-/ Bild-/ Videomaterial) in ihren Präsentationen zu respektieren.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_media_3_8",
+            "type": "SINGLE",
+            "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, das Persönlichkeitsrecht von anderen in ihren Präsentationen zu respektieren.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "Attributed non-commercial digital adaptation of the specifically CC BY-NC-SA 4.0 labelled ISQ PDF, distributed under the same license. Only exact original teacher-column items are used; no scored report or validation transfer claimed. No copyrighted portal-only teacher wording is borrowed.",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot"
+  ],
+  "reference": {
+    "tags": [
+      "family:sep_klassik",
+      "role:teacher_self",
+      "language:de",
+      "stage:secondary_I_level_D",
+      "source_version:media_202601",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none",
+      "license:cc_by_nc_sa_4_0"
+    ],
+    "source": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Medienbildung%20SEP-Klassik%20Sek%20I-D.pdf",
+      "sha256": "69a14d32f0173f2d293ea897e8619e1815f0c01b6714d551d8dd80a94cfd3576",
+      "title": "Bausteine SEP-Klassik Medienbildung Sek I, RLP 1-10, Niveaustufe D — teacher column",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "secondary_I_level_D",
+      "itemCount": 38,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "First-page CC BY NC SA pictogram and 4.0 DE visually verified.",
+      "responseOptionsSource": "https://sep-klassik.isq.berlin/de_DE/fragebogen/voransicht/SMS2627/vollst%C3%A4ndig.html",
+      "note": "PDF teacher items preserved verbatim, including De typo in module6 item1 and no final period in module4 item5; common response anchors verified in matching official public preview.",
+      "module": 3,
+      "moduleTitle": "Präsentieren",
+      "page": 4,
+      "sourceItems": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, unterschiedliche Möglichkeiten zur Präsentation zu nutzen (z. B. Plakat, Präsentationssoftware)."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht die Vor- und Nachteile unterschiedlicher Möglichkeiten zur Präsentation kennen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler Kriterien für eine gute Präsentation kennen und anzuwenden."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, passende Elemente (z. B. Text, Bild, Video) für ihre Präsentation auszuwählen."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In meinem Unterricht präsentieren die Schülerinnen und Schüler ihre Arbeitsergebnisse in Form mediengestützter Präsentationen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, ihren Mitschülerinnen und -schülern kriterienorientiert Rückmeldung zu ihren Präsentationen zu geben und diese auch selbst anzunehmen."
+        },
+        {
+          "sourceNumber": 7,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, das Urheberrecht von lizenzierten Inhalten (Texte, Audio-/ Bild-/ Videomaterial) in ihren Präsentationen zu respektieren."
+        },
+        {
+          "sourceNumber": 8,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, das Persönlichkeitsrecht von anderen in ihren Präsentationen zu respektieren."
+        }
+      ],
+      "locale": "de"
+    },
+    "license": {
+      "identifier": "CC-BY-NC-SA-4.0",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "author": "Institut für Schulqualität des Landes Berlin e.V. (ISQ)",
+      "adaptationLicense": "CC-BY-NC-SA-4.0",
+      "commercialUse": "NOT_AUTHORIZED",
+      "changes": [
+        "digital format and module split",
+        "optional answering/refusal",
+        "technical identifiers and Chinese catalog names only; no item translation"
+      ]
+    },
+    "respondent": "teacher",
+    "recipient": "teacher_under_existing_authorization",
+    "construct": "teacher self-report of media-education practices, not general teaching quality",
+    "scoring": {
+      "mode": "none",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "reason": "No complete aggregation and missing-response contract for these digital module versions; for SINUS the positive rewording/coding and first-module direction statement also require clarification. Not a lack-of-norms decision."
+    },
+    "notAuthoritativeIndependentValidation": true
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "requestId": "ce36ca51-8a7d-5c6f-b995-cf57fd29bcf9",
+  "toolKey": "sep_klassik_sinus_m2_teacher_de",
+  "version": "0.1.0",
+  "title": "SEP-Klassik｜SINUS·内摄动机感知｜教师报告学生动机｜DE·2026-10",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "sep_klassik_sinus_m2_teacher_de",
+        "title": "Introjizierte Lernmotivation",
+        "description": "Source: Institut für Schulqualität des Landes Berlin e.V. (ISQ), Bausteine SEP-Klassik SINUS-Skala zur Lernmotivation — teacher column, PDF p.3. CC BY-NC-SA 4.0, https://creativecommons.org/licenses/by-nc-sa/4.0/. Digitale Übertragung für nichtkommerzielle Reflexion; unveränderte deutsche Itemtexte, freiwillige Antworten, keine Punktwerte. Änderungen: Modultrennung, technische Itemschlüssel, optionale Antworten und Verweigerung. Kein validierter chinesischer Fragebogen. Beurteilt wird Ihre Wahrnehmung der Motivation der Schüler*innen in der betreffenden Unterrichtsstunde, nicht Ihre Unterrichtsqualität oder eine stabile Eigenschaft der Lernenden. Die Quelle nennt die Endpunkte 1-trifft zu und 4-trifft nicht zu; 2 und 3 bleiben numerisch ohne erfundene Zwischenanker. Seidel et al. (2003), S.317 ff.; Lehrerperspektive und positive Umformulierung durch ISQ.",
+        "questions": [
+          {
+            "itemKey": "sep_sinus_2_1",
+            "type": "SINGLE",
+            "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mitgearbeitet, weil sie es immer so machen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "c1",
+                "label": "1 — trifft zu"
+              },
+              {
+                "optionKey": "c2",
+                "label": "2"
+              },
+              {
+                "optionKey": "c3",
+                "label": "3"
+              },
+              {
+                "optionKey": "c4",
+                "label": "4 — trifft nicht zu"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_sinus_2_2",
+            "type": "SINGLE",
+            "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler angestrengt, weil sie gerne alles richtig machen wollen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "c1",
+                "label": "1 — trifft zu"
+              },
+              {
+                "optionKey": "c2",
+                "label": "2"
+              },
+              {
+                "optionKey": "c3",
+                "label": "3"
+              },
+              {
+                "optionKey": "c4",
+                "label": "4 — trifft nicht zu"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_sinus_2_3",
+            "type": "SINGLE",
+            "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler beteiligt, weil es sich so für Schülerinnen und Schüler gehört.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "c1",
+                "label": "1 — trifft zu"
+              },
+              {
+                "optionKey": "c2",
+                "label": "2"
+              },
+              {
+                "optionKey": "c3",
+                "label": "3"
+              },
+              {
+                "optionKey": "c4",
+                "label": "4 — trifft nicht zu"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "Attributed non-commercial digital adaptation of the specifically CC BY-NC-SA 4.0 labelled ISQ PDF, distributed under the same license. Only exact original teacher-column items are used; no scored report or validation transfer claimed. No copyrighted portal-only teacher wording is borrowed.",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot"
+  ],
+  "reference": {
+    "tags": [
+      "family:sep_klassik",
+      "role:teacher_report",
+      "language:de",
+      "stage:primary_secondary_as_listed_by_portal",
+      "source_version:sinus_202610",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none",
+      "license:cc_by_nc_sa_4_0"
+    ],
+    "source": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-10/SINUS-Skala_Lernmotivation.pdf",
+      "sha256": "16e2ac0d3698add5df24f0754f9fabc86f92b60aed3326b3fd7576356114bcb3",
+      "title": "Bausteine SEP-Klassik SINUS-Skala zur Lernmotivation — teacher column",
+      "resourceRevision": "2026-10_resource_path_no_printed_revision",
+      "role": "teacher_report",
+      "gradeBand": "primary_secondary_as_listed_by_portal",
+      "itemCount": 18,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "First page visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.",
+      "originalCitation": "Seidel et al. (2003), Technischer Bericht zur Videostudie Lehr-Lern-Prozesse im Physikunterricht, p.317 ff.; teacher adaptation and positive rewording by ISQ, not the untouched 2003 instrument.",
+      "module": 2,
+      "moduleTitle": "Introjizierte Lernmotivation",
+      "page": 3,
+      "sourceItems": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mitgearbeitet, weil sie es immer so machen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler angestrengt, weil sie gerne alles richtig machen wollen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler beteiligt, weil es sich so für Schülerinnen und Schüler gehört."
+        }
+      ],
+      "locale": "de"
+    },
+    "license": {
+      "identifier": "CC-BY-NC-SA-4.0",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "author": "Institut für Schulqualität des Landes Berlin e.V. (ISQ)",
+      "adaptationLicense": "CC-BY-NC-SA-4.0",
+      "commercialUse": "NOT_AUTHORIZED",
+      "changes": [
+        "digital format and module split",
+        "optional answering/refusal",
+        "technical identifiers and Chinese catalog names only; no item translation"
+      ]
+    },
+    "respondent": "teacher",
+    "recipient": "teacher_under_existing_authorization",
+    "construct": "teacher perception of student lesson-specific motivation, not teaching quality",
+    "scoring": {
+      "mode": "none",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "reason": "No complete aggregation and missing-response contract for these digital module versions; for SINUS the positive rewording/coding and first-module direction statement also require clarification. Not a lack-of-norms decision."
+    },
+    "notAuthoritativeIndependentValidation": true
+  }
+}
