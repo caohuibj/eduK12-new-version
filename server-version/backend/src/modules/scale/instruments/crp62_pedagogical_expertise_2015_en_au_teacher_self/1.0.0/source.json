@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "crp62_pedagogical_expertise_2015_en_au_teacher_self",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "CRP62（Boon–Lewthwaite）｜教学专长｜教师自评｜2015澳大利亚英文",
+      "abbreviation": "CRP62-PEDAGOGICAL_EXPERTISE",
+      "instrumentFamily": "CRP62 / Boon & Lewthwaite / 2015 accepted manuscript / en-AU / teacher self-report"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Pedagogical Expertise；附录A保留题中的15项。原指导语为教师对课堂行为使用频率的自陈，不只测理念，也不是独立观察的教学质量。仅目录候选，不能施测。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:crp62_boon_lewthwaite",
+        "role:teacher_self",
+        "respondent:SELF",
+        "population:teacher",
+        "school_stage:primary_secondary",
+        "language:en-AU",
+        "country:Australia",
+        "source_version:2015_accepted",
+        "purpose:teacher_development",
+        "status:PILOT",
+        "rights:CC_BY_vs_CC_BY_NC_ND_conflict",
+        "availability:catalog_only",
+        "scoring:Rasch_not_implemented"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "澳大利亚北昆士兰天主教学校小学及中学教师试点；原研究结合原住民学生和家庭经验。未有中国常模或经验证中文版本，不把本地原住民语境机械迁移。"
+    },
+    "administration": {
+      "itemCount": 15,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "原文未规定新回忆窗口；按自报课堂使用频率回答。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持附录A分区及原始V题号，不按1–62重新冒充原始编号。",
+        "原五档含百分比频率锚点；不能改为同意程度、能力感或理念。",
+        "作者讨论提出分区可独立使用；本项目无新的独立施测/跨文化等值证据，不将其另立门禁。",
+        "estimatedMinutes为编辑估计，未实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "开发团队初步验证不能证明本项目独立分区版或中国情境等值；待权利范围审核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en-AU",
+    "targetLocale": "en-AU",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Boon & Lewthwaite (2015) accepted manuscript, Appendix A and Section 4.3.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原英文；中文目录和报告为项目编辑草稿，不是已验证中文翻译。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Development of an instrument to measure a facet of quality teaching: culturally responsive pedagogy",
+      "citation": "Boon, H. J., & Lewthwaite, B. (2015). International Journal of Educational Research, 72, 38–58. https://doi.org/10.1016/j.ijer.2015.05.002. JCU accepted manuscript, Appendix A/B.",
+      "url": "https://researchonline.jcu.edu.au/39194/",
+      "publicationYear": 2015
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "教学专长"
+      ],
+      "limitations": [
+        "Original 2015 pilot uses Rasch Rating Scale Model; no executable Rasch scoring installed.",
+        "No scalar mean/sum, item difficulty as weight, 0–100 attainment percentage, norms, diagnostic cutoffs or teacher rankings.",
+        "Higher original person measures indicate greater self-reported frequency/endorsement of the source practices, not proof of actual teaching effectiveness.",
+        "Private categorical FORM preparation preserves raw responses; no reverse transform or numeric report.",
+        "V69 learning-preferences wording must not support diagnosing learning styles or matching instruction to fixed style types."
+      ],
+      "disclaimer": "元数据不可施测。完整题本已取得；许可标示冲突待澄清，原题不公开。内部FORM不是公共开发库或生产安装。教师本人发展性草稿沿既有接收者授权，不披露个人回答给无权者。"
+    },
+    "blockers": [
+      "Repository record links CC BY 4.0 but actual accepted-PDF cover says CC BY-NC-ND 4.0; do not treat record alone as public adaptation/commercial grant.",
+      "Existing native scoring engine has no verified reproduction of the source Rasch person measures/step thresholds and missing/extreme policies; no new engine in this task.",
+      "Actual public developer/production installation, usage authorization and final production/admin dedup are not performed."
+    ]
+  }
+}
