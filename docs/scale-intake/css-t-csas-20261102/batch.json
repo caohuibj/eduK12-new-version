@@ -1,0 +1,629 @@
+{
+  "recordType": "intake_work_record_not_new_runtime",
+  "mother": {
+    "key": "css_t_csas",
+    "name": "CSS-T／CSAS",
+    "sharedTag": "family:css_t_csas",
+    "status": "NATIVE_UNSCORED_FORM_CANDIDATES",
+    "noCrossToolTotal": true
+  },
+  "baseSha": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "source": {
+    "article": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2023.1281431/full",
+    "articleXmlSha256": "e758c30412fc601f92f71192e695df68c8a8ec2afbb62b12a3b62b9fc71383d8",
+    "supplement": "https://public-pages-files-2025.frontiersin.org/articles/1281431/file/Table_1.docx/1281431_supplementary-materials_tables_1_docx/2",
+    "supplementSha256": "2f66cfe95b203e774ad670313ff33a4972ecb0db44bbec7be54d01462424451b",
+    "table": "S2",
+    "itemCount": 49,
+    "sourceLanguage": "French adapted items; original English item text",
+    "frenchOptions": "Project French translation of the seven English anchors explicitly provided in S2; not an independently verified official French anchor text",
+    "licenseBasis": "Article CC BY 4.0 and publisher reuse policy; all supplemental XML parts checked, no separate prohibiting copyright/credit exclusion found in S2. Attribution to Dierendonck 2023 and Reddy et al 2015 retained. Scope is S2 material only, not commercial CSAS current test/manual or other papers."
+  },
+  "forms": [
+    {
+      "key": "css_t_lu2023_student_focused_learning_engagement_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜学习投入与参与（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_student_focused_learning_engagement_fr.json",
+      "sourceFactorCR": 0.773,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_instructional_delivery_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜教学呈现（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_instructional_delivery_fr.json",
+      "sourceFactorCR": 0.856,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_promotes_student_thinking_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜促进学生思考（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_promotes_student_thinking_fr.json",
+      "sourceFactorCR": 0.865,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_academic_performance_feedback_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜学业表现反馈（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_academic_performance_feedback_fr.json",
+      "sourceFactorCR": 0.802,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_praise_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜表扬与鼓励（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_praise_fr.json",
+      "sourceFactorCR": 0.712,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_corrective_feedback_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜纠正性反馈（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_corrective_feedback_fr.json",
+      "sourceFactorCR": 0.794,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_prevention_management_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜预防性管理（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_prevention_management_fr.json",
+      "sourceFactorCR": 0.148,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_directives_transitions_fr",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜指令与过渡（无计分）｜教师自评｜LU2023-FR·小学",
+      "language": "fr",
+      "role": "teacher_self",
+      "sourceItems": [
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:fr",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_directives_transitions_fr.json",
+      "sourceFactorCR": 0.817,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_student_focused_learning_engagement_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜学习投入与参与（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_student_focused_learning_engagement_en.json",
+      "sourceFactorCR": 0.773,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_instructional_delivery_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜教学呈现（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_instructional_delivery_en.json",
+      "sourceFactorCR": 0.856,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_promotes_student_thinking_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜促进学生思考（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_promotes_student_thinking_en.json",
+      "sourceFactorCR": 0.865,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_academic_performance_feedback_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜学业表现反馈（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_academic_performance_feedback_en.json",
+      "sourceFactorCR": 0.802,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_praise_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜表扬与鼓励（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_praise_en.json",
+      "sourceFactorCR": 0.712,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_corrective_feedback_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜纠正性反馈（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_corrective_feedback_en.json",
+      "sourceFactorCR": 0.794,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_prevention_management_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜预防性管理（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_prevention_management_en.json",
+      "sourceFactorCR": 0.148,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    },
+    {
+      "key": "css_t_lu2023_directives_transitions_en",
+      "version": "0.1.0",
+      "kind": "FORM",
+      "title": "CSS-T／CSAS｜指令与过渡（无计分）｜教师自评｜LU2023-EN·小学",
+      "language": "en",
+      "role": "teacher_self",
+      "sourceItems": [
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "tags": [
+        "family:css_t_csas",
+        "role:teacher_self",
+        "stage:elementary",
+        "language:en",
+        "source_version:lu2023_frequency49",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none"
+      ],
+      "parameterVersion": null,
+      "reportVersion": null,
+      "path": "forms/css_t_lu2023_directives_transitions_en.json",
+      "sourceFactorCR": 0.817,
+      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
+    }
+  ],
+  "otherVersions": [
+    {
+      "key": "css_t_2015_teacher_actual_ideal_en",
+      "status": "SOURCE_MANUAL_AND_EXACT_FORM_NOT_OBTAINED",
+      "role": "teacher_self + ideal separately collected",
+      "source": "https://doi.org/10.1037/spq0000110",
+      "note": "Original recommendation has actual/recommended frequency discrepancy; no exact-item or scoring manual reconstruction. Do not substitute LU2023 actual-only forms."
+    },
+    {
+      "key": "csas_2023_teacher_observer",
+      "status": "RESTRICTED_PAPER_AND_CURRENT_FORMS_NOT_OBTAINED",
+      "source": "https://doi.org/10.1177/15345084221112858",
+      "roles": [
+        "teacher_self",
+        "observer"
+      ],
+      "note": "Publisher explicitly restricted access; only abstract read. Separate identities required; no original student parallel version verified."
+    }
+  ],
+  "optionalComposites": [
+    {
+      "key": "css_t_lu2023_frequency49_combo_fr",
+      "kind": "ordinary_combination_plan",
+      "childKeys": [
+        "css_t_lu2023_student_focused_learning_engagement_fr",
+        "css_t_lu2023_instructional_delivery_fr",
+        "css_t_lu2023_promotes_student_thinking_fr",
+        "css_t_lu2023_academic_performance_feedback_fr",
+        "css_t_lu2023_praise_fr",
+        "css_t_lu2023_corrective_feedback_fr",
+        "css_t_lu2023_prevention_management_fr",
+        "css_t_lu2023_directives_transitions_fr"
+      ],
+      "totalScore": null,
+      "status": "NOT_CREATED",
+      "note": "Same-language whole 49-item presentation may be assembled using existing ordinary combination after child review; no latent factor score, actual/ideal discrepancy, cross-language equality or cross-tool total."
+    },
+    {
+      "key": "css_t_lu2023_frequency49_combo_en",
+      "kind": "ordinary_combination_plan",
+      "childKeys": [
+        "css_t_lu2023_student_focused_learning_engagement_en",
+        "css_t_lu2023_instructional_delivery_en",
+        "css_t_lu2023_promotes_student_thinking_en",
+        "css_t_lu2023_academic_performance_feedback_en",
+        "css_t_lu2023_praise_en",
+        "css_t_lu2023_corrective_feedback_en",
+        "css_t_lu2023_prevention_management_en",
+        "css_t_lu2023_directives_transitions_en"
+      ],
+      "totalScore": null,
+      "status": "NOT_CREATED",
+      "note": "Same-language whole 49-item presentation may be assembled using existing ordinary combination after child review; no latent factor score, actual/ideal discrepancy, cross-language equality or cross-tool total."
+    }
+  ],
+  "validation": {
+    "schema": "PASS_16",
+    "isolatedSubmitReadback": "PASS_16_SUBMITTED",
+    "production": "NOT_RUN",
+    "formalCI": "NOT_RUN",
+    "answerBoundaryCases": 64,
+    "developmentStatus": "16 Forms submitted into dedicated isolated local verification database; not shared development/production library",
+    "indexedFamilyFacet": "NOT_IMPLEMENTED_BY_EXISTING_IMPORTER_no_new_engine"
+  },
+  "tagStorage": {
+    "classificationTags": "Only existing controlled IDs accepted by originalFormSubmission; uses teacher/self/research/PILOT and English content locale when applicable",
+    "tags": "Free family/role/grade/language/source-version tags persisted in existing reference.tags -> artifact.reference.metadata.annotations.tags",
+    "indexedFamilyFacet": "Not claimed. Existing original Form importer does not project annotations.tags into UI facets; no global tag-engine/dictionary edit in this content branch."
+  },
+  "dedup": {
+    "mainSha": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "sourceFilesChecked": 493,
+    "termMatches": {
+      "css-t": [],
+      "csas": [],
+      "reddy": [],
+      "dudek": [],
+      "1281431": [],
+      "spq0000110": [],
+      "15345084221112858": [],
+      "Actively participates in new activities with students": [],
+      "Je participe activement aux activités avec les élèves": []
+    },
+    "openPrCount": 42,
+    "openPrMatches": [],
+    "productionDatabase": "NOT_CHECKED",
+    "compatibleMainSha": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+    "reuseReason": "Main update changes only SJT onboarding buffer, Scale selected checker and release evidence controls; native Form consumer/source inputs unchanged."
+  },
+  "files": {
+    "forms/css_t_lu2023_academic_performance_feedback_en.json": "d64ac0b70c9ddd654c028d887dc6227433a5e746c7e4864c0250ec7a0a41de82",
+    "forms/css_t_lu2023_academic_performance_feedback_fr.json": "8ebb06a4f41ba3605de0999d41f28859b66238af6c98d4b212f5692e40ed911e",
+    "forms/css_t_lu2023_corrective_feedback_en.json": "592353f6de1904ee1db92f05e5b137bdf24463671d19f06633f3575192c34ac2",
+    "forms/css_t_lu2023_corrective_feedback_fr.json": "5f28c1fe77ead7a766131c000d514ee7706c7288997e3c4916256975d4292c2a",
+    "forms/css_t_lu2023_directives_transitions_en.json": "02e601b2612b0576b0b2e1b07299d41cfe6e06fd88d7e571e2de8c0744d573fb",
+    "forms/css_t_lu2023_directives_transitions_fr.json": "bae9059c96185dce0e71549b005b6060a16561431676e89ad1a1ec19202aebde",
+    "forms/css_t_lu2023_instructional_delivery_en.json": "a8cd901d110dc7116f7ded3e43d1c87a839509bda81f369e0390ea87836a994b",
+    "forms/css_t_lu2023_instructional_delivery_fr.json": "f7c0f0fd490cc6698aeb63de9eda892afc6f7bf9809eba9d93096e7c2ce5e5d9",
+    "forms/css_t_lu2023_praise_en.json": "3baa4f2d46288a49460119e6e9c4ebb57cbe3e8d65d78a7b75b6395fe647342f",
+    "forms/css_t_lu2023_praise_fr.json": "44fad173825da9f5533ea6ef0fc3f4ee1fa902092d69a5a0d3316c96a5038f3f",
+    "forms/css_t_lu2023_prevention_management_en.json": "7945225b9ab3873d5625700ababde724aa1fd60b19946555a43e30d479498508",
+    "forms/css_t_lu2023_prevention_management_fr.json": "0c4c69b278412ce07086238aa7467186c32752a0bcd99da2b1deab919bf7ca9a",
+    "forms/css_t_lu2023_promotes_student_thinking_en.json": "199cbee543ff355d378c1dd8970d4d3acde87d5d06f119efd70ea86da6750ebd",
+    "forms/css_t_lu2023_promotes_student_thinking_fr.json": "56bf13cfef61b9dbbf5dd6e276146f7dbf45c08b8dcbffb6debf1a2a7f768ec7",
+    "forms/css_t_lu2023_student_focused_learning_engagement_en.json": "0c34458777377cddde2e8446f41262cb647be144e6919d38f7c4029de807b9a1",
+    "forms/css_t_lu2023_student_focused_learning_engagement_fr.json": "878725e8678e7c645a4f916b69fc7b28b311a2ea6a321e74a378cebb3aa1ce0e"
+  }
+}
