@@ -1,0 +1,3839 @@
+{
+  "templateVersion": "sjt-upload-v1",
+  "instrumentKey": "cpj-cj19-sd-baseline",
+  "instrumentVersion": "0.4.2",
+  "title": "四个人的作品，只有一个人知道怎么做｜SD｜明示动作反思候选",
+  "respondentType": "teacher_self_report",
+  "entryNodeKey": "R1",
+  "author": "课堂观察联合方案作者；本次AI编辑候选",
+  "sourceNote": "私有原稿v0.2→文字修订v0.3→内容编码v0.4；24个母情境独立选用。本库为原创候选自述来源，授权状态待人工核对；不公开再分发。",
+  "disclaimer": "本次只统计所选文字明确提出的教学动作，并显示实际机会。0不是能力不足，较大次数不代表更适切；不同路径、SD/WD与观察不可合总分或排名。没有专家共识键、常模、可靠性保证或培训效果保证。一个情境仅一项独立情境证据；自愿、低风险反思用途。",
+  "licenseStatus": "unknown",
+  "redistribution": "restricted",
+  "nodes": [
+    {
+      "nodeKey": "R1",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第1轮",
+      "stimulus": "你的角色：你组织小组设计校园导览图，可调整合作要求，不按作品外观单独评价团队学习。\n学习目标：学生能相互解释关键选择、整合贡献并共同承担可辨认的任务。\n现实条件：剩18分钟；展示必须在本节完成；部分成员有绘图优势，部分擅长路线说明。\n已知信息：一人绘图并决定全部内容，两人装饰，一人等待；不能仅据等待认定偷懒。\n\n一组导览图完成得很漂亮，但你追问为什么选择这条路线时只有绘图者能回答。其余人说自己负责涂色和签名。绘图者担心重新分工会毁掉作品，等待的学生说“他们不让我动”。你需要怎样介入？"
+    },
+    {
+      "nodeKey": "R2A",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第2轮",
+      "stimulus": "\n你引入了贡献讨论或交换解释。绘图者愿意解释，但另两人仍只说“你决定”；等待者提出一条有价值却需要重画的路线。小组离展示只剩10分钟。"
+    },
+    {
+      "nodeKey": "R2B",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第2轮",
+      "stimulus": "\n你均分画面或先保留原分工。作品由四块拼成，路线接不上；或成品很完整但其他人仍不懂逻辑。学生开始争论谁拖累谁。"
+    },
+    {
+      "nodeKey": "R3A1",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第3轮",
+      "stimulus": "\n小组比较了路线并作出有限修订。展示前有成员担心自己口头表达差，希望由他人代讲；他能在图上准确指出理由。怎样安排展示？"
+    },
+    {
+      "nodeKey": "R3A2",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第3轮",
+      "stimulus": "\n教师选了路线或小组保留原决定。展示后学生仍觉得有人的意见从未进入成品。下一次你只改变一个合作规则。"
+    },
+    {
+      "nodeKey": "R3B1",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第3轮",
+      "stimulus": "\n你安排了解释衔接或共同依据检查。作品没有原来漂亮，但更多成员能解释路线。一名学生抱怨“这样看起来不如别组”。如何评价？"
+    },
+    {
+      "nodeKey": "R3B2",
+      "motherSceneKey": "CJ19",
+      "title": "四个人的作品，只有一个人知道怎么做｜第3轮",
+      "stimulus": "\n你让熟练者统一修改或改为个人评分。成品按时完成，但等待者下次更不愿参与，熟练者也觉得全靠自己。怎样修订下一任务？"
+    }
+  ],
+  "questions": [
+    {
+      "nodeKey": "R1",
+      "questionKey": "action_R1",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "R2A",
+      "questionKey": "action_R2A",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "R2B",
+      "questionKey": "action_R2B",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "R3A1",
+      "questionKey": "action_R3A1",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "R3A2",
+      "questionKey": "action_R3A2",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "R3B1",
+      "questionKey": "action_R3B1",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    },
+    {
+      "nodeKey": "R3B2",
+      "questionKey": "action_R3B2",
+      "prompt": "请判断哪项作为下一步更适切。",
+      "kind": "CORE",
+      "purpose": "PROFESSIONAL_JUDGMENT",
+      "required": true,
+      "order": 0
+    }
+  ],
+  "options": [
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O4",
+      "label": "先完成作品展示，之后单独处理分工不均。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O1",
+      "label": "先让各人说明已有贡献和想参与的决定，再分配一项必须相互解释的关键任务。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O2",
+      "label": "要求小组暂时放下成品，交换路线理由，由不同成员检查并确认。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O3",
+      "label": "规定每人画四分之一，以确保工作量相等。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O1",
+      "label": "让小组按共同标准比较新旧路线，保留不重画也能标注说明的方案，再分工完成。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O2",
+      "label": "要求每人提出一个支持或质疑，由小组决定修改范围并记录依据。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O3",
+      "label": "教师选出更好的路线，学生执行分工。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O4",
+      "label": "维持原路线，承诺下一次让其他人做决定。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O2",
+      "label": "把评价焦点改为每人能说明共同方案的一处依据，减少装饰要求以留协商时间。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O3",
+      "label": "请最熟练者统一修改，其他人配合整理。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O4",
+      "label": "按个人完成部分分别评分，取消小组共同责任。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O1",
+      "label": "安排各人向下一位解释本部分如何与整体衔接，一起修复一个最关键断点。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O3",
+      "label": "为保证质量只让最会讲者展示，其他人站在旁边。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O4",
+      "label": "给每人相同的口头时段，允许提前写提纲，先保证每人都有展示位置。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O1",
+      "label": "允许指图、补充或口头分工，但每个人都需确认自己理解的一处依据。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O2",
+      "label": "由一人主讲、其他人各回应一个事先商定的问题，允许书面辅助。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O4",
+      "label": "固定每个人的工作量，避免意见争论。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O1",
+      "label": "在制作前设置一次理由比较与成员确认，再由小组选择分工。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O2",
+      "label": "规定重要修改需听取不同成员的依据，但不要求每项意见都被采纳。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O3",
+      "label": "轮换组长，其他合作规则不变。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O1",
+      "label": "分别反馈可用性、理由质量和共同理解，不把少装饰视为学习退步。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O2",
+      "label": "请学生说明协作改变了哪一处决定，再给一个可继续完善的任务。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O3",
+      "label": "优先评外观完整性，以保持全班同一标准。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O4",
+      "label": "本次先反馈合作过程，作品可用性留到下一次试用时再检查。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O2",
+      "label": "保留优势分工，但增加互相教学与交接检查点，避免一人掌握全部。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O3",
+      "label": "把能力相近者放一起，减少合作难度。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O4",
+      "label": "继续让熟练者负责成品，用额外奖励补偿。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O1",
+      "label": "设计必须交换信息才能完成的关键决定，并要求每人说明同伴的一条理由。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "U",
+      "label": "信息不足，无法判断",
+      "nonanswerReason": "UNABLE_TO_JUDGE"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "N",
+      "label": "不愿回答本情境",
+      "nonanswerReason": "DECLINED"
+    }
+  ],
+  "transitions": [
+    {
+      "nodeKey": "R1",
+      "optionKey": "O4",
+      "nextNodeKey": "R2B",
+      "bridgeText": "上一轮你选择：先完成作品展示，之后单独处理分工不均。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O1",
+      "nextNodeKey": "R2A",
+      "bridgeText": "上一轮你选择：先让各人说明已有贡献和想参与的决定，再分配一项必须相互解释的关键任务。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O2",
+      "nextNodeKey": "R2A",
+      "bridgeText": "上一轮你选择：要求小组暂时放下成品，交换路线理由，由不同成员检查并确认。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O3",
+      "nextNodeKey": "R2B",
+      "bridgeText": "上一轮你选择：规定每人画四分之一，以确保工作量相等。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O1",
+      "nextNodeKey": "R3A1",
+      "bridgeText": "上一轮你选择：让小组按共同标准比较新旧路线，保留不重画也能标注说明的方案，再分工完成。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O2",
+      "nextNodeKey": "R3A1",
+      "bridgeText": "上一轮你选择：要求每人提出一个支持或质疑，由小组决定修改范围并记录依据。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O3",
+      "nextNodeKey": "R3A2",
+      "bridgeText": "上一轮你选择：教师选出更好的路线，学生执行分工。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O4",
+      "nextNodeKey": "R3A2",
+      "bridgeText": "上一轮你选择：维持原路线，承诺下一次让其他人做决定。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O2",
+      "nextNodeKey": "R3B1",
+      "bridgeText": "上一轮你选择：把评价焦点改为每人能说明共同方案的一处依据，减少装饰要求以留协商时间。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O3",
+      "nextNodeKey": "R3B2",
+      "bridgeText": "上一轮你选择：请最熟练者统一修改，其他人配合整理。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O4",
+      "nextNodeKey": "R3B2",
+      "bridgeText": "上一轮你选择：按个人完成部分分别评分，取消小组共同责任。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O1",
+      "nextNodeKey": "R3B1",
+      "bridgeText": "上一轮你选择：安排各人向下一位解释本部分如何与整体衔接，一起修复一个最关键断点。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。"
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O3",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O4",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O1",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O2",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O4",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O1",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O2",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O3",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O1",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O2",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O3",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O4",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O2",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O3",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O4",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O1",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "U",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "N",
+      "nextNodeKey": "END",
+      "bridgeText": ""
+    }
+  ],
+  "metrics": [
+    {
+      "metricKey": "T10_A_explicit_count",
+      "label": "安排成员相互解释、整合信息或作实质贡献｜明示次数",
+      "construct": "cpj_t10_a_explicit_action",
+      "role": "primary"
+    },
+    {
+      "metricKey": "T10_B_explicit_count",
+      "label": "安排个人理解检查、角色互换或互助负担限制｜明示次数",
+      "construct": "cpj_t10_b_explicit_action",
+      "role": "secondary"
+    }
+  ],
+  "opportunities": [
+    {
+      "nodeKey": "R1",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R1",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R2A",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R2A",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "NA"
+    },
+    {
+      "nodeKey": "R2B",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R2B",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3A1",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3A1",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3A2",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3A2",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3B1",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3B1",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3B2",
+      "metricKey": "T10_A_explicit_count",
+      "applicability": "OPPORTUNITY"
+    },
+    {
+      "nodeKey": "R3B2",
+      "metricKey": "T10_B_explicit_count",
+      "applicability": "OPPORTUNITY"
+    }
+  ],
+  "scores": [
+    {
+      "nodeKey": "R1",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O4",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O1",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O2",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R1",
+      "optionKey": "O3",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2A",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O2",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O3",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O4",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R2B",
+      "optionKey": "O1",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O3",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O4",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O1",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A1",
+      "optionKey": "O2",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O4",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O1",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O2",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3A2",
+      "optionKey": "O3",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O1",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O2",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O3",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B1",
+      "optionKey": "O4",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O2",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O3",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O4",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O1",
+      "metricKey": "T10_A_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O2",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O3",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O4",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 0
+    },
+    {
+      "nodeKey": "R3B2",
+      "optionKey": "O1",
+      "metricKey": "T10_B_explicit_count",
+      "contribution": 1
+    }
+  ],
+  "feedback": [
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第1轮，你认为下一步较适切的是：先完成作品展示，之后单独处理分工不均。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第1轮，你认为下一步较适切的是：先让各人说明已有贡献和想参与的决定，再分配一项必须相互解释的关键任务。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第1轮，你认为下一步较适切的是：要求小组暂时放下成品，交换路线理由，由不同成员检查并确认。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第1轮，你认为下一步较适切的是：规定每人画四分之一，以确保工作量相等。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第1轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R1",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第1轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：让小组按共同标准比较新旧路线，保留不重画也能标注说明的方案，再分工完成。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献。该文字明示：安排成员相互解释、整合信息或作实质贡献。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：要求每人提出一个支持或质疑，由小组决定修改范围并记录依据。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献。该文字明示：安排成员相互解释、整合信息或作实质贡献。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：教师选出更好的路线，学生执行分工。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：维持原路线，承诺下一次让其他人做决定。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第2轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R2A",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第2轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：把评价焦点改为每人能说明共同方案的一处依据，减少装饰要求以留协商时间。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：请最熟练者统一修改，其他人配合整理。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：按个人完成部分分别评分，取消小组共同责任。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第2轮，你认为下一步较适切的是：安排各人向下一位解释本部分如何与整体衔接，一起修复一个最关键断点。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献。未明示：安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第2轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R2B",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第2轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：为保证质量只让最会讲者展示，其他人站在旁边。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O3",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：给每人相同的口头时段，允许提前写提纲，先保证每人都有展示位置。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献。未明示：安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O4",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：允许指图、补充或口头分工，但每个人都需确认自己理解的一处依据。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O1",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：由一人主讲、其他人各回应一个事先商定的问题，允许书面辅助。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "O2",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3A1",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：固定每个人的工作量，避免意见争论。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O4",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：在制作前设置一次理由比较与成员确认，再由小组选择分工。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O1",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：规定重要修改需听取不同成员的依据，但不要求每项意见都被采纳。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献。未明示：安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O2",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：轮换组长，其他合作规则不变。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排个人理解检查、角色互换或互助负担限制。未明示：安排成员相互解释、整合信息或作实质贡献。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "O3",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3A2",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：分别反馈可用性、理由质量和共同理解，不把少装饰视为学习退步。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排个人理解检查、角色互换或互助负担限制。未明示：安排成员相互解释、整合信息或作实质贡献。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O1",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：请学生说明协作改变了哪一处决定，再给一个可继续完善的任务。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献。未明示：安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O2",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：优先评外观完整性，以保持全班同一标准。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O3",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：本次先反馈合作过程，作品可用性留到下一次试用时再检查。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "O4",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3B1",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O2",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：保留优势分工，但增加互相教学与交接检查点，避免一人掌握全部。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O2",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O3",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：把能力相近者放一起，减少合作难度。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O3",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O4",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：继续让熟练者负责成品，用额外奖励补偿。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：未明示这两类特定动作。未明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O4",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O1",
+      "kind": "ACTION",
+      "text": "第3轮，你认为下一步较适切的是：设计必须交换信息才能完成的关键决定，并要求每人说明同伴的一条理由。 本轮提供的编码入口：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。该文字明示：安排成员相互解释、整合信息或作实质贡献；安排个人理解检查、角色互换或互助负担限制。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "O1",
+      "kind": "GUIDANCE",
+      "text": "针对本情境的小练习：随机邀请成员解释伙伴负责部分的依据。 练习步骤：把合作任务设计成成员信息需要整合，先各自准备再互相解释。结束时每人独立回答一个核心问题，同时询问互助负担。下次只调整一个角色或轮换规则；作品完成不等于人人理解，帮助者也需要支持。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "U",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    },
+    {
+      "questionKey": "action_R3B2",
+      "optionKey": "N",
+      "kind": "ACTION",
+      "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。"
+    }
+  ],
+  "comparisons": [],
+  "cases": [
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O4__R2B-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O1__R2A-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O1__R2A-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 3,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3A1",
+          "questionKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3A2",
+          "questionKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O2__R2A-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O2__R2A-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R2A",
+          "questionKey": "action_R2A",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 2
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 0,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "nodeKey": "R3B2",
+          "questionKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O1",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 1
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O2",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 2,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O3",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O4",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": 1,
+        "T10_B_explicit_count": 0
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "nodeKey": "R3B1",
+          "questionKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-O3__R2B-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "nodeKey": "R2B",
+          "questionKey": "action_R2B",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-U",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    },
+    {
+      "name": "R1-N",
+      "responses": [
+        {
+          "nodeKey": "R1",
+          "questionKey": "action_R1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "T10_A_explicit_count": null,
+        "T10_B_explicit_count": null
+      }
+    }
+  ]
+}

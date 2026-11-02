@@ -1,0 +1,2029 @@
+{
+  "recordType": "native_form_api_arguments_and_source_handoff_not_new_runtime_schema",
+  "familyTag": "family:talis24_tp",
+  "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+  "sourceCitation": "OECD (2024), Teaching and Learning International Survey (TALIS): Teacher Questionnaire",
+  "sourcePdfSha256": "f6ff9c69c98ced95500ed0201bef3c46d6bb97e0baba2ae317c1479ae4cc7ba7",
+  "sourceTechnicalV3Sha256": "19942b8f378e02a067e7fe7de7e19571af2fd01df7c814b16ed5d98610e4526c",
+  "sourceUserGuideV3Sha256": "2acc4dfb840c80c647c3843549a8ef9ac708ca4c871cd3e00b726d0951ac674e",
+  "resources": [
+    {
+      "instrumentKey": "talis2024_clarity_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLAIN",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜ISCED1英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51a",
+              "label": "I present a summary of recently learned content."
+            },
+            {
+              "rowKey": "tt4g51b",
+              "label": "I set goals at the beginning of a lesson or a unit."
+            },
+            {
+              "rowKey": "tt4g51c",
+              "label": "I explain what I expect the students to learn."
+            },
+            {
+              "rowKey": "tt4g51d",
+              "label": "I explain how new and old topics are related."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_clarity_isced1_teacher_self_en",
+            "title": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜ISCED1英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_clarity_isced1_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51a",
+                    "label": "I present a summary of recently learned content."
+                  },
+                  {
+                    "rowKey": "tt4g51b",
+                    "label": "I set goals at the beginning of a lesson or a unit."
+                  },
+                  {
+                    "rowKey": "tt4g51c",
+                    "label": "I explain what I expect the students to learn."
+                  },
+                  {
+                    "rowKey": "tt4g51d",
+                    "label": "I explain how new and old topics are related."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4COGAC",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜ISCED1英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51e",
+              "label": "I present tasks for which there is no obvious solution."
+            },
+            {
+              "rowKey": "tt4g51f",
+              "label": "I give tasks that require students to think critically."
+            },
+            {
+              "rowKey": "tt4g51g",
+              "label": "I have students work in small groups to come up with a joint solution to a problem or task."
+            },
+            {
+              "rowKey": "tt4g51h",
+              "label": "I ask students to decide on their own procedures for solving complex tasks."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_cognitive_activation_isced1_teacher_self_en",
+            "title": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜ISCED1英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_cognitive_activation_isced1_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51e",
+                    "label": "I present tasks for which there is no obvious solution."
+                  },
+                  {
+                    "rowKey": "tt4g51f",
+                    "label": "I give tasks that require students to think critically."
+                  },
+                  {
+                    "rowKey": "tt4g51g",
+                    "label": "I have students work in small groups to come up with a joint solution to a problem or task."
+                  },
+                  {
+                    "rowKey": "tt4g51h",
+                    "label": "I ask students to decide on their own procedures for solving complex tasks."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLASM",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜ISCED1英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51i",
+              "label": "I tell students to follow classroom rules."
+            },
+            {
+              "rowKey": "tt4g51j",
+              "label": "I tell students to listen to what I say."
+            },
+            {
+              "rowKey": "tt4g51k",
+              "label": "I calm students who are disruptive."
+            },
+            {
+              "rowKey": "tt4g51l",
+              "label": "When the lesson begins, I tell students to quieten down quickly."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_classroom_management_isced1_teacher_self_en",
+            "title": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜ISCED1英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_classroom_management_isced1_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51i",
+                    "label": "I tell students to follow classroom rules."
+                  },
+                  {
+                    "rowKey": "tt4g51j",
+                    "label": "I tell students to listen to what I say."
+                  },
+                  {
+                    "rowKey": "tt4g51k",
+                    "label": "I calm students who are disruptive."
+                  },
+                  {
+                    "rowKey": "tt4g51l",
+                    "label": "When the lesson begins, I tell students to quieten down quickly."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜ISCED1英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51m",
+              "label": "I refer to a problem from everyday life or work to demonstrate why new knowledge is useful."
+            },
+            {
+              "rowKey": "tt4g51n",
+              "label": "I give students projects that require at least one week to complete."
+            },
+            {
+              "rowKey": "tt4g51o",
+              "label": "I encourage students to question and critique arguments made by other students."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_other_practices_isced1_teacher_self_en",
+            "title": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜ISCED1英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_other_practices_isced1_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51m",
+                    "label": "I refer to a problem from everyday life or work to demonstrate why new knowledge is useful."
+                  },
+                  {
+                    "rowKey": "tt4g51n",
+                    "label": "I give students projects that require at least one week to complete."
+                  },
+                  {
+                    "rowKey": "tt4g51o",
+                    "label": "I encourage students to question and critique arguments made by other students."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q50",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "sourcePdfPage": 31,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 1,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜ISCED1英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "constant_sum",
+        "formLabel": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+        "required": false,
+        "formDefinition": {
+          "type": "CONSTANT_SUM",
+          "prompt": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+          "required": false,
+          "total": 100,
+          "integerOnly": false,
+          "options": [
+            {
+              "optionKey": "tt4g50a",
+              "label": "Administrative tasks (e.g. recording attendance, handing out school information/forms)"
+            },
+            {
+              "optionKey": "tt4g50b",
+              "label": "Keeping order in the classroom (maintaining discipline)"
+            },
+            {
+              "optionKey": "tt4g50c",
+              "label": "Actual teaching and learning"
+            }
+          ],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_time_allocation_isced1_teacher_self_en",
+            "title": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜ISCED1英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 1> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 1> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_time_allocation_isced1_teacher_self_en",
+                "type": "CONSTANT_SUM",
+                "prompt": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+                "required": false,
+                "total": 100,
+                "integerOnly": false,
+                "options": [
+                  {
+                    "optionKey": "tt4g50a",
+                    "label": "Administrative tasks (e.g. recording attendance, handing out school information/forms)"
+                  },
+                  {
+                    "optionKey": "tt4g50b",
+                    "label": "Keeping order in the classroom (maintaining discipline)"
+                  },
+                  {
+                    "optionKey": "tt4g50c",
+                    "label": "Actual teaching and learning"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLAIN",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51a",
+              "label": "I present a summary of recently learned content."
+            },
+            {
+              "rowKey": "tt4g51b",
+              "label": "I set goals at the beginning of a lesson or a unit."
+            },
+            {
+              "rowKey": "tt4g51c",
+              "label": "I explain what I expect the students to learn."
+            },
+            {
+              "rowKey": "tt4g51d",
+              "label": "I explain how new and old topics are related."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_clarity_isced2_teacher_self_en",
+            "title": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_clarity_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51a",
+                    "label": "I present a summary of recently learned content."
+                  },
+                  {
+                    "rowKey": "tt4g51b",
+                    "label": "I set goals at the beginning of a lesson or a unit."
+                  },
+                  {
+                    "rowKey": "tt4g51c",
+                    "label": "I explain what I expect the students to learn."
+                  },
+                  {
+                    "rowKey": "tt4g51d",
+                    "label": "I explain how new and old topics are related."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4COGAC",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51e",
+              "label": "I present tasks for which there is no obvious solution."
+            },
+            {
+              "rowKey": "tt4g51f",
+              "label": "I give tasks that require students to think critically."
+            },
+            {
+              "rowKey": "tt4g51g",
+              "label": "I have students work in small groups to come up with a joint solution to a problem or task."
+            },
+            {
+              "rowKey": "tt4g51h",
+              "label": "I ask students to decide on their own procedures for solving complex tasks."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+            "title": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51e",
+                    "label": "I present tasks for which there is no obvious solution."
+                  },
+                  {
+                    "rowKey": "tt4g51f",
+                    "label": "I give tasks that require students to think critically."
+                  },
+                  {
+                    "rowKey": "tt4g51g",
+                    "label": "I have students work in small groups to come up with a joint solution to a problem or task."
+                  },
+                  {
+                    "rowKey": "tt4g51h",
+                    "label": "I ask students to decide on their own procedures for solving complex tasks."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLASM",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51i",
+              "label": "I tell students to follow classroom rules."
+            },
+            {
+              "rowKey": "tt4g51j",
+              "label": "I tell students to listen to what I say."
+            },
+            {
+              "rowKey": "tt4g51k",
+              "label": "I calm students who are disruptive."
+            },
+            {
+              "rowKey": "tt4g51l",
+              "label": "When the lesson begins, I tell students to quieten down quickly."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_classroom_management_isced2_teacher_self_en",
+            "title": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_classroom_management_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51i",
+                    "label": "I tell students to follow classroom rules."
+                  },
+                  {
+                    "rowKey": "tt4g51j",
+                    "label": "I tell students to listen to what I say."
+                  },
+                  {
+                    "rowKey": "tt4g51k",
+                    "label": "I calm students who are disruptive."
+                  },
+                  {
+                    "rowKey": "tt4g51l",
+                    "label": "When the lesson begins, I tell students to quieten down quickly."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51m",
+              "label": "I refer to a problem from everyday life or work to demonstrate why new knowledge is useful."
+            },
+            {
+              "rowKey": "tt4g51n",
+              "label": "I give students projects that require at least one week to complete."
+            },
+            {
+              "rowKey": "tt4g51o",
+              "label": "I encourage students to question and critique arguments made by other students."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_other_practices_isced2_teacher_self_en",
+            "title": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_other_practices_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51m",
+                    "label": "I refer to a problem from everyday life or work to demonstrate why new knowledge is useful."
+                  },
+                  {
+                    "rowKey": "tt4g51n",
+                    "label": "I give students projects that require at least one week to complete."
+                  },
+                  {
+                    "rowKey": "tt4g51o",
+                    "label": "I encourage students to question and critique arguments made by other students."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q50",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "sourcePdfPage": 31,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "constant_sum",
+        "formLabel": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+        "required": false,
+        "formDefinition": {
+          "type": "CONSTANT_SUM",
+          "prompt": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+          "required": false,
+          "total": 100,
+          "integerOnly": false,
+          "options": [
+            {
+              "optionKey": "tt4g50a",
+              "label": "Administrative tasks (e.g. recording attendance, handing out school information/forms)"
+            },
+            {
+              "optionKey": "tt4g50b",
+              "label": "Keeping order in the classroom (maintaining discipline)"
+            },
+            {
+              "optionKey": "tt4g50c",
+              "label": "Actual teaching and learning"
+            }
+          ],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_time_allocation_isced2_teacher_self_en",
+            "title": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_time_allocation_isced2_teacher_self_en",
+                "type": "CONSTANT_SUM",
+                "prompt": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+                "required": false,
+                "total": 100,
+                "integerOnly": false,
+                "options": [
+                  {
+                    "optionKey": "tt4g50a",
+                    "label": "Administrative tasks (e.g. recording attendance, handing out school information/forms)"
+                  },
+                  {
+                    "optionKey": "tt4g50b",
+                    "label": "Keeping order in the classroom (maintaining discipline)"
+                  },
+                  {
+                    "optionKey": "tt4g50c",
+                    "label": "Actual teaching and learning"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLAIN",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜ISCED3英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51a",
+              "label": "I present a summary of recently learned content."
+            },
+            {
+              "rowKey": "tt4g51b",
+              "label": "I set goals at the beginning of a lesson or a unit."
+            },
+            {
+              "rowKey": "tt4g51c",
+              "label": "I explain what I expect the students to learn."
+            },
+            {
+              "rowKey": "tt4g51d",
+              "label": "I explain how new and old topics are related."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_clarity_isced3_teacher_self_en",
+            "title": "TALIS2024教学实践｜清晰教学（无计分）｜教师自评｜ISCED3英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_clarity_isced3_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51a",
+                    "label": "I present a summary of recently learned content."
+                  },
+                  {
+                    "rowKey": "tt4g51b",
+                    "label": "I set goals at the beginning of a lesson or a unit."
+                  },
+                  {
+                    "rowKey": "tt4g51c",
+                    "label": "I explain what I expect the students to learn."
+                  },
+                  {
+                    "rowKey": "tt4g51d",
+                    "label": "I explain how new and old topics are related."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4COGAC",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜ISCED3英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51e",
+              "label": "I present tasks for which there is no obvious solution."
+            },
+            {
+              "rowKey": "tt4g51f",
+              "label": "I give tasks that require students to think critically."
+            },
+            {
+              "rowKey": "tt4g51g",
+              "label": "I have students work in small groups to come up with a joint solution to a problem or task."
+            },
+            {
+              "rowKey": "tt4g51h",
+              "label": "I ask students to decide on their own procedures for solving complex tasks."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_cognitive_activation_isced3_teacher_self_en",
+            "title": "TALIS2024教学实践｜认知激活（无计分）｜教师自评｜ISCED3英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_cognitive_activation_isced3_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51e",
+                    "label": "I present tasks for which there is no obvious solution."
+                  },
+                  {
+                    "rowKey": "tt4g51f",
+                    "label": "I give tasks that require students to think critically."
+                  },
+                  {
+                    "rowKey": "tt4g51g",
+                    "label": "I have students work in small groups to come up with a joint solution to a problem or task."
+                  },
+                  {
+                    "rowKey": "tt4g51h",
+                    "label": "I ask students to decide on their own procedures for solving complex tasks."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": "T4CLASM",
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜ISCED3英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51i",
+              "label": "I tell students to follow classroom rules."
+            },
+            {
+              "rowKey": "tt4g51j",
+              "label": "I tell students to listen to what I say."
+            },
+            {
+              "rowKey": "tt4g51k",
+              "label": "I calm students who are disruptive."
+            },
+            {
+              "rowKey": "tt4g51l",
+              "label": "When the lesson begins, I tell students to quieten down quickly."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_classroom_management_isced3_teacher_self_en",
+            "title": "TALIS2024教学实践｜课堂管理（无计分）｜教师自评｜ISCED3英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_classroom_management_isced3_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51i",
+                    "label": "I tell students to follow classroom rules."
+                  },
+                  {
+                    "rowKey": "tt4g51j",
+                    "label": "I tell students to listen to what I say."
+                  },
+                  {
+                    "rowKey": "tt4g51k",
+                    "label": "I calm students who are disruptive."
+                  },
+                  {
+                    "rowKey": "tt4g51l",
+                    "label": "When the lesson begins, I tell students to quieten down quickly."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q51",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "sourcePdfPage": 32,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜ISCED3英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g51m",
+              "label": "I refer to a problem from everyday life or work to demonstrate why new knowledge is useful."
+            },
+            {
+              "rowKey": "tt4g51n",
+              "label": "I give students projects that require at least one week to complete."
+            },
+            {
+              "rowKey": "tt4g51o",
+              "label": "I encourage students to question and critique arguments made by other students."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_other_practices_isced3_teacher_self_en",
+            "title": "TALIS2024教学实践｜其他课堂实践（无计分）｜教师自评｜ISCED3英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_other_practices_isced3_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you do the following?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g51m",
+                    "label": "I refer to a problem from everyday life or work to demonstrate why new knowledge is useful."
+                  },
+                  {
+                    "rowKey": "tt4g51n",
+                    "label": "I give students projects that require at least one week to complete."
+                  },
+                  {
+                    "rowKey": "tt4g51o",
+                    "label": "I encourage students to question and critique arguments made by other students."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceScale": null,
+      "sourceQuestion": "Q50",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "sourcePdfPage": 31,
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 3,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜ISCED3英文",
+        "description": "Original English TALIS 2024 item-set excerpt; unscored descriptive teacher reflection, not the OECD CFA score. Version 1.0.0. OECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "constant_sum",
+        "formLabel": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+        "required": false,
+        "formDefinition": {
+          "type": "CONSTANT_SUM",
+          "prompt": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+          "required": false,
+          "total": 100,
+          "integerOnly": false,
+          "options": [
+            {
+              "optionKey": "tt4g50a",
+              "label": "Administrative tasks (e.g. recording attendance, handing out school information/forms)"
+            },
+            {
+              "optionKey": "tt4g50b",
+              "label": "Keeping order in the classroom (maintaining discipline)"
+            },
+            {
+              "optionKey": "tt4g50c",
+              "label": "Actual teaching and learning"
+            }
+          ],
+          "rows": []
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "talis2024_time_allocation_isced3_teacher_self_en",
+            "title": "TALIS2024教学实践｜课堂时间分配（无计分）｜教师自评｜ISCED3英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 3> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 3> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: this standalone English form contains a selected original item group; it does not calculate the OECD factor score or a teaching-quality score. Keep the same target class when combining forms. You may leave an item unanswered. Numeric source response codes identify categories, not points.\n\nOECD (2024), “Teaching and Learning International Survey (TALIS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/talis2024questionnaires/TALIS2024TeacherQuestionnaireISCED1-2-3.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "talis2024_time_allocation_isced3_teacher_self_en",
+                "type": "CONSTANT_SUM",
+                "prompt": "For this <target class>, what percentage of <class> time is typically spent on each of the following activities?\nWrite a percentage for each activity. Write 0 (zero) if none.\nPlease ensure that responses add up to 100%.",
+                "required": false,
+                "total": 100,
+                "integerOnly": false,
+                "options": [
+                  {
+                    "optionKey": "tt4g50a",
+                    "label": "Administrative tasks (e.g. recording attendance, handing out school information/forms)"
+                  },
+                  {
+                    "optionKey": "tt4g50b",
+                    "label": "Keeping order in the classroom (maintaining discipline)"
+                  },
+                  {
+                    "optionKey": "tt4g50c",
+                    "label": "Actual teaching and learning"
+                  }
+                ],
+                "rows": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ordinaryCombinations": [
+    {
+      "key": "talis2024_teaching_practices_isced1_teacher_self_en",
+      "name": "TALIS2024教学实践｜教师自评｜ISCED1英文",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "talis2024_time_allocation_isced1_teacher_self_en",
+        "talis2024_clarity_isced1_teacher_self_en",
+        "talis2024_cognitive_activation_isced1_teacher_self_en",
+        "talis2024_classroom_management_isced1_teacher_self_en",
+        "talis2024_other_practices_isced1_teacher_self_en"
+      ],
+      "crossToolScore": false
+    },
+    {
+      "key": "talis2024_teaching_practices_isced2_teacher_self_en",
+      "name": "TALIS2024教学实践｜教师自评｜ISCED2英文",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "talis2024_time_allocation_isced2_teacher_self_en",
+        "talis2024_clarity_isced2_teacher_self_en",
+        "talis2024_cognitive_activation_isced2_teacher_self_en",
+        "talis2024_classroom_management_isced2_teacher_self_en",
+        "talis2024_other_practices_isced2_teacher_self_en"
+      ],
+      "crossToolScore": false
+    },
+    {
+      "key": "talis2024_teaching_practices_isced3_teacher_self_en",
+      "name": "TALIS2024教学实践｜教师自评｜ISCED3英文",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "sourceOrder": [
+        "talis2024_time_allocation_isced3_teacher_self_en",
+        "talis2024_clarity_isced3_teacher_self_en",
+        "talis2024_cognitive_activation_isced3_teacher_self_en",
+        "talis2024_classroom_management_isced3_teacher_self_en",
+        "talis2024_other_practices_isced3_teacher_self_en"
+      ],
+      "crossToolScore": false
+    }
+  ]
+}

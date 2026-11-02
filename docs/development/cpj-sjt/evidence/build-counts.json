@@ -1,0 +1,13 @@
+{
+  "episodes": 24,
+  "nodes": 168,
+  "options": 672,
+  "metrics": 24,
+  "opportunityRows": 336,
+  "templates": 48,
+  "cases": 5088,
+  "forms": 39,
+  "conditionTiming": "baseline; optional POST_FINAL_REFLECTION separate FORM",
+  "engineChanges": 0,
+  "productionWrites": 0
+}

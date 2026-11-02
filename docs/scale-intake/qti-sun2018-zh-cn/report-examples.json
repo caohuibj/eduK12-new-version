@@ -1,0 +1,50 @@
+{
+  "status": "DRAFT_EXAMPLES_ONLY_NOT_RUNTIME_R",
+  "respondent": "STUDENT_GRADES_7_9",
+  "noThresholdsOrSyntheticScoreBands": true,
+  "studentVisibility": "Only existing authorized respondent report access; obey current anonymity/release rules; no new visibility granted.",
+  "teacherVisibility": "Only existing authorized group aggregate access after current minimum group size, anonymity and release conditions; no individual student disclosure.",
+  "examples": [
+    {
+      "audience": "student",
+      "scenario": "ordinary_experience",
+      "trigger": "Hypothetical complete interpretable feedback describing supportive experiences; NOT a numeric cutoff.",
+      "text": "你这次的回答记录了自己怎样感受这位老师的课堂。有些经历可能让你觉得被倾听、容易参与；它们是你看到的课堂片段，不是对老师或你的定论。你可以回想一个让自己愿意提问的时刻，下次试着用“我已经理解了……，还想请教……”提出一个具体问题。也可以记下哪种讲解最帮助你，再用合适的方式表达自己的学习需要。"
+    },
+    {
+      "audience": "student",
+      "scenario": "difficult_experience",
+      "trigger": "Hypothetical interpretable answers describing discomfort or pressure; NOT a global low-score band.",
+      "text": "如果这些回答对应的课堂经历让你紧张、觉得难以开口，这些感受值得被认真听见。这不表示你能力差，也不表示你应该为不公平或让你受伤的对待负责。你可以先记下一个具体情况和当时需要的帮助；如果愿意，也觉得安全，可以用“我在……时不太明白，希望……”表达学习需要。若你担心说出来会受到不利对待，或正遇到威胁、羞辱等让你难受的事，可以先找可信的家长、学校辅导人员或其他成人支持，不必独自面对，也不用直接与老师争辩。问卷本身不能判断事情的全部原因。"
+    },
+    {
+      "audience": "student",
+      "scenario": "insufficient_evidence",
+      "trigger": "Current candidate status, missing response protocol, missing answers, or no interpretable result.",
+      "text": "目前的信息还不足以解释这次课堂体验，因此这里不显示分数或高低判断。少答、暂时不想回答，或工具尚未准备好，都不是你做得不好。你可以先想一想：最近一次你想得到帮助的课堂片段是什么？如果愿意，可以把这个需要告诉可信的成人。你无需为了得到报告而勉强补答让你不舒服的问题。"
+    },
+    {
+      "audience": "teacher",
+      "scenario": "ordinary_experience",
+      "trigger": "Hypothetical authorized interpretable group aggregate; never a single-student answer.",
+      "text": "本次已授权的群体反馈可作为了解学生课堂体验的一条线索。若汇总显示学生较常感受到倾听与支持，可以回顾哪些提问、回应和讲解方式帮助了学生参与，并在后续课堂持续提供这些机会。群体结果不能代表每一位学生，也不能据此认定教学成效或教师等级；请结合课堂记录和自愿反馈讨论改进。"
+    },
+    {
+      "audience": "teacher",
+      "scenario": "difficult_experience",
+      "trigger": "Hypothetical authorized group aggregate suggesting more pressure or less support; no new threshold.",
+      "text": "如果群体反馈中有较多压力或难以表达需要的体验，可以先检视课堂规则、纠错语言和提问机会，选择一项可观察的小改变，例如明确允许学生在课后或匿名渠道提问。请避免追查谁给出了某个回答，也不要把学生的困难解释为不配合。当前结果只描述学生感知，不能用于教师排名、惩戒或个人归责。"
+    },
+    {
+      "audience": "teacher",
+      "scenario": "insufficient_evidence",
+      "trigger": "Incomplete/noninterpretable aggregate OR existing group-size/anonymity/release rule denies display.",
+      "text": "当前没有可提供解释的已授权群体结果，因此不显示分数、分级或个体答卷。请按既有匿名、最小人数和发布规则处理；不能通过拆分小群体或追问学生来补足报告。后续如需了解课堂需要，可提供自愿、不会带来不利后果的反馈方式。"
+    }
+  ],
+  "unscoredForm": {
+    "score": null,
+    "report": "已记录你选择提供的施测背景信息。此表单不计分，不评价学生能力或教师好坏。",
+    "factsOnly": true
+  }
+}
