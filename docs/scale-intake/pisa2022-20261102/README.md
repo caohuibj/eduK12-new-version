@@ -31,7 +31,7 @@
 
 ## 来源许可及本轮公开范围
 
-[OECD条款§1.2](https://www.oecd.org/en/about/terms-conditions.html)允许在署名条件下使用、复制、分发与改编其独有的2024年7月以前文字；第三方权利仍需确认。2025修订技术报告自带CC BY 4.0，不由此推定2022美国题本也采用CC BY。NCES公开可读本身不足以证明美国国家版全部题文可以公开再分发。OECD数据库列出的[美国国家版ZIP](https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip)在当前云端请求返回HTTP403，未绕过；其具体notice/第三方范围尚未核齐。
+[OECD条款§1.2](https://www.oecd.org/en/about/terms-conditions.html)允许在署名条件下使用、复制、分发与改编其独有的2024年7月以前文字；第三方权利仍需确认。2025修订技术报告自带CC BY 4.0，不由此推定2022美国题本也采用CC BY。NCES公开可读本身不足以证明美国国家版全部题文可以公开再分发。OECD数据库列出的[美国国家版ZIP](https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip)原先请求403；本次复核同一公开URL已正常取得。包内无README或额外许可文件，正式Main题本37项及22个分块选项标签与既有FORM全部吻合。具体条件、商业英文与商业翻译的区别见[可解决性复核](rights-resolution-review.md)，不得再把缺单独授权信视为完全禁止。
 
 因此公开PR不含原PDF/ZIP/题文/选项，也不把管理员审核写成授权。合法取得的文本只在当前隔离环境进行内部导入准备与验证，不公开推送。不接受需用户签署的条款、不新译、不贴OECD标志。若后续确认可公开改编题项，应保留完整署名并加入：This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.
 
