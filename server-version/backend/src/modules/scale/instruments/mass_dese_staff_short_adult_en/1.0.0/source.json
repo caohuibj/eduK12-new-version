@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mass_dese_staff_short_adult_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Massachusetts DESE｜Short｜教职工｜教师/教职工（目录候选）",
+      "abbreviation": "MA-DESE",
+      "instrumentFamily": "Massachusetts DESE Model Feedback Instruments"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Short官方独立表单的来源目录；教师/教职工反馈管理者实践。保留原组卷，不把标准/指标映射自动当作可独立施测量表；不合成长短版或跨学段总分。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "mother:massachusetts_dese",
+        "source:Massachusetts_DESE",
+        "state:PILOT",
+        "availability:catalog_only",
+        "language:en",
+        "rights:redistribution_scope_unresolved",
+        "scoring:not_installed",
+        "report:not_installed",
+        "form:short",
+        "grade:staff",
+        "respondent:staff",
+        "evaluation_target:administrator",
+        "age:staff_role_no_age_cutoff",
+        "教职工填答",
+        "评价对象:管理者"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "TEACHER"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版英文，适用角色/年级：教职工；教师/教职工填答，评价administrator。年级不能自动换算为年龄，不外推中国K12效度或中文验证。目录TEACHER枚举表示教职工填答；不等于学生版或管理者自评。"
+    },
+    "administration": {
+      "itemCount": 35,
+      "estimatedMinutes": 15,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "原表针对该教师课堂/该管理者的实践反馈，没有据此设定固定过去若干天；本目录不能用于施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Staff管理协议建议长版约30分钟、短版约15分钟；不是本平台实测。",
+        "当前官方文件正式编号题共35题；题项键、可选评论、补充/替换题不混入正式题数。",
+        "保留原表单和原锚点；不公开复制题文、指导语、完整条目键或译本。",
+        "普通组合只可选用同一学段的一种版本，附原版可选无分评论；无跨工具总分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官网将反馈用于教育者专业发展；仅来源目录，许可、报告和具体人群证据审核前不可施测。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-short-form.docx",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "仅官方英文来源索引；没有创建或声称已验证的中文译本。2014技术报告与当前下载版本的对应范围见同母工具证据。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "DESE Model Staff Feedback Survey — 教职工, Short",
+      "citation": "Massachusetts Department of Elementary and Secondary Education. Model Feedback Instruments & Administration Protocols. Current official DOCX retrieved 2026-11-02; not assigned a new official edition year.",
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-short-form.docx"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "内容映射：Standard I Instructional Leadership",
+        "内容映射：Standard II Management and Operations",
+        "内容映射：Standard IV Professional Culture"
+      ],
+      "limitations": [
+        "Staff为管理者实践反馈，不混入学生评教。",
+        "当前学生技术报告不能替代Staff计分或结构效度证据。",
+        "目录候选没有个体/群体分数、常模、排名或跨工具总分。",
+        "原Staff指导语承诺个体匿名、只看汇总；启用前须核对既有授权、匿名与发布条件，不把目录TEACHER枚举当作任意管理者关系已获支持。",
+        "官方题文与题项来源许可需逐项核定；不把2014技术报告的非商业教育复制说明当作当前全题本改编或收费再分发许可。"
+      ],
+      "disclaimer": "候选待审；未安装内容、计分参数或评分报告，不可公开施测。"
+    },
+    "blockers": [
+      "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "SCORING_AND_REPORT_NOT_INSTALLED",
+      "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED"
+    ]
+  }
+}
