@@ -426,37 +426,6 @@
       "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
     },
     {
-      "key": "css_t_lu2023_corrective_feedback_en",
-      "version": "0.1.0",
-      "kind": "FORM",
-      "title": "CSS-T／CSAS｜纠正性反馈（无计分）｜教师自评｜LU2023-EN·小学",
-      "language": "en",
-      "role": "teacher_self",
-      "sourceItems": [
-        32,
-        33,
-        34,
-        35,
-        36,
-        37
-      ],
-      "tags": [
-        "family:css_t_csas",
-        "role:teacher_self",
-        "stage:elementary",
-        "language:en",
-        "source_version:lu2023_frequency49",
-        "use:developmental_reflection",
-        "state:pilot",
-        "scoring:none"
-      ],
-      "parameterVersion": null,
-      "reportVersion": null,
-      "path": "forms/css_t_lu2023_corrective_feedback_en.json",
-      "sourceFactorCR": 0.794,
-      "status": "NATIVE_CONTENT_READY_PENDING_REVIEW"
-    },
-    {
       "key": "css_t_lu2023_prevention_management_en",
       "version": "0.1.0",
       "kind": "FORM",
@@ -555,32 +524,19 @@
       "totalScore": null,
       "status": "NOT_CREATED",
       "note": "Same-language whole 49-item presentation may be assembled using existing ordinary combination after child review; no latent factor score, actual/ideal discrepancy, cross-language equality or cross-tool total."
-    },
-    {
-      "key": "css_t_lu2023_frequency49_combo_en",
-      "kind": "ordinary_combination_plan",
-      "childKeys": [
-        "css_t_lu2023_student_focused_learning_engagement_en",
-        "css_t_lu2023_instructional_delivery_en",
-        "css_t_lu2023_promotes_student_thinking_en",
-        "css_t_lu2023_academic_performance_feedback_en",
-        "css_t_lu2023_praise_en",
-        "css_t_lu2023_corrective_feedback_en",
-        "css_t_lu2023_prevention_management_en",
-        "css_t_lu2023_directives_transitions_en"
-      ],
-      "totalScore": null,
-      "status": "NOT_CREATED",
-      "note": "Same-language whole 49-item presentation may be assembled using existing ordinary combination after child review; no latent factor score, actual/ideal discrepancy, cross-language equality or cross-tool total."
     }
   ],
   "validation": {
-    "schema": "PASS_16",
-    "isolatedSubmitReadback": "PASS_16_SUBMITTED",
+    "historicalEvidence": "validation.json",
+    "historicalSchema": "PASS_16_BEFORE_SOURCE_COMPLETENESS_WITHDRAWAL",
+    "historicalIsolatedSubmitReadback": "16_SUBMITTED_not_approval_or_administrability",
+    "answerBoundaryCasesHistorical": 64,
+    "affectedManifestReferenceCheck": "withdrawal-validation.json",
+    "currentEligibleForms": 15,
+    "currentEligiblePayloads": "UNCHANGED_BYTES_reuse_original_validation_no_schema_or_database_replay",
+    "developmentStatus": "Original16 synthetic local submissions retained historically; current delivery only15 complete forms. No shared development/production write or frozen-record mutation.",
     "production": "NOT_RUN",
     "formalCI": "NOT_RUN",
-    "answerBoundaryCases": 64,
-    "developmentStatus": "16 Forms submitted into dedicated isolated local verification database; not shared development/production library",
     "indexedFamilyFacet": "NOT_IMPLEMENTED_BY_EXISTING_IMPORTER_no_new_engine"
   },
   "tagStorage": {
@@ -611,7 +567,6 @@
   "files": {
     "forms/css_t_lu2023_academic_performance_feedback_en.json": "d64ac0b70c9ddd654c028d887dc6227433a5e746c7e4864c0250ec7a0a41de82",
     "forms/css_t_lu2023_academic_performance_feedback_fr.json": "8ebb06a4f41ba3605de0999d41f28859b66238af6c98d4b212f5692e40ed911e",
-    "forms/css_t_lu2023_corrective_feedback_en.json": "592353f6de1904ee1db92f05e5b137bdf24463671d19f06633f3575192c34ac2",
     "forms/css_t_lu2023_corrective_feedback_fr.json": "5f28c1fe77ead7a766131c000d514ee7706c7288997e3c4916256975d4292c2a",
     "forms/css_t_lu2023_directives_transitions_en.json": "02e601b2612b0576b0b2e1b07299d41cfe6e06fd88d7e571e2de8c0744d573fb",
     "forms/css_t_lu2023_directives_transitions_fr.json": "bae9059c96185dce0e71549b005b6060a16561431676e89ad1a1ec19202aebde",
@@ -625,5 +580,42 @@
     "forms/css_t_lu2023_promotes_student_thinking_fr.json": "56bf13cfef61b9dbbf5dd6e276146f7dbf45c08b8dcbffb6debf1a2a7f768ec7",
     "forms/css_t_lu2023_student_focused_learning_engagement_en.json": "0c34458777377cddde2e8446f41262cb647be144e6919d38f7c4029de807b9a1",
     "forms/css_t_lu2023_student_focused_learning_engagement_fr.json": "878725e8678e7c645a4f916b69fc7b28b311a2ea6a321e74a378cebb3aa1ce0e"
+  },
+  "withheldCandidates": [
+    {
+      "candidateKey": "css_t_lu2023_corrective_feedback_en",
+      "status": "NOT_ADMINISTRABLE_MISSING_SOURCE",
+      "importable": false,
+      "missingSourceItems": [
+        35
+      ],
+      "sourceMetadataPath": "withheld/css_t_lu2023_corrective_feedback_en.source.json",
+      "reason": "Original English item35 omits the distance number; entire six-item English corrective-feedback module removed from native forms and READY/import manifests. Other seven complete English modules and all eight French modules are unchanged."
+    }
+  ],
+  "withheldComposites": [
+    {
+      "candidateKey": "css_t_lu2023_frequency49_combo_en",
+      "status": "NOT_ADMINISTRABLE_MISSING_CHILD_SOURCE",
+      "importable": false,
+      "missingChildKey": "css_t_lu2023_corrective_feedback_en",
+      "sourceItemCount": 49,
+      "reason": "The complete English49 plan cannot be assembled without the withheld module. No childKeys/import payload retained; no replacement 43-item version is claimed."
+    }
+  ],
+  "deliveryScope": {
+    "eligibleForms": 15,
+    "eligibleItemInstances": 92,
+    "french": {
+      "forms": 8,
+      "items": 49
+    },
+    "english": {
+      "forms": 7,
+      "items": 43
+    },
+    "withheldNativeForms": 1,
+    "eligibleOrdinaryCombinationPlans": 1,
+    "note": "READY means complete content pending existing review, not approval or publication."
   }
 }
