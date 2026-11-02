@@ -1,0 +1,78 @@
+import assert from 'node:assert/strict'
+import {readFileSync,writeFileSync} from 'node:fs'
+import {createHash,randomUUID} from 'node:crypto'
+import {Prisma} from '@prisma/client'
+import {prisma} from './src/config/database'
+import {requireIsolatedReleaseDatabase} from './src/__tests__/integration/integration-env'
+import {createFormTemplate,addItem,create,importFormTemplate,detail} from './src/modules/questionnaire-product/service'
+import {updateCatalogTags} from './src/modules/training-catalog/tags'
+import {validateFormDefinition,formAnswerFieldCount} from './src/modules/assessment-core/form/definition'
+import {normalizeFormAnswers} from './src/modules/assessment-core/form/runtime'
+import {dryRunSurveyForm} from './src/modules/survey/final.compute'
+const file='../../docs/scale-intake/talis2024-practices-20261102/native-forms.json'
+const out='../../docs/scale-intake/talis2024-practices-20261102/validation.json'
+const pack=JSON.parse(readFileSync(file,'utf8'))
+const stableRequest=(key:string)=>{const h=createHash('sha256').update(key).digest('hex');return h.slice(0,8)+'-'+h.slice(8,12)+'-4'+h.slice(13,16)+'-a'+h.slice(17,20)+'-'+h.slice(20,32)}
+async function main(){
+ requireIsolatedReleaseDatabase(process.env.DATABASE_URL!)
+ assert.equal(new URL(process.env.DATABASE_URL!).pathname,'/eduk12_talis24_test')
+ const user=await prisma.user.upsert({where:{username:'talis24-content-fixture-20261102'},create:{username:'talis24-content-fixture-20261102',passwordHash:'synthetic-not-a-real-login',role:'TEACHER',accountDomain:'TRAINING',teacherApproved:true},update:{}})
+ const actor={userId:user.id,role:'TEACHER' as const}
+ const imported:any[]=[]
+ let sourceFields=0
+ for(const resource of pack.resources){
+  assert.ok(resource.tags.every((x:string)=>x.length<=20));assert.ok(resource.tags.length<=10)
+  const checked=validateFormDefinition(resource.definition,{forPreview:true});assert.ok(checked.definition);assert.deepEqual(checked.issues.filter(i=>i.severity==='error'),[])
+  assert.ok(resource.addItem.formDefinition.options.every((o:any)=>o.score===undefined))
+  let form=await createFormTemplate(actor,{...resource.create,requestId:stableRequest(resource.instrumentKey)})
+  if(form.items.length===0)form=await addItem(actor,form.id,{revision:form.revision,item:resource.addItem})
+  assert.equal(form.items.length,1)
+  // Native FORM_TEMPLATE metadata column; current tag editor excludes this kind.
+  // Fixture-only metadata write is scoped to the creator and new unpublished row.
+  const tagged=await prisma.compositeAssessment.updateMany({where:{id:form.id,createdBy:actor.userId,status:'DRAFT',productKind:'FORM_TEMPLATE'},data:{tags:resource.tags,code:resource.instrumentKey}})
+  assert.equal(tagged.count,1)
+  const stored=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:form.id},include:{items:true,formSections:true}})
+  assert.equal(stored.code,resource.instrumentKey);assert.equal(stored.productKind,'FORM_TEMPLATE');assert.equal(stored.publicEnabled,false);assert.equal(stored.status,'DRAFT');assert.deepEqual(stored.tags,resource.tags)
+  assert.equal(stored.items[0].type,'FORM');assert.equal(stored.items[0].scaleId,null)
+  const q=stored.items[0].formDefinition as any
+  const {itemKey:storedKey,...storedQuestion}=q; assert.deepEqual(storedQuestion,resource.addItem.formDefinition)
+  const definition={schemaVersion:2 as const,pages:[{pageKey:'check',title:stored.name,questions:[q]}]}
+  let checks=0
+  if(q.type==='MATRIX'){
+   for(const option of ['r1','r3','r4']){const raw=Object.fromEntries(q.rows.map((row:any)=>[q.itemKey+':'+row.rowKey,option]));const result=dryRunSurveyForm(definition,raw);assert.equal(result.missing.length,0);assert.deepEqual(Object.values(result.rawAnswers[q.itemKey] as any),q.rows.map(()=>option));checks++}
+   const partial=dryRunSurveyForm(definition,{[q.itemKey+':'+q.rows[0].rowKey]:'r2'});assert.equal(partial.missing.length,q.rows.length-1);checks++
+   const empty=dryRunSurveyForm(definition,{});assert.equal(empty.missing.length,q.rows.length);checks++
+   assert.throws(()=>dryRunSurveyForm(definition,{[q.itemKey+':'+q.rows[0].rowKey]:'r5'}));checks++
+  }else{
+   const codes=q.options.map((o:any)=>o.optionKey)
+   for(const vals of [[0,10,90],[5.5,9.5,85],[100,0,0]]){const result=dryRunSurveyForm(definition,{[q.itemKey]:Object.fromEntries(codes.map((k:string,i:number)=>[k,vals[i]]))});assert.deepEqual(result.rawAnswers[q.itemKey],Object.fromEntries(codes.map((k:string,i:number)=>[k,vals[i]])));checks++}
+   for(const vals of [[0,10,89],[-1,1,100],[101,0,0]]){assert.throws(()=>dryRunSurveyForm(definition,{[q.itemKey]:Object.fromEntries(codes.map((k:string,i:number)=>[k,vals[i]]))}));checks++}
+   const empty=dryRunSurveyForm(definition,{});assert.equal(empty.missing.length,1);checks++
+  }
+  assert.equal((dryRunSurveyForm(definition,{}) as any).scores,undefined)
+  assert.equal((dryRunSurveyForm(definition,{}) as any).privateScoring,undefined)
+  assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:stored.id}}),0)
+  assert.equal(await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:stored.id}}),0)
+  sourceFields+=resource.sourceItemIds.length
+  imported.push({instrumentKey:resource.instrumentKey,contentVersion:resource.contentVersion,scoringVersion:null,reportVersion:null,id:stored.id,nativeCode:stored.code,nativeRevision:stored.revision,status:stored.status,tags:stored.tags,sourceVariables:resource.sourceItemIds,answerChecks:checks})
+ }
+ const combinations=[]
+ for(const combo of pack.ordinaryCombinations){
+  let target=await create(actor,{name:combo.name,questionnaireType:'GENERAL',requestId:stableRequest(combo.key)})
+  if(target.items.length===0)for(const key of combo.sourceOrder){const source=imported.find(x=>x.instrumentKey===key);target=await importFormTemplate(actor,target.id,{revision:target.revision,source:{id:source.id,kind:'COMPOSITE',revision:source.nativeRevision}})}
+  const tag=(await prisma.compositeAssessment.findUniqueOrThrow({where:{id:target.id}})).tags
+  await updateCatalogTags(actor,target.id,{kind:'QUESTIONNAIRE',tags:combo.tags,expectedTags:tag})
+  const reloaded=await detail(actor,target.id)
+  assert.equal(reloaded.items.length,5);assert.ok(reloaded.items.every((x:any)=>x.type==='FORM'));assert.equal(reloaded.reportMode,'COLLECTION_ONLY')
+  assert.equal(reloaded.publicEnabled,false)
+  const row=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:target.id},include:{items:true}})
+  assert.deepEqual(row.tags,combo.tags);assert.ok(row.items.every((x:any)=>x.scaleId===null))
+  assert.equal(row.reportPackageKey,null);assert.equal(row.analysisProtocolKey,null)
+  combinations.push({key:combo.key,id:row.id,status:row.status,nativeRevision:row.revision,items:row.items.length,tags:row.tags,reportMode:'COLLECTION_ONLY'})
+ }
+ assert.equal(imported.length,15);assert.equal(sourceFields,54)
+ const evidence={status:'PASS',scope:'actual native Form API create/add/read, owned DRAFT tag metadata, three ordinary combination imports and Form answer boundaries',database:'isolated disposable loopback PostgreSQL16.15 / eduk12_talis24_test',schemaPreparation:'current Prisma schema db push, not migration/deployment validation',fixture:'synthetic teacher; no real respondents; no Attempt/FINAL/access token or public delivery',nativeForms:imported,combinations,sourceFields,answerChecks:imported.reduce((n,x)=>n+x.answerChecks,0),scoringExecutions:0,reportRendering:'NOT_EXECUTED_UNSCORED_FORMS',fieldTagLimitation:'FORM_TEMPLATE tag editor/API not supported on current main; fixture writes existing tags column only under owner+DRAFT restriction; ordinary QUESTIONNAIRE tags use existing updateCatalogTags',nativePayloadSha256:createHash('sha256').update(readFileSync(file)).digest('hex')}
+ writeFileSync(out,JSON.stringify(evidence,null,2)+'\n')
+ console.log(JSON.stringify({status:evidence.status,forms:15,combinations:3,answerChecks:evidence.answerChecks,sourceFields,scoringExecutions:0}))
+}
+main().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>prisma.$disconnect())

@@ -1,0 +1,5 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+TEXT,本次记录编号/课程与年级/日期（勿填学生姓名）,false,,,,,,,,,,,,,
+MULTIPLE,选择本次想关注的专题（可只选一个）,false,T01 目标与任务对得上||T02 内容准确，概念连得起来||T03 保留解释、比较与论证||T04 给到支架，也逐步放手||T05 每个人都有适切的参与机会||T06 学生有选择，也能解释和负责||T07 用证据弄清学生懂在哪里||T08 让反馈变成修改、重试与调整||T09 尊重错误、保护安全表达||T10 合作中有解释、回应和互助||T11 转换有效，时间留给学习||T12 规则清楚，回应帮助回到学习,,,,,,,,,,,,
+LONG_TEXT,学生要学会什么？目前最想弄清的一个困难是什么？,false,,,,,,,,,,,,,
+LONG_TEXT,可选：准备在哪个环节、看哪些学生产出；有哪些资源或时间限制？,false,,,,,,,,,,,,,

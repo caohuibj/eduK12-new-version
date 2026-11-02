@@ -1,0 +1,327 @@
+{
+  "reviewedAt": "2026-11-02T00:32:27.184425+00:00",
+  "repository": "caohuibj/eduK12-new-version",
+  "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "officialRetrievals": [
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5standard-form.docx",
+      "bytes": 73228,
+      "sha256": "4e6f75731b8f31a32cdeef0eb078735794d68e0cdcb50208f4bd90e5479d1123",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5short-form.docx",
+      "bytes": 64489,
+      "sha256": "361fe64404893ac64b9d8c9268f05902795ba4073a1c905c3294a468e34e1139",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-i.docx",
+      "bytes": 62408,
+      "sha256": "3eb360afbff14a1e237f9f0b65656524a93b6748948adbab6c1e3d5b9ba92436",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-ii.docx",
+      "bytes": 61659,
+      "sha256": "ea5a1eef4fce78a6a6578f947c61c5d3f48579189cb6b93eeef4afd907cc92ac",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-i-ii.docx",
+      "bytes": 62181,
+      "sha256": "3adf250d2424648bc30c5f3426b9f41e09f35ec22b4f8bca4f9cfa8152e9b31b",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5admin-protocol.docx",
+      "bytes": 55910,
+      "sha256": "2f23775047112842d010fe7f9bd05a412abf0e31500b5ca4647d5867163435fb",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12standard-form.docx",
+      "bytes": 80354,
+      "sha256": "2bc62c1c2b28e32922186d1c165722f2a39348f7835a14b458bacb67a5700448",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12short-form.docx",
+      "bytes": 70283,
+      "sha256": "8bb9205ea956afc3ac70ca8b3ab28dc033afd319312eb83865d39389e90a8686",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12mini-form-i.docx",
+      "bytes": 61792,
+      "sha256": "bb3411253ed01280586fb93abf17faf124caa57bdb96581dfe84f3626002db02",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12mini-form-ii.docx",
+      "bytes": 62606,
+      "sha256": "786c83673831ac6cedbed922047be83a16759946c321a83b927056e9b1d4ee61",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12mini-form-i-ii.docx",
+      "bytes": 62679,
+      "sha256": "b787962cbe3031b36c372ba13793bd7660a757f7ba9ea349870f2aa9efa2ed4f",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g6-12admin-protocol.docx",
+      "bytes": 55097,
+      "sha256": "753725c2a719ca5743fdfc1ff16b34791c1a6d4b42c6d25d96081f027ec6eb3c",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-standard-form.docx",
+      "bytes": 92902,
+      "sha256": "c06e039047483bf362db3f34c926aad2b01a329ff47a1edbc53419568bfc4197",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-short-form.docx",
+      "bytes": 77499,
+      "sha256": "c549fa2f208ec426a615e67a0bf0075fdf58f7ab4055d743b211e0855993a797",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/staff-admin-protocol.docx",
+      "bytes": 49491,
+      "sha256": "f01ba27618c5b75593e3885b3bd6f94fd4098cf0b1605c1f45c18185f93da97d",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/k-2-discussion-protocol.docx",
+      "bytes": 77057,
+      "sha256": "c079aa123091425556513c58e781aaacb790d0f946f2d1e273d76d6c945338ed",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/2014sfs-techreport.docx",
+      "bytes": 2997728,
+      "sha256": "985133992dc30b8d22fe3bb4709df2c2fdf9232e31add2950edebe35a92afe3b",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/surveys.html",
+      "bytes": 51068,
+      "sha256": "fc1128e369ff40903877bf702b440800087b1743ec5c256b4f18dfa8f0500104",
+      "status": "retrieved"
+    },
+    {
+      "url": "https://www.mass.gov/policy-statement/permissions-to-reproduce-content-or-images",
+      "bytes": 183436,
+      "sha256": "f92a0c3a8209fb902f80ee205f359341fc845ba7a0f69fbf2eaf938c35198cd5",
+      "status": "retrieved"
+    }
+  ],
+  "dedup": {
+    "scope": "Tracked baseline Scale source.json and instrument.ts; institution/name/domain/version metadata, normalized complete formal DOCX table-row question text against JSON string values and inline instrument TS text; open PR titles, branches and changed filenames. No production DB audit.",
+    "baselineSourceJSONCount": 235,
+    "baselineInstrumentTSCount": 258,
+    "keywords": "massachusetts|\\bDESE\\b|doe\\.mass\\.edu|model (?:student|staff) feedback|g3-5standard|g6-12standard|WestEd",
+    "keywordHitPaths": [],
+    "openPRs": [
+      {
+        "number": 540,
+        "head": "744d9aa5cd6431f56869a3f424d9baaacbe4063d",
+        "changedFileCount": 25
+      },
+      {
+        "number": 539,
+        "head": "0ef13277b8634dcde2fa2e7446486a13c61206b5",
+        "changedFileCount": 100
+      },
+      {
+        "number": 538,
+        "head": "c6c415436ed3ff6f3de2cdf320b7c160cc4fd489",
+        "changedFileCount": 33
+      },
+      {
+        "number": 537,
+        "head": "46ff029d9cca20b221208e85257b5fa482eaefa3",
+        "changedFileCount": 17
+      },
+      {
+        "number": 529,
+        "head": "cff8728f67818a28b9ab0a2189c30040470dbd6b",
+        "changedFileCount": 5
+      },
+      {
+        "number": 515,
+        "head": "70a6b3bc54e30c95c35733a705c6350f929d2a6d",
+        "changedFileCount": 6
+      },
+      {
+        "number": 491,
+        "head": "290aa955a3445bcb0b519829423e626d044a2fc1",
+        "changedFileCount": 4
+      },
+      {
+        "number": 489,
+        "head": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28",
+        "changedFileCount": 3
+      },
+      {
+        "number": 488,
+        "head": "0c526f0529ab47c0054f9470d0bb9217e1d787a5",
+        "changedFileCount": 3
+      },
+      {
+        "number": 482,
+        "head": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8",
+        "changedFileCount": 100
+      },
+      {
+        "number": 441,
+        "head": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5",
+        "changedFileCount": 100
+      },
+      {
+        "number": 413,
+        "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65",
+        "changedFileCount": 15
+      },
+      {
+        "number": 412,
+        "head": "4d79bc45d607f8e771eccfacc49a7558b8a3985e",
+        "changedFileCount": 1
+      },
+      {
+        "number": 397,
+        "head": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d",
+        "changedFileCount": 2
+      },
+      {
+        "number": 383,
+        "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f",
+        "changedFileCount": 5
+      },
+      {
+        "number": 379,
+        "head": "333200ade0c6cb42130cbc052189ba9c64691a12",
+        "changedFileCount": 100
+      },
+      {
+        "number": 375,
+        "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792",
+        "changedFileCount": 100
+      },
+      {
+        "number": 373,
+        "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53",
+        "changedFileCount": 61
+      },
+      {
+        "number": 371,
+        "head": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+        "changedFileCount": 100
+      },
+      {
+        "number": 370,
+        "head": "bfd6dcbca24567219ec24979481f3da8e0137984",
+        "changedFileCount": 66
+      },
+      {
+        "number": 368,
+        "head": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+        "changedFileCount": 100
+      },
+      {
+        "number": 367,
+        "head": "8e4440cac46086f73390f8774c40853beb9a6ddd",
+        "changedFileCount": 100
+      },
+      {
+        "number": 362,
+        "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1",
+        "changedFileCount": 9
+      },
+      {
+        "number": 360,
+        "head": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+        "changedFileCount": 100
+      },
+      {
+        "number": 330,
+        "head": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+        "changedFileCount": 15
+      },
+      {
+        "number": 329,
+        "head": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+        "changedFileCount": 62
+      },
+      {
+        "number": 328,
+        "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+        "changedFileCount": 73
+      }
+    ],
+    "openPRKeywordHits": [],
+    "productionDatabase": "NOT_ACCESSED",
+    "administratorCustomTools": "NOT_VERIFIED",
+    "formalQuestionComparisons": 285,
+    "formalQuestionCounts": [
+      {
+        "officialFile": "g3-5standard-form.docx",
+        "formalQuestionCount": 40
+      },
+      {
+        "officialFile": "g3-5short-form.docx",
+        "formalQuestionCount": 20
+      },
+      {
+        "officialFile": "g3-5mini-form-i.docx",
+        "formalQuestionCount": 8
+      },
+      {
+        "officialFile": "g3-5mini-form-ii.docx",
+        "formalQuestionCount": 10
+      },
+      {
+        "officialFile": "g3-5mini-form-i-ii.docx",
+        "formalQuestionCount": 12
+      },
+      {
+        "officialFile": "g6-12standard-form.docx",
+        "formalQuestionCount": 45
+      },
+      {
+        "officialFile": "g6-12short-form.docx",
+        "formalQuestionCount": 20
+      },
+      {
+        "officialFile": "g6-12mini-form-i.docx",
+        "formalQuestionCount": 8
+      },
+      {
+        "officialFile": "g6-12mini-form-ii.docx",
+        "formalQuestionCount": 10
+      },
+      {
+        "officialFile": "g6-12mini-form-i-ii.docx",
+        "formalQuestionCount": 12
+      },
+      {
+        "officialFile": "staff-standard-form.docx",
+        "formalQuestionCount": 65
+      },
+      {
+        "officialFile": "staff-short-form.docx",
+        "formalQuestionCount": 35
+      }
+    ],
+    "exactQuestionHitPaths": [],
+    "itemComparisonLimitations": "Whitespace/punctuation normalized equality against JSON string values and contiguous normalized instrument.ts text; not semantic equivalence of translations or production custom items. Official texts and item keys also read manually."
+  },
+  "rights": {
+    "status": "UNRESOLVED_FOR_PUBLIC_EDITABLE_REDISTRIBUTION",
+    "desePage": "District use/adaptation is described; not inferred to authorize this platform public editable distribution or paid use.",
+    "linkedPolicy": "DESE links an EOHHS policy requiring unaltered and free redistribution; scope applicability to these editable instruments remains unresolved.",
+    "technicalReport": "Explicit attributed non-commercial educational copying permission for that report; acknowledgements include third-party TRIPOD and ESSCES items. Not treated as blanket current-instrument translation/commercial permission."
+  }
+}

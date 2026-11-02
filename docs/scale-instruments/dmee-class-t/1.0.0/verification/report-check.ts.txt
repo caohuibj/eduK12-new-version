@@ -1,0 +1,11 @@
+import fs from 'node:fs'
+import {strict as assert} from 'node:assert'
+import {prisma} from '/workspace/dmee-class-t/server-version/backend/src/config/database'
+import {typedFormPresentation} from '/workspace/dmee-class-t/server-version/backend/src/modules/reporting/typed-form-presentation'
+import {mapCompositeSection} from '/workspace/dmee-class-t/server-version/backend/src/modules/assessment-runtime/form-section-definition'
+import {updateCatalogTags} from '/workspace/dmee-class-t/server-version/backend/src/modules/training-catalog/tags'
+const file='/workspace/dmee-class-t/docs/scale-instruments/dmee-class-t/1.0.0/verification/isolated-import.json'
+async function main(){const evidence=JSON.parse(fs.readFileSync(file,'utf8'));const results=[]
+for(const r of evidence.results){const row=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:r.id},include:{formSections:{include:{items:true}}}});const s=mapCompositeSection(row.formSections[0]);const first=s.items[0];for(const value of ['frequency_7','frequency_1',null]){const p=typedFormPresentation(first,value);assert.equal(p.typedValue,value);assert.equal(p.presentation.options.length,7);assert(!('score'in p));}results.push({key:r.key,states:['frequency_7','frequency_1','missing_null'],nativePresentation:'PASS',score:null});if(results.length===1){await assert.rejects(updateCatalogTags({userId:row.createdBy!,role:'TEACHER'},row.id,{kind:'COLLECTION',tags:['family:dmee-class-t'],expectedTags:[]}));assert.deepEqual((await prisma.compositeAssessment.findUniqueOrThrow({where:{id:row.id}})).tags,r.tags)}}
+fs.writeFileSync(file.replace('isolated-import.json','report-presentation.json'),JSON.stringify({checkedAt:new Date().toISOString(),scope:'Existing typedFormPresentation on persisted native items; high/low frequency labels and null remain descriptive facts; no scoring reports generated',results,staleTagCASRejected:true},null,2)+'\n');console.log(JSON.stringify({forms:results.length,reportPresentationCases:results.length*3,scoringReports:0,staleTagCASRejected:true}))}
+main().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await prisma.$disconnect();process.exit(process.exitCode??0)})

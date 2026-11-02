@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-11-02T01:02:54.150Z",
+  "results": [
+    {
+      "key": "dmee_class_t_orientation_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_structuring_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_questioning_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_modeling_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_application_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_learning_environment_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_assessment_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    },
+    {
+      "key": "dmee_class_t_differentiation_teacher_self_en",
+      "schema": "PASS",
+      "registry": "PASS",
+      "scoreRuntime": false
+    }
+  ],
+  "initialAuthoringCorrection": "An initial local candidate used unsupported localization adaptationMethod TRANSLATION; existing validator rejected it. Corrected to existing DIRECT_TRANSLATION before final validation. No shared schema changed."
+}

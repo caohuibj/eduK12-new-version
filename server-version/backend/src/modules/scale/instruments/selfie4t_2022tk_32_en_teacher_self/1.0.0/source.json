@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "selfie4t_2022tk_32_en_teacher_self",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "SELFIEforTEACHERS｜32项母工具与六区组合索引｜教师自评｜2022 Toolkit英文固定版",
+      "abbreviation": "SELFIE4T32-2022TK",
+      "instrumentFamily": "SELFIEforTEACHERS 32-item tool, fixed 2022 Toolkit; NOT DigCompEdu Check-In22 or school SELFIE"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "Mother-tool index for32 original digital competence self-reflection items grouped into six native area units. No executable mother score or cross-unit total in this record.",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "family:selfie4t",
+        "role:teacher_self",
+        "stage:primary_sec",
+        "locale:en",
+        "version:2022tk1",
+        "use:reflection",
+        "license:CCBY4",
+        "pilot",
+        "source:JRC129699",
+        "catalog:mother"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Adult primary/secondary teachers; fixed English public Toolkit, not a claim about the login-only current online version."
+    },
+    "administration": {
+      "itemCount": 32,
+      "estimatedMinutes": 25,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Current professional digital practice; no fixed recall window verified.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Mother metadata only. Use the existing ordinary-composite recipe to keep all32 competences in original order.",
+        "Six areas have9,5,5,3,4,6 items. Each competence has six original A1–C2 statements plus the separate0-point not-aware option.",
+        "2022 Toolkit complete item wording; official2023 report p.11/Annex1 per-item mapping. No silent repair of the2023 chapter4 omission at6.5.",
+        "The original whole-tool192-point bands are documented as provenance only and are not computed across the split tools."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Index and ordinary-composite preparation, not a separate executable scale."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text).",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Metadata only; exact current online text and validated Chinese adaptation not verified."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "SELFIEforTEACHERS fixed 2022 English Toolkit Annex I (32 competences); official 2023 per-item scoring",
+      "citation": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text). Scoring/awareness option: Economou, A. (2023). SELFIEforTEACHERS. Designing and developing a self-reflection tool for teachers’ digital competence. doi:10.2760/561258, JRC131282, p.11 and Annex 1 p.92 (PDF page96).",
+      "url": "https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+      "publicationYear": 2022
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Professional engagement",
+        "Digital resources",
+        "Teaching and learning",
+        "Assessment",
+        "Empowering learners",
+        "Facilitating learners’ digital competence"
+      ],
+      "limitations": [
+        "Six native area units report32 item-level positions; no cross-area total or whole-tool band is computed.",
+        "Original English fixed-source content does not establish an independently validated Chinese or current online version."
+      ],
+      "disclaimer": "Mother metadata only; native child units are separately identified DRAFT project digital packages."
+    },
+    "blockers": [
+      "NO_EXECUTABLE_MOTHER_BY_DESIGN",
+      "USE_EXISTING_ORDINARY_COMPOSITE_RECIPE"
+    ]
+  }
+}

@@ -1,0 +1,421 @@
+{
+  "requestId": "104c6589-695b-550a-8dc9-20e2a1df9d7f",
+  "toolKey": "mass_inclusive_practice_part_b_en",
+  "version": "0.1.0",
+  "title": "Massachusetts Inclusive Practice｜B·Power Elements 实施状态｜教师自评｜EN·2017指南无分表单",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "mass_b_1",
+        "title": "Child and Adolescent Development (I-A-2)",
+        "description": "© 2017 Massachusetts Department of Elementary and Secondary Education. Reproduced for non-commercial educational purposes with attribution under the permission in the official Guidebook. Commercial embedding and translation permission are not established. Digital transcription for teacher reflection. You may leave any field blank. No score is calculated. Use de-identified evidence; do not enter student names or identifying case details. Narrative fields have a project technical limit of 2000 characters. This is not a signed evaluation form. Standard I: Curriculum, Planning, and Assessment\nProficient Descriptor and Inclusive Practice Examples\nDemonstrates knowledge of the developmental levels of students in the classroom and the different ways these students learn by providing differentiated learning experiences that enable all students to progress toward meeting intended outcomes.\n• Designs the developmentally appropriate learning environment to support all students’ learning by facilitating various learning activities, integrating multiple opportunities for student action and expression, and collaboration with peers.",
+        "questions": [
+          {
+            "itemKey": "mass_b_1_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_1_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_2",
+        "title": "Variety of Assessment Methods (I-B-1)",
+        "description": "Standard I: Curriculum, Planning, and Assessment\nProficient Descriptor and Inclusive Practice Examples\nDesigns and administers a variety of informal and formal methods and assessments, including common interim assessments, to measure each student’s learning, growth, and progress toward achieving state/local standards.\n• Conducts frequent checks for student understanding and uses data to drive instruction\n• Provides multiple and varied options for student communication and expression to demonstrate understanding and build fluency",
+        "questions": [
+          {
+            "itemKey": "mass_b_2_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_2_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_3",
+        "title": "Adjustment to Practice (I-B-2)",
+        "description": "Standard I: Curriculum, Planning, and Assessment\nProficient Descriptor and Inclusive Practice Examples\nOrganizes and analyzes results from a variety of assessments to determine progress toward intended outcomes and uses these findings to adjust practice and identify and/or implement appropriate differentiated interventions and enhancements for students.\n• Ensures assessments are accessible such that all students’ knowledge can be demonstrated and accurately captured\n• Provides frequent and varied feedback and positive reinforcement to student responses",
+        "questions": [
+          {
+            "itemKey": "mass_b_3_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_3_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_4",
+        "title": "Meeting Diverse Needs (II-A-3)",
+        "description": "Standard II: Teaching All Students\nProficient Descriptor and Inclusive Practice Examples\nUses appropriate practices, including tiered instruction and scaffolds, to accommodate differences in learning styles, needs, interests, and levels of readiness, including those of students with disabilities and English learners.\n• Identifies and removes curricular and/or instructional barriers to student learning\n• Familiarizes themselves with student learning profiles (IEPs, 504s, WIDA report cards) and uses information to guide instruction\n• Utilizes evidence based practices and district supports (UDL, PBIS, SEL, SEI, DCAP)",
+        "questions": [
+          {
+            "itemKey": "mass_b_4_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_4_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_5",
+        "title": "Safe Learning Environment (II-B-1)",
+        "description": "Standard II: Teaching All Students\nProficient Descriptor and Inclusive Practice Examples\nUses rituals, routines, and appropriate responses that create and maintain a safe physical and intellectual environment.\n• Promotes academic risk taking\n• Utilizes preventative measures to minimize behaviors that interfere with learning.\n• Fosters collaboration and community by creating an accepting and supportive classroom climate that is sensitive to individual learner profiles\n• Creates a nonthreatening, positive, and academically rigorous atmosphere and integrated with other important initiatives",
+        "questions": [
+          {
+            "itemKey": "mass_b_5_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_5_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_6",
+        "title": "Access to Knowledge (II-D-3)",
+        "description": "Standard II: Teaching All Students\nProficient Descriptor and Inclusive Practice Examples\nConsistently adapts instruction, materials, and assessments to make challenging material accessible to all students, including English learners and students with disabilities.\n• Presents curriculum content through multiple means and provides scaffolds and supports for metacognitive processing",
+        "questions": [
+          {
+            "itemKey": "mass_b_6_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_6_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_7",
+        "title": "Two Way Communication (III-C-1)",
+        "description": "Standard III: Family and Community Engagement\nProficient Descriptor and Inclusive Practice Examples\nRegularly uses two-way communication with families about student performance and learning and responds promptly and carefully to communications from families.\n• Establishes a welcoming and family friendly classroom\n• Utilizes multiple means of communication to reach all families\n• Is sensitive to cultural and other demographic considerations when communicating with families",
+        "questions": [
+          {
+            "itemKey": "mass_b_7_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_7_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_8",
+        "title": "Reflective Practice (IV-A-1)",
+        "description": "Standard IV: Professional Culture\nProficient Descriptor and Inclusive Practice Examples\nRegularly reflects on the effectiveness of lessons, units, and interactions with students, both individually and with colleagues, and uses insights gained to improve practice and student learning.\n• Utilizes a variety of approaches to gather information, analyze data, examine issues, set meaningful goals, and develop new approaches in order to improve inclusive practices\n• Regularly assesses all student performance to determine effectiveness of instructional practice",
+        "questions": [
+          {
+            "itemKey": "mass_b_8_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_8_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_b_9",
+        "title": "Shared Responsibility (IV-E-1)",
+        "description": "Standard IV: Professional Culture\nProficient Descriptor and Inclusive Practice Examples\nWithin and beyond the classroom, consistently reinforces school-wide behavior and learning expectations for all students, and contributes to their learning by sharing responsibility for meeting their needs.\n• Collaborates with others to ensure alignment of instructional plans and academic expectations\n• Collaborates with others to align practices, routines, and vocabulary for behavior\n• Shares and discusses student data and problem solves collaboratively",
+        "questions": [
+          {
+            "itemKey": "mass_b_9_status",
+            "type": "SINGLE",
+            "prompt": "In Place Status: (circle one)",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "yes",
+                "label": "Yes"
+              },
+              {
+                "optionKey": "no",
+                "label": "no"
+              },
+              {
+                "optionKey": "partial",
+                "label": "partial"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_b_9_notes",
+            "type": "LONG_TEXT",
+            "prompt": "Notes",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "Faithful English transcription of Massachusetts DESE Tool 2d, for non-commercial educational teacher reflection under the 2017 Guidebook copying permission; original authorship and rights remain with Massachusetts DESE. No scoring or commercial permission claimed. Part A signature workflow is retained in the source, not simulated here.",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot",
+    "language_validation:content_en"
+  ],
+  "reference": {
+    "tags": [
+      "family:mass_inclusive_practice",
+      "role:teacher_self",
+      "stage:k12",
+      "language:en",
+      "source_version:guidebook2017_2d_pdf20261102",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none",
+      "license:noncommercial_educational"
+    ],
+    "source": {
+      "url": "https://www.doe.mass.edu/edeval/guidebook/2d-teacherselfassess.pdf",
+      "pdfSha256": "e5d4ebf240ec79e71df9c30f12aa6cc4ed271a64e4ff3e1eb58b2e057bdd2722",
+      "permissionSource": "https://www.doe.mass.edu/edeval/guidebook/guidebook.docx",
+      "guidebookSha256": "7cdc21aa2882c5216c6b8c1600e1a18771f2e87c44ac1f67eb165dc3d89a6a92",
+      "edition": "2017 Guidebook; 7-page standalone PDF retrieved 2026-11-02, no printed revision number",
+      "locale": "en",
+      "author": "Massachusetts Department of Elementary and Secondary Education",
+      "permission": "copy any or all parts for non-commercial educational purposes with attribution; no commercial authorization claimed",
+      "part": "part_b",
+      "pages": [
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "license": {
+      "scope": "non-commercial educational reproduction only",
+      "attribution": "© 2017 Massachusetts Department of Elementary and Secondary Education. Reproduced for non-commercial educational purposes with attribution under the permission in the official Guidebook. Commercial embedding and translation permission are not established.",
+      "commercialEmbedding": "NOT_AUTHORIZED_BY_THIS_PERMISSION",
+      "translation": "NOT_CLAIMED"
+    },
+    "recipient": "teacher_self_only_under_existing_release_permissions",
+    "scoring": {
+      "mode": "none",
+      "parametersVersion": null,
+      "reportVersion": null
+    },
+    "digitalChanges": [
+      "One source field per native question; page breaks become pages.",
+      "Optional fields and refusal supported by existing Form engine.",
+      "2000-character project technical text limit, not a source scoring or completeness rule.",
+      "Part A signature/date receipt fields are not imported as answer items; existing authorization is unchanged.",
+      "Visible teacher labels are used; hidden administrator labels in DOCX/PDF extraction are excluded.",
+      "No project Chinese translation of source items; Chinese names are catalog metadata only."
+    ]
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "requestId": "7207b7c6-94e8-508d-8133-1844b153e4fa",
+  "toolKey": "sep_klassik_math_m3_teacher_de",
+  "version": "0.1.0",
+  "title": "SEP-Klassik｜数学问题解决｜教师自评｜DE·数学3–6年级·2026-01",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "sep_klassik_math_m3_teacher_de",
+        "title": "Probleme mathematisch lösen",
+        "description": "Source: Institut für Schulqualität des Landes Berlin e.V. (ISQ), SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft, PDF p.4. CC BY-NC-SA 4.0, https://creativecommons.org/licenses/by-nc-sa/4.0/. Digitale Übertragung für nichtkommerzielle Reflexion; unveränderte deutsche Itemtexte, freiwillige Antworten, keine Punktwerte. Änderungen: Modultrennung, technische Itemschlüssel, optionale Antworten und Verweigerung. Kein validierter chinesischer Fragebogen. Inwieweit stimmen Sie den folgenden Aussagen zu? Dieser Baustein erfasst, in welchem Maße Sie und Ihre Schüler*innen zustimmen, dass Ihr Unterricht Anlässe bietet, um allein oder gemeinsam Lösungen für mathematische Probleme zu erarbeiten oder zu bewerten. Das mathematische Problemlösen beinhaltet beispielsweise das Entwickeln und Nutzen geeigneter Lösungsansätze für problemhaltige Aufgaben (z. B. systematisches Probieren, Rückwärtsarbeiten) oder das Übertragen bekannter Zusammenhänge auf neue Sachverhalte. Trifft Trifft Kann Trifft ich über- Trifft voll Basis- und weiterführende Items bleiben in der ursprünglichen Reihenfolge; die gesamte Modulversion enthält beide Gruppen.",
+        "questions": [
+          {
+            "itemKey": "sep_math_3_1",
+            "type": "SINGLE",
+            "prompt": "Die Schüler*innen können sich aussuchen, wie sie eine Aufgabe lösen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_3_2",
+            "type": "SINGLE",
+            "prompt": "Ich möchte, dass die Schüler*innen eigene Lösungswege und Ideen ausprobieren.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_3_3",
+            "type": "SINGLE",
+            "prompt": "Die Schüler*innen besprechen manchmal mehrere Lösungswege für eine Aufgabe.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_3_4",
+            "type": "SINGLE",
+            "prompt": "Im Unterricht bearbeiten die Schüler*innen auch Aufgaben, bei denen der Lösungsweg nicht sofort zu erkennen ist.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_3_5",
+            "type": "SINGLE",
+            "prompt": "Die Schüler*innen üben Wege, die ihnen helfen, Aufgaben zu lösen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_3_6",
+            "type": "SINGLE",
+            "prompt": "Im Unterricht beschäftigen die Schüler*innen sich mit Aufgaben, die unterschiedliche Lösungswege (z. B. rechnen, probieren, zeichnen oder beschreiben) zulassen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_3_7",
+            "type": "SINGLE",
+            "prompt": "Bei Aufgaben, die die Schüler*innen nicht gleich lösen können, zeige ich ihnen, wie man Hilfsmittel (z. B. Tabelle, Skizze) nutzen kann.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "Attributed non-commercial digital adaptation of the specifically CC BY-NC-SA 4.0 labelled ISQ PDF, distributed under the same license. Only exact original teacher-column items are used; no scored report or validation transfer claimed. No copyrighted portal-only teacher wording is borrowed.",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot"
+  ],
+  "reference": {
+    "tags": [
+      "family:sep_klassik",
+      "role:teacher_self",
+      "language:de",
+      "stage:3-6",
+      "source_version:math_202601",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none",
+      "license:cc_by_nc_sa_4_0"
+    ],
+    "source": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=2026-01/Item%C3%BCbersicht+Mathematik_Eigenperspektive+.pdf",
+      "sha256": "37191c01134456b5c73949c1e897c6607490ea8b4c502fcfb3e7ecef9720ef15",
+      "title": "SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "3-6",
+      "itemCount": 35,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "Cover visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.; DE is the source label, not a claimed separate 4.0 jurisdiction port.",
+      "module": 3,
+      "moduleTitle": "Probleme mathematisch lösen",
+      "page": 4,
+      "sourceItems": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen können sich aussuchen, wie sie eine Aufgabe lösen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Ich möchte, dass die Schüler*innen eigene Lösungswege und Ideen ausprobieren."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen besprechen manchmal mehrere Lösungswege für eine Aufgabe."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Im Unterricht bearbeiten die Schüler*innen auch Aufgaben, bei denen der Lösungsweg nicht sofort zu erkennen ist."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen üben Wege, die ihnen helfen, Aufgaben zu lösen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": "extended",
+          "prompt": "Im Unterricht beschäftigen die Schüler*innen sich mit Aufgaben, die unterschiedliche Lösungswege (z. B. rechnen, probieren, zeichnen oder beschreiben) zulassen."
+        },
+        {
+          "sourceNumber": 7,
+          "tier": "extended",
+          "prompt": "Bei Aufgaben, die die Schüler*innen nicht gleich lösen können, zeige ich ihnen, wie man Hilfsmittel (z. B. Tabelle, Skizze) nutzen kann."
+        }
+      ],
+      "locale": "de"
+    },
+    "license": {
+      "identifier": "CC-BY-NC-SA-4.0",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "author": "Institut für Schulqualität des Landes Berlin e.V. (ISQ)",
+      "adaptationLicense": "CC-BY-NC-SA-4.0",
+      "commercialUse": "NOT_AUTHORIZED",
+      "changes": [
+        "digital format and module split",
+        "optional answering/refusal",
+        "technical identifiers and Chinese catalog names only; no item translation"
+      ]
+    },
+    "respondent": "teacher",
+    "recipient": "teacher_under_existing_authorization",
+    "construct": "teacher self-report of mathematics classroom opportunities",
+    "scoring": {
+      "mode": "none",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "reason": "No complete aggregation and missing-response contract for these digital module versions; for SINUS the positive rewording/coding and first-module direction statement also require clarification. Not a lack-of-norms decision."
+    },
+    "notAuthoritativeIndependentValidation": true
+  }
+}
