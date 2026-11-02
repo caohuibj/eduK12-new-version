@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "eltri29_critical_teacher_en_2018",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "ELTRI-29｜批判反思｜教师自评｜2018英文再刊来源候选",
+      "abbreviation": "ELTRI-29-CRITICAL",
+      "instrumentFamily": "English Language Teaching Reflection Inventory; Akbari et al. 2010, Rahimi & Weisi 2018 Appendix A reproduction"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师英语教学专业反思的自我报告。对教学所处社会环境与公平议题的反思；不是政治立场或师德评级。 不等于课堂教学质量、学生成绩或教师绩效。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "family:eltri29",
+        "role:teacher_self",
+        "school_stage:mixed_education_contexts",
+        "language:en",
+        "subject:english_language_teaching",
+        "edition:akbari2010_reprint2018",
+        "use:research",
+        "maturity:PILOT",
+        "availability:source_candidate",
+        "rights:unconfirmed"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原2010研究涉及伊朗英语教师（学校、机构与高校混合情境）；本题号身份固定为2018研究Appendix A再刊的英文29题，不宣称中国K12或独立子量表施测等值。学生不是本工具填答者。"
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "一般反思实践频率；再刊附录未规定最近一周／一月，不添加统一回顾窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "实际核读2018 Appendix A pp.775–776：本分量原编号23–29，共7题；题文不在本公开目录。",
+        "原作Appendix II表格未在所读HTML中提取；不从42项初稿的删题叙述重建或静默修正最终题本。",
+        "五分量合计29题；本目录拆分仅作来源管理，保留完整原组卷，不宣称各分量独立施测已验证。",
+        "再刊锚点1–5按频率递增；未取得专门计分手册、官方反向或缺失规则。不把因子载荷作为评分权重。",
+        "三分钟为目录估计，不是原文已核施测时长。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只做来源与版本准备；题文提取、电子施测、拆分和再分发权利范围未明确，无可执行原生版本。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Akbari, R., Behzadpoor, F., & Dadvand, B. (2010), System 38(2),211–227, doi:10.1016/j.system.2010.03.003; actual complete item source: Rahimi, M., & Weisi, H. (2018), IIER 28(3),756–780, Appendix A pp.775–776.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文再刊来源身份，不是已验证中文版。原2010 Appendix II完整页面仍需比对；元数据中文标签和反馈编辑不是量表翻译。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Reflective practice, self-efficacy and research practice of EFL teachers: Examining possible relationships — Appendix A, ELTRI reproduction",
+      "citation": "Rahimi, M., & Weisi, H. (2018). Issues in Educational Research,28(3),756–780. Appendix A,775–776. Reproduces Akbari, Behzadpoor & Dadvand (2010), doi:10.1016/j.system.2010.03.003.",
+      "url": "https://www.iier.org.au/iier28/rahimi.pdf",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "批判反思"
+      ],
+      "limitations": [
+        "自报反思频率不等于教学质量或学生学习效果；不设常模、优秀等级或跨分量总分。",
+        "目前无可计算报告或题文公开授权；教师反馈仅为原创编辑草案。",
+        "后续研究的36项道德反思改编不属该29项身份；不能套用其因子或计分。",
+        "原文出现学习风格措辞，不推断固定学习类型，不推荐据此分组或匹配教学。"
+      ],
+      "disclaimer": "来源候选；完整2018再刊题文可读，但原问卷电子化／拆分再分发范围未核。开发／隔离／生产均未导入。"
+    },
+    "blockers": [
+      "QUESTIONNAIRE_EXTRACTION_ADMINISTRATION_REDISTRIBUTION_SCOPE_UNCONFIRMED",
+      "ORIGINAL_2010_APPENDIX_II_PAGE_COMPARISON_PENDING",
+      "OPERATIONAL_SCORING_AND_MISSING_RULES_NOT_VERIFIED"
+    ]
+  }
+}
