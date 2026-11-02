@@ -20,7 +20,7 @@ async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: 
   const composite = parent?.compositeAssessment
   const courseId = parent?.deliveryCourseId ?? composite?.courseId
   if (!composite || !['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
-    || composite.reportPackageKey || composite.analysisProtocolKey || parent?.assignmentRef
+    || parent?.assignmentRef
     || !await isTrainingTaskCourse(db, courseId)) return false
   if (!parent || parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId
     || parent.respondentUserId && parent.respondentUserId !== userId || parent.status !== 'IN_PROGRESS'

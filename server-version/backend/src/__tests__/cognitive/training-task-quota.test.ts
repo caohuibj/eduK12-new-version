@@ -43,6 +43,11 @@ describe('Training participation quotas belong to the delivery task', () => {
     db.cognitiveSession.count.mockResolvedValue(1)
     await expect(admitCognitiveAttempt(tx, 'student', 'task', scope)).rejects.toMatchObject({ statusCode: 409 })
   })
+  it('keeps Training report and analysis selections independent of participation quotas', async () => {
+    parent.compositeAssessment = { ...composite, reportPackageKey: 'fixed-report', analysisProtocolKey: 'fixed-analysis' } as typeof parent.compositeAssessment
+    await admitCognitiveAttempt(tx, 'student', 'task', scope)
+    expect(db.cognitiveSession.count).toHaveBeenCalledWith({ where: { userId: 'student', compositeAttemptId: 'parent', compositeItemId: 'slot' } })
+  })
   it('allows another delivery of the same tool but enforces the parent participation limit', async () => {
     await admitCognitiveAttempt(tx, 'student', 'task', scope)
     parent = { ...makeParent(), id: 'second-parent', compositeAssessmentId: 'second', compositeAssessment: { ...composite, id: 'second' } }
