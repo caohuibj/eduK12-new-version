@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "family": "TFALS",
+  "familyTag": "family:tfals",
+  "projectVersion": "1.0.0",
+  "sourceVersion": "Yan & Pastore 2022 final22",
+  "status": "CATALOG_ONLY_NOT_ADMINISTRABLE",
+  "language": "en",
+  "tags": [
+    "family:tfals",
+    "role:teacher_self",
+    "stage:primary_sec",
+    "lang:en",
+    "version:2022",
+    "use:literacy",
+    "status:pilot",
+    "license:pending"
+  ],
+  "tagsPersistence": "PLANNED_EXISTING_COLLECTION_TAGS_API_NOT_WRITTEN",
+  "parts": [
+    {
+      "key": "tfals_conceptual_teacher_self_en",
+      "name": "TFALS｜概念素养｜教师自评｜2022英文",
+      "version": "1.0.0",
+      "finalAppendixItems": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "analysis27ItemIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8
+      ],
+      "itemCount": 7,
+      "carrier": "SCALE_CANDIDATE_NO_EXECUTABLE"
+    },
+    {
+      "key": "tfals_practical_teacher_self_en",
+      "name": "TFALS｜实践素养｜教师自评｜2022英文",
+      "version": "1.0.0",
+      "finalAppendixItems": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "analysis27ItemIds": [
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "itemCount": 8,
+      "carrier": "SCALE_CANDIDATE_NO_EXECUTABLE"
+    },
+    {
+      "key": "tfals_socio_emotional_teacher_self_en",
+      "name": "TFALS｜社会情绪素养｜教师自评｜2022英文",
+      "version": "1.0.0",
+      "finalAppendixItems": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "analysis27ItemIds": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "itemCount": 7,
+      "carrier": "SCALE_CANDIDATE_NO_EXECUTABLE"
+    }
+  ],
+  "optionalComposite": {
+    "kind": "COLLECTION",
+    "status": "PLANNED_NOT_CREATED",
+    "parts": [
+      "tfals_conceptual_teacher_self_en",
+      "tfals_practical_teacher_self_en",
+      "tfals_socio_emotional_teacher_self_en"
+    ],
+    "administration": "full22 original order preferred",
+    "crossToolTotalScore": false
+  },
+  "forms": [],
+  "notImported": [
+    "author English booklet: HTTP503",
+    "author Chinese booklet: entry known, file not retrieved",
+    "restricted original item text",
+    "Rasch individual scoring calibration",
+    "TFAPS10 separate family"
+  ],
+  "actualImport": {
+    "catalogDeclarations": 3,
+    "scales": 0,
+    "forms": 0,
+    "questionnaires": 0,
+    "developmentDB": "NOT_WRITTEN",
+    "productionDB": "NOT_ACCESSED"
+  }
+}

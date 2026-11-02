@@ -1,0 +1,56 @@
+{
+  "checkedAt": "2026-11-02T01:17:10.905Z",
+  "results": [
+    {
+      "key": "tfals_conceptual_teacher_self_en",
+      "version": "1.0.0",
+      "itemCount": 7,
+      "schema": "PASS",
+      "registry": "PASS",
+      "nativePreview": "PASS_NO_ACTIVATION",
+      "scoreRuntime": false,
+      "blockers": [
+        "AUTHOR_BOOKLET_UNAVAILABLE_HTTP_503",
+        "INDIVIDUAL_SCORING_CONTRACT_NOT_VERIFIED",
+        "PLATFORM_USE_AND_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED"
+      ]
+    },
+    {
+      "key": "tfals_practical_teacher_self_en",
+      "version": "1.0.0",
+      "itemCount": 8,
+      "schema": "PASS",
+      "registry": "PASS",
+      "nativePreview": "PASS_NO_ACTIVATION",
+      "scoreRuntime": false,
+      "blockers": [
+        "AUTHOR_BOOKLET_UNAVAILABLE_HTTP_503",
+        "INDIVIDUAL_SCORING_CONTRACT_NOT_VERIFIED",
+        "PLATFORM_USE_AND_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED"
+      ]
+    },
+    {
+      "key": "tfals_socio_emotional_teacher_self_en",
+      "version": "1.0.0",
+      "itemCount": 7,
+      "schema": "PASS",
+      "registry": "PASS",
+      "nativePreview": "PASS_NO_ACTIVATION",
+      "scoreRuntime": false,
+      "blockers": [
+        "AUTHOR_BOOKLET_UNAVAILABLE_HTTP_503",
+        "INDIVIDUAL_SCORING_CONTRACT_NOT_VERIFIED",
+        "PLATFORM_USE_AND_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED"
+      ]
+    }
+  ],
+  "reportDraftCases": 9,
+  "reportCheck": "MANUAL_CASE_REVIEW_AND_CONTENT_ASSERTIONS_ONLY",
+  "notTested": [
+    "runtime scored reports",
+    "DB import",
+    "English/Chinese original booklet equivalence",
+    "scientific review",
+    "production duplicates"
+  ]
+}

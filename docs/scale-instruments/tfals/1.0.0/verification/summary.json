@@ -1,0 +1,45 @@
+{
+  "status": "PASS_LIMITED_CATALOG_PREPARATION",
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "scope": "Three TFALS metadata-only catalog candidates plus generated registry and documentation",
+  "requiredChecks": [
+    "Three candidate schema/registry/native preview",
+    "Generated index freshness",
+    "Selected Scale intake checker on frozen Git HEAD",
+    "Changed-path classifier on same Git HEAD"
+  ],
+  "localCompleted": {
+    "candidateCheck": "PASS_3_NO_EXECUTABLE_NO_ACTIVATION",
+    "generatedIndex": "PASS",
+    "reportDraftReview": "9 contextual examples, manual review plus limited content assertions; not runtime report verification"
+  },
+  "execution": [
+    "copy verification/check-candidates.ts.txt to .tfals-check.ts in repo root",
+    "server-version/backend/node_modules/.bin/tsx .tfals-check.ts",
+    "npm run scale:instruments:check (backend cwd)",
+    "SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<actual HEAD> node --import ./server-version/backend/node_modules/tsx/dist/loader.mjs server-version/backend/scripts/scale-intake-selected-check.ts",
+    "SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<actual HEAD> node .github/scripts/scale-intake-scope.mjs"
+  ],
+  "environment": {
+    "lockSHA256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "schemaSHA256": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "dependencies": "reused existing backend node_modules matching unchanged lock; temporary symlink removed before commit; no new dependency install"
+  },
+  "failuresRetained": [
+    {
+      "action": "initial generator invocation",
+      "outcome": "exit127 tsx not found",
+      "reason": "temporary dependency symlink was attempted relative to wrong working directory",
+      "correction": "created symlink at actual backend cwd; generator exit0 and subsequent freshness check exit0"
+    }
+  ],
+  "notExecuted": [
+    "isolated database import: original platform content rights not established, no fake fixture",
+    "runtime scores/report activation: no executable",
+    "full frontend/backend/platform CI: unaffected",
+    "production/admin custom-tool deduplication",
+    "independent scientific/human approval",
+    "merge/deployment"
+  ],
+  "ci": "Local validation is not CI. Draft workflow results must be read separately; no skip-ci marker."
+}
