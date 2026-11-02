@@ -80,6 +80,36 @@ test('builtin static SCALE slots cover literals, local observer factory and unre
  assert.deepEqual(checkSelectedBuiltinDependencies([value],{'other.ts':literal.replace(value.identity.instrumentVersion,'99.0.0')}),[])
 })
 
+test('actual CHEXI imported identity is unrelated to an empty or different selection and still checks a selected CHEXI', () => {
+ const file='server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts'
+ const text=readFileSync(resolve(repo,file),'utf8'),read=(path:string)=>readFileSync(resolve(repo,path),'utf8')
+ assert.deepEqual(checkSelectedBuiltinDependencies([],{[file]:text},read),[])
+ assert.deepEqual(checkSelectedBuiltinDependencies([source()],{[file]:text},read),[])
+ const selected=source();selected.identity={instrumentKey:'chexi_zh_hans',instrumentVersion:'1.0.0'}
+ selected.executable.definition.scoring.scores=['working_memory','inhibition'].map(key=>({...selected.executable.definition.scoring.scores[0],key}))
+ assert.deepEqual(checkSelectedBuiltinDependencies([selected],{[file]:text},read),[`${file}:chexi_zh_hans@1.0.0`])
+ assert.throws(()=>checkSelectedBuiltinDependencies([selected],{[file]:text.replace("valueSelectors: ['working_memory', 'inhibition']","valueSelectors: ['unknown']")},read),/BUILTIN_SCALE_SELECTOR/)
+ assert.throws(()=>checkSelectedBuiltinDependencies([selected],{[file]:text},()=>"export const CHEXI_IDENTITY = dynamicIdentity()"),/STATIC_UNRESOLVED/)
+})
+
+test('arrow and declaration factories resolve their own parameters, independently of imported constant properties', () => {
+ const value=source(),key=value.executable.definition.scoring.scores[0].key
+ const slot=`{unitType:'SCALE',instrumentKey:input.instrumentKey,instrumentVersion:'1.0.0',valueSelectors:input.valueSelectors}`
+ for(const declaration of [`const observer = (input: Input) => wrap({slots:[${slot}]})`,`function observer(input: Input) { return wrap({slots:[${slot}]}) }`]){
+  const text=declaration+`;observer({instrumentKey:'${value.identity.instrumentKey}',valueSelectors:['${key}']})`
+  assert.equal(checkSelectedBuiltinDependencies([value],{'factory.ts':text}).length,1)
+  assert.throws(()=>checkSelectedBuiltinDependencies([value],{'factory.ts':text.replace(`['${key}']`,'unknownSelectors')}),/STATIC_UNRESOLVED/)
+ }
+ const imported=`import { ID as shared } from './identity';function observer(input: Input) { return wrap({slots:[{unitType:'SCALE',instrumentKey:shared.instrumentKey,instrumentVersion:shared.instrumentVersion,valueSelectors:input.valueSelectors}]}) }`
+ const read=()=>`export const ID = {instrumentKey:'${value.identity.instrumentKey}',instrumentVersion:'1.0.0'} as const`
+ assert.equal(checkSelectedBuiltinDependencies([value],{'factory.ts':imported+`;observer({valueSelectors:['${key}']})`},read).length,1)
+ assert.throws(()=>checkSelectedBuiltinDependencies([value],{'factory.ts':imported},read),/factory-calls/)
+ assert.deepEqual(checkSelectedBuiltinDependencies([value],{'factory.ts':imported},()=>"export const ID = {instrumentKey:'unrelated',instrumentVersion:'1.0.0'} as const"),[])
+ assert.throws(()=>checkSelectedBuiltinDependencies([value],{'factory.ts':imported.replace('return wrap','const shared = unknownIdentity; return wrap')},read),/constant-shadow/)
+ const unknown=`const observer = function(input: Input) { return wrap({slots:[${slot}]}) };observer({instrumentKey:'${value.identity.instrumentKey}',valueSelectors:['${key}']})`
+ assert.throws(()=>checkSelectedBuiltinDependencies([value],{'unknown.ts':unknown}),/factory-shape/)
+})
+
 test('same-axis source snapshot rejects unversioned catalog description rewrite', () => {
  const old=source(),next=source()
  next.catalog.construct.constructDefinition+=' clarified'

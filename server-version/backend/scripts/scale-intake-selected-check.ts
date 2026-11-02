@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { dirname, resolve } from 'node:path'
+import { dirname, posix, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import ts from 'typescript'
 import { inspectScaleContent } from './scale-onboarding-check.mjs'
@@ -229,12 +229,14 @@ export function checkSelectedBundleDependencies(sources: ScaleInstrumentSourceV1
 }
 
 /** Static built-in slot extraction only: no bundle/engine module is imported.
- * Handles literal slots and the existing local observerBundle({ ... }) factory
- * by following its explicit literal argument properties, never evaluating TS.
+ * Handles literal slots, local factories and imported literal identity objects
+ * by following their explicit properties in exact-head text, never evaluating TS.
  * Unresolved slot shapes fail closed to the broader content lane.
  */
-export function checkSelectedBuiltinDependencies(sources: ScaleInstrumentSourceV1[], files: Record<string, string>) {
+export function checkSelectedBuiltinDependencies(sources: ScaleInstrumentSourceV1[], files: Record<string, string>, read: (file: string) => string | undefined = file => files[file]) {
   const checked: string[] = []
+  if (!sources.length) return checked
+  const importedTrees = new Map<string, ts.SourceFile>()
   for (const [file, text] of Object.entries(files)) {
     const tree = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true)
     const nodes: ts.Node[] = []
@@ -247,6 +249,36 @@ export function checkSelectedBuiltinDependencies(sources: ScaleInstrumentSourceV
       return prop && ts.isPropertyAssignment(prop) ? prop.initializer : undefined
     }
     const unresolved = (detail: string): never => { throw new Error(`BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:${file}:${detail}`) }
+    const unwrap = (value: ts.Expression): ts.Expression => ts.isAsExpression(value) || ts.isSatisfiesExpression(value) || ts.isParenthesizedExpression(value)
+      ? unwrap(value.expression) : value
+    const importedProperty = (value: ts.PropertyAccessExpression) => {
+      if (!ts.isIdentifier(value.expression)) return unresolved('constant-property')
+      const localName = value.expression.text
+      // A shadowed import is not evidence for the slot's identity.
+      if (nodes.some(node => (ts.isVariableDeclaration(node) || ts.isParameter(node)) && ts.isIdentifier(node.name) && node.name.text === localName)) unresolved('constant-shadow')
+      const imports = tree.statements.filter(ts.isImportDeclaration).flatMap(statement => {
+        const bindings = statement.importClause?.namedBindings
+        if (statement.importClause?.isTypeOnly || !bindings || !ts.isNamedImports(bindings) || !ts.isStringLiteral(statement.moduleSpecifier)) return []
+        return bindings.elements.filter(binding => !binding.isTypeOnly && binding.name.text === localName)
+          .map(binding => ({ module: (statement.moduleSpecifier as ts.StringLiteral).text, name: (binding.propertyName ?? binding.name).text }))
+      })
+      if (imports.length !== 1 || !imports[0].module.startsWith('.')) return unresolved('constant-import')
+      const moduleFile = posix.normalize(posix.join(posix.dirname(file), imports[0].module + '.ts'))
+      if (!importedTrees.has(moduleFile)) {
+        let text: string | undefined
+        try { text = read(moduleFile) } catch { return unresolved('constant-source') }
+        if (typeof text !== 'string') return unresolved('constant-source')
+        importedTrees.set(moduleFile, ts.createSourceFile(moduleFile, text, ts.ScriptTarget.Latest, true))
+      }
+      const declarations = importedTrees.get(moduleFile)!.statements.filter(ts.isVariableStatement)
+        .filter(statement => (statement.declarationList.flags & ts.NodeFlags.Const) && statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword))
+        .flatMap(statement => statement.declarationList.declarations)
+        .filter(declaration => ts.isIdentifier(declaration.name) && declaration.name.text === imports[0].name)
+      if (declarations.length !== 1 || !declarations[0].initializer) return unresolved('constant-declaration')
+      const object = unwrap(declarations[0].initializer!)
+      if (!ts.isObjectLiteralExpression(object) || object.properties.some(ts.isSpreadAssignment)) return unresolved('constant-object')
+      return property(object, value.name.text)
+    }
     for (const node of nodes) {
       if (!ts.isPropertyAssignment(node) || !(ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) || node.name.text !== 'slots') continue
       if (!ts.isArrayLiteralExpression(node.initializer)) unresolved('slots-array')
@@ -258,28 +290,34 @@ export function checkSelectedBuiltinDependencies(sources: ScaleInstrumentSourceV
         if ((unit as ts.StringLiteral).text !== 'SCALE') continue
         if (slot.properties.some(p => ts.isSpreadAssignment(p))) unresolved('slot-spread')
         const key = property(slot, 'instrumentKey'), version = property(slot, 'instrumentVersion'), selectors = property(slot, 'valueSelectors')
-        let contexts: Array<{ parameter?: string; argument?: ts.ObjectLiteralExpression }> = [{}]
-        if ([key, version, selectors].some(value => value && ts.isPropertyAccessExpression(value))) {
-          let parent: ts.Node | undefined = slot.parent
-          while (parent && !ts.isArrowFunction(parent)) parent = parent.parent
-          if (!parent || !ts.isArrowFunction(parent) || !ts.isVariableDeclaration(parent.parent) || !ts.isIdentifier(parent.parent.name)
-            || parent.parameters.length !== 1 || !ts.isIdentifier(parent.parameters[0].name)) unresolved('factory-shape')
-          const factory = parent as ts.ArrowFunction
-          const declaration = factory.parent as ts.VariableDeclaration
-          const name = (declaration.name as ts.Identifier).text
+        let parent: ts.Node | undefined = slot.parent
+        while (parent && !ts.isArrowFunction(parent) && !ts.isFunctionDeclaration(parent) && !ts.isFunctionExpression(parent)) parent = parent.parent
+        const factory = parent as ts.ArrowFunction | ts.FunctionDeclaration | ts.FunctionExpression | undefined
+        const parameterProperty = (value: ts.Expression | undefined) => !!value && ts.isPropertyAccessExpression(value) && ts.isIdentifier(value.expression)
+          && !!factory?.parameters.some(parameter => ts.isIdentifier(parameter.name) && parameter.name.text === (value.expression as ts.Identifier).text)
+        type Context = { parameter?: string; argument?: ts.ObjectLiteralExpression }
+        const factoryContexts = (): Context[] => {
+          if (!factory || factory.parameters.length !== 1 || !ts.isIdentifier(factory.parameters[0].name)) return unresolved('factory-shape')
+          const name = ts.isFunctionDeclaration(factory) ? factory.name?.text
+            : ts.isArrowFunction(factory) && ts.isVariableDeclaration(factory.parent) && ts.isIdentifier(factory.parent.name) ? factory.parent.name.text : undefined
+          if (!name) return unresolved('factory-shape')
           const calls = nodes.filter(n => ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === name) as ts.CallExpression[]
           if (!calls.length) unresolved('factory-calls')
-          contexts = calls.map(call => {
+          return calls.map(call => {
             if (call.arguments.length !== 1 || !ts.isObjectLiteralExpression(call.arguments[0])) unresolved('factory-argument')
             return { parameter: (factory.parameters[0].name as ts.Identifier).text, argument: call.arguments[0] as ts.ObjectLiteralExpression }
           })
         }
+        // Imported identities are independent of reporter/factory parameters.
+        // Resolve identity before requiring selectors or calls for unrelated tools.
+        const contexts: Context[] = [key, version].some(parameterProperty) ? factoryContexts() : [{}]
         for (const context of contexts) {
-          const resolveValue = (value: ts.Expression | undefined) => {
+          const resolveValue = (value: ts.Expression | undefined, activeContext: Context = context) => {
             if (value && ts.isPropertyAccessExpression(value)) {
-              if (!context.argument || !ts.isIdentifier(value.expression) || value.expression.text !== context.parameter) unresolved('factory-property')
-              if (context.argument!.properties.some(p => ts.isSpreadAssignment(p))) unresolved('argument-spread')
-              return property(context.argument!, value.name.text)
+              if (!parameterProperty(value)) return importedProperty(value)
+              if (!activeContext.argument || !ts.isIdentifier(value.expression) || value.expression.text !== activeContext.parameter) unresolved('factory-property')
+              if (activeContext.argument!.properties.some(p => ts.isSpreadAssignment(p))) unresolved('argument-spread')
+              return property(activeContext.argument!, value.name.text)
             }
             return value
           }
@@ -288,11 +326,14 @@ export function checkSelectedBuiltinDependencies(sources: ScaleInstrumentSourceV
           const source = sources.find(source => source.identity.instrumentKey === (actualKey as ts.StringLiteral).text && source.identity.instrumentVersion === (actualVersion as ts.StringLiteral).text)
           if (!source) continue
           assert.ok(source.executable, `BUILTIN_SCALE_NOT_EXECUTABLE:${file}:${source.identity.instrumentKey}`)
-          const values = resolveValue(selectors)
-          if (!values || !ts.isArrayLiteralExpression(values) || values.elements.some(value => !ts.isStringLiteral(value))) unresolved('valueSelectors')
-          const keys = new Set(source.executable.definition.scoring.scores.map(score => score.key))
-          for (const value of (values as ts.ArrayLiteralExpression).elements) assert.ok(keys.has((value as ts.StringLiteral).text), `BUILTIN_SCALE_SELECTOR:${file}:${(value as ts.StringLiteral).text}`)
-          checked.push(`${file}:${source.identity.instrumentKey}@${source.identity.instrumentVersion}`)
+          const selectorContexts = parameterProperty(selectors) && !context.argument ? factoryContexts() : [context]
+          for (const selectorContext of selectorContexts) {
+            const values = resolveValue(selectors, selectorContext)
+            if (!values || !ts.isArrayLiteralExpression(values) || values.elements.some(value => !ts.isStringLiteral(value))) unresolved('valueSelectors')
+            const keys = new Set(source.executable.definition.scoring.scores.map(score => score.key))
+            for (const value of (values as ts.ArrayLiteralExpression).elements) assert.ok(keys.has((value as ts.StringLiteral).text), `BUILTIN_SCALE_SELECTOR:${file}:${(value as ts.StringLiteral).text}`)
+            checked.push(`${file}:${source.identity.instrumentKey}@${source.identity.instrumentVersion}`)
+          }
         }
       }
     }
@@ -320,7 +361,7 @@ export async function main() {
   }
   const bundleDependencies = checkSelectedBundleDependencies(sources, JSON.parse(git(['show', `${head}:server-version/backend/src/modules/assessment-bundle/generated/packages.json`])))
   const builtinPaths = git(['ls-tree', '-r', '--name-only', head, '--', 'server-version/backend/src/modules/assessment-bundle/bundles']).trim().split('\n').filter(path => path.endsWith('.ts'))
-  const builtinDependencies = checkSelectedBuiltinDependencies(sources, Object.fromEntries(builtinPaths.map(path => [path, git(['show', `${head}:${path}`])])) )
+  const builtinDependencies = checkSelectedBuiltinDependencies(sources, Object.fromEntries(builtinPaths.map(path => [path, git(['show', `${head}:${path}`])])), path => git(['show', `${head}:${path}`]))
   console.log(JSON.stringify({ builtinDependencies, bundleDependencies, status: 'SCALE_INTAKE_SELECTED_PASSED', base, head, checked: results.length, results,
     boundary: 'content-contract-only; generator checked separately; no scientific, copyright, publication or deployment approval' }))
 }
