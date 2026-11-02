@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "pages": [
+    {
+      "pageKey": "practice_journal_page",
+      "title": "实践证据札记",
+      "description": "这是一份可跳过任意问题的个人反思记录。它没有分数，不用于判断教学优劣。可以只记录一件事，并选择一个需要支持的小步骤。",
+      "questions": [
+        {
+          "itemKey": "practice_context",
+          "type": "SHORT_TEXT",
+          "prompt": "任选最近一次课堂或一段教学经历，写下科目、学段与大致时间；可不填具体班级。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 160
+        },
+        {
+          "itemKey": "practice_topic",
+          "type": "SINGLE",
+          "prompt": "这次想从哪个实践话题开始记录？",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "student_centered_discipline",
+              "label": "支持学习的规则与纪律"
+            },
+            {
+              "optionKey": "teacher_language",
+              "label": "教师表达与回应"
+            },
+            {
+              "optionKey": "responsibility_choice",
+              "label": "责任与选择"
+            },
+            {
+              "optionKey": "warmth_support",
+              "label": "温暖与支持"
+            },
+            {
+              "optionKey": "cooperative_learning",
+              "label": "合作学习"
+            },
+            {
+              "optionKey": "classroom_discussions",
+              "label": "课堂讨论"
+            },
+            {
+              "optionKey": "self_assessment_reflection",
+              "label": "学习中的自评与反思"
+            },
+            {
+              "optionKey": "balanced_instruction",
+              "label": "多种教学方式的安排"
+            },
+            {
+              "optionKey": "academic_press_expectations",
+              "label": "学习挑战与期望"
+            },
+            {
+              "optionKey": "competence_building",
+              "label": "示范、练习与反馈支持"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "practice_evidence",
+          "type": "LONG_TEXT",
+          "prompt": "记录一个你实际看到或听到的片段，先描述发生了什么。不要填写学生姓名或可识别细节。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "practice_notice",
+          "type": "LONG_TEXT",
+          "prompt": "这个片段让你注意到什么？可以分别写下你已知道的事和仍不确定的地方。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "practice_support",
+          "type": "LONG_TEXT",
+          "prompt": "这次情境中，有哪些条件在帮助你，或有哪些支持还没有到位？",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "practice_next",
+          "type": "LONG_TEXT",
+          "prompt": "如果愿意，再写下下一次想尝试的一个小调整。",
+          "required": false,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "practice_evidence_status",
+          "type": "SINGLE",
+          "prompt": "目前的记录处于哪种状态？",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "specific_event",
+              "label": "已有具体片段"
+            },
+            {
+              "optionKey": "still_gathering",
+              "label": "还需要补充材料"
+            },
+            {
+              "optionKey": "no_opportunity",
+              "label": "最近没有合适情境"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    }
+  ]
+}

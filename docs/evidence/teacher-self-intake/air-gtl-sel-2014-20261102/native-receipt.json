@@ -1,0 +1,134 @@
+{
+  "status": "PASS",
+  "baseCommit": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "database": "eduk12_form_intake_test_8510d02e27e1",
+  "databaseHost": "127.0.0.1",
+  "node": "v24.21.0",
+  "receipts": [
+    {
+      "toolKey": "air_gtl_sel2014_practice_journal_zh_cn",
+      "version": "0.1.0",
+      "formId": "41289634-6d2b-5636-b07b-10fcb0d49bed",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "2e2ea105782a48e2ee4255ce2311ab98a81cf4971bd29747f7ecedc6f273169d",
+      "snapshotHash": "ce2860bd4d1617343eccd0e866ced6a8e8425660553d2fa036d8ed05a77819be",
+      "sourceFileSha256": "cce08b01c4b4fae1802c1f888fb309780b1b1c41a86e6f6f58d3696d89400dc2",
+      "questions": 7,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 7,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 7,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 7,
+          "score": null
+        }
+      ]
+    },
+    {
+      "toolKey": "air_gtl_sel2014_competency_journal_zh_cn",
+      "version": "0.1.0",
+      "formId": "e08ed152-f084-5652-8e23-b7ef373a95aa",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "b9c871c492cc17ac53410876aa127d49af89cebbf9ca50041bccac328fbda7e3",
+      "snapshotHash": "6fdd16483ce752e8fe99b5d26d1fe813be3912c96761710b4a2a716849220a78",
+      "sourceFileSha256": "eb4bd51b837cb26468bd20de759544cda3008c4c82fe7e2f2f7c0288d09dc1d5",
+      "questions": 6,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 6,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 6,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 6,
+          "score": null
+        }
+      ]
+    },
+    {
+      "toolKey": "air_gtl_sel2014_action_review_zh_cn",
+      "version": "0.1.0",
+      "formId": "7727b171-7f14-50e0-bf0a-cdc839becf42",
+      "state": "SUBMITTED",
+      "approvedBy": null,
+      "definitionDigest": "a9408a72a61ddb91c1fa7fafe13158402526c5e6f65dabe3c82ca30540e14dc5",
+      "snapshotHash": "d1d5d09e8c85ea0a007224b588fc97e030466d44735e88a3e7302f33e278ea15",
+      "sourceFileSha256": "cfe9f22a8f8877b82cb720592668e1498b6b58be46b5e0168836394a4f75595a",
+      "questions": 6,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "trialCreated": false,
+      "nativeHttpSaveReadback": true,
+      "csvParserAndBuilder": true,
+      "scenarios": [
+        {
+          "situation": "normal",
+          "normalizedFields": 6,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "difficulty",
+          "normalizedFields": 6,
+          "missingFields": 0,
+          "score": null
+        },
+        {
+          "situation": "insufficient",
+          "normalizedFields": 0,
+          "missingFields": 6,
+          "score": null
+        }
+      ]
+    }
+  ],
+  "sharedFamilyTag": "family:air_gtl_sel",
+  "sharedFamilyMetadataQueryCount": 3,
+  "controlledTagCatalogQuery": "license:self_authored + exact tool key PASS",
+  "customFamilyUiFacet": "NOT_REGISTERED; metadata grouping only",
+  "authorizationChecks": {
+    "anonymous": 401,
+    "ordinaryAdmin": 403
+  },
+  "boundaries": {
+    "environment": "TASK_OWNED_ISOLATED_DB",
+    "originalAirItemsImported": false,
+    "production": false,
+    "publicOnline": false,
+    "humanApproval": false,
+    "scoredReports": false
+  },
+  "setup": "Existing Prisma schema migrations applied once to a new disposable task database; no app build or full test suite"
+}

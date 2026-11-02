@@ -1,0 +1,189 @@
+{
+  "requestId": "7727b171-7f14-50e0-bf0a-cdc839becf42",
+  "toolKey": "air_gtl_sel2014_action_review_zh_cn",
+  "version": "0.1.0",
+  "title": "AIR/GTL SEL｜行动与回顾计划（项目自编）｜教师自评｜zh-CN v0.1.0",
+  "definition": {
+    "schemaVersion": 1,
+    "pages": [
+      {
+        "pageKey": "action_review_page",
+        "title": "行动与回顾计划",
+        "description": "这是一份可跳过任意问题的个人反思记录。它没有分数，不用于判断教学优劣。可以只记录一件事，并选择一个需要支持的小步骤。",
+        "questions": [
+          {
+            "itemKey": "plan_focus",
+            "type": "SINGLE",
+            "prompt": "这次计划想关注什么？",
+            "required": false,
+            "options": [
+              {
+                "optionKey": "practice_student_centered_discipline",
+                "label": "支持学习的规则与纪律"
+              },
+              {
+                "optionKey": "practice_teacher_language",
+                "label": "教师表达与回应"
+              },
+              {
+                "optionKey": "practice_responsibility_choice",
+                "label": "责任与选择"
+              },
+              {
+                "optionKey": "practice_warmth_support",
+                "label": "温暖与支持"
+              },
+              {
+                "optionKey": "practice_cooperative_learning",
+                "label": "合作学习"
+              },
+              {
+                "optionKey": "practice_classroom_discussions",
+                "label": "课堂讨论"
+              },
+              {
+                "optionKey": "practice_self_assessment_reflection",
+                "label": "学习中的自评与反思"
+              },
+              {
+                "optionKey": "practice_balanced_instruction",
+                "label": "多种教学方式的安排"
+              },
+              {
+                "optionKey": "practice_academic_press_expectations",
+                "label": "学习挑战与期望"
+              },
+              {
+                "optionKey": "practice_competence_building",
+                "label": "示范、练习与反馈支持"
+              },
+              {
+                "optionKey": "competency_self_awareness",
+                "label": "自我觉察"
+              },
+              {
+                "optionKey": "competency_self_management",
+                "label": "自我管理与情绪调节"
+              },
+              {
+                "optionKey": "competency_social_awareness",
+                "label": "理解他人和情境"
+              },
+              {
+                "optionKey": "competency_relationship_skills",
+                "label": "关系与沟通"
+              },
+              {
+                "optionKey": "competency_responsible_decision",
+                "label": "负责任的决策"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "plan_step",
+            "type": "LONG_TEXT",
+            "prompt": "选择一个你能尝试的小步骤，写清准备在什么情境中做什么。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "plan_evidence",
+            "type": "LONG_TEXT",
+            "prompt": "尝试后，你准备记录哪一种具体变化或片段，帮助自己回看？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "plan_support",
+            "type": "LONG_TEXT",
+            "prompt": "尝试这一步需要哪些时间、资源或他人的协助？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          },
+          {
+            "itemKey": "plan_review_window",
+            "type": "SHORT_TEXT",
+            "prompt": "你希望什么时候回看这次尝试？可以写一个方便自己的时间。",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 160
+          },
+          {
+            "itemKey": "plan_followup",
+            "type": "LONG_TEXT",
+            "prompt": "回看时再填写：实际发生了什么？你想保留、调整，还是暂缓这一步？",
+            "required": false,
+            "options": [],
+            "rows": [],
+            "maxLength": 1200
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "EduK12项目自编的开放式记录与行动模板，借用一般反思流程；没有复制、翻译或逐题改写AIR/GTL原手册题项，不冒充原工具或其短版；待审，无评分。",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "domain:teacher_workplace",
+    "language_validation:content_zh-CN",
+    "license:self_authored",
+    "use:not_diagnostic"
+  ],
+  "reference": {
+    "tags": [
+      "family:air_gtl_sel",
+      "role:teacher_self",
+      "stage:k12",
+      "language:zh-CN",
+      "version:project_0_1_0",
+      "use:developmental_reflection",
+      "research:PILOT",
+      "content:project_authored_journal",
+      "scoring:none",
+      "journal:action_review"
+    ],
+    "motherTool": "AIR/GTL SEL teaching reflection",
+    "motherTag": "family:air_gtl_sel",
+    "contentOrigin": "PROJECT_AUTHORED_OPEN_JOURNAL_NOT_ORIGINAL_AIR_INSTRUMENT",
+    "sourceContext": {
+      "author": "Nicholas Yoder",
+      "year": 2014,
+      "url": "https://files.eric.ed.gov/fulltext/ED553369.pdf",
+      "sha256": "0b3cfdd980e55bec88ea6bfde5ec231cf4864ee84c477c2902f474dc9702c37b",
+      "relationship": "bibliographic and broad-topic context only; no original items, rating anchors or reflection questions reproduced"
+    },
+    "language": "zh-CN",
+    "translationStatus": "NOT_A_TRANSLATION_OF_ORIGINAL_ITEMS",
+    "audience": {
+      "respondent": "teacher_self",
+      "receiver": "teacher_self_or_existing_explicit_authorization",
+      "studentVersion": null
+    },
+    "versions": {
+      "content": "0.1.0",
+      "parameters": null,
+      "report": null
+    },
+    "scientificMaturity": "PILOT",
+    "rights": {
+      "originalSource": "AIR 2014 all rights reserved; project reuse scope unresolved",
+      "thesePrompts": "project-authored draft; do not imply AIR approval or licensing of original content"
+    },
+    "scoring": "NONE",
+    "reportPolicy": "COMPLETION_ONLY",
+    "limitations": [
+      "描述个人记录，不推断实际教学质量、学生获得的支持或能力水平。",
+      "没有原工具量表得分、常模、诊断或跨工具总分。",
+      "填写者不等于所有报告接收者；不自动改变原有可见范围或共享规则。"
+    ]
+  }
+}

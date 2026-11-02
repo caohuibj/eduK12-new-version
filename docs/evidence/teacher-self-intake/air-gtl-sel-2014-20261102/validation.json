@@ -1,0 +1,275 @@
+{
+  "scope": "AIR/GTL SEL 2014 source review and three independently project-authored native unscored reflection Form candidates; no original AIR item text imported",
+  "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "motherTag": "family:air_gtl_sel",
+  "originalInstrument": {
+    "status": "FULLTEXT_READ_NOT_IMPORTED_RIGHTS_UNRESOLVED",
+    "source": {
+      "author": "Nicholas Yoder",
+      "year": 2014,
+      "month": "February",
+      "title": "Self-Assessing Social and Emotional Instruction and Competencies: A Tool for Teachers",
+      "url": "https://files.eric.ed.gov/fulltext/ED553369.pdf",
+      "sha256": "0b3cfdd980e55bec88ea6bfde5ec231cf4864ee84c477c2902f474dc9702c37b",
+      "pages": 30,
+      "rightsNotice": "Copyright 2014 American Institutes for Research. All rights reserved.",
+      "rightsConclusion": "No project-specific digital adaptation/translation/public redistribution license obtained; original questionnaire text is not reproduced.",
+      "retrieved": "2026-11-02"
+    },
+    "sourceMetadataComponents": 20,
+    "sourceItemPositionsAudited": 104,
+    "scoringContradiction": {
+      "component": "student_centered_discipline",
+      "definitionPagePrinted": 4,
+      "definitionPagePdf": 10,
+      "items": "a–h (8 rows)",
+      "responseRange": [
+        1,
+        5
+      ],
+      "computedMaximum": 40,
+      "printedScoringPageMaximum": 35,
+      "scoringPagePrinted": 13,
+      "scoringPagePdf": 19,
+      "resolution": "UNRESOLVED_SOURCE_INCONSISTENCY; no silent item deletion, denominator correction, or implemented official score"
+    }
+  },
+  "projectFormResults": {
+    "forms": 3,
+    "questions": 19,
+    "nativeHttpSubmissions": "PASS",
+    "nativeReadback": "PASS",
+    "normalDifficultyInsufficientCases": 9,
+    "allScoredResults": false,
+    "csvParseAndMap": "PASS",
+    "invalidOptionAndLengthRejection": "PASS",
+    "anonymousRequest": 401,
+    "ordinaryAdminRequest": 403,
+    "sharedFamilyMetadataQueryMatches": 3,
+    "controlledClassificationCatalogLookup": "PASS",
+    "customFamilyUiFacet": "NOT_REGISTERED; reference.tags retained for metadata grouping"
+  },
+  "receiptFile": "native-receipt.json",
+  "deduplication": {
+    "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+    "initialBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "initialTrackedTextFilesChecked": 4713,
+    "initialAuthorOrSourceMatches": [],
+    "mainNativeDeclarationFilesChecked": 493,
+    "sourceItemPrefixesChecked": 104,
+    "mainSameSourceOrItemPrefixMatches": [],
+    "openPrPathListsChecked": 42,
+    "allPrPathReadsSucceeded": true,
+    "changedNativeDeclarationOrSubmissionFilesChecked": 517,
+    "openPrHeads": [
+      {
+        "pr": 555,
+        "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b"
+      },
+      {
+        "pr": 554,
+        "head": "84b802dd591ef623e615194552c800e2f7b78862"
+      },
+      {
+        "pr": 553,
+        "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7"
+      },
+      {
+        "pr": 552,
+        "head": "51569d88e26ef7d9c58ef93cca206c451159673d"
+      },
+      {
+        "pr": 550,
+        "head": "21162f30b500011c6b3e9f296fad0d0545b58755"
+      },
+      {
+        "pr": 548,
+        "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a"
+      },
+      {
+        "pr": 547,
+        "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8"
+      },
+      {
+        "pr": 546,
+        "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb"
+      },
+      {
+        "pr": 545,
+        "head": "783729150611c865cf753bff408288a39a141c6d"
+      },
+      {
+        "pr": 544,
+        "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1"
+      },
+      {
+        "pr": 543,
+        "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078"
+      },
+      {
+        "pr": 542,
+        "head": "2426aee58647236dd6084845ea834f23a95c6b17"
+      },
+      {
+        "pr": 541,
+        "head": "2c69a375498b971941aa689ddbf6d684a5b1ab4e"
+      },
+      {
+        "pr": 540,
+        "head": "648c2bf5b35515de62e8719c1788616ba337d49f"
+      },
+      {
+        "pr": 413,
+        "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65"
+      },
+      {
+        "pr": 383,
+        "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f"
+      },
+      {
+        "pr": 379,
+        "head": "333200ade0c6cb42130cbc052189ba9c64691a12"
+      },
+      {
+        "pr": 375,
+        "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792"
+      },
+      {
+        "pr": 373,
+        "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53"
+      },
+      {
+        "pr": 371,
+        "head": "75b956cbd4c45f75beee606fb53257494adc1ca0"
+      },
+      {
+        "pr": 370,
+        "head": "bfd6dcbca24567219ec24979481f3da8e0137984"
+      },
+      {
+        "pr": 367,
+        "head": "8e4440cac46086f73390f8774c40853beb9a6ddd"
+      },
+      {
+        "pr": 362,
+        "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1"
+      },
+      {
+        "pr": 328,
+        "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+      }
+    ],
+    "openPrSameSourceOrItemPrefixMatches": [],
+    "productionAndAdminPrivateTools": "UNKNOWN_NOT_QUERIED",
+    "targetIsolatedDatabase": "new empty task DB; source-version lookup before each insertion returned no existing row",
+    "scope": "source/author/version and distinctive item-prefix comparison against repository declarations and changed native declaration/submission files. Not an exhaustive private or production inventory.",
+    "submissionBaseIncrementalReview": {
+      "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+      "nativeDeclarationPathsChangedSinceScan": 0,
+      "candidateSourceMatches": 0,
+      "privateProductionScope": "UNKNOWN"
+    }
+  },
+  "inputHashes": {
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_practice_journal_zh_cn.form.json": "a41ac40def080635f3821c714b3ed43bac09fbc72f6f91b0c125e646e8afdf97",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_practice_journal_zh_cn.submission.json": "cce08b01c4b4fae1802c1f888fb309780b1b1c41a86e6f6f58d3696d89400dc2",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_competency_journal_zh_cn.form.json": "5579734bc83a3e486aed2ff53f013f39735df20417d93602701419c85b4be45b",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_practice_journal_zh_cn.import.txt": "50fbdce561f07744bad8e124c63bcc3c391f347a86b070da7d419c9b3c13e0ec",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_action_review_zh_cn.form.json": "fca771366056927965c8d145dbbbad51a03f2a6b1a7685cea90ebb748579d01a",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_competency_journal_zh_cn.submission.json": "eb4bd51b837cb26468bd20de759544cda3008c4c82fe7e2f2f7c0288d09dc1d5",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_action_review_zh_cn.import.txt": "672de751adf63ebc7cf6a9246e8ac49ede3c3c97235989267023f2a6e9a31256",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_competency_journal_zh_cn.import.txt": "dcfecc04e7470eb493c48027b82344a1670871302349077b6776451db93732ab",
+    "docs/evidence/teacher-self-intake/air-gtl-sel-2014-20261102/air_gtl_sel2014_action_review_zh_cn.submission.json": "cfe9f22a8f8877b82cb720592668e1498b6b58be46b5e0168836394a4f75595a"
+  },
+  "nativeConsumerHashes": {
+    "src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "src/modules/assessment-core/form/import-parser.ts": "89969bd75f39fe258420e5a328705eab21d54304283d7c2a9237f7d770f70050",
+    "src/modules/assessment-core/form/import-builder.ts": "0bbfc149d8a9e22c7b9c4113d8a570e4f6673565d7ad212dc645ecd0080301d5",
+    "src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "src/modules/survey/governed-tool.service.ts": "76f68b15bd6aab2044ad80b9357337b741d166ddecd5c2b21fc08365b025daa9",
+    "src/modules/survey/governed-tool.routes.ts": "cbf3351ee324d4a16cce614a97657bcbe7eb6376cc38e43174925b6c3d08b2a1",
+    "src/modules/survey/governed-tool.model.ts": "4d9aa36c3d3e2dc20df66995c30bae937e11d3054a81a5be676c299fd5f1575a",
+    "src/modules/survey/tool-reference.ts": "ad2bfa45dd1b164a6e603ce7c9627c58ffdaa793980db664a72b4714db82bf56",
+    "src/modules/survey/final.compute.ts": "2cfd50b03964bb511e2b4d476d35375e38537b16e558ba949d7840b1954e2c23",
+    "src/modules/survey/publication.service.ts": "ac269d24411e4b8ee24cfb2f5bb8fdaf488e220d90067b05d7c8b60b9a8906bc",
+    "src/modules/scale/library/catalog-tag-labels.json": "4078cfedffc6591017e83c479cf346bdc4b239f19adc3ed0606bbee97b213dd2",
+    "prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591"
+  },
+  "status": {
+    "taskIsolatedDatabase": "THREE_FORMS_SUBMITTED_UNAPPROVED_RETAINED_FOR_REVIEW",
+    "developmentPublicLibrary": "NOT_IMPORTED",
+    "production": "NOT_RUN",
+    "humanApproval": "NOT_PERFORMED",
+    "originalAirItemImport": "NOT_RUN_RIGHTS_PENDING",
+    "scoring": "NONE_FOR_PROJECT_FORMS",
+    "parameters": "NONE",
+    "report": "NO_SCORING_REPORT_OR_FROZEN_R",
+    "formalCiAtRecordCreation": "NOT_RUN",
+    "githubAtRecordCreation": "LOCAL_CANDIDATE; authorized submission and Draft planned; actual run and PR must be read back"
+  },
+  "setupHistory": [
+    {
+      "stage": "Prisma generator/migration setup",
+      "initial": "EROFS default home engine cache",
+      "resolution": "Used installed engine selectors whose CLI and expected package engine hash both equal 605197351a3c8bdd595af2d2a9bc3025bca48ea2; generated current client and migrated dedicated empty DB; no TLS/integrity bypass."
+    },
+    {
+      "stage": "HTTP fixture attempts 1 and 2",
+      "initial": "Missing /tools mount prefix returned 404 non-JSON at first anonymous request",
+      "outcome": "No authorized submission stage reached; task database lookup confirmed no candidate rows. Application routes unchanged."
+    },
+    {
+      "stage": "Corrected HTTP fixture",
+      "result": "PASS; three actual POST saves and GET readbacks; no approval/trial/ONLINE or production write."
+    }
+  ],
+  "notRun": [
+    "Original AIR questionnaire execution or scoring",
+    "AIR total or teacher quality scoring",
+    "Student/observer/ideal corresponding versions",
+    "Real participant data",
+    "Automatic individualized narrative report generation",
+    "UI/browser or whole backend/frontend suites",
+    "Production or administrator-private final deduplication",
+    "Merge or deploy"
+  ],
+  "nextSteps": [
+    "Review three project-authored Form payloads as such; do not call them the AIR instrument or a validated translation.",
+    "Resolve original AIR digital use, translation and public redistribution scope before original-item ingestion.",
+    "Clarify original discipline count/printed maximum and missing policy before any scored original version.",
+    "Confirm actual target DB/admin private-tool aliases before installing any production/development public candidate.",
+    "Use native current submission/approval/entry authorization separately; SUBMITTED is not ONLINE or a grant."
+  ],
+  "submissionBase": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "evidenceReuse": {
+    "executedSourceBase": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+    "submissionBase": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+    "hashedNativeConsumersUnchanged": 13,
+    "repeatedNativeDbChecks": false,
+    "reason": "Upstream #538 changes unrelated application permissions, tests and CI control. The 13 recorded native Form/schema/lock inputs are byte-identical; no candidate payload or exercised Form admission/facts branch changed. The baseline remains ae05ed2e7; no claim of running all new-main checks.",
+    "upstreamMigration": "New campus_task_current_product_access guard is outside the exercised Form tables/path; not applied or claimed passed in the retained ae05ed2e7 task-DB fixture."
+  },
+  "csvFinalization": "Converted CSV line endings from CRLF to LF after whitespace preflight; final CSV parser/builder/validator checked once separately. Native payload bytes and DB receipts unchanged.",
+  "notionCiPreflight": {
+    "pageRead": "PASS via Qiang connection before activation",
+    "applicable": [
+      {
+        "id": "CI-001",
+        "state": "PASS_LOCAL_ONLY",
+        "reason": "Owned loopback task DB; no fixture opt-in skip; actual HTTP/PG save/readback."
+      },
+      {
+        "id": "CI-006",
+        "state": "PASS_LOCAL_ONLY",
+        "reason": "Actual synthetic current-system account admitted; anonymous401 and ordinary-admin403; no APPROVE or grant."
+      },
+      {
+        "id": "CI-020",
+        "state": "CANDIDATE_TO_FREEZE",
+        "reason": "Selected route is documentation evidence only; native inputs and source/evidence hashes recorded; formal run not yet active."
+      }
+    ],
+    "scope": "No workflow, permissions, shared source or dictionary changes. Existing native Form receives manual payloads; docs CI cannot be described as product or scientific validation."
+  }
+}
