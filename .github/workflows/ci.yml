@@ -421,6 +421,8 @@ jobs:
           const refs=[b.reviewedCandidate,b.originalSource,b.backendAuditReuse?.sourceHead,b.frontendAuditReuse?.sourceHead,b.qualificationReuse?.sourceHead,...Object.values(b.files).map(v=>v.originalBase)].filter(Boolean);
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',...new Set(refs)],{stdio:'inherit'});
           JS
+      - name: verify bounded risk-tier routing and historical evidence refusal
+        run: node --test .github/scripts/ci-qualification.test.mjs
       - name: fetch the exact diff base without full history
         env:
           CI_EVENT: ${{ github.event_name }}
