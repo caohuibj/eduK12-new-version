@@ -1,0 +1,17 @@
+{
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "scope": "Git source files only; no production DB or administrator-created drafts",
+  "registeredInstrumentVersions": 258,
+  "sourceJsonFiles": 235,
+  "filesCompared": 493,
+  "officialExperienceItemsCompared": 47,
+  "normalization": "NFKC, lowercase, strip non-ASCII-alphanumeric; normalized full-item substring in all source.json and instrument.ts blobs",
+  "fullItemMatches": [],
+  "sourceAliasMatches": [],
+  "limits": [
+    "Not a semantic equivalence or licensed item-lineage proof.",
+    "Chinese translations and adapted source-family overlap require administrator review; reference-list citation does not establish item equivalence.",
+    "Production DB, administrator drafts and branches with no PR not independently queried.",
+    "If a matching existing source/version is later found, reference it rather than create another tool."
+  ]
+}
