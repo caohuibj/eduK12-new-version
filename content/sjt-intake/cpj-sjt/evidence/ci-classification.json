@@ -1,0 +1,14 @@
+{
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "fileCount": 128,
+  "result": {
+    "maintenance": false,
+    "documentation": false,
+    "content": false,
+    "frontend": false,
+    "presentation": false,
+    "domains": []
+  },
+  "reason": "Native upload intake content is outside the registered SJT package content paths; do not rename protocol or falsely mark documentation.",
+  "prCreation": "PENDING: opening against main selects unrelated backend compile and frontend type/build jobs under existing draft-platform route; no skip-ci and no workflow edits"
+}

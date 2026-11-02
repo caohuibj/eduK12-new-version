@@ -1,0 +1,6 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+TEXT,本次记录编号与专题编号（可直接填写，无需先完成课前表）,false,,,,,,,,,,,,,
+SINGLE,本次观察机会,false,确有机会||本次无机会||机会不明||暂不填写,,,,,,,,,,,,
+TEXT,证据编号 evidence_ref 与时点；取样涉及哪些位置或任务（不写学生姓名）,false,,,,,,,,,,,,,
+LONG_TEXT,关键事实：教师说/做了什么，学生随后怎样回应或产出；也可记相反证据。,false,,,,,,,,,,,,,
+LONG_TEXT,可选：尚未知的信息或其他合理解释。,false,,,,,,,,,,,,,

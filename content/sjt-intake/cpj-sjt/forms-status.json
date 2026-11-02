@@ -1,0 +1,353 @@
+[
+  {
+    "file": "forms/CJ01_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": true,
+    "browserTested": true,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ02_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ03_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ04_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ05_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ06_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ07_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ08_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ09_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ10_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ11_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ12_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ13_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ14_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ15_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ16_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ17_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ18_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ19_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ20_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ21_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ22_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ23_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/CJ24_交卷后可选反思.csv",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T01_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T02_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T03_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T04_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T05_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T06_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T07_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T08_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T09_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T10_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T11_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/T12_独立观察表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/课中_独立短表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/课前_独立短表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  },
+  {
+    "file": "forms/课后_独立短表.csv",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false
+  }
+]
