@@ -4,16 +4,16 @@ import { Clock3, History, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { DiscoveryCard, PageHeader, ProductPage, ProductStatus } from '../../../components/product-ui'
 import { situationalApi } from '../api'
-import type { SituationalInstrument } from '../types'
+import type { SituationalInstrumentSummary } from '../types'
 import { situationalErrorMessage } from '../draft'
 
-const instrumentTitle = (instrument: SituationalInstrument): string => (
-  instrument.title || instrument.report.interpretations[0]?.headline
+const instrumentTitle = (instrument: SituationalInstrumentSummary): string => (
+  instrument.title
   || instrument.key.replace(/[-_]/g, ' ')
 )
 
 const SituationalHome: React.FC = () => {
-  const [instruments, setInstruments] = useState<SituationalInstrument[]>([])
+  const [instruments, setInstruments] = useState<SituationalInstrumentSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -70,11 +70,11 @@ const SituationalHome: React.FC = () => {
                 </span>
               )}
               status={<span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">{instrument.scienceMaturity} · reference NONE</span>}
-              description={instrument.report.limitations[0] || '试点阶段结果仅用于描述当前情境任务中的反应模式。'}
+              description={instrument.description || '试点阶段结果仅用于描述当前情境任务中的反应模式。'}
               meta={(
                 <>
                   <span>版本 {instrument.version}</span>
-                  <span>{instrument.definition.schemaVersion === 2 ? new Set(instrument.definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [n.motherSceneKey] : [])).size : instrument.definition.scenes.length} 组情境</span>
+                  <span>{instrument.sceneCount} 组情境</span>
                   <span className="inline-flex items-center gap-1.5"><Clock3 className="h-4 w-4" aria-hidden="true" />文字版</span>
                 </>
               )}

@@ -17,11 +17,23 @@ import {Prisma} from '@prisma/client'
 const url=integrationDatabaseUrl('TRAINING_PERSONAL_TRACKING_DATABASE_URL'),suite=url?describe:describe.skip
 suite('Training personal longitudinal native publication and SELF results',()=>{
  let teacher:any,student:any,course:any,source:any,item:any,next:any,actor:any,scale:any
+ let personalParentOrder:'asc'|'desc'|null=null
  const id=()=>randomUUID(),future=()=>new Date(Date.now()+86400000)
  beforeAll(async()=>{
   requireIsolatedReleaseDatabase(url!)
   process.env.ASSESSMENT_REPORT_ASYNC_ENABLED='false'
   if(process.env.TRAINING_PERSONAL_TRACKING_BROWSER_ONLY==='true'||process.env.TRAINING_PERSONAL_TRACKING_CONTINUATION_ONLY==='true')return
+  // An unconstrained relational read may return the same rows in either order.
+  // Keep real SQL, persisted results and authorization; vary only that order.
+  db.$use(async(params,next)=>{
+   const result=await next(params)
+   if(personalParentOrder&&params.model==='CompositeAssessmentAttempt'&&params.action==='findMany'
+    &&params.args?.include?.compositeAssessment===true&&Array.isArray(params.args?.where?.id?.in)){
+    const direction=personalParentOrder==='asc'?1:-1
+    return [...result].sort((a,b)=>direction*a.id.localeCompare(b.id))
+   }
+   return result
+  })
   teacher=await db.user.create({data:{username:'longitudinal-teacher-'+id(),passwordHash:'synthetic',role:'TEACHER',accountDomain:'TRAINING',teacherApproved:true}})
   student=await db.user.create({data:{username:'longitudinal-student-'+id(),passwordHash:'synthetic',role:'STUDENT',accountDomain:'TRAINING'}})
   actor={userId:teacher.id,role:'TEACHER'}
@@ -161,11 +173,15 @@ suite('Training personal longitudinal native publication and SELF results',()=>{
   await product.publish(actor,next.id,{revision:draft.revision})
   const second=await composite.startUserAttempt(student.id,next.id)
   await finish(second.attempt.id,{userId:student.id},'yes')
-  const changes=await readTrainingPersonalChanges(second.attempt.id,{userId:student.id})
-  expect(changes.status).toBe('AVAILABLE')
-  expect(changes).toMatchObject({metrics:[{points:[{value:0},{value:1}],adjacent:[{delta:1}],baseline:[{delta:1}]}]})
-  const again=await readTrainingPersonalChanges(second.attempt.id,{userId:student.id})
-  expect(again).toEqual(changes)
+  try{
+   personalParentOrder='asc'
+   const changes=await readTrainingPersonalChanges(second.attempt.id,{userId:student.id})
+   expect(changes.status).toBe('AVAILABLE')
+   expect(changes).toMatchObject({metrics:[{points:[{value:0},{value:1}],adjacent:[{delta:1}],baseline:[{delta:1}]}]})
+   personalParentOrder='desc'
+   const again=await readTrainingPersonalChanges(second.attempt.id,{userId:student.id})
+   expect(again).toEqual(changes)
+  }finally{personalParentOrder=null}
   expect((await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition).toEqual(changed)
   await expect(readTrainingPersonalChanges(second.attempt.id,{userId:teacher.id})).rejects.toMatchObject({statusCode:403})
   const final=await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:second.attempt.id}})

@@ -7,15 +7,28 @@ import { numberlineNpConfigSchema } from '../../modules/cognitive/schemas/number
 import { scoreNumberlineNpV1 } from '../../modules/cognitive/scoring/numberline.np.v1'
 
 const randomSeed = 'synthetic-numberline-np'
-const config = numberlineNpConfigSchema.parse(seeds[1].config)
+const npSeeds = seeds.filter(seed => seed.engineVersion === '1.1.0' && seed.scoringVersion === '1.1.0')
+const config = numberlineNpConfigSchema.parse(npSeeds.find(seed => seed.configVersion === '1.1.0')!.config)
 const trials = () => buildNumberlineNpTargets(randomSeed, config.lineMax, config.targetSet).map((t, trialIndex) => ({ trialIndex, payload: { targetNumber: t.targetNumber, responsePosition: t.targetNumber / config.lineMax, rtMs: 1000, interrupted: false } }))
 describe('numberline NP numeric adaptation', () => {
   it('freezes eight separate range/set/deadline configs and scores exactly the six original numerical points', () => {
     expect(seeds[0]).toMatchObject({ configVersion: '1.0.1', engineVersion: '1.0.1', scoringVersion: '1.0.0' })
     expect(executionEntries[0].profiles!.research.configPatch).toEqual({ totalTrials: 40 })
-    expect(seeds).toHaveLength(9)
-    for (const seed of seeds.slice(1)) {
+    const originalVersions = Array.from({ length: 8 }, (_, index) => `1.1.${index}`)
+    expect(npSeeds.map(seed => seed.configVersion).sort()).toEqual([
+      ...originalVersions, ...originalVersions.map(version => `${version}-report3`),
+    ].sort())
+    const protocols = new Set<string>()
+    for (const version of originalVersions) {
+      const original = npSeeds.find(seed => seed.configVersion === version)!
+      const revised = npSeeds.find(seed => seed.configVersion === `${version}-report3`)!
+      expect(original.config.report).toEqual({ reportVersion: '1.1.0', referenceMode: 'none' })
+      expect(revised.config.report).toEqual({ reportVersion: '3.0.0', referenceMode: 'none' })
+      expect({ ...revised.config, report: original.config.report }).toEqual(original.config)
+    }
+    for (const seed of npSeeds) {
       const c = numberlineNpConfigSchema.parse(seed.config)
+      protocols.add(`${c.lineMax}/${c.targetSet}/${c.maxResponseMs}`)
       const targets = buildNumberlineNpTargets(randomSeed, c.lineMax, c.targetSet)
       expect(targets).toEqual(frontendTargets(randomSeed, c.lineMax, c.targetSet))
       expect(targets.map(t => t.targetNumber).sort((a, b) => a - b)).toEqual([...NUMBERLINE_NP_SETS[c.lineMax][c.targetSet]].sort((a, b) => a - b))
@@ -24,6 +37,7 @@ describe('numberline NP numeric adaptation', () => {
       expect(executionEntries[1].finalSubmission!.maxTrials(c)).toBe(6)
       expect(executionEntries[1].profiles!.research.configPatch).toEqual({})
     }
+    expect([...protocols].sort()).toEqual([100, 1000].flatMap(range => ['A', 'B'].flatMap(set => [4000, 30000].map(deadline => `${range}/${set}/${deadline}`))).sort())
   })
   it('rejects changed targets, late responses, missing trials and invalid protocol settings', () => {
     const wrong = trials(); wrong[0].payload.targetNumber++

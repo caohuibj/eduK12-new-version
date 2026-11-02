@@ -7,6 +7,7 @@ import {compositeFormSectionMaterialReferences,frozenFormSectionMediaReferences}
 import {runnerDefinition} from '../../modules/scale/scale-definition'
 import {projectRawScoreFeedback} from '../../modules/scale/raw-score-feedback'
 import {publicTrainingFormDefinition} from '../../modules/assessment-runtime/typed-form'
+import trainingWorkspaceRouter from '../../routes/trainingWorkspace'
 const item={asset:{assetId:'198e278f-f993-44fa-9eaa-223693fa4db3',contentHash:'a'.repeat(64),mimeType:'application/pdf' as const},name:'说明',rightsStatus:'authorized' as const,rightsNote:'私有使用依据'}
 const asset={id:item.asset.assetId,ownerId:'author',sha256:item.asset.contentHash,mimeType:item.asset.mimeType,sizeBytes:100}
 const database=()=>({$queryRaw:vi.fn().mockResolvedValue([{id:asset.id}]),storedAsset:{findUniqueOrThrow:vi.fn().mockResolvedValue(asset)}})
@@ -52,8 +53,7 @@ describe('Training material ownership and immutable references',()=>{
 
 describe('Training material HTTP identity admission',()=>{
   it('rejects malformed content identities before loading any asset',async()=>{
-    const router=(await import('../../routes/trainingWorkspace')).default
-    const handler=(router as any).stack.find((layer:any)=>layer.route?.path==='/media/:id/content').route.stack[0].handle
+    const handler=(trainingWorkspaceRouter as any).stack.find((layer:any)=>layer.route?.path==='/media/:id/content').route.stack[0].handle
     const res:any={statusCode:200,status(code:number){this.statusCode=code;return this},json(body:unknown){this.body=body;return this}}
     const next=vi.fn()
     await handler({user:{userId:'viewer'},params:{id:'not-an-asset-id'}},res,next)

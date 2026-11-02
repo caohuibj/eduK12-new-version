@@ -44,7 +44,11 @@ async function usage() {
   expect(result.body.code).toBe(0); return result.body.data.usageCount
 }
 async function join(actor: any, data: any = {}) {
-  const socket = { data: actor ? { authenticated: true, userId: actor.id, userRole: actor.role } : { authenticated: false }, emit: vi.fn(), join: vi.fn(), handshake: { address: '127.0.0.1' } }
+  const socket = {
+    data: actor ? { authenticated: true, userId: actor.id, userRole: actor.role, tokenVersion: actor.tokenVersion } : { authenticated: false },
+    emit: vi.fn(), join: vi.fn(),
+    handshake: { address: '127.0.0.1', headers: actor ? { cookie: headers(actor).Cookie } : {} },
+  }
   await (handler as any).handleStudentJoin(socket, { code: classroom.code, ...data })
   return socket
 }

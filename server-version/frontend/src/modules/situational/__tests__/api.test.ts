@@ -42,9 +42,9 @@ it('uses the dedicated teacher API only on the teacher participant surface',asyn
   try {
     window.history.replaceState({},'', '/teacher/situational')
     await situationalApi.listInstruments()
-    expect(getMock).toHaveBeenLastCalledWith('/teacher/situational/instruments')
+    expect(getMock).toHaveBeenLastCalledWith('/teacher/situational/instruments', { params: { view: 'summary' } })
     window.history.replaceState({},'', '/student/situational')
     await situationalApi.listInstruments()
-    expect(getMock).toHaveBeenLastCalledWith('/situational/instruments')
+    expect(getMock).toHaveBeenLastCalledWith('/situational/instruments', { params: { view: 'summary' } })
   } finally {window.history.replaceState({},'', '/');vi.restoreAllMocks()}
 })

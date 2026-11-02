@@ -88,6 +88,13 @@ describe('Composite course-scoped availability', () => {
     expect(res.json.mock.calls[0][0].data.list.map((row: any) => row.id)).toEqual([...targetIds])
     expect(reads).toEqual({ composites: 4, attempts: 8 })
   })
+  it('opts into the summary projection without changing the course entitlement', async () => {
+    const res = response()
+    await compositeController.available({ user: { userId: 'student' }, query: { courseId: 'c0', view: 'summary' } } as any, res)
+    expect(res.json.mock.calls[0][0].data.list.map((row: any) => row.id)).toEqual([...targetIds])
+    expect(db.compositeAssessment.findMany.mock.calls[0][0].select.reportPackageSnapshotEncrypted).toBe(false)
+    expect(reads).toEqual({ composites: 4, attempts: 8 })
+  })
   it('keeps task-feed counts, ordering and page continuation while reducing each page read', async () => {
     const first = await listStudentTasks('student', { page: 1, pageSize: 2, courseId: 'c0' }, now)
     const second = await listStudentTasks('student', { page: 2, pageSize: 2, courseId: 'c0' }, now)

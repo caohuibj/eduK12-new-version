@@ -8,7 +8,7 @@
   "provenance": "Synthetic fixed-count authoring fixture; expected output computed with v1.1 scorer. Not human data or reliability evidence.",
   "cases": [
     {
-      "name": "fixed-six-target-short-profile",
+      "name": "golden",
       "input": {
         "config": {
           "nLevel": 2,
@@ -295,6 +295,70 @@
           "interrupted": false
         }
       }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "nLevel": 2,
+          "totalTrials": 22,
+          "targetRatio": 0.3,
+          "stimulusMs": 500,
+          "isiMs": 1500,
+          "toneFrequenciesHz": [
+            262,
+            330,
+            392,
+            494,
+            587
+          ],
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "r2-counterexample",
+        "trials": []
+      },
+      "expectedError": "auditorynback v1 expects exactly 22 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "nLevel": 2,
+          "totalTrials": 22,
+          "targetRatio": 0.3,
+          "stimulusMs": 500,
+          "isiMs": 1500,
+          "toneFrequenciesHz": [
+            262,
+            330,
+            392,
+            494,
+            587
+          ],
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "r2-counterexample",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "trialIndex": 0,
+              "toneIndex": 3,
+              "responded": false,
+              "rtMs": null,
+              "interrupted": false,
+              "audioLatencyMs": 10
+            }
+          }
+        ]
+      },
+      "expectedError": "auditorynback v1 expects exactly 22 trials, got 1"
     }
   ]
 }

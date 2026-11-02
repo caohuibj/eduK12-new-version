@@ -130,7 +130,7 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
   })
   it('rejects enrollment lost inside admission before insertion', async () => {
     db.courseStudent.findFirst.mockResolvedValueOnce({ courseId: 'training', status: 'ACTIVE' }).mockResolvedValueOnce(null)
-    await expect(startUserAttempt('student', 'publication')).rejects.toMatchObject({ statusCode: 403, message: '不是问卷投放课程的有效学生' })
+    await expect(startUserAttempt('student', 'publication')).rejects.toMatchObject({ statusCode: 403, message: '不是问卷投放课程的有效学生或本轮已同意的成人观察者' })
     expect(db.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
   })
 })

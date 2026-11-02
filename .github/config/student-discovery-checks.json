@@ -1,0 +1,76 @@
+{
+  "sources": [
+    "server-version/backend/src/controllers/situationalController.ts",
+    "server-version/backend/src/modules/bundle-product/analysis.ts",
+    "server-version/backend/src/modules/cognitive/assignment.service.ts",
+    "server-version/backend/src/modules/composite/composite.controller.ts",
+    "server-version/backend/src/modules/composite/composite.service.ts",
+    "server-version/backend/src/modules/huiteacher/personalScale.service.ts",
+    "server-version/backend/src/modules/huiteacher/scaleLicense.service.ts",
+    "server-version/backend/src/modules/situational/authoring/service.ts",
+    "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+    "server-version/backend/src/services/studentTasks.ts",
+    "server-version/frontend/src/modules/composite/api.ts",
+    "server-version/frontend/src/modules/situational/api.ts",
+    "server-version/frontend/src/modules/situational/pages/SituationalHistory.tsx",
+    "server-version/frontend/src/modules/situational/pages/SituationalHome.tsx",
+    "server-version/frontend/src/modules/situational/types.ts",
+    "server-version/frontend/src/pages/student/CourseDetail.tsx",
+    "server-version/frontend/src/training/courseAssessments.ts"
+  ],
+  "tests": [
+    "server-version/backend/src/__tests__/bundle-onboarding/cognitive-disclosure.test.ts",
+    "server-version/backend/src/__tests__/bundle-onboarding/derived-saved-read.test.ts",
+    "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts",
+    "server-version/backend/src/__tests__/composite/available-projection.test.ts",
+    "server-version/backend/src/__tests__/composite/copy.service.test.ts",
+    "server-version/backend/src/__tests__/composite/course-scope-availability.test.ts",
+    "server-version/backend/src/__tests__/composite/student-archived-availability.postgres.integration.test.ts",
+    "server-version/backend/src/__tests__/huiteacher/self-group-personal-license.test.ts",
+    "server-version/backend/src/__tests__/integration/huiteacherPersonalScale.postgres.integration.test.ts",
+    "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+    "server-version/backend/src/__tests__/situational/situational-discovery-controller.test.ts",
+    "server-version/backend/src/__tests__/situational/situational-discovery-summary.test.ts",
+    "server-version/backend/src/__tests__/situational/situational-standalone.postgres.integration.test.ts",
+    "server-version/backend/src/__tests__/situational/sjt-release-status-batch.test.ts",
+    "server-version/frontend/src/modules/situational/__tests__/SituationalDiscovery.summary.test.tsx",
+    "server-version/frontend/src/modules/situational/__tests__/api.test.ts",
+    "server-version/frontend/src/pages/student/__tests__/CourseDetail.composite.test.tsx",
+    "server-version/frontend/src/pages/student/__tests__/CourseDetail.scope.test.tsx",
+    "server-version/frontend/src/training/courseAssessments.pagination.test.ts",
+    "server-version/frontend/src/training/courseAssessments.test.ts"
+  ],
+  "controls": [
+    ".github/config/student-discovery-checks.json",
+    ".github/scripts/student-discovery-scope.mjs",
+    ".github/scripts/student-discovery-scope.test.mjs",
+    ".github/scripts/catalog-discovery-scope.mjs",
+    ".github/scripts/catalog-discovery-scope.test.mjs",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    ".github/workflows/ci-frontend.yml"
+  ],
+  "backendChecks": {
+    "unitFiles": [
+      "src/__tests__/bundle-onboarding/cognitive-disclosure.test.ts",
+      "src/__tests__/bundle-onboarding/derived-saved-read.test.ts",
+      "src/__tests__/cognitive/assignment.service.test.ts",
+      "src/__tests__/composite/available-projection.test.ts",
+      "src/__tests__/composite/copy.service.test.ts",
+      "src/__tests__/composite/course-scope-availability.test.ts",
+      "src/__tests__/huiteacher/self-group-personal-license.test.ts",
+      "src/__tests__/services/studentTasks.test.ts",
+      "src/__tests__/situational/situational-discovery-controller.test.ts",
+      "src/__tests__/situational/situational-discovery-summary.test.ts",
+      "src/__tests__/situational/sjt-release-status-batch.test.ts"
+    ],
+    "postgresFiles": [
+      "src/__tests__/composite/student-archived-availability.postgres.integration.test.ts",
+      "src/__tests__/integration/huiteacherPersonalScale.postgres.integration.test.ts",
+      "src/__tests__/situational/situational-standalone.postgres.integration.test.ts"
+    ]
+  },
+  "scenario": "participant-discovery",
+  "reuseBoundary": "Existing catalog executors only; no new identity qualification or historical pass claim. Freeze before one formal run; retain local evidence. Unknown paths use the normal route."
+}

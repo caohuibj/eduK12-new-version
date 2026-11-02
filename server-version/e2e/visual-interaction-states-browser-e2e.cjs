@@ -50,7 +50,7 @@ async function assertModal(page, dialog, background) {
 }
 
 async function main() {
-  if (process.env.VISUAL_QA_SCOPE !== undefined && scope !== 'assignment-list-states') {
+  if (process.env.VISUAL_QA_SCOPE !== undefined && !['assignment-list-states', 'scale-library-filters'].includes(scope)) {
     throw new Error(`Unknown VISUAL_QA_SCOPE: ${scope}`)
   }
   fs.mkdirSync(output, { recursive: true })
@@ -200,7 +200,7 @@ async function main() {
         await page.goto(base + '/scale-library')
         await page.getByRole('heading', { name: longTitle, exact: true }).waitFor()
         assert.equal(await page.getByLabel('年龄下界', { exact: true }).isVisible(), false, 'advanced fields are initially collapsed')
-        const more = page.getByText('更多筛选', { exact: true })
+        const more = page.locator('details').filter({ has: page.getByLabel('年龄下界', { exact: true }) }).locator('summary')
         await more.press('Enter')
         await page.getByLabel('年龄下界', { exact: true }).fill('10')
         await capture(page, 'scale-more-filters', width)
@@ -215,7 +215,7 @@ async function main() {
         assert.equal(await page.getByLabel('已应用筛选').count(), 0)
         await page.getByText('版本与证据', { exact: true }).press('Enter')
         await capture(page, 'scale-card-evidence', width)
-      })
+      }, 'scale-library-filters')
       for (const state of assignmentStates) {
         await scenario(width, 'TEACHER', async page => {
           let release
@@ -287,7 +287,7 @@ async function main() {
             await page.getByText('暂无匹配练习', { exact: true }).waitFor()
           }
         }, 'assignment-list-states')
-        assignmentResults.push({ state, passed: true })
+        if (scope === 'full' || scope === 'assignment-list-states') assignmentResults.push({ state, passed: true })
       }
       for (const state of ['loading', 'empty', 'error', 'populated']) {
         await scenario(width, 'STUDENT', async page => {

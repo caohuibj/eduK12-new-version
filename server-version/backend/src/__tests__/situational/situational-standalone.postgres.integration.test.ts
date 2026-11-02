@@ -22,6 +22,7 @@ let submitSituationalAttemptFinal: typeof import('../../modules/situational/situ
 let submitSituationalAttemptFinalWithContext: typeof import('../../modules/situational/situational-final-submit.service')['submitSituationalAttemptFinalWithContext']
 let testOnlyPersistSituationalAttemptFinal: typeof import('../../modules/situational/situational-final-submit.service')['__testOnlyPersistSituationalAttemptFinal']
 let listSituationalHistory: typeof import('../../modules/situational/situational-runtime.service')['listSituationalHistory']
+let listSituationalHistorySummaries: typeof import('../../modules/situational/situational-runtime.service')['listSituationalHistorySummaries']
 let loadSituationalAttemptRuntime: typeof import('../../modules/situational/situational-runtime.service')['loadSituationalAttemptRuntime']
 let situationalAttemptForResponse: typeof import('../../modules/situational/situational-runtime.service')['situationalAttemptForResponse']
 
@@ -105,6 +106,7 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
     startSituationalAttempt = runtime.startSituationalAttempt
     resumeSituationalAttempt = runtime.resumeSituationalAttempt
     listSituationalHistory = runtime.listSituationalHistory
+    listSituationalHistorySummaries = runtime.listSituationalHistorySummaries
     loadSituationalAttemptRuntime = runtime.loadSituationalAttemptRuntime
     situationalAttemptForResponse = runtime.situationalAttemptForResponse
     submitSituationalAttemptFinal = submit.submitSituationalAttemptFinal
@@ -220,6 +222,25 @@ suite('Situational PR-B standalone PostgreSQL runtime', () => {
 
     const history = await listSituationalHistory(userId)
     expect(history.list.some((entry) => entry.attemptId === started.attemptId)).toBe(true)
+    const summaries = await listSituationalHistorySummaries(userId)
+    expect(summaries.total).toBe(history.total)
+    expect(summaries.list.map(row => row.attemptId)).toEqual(history.list.map(row => row.attemptId))
+    for (const [index, row] of summaries.list.entries()) {
+      const full = history.list[index]!
+      expect(row.attempt).toMatchObject({ instrumentKey: full.attempt.instrumentKey,
+        instrumentVersion: full.attempt.instrumentVersion, status: full.attempt.status, startedAt: full.attempt.startedAt })
+      expect(row.instrument.title).toBe(full.instrument.title)
+      expect(row.instrument.scientificContext).toEqual(full.instrument.scientificContext)
+      expect(row.hasNarrative).toBe(Boolean(full.result?.narrative))
+      const primary = full.result?.metrics.find(metric => metric.role === 'primary')
+      expect(row.primaryMetric).toEqual(primary ? { label: primary.label, value: primary.value, displayPrecision: primary.displayPrecision } : null)
+      expect(row.instrument).not.toHaveProperty('definition')
+      expect(row.instrument).not.toHaveProperty('report')
+      expect(row).not.toHaveProperty('result')
+    }
+    expect(JSON.stringify(summaries).length).toBeLessThan(JSON.stringify(history).length)
+    const otherUser = await createUser('summary-isolation')
+    expect((await listSituationalHistorySummaries(otherUser)).list).toEqual([])
     expect((await resumeSituationalAttempt(started.attemptId, userId)).canonicalResult?.resultHash)
       .toBe(submitted.canonicalResult?.resultHash)
 

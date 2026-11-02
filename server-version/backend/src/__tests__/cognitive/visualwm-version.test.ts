@@ -29,7 +29,7 @@ describe('visualwm 1.1.0 practice-only identity', () => {
     expect({ ...newSeed.config, report: oldSeed.config.report }).toEqual(oldSeed.config)
     expect(newSeed.config).not.toBe(oldSeed.config)
     expect(participantPresentations.map((p) => [p.engineVersion, p.presentationVersion])).toEqual([
-      ['1.0.1', '1.0.1'], ['1.1.0', '1.1.0'],
+      ['1.0.1', '1.0.1'], ['1.1.0', '1.1.0'], ['1.0.1', '3.0.0'], ['1.1.0', '3.0.0'],
     ])
   })
 

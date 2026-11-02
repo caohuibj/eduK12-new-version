@@ -401,6 +401,7 @@ describe('Survey FINAL bounded transaction reads and selected definition reuse',
     .filter(([,value])=>!!value).map(([key,value])=>[key,value===true?row[key]:project(row[key],(value as any).select)]))
   it('does not transfer unused attempt ciphers or wave authoring data on first commit',async()=>{
     known.status=current.status='STARTED';mocks.final.mockResolvedValue(null)
+    current.startedAt=new Date(Date.now()-60000)
     current.contentBindingCipher='private-binding';current.flowAssignmentCipher='private-assignment'
     current.wave.flowDefinition={private:'draft'};current.wave.consentText='private-consent'
     mocks.attempt.mockImplementation(async(args:any)=>project(current,args.select))
@@ -409,7 +410,7 @@ describe('Survey FINAL bounded transaction reads and selected definition reuse',
     expect(result).toMatchObject({status:'COMPLETED',idempotent:false})
     expect(selected).toHaveBeenCalledTimes(1)
     expect(mocks.attempt.mock.calls[0][0]).toEqual({where:{id:'attempt',projectId:'project',waveId:'wave'},select:{
-      id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,wave:{select:{
+      id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,startedAt:true,wave:{select:{
         id:true,consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true,
         publication:{select:{id:true,definitionDigest:true,compiledSnapshot:true}},
       }},

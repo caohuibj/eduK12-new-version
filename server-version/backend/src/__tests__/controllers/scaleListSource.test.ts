@@ -3,6 +3,7 @@ import { UserRole } from '@prisma/client'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    $queryRaw: vi.fn(),
     scale: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn() },
     assessment: { findMany: vi.fn() },
     materialGrant: { findMany: vi.fn() },
@@ -38,6 +39,7 @@ const makeRes = () => {
 beforeEach(() => {
   vi.clearAllMocks()
   mockPrisma.materialGrant.findMany.mockResolvedValue([{ resourceId: 'scale-granted' }])
+  mockPrisma.$queryRaw.mockResolvedValue([{ total: 0, facetTags: [], list: [] }])
   mockPrisma.scale.count.mockResolvedValue(2)
   mockPrisma.scale.findUnique.mockResolvedValue({ id: 'scale-own', creatorId: 'admin-1' })
   mockPrisma.assessment.findMany.mockResolvedValue([])
@@ -96,22 +98,28 @@ describe('scaleController.list source', () => {
 })
 describe('opt-in Training catalog summary', () => {
   it.each([UserRole.ADMIN, UserRole.TEACHER])('preserves %s current visibility, pagination and totals with only catalog fields', async role => {
-    const row = { id: 's', name: 'Scale', code: 'S', instrumentVersion: '2.0.0', instrumentClass: 'CUSTOM_DESCRIPTIVE', libraryEntryId: 'entry', status: 'DRAFT', description: 'Description' }
-    mockPrisma.scale.findMany.mockImplementation(async args => {
-      expect(args.select).toEqual(Object.fromEntries(Object.keys(row).map(key => [key, true])))
-      expect(args.include).toBeUndefined()
-      return [row]
-    })
-    mockPrisma.scale.count.mockResolvedValue(205)
+    const row = { id: 's', name: 'Scale', code: 'S', instrumentVersion: '2.0.0', instrumentClass: 'CUSTOM_DESCRIPTIVE', libraryEntryId: 'entry', status: 'DRAFT', description: 'Description', tags: ['mathematics'], classificationTags: [{ id: 'mathematics', label: '数学', facet: 'subject' }] }
+    mockPrisma.$queryRaw.mockResolvedValue([{ list: [row], total: 205, facetTags: row.classificationTags }])
     const res = makeRes()
     await scaleController.list(makeReq({ user: { userId: 'teacher-1', role }, query: { view: 'training-catalog', page: '2', pageSize: '100', status: 'DRAFT', courseId: 'course' } }) as any, res)
-    const args = mockPrisma.scale.findMany.mock.calls[0][0]
-    expect(args).toMatchObject({ skip: 100, take: 100, orderBy: { createdAt: 'desc' }, where: { status: 'DRAFT', courseScales: { some: { courseId: 'course' } } } })
-    expect(args.where.OR).toEqual(role === UserRole.ADMIN ? [{ libraryEntryId: null }, { id: { in: [] } }] : [
-      { creatorId: 'teacher-1', libraryEntryId: null }, { id: { in: ['scale-granted'] }, status: 'PUBLISHED', libraryEntryId: null }, { id: { in: [] }, status: 'PUBLISHED' },
+    expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1)
+    const query = mockPrisma.$queryRaw.mock.calls[0][0]
+    const sql = query.strings.join('?').replace(/\s+/g, ' ').trim()
+    const visibility = role === UserRole.ADMIN
+      ? '(s.library_entry_id IS NULL OR s.id=ANY(?::text[]))'
+      : "((s.creator_id=? AND s.library_entry_id IS NULL) OR (s.id=ANY(?::text[]) AND s.status='PUBLISHED' AND s.library_entry_id IS NULL) OR (s.id=ANY(?::text[]) AND s.status='PUBLISHED'))"
+    expect(sql).toContain('WHERE ' + visibility + ' AND s.status::text=? AND EXISTS(SELECT 1 FROM course_scales cs WHERE cs.scale_id=s.id AND cs.course_id=?)')
+    expect(query.values.slice(role === UserRole.ADMIN ? -5 : -7)).toEqual([
+      ...(role === UserRole.ADMIN ? [] : ['teacher-1', ['scale-granted']]), [], 'DRAFT', 'course', 100, 100,
     ])
-    expect(mockPrisma.scale.count).toHaveBeenCalledExactlyOnceWith({ where: args.where })
-    expect(res.body.data).toEqual({ list: [row], total: 205, page: 2, pageSize: 100, totalPages: 3, hasMore: true })
+    expect(sql).toContain('(SELECT count(*)::int FROM matches) AS total')
+    expect(sql).toContain('FROM visible CROSS JOIN LATERAL jsonb_array_elements("classificationTags")')
+    expect(sql).toContain('FROM (SELECT id,name,code,"instrumentVersion","instrumentClass","libraryEntryId",status,description,tags,"classificationTags" FROM matches ORDER BY created_at DESC,id LIMIT ? OFFSET ?) page)')
+    expect(mockPrisma.scale.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.scale.count).not.toHaveBeenCalled()
+    expect(libraryReadableScaleIds).toHaveBeenCalledExactlyOnceWith('teacher-1')
+    expect(res.body.data).toEqual({ list: [row], total: 205, page: 2, pageSize: 100, totalPages: 3, hasMore: true,
+      tagFacets: { population: [], construct: [], subject: [{ id: 'mathematics', label: '数学' }], domain: [], language: [], orientation: [], response: [], use: [], license: [] } })
   })
   it.each([undefined, 'other'])('keeps the default full list contract for view=%s', async view => {
     const row = { id: 's', creatorId: 'teacher-1', definition: { items: [{ id: 'item' }] }, copySource: { original: 'source' }, courseScales: [{ course: { id: 'course', title: 'Course' } }], _count: { assessments: 3 } }
@@ -129,15 +137,20 @@ describe('opt-in Training catalog summary', () => {
     const req = makeReq({ user: { userId: 'admin-1', role: UserRole.ADMIN }, query: { view: 'training-catalog' } })
     vi.mocked(libraryReadableScaleIds).mockResolvedValueOnce({ systemAdmin: false, ids: ['granted-now'] })
     await scaleController.list(req as any, makeRes())
-    expect(mockPrisma.scale.findMany.mock.calls[0][0].where.OR).toEqual([{ libraryEntryId: null }, { id: { in: ['granted-now'] } }])
+    const first = mockPrisma.$queryRaw.mock.calls[0][0]
+    expect(first.strings.join('?')).toContain('WHERE (s.library_entry_id IS NULL OR s.id=ANY(?::text[]))')
+    expect(first.values.slice(-3)).toEqual([['granted-now'], 20, 0])
     vi.mocked(libraryReadableScaleIds).mockResolvedValueOnce({ systemAdmin: false, ids: [] })
     await scaleController.list(req as any, makeRes())
-    expect(mockPrisma.scale.findMany.mock.calls[1][0].where.OR).toEqual([{ libraryEntryId: null }, { id: { in: [] } }])
+    const second = mockPrisma.$queryRaw.mock.calls[1][0]
+    expect(second.strings.join('?')).toContain('WHERE (s.library_entry_id IS NULL OR s.id=ANY(?::text[]))')
+    expect(second.values.slice(-3)).toEqual([[], 20, 0])
     vi.mocked(libraryReadableScaleIds).mockRejectedValueOnce(new Error('authority unavailable'))
     const denied = makeRes()
     await scaleController.list(req as any, denied)
     expect(denied.body.code).not.toBe(0)
-    expect(mockPrisma.scale.findMany).toHaveBeenCalledTimes(2)
-    expect(mockPrisma.scale.count).toHaveBeenCalledTimes(2)
+    expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(2)
+    expect(mockPrisma.scale.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.scale.count).not.toHaveBeenCalled()
     expect(libraryReadableScaleIds).toHaveBeenCalledTimes(3)
   })
