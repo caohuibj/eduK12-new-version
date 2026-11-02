@@ -11,3 +11,5 @@ base=`826f8e2ee5171acfff644efdd9e8527d41a8238f`，已含#551/#556。精确head/t
 用户将教师自评标准流程明确延续到扩展批；公开范围仅本来源元数据、原创报告编辑计划、必要脱敏验证，不含受限原文、真实学生数据或凭据。正式题本许可另核，不合并或部署，不伪造人类独审。
 
 本地boundary证据保留其记录时688d61eb输入身份；最终base刷新为826f8e2e，source未改，正式public selected检查仍以实际checkout执行。没有重跑原题/计分/PG或旧失败run。
+
+本次授权恢复后，实际main推进到6cad86d8f721a45a47a91290edf1523519d1d239；原生成索引合并冲突用现有生成器处理，保留主线全部条目。该base未检出同源SRLIS。原source及私有/原题边界未变；旧本地验证保留其原输入身份。正式selected合同及generator --check由新PR轻CI执行，不重新跑全平台。精确新head/tree见PR。
