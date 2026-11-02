@@ -8,7 +8,7 @@
 
 只增加本母工具的 source.json / instrument.ts 来源目录、生成索引、说明与原创反馈示例。沿已有目录和标签机制，不改 Form/Scale 引擎、权限、schema、依赖、CI或数据库表。所需检查发现的具体问题是：原题块数量/角色错配、版本混用、无分表单被投影为有分报告、候选被误启动、公开文件带入受限原文。主要执行位置为本 worktree 的本地定向检查，预计约5分钟；复用现有解析/目录消费者，不跑全平台或构建。
 
-当前基线的轻型CLI存在共同 CHEXI `factory-shape` 问题，由工程PR #556处理。本PR不复制修复，不换全量路线、不重复触发已知失败。源目录合同与原生目录投影单列检查，不能冒充完整CLI或正式CI成功；最终CI状态见证据/PR回读。CI清单已通过协调者给定的 Qiang 连接读取，适用CI-004、CI-020；不再把之前的Hui连接错误当作页面全局不存在。
+开工基线的轻型CLI曾有共同 CHEXI `factory-shape` 问题；已纳入 main `ae05ed2e70691bda817ab323130f9caf4dff26ca`（#551/#556）的公共修复，本PR相对该main不含检查器或CI修改。完整selected CLI和生成索引check以本次GitHub轻型内容作业为主要执行位置，本地不先重复整条检查；本地只核原生目录/隔离拒绝/题块映射及公开边界。最终CI状态见证据/PR回读。CI清单已通过协调者给定的 Qiang 连接读取，适用CI-004、CI-020；不再把之前的Hui连接错误当作页面全局不存在。
 
 ## 原版结构与拆分清单
 
@@ -36,7 +36,7 @@
 
 35项共用稳定 `family:emu` 和名称前缀 `EMU｜`，沿现有catalog constructOverlapTags与将来的原生工具tags。inventory逐项列出tags：role:teacher_self/student/observer、language:de、version:emu_core_v6_0、timeframe:single_lesson、专业反思用途、许可待确认、执教者性别措辞和DU/SIE。没有标签引擎/新表；共同tag只用于筛选和并列阅读。
 
-候选身份版本为6.0.0、catalogManifestVersion为1、来源语言元数据localizationVersion为1.0.0。这些都不是已发布内容C。**C尚未实例化；计分参数P及评分报告R不适用**；原创非评分反馈文案草稿单独标1.0.0。中文名称/说明只是编辑元数据，不是得到作者同意的EM U中文题本或已验证翻译。没有ideal版身份，原件没有本轮可用的ideal题本。
+候选身份版本为6.0.0、catalogManifestVersion为1、来源语言元数据localizationVersion为1.0.0。这些都不是已发布内容C。**C尚未实例化；计分参数P及评分报告R不适用**；原创非评分反馈文案草稿单独标1.0.0。中文名称/说明只是编辑元数据，不是得到作者同意的EMU中文题本或已验证翻译。没有ideal版身份，原件没有本轮可用的ideal题本。
 
 ## 响应、缺失与分析边界
 

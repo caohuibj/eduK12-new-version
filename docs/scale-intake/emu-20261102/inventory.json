@@ -162,7 +162,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_teacher_self_de",
@@ -212,7 +220,16 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_teacher_self_de",
@@ -261,7 +278,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_teacher_self_de",
@@ -311,7 +336,16 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_teacher_self_de",
@@ -360,7 +394,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 4,
+        "27": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_classroom_management_observer_female_de",
@@ -409,7 +451,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_observer_female_de",
@@ -459,7 +509,16 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_observer_female_de",
@@ -508,7 +567,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_observer_female_de",
@@ -558,7 +625,16 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_observer_female_de",
@@ -607,7 +683,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 4,
+        "27": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_classroom_management_observer_male_de",
@@ -656,7 +740,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_observer_male_de",
@@ -706,7 +798,16 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_observer_male_de",
@@ -755,7 +856,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_observer_male_de",
@@ -805,7 +914,16 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_observer_male_de",
@@ -854,7 +972,15 @@
         "population:teacher",
         "classroom_stage:all_source_school_grades"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 4,
+        "27": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_classroom_management_student_female_du_de",
@@ -904,7 +1030,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_student_female_du_de",
@@ -955,7 +1089,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_student_female_du_de",
@@ -1005,7 +1148,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_student_female_du_de",
@@ -1056,7 +1207,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_student_female_du_de",
@@ -1105,7 +1265,14 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 5
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_classroom_management_student_female_sie_de",
@@ -1155,7 +1322,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_student_female_sie_de",
@@ -1206,7 +1381,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_student_female_sie_de",
@@ -1256,7 +1440,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_student_female_sie_de",
@@ -1307,7 +1499,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_student_female_sie_de",
@@ -1356,7 +1557,14 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 5
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_classroom_management_student_male_du_de",
@@ -1406,7 +1614,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_student_male_du_de",
@@ -1457,7 +1673,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_student_male_du_de",
@@ -1507,7 +1732,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_student_male_du_de",
@@ -1558,7 +1791,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_student_male_du_de",
@@ -1607,7 +1849,14 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 5
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_classroom_management_student_male_sie_de",
@@ -1657,7 +1906,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_learning_climate_motivation_student_male_sie_de",
@@ -1708,7 +1965,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "6": 4,
+        "7": 4,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_clarity_structure_student_male_sie_de",
@@ -1758,7 +2024,15 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4,
+        "16": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_activation_support_student_male_sie_de",
@@ -1809,7 +2083,16 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "17": 4,
+        "18": 4,
+        "19": 4,
+        "20": 4,
+        "21": 4,
+        "22": 4
+      },
+      "scoring": false
     },
     {
       "key": "emu_v6_lesson_lesson_review_student_male_sie_de",
@@ -1858,7 +2141,14 @@
         "population:original_source_grade5plus",
         "age:grade_based_no_fixed_age"
       ],
-      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed."
+      "administration": "Sub-blocks are indexing/import candidates only; no independently validated or author-approved extract claimed. Prefer complete original context if licensed.",
+      "responseOptionCounts": {
+        "23": 4,
+        "24": 4,
+        "25": 4,
+        "26": 5
+      },
+      "scoring": false
     }
   ],
   "parallelMapping": {

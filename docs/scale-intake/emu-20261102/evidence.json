@@ -1,0 +1,874 @@
+{
+  "schemaVersion": 1,
+  "recordedOn": "2026-11-02",
+  "initialBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "integratedBase": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "sharedFixes": "main #551/#556; no tool/CI edits relative to integratedBase",
+  "originalSpsWorkPreserved": {
+    "branch": "feat/colorado-sps-intake-20261102",
+    "pr": 553,
+    "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7",
+    "modifiedByEmuTask": false
+  },
+  "nativeMetadataAndLocalRefusal": {
+    "status": "NATIVE_METADATA_AND_LOCAL_REFUSAL_PASSED",
+    "candidates": 35,
+    "scoreCountEach": 0,
+    "nativeScalePackages": 0,
+    "nativeFormsInstalled": 0,
+    "launchLinks": 0,
+    "rightsApproval": false,
+    "localDatabase": {
+      "host": "127.0.0.1",
+      "port": "55432",
+      "database": "eduk12_dev",
+      "scalesBefore": 17,
+      "scalesAfter": 17,
+      "familyMatches": 0
+    },
+    "nativeScaleMaterializeExpectedRefusals": 35,
+    "writes": 0,
+    "partitions": [
+      {
+        "identity": "emu_v6_lesson_full_teacher_self_de",
+        "blocks": 5,
+        "originalCount": 27,
+        "uniqueItems": true
+      },
+      {
+        "identity": "emu_v6_lesson_full_observer_female_de",
+        "blocks": 5,
+        "originalCount": 27,
+        "uniqueItems": true
+      },
+      {
+        "identity": "emu_v6_lesson_full_observer_male_de",
+        "blocks": 5,
+        "originalCount": 27,
+        "uniqueItems": true
+      },
+      {
+        "identity": "emu_v6_lesson_full_student_female_du_de",
+        "blocks": 5,
+        "originalCount": 26,
+        "uniqueItems": true
+      },
+      {
+        "identity": "emu_v6_lesson_full_student_female_sie_de",
+        "blocks": 5,
+        "originalCount": 26,
+        "uniqueItems": true
+      },
+      {
+        "identity": "emu_v6_lesson_full_student_male_du_de",
+        "blocks": 5,
+        "originalCount": 26,
+        "uniqueItems": true
+      },
+      {
+        "identity": "emu_v6_lesson_full_student_male_sie_de",
+        "blocks": 5,
+        "originalCount": 26,
+        "uniqueItems": true
+      }
+    ],
+    "longerPeriod": {
+      "items": 40,
+      "blocks": 7,
+      "observer": false
+    },
+    "boundary": "Catalog and rejection checks only. No original-content native Form or actual scoring/report pipeline was constructed or installed; substantive source permission remains unresolved."
+  },
+  "sourceReview": {
+    "officialPDFsRead": 7,
+    "coreVersionsRead": 4,
+    "longerPeriodVersionsRead": 3,
+    "coreRoleNormalizedFullTextHashes": {
+      "Abgleichfrageboegen_Sie-Fassung_maennliche_Lehrperson_V6.0": {
+        "teacher_full": "3aaa2b4aaea7732e0a0849b8a0d7eabb3455198417ea6c413ed85a32ee5e5cb0",
+        "observer_full": "492fab164c5efbf31e8a87d09e01f7ef43edd0ae2accc9647f9d445a1e35c415",
+        "student_full": "266ec2d63e85c8bac6fcb550de1f0aa0e959c59850d9dab566a4ac24f43ed1ef"
+      },
+      "Abgleichfrageboegen_Sie-Version_weibliche_Lehrperson_V6.0": {
+        "teacher_full": "3aaa2b4aaea7732e0a0849b8a0d7eabb3455198417ea6c413ed85a32ee5e5cb0",
+        "observer_full": "a7ae4af57c5a7670eaee29d74008eeba1fddcb27fc72866c9b711da610016856",
+        "student_full": "90727d22c14d28d91ac2b89effa1c046a4b93761d23d2a3d26b919dd57daa133"
+      },
+      "Abgleichfrageboegen_maennliche_Lehrperson_V6.0": {
+        "teacher_full": "3aaa2b4aaea7732e0a0849b8a0d7eabb3455198417ea6c413ed85a32ee5e5cb0",
+        "observer_full": "492fab164c5efbf31e8a87d09e01f7ef43edd0ae2accc9647f9d445a1e35c415",
+        "student_full": "e8268bb2d8b86366a467f3c02db19feeb12e6f283e561edf42386fb954b6d809"
+      },
+      "Abgleichfrageboegen_weibliche_Lehrperson_V6.0": {
+        "teacher_full": "3aaa2b4aaea7732e0a0849b8a0d7eabb3455198417ea6c413ed85a32ee5e5cb0",
+        "observer_full": "a7ae4af57c5a7670eaee29d74008eeba1fddcb27fc72866c9b711da610016856",
+        "student_full": "7dd51da433e995f857a4beb42a85a6f6976b003d4b8fd5bf0cf26595e159c787"
+      }
+    },
+    "method": "pdftotext -layout for private source review; normalized hashes are transcription/duplicate evidence only, not permission or cross-role measurement equivalence.",
+    "mainBaseWrappers": 258,
+    "mainBaseSourceJson": 235,
+    "mainItemAudit": {
+      "scannedFiles": 554,
+      "sourceItemComparisons": 256,
+      "matches": []
+    },
+    "coreItemCounts": {
+      "teacher": 27,
+      "observer": 27,
+      "student": 26
+    },
+    "longerPeriod": {
+      "teacher": 40,
+      "studentFemale": 40,
+      "studentMale": 40,
+      "observerProvided": false
+    }
+  },
+  "openPrAudit": {
+    "count": 42,
+    "familyTermMatches": 0,
+    "errors": 0,
+    "records": [
+      {
+        "pr": 556,
+        "method": "DIFF",
+        "files": 2,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 555,
+        "method": "DIFF",
+        "files": 71,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 554,
+        "method": "DIFF",
+        "files": 35,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 553,
+        "method": "DIFF",
+        "files": 28,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 552,
+        "method": "DIFF",
+        "files": 16,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 550,
+        "method": "DIFF",
+        "files": 24,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 549,
+        "method": "DIFF",
+        "files": 4,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 548,
+        "method": "DIFF",
+        "files": 16,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 547,
+        "method": "DIFF",
+        "files": 14,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 546,
+        "method": "DIFF",
+        "files": 13,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 545,
+        "method": "DIFF",
+        "files": 40,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 544,
+        "method": "DIFF",
+        "files": 23,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 543,
+        "method": "DIFF",
+        "files": 82,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 542,
+        "method": "DIFF",
+        "files": 37,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 541,
+        "method": "DIFF",
+        "files": 31,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 540,
+        "method": "DIFF",
+        "files": 27,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 539,
+        "method": "DIFF",
+        "files": 277,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 538,
+        "method": "DIFF",
+        "files": 36,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 537,
+        "method": "DIFF",
+        "files": 17,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 529,
+        "method": "DIFF",
+        "files": 5,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 515,
+        "method": "DIFF",
+        "files": 6,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 491,
+        "method": "DIFF",
+        "files": 4,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 489,
+        "method": "DIFF",
+        "files": 3,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 488,
+        "method": "DIFF",
+        "files": 3,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 482,
+        "method": "FILES_API",
+        "files": 310,
+        "familyTermMatch": false,
+        "missingPatches": 0,
+        "missingScaleSourcePatches": []
+      },
+      {
+        "pr": 441,
+        "method": "FILES_API",
+        "files": 693,
+        "familyTermMatch": false,
+        "missingPatches": 2,
+        "missingScaleSourcePatches": []
+      },
+      {
+        "pr": 413,
+        "method": "DIFF",
+        "files": 15,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 412,
+        "method": "DIFF",
+        "files": 1,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 397,
+        "method": "DIFF",
+        "files": 2,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 383,
+        "method": "DIFF",
+        "files": 5,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 379,
+        "method": "FILES_API",
+        "files": 272,
+        "familyTermMatch": false,
+        "missingPatches": 29,
+        "missingScaleSourcePatches": [
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+            "sha": "14ad739f89a99c41baddc8b31441704b18c3f850",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+            "sha": "d02efb4fbfd47618675fa952ea0332c78e709417",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+            "sha": "65fa7348627e396ff8aa04331e05c66a6d084f69",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+            "sha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+            "sha": "4bc4ca86144ce287e750f2b91410c16b2beaf14d",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+            "sha": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+            "sha": "af278ab324ed7bd18ee65b56f27736247c2c4855",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+            "sha": "8901cc70b49f34bce955541a93bab8a0a03c81e0",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+            "sha": "c887b6529869f2c7467a61e02c460abe3436d10d",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+            "sha": "007ad1dfd5b3aeb606f22d447ac36b4a2c52b39c",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+            "sha": "f6b2d12726e0fbd8d7fc0cff4a591776f5304289",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+            "sha": "513de03d05051f9a26692bed14e10650c87a40e8",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+            "sha": "410e10f564ec0020204d40956c320776253fd086",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "10670b9b23fd9fcb8b8f512d8d9cdde538647120",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+            "sha": "c2cb9e5b4206443a0e1f44a6456358fb16fee65b",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+            "sha": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
+            "sha": "0e909b68004afa246aae3f41971bef90bce58970",
+            "status": "added"
+          }
+        ]
+      },
+      {
+        "pr": 375,
+        "method": "FILES_API",
+        "files": 374,
+        "familyTermMatch": false,
+        "missingPatches": 75,
+        "missingScaleSourcePatches": [
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+            "sha": "14ad739f89a99c41baddc8b31441704b18c3f850",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+            "sha": "d02efb4fbfd47618675fa952ea0332c78e709417",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+            "sha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+            "sha": "4bc4ca86144ce287e750f2b91410c16b2beaf14d",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+            "sha": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+            "sha": "af278ab324ed7bd18ee65b56f27736247c2c4855",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+            "sha": "8901cc70b49f34bce955541a93bab8a0a03c81e0",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+            "sha": "c887b6529869f2c7467a61e02c460abe3436d10d",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+            "sha": "007ad1dfd5b3aeb606f22d447ac36b4a2c52b39c",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+            "sha": "f6b2d12726e0fbd8d7fc0cff4a591776f5304289",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+            "sha": "f9c63ff5f4e851663b58e01877df85af53699772",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/scorer.ts",
+            "sha": "81b5a5b8b2c388432382d2deb15cfe2cb231b352",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+            "sha": "410e10f564ec0020204d40956c320776253fd086",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "10670b9b23fd9fcb8b8f512d8d9cdde538647120",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+            "sha": "c2cb9e5b4206443a0e1f44a6456358fb16fee65b",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+            "sha": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/instrument.ts",
+            "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+            "status": "added"
+          },
+          {
+            "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
+            "sha": "0e909b68004afa246aae3f41971bef90bce58970",
+            "status": "added"
+          }
+        ]
+      },
+      {
+        "pr": 373,
+        "method": "DIFF",
+        "files": 61,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 371,
+        "method": "DIFF",
+        "files": 208,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 370,
+        "method": "DIFF",
+        "files": 66,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 368,
+        "method": "FILES_API",
+        "files": 2101,
+        "familyTermMatch": false,
+        "missingPatches": 446,
+        "missingScaleSourcePatches": []
+      },
+      {
+        "pr": 367,
+        "method": "DIFF",
+        "files": 136,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 362,
+        "method": "DIFF",
+        "files": 9,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 360,
+        "method": "FILES_API",
+        "files": 1269,
+        "familyTermMatch": false,
+        "missingPatches": 302,
+        "missingScaleSourcePatches": []
+      },
+      {
+        "pr": 330,
+        "method": "DIFF",
+        "files": 15,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 329,
+        "method": "DIFF",
+        "files": 62,
+        "familyTermMatch": false
+      },
+      {
+        "pr": 328,
+        "method": "DIFF",
+        "files": 73,
+        "familyTermMatch": false
+      }
+    ],
+    "missingScalePatchBlobs": [
+      {
+        "sha": "14ad739f89a99c41baddc8b31441704b18c3f850",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "d02efb4fbfd47618675fa952ea0332c78e709417",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "65fa7348627e396ff8aa04331e05c66a6d084f69",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "4bc4ca86144ce287e750f2b91410c16b2beaf14d",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/instrument.ts",
+        "familyMatch": false
+      },
+      {
+        "sha": "af278ab324ed7bd18ee65b56f27736247c2c4855",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "8901cc70b49f34bce955541a93bab8a0a03c81e0",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+        "familyMatch": false
+      },
+      {
+        "sha": "c887b6529869f2c7467a61e02c460abe3436d10d",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "007ad1dfd5b3aeb606f22d447ac36b4a2c52b39c",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "f6b2d12726e0fbd8d7fc0cff4a591776f5304289",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+        "familyMatch": false
+      },
+      {
+        "sha": "513de03d05051f9a26692bed14e10650c87a40e8",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+        "familyMatch": false
+      },
+      {
+        "sha": "410e10f564ec0020204d40956c320776253fd086",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "10670b9b23fd9fcb8b8f512d8d9cdde538647120",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+        "familyMatch": false
+      },
+      {
+        "sha": "c2cb9e5b4206443a0e1f44a6456358fb16fee65b",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "0e909b68004afa246aae3f41971bef90bce58970",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
+        "familyMatch": false
+      },
+      {
+        "sha": "f9c63ff5f4e851663b58e01877df85af53699772",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+        "familyMatch": false
+      },
+      {
+        "sha": "81b5a5b8b2c388432382d2deb15cfe2cb231b352",
+        "status": "READ",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/scorer.ts",
+        "familyMatch": false
+      }
+    ],
+    "coverage": "All listed paths and available patches; 20 omitted Scale source blobs fetched by SHA. Omitted non-Scale large/binary patches were not represented as fully read."
+  },
+  "publicBoundary": {
+    "newPublicFilesScanned": 74,
+    "originalPromptMatches": 0,
+    "method": "Compare normalized original prompts of length>=45 against proposed new public metadata/docs; no full prompt matches. Short proper construct names are intentional bibliographic metadata.",
+    "originalSourceFilesCommitted": false,
+    "originalItemTextsCommitted": false,
+    "nativeInstrumentDerivativeCreated": false,
+    "humanReviewClaimed": false
+  },
+  "localChecks": {
+    "nativeCatalogProjection": "PASSED:35,scoreCount0,noLaunch,noApprovedRights",
+    "sourceRolePartition": "PASSED:7 complete-form contexts, five original blocks each; 27/27/26 items preserved without duplication",
+    "originalResponseCategoryBoundary": "PASSED_METADATA_ONLY: studentQ26 has5 categories, other core items4; no option.score or scoring definition instantiated",
+    "localDatabase": "PASSED_EXPECTED_REFUSAL_ONLY; zero library writes,17scale rows unchanged; not successful Form import",
+    "feedbackProse": "EDITORIAL_REVIEW_ONLY:teacher/self/aggregate/observer and student5-6/7-12,ordinary/difficulty/insufficient; no numeric report or privacy change"
+  },
+  "ciPlan": {
+    "primaryExecution": "GitHub existing scale_intake_light; generated registry and full selected contract run there once; no pre-run of the complete CLI locally",
+    "localPreflight": "Only actual branch scope and public content boundary plus native read/rejection and source partitions",
+    "notionChecklist": "Read through Qiang connection link_6ae487749ba88191982b4dcc83ac39b8; CI-004 and CI-020 applicable; old Hui failure not treated as global unavailability",
+    "officialRun": "NOT_STARTED_AT_EVIDENCE_COMMIT",
+    "status": "PENDING_OFFICIAL_CI",
+    "knownOldFailure": "Prior main factory-shape failure belongs to old checker/#556; not reproduced or counted as this EMU candidate failure.",
+    "fullPlatform": "NOT_SELECTED"
+  },
+  "remainingBlockers": [
+    {
+      "action": "Create/install native original-content Form or administer EMU",
+      "target": "EMU corev6.0 and any extracted block; this EduK12 deployment",
+      "reason": "Official terms exclude commercial companies and require author consent for adaptations/translations; eligible institutional use, digital embedding, block extraction and public redistribution not established.",
+      "status": "NOT_ATTEMPTED_RIGHTS_PENDING",
+      "alreadyCompleted": "7official PDFs read;35block metadata and7full-form references; no original derivative installed",
+      "notMissing": "Original questionnaires are available, not missing."
+    },
+    {
+      "action": "Assert no existing production/admin-authored duplicate",
+      "target": "production library and administrator drafts",
+      "reason": "Only repository/openPR and local17scale snapshot audited; no production data accessed",
+      "status": "NOT_RUN"
+    }
+  ],
+  "notExecuted": [
+    "NativeForm import/save/readback with original items",
+    "Native scoring or score-report execution; authors prescribe no domain scales/sums",
+    "Fullbackend/frontend/platform tests",
+    "Application build",
+    "Migration",
+    "Production DB read/write",
+    "Real student answers",
+    "Translations/adaptation/public item redistribution",
+    "Author contact or terms acceptance",
+    "Independent human approval",
+    "Merge or deployment"
+  ],
+  "validatedInputSha256": {
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_teacher_self_de/6.0.0/source.json": "fcc507c05c3ba7aac65725d1c618347bfdc6e93b3ecb056eaba0abfcc808d384",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_teacher_self_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_male_sie_de/6.0.0/source.json": "fe6d3c8d87e52f3ea73dfc20ec0c6f6d31dcfa5dca6a392edebcf054e9f1b93f",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_male_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_female_sie_de/6.0.0/source.json": "e8bdc92c41baa0103b69627448f6ab5a0cff9b352db9c90c9d32a3ca82aae1c1",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_female_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_male_du_de/6.0.0/source.json": "220a1810e3c0e07f0e8665b3d31207589cbd818c6515ed8b8fc12e1e2707c4c7",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_male_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_female_du_de/6.0.0/source.json": "b688ce62802c4412719d15bbc8aef595d4ec43d8e03201b04efca5c05b7117c4",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_female_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_observer_female_de/6.0.0/source.json": "2846db72571242d1881d0b5a76f39ecd637484588375ce79dc0ac47f6b9090d4",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_observer_female_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_female_sie_de/6.0.0/source.json": "75ff7ac61df1b8ecb224f11e01c70c4dc61a02c50375c0e5cdfe8ebd172d0f2b",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_female_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_observer_male_de/6.0.0/source.json": "48ac0ccc4281583a3595748f7022f0bc7d44adae61e6772a0e481fda546b5396",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_observer_male_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_male_sie_de/6.0.0/source.json": "afe43c58f0ebc2e41800ff534ef73c3578c6e61207174d58d20b88788faf5abc",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_male_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_observer_female_de/6.0.0/source.json": "e39963640298eb808e3cbe55f17925b07c957d51ce936fefb5f886caedc4881f",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_observer_female_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_female_du_de/6.0.0/source.json": "3d7d3a5235dcf406d2d40d7df7a054f9d8b72f07755e0ad0cc618389f4094c64",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_female_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_male_du_de/6.0.0/source.json": "c5f66b4b0eab45e455810297ca9e5e839a6dcdab93b3ede79f6c2ddfde9b629f",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_male_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_male_sie_de/6.0.0/source.json": "cefa559a2e49c39ea0b59f5a0c2f061a555b4fb16705dad8212bc0dcb4b2a0b4",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_male_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_male_du_de/6.0.0/source.json": "aa5e4ecc6770f0fce3a84e9829785864ce8fcfb1006ea56780c6078722c40d35",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_male_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_observer_male_de/6.0.0/source.json": "6ed2f80acaa71f599414a03bebe776db22d36bd41ac05e051d478879337d649b",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_observer_male_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_female_du_de/6.0.0/source.json": "cc91ed70b4afb6727df088b45272eb733aeb6ef35d548bc91d387fcb8ec1d754",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_female_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_female_du_de/6.0.0/source.json": "15be4a90bf2362bfff6b9f2bb53272a8ab83f1b340dc2499ae554210a38d46cd",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_female_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_observer_female_de/6.0.0/source.json": "f43725c99d203defca0a075f096ea5c758049dcca7cedd1349d1d05b4c70c4c8",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_observer_female_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_teacher_self_de/6.0.0/source.json": "a2ce86d48050844678c95a239c9ec81fdc0fd8e2c581dca4f70450e422d36b84",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_teacher_self_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_male_du_de/6.0.0/source.json": "d12f50ed37a1c8d19651d545ec314b23b790db23fa29dc7e72db21023d7d711a",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_male_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_observer_male_de/6.0.0/source.json": "6d9be272931ad716db0cc961d2e13e259fe8bc481a5eb64c1ee8c48faeeb7a24",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_observer_male_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_observer_female_de/6.0.0/source.json": "73f79940623ab7d69974f69d5007fa51565efe5b2eff5fd8a4ff705a39cca067",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_observer_female_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_teacher_self_de/6.0.0/source.json": "9c717dedfeffc9539dba3a17b031c53d84ba9a145ee2e5a2521b5142ef341798",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_teacher_self_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_male_sie_de/6.0.0/source.json": "d7b086949bcdadfc49afe791ac2b379e413b1e4e5ad5cc360225b3525376b89e",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_student_male_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_male_sie_de/6.0.0/source.json": "1a16a4ccae4f5137c180e598839c0bee33aa00c3cdc028b3fad3a8d48114b565",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_male_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_observer_male_de/6.0.0/source.json": "f11748d8ffb6dd6edd769dd76a94077a064de409d3409bc4caedfc3ad9689f4e",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_activation_support_observer_male_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_teacher_self_de/6.0.0/source.json": "8c00ae63d7197ea89610a358085a4cfd9293ce49d75542d5249748510737f7c3",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_teacher_self_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_female_sie_de/6.0.0/source.json": "471ccc0da66afdb658c561f3eaa87a092985f6fb104f26edb6105491d1868be8",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_student_female_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_observer_female_de/6.0.0/source.json": "2f1471d20196255d4b8d25425fa284160e6aa5ad4838425d31e4cb934b8e1ab9",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_clarity_structure_observer_female_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_female_sie_de/6.0.0/source.json": "5aa652c2e53cef4d06e321a3d871f90d80eca1c14bb1b620e9effa05478613d6",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_student_female_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_observer_male_de/6.0.0/source.json": "5f8d3fa5058281656f1ae9d91e8ae3ce0335121319d4b14055b6a6a0d4519cc9",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_learning_climate_motivation_observer_male_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_teacher_self_de/6.0.0/source.json": "8629372d5fc2854527412eac430f58e8afe866bca8cd838acc225504c272c79d",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_teacher_self_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_female_du_de/6.0.0/source.json": "6facd276522d063600f4681e8e50bc0c6c88abb0934769db1d2a8c5b89b35dd9",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_lesson_review_student_female_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_male_du_de/6.0.0/source.json": "cea9c2d542c1d691301cc4af069366d60f1c7f1527efa7b7940c736063c580c0",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_male_du_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_female_sie_de/6.0.0/source.json": "7a1aff6494a9eec1b4b021c423daa55b7e383179d139fbc14fc561c28425750b",
+    "server-version/backend/src/modules/scale/instruments/emu_v6_lesson_classroom_management_student_female_sie_de/6.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "74269f5ff0c1adda586c638a51df223812ca25724587a883b9de5808b831fbd8",
+    "docs/scale-intake/emu-20261102/inventory.json": "98abbc15e797fc5124a6e6d9b3039e3ebe51df66d78deee8066884f78ce00f66",
+    "docs/scale-intake/emu-20261102/sources.json": "cf01d52b63837523563d013d840ecf5347e81a1f61f4511aae6554082a7673ad",
+    "docs/scale-intake/emu-20261102/feedback-examples.md": "bd07a3a6db251866aca86efa935c4f0f28a656e3d18df9a0e36884411ef01a26"
+  }
+}
