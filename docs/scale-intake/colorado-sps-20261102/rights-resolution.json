@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "checkedOn": "2026-11-02",
+  "conclusion": "CONDITIONALLY_PROCESSABLE; NOT_MISSING_FULL_TEXT; vendor use needs the specific CEI licensing route",
+  "sources": [
+    {
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/10/CEI-SPS_PlanningGuide_16Sept2015.pdf",
+      "pdfPage": 6,
+      "printedPage": 5,
+      "sha256": "9049ff3955ef6a63ae8b6f4abc2120053c41e841952b697fb9971d7f6f0d8f2b",
+      "shortQuote": "the vendor must enter into a licensing agreement with CEI",
+      "contactPublishedInDocument": "info@coloradoedinitiative.org"
+    },
+    {
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/02/SPS_Administration_survey-instrument-3-5-CEI.pdf",
+      "pdfPage": 1,
+      "shortQuote": "To request permission to excerpt or share this publication, either in print or electronically",
+      "contactPublishedInDocument": "publications@coloradoedinitiative.org"
+    },
+    {
+      "url": "https://www.coloradoedinitiative.org/Resources/student-perception-survey-toolkit/",
+      "note": "Official school/district planning, administration, self-assessment and reflection resources; online version routes users to CEI."
+    }
+  ],
+  "rightsByAction": [
+    {
+      "action": "合法访问与资料研究",
+      "alreadyObtained": "两学段最终34题、两份原序DOCX、两份教师自评34题、反思DOCX与技术报告均已取得。",
+      "exactGap": "没有题本缺口；访问原件不等于取得一切后续用途许可。",
+      "source": "https://www.coloradoedinitiative.org/Resources/student-perception-survey-toolkit/",
+      "directSolution": "保留原件、哈希、题号与原选项映射，可继续非发布资料核对。",
+      "userOrRightsHolderAction": "此层面无须新增授权信。"
+    },
+    {
+      "action": "校/学区内部非商业数字施测与处理",
+      "alreadyObtained": "Planning Guide明确列出学区自行负责在线或纸笔施测、分析与报告的路径。",
+      "exactGap": "实际主体、服务对象及第三方参与方式未说明；本条不是对任何商业平台的通用许可。",
+      "source": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/10/CEI-SPS_PlanningGuide_16Sept2015.pdf#page=6",
+      "directSolution": "符合学区内部自办场景时按官方全34题原序、原英文与既有功能处理；不要求仅因无单独授权信就全部停用。私有资料核对不是对学生施测。",
+      "userOrRightsHolderAction": "明确学校/学区主体、是否自行组织、EduK12仅供内部使用还是对外提供施测/分析/报告服务；界线不清请CEI确认。"
+    },
+    {
+      "action": "第三方供应商施测/分析/报告服务（收费与否分开核）",
+      "alreadyObtained": "官方明确设置供应商许可协议路径。",
+      "exactGap": "未取得覆盖实际供应商/主体及服务范围的CEI licensing agreement；不能仅用非商业说明替代该条。",
+      "source": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/10/CEI-SPS_PlanningGuide_16Sept2015.pdf#page=6",
+      "directSolution": "复用已有CEI供应商协议；否则由用户发起规定的供应商许可确认。不是技术上不能实现。",
+      "userOrRightsHolderAction": "提供已有协议及覆盖主体/工具/版本/地域/期限；没有时用户联系info@coloradoedinitiative.org确认供应商许可。助手未联系/签署。"
+    },
+    {
+      "action": "公共GitHub题文/电子摘录及再分发",
+      "alreadyObtained": "版权声明欢迎非商业分享，同时明确要求就印刷或电子摘录/分享请求许可。",
+      "exactGap": "尚无覆盖将原题全文、选项、可下载JSON公开再分发的许可。",
+      "source": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/02/SPS_Administration_survey-instrument-3-5-CEI.pdf",
+      "directSolution": "公开PR继续仅放来源、题号/选项映射、原创报告与缺口说明，不上传受限题文。内部资料不自动变成公共题库。",
+      "userOrRightsHolderAction": "请CEI明确是否允许公开仓库完整题文及JSON分发，并确认其可授权MET衍生题；未获许可则保持私有导入路线。"
+    },
+    {
+      "action": "商业平台/收费使用",
+      "alreadyObtained": "官方讨论付费供应商服务，说明商业服务有许可路径，并非完全不可解决。",
+      "exactGap": "非商业分享声明不覆盖收费平台、商业嵌入或对外托管。",
+      "source": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/10/CEI-SPS_PlanningGuide_16Sept2015.pdf#page=6",
+      "directSolution": "按供应商协议约定范围部署；免费访问/免费试用不能单独证明不是供应商。",
+      "userOrRightsHolderAction": "确认协议是否覆盖本主体商业模式、托管、报告服务和用户范围。"
+    },
+    {
+      "action": "翻译、改编、拆分与改序",
+      "alreadyObtained": "英文完整原题和选项齐；最终题本要求按施测材料原序，而非按四维连续排题。",
+      "exactGap": "未找到中文翻译、改题、四个独立包或改序的明示许可；这不等于找到绝对禁止条款。",
+      "source": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/02/SPS_Administration_survey-instrument-3-5-CEI.pdf",
+      "directSolution": "优先原英文完整34题原序，四维作为分析映射。教师自评与反思用无分Form；不凭学生分数验证教师自评。完整原序可由现有原生完整问卷表达，四个连续组件不能冒充同一原序。",
+      "userOrRightsHolderAction": "按实际需要逐项确认翻译/独立模块/改序；不需要翻译就先申请原英文用途。"
+    },
+    {
+      "action": "教师自评与反思附件",
+      "alreadyObtained": "两份34题教师自评注明Thompson School District；反思指南可下载，字段映射齐。",
+      "exactGap": "托管不证明CEI持有本用途全部再许可权；附件未单独给出通用电子再分发许可。",
+      "source": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_results_self-assessment-3-5_CEI.pdf",
+      "directSolution": "保持无分、原选项，原作者笔误不默改；合并在一次用途询问中确认覆盖范围。",
+      "userOrRightsHolderAction": "请CEI说明供应商/电子化许可是否同时覆盖Thompson教师表及反思指南，若不能请指明授权主体。"
+    }
+  ],
+  "technicalStatus": {
+    "fullTextMissing": false,
+    "nativeScalesImported": 0,
+    "nativeFormsImported": 0,
+    "publicItemTextAdded": false,
+    "realParticipantAdministration": false,
+    "reasonForNoNativeImport": "Actual deployment role is not established; third-party survey services expressly require CEI licensing. No grant for public payload publishing has been confirmed. Native deployment/publication remains pending; source verification is not prohibited.",
+    "existingLibraryLimits": "No new source/scorer/permissions/engine. Ordinary contiguous subscale components do not reproduce interleaved34-item order. Use intact administration after exact use scope resolved; no cross-tool total.",
+    "scoring": "Four ordered frequency categories; native unscored Forms need no scoring key. Existing raw mean/percent-favourable source basis can be used only with separately stated missing/aggregation policy; no unverified IRT recreation.",
+    "oldCiFailure": "Historical CHEXI parser failure retained; shared repair now exists. It is not the current licensing gap; no repeated full CLI/CI for this documentary follow-up."
+  },
+  "notDone": [
+    "No contact with rights holders",
+    "No account registration or payment",
+    "No agreement accepted or signed",
+    "No restricted source text pushed",
+    "No deployment or production writes"
+  ]
+}

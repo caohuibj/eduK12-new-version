@@ -1,0 +1,354 @@
+{
+  "status": "EXACT_SOURCE_MAPPING_READY_NOT_AN_EXECUTABLE_PACKAGE",
+  "studentAdministration": [
+    {
+      "gradeSpan": "3_5",
+      "source": "admin_3_5",
+      "docxSha256": "b993f7809a695f05cce7f5c82d6e87d3a03db94c662ab7ec8fa14548c806fad8",
+      "actualFinalRows": 34,
+      "nativeQuestionOrder": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "responseOptionKeys": [
+        {
+          "optionKey": "never",
+          "label": "Never",
+          "sourceStudentCoding": 1
+        },
+        {
+          "optionKey": "some",
+          "label": "Some of the time",
+          "sourceStudentCoding": 2
+        },
+        {
+          "optionKey": "most",
+          "label": "Most of the time",
+          "sourceStudentCoding": 3
+        },
+        {
+          "optionKey": "always",
+          "label": "Always",
+          "sourceStudentCoding": 4
+        }
+      ],
+      "unscoredFormRule": "Do not copy sourceStudentCoding into Form option.score; it records the scale coding reference only. Missing remains missing.",
+      "analysisMap": [
+        {
+          "candidate": "colorado_sps_student_learning_g3_5_student_en",
+          "sourceStudyQ": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            15,
+            17,
+            18
+          ],
+          "finalPositions": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            15,
+            17,
+            18
+          ]
+        },
+        {
+          "candidate": "colorado_sps_student_centered_environment_g3_5_student_en",
+          "sourceStudyQ": [
+            4,
+            14,
+            16,
+            19,
+            21,
+            22,
+            28,
+            29,
+            32,
+            33
+          ],
+          "finalPositions": [
+            4,
+            14,
+            16,
+            19,
+            21,
+            22,
+            27,
+            28,
+            31,
+            32
+          ]
+        },
+        {
+          "candidate": "colorado_sps_classroom_community_g3_5_student_en",
+          "sourceStudyQ": [
+            20,
+            30,
+            31,
+            34,
+            35
+          ],
+          "finalPositions": [
+            20,
+            29,
+            30,
+            33,
+            34
+          ]
+        },
+        {
+          "candidate": "colorado_sps_classroom_management_g3_5_student_en",
+          "sourceStudyQ": [
+            23,
+            24,
+            25,
+            26
+          ],
+          "finalPositions": [
+            23,
+            24,
+            25,
+            26
+          ]
+        }
+      ],
+      "sourceTextInPublicMap": false
+    },
+    {
+      "gradeSpan": "6_12",
+      "source": "admin_6_12",
+      "docxSha256": "c359b6266f938ced9408b5666ba7b4004187bab4bc8d2e5b0d0b57858fd6be69",
+      "actualFinalRows": 34,
+      "nativeQuestionOrder": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "responseOptionKeys": [
+        {
+          "optionKey": "never",
+          "label": "Never",
+          "sourceStudentCoding": 1
+        },
+        {
+          "optionKey": "some",
+          "label": "Some of the time",
+          "sourceStudentCoding": 2
+        },
+        {
+          "optionKey": "most",
+          "label": "Most of the time",
+          "sourceStudentCoding": 3
+        },
+        {
+          "optionKey": "always",
+          "label": "Always",
+          "sourceStudentCoding": 4
+        }
+      ],
+      "unscoredFormRule": "Do not copy sourceStudentCoding into Form option.score; it records the scale coding reference only. Missing remains missing.",
+      "analysisMap": [
+        {
+          "candidate": "colorado_sps_student_learning_g6_12_student_en",
+          "sourceStudyQ": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            16,
+            17,
+            18
+          ],
+          "finalPositions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            16,
+            17,
+            18
+          ]
+        },
+        {
+          "candidate": "colorado_sps_student_centered_environment_g6_12_student_en",
+          "sourceStudyQ": [
+            12,
+            13,
+            14,
+            19,
+            20,
+            27,
+            28
+          ],
+          "finalPositions": [
+            12,
+            13,
+            14,
+            19,
+            20,
+            26,
+            27
+          ]
+        },
+        {
+          "candidate": "colorado_sps_classroom_community_g6_12_student_en",
+          "sourceStudyQ": [
+            21,
+            26,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "finalPositions": [
+            21,
+            25,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34
+          ]
+        },
+        {
+          "candidate": "colorado_sps_classroom_management_g6_12_student_en",
+          "sourceStudyQ": [
+            22,
+            23,
+            24,
+            29
+          ],
+          "finalPositions": [
+            22,
+            23,
+            24,
+            28
+          ]
+        }
+      ],
+      "sourceTextInPublicMap": false
+    }
+  ],
+  "teacherSelfAssessment": {
+    "versions": [
+      "grades3–5",
+      "grades6–12"
+    ],
+    "questionCountEach": 34,
+    "options": [
+      "Never",
+      "Some of the time",
+      "Most of the time",
+      "Always"
+    ],
+    "numericOptionScores": null,
+    "sourceTypos": "Preserve source; corrections require a clearly identified adaptation."
+  },
+  "reflection": {
+    "editorialInputSlots": 13,
+    "numericScores": null,
+    "notOfficial13ItemScale": true
+  },
+  "validation": "New mapping contract only: both DOCX have34 actual English/Spanish question rows; existing four-dimension maps partition1–34 exactly once. No repeated native import or scoring tests."
+}
