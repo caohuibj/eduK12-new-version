@@ -48,6 +48,7 @@ import {
   activateScaleAdmission,
   loadScaleAdmissionRuntime,
   assertAdmissionParentBinding,
+  frozenScaleInstrumentKey,
   type ScaleAdmissionChildRow,
 } from './scale-admission.service'
 
@@ -131,7 +132,7 @@ const assertFrozenAdmission = async (
   if (
     !admission.scale
     || admission.scale.id !== child.scale.id
-    || admission.scale.code !== child.scale.code
+    || admission.scale.code !== frozenScaleInstrumentKey(child)
     || admission.scale.instrumentVersion !== child.scale.instrumentVersion
   ) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照身份不匹配', 409)
@@ -159,7 +160,7 @@ const assertRuntimeAgainstAdmission = (
   snapshot: VersionedFrozenScaleRuntimeSnapshot,
   input: UnifiedScaleFinalSubmitInput,
 ): void => {
-  if (snapshot.instrumentKey !== child.scale.code || snapshot.instrumentVersion !== child.scale.instrumentVersion) {
+  if (snapshot.instrumentKey !== frozenScaleInstrumentKey(child) || snapshot.instrumentVersion !== child.scale.instrumentVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '冻结的量表运行时身份不匹配', 409)
   }
   if (child.compiledRuntimeHash !== snapshot.compiledRuntime.compiledRuntimeHash) {
@@ -192,7 +193,7 @@ const buildResult = async (
   }
   return buildScaleResult({
     scaleId: child.scale.id,
-    instrumentKey: child.scale.code,
+    instrumentKey: snapshot.instrumentKey,
     name: child.scale.name,
     instrumentVersion: child.scale.instrumentVersion,
     definition: snapshot.definition,

@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { hashDeclarativePackage, parseDeclarativePackage } from '../assessment-bundle/onboarding/contract'
 import { dependencyBlockers } from '../assessment-bundle/onboarding/dependencies'
+import {resolveBundleScaleDependencies,bundleScaleDependencyLookup} from './standard-source'
 const reviewSchema=z.object({contentHash:z.string().regex(/^[a-f0-9]{64}$/),reviewerId:z.string().min(1),reviewedAt:z.string().datetime().optional(),expiresAt:z.string().datetime(),claims:z.array(z.enum(['independent_summary','cross_source_condition','joint_conclusion'])),scientific:z.literal(true),rights:z.literal(true),language:z.literal(true),report:z.literal(true),signature:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
 export function validateReview(raw:unknown,hash:string,secret:string|undefined,now=Date.now()) {
   const review=reviewSchema.parse(raw),{signature,...material}=review
@@ -25,9 +26,10 @@ export async function installPackage(db:PrismaClient,actorId:string,raw:unknown)
   if (existing && !existing.declarativePackage) throw new Error('BUNDLE_LEGACY_IDENTITY_RESERVED')
   if (existing?.declarativePackage && hashDeclarativePackage(existing.declarativePackage) !== hash) throw new Error('BUNDLE_VERSION_IMMUTABLE')
   verifyPackageFixtures(p)
-  const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
   return db.$transaction(async tx=>{
     await admin(tx,actorId)
+    const sources=await resolveBundleScaleDependencies(tx,p)
+    const blockers=dependencyBlockers(p,bundleScaleDependencyLookup(p,sources));if(blockers.length)throw new Error(blockers.join('; '))
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${d.bundleKey+'@'+d.bundleVersion},0))`
     const where={bundleKey_bundleVersion:{bundleKey:d.bundleKey,bundleVersion:d.bundleVersion}}
     const previous=await tx.bundlePackageRelease.findUnique({where})
@@ -44,13 +46,14 @@ export async function installPackage(db:PrismaClient,actorId:string,raw:unknown)
   })
 }
 async function assertPublishedDependencies(db: Prisma.TransactionClient, p: ReturnType<typeof parseDeclarativePackage>) {
+    const sources=await resolveBundleScaleDependencies(db,p),scale=bundleScaleDependencyLookup(p,sources)
     for(const slot of p.manifest.definition.slots){
       if(slot.unitType==='COGNITIVE'){
         const dep=p.manifest.cognitiveDependencies.find(d=>d.slotKey===slot.slotKey)!
         const cfg=await db.cognitiveTestConfig.findUnique({where:{testType_configVersion:{testType:slot.instrumentKey,configVersion:dep.configVersion}}})
         if(!cfg||cfg.status!=='PUBLISHED'||cfg.engineVersion!==dep.engineVersion||cfg.scoringVersion!==dep.scoringVersion)throw new Error('BUNDLE_COGNITIVE_DEPENDENCY_UNAVAILABLE')
       }
-      if(slot.unitType==='SCALE'){const {getExecutableScalePackage}=await import('../scale/onboarding/executable-registry');if(getExecutableScalePackage(slot.instrumentKey,slot.instrumentVersion)?.releaseStatus!=='PUBLISHED')throw new Error('BUNDLE_SCALE_DEPENDENCY_UNAVAILABLE')}
+      if(slot.unitType==='SCALE'){if(scale(slot.instrumentKey,slot.instrumentVersion)?.releaseStatus!=='PUBLISHED')throw new Error('BUNDLE_SCALE_DEPENDENCY_UNAVAILABLE')}
       if(slot.unitType==='SITUATIONAL'){const {selectPublishedSituationPackage,listSituationPackages}=await import('../situational/situation-package.registry');if(!selectPublishedSituationPackage(listSituationPackages(),slot.instrumentKey,slot.instrumentVersion))throw new Error('BUNDLE_SJT_DEPENDENCY_UNAVAILABLE')}
     }
 }
@@ -69,7 +72,8 @@ export async function publishPackage(db:PrismaClient,actorId:string,key:string,v
     // independent signed review, never by replaying the pre-HOLD approval.
     if(row.status==='HOLD' && (!review.reviewedAt || Date.parse(review.reviewedAt)<=row.updatedAt.getTime() || (row.review as any)?.signature===review.signature))throw new Error('BUNDLE_HOLD_REVIEW_REQUIRED')
     if(hashDeclarativePackage(p)!==row.contentHash)throw new Error('BUNDLE_CONTENT_HASH_MISMATCH')
-    const blockers=dependencyBlockers(p);if(blockers.length)throw new Error(blockers.join('; '))
+    const sources=await resolveBundleScaleDependencies(tx,p)
+    const blockers=dependencyBlockers(p,bundleScaleDependencyLookup(p,sources));if(blockers.length)throw new Error(blockers.join('; '))
     if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     if(p.rules.items.some(r=>r.kind!=='limitation'&&!review.claims.includes(r.kind)))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
     await assertPublishedDependencies(tx, p)
@@ -99,7 +103,8 @@ async function validatePackageAdmission(db:Prisma.TransactionClient,p:ReturnType
   await admin(db,review.reviewerId)
   if(review.reviewerId===row.installedBy)throw new Error('BUNDLE_INDEPENDENT_REVIEW_REQUIRED')
   if(p.schemaVersion===2 && !review.claims.includes('cross_source_condition'))throw new Error('BUNDLE_CLAIM_NOT_APPROVED')
-  const blockers = dependencyBlockers(p); if (blockers.length) throw new Error(blockers.join('; '))
+  const sources=await resolveBundleScaleDependencies(db,p)
+  const blockers = dependencyBlockers(p,bundleScaleDependencyLookup(p,sources)); if (blockers.length) throw new Error(blockers.join('; '))
   await assertPublishedDependencies(db, p)
   return row
 }

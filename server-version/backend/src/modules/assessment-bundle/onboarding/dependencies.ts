@@ -7,12 +7,16 @@ import { getSituationPackage } from '../../situational/situation-package.registr
 import { getCognitiveRegistryEntry, hasCognitiveProfile } from '../../cognitive/cognitive.registry'
 import { parseBundleContextDefinition } from '../context'
 import { parseDeclarativePackage } from './contract'
-export function dependencyBlockers(raw: unknown): string[] {
+export function dependencyBlockers(raw: unknown, resolveScale?: typeof getExecutableScalePackage): string[] {
   const p=parseDeclarativePackage(raw), errors:string[]=[]
+  const scale = resolveScale ?? ((key: string, version: string) => {
+    const source = p.manifest.scaleDependencies?.find(d => d.source.identity.instrumentKey === key && d.source.identity.instrumentVersion === version)?.source
+    return source?.executable ? {key,instrumentVersion:version,...source.executable} : getExecutableScalePackage(key,version)
+  })
   for(const slot of p.manifest.definition.slots) {
     const mappings=p.evidence.filter(e=>e.slotKey===slot.slotKey)
     if(slot.unitType==='SCALE') {
-      const pkg=getExecutableScalePackage(slot.instrumentKey,slot.instrumentVersion)
+      const pkg=scale(slot.instrumentKey,slot.instrumentVersion)
       if(!pkg) { errors.push(`${slot.slotKey}: unknown SCALE identity`);continue }
       for(const e of mappings) if(!pkg.definition.scoring.scores.some(s=>s.key===e.selector)||e.valueType!=='number'||e.unit!=='points') errors.push(`${e.evidenceKey}: SCALE selector/type/unit mismatch (points required)`)
     } else if(slot.unitType==='SITUATIONAL') {
@@ -34,7 +38,7 @@ export function dependencyBlockers(raw: unknown): string[] {
     }
   }
   if(p.schemaVersion===2)for(const b of p.profile.bindings){
-    const e=p.evidence.find(e=>e.evidenceKey===b.evidenceKey)!,pkg=getExecutableScalePackage(b.source.instrumentKey,b.source.instrumentVersion)
+    const e=p.evidence.find(e=>e.evidenceKey===b.evidenceKey)!,pkg=scale(b.source.instrumentKey,b.source.instrumentVersion)
     const d=pkg?.definition,score=d?.scoring.scores.find(s=>s.key===e.selector)
     const range=d?calculateScoreRanges(d).get(e.selector):undefined
     if(!d || canonicalHash(d)!==b.source.runtimeDefinitionHash || range?.min!==b.transformation.min || range?.max!==b.transformation.max || hashScaleDefinition(d)!==b.source.measurementHash || d.scoring.scoringVersion!==b.source.scoringVersion ||
@@ -46,7 +50,7 @@ export function dependencyBlockers(raw: unknown): string[] {
     const scaleScore=(key:string)=>{
       const e=p.evidence.find(e=>e.evidenceKey===key),slot=p.manifest.definition.slots.find(s=>s.slotKey===e?.slotKey)
       if(!e||slot?.unitType!=='SCALE')return null
-      const pkg=getExecutableScalePackage(slot.instrumentKey,slot.instrumentVersion)
+      const pkg=scale(slot.instrumentKey,slot.instrumentVersion)
       return pkg?{score:pkg.definition.scoring.scores.find(s=>s.key===e.selector),range:calculateScoreRanges(pkg.definition).get(e.selector)}:null
     }
     for(const d of p.rules.derivations){

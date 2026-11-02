@@ -1,4 +1,5 @@
 import {loadCognitiveProfileArtifact} from '../assessment-authorization/cognitive-profile-artifact'
+import {bundleScaleSourceSchema,readBundleScaleSources,readBundleScaleContentIdentity} from '../bundle-product/standard-source'
 import {readTrainingCognitiveTaskBinding,trainingCognitiveTaskBindingSchema} from '../assessment-authorization/training-cognitive-profile-use'
 import {assertCognitiveAssignmentFreeze} from '../assessment-authorization/cognitive-profile-assignment'
 import {assertCompositionPublicContent} from '../education-tools/private-tool.composition-content'
@@ -33,7 +34,8 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  cognitiveProfile:trainingCognitiveTaskBindingSchema.optional(),educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),educationNative:educationNativeDescriptorSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  bundleStandard:bundleScaleSourceSchema.optional(),cognitiveProfile:trainingCognitiveTaskBindingSchema.optional(),educationBinding:educationMarkerBindingSchema.optional(),educationStandard:educationStandardSourceSchema.optional(),educationLibrary:educationLibrarySourceSchema.optional(),educationNative:educationNativeDescriptorSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.bundleStandard&&(source.kind!=='SCALE'||source.id!==source.bundleStandard.scaleId||source.privateVersionId||source.libraryEntryId||source.standardCombination||source.educationStandard||source.educationLibrary||source.educationNative||source.educationBinding||source.cognitiveProfile))ctx.addIssue({code:'custom',message:'Bundle SCALE retains its independent exact C/P/R identity'})
  if(source.cognitiveProfile&&(source.kind!=='COGNITIVE_CONFIG'||!source.assignmentId||source.educationNative||source.educationBinding||source.standardCombination||source.educationStandard||source.educationLibrary||source.privateVersionId||source.libraryEntryId))ctx.addIssue({code:'custom',message:'认知精确配置必须保留独立来源'})
  if(source.educationNative&&(source.privateVersionId||source.libraryEntryId||source.educationStandard||source.educationLibrary||source.standardCombination||source.educationBinding
   ||(source.educationNative.provider==='COGNITIVE_CONFIG'?(source.kind!=='COGNITIVE_CONFIG'||source.id!==source.educationNative.sourceId||!source.assignmentId):!['SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY'].includes(source.kind)||source.id!==source.educationNative.sourceId)))ctx.addIssue({code:'custom',message:'教育原生单元必须保留独立原源身份'})
@@ -66,8 +68,9 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   resolvedSituational:Map<string,ResolvedSituationalRelease>,purpose:'NEW_ADMINISTRATION'|'HISTORICAL_INTERPRETATION'='NEW_ADMINISTRATION',standardMode:'PREVIEW'|'PUBLISH'='PREVIEW'){
   if(!composite.id||!Array.isArray(composite.items)||composite.items.length>1000)fail('SNAPSHOT_INVALID')
   const items=composite.items.filter(item=>item.type!=='FORM')
+  const bundleSources=await readBundleScaleSources(db,composite,items)
   if(items.some(item=>!['SCALE','COGNITIVE','SITUATIONAL'].includes(item.type))||new Set(items.map(item=>item.id)).size!==items.length)fail('SOURCE_INVALID')
-  const scaleIds=[...new Set<string>(items.filter(item=>item.type==='SCALE'&&item.standardCombinationSource==null).map(item=>item.scale?.id))]
+  const scaleIds=[...new Set<string>(items.filter(item=>item.type==='SCALE'&&item.standardCombinationSource==null&&!bundleSources.has(item.id)).map(item=>item.scale?.id))]
   const configIds=[...new Set<string>(items.filter(item=>item.type==='COGNITIVE').map(item=>item.cognitiveAssignment?.config?.id))]
   const assignmentIds=[...new Set<string>(items.filter(item=>item.type==='COGNITIVE').map(item=>item.cognitiveAssignment?.id))]
   const sjt=items.filter(item=>item.type==='SITUATIONAL').map(item=>({instrumentKey:item.situationalInstrumentKey,instrumentVersion:item.situationalInstrumentVersion}))
@@ -112,6 +115,16 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   }
   const units:Unit[]=[]
   for(const item of items){
+    const bundle=bundleSources.get(item.id)
+    if(bundle){
+      const derived=standardMode==='PUBLISH'?await materializeStandardCombinationContent(db,bundle.resolved.row,bundle.resolved.measurement,bundle.source.ownerId)
+        :await previewStandardCombinationContent(db,bundle.resolved.row,bundle.resolved.measurement)
+      releases.set(bundle.resolved.measurement.releaseId,bundle.resolved.measurement)
+      for(const [id,release] of derived.releases)releases.set(id,release)
+      units.push({itemId:item.id,family:'SCALE',source:{kind:'SCALE',id:item.scaleId,ownerId:bundle.scale.creatorId,bundleStandard:bundle.source},
+        measurement:{...bundle.source.measurement,measurementHash:bundle.resolved.measurement.content.measurementHash},referencePolicy:derived.referencePolicy,...(derived.report?{report:derived.report}:{})})
+      continue
+    }
     if(item.standardCombinationSource!=null){
       const standard=await verifyStoredTrainingStandardItem(db,composite,item)
       const derived=standardMode==='PUBLISH'?await materializeStandardCombinationContent(db,standard.resolved.row,standard.resolved.measurement,standard.reference.ownerId)
@@ -206,7 +219,7 @@ function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Ma
   return expected
 }
 export function trainingMeasurementSourceScopeMatches(release:Stored,source:Unit['source']){
- if(source.libraryEntryId||source.standardCombination||source.educationStandard)return false // Requires the database-backed exact adapter below.
+ if(source.libraryEntryId||source.standardCombination||source.educationStandard||source.bundleStandard)return false // Requires the database-backed exact adapter below.
  const scope=release.scope
  if(release.provenance?.sourceKind==='STATIC_SJT_REGISTRY'&&source.kind!=='STATIC_SJT_REGISTRY')return false
  if(source.kind==='STATIC_SJT_REGISTRY')return release.layer==='MEASUREMENT'&&release.family==='SJT'&&scope.kind==='PLATFORM'&&scope.ownerId===undefined&&source.ownerId===undefined
@@ -249,6 +262,11 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
   return source.kind==='SCALE'&&Boolean(source.privateVersionId)&&!source.libraryEntryId&&!source.educationBinding&&!source.standardCombination
    &&source.ownerId===origin.ownerUserId&&context.ownerId===origin.ownerUserId
    &&scope.kind==='PRIVATE'&&scope.product===origin.entry&&scope.ownerId===origin.ownerUserId&&scope.resourceId===source.privateVersionId
+ }
+ if(source.bundleStandard){
+  if(!context||release.layer!=='MEASUREMENT')fail('SCOPE_DENIED')
+  const exact=await readBundleScaleContentIdentity(db,source.bundleStandard,context)
+  return exact.measurement.releaseId===release.releaseId&&exact.measurement.contentHash===release.contentHash
  }
  if(source.standardCombination){
   if(!context||release.layer!=='MEASUREMENT')fail('SCOPE_DENIED')
@@ -331,6 +349,7 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       educationUnitPresentation:presentation,recheckSourceLicenses:async()=>{}}
   }
   const actualItems=input.composite.items.filter(item=>item.type!=='FORM')
+  const bundleSources=await readBundleScaleSources(db,input.composite,actualItems,'COLLECTION')
   const itemsById=new Map<string,any>(actualItems.map(item=>[item.id,item]))
   if(actualItems.length!==snapshot.units.length||itemsById.size!==actualItems.length)fail('SOURCE_MISMATCH')
   const releases=new Map<string,Stored>(),staticReceipts:Array<Awaited<ReturnType<typeof readStaticSjtMeasurementForStart>>>=[]
@@ -343,6 +362,12 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     if(item.type==='SITUATIONAL'&&(!['SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY'].includes(unit.source.kind)||unit.source.instrumentKey!==item.situationalInstrumentKey
       ||unit.source.instrumentVersion!==item.situationalInstrumentVersion))fail('SOURCE_MISMATCH')
     if(item.type==='COGNITIVE'&&canonicalHash(unit.source.cognitiveProfile??null)!==canonicalHash(readTrainingCognitiveTaskBinding(item.cognitiveAssignment.courseSnapshot)))fail('COGNITIVE_PROFILE_INVALID')
+    if(unit.source.bundleStandard){
+      const exact=bundleSources.get(item.id)
+      if(!exact||canonicalHash(exact.source)!==canonicalHash(unit.source.bundleStandard)||canonicalHash(exact.source.measurement)!==canonicalHash({releaseId:unit.measurement.releaseId,contentHash:unit.measurement.contentHash}))fail('SOURCE_MISMATCH')
+      releases.set(exact.resolved.measurement.releaseId,exact.resolved.measurement)
+      continue
+    }
     if(unit.source.standardCombination){
       if(!item.standardCombinationSource||canonicalHash(item.standardCombinationSource)!==canonicalHash(unit.source.standardCombination))fail('SOURCE_MISMATCH')
       const standard=await verifyStoredTrainingStandardItem(db,input.composite,item,'COLLECTION')

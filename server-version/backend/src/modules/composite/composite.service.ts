@@ -14,6 +14,8 @@ import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
 import { assertTrainingScaleCollectionAllowed } from '../scale/scale-collection-guard'
+import {readBundleScaleSources,assertBundleScaleChildSource} from '../bundle-product/standard-source'
+import {freezeExactStandardScaleRuntime} from './training-standard-combination'
 import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance/collection-guard'
 import { assertCompositeCourseScope } from './composite-course-scope'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
@@ -115,7 +117,7 @@ import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-def
 import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT,frozenScaleInstrumentKey } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota, readCognitiveQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -307,6 +309,9 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
                     instrumentVersion: true,
                     libraryEntryId: true,
                     measurementReleaseId: true,
+                    standardSourceKind: true,
+                    standardToolKey: true,
+                    definitionHash: true,
                     definition: true,
                   },
                 },
@@ -1168,6 +1173,9 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
               status: true,
               instrumentClass: true,
               instrumentVersion: true,
+              standardSourceKind: true,
+              standardToolKey: true,
+              definitionHash: true,
               definition: true,
             },
           },
@@ -2192,14 +2200,16 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
   const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational,'PUBLISH')
   const publicationSource=await loadComposite(id,true,db)
+  const bundleSources=await readBundleScaleSources(db as Prisma.TransactionClient,publicationSource,publicationSource.items)
   const tracking=await freezeTrainingTracking(db as Prisma.TransactionClient,publicationSource,prepared.trainingContentSnapshot,trackingSelection)
-  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId))
+  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null&&!bundleSources.has(item.id)).map((item:any)=>item.scaleId))
   await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
   // Shared P/R insertion or material locks may have waited past expiry. Repeat
   // CURRENT exact use/deployment rights after those waits, immediately before
   // publication; only immutable source bodies can be reused in this transaction.
   for(const item of publicationSource.items)if(item.standardCombinationSource!=null)
     await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,publicationSource,item)
+  await readBundleScaleSources(db as Prisma.TransactionClient,publicationSource,publicationSource.items)
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
@@ -2567,6 +2577,10 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
   for (const item of items) {
     if (!item.required) continue
     if (item.type === 'SCALE') {
+      const hasPinnedBundle=attempt.trainingContentBinding?.units?.some((unit:any)=>unit.itemId===item.id&&unit.source.bundleStandard)
+      const pinnedBundle=hasPinnedBundle
+        ? await assertBundleScaleChildSource(db as Prisma.TransactionClient,attempt,item.id) : undefined
+      if(hasPinnedBundle&&(!pinnedBundle||!prepared?.scales.has(item.id)))throw compositeForbidden('Bundle 精确来源尚未冻结')
       const frozenScale = attempt.runtimeGeneration === 'UNIFIED_V1'
         ? prepared?.scales.get(item.id) ?? await freezeScaleRuntimeAtAttemptStart(db, {
             instrumentKey: item.scale.code,
@@ -2579,7 +2593,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
       // Match the existing parent START boundary for education organization resources.
       if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
-      else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
+      else if(!pinnedBundle)await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
         ...(verifiedFlowMaterialization?{verifiedFlowMaterialization,compositeAttemptEpoch:attempt.attemptEpoch}:{})})
       const child = await db.assessment.create({
         data: {
@@ -2606,7 +2620,7 @@ const createChildRecords = async (db: Db, attempt: any, composite: {productKind:
         await retainFrozenScaleAssessmentImages({ assessmentId: child.id, snapshot: frozenScale, db })
         runtime.scales.push({
           compositeItemId: item.id,
-          code: item.scale.code,
+          code: pinnedBundle ? frozenScale.instrumentKey : item.scale.code,
           instrumentVersion: item.scale.instrumentVersion,
           sourceDefinitionHash: frozenScale.sourceDefinitionHash,
           compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
@@ -2898,12 +2912,13 @@ const createAttempt = async (
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
+  const bundleScaleSources=await readBundleScaleSources(db as Prisma.TransactionClient,composite,composite.items,'COLLECTION')
   const hasPreciseCognitiveProfiles=composite.items.some((item:any)=>item.type==='COGNITIVE'&&(readTrainingCognitiveTaskBinding(item.cognitiveAssignment?.courseSnapshot)!==null||readEducationCognitiveProfilePin(item.cognitiveAssignment?.courseSnapshot)!==null))
   const educationStandardUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationStandard):[]
   const educationLibraryUnits=educationComposition?(composite.trainingContentSnapshot as import('./training-content-binding').TrainingContentSnapshot).units.filter(unit=>unit.source.educationLibrary):[]
   const educationStandards=await readEducationStandardStartSources(db as Prisma.TransactionClient,educationStandardUnits,composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scale))
   const educationFrozenScales=new Map<string,Awaited<ReturnType<typeof freezeExactStandardScaleDefinition>>>()
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||hasPreciseCognitiveProfiles||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations||bundleScaleSources.size>0||hasPreciseCognitiveProfiles||educationStandardUnits.length>0||educationLibraryUnits.length>0) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2960,6 +2975,7 @@ const createAttempt = async (
         if(runtime.sourceDefinitionHash!==source.nativeDefinitionHash)throw compositeForbidden('教育共用量表冻结内容不一致')
         prepared.scales.set(item.id,runtime)
       }
+      else if (item.type === 'SCALE'&&bundleScaleSources.has(item.id))prepared.scales.set(item.id,await freezeExactStandardScaleRuntime(db as Prisma.TransactionClient,bundleScaleSources.get(item.id)!.resolved.row.snapshot))
       else if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
         await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
       else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
@@ -3076,7 +3092,7 @@ const createAttempt = async (
     // Training entry approval. contentCandidate already revalidated each such
     // item, its current use, source/deployment identity and shared stop locks.
     // Filter at item level so a native item sharing the Scale cannot borrow it.
-    const nativeScaleIds=composite.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId)
+    const nativeScaleIds=composite.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null&&!bundleScaleSources.has(item.id)).map((item:any)=>item.scaleId)
     await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,nativeScaleIds,{sourceOwnerId:composite.createdBy})
   }
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
@@ -3654,6 +3670,9 @@ const loadAttemptWithChildren = async (attemptId: string, reportOnly = false) =>
                   status: true,
                   instrumentClass: true,
                   instrumentVersion: true,
+                  standardSourceKind: true,
+                  standardToolKey: true,
+                  definitionHash: true,
                   ...(reportOnly ? {} : { definition: true }),
                 },
               },
@@ -4143,8 +4162,11 @@ const getUnifiedCompositeAttemptState = async (
     if (!child || !child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
       const runtime = (await loadScaleAdmissionRuntime(child))
+      const scaleKey=attempt.compositeAssessment.productKind==='ASSESSMENT_BUNDLE'
+        &&child.scale.id===item.scaleId&&slot.sourceDefinitionIdentity.key===frozenScaleInstrumentKey(child)
+        ? frozenScaleInstrumentKey(child) : item.scale?.code
       if (
-        runtime.instrumentKey !== item.scale?.code
+        runtime.instrumentKey !== scaleKey
         || runtime.instrumentVersion !== item.scale?.instrumentVersion
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
