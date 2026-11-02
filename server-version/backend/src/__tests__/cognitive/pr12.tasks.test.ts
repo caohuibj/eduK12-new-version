@@ -221,10 +221,12 @@ describe('PR12 cognitive task contracts', () => {
 
   it('keeps PR12 tasks standalone while exposing qualified release identities', () => {
     for (const testType of ['trailmaking', 'reversallearning']) {
-      const entry = getCognitiveRegistryEntry(testType, '1.0.0', '1.0.0')
+      const engineVersion = testType === 'reversallearning' ? '1.1.0' : '1.0.0'
+      const entry = getCognitiveRegistryEntry(testType, engineVersion, '1.0.0')
       expect(entry?.recommendedForCreate).toBe(true)
-      expect(listCognitiveTestsCatalog(testType).list[0].recommendedForCreate).toBe(true)
+      expect(listCognitiveTestsCatalog(testType).list.find(candidate => candidate.engineVersion === engineVersion && candidate.scoringVersion === '1.0.0')?.recommendedForCreate).toBe(true)
     }
+    expect(getCognitiveRegistryEntry('reversallearning', '1.0.0', '1.0.0')?.recommendedForCreate).toBe(false)
     expect(getCognitiveRegistryEntry('bart', '1.0.0', '1.0.0')?.recommendedForCreate).toBe(false)
     expect(getCognitiveRegistryEntry('bart', '1.0.0', '1.1.0')?.recommendedForCreate).toBe(true)
     expect(listCognitiveTestsCatalog('bart').list.find((entry) => entry.scoringVersion === '1.1.0')?.recommendedForCreate).toBe(true)

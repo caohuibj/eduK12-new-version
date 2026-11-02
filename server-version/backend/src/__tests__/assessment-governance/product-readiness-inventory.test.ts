@@ -11,7 +11,8 @@ import { evaluateCognitiveProductReadiness } from '../../modules/cognitive/libra
 import { listSituationPackages } from '../../modules/situational/situation-package.registry'
 import { evaluateSituationalProductReadiness } from '../../modules/situational/product-readiness'
 
-const frontendRoot = resolve(process.cwd(), '../frontend/src/modules/cognitive')
+const repositoryRoot = resolve(__dirname, '../../../../..')
+const frontendRoot = resolve(repositoryRoot, 'server-version/frontend/src/modules/cognitive')
 
 const readinessMessage = (identity: string, blockers: Array<{ stage: string; code: string; message: string }>): string => (
   `${identity}: ${blockers.map((blocker) => `${blocker.stage}/${blocker.code} ${blocker.message}`).join('; ')}`
@@ -19,11 +20,13 @@ const readinessMessage = (identity: string, blockers: Array<{ stage: string; cod
 
 const cognitiveFrontendReady = (testType: string, engineVersion: string): boolean => {
   const frontendRegistry = readFileSync(resolve(frontendRoot, 'generated/runners.ts'), 'utf8')
-  const registryFile = resolve(frontendRoot, 'tasks', testType, `${testType}.registry.ts`)
-  if (!existsSync(registryFile)) return false
-  const taskRegistry = readFileSync(registryFile, 'utf8')
+  const taskPackage = JSON.parse(readFileSync(resolve(__dirname, '../../modules/cognitive/tasks', testType, 'task-package.json'), 'utf8'))
+  const binding = taskPackage.frontend.find((runner: { testType: string; engineVersion: string }) => runner.testType === testType && runner.engineVersion === engineVersion)
+  if (!binding || !existsSync(resolve(repositoryRoot, binding.file))) return false
+  const taskRegistry = readFileSync(resolve(repositoryRoot, binding.file), 'utf8')
   return taskRegistry.includes(engineVersion)
-    && frontendRegistry.includes(`${testType}RegistryEntry as `)
+    && taskRegistry.includes(binding.export)
+    && frontendRegistry.includes(`${binding.export} as `)
     && cognitiveManifest.runners.some(r => r.testType === testType && r.engineVersion === engineVersion)
 }
 
@@ -49,35 +52,44 @@ describe('assessment product readiness inventory', () => {
     }
   })
 
-  it('keeps Cognitive product release aligned with backend + exact frontend readiness', () => {
+  it('requires backend + exact frontend readiness for Cognitive publication without promoting drafts', () => {
     const definitions = listCognitiveV2TaskDefinitions().filter((definition) => (
       definition.testType !== 'fake' && definition.publication.status !== 'RETIRED'
     ))
     expect(definitions.length).toBeGreaterThan(0)
     for (const definition of definitions) {
       const identity = `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`
+      const originalStatus = definition.publication.status
       const backend = evaluateCognitiveProductReadiness(definition)
       const frontendReady = cognitiveFrontendReady(definition.testType, definition.engineVersion)
       const ready = backend.ready && frontendReady
       if (definition.publication.status === 'PUBLISHED') {
         expect(ready, `${readinessMessage(identity, backend.blockers)}; frontendReady=${frontendReady}`).toBe(true)
-      } else {
-        expect(ready, `${identity}: DRAFT has no backend/frontend executable blocker and should be PUBLISHED`).toBe(false)
       }
+      expect(definition.publication.status).toBe(originalStatus)
     }
+    const draft = definitions.find(definition => definition.testType === 'lineangle' && definition.engineVersion === '2.0.0')!
+    expect(draft.publication.status).toBe('DRAFT')
+    expect(evaluateCognitiveProductReadiness(draft).ready).toBe(true)
+    expect(cognitiveFrontendReady(draft.testType, draft.engineVersion)).toBe(true)
+    expect(draft.publication.status).toBe('DRAFT')
   })
 
-  it('keeps production Situational release status aligned with executable readiness', () => {
+  it('requires executable readiness for Situational publication without promoting drafts', () => {
     const packages = listSituationPackages().filter((candidate) => candidate.releaseStatus !== 'RETIRED')
     expect(packages.length).toBeGreaterThan(0)
     for (const pkg of packages) {
+      const originalStatus = pkg.releaseStatus
       const readiness = evaluateSituationalProductReadiness(pkg)
       const identity = `${pkg.key}@${pkg.instrumentVersion}`
       if (pkg.releaseStatus === 'PUBLISHED') {
         expect(readiness.ready, readinessMessage(identity, readiness.blockers)).toBe(true)
-      } else {
-        expect(readiness.ready, `${identity}: DRAFT has no executable blocker and should be PUBLISHED`).toBe(false)
       }
+      expect(pkg.releaseStatus).toBe(originalStatus)
     }
+    const draft = packages.find(pkg => pkg.key === 'tosa-teacher-wd-full' && pkg.instrumentVersion === '0.4.2')!
+    expect(draft.releaseStatus).toBe('DRAFT')
+    expect(evaluateSituationalProductReadiness(draft).ready).toBe(true)
+    expect(draft.releaseStatus).toBe('DRAFT')
   })
 })

@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -99,13 +99,19 @@ const entry = (overrides: Partial<ScaleLibraryEntry> = {}): ScaleLibraryEntry =>
 })
 
 describe('ScaleLibrary page', () => {
+  beforeEach(() => {
+    mockList.mockReset()
+    mockDetail.mockReset()
+    authState.user = { id: 'student-1', role: 'STUDENT' }
+  })
   it('offers the Chinese motivation filter and sends its stable domain ID', async () => {
     mockList.mockResolvedValue({ code: 0, data: { entries: [entry()] } })
     const user = userEvent.setup()
     render(<MemoryRouter><ScaleLibrary /></MemoryRouter>)
     await screen.findByText('WHO-5 Well-Being Index')
-    await user.click(screen.getByText('更多筛选'))
-    expect(screen.getByRole('option', { name: '学习动机' })).toHaveValue('MOTIVATION')
+    const filters = within(screen.getByRole('button', { name: '应用筛选' }).closest('form')!)
+    await user.click(filters.getByText('更多筛选'))
+    expect(filters.getByRole('option', { name: '学习动机' })).toHaveValue('MOTIVATION')
     await user.selectOptions(screen.getByLabelText('主要构念'), 'MOTIVATION')
     await user.click(screen.getByRole('button', { name: '应用筛选' }))
     await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({ primaryDomain: 'MOTIVATION' }))
@@ -120,9 +126,10 @@ describe('ScaleLibrary page', () => {
     const user = userEvent.setup()
     render(<MemoryRouter><ScaleLibrary /></MemoryRouter>)
     await screen.findByText('WHO-5 Well-Being Index')
-    const more = screen.getByText('更多筛选').closest('details')!
+    const filters = within(screen.getByRole('button', { name: '应用筛选' }).closest('form')!)
+    const more = filters.getByText('更多筛选').closest('details')!
     expect(more).not.toHaveAttribute('open')
-    await user.click(screen.getByText('更多筛选'))
+    await user.click(filters.getByText('更多筛选'))
     await user.type(screen.getByLabelText('年龄下界'), '10')
     await user.type(screen.getByLabelText('关键词'), 'older')
     await user.click(screen.getByRole('button', { name: '应用筛选' }))
@@ -152,10 +159,6 @@ describe('ScaleLibrary page', () => {
     await user.click(screen.getByRole('button', { name: '重试' }))
     expect((await screen.findByText('没有符合条件的量表')).closest('.hui-scale-library')).not.toBeNull()
     expect(container.querySelectorAll('.hui-scale-library')).toHaveLength(1)
-  })
-  beforeEach(() => {
-    vi.clearAllMocks()
-    authState.user = { id: 'student-1', role: 'STUDENT' }
   })
 
   it('renders metadata cards and the no-results state without item content', async () => {

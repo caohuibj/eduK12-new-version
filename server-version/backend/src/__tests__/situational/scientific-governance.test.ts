@@ -11,7 +11,7 @@ import { createSituationalScientificRegistry } from '../../modules/situational/o
 import { evaluateScopedSituationalQualification, situationalExecutionRef } from '../../modules/situational/onboarding/scientific-qualification'
 import { compileSituationRuntime } from '../../modules/assessment-runtime/compiler'
 
-const source = () => instrumentSourceSchema.parse(GENERATED_SITUATIONAL_INSTRUMENT_SOURCES[0])
+const source = () => GENERATED_SITUATIONAL_INSTRUMENT_SOURCES.map(value=>instrumentSourceSchema.parse(value)).find(source=>source.content.identity.instrumentKey==='sjt-anxiety-golden')!
 const withEvidence = () => {
   const s = source()
   const scope = { language: 'zh-CN', population: 'adult volunteers', use: 'research', claim: 'task construct association' }

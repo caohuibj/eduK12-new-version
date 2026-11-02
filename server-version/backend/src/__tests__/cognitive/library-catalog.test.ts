@@ -54,8 +54,8 @@ const realRegistryEntries = listCognitiveRegistryEntries().filter(
 )
 
 describe('cognitive library catalog identity', () => {
-  it('covers exactly the 24 real tasks and excludes fake', () => {
-    expect(listCatalogTestTypes()).toHaveLength(24)
+  it('covers exactly the real registered tasks and excludes fake', () => {
+    expect([...listCatalogTestTypes()].sort()).toEqual([...new Set(realRegistryEntries.map(entry => entry.testType))].sort())
     expect(listCatalogTestTypes()).not.toContain('fake')
     expect(getCatalogEntry('fake')).toBeUndefined()
   })
@@ -205,8 +205,8 @@ describe('catalog single-source-of-truth boundaries', () => {
 
 describe('dual contract declarations', () => {
   it('every catalog task has both declarations with the review-mandated shapes', () => {
-    expect(listScoringContractDeclarations()).toHaveLength(24)
-    expect(listResearchCaptureDeclarations()).toHaveLength(24)
+    expect(listScoringContractDeclarations().map(entry => entry.testType).sort()).toEqual([...listCatalogTestTypes()].sort())
+    expect(listResearchCaptureDeclarations().map(entry => entry.testType).sort()).toEqual([...listCatalogTestTypes()].sort())
     expect(getScoringContractDeclaration('fake')).toBeUndefined()
     expect(getResearchCaptureDeclaration('fake')).toBeUndefined()
     for (const declaration of listScoringContractDeclarations()) {

@@ -32,4 +32,11 @@ describe('cogest 1.1.0 frozen form',()=>{
  })
 })
 
-it('synthetic fixtures remain exact scorer inputs and outputs for the current 36 candidates',async()=>{const fixtures=await import('../../modules/cognitive/tasks/cogest/fixtures/1.1.0-1.1.0.json');for(const c of fixtures.default.cases)expect(score({...c.input,config:schema.parse(c.input.config)})).toEqual(c.expected)})
+it('synthetic fixtures retain exact scorer outputs and declared rejection cases for the 36-item form', async () => {
+  const fixtures = await import('../../modules/cognitive/tasks/cogest/fixtures/1.1.0-1.1.0.json')
+  for (const c of fixtures.default.cases) {
+    const execute = () => score({ ...c.input, config: schema.parse(c.input.config) })
+    if ('expectedError' in c) expect(execute, c.name).toThrow(c.expectedError)
+    else expect(execute(), c.name).toEqual(c.expected)
+  }
+})
