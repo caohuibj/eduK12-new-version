@@ -1,0 +1,73 @@
+{
+  "status": "PASS_RESEARCH_ARTIFACT_CHECKS_NOT_TOOL_INSTALL",
+  "baseline": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "sourceTreeReuse": {
+    "server-version/backend/src/modules/scale/instruments": {
+      "initial": "1a04fd036a8e7293883668c85ddb578047ca9129",
+      "current": "1a04fd036a8e7293883668c85ddb578047ca9129",
+      "status": "IDENTICAL_INPUT_REUSED"
+    },
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": {
+      "initial": "62cbf77099739773099015f71b0420eb43c276f3",
+      "current": "62cbf77099739773099015f71b0420eb43c276f3",
+      "status": "IDENTICAL_INPUT_REUSED"
+    }
+  },
+  "tagCheck": {
+    "status": "PASS_EXISTING_TAG_FILTER",
+    "variants": 5,
+    "sharedTag": "family:qti",
+    "persistedTags": 0,
+    "tagEngineChanges": 0
+  },
+  "jsonParsed": 4,
+  "reportCopyExamples": 6,
+  "restrictedItemTextCommitted": false,
+  "runtimeSourcesAdded": 0,
+  "catalogEntriesAdded": 0,
+  "nativeFormsBuilt": 0,
+  "rightsEvidence": "Official repository item metadata, license.value=300 / written permission required",
+  "nativeSchemaAndScoring": "NOT_RUN_NO_AUTHORIZED_COMPLETE_NATIVE_PAYLOAD",
+  "isolatedDbImport": "NOT_RUN_NO_AUTHORIZED_COMPLETE_NATIVE_PAYLOAD",
+  "runtimeReportProjection": "NOT_RUN_NO_RUNTIME_R",
+  "production": "NOT_TOUCHED",
+  "priorStudentPr": {
+    "number": 545,
+    "head": "783729150611c865cf753bff408288a39a141c6d",
+    "state": "OPEN_DRAFT_UNCHANGED_AT_READBACK"
+  },
+  "ciChecklist": {
+    "status": "READ_SUCCESS_VIA_QIANG_CONNECTION",
+    "page": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+    "applicable": [
+      "CI-020: bind exact base/head and distinguish skipped/unrun results",
+      "CI-004: do not invent registered source or broaden lane to bypass unselected input; public fix inherited from main PR556"
+    ],
+    "independentHumanReview": "NOT_CLAIMED"
+  },
+  "formalCi": "NOT_RUN_PENDING_EXACT_ROUTE_REVIEW_NO_NATIVE_SELECTED_SOURCE",
+  "environment": {
+    "node": "v24.19.0",
+    "dependencyUse": "Reused installed zod/tsx for existing tag-filter invocation only; no full locked-dependency/build qualification claim."
+  },
+  "sha256": {
+    "tag-and-split-plan.json": "bbbf7b8f0338379ba876f27ff8ba1c77820828f5ce2075ef2296347569522060",
+    "source-status.json": "2ea0807fe4c3925290f1a81600051bdee0cb755f2bef86e5608314f0f7a5a335",
+    "dedup-summary.json": "c2504e222cd07220c1095f039a94297d98fb57838d00105fef686c4ecf167669",
+    "MATERIALS_NEEDED.md": "03c566516999e6328f0078b2a8ea5089494c8c5a45755cee5be3685c57611600",
+    "teacher-report-copy-plan.json": "f578afcfa0ab2b153f5e9838459cdbc6026467bf7280dbc46aa754703142dcc5",
+    "README.md": "50e49e9ecc58791ba750521a4152e0f6e6caf3d94d98da158b0bea67da2c9aa4"
+  },
+  "routing": {
+    "checked": "Existing classifyChanges on complete staged raw diff",
+    "changedFiles": 7,
+    "domains": [
+      "scale"
+    ],
+    "content": true,
+    "scale_intake_light": false,
+    "selectedNativeSources": 0,
+    "formalCi": "NOT_RUN",
+    "decision": "Research dossier only, no executable input; no fake registered source and no broader all-tools boundary run. Draft CI skip is not qualification."
+  }
+}

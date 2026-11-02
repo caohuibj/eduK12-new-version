@@ -1,0 +1,47 @@
+{
+  "recordType": "ORIGINAL_TEACHER_REPORT_COPY_PLAN_NOT_RUNTIME_R",
+  "audience": "teacher",
+  "reportVersion": null,
+  "visibleOnly": "Future authorized teacher self report under existing recipient/disclosure rules. No student individual answers or new access granted.",
+  "appliesToCurrentMissingForm": false,
+  "noNormsNoTeacherRankingNoTotal": true,
+  "examples": [
+    {
+      "view": "actual",
+      "scenario": "ordinary",
+      "trigger": "Future exact form/version, valid interpretable answers and authorized display; no invented score threshold.",
+      "text": "这份结果记录您怎样看待自己在这个班级中的互动方式，不能单独证明学生的体验或教学质量。可以选一个最近的课堂片段，记下您当时说了什么、学生怎样回应；下一次保留其中有帮助的一步，再观察回应是否改变。"
+    },
+    {
+      "view": "actual",
+      "scenario": "difficulty",
+      "trigger": "Future interpretable responses describing pressure or interaction difficulty; not a global low-score label.",
+      "text": "如果您感到课堂中的回应变得紧绷，可以先选一个容易重复出现的时刻，试着把提醒改成简短、具体的下一步指令，再留出学生表达不明白的机会。困难也可能与时间、支持或班级情境有关，不宜用一次自评给自己贴上好坏标签；需要时可与可信同事讨论一小段具体证据。"
+    },
+    {
+      "view": "actual",
+      "scenario": "insufficient",
+      "trigger": "Current state: exact authorized form/scoring not available, or future incomplete/noninterpretable evidence.",
+      "text": "目前资料还不足以生成可解释的QTI教师自评分数，因此不显示分级或排名。若您愿意，可以先保留一个课堂片段及当时希望获得的支持；这只是可选的反思建议，不是补出的量表答案或测量结果。"
+    },
+    {
+      "view": "ideal",
+      "scenario": "ordinary",
+      "trigger": "Future authorized ideal form with interpretable data; no ideal-as-performance claim.",
+      "text": "这份结果表达您希望形成怎样的课堂互动，不表示这些做法已经发生。可以选一个最想靠近的目标，把它转成下一节课能试的一步，并先想好用什么课堂证据判断它是否有帮助。"
+    },
+    {
+      "view": "ideal",
+      "scenario": "difficulty",
+      "trigger": "Future teacher reflection on desired behaviour under real constraints; no numeric ideal-gap cutoff.",
+      "text": "理想中的互动方式可能暂时受到时间、班级需要或资源的限制，这不等于您不够努力。可以先缩小到一个可尝试的情境，写下需要的支持，与同事商量一个能在现有条件下落实的小改变；不必把所有理想同时变成要求。"
+    },
+    {
+      "view": "ideal",
+      "scenario": "insufficient",
+      "trigger": "Current missing ideal-item text/version/rights; do not generate proxy ideal score.",
+      "text": "目前尚未核齐理想版的完整题本和使用范围，因此不生成理想画像，也不计算与实际行为的差距。后续取得正确版本后，再分别解释两种视角；现在的缺项不是教师能力不足。"
+    }
+  ],
+  "unscoredBoundary": "If an authorized complete form lacks official scoring, use native FORM collection-only with factual/descriptive responses and no scoring report. An unscored form does not resolve missing item rights or missing item text."
+}
