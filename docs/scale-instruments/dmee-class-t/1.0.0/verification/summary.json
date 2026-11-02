@@ -85,5 +85,51 @@
     "ownedAnonymousPostgresVolumeRemoved": true,
     "developmentDatabasePersists": false,
     "note": "Readback installation proof retained; no claim of persistent development-library installation."
+  },
+  "currentMainContinuation": {
+    "checkedAt": "2026-11-02T01:05:58.852795+00:00",
+    "originalExecutionBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "currentMain": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+    "contentCommitAfterRebase": "1fc27575737eb8a71940ab1c4ede45538ef36d8e",
+    "unchangedConsumerInputs": [
+      {
+        "path": "server-version/backend/src/modules/questionnaire-product/service.ts",
+        "unchangedBlob": "96ea8096f2c7a537228461da4623f6064df42325"
+      },
+      {
+        "path": "server-version/backend/src/modules/training-catalog/tags.ts",
+        "unchangedBlob": "af26fbd939f32e599063956b98166f19cf268ae4"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-core/form/definition.ts",
+        "unchangedBlob": "269514b731b6caa3cea0b2cf17fd18d46d918cc8"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-core/form/runtime.ts",
+        "unchangedBlob": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/typed-form.ts",
+        "unchangedBlob": "4a95fde00a03c6f6708221ee4752e684b4377ca4"
+      },
+      {
+        "path": "server-version/backend/src/modules/reporting/typed-form-presentation.ts",
+        "unchangedBlob": "262e61e81308a613f1b38ed72cc82022d667050c"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/form-section-definition.ts",
+        "unchangedBlob": "e153c2d3f52494e45aee5469d321ced15bacccc7"
+      },
+      {
+        "path": "server-version/backend/package-lock.json",
+        "unchangedBlob": "a9d8032f6511c4b1a12c31cc72e6a95aab79d491"
+      },
+      {
+        "path": "server-version/backend/prisma/schema.prisma",
+        "unchangedBlob": "99ea9850cabaad4a61561bc968384d2149f4ce31"
+      }
+    ],
+    "noDatabaseReplay": "Existing native Form/tags/import/display consumers, schema and lock are byte-identical; original isolated proof retained, not relabelled as a new run.",
+    "formalSelectedChecker": "Use current main checker incorporating PR556; official PR CI selected check is the primary execution, not a retry of the old failing run."
   }
 }
