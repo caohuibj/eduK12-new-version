@@ -111,6 +111,7 @@ export function imageBuildOnly(entries){
   &&e.oldMode===(e.file==='.github/scripts/build-ci-images.sh'?'100755':'100644')&&e.newMode===e.oldMode);
 }
 const releaseToolFiles=new Set([
+ '.github/scripts/declarative-content.mjs',
  ...copyTools,
  '.github/scripts/onboarding-scope.mjs','.github/scripts/onboarding-controls.test.mjs',
  'docs/development/ci-gate-cleanup-20261031.md',

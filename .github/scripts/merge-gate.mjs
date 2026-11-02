@@ -2,7 +2,7 @@ import {readMaintenanceRepairScope,maintenanceRepairOutputs} from './maintenance
 import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
 import {cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
 import {catalogDiscoveryScope,bundleRuntimeSelectionMatches} from './catalog-discovery-scope.mjs';
-import {cognitiveMixedProductScope, acceptanceFor} from './content-scope.mjs';
+import {cognitiveMixedProductScope, acceptanceFor, classifyChanges, contentCodeqlRequired} from './content-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {personalTrackingReadyPlan} from './personal-tracking-ready.mjs';
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
@@ -37,6 +37,13 @@ export function recheckCognitiveIntake(needs,{base,head,cwd=process.cwd(),draft=
   if(actual.requiresBrowser || scope.scale_intake_light==='true' || scope.scale==='true' || scope.situational==='true' || scope.bundle==='true') failed.push('unsupported-or-mixed-cognitive-intake');
   for(const name of ['scope','content','codeql']) if(needs[name]?.result!=='success')failed.push(name);
   return [...new Set(failed)];
+}
+
+export function recheckContentSast(needs,entries,readers) {
+  const actual=classifyChanges(entries,false,readers),failed=[];
+  if(!actual.content||actual.frontend||needs.scope.outputs.codeql!==String(contentCodeqlRequired(entries,readers)))failed.push('recomputed-content-sast');
+  if(needs.content?.result!=='success')failed.push('content');
+  return failed;
 }
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
@@ -564,6 +571,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.scenario==='content'&&needs.scope.outputs.content==='true'){
+    const {changedEntries}=await import('./content-scope.mjs');
+    const {declarationReaders}=await import('./declarative-content.mjs');
+    const entries=changedEntries(process.env.CI_BASE_SHA),readers=declarationReaders(process.env.CI_BASE_SHA);
+    failed.push(...recheckContentSast(needs,entries,readers));
+  }
   if(needs.scope?.outputs?.application_route==='maintenance-repair'&&!readMaintenanceRepairScope(process.env.CI_BASE_SHA))failed.push('recomputed-maintenance-repair');
   if(needs.scope?.outputs?.application_route==='edge-config'&&!readEdgeScope(process.env.CI_BASE_SHA))failed.push('recomputed-edge-scope');
   if(needs.scope?.outputs?.scenario==='catalog-discovery'){const {changedEntries}=await import('./content-scope.mjs');const entries=changedEntries(process.env.CI_BASE_SHA);if(!catalogDiscoveryScope(entries))failed.push('recomputed-catalog-discovery');if(!bundleRuntimeSelectionMatches(entries,needs.scope.outputs))failed.push('recomputed-bundle-runtime');}
