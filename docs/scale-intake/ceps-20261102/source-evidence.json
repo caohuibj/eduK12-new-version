@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-11-02",
+  "retrieval": {
+    "officialIndex": "https://ceps.ruc.edu.cn/xmwd/dcwj.htm",
+    "indexCurlStatus": 503,
+    "webReaderResult": "Timeout fetching",
+    "pdfResponses": [
+      {
+        "source": "baseline_g9_pdf",
+        "httpStatus": 503,
+        "responseBytes": 216,
+        "responseSha256": "b5b660bc2bb92e97199b4b045f7e21eca39307fa087b8be85bb006cc7d83b34b",
+        "isQuestionnairePdf": false
+      },
+      {
+        "source": "followup_g8_pdf",
+        "httpStatus": 503,
+        "responseBytes": 216,
+        "responseSha256": "b5b660bc2bb92e97199b4b045f7e21eca39307fa087b8be85bb006cc7d83b34b",
+        "isQuestionnairePdf": false
+      }
+    ],
+    "baselineG7Pdf": "Direct URL not obtained; no full-text retrieval claimed"
+  },
+  "dedup": {
+    "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "registeredInstrumentVersions": 258,
+    "repositorySearchTerms": [
+      "CEPS",
+      "中国教育追踪",
+      "ceps.ruc.edu.cn"
+    ],
+    "repositoryMatches": 0,
+    "openPullRequests": 26,
+    "openPrTitleOrBranchMatches": 0,
+    "githubPrSearchMatches": 0,
+    "parentEvidence": "Parent reports review of all source.json and 24 open PR / 10 content PR paths at the same base; not independently re-enumerated here.",
+    "scopeLimit": "Production DB and administrator-created instruments not inspected. Item-level equivalence cannot be checked without the source questionnaires."
+  },
+  "validation": {
+    "scope": "Documentation and research metadata only; no runtime source changes",
+    "nativeSchemaResult": "Not submitted: native catalog requires positive itemCount and estimatedMinutes; neither is verified. Do not insert fabricated defaults.",
+    "scoringBoundary": "No score, scorer, parameters, thresholds or report runtime created",
+    "developmentDatabaseImport": "NOT_ATTEMPTED_NO_VERIFIED_OR_AUTHORIZED_ITEMS",
+    "productionWrite": "NOT_ATTEMPTED",
+    "ci": "NOT_ACTIVATED_PENDING_REQUIRED_NOTION_READ",
+    "notionBlocker": {
+      "target": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+      "action": "Read CI common errors before CI activation",
+      "outcome": "FAILED",
+      "reason": "Connected notion_fetch returned Unknown tool notion.fetch after supplying required link_id; no page content obtained"
+    },
+    "skippedChecks": [
+      "Backend/frontend full build and tests: no implementation changes",
+      "Native scoring boundary/golden report tests: no executable package",
+      "Isolated DB import: no verified item or authorized import artifact"
+    ],
+    "localChecks": {
+      "jsonParse": "PASS: both research JSON files",
+      "reservedIdentityUniqueness": "PASS: 3 source IDs and 9 tentative block IDs",
+      "cohortSeparation": "PASS: baseline G7/G9 and followup G8 distinct",
+      "nonExecutableBoundary": "PASS: no native registration, import, C/P/R, scores or item text",
+      "diffWhitespace": "PASS",
+      "existingRouter": {
+        "content": true,
+        "domains": [
+          "scale"
+        ],
+        "scaleIntakeLight": false,
+        "selectedScaleIntake": null
+      },
+      "reportDraftReview": "Six original unscored examples; student/teacher audiences and existing visibility conditions stated; runtime consumer untested"
+    }
+  },
+  "privateContentCommitted": false
+}

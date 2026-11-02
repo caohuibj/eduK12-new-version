@@ -1,0 +1,302 @@
+{
+  "documentType": "CEPS_RESEARCH_INTAKE_NOT_NATIVE_IMPORT",
+  "checkedAt": "2026-11-02",
+  "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "motherTool": "CEPS",
+  "candidates": [
+    {
+      "candidateId": "ceps_baseline_2013_2014_g7_student_zh_cn",
+      "metadataRevision": "2026-11-02.1",
+      "name": "CEPS｜学生评教与学校经历待拆分目录｜7年级基线｜学生",
+      "status": "SOURCE_RETRIEVAL_PENDING",
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "source": {
+        "project": "中国教育追踪调查（CEPS）",
+        "institution": "中国人民大学",
+        "schoolYear": "2013-2014",
+        "wave": "baseline_2013_2014",
+        "grade": 7,
+        "respondent": "STUDENT",
+        "language": "zh-CN",
+        "indexUrl": "https://ceps.ruc.edu.cn/xmwd/dcwj.htm",
+        "pdfUrl": null,
+        "fullTextRetrieved": false,
+        "sha256": null,
+        "questionCodesVerified": false
+      },
+      "versions": {
+        "content": null,
+        "scoringParameters": null,
+        "report": null,
+        "note": "目录候选身份不是C/P/R执行版本；未建立原生版本。"
+      },
+      "tags": [
+        "母工具:CEPS",
+        "学生评教",
+        "评价对象:教师",
+        "评价对象:课堂",
+        "评价对象:学校",
+        "年级:7",
+        "年龄:待核_不由年级推算",
+        "填答者:学生",
+        "语言:简体中文",
+        "来源:中国人民大学CEPS",
+        "许可:再分发范围未确认",
+        "用途:研究候选",
+        "状态:PILOT_未验证",
+        "调查波次:baseline_2013_2014"
+      ],
+      "requestedBlockCandidates": [
+        {
+          "reservedId": "ceps_baseline_2013_2014_g7_student_zh_cn_teacher_relationship",
+          "name": "CEPS｜教师互动与师生关系｜7年级基线｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        },
+        {
+          "reservedId": "ceps_baseline_2013_2014_g7_student_zh_cn_classroom_experience",
+          "name": "CEPS｜课堂经历｜7年级基线｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        },
+        {
+          "reservedId": "ceps_baseline_2013_2014_g7_student_zh_cn_school_experience",
+          "name": "CEPS｜学校经历｜7年级基线｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        }
+      ],
+      "scoring": {
+        "status": "NOT_ESTABLISHED",
+        "reverseItems": null,
+        "missingRule": null,
+        "scoreRange": null,
+        "direction": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "UNRESOLVED",
+        "publicDownloadDoesNotGrantRedistribution": true,
+        "itemTextIncluded": false,
+        "agreementAccepted": false
+      },
+      "blockers": [
+        "OFFICIAL_FULL_TEXT_NOT_RETRIEVED",
+        "EXACT_BLOCKS_AND_RESPONSE_OPTIONS_UNVERIFIED",
+        "SCORING_AND_INDEPENDENT_ADMINISTRATION_EVIDENCE_UNVERIFIED",
+        "ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "PRODUCTION_AND_ADMIN_CUSTOM_DUPLICATION_NOT_CHECKED"
+      ]
+    },
+    {
+      "candidateId": "ceps_baseline_2013_2014_g9_student_zh_cn",
+      "metadataRevision": "2026-11-02.1",
+      "name": "CEPS｜学生评教与学校经历待拆分目录｜9年级基线｜学生",
+      "status": "SOURCE_RETRIEVAL_PENDING",
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "source": {
+        "project": "中国教育追踪调查（CEPS）",
+        "institution": "中国人民大学",
+        "schoolYear": "2013-2014",
+        "wave": "baseline_2013_2014",
+        "grade": 9,
+        "respondent": "STUDENT",
+        "language": "zh-CN",
+        "indexUrl": "https://ceps.ruc.edu.cn/xmwd/dcwj.htm",
+        "pdfUrl": "https://ceps.ruc.edu.cn/__local/E/3E/53/A79731C8960FF6CBE305DFCD9E4_AFFB258D_774B3.pdf?e=.pdf",
+        "fullTextRetrieved": false,
+        "sha256": null,
+        "questionCodesVerified": false
+      },
+      "versions": {
+        "content": null,
+        "scoringParameters": null,
+        "report": null,
+        "note": "目录候选身份不是C/P/R执行版本；未建立原生版本。"
+      },
+      "tags": [
+        "母工具:CEPS",
+        "学生评教",
+        "评价对象:教师",
+        "评价对象:课堂",
+        "评价对象:学校",
+        "年级:9",
+        "年龄:待核_不由年级推算",
+        "填答者:学生",
+        "语言:简体中文",
+        "来源:中国人民大学CEPS",
+        "许可:再分发范围未确认",
+        "用途:研究候选",
+        "状态:PILOT_未验证",
+        "调查波次:baseline_2013_2014"
+      ],
+      "requestedBlockCandidates": [
+        {
+          "reservedId": "ceps_baseline_2013_2014_g9_student_zh_cn_teacher_relationship",
+          "name": "CEPS｜教师互动与师生关系｜9年级基线｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        },
+        {
+          "reservedId": "ceps_baseline_2013_2014_g9_student_zh_cn_classroom_experience",
+          "name": "CEPS｜课堂经历｜9年级基线｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        },
+        {
+          "reservedId": "ceps_baseline_2013_2014_g9_student_zh_cn_school_experience",
+          "name": "CEPS｜学校经历｜9年级基线｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        }
+      ],
+      "scoring": {
+        "status": "NOT_ESTABLISHED",
+        "reverseItems": null,
+        "missingRule": null,
+        "scoreRange": null,
+        "direction": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "UNRESOLVED",
+        "publicDownloadDoesNotGrantRedistribution": true,
+        "itemTextIncluded": false,
+        "agreementAccepted": false
+      },
+      "blockers": [
+        "OFFICIAL_FULL_TEXT_NOT_RETRIEVED",
+        "EXACT_BLOCKS_AND_RESPONSE_OPTIONS_UNVERIFIED",
+        "SCORING_AND_INDEPENDENT_ADMINISTRATION_EVIDENCE_UNVERIFIED",
+        "ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "PRODUCTION_AND_ADMIN_CUSTOM_DUPLICATION_NOT_CHECKED"
+      ]
+    },
+    {
+      "candidateId": "ceps_followup_2014_2015_g8_student_zh_cn",
+      "metadataRevision": "2026-11-02.1",
+      "name": "CEPS｜学生评教与学校经历待拆分目录｜8年级追访｜学生",
+      "status": "SOURCE_RETRIEVAL_PENDING",
+      "nativeRegistered": false,
+      "developmentDatabaseImported": false,
+      "productionDatabaseImported": false,
+      "source": {
+        "project": "中国教育追踪调查（CEPS）",
+        "institution": "中国人民大学",
+        "schoolYear": "2014-2015",
+        "wave": "followup_2014_2015",
+        "grade": 8,
+        "respondent": "STUDENT",
+        "language": "zh-CN",
+        "indexUrl": "https://ceps.ruc.edu.cn/xmwd/dcwj.htm",
+        "pdfUrl": "https://ceps.ruc.edu.cn/__local/C/67/E7/F7BA6FBDFBC3C8B808AA0F6E0FA_905BECDA_7A84E.pdf?e=.pdf",
+        "fullTextRetrieved": false,
+        "sha256": null,
+        "questionCodesVerified": false
+      },
+      "versions": {
+        "content": null,
+        "scoringParameters": null,
+        "report": null,
+        "note": "目录候选身份不是C/P/R执行版本；未建立原生版本。"
+      },
+      "tags": [
+        "母工具:CEPS",
+        "学生评教",
+        "评价对象:教师",
+        "评价对象:课堂",
+        "评价对象:学校",
+        "年级:8",
+        "年龄:待核_不由年级推算",
+        "填答者:学生",
+        "语言:简体中文",
+        "来源:中国人民大学CEPS",
+        "许可:再分发范围未确认",
+        "用途:研究候选",
+        "状态:PILOT_未验证",
+        "调查波次:followup_2014_2015"
+      ],
+      "requestedBlockCandidates": [
+        {
+          "reservedId": "ceps_followup_2014_2015_g8_student_zh_cn_teacher_relationship",
+          "name": "CEPS｜教师互动与师生关系｜8年级追访｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        },
+        {
+          "reservedId": "ceps_followup_2014_2015_g8_student_zh_cn_classroom_experience",
+          "name": "CEPS｜课堂经历｜8年级追访｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        },
+        {
+          "reservedId": "ceps_followup_2014_2015_g8_student_zh_cn_school_experience",
+          "name": "CEPS｜学校经历｜8年级追访｜学生",
+          "status": "UNVERIFIED_BLOCK",
+          "itemCodes": null,
+          "itemCount": null,
+          "responseOptions": null,
+          "nativeType": "UNDECIDED",
+          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+        }
+      ],
+      "scoring": {
+        "status": "NOT_ESTABLISHED",
+        "reverseItems": null,
+        "missingRule": null,
+        "scoreRange": null,
+        "direction": null,
+        "totalScoreAllowed": false
+      },
+      "rights": {
+        "status": "UNRESOLVED",
+        "publicDownloadDoesNotGrantRedistribution": true,
+        "itemTextIncluded": false,
+        "agreementAccepted": false
+      },
+      "blockers": [
+        "OFFICIAL_FULL_TEXT_NOT_RETRIEVED",
+        "EXACT_BLOCKS_AND_RESPONSE_OPTIONS_UNVERIFIED",
+        "SCORING_AND_INDEPENDENT_ADMINISTRATION_EVIDENCE_UNVERIFIED",
+        "ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+        "PRODUCTION_AND_ADMIN_CUSTOM_DUPLICATION_NOT_CHECKED"
+      ]
+    }
+  ]
+}
