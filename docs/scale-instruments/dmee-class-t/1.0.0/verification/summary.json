@@ -1,0 +1,89 @@
+{
+  "checkedAt": "2026-11-02T01:04:40.575267+00:00",
+  "scope": "DMEE-Class-T content/forms only",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "dependencyReuse": {
+    "packageLockSHA256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "prismaSchemaSHA256": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "exactBytesSameAsExistingInstalledWorkspace": true,
+    "newInstallBuildOrFullTest": false
+  },
+  "commands": [
+    {
+      "command": "prisma db push --skip-generate against loopback dmee_isolated only",
+      "exit": 0,
+      "purpose": "Prepare disposable current-schema integration fixture, not production migration"
+    },
+    {
+      "command": "tsx /tmp/dmee-class-t/isolated-import.ts",
+      "exit": 0,
+      "result": "9 DRAFT ordinary questionnaires, 110 native Form fields, existing tags and readback; no score or publication"
+    },
+    {
+      "command": "tsx /tmp/dmee-class-t/report-check.ts",
+      "exit": 0,
+      "result": "27 descriptive presentation cases from persisted items; missing null, no score; stale tag CAS rejected"
+    },
+    {
+      "command": "tsx /tmp/dmee-class-t/check-content.ts",
+      "exit": 0,
+      "result": "8 registered catalog-only sources valid; no ESEM runtime policy"
+    },
+    {
+      "command": "npm run scale:instruments:check",
+      "exit": 0
+    },
+    {
+      "command": "npm run scale:onboarding:check",
+      "exit": 0
+    }
+  ],
+  "executedSource": [
+    {
+      "path": "verification/isolated-import.ts.txt",
+      "sha256": "0c0fa749b664b0d10f376039465d5e41cb42493d27d010f587d7f3c533e3c701",
+      "note": "Exact one-off executed source retained as non-executable documentation; paths identify this selected environment, not a platform CLI."
+    },
+    {
+      "path": "verification/report-check.ts.txt",
+      "sha256": "5bf535c0927cca106d87c7605a8338ece8d88304726c5ff844c7bad336d7ccba",
+      "note": "Exact one-off executed source retained as non-executable documentation; paths identify this selected environment, not a platform CLI."
+    },
+    {
+      "path": "verification/check-content.ts.txt",
+      "sha256": "a8a279722ef6f086c6a3184dd79f0cd96b5e10e5417f73e33d76b4fda6c6aea4",
+      "note": "Exact one-off executed source retained as non-executable documentation; paths identify this selected environment, not a platform CLI."
+    }
+  ],
+  "notExecuted": [
+    "full frontend/backend tests or builds",
+    "production DB access or dedup",
+    "public administration or participant FINAL",
+    "ESEM scorer or factor-score fixtures",
+    "native French response anchors not provided"
+  ],
+  "reportCopyReview": {
+    "method": "manual review of report-examples.md",
+    "states": [
+      "general reflection",
+      "difficulties or less frequent practices",
+      "insufficient information/missing"
+    ],
+    "recipient": "teacher self-reflection under existing recipient authorization",
+    "claimsExcluded": [
+      "teacher performance ranking",
+      "diagnosis",
+      "student labels",
+      "actual teaching-quality proof",
+      "student achievement causality",
+      "cross-tool total"
+    ]
+  },
+  "cleanup": {
+    "checkedAt": "2026-11-02T01:05:11.817341+00:00",
+    "ownedIsolatedContainersRemoved": true,
+    "ownedAnonymousPostgresVolumeRemoved": true,
+    "developmentDatabasePersists": false,
+    "note": "Readback installation proof retained; no claim of persistent development-library installation."
+  }
+}

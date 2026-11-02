@@ -1,0 +1,220 @@
+{
+  "checkedAt": "2026-11-02T01:04:23.378969+00:00",
+  "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "officialSources": [
+    {
+      "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2023.1281431/full",
+      "bytes": 796235,
+      "sha256": "d8a1b0313c12ce44deb63d0d766945c860923874dff0ac634afabba9dd3ad7c8"
+    },
+    {
+      "url": "https://ndownloader.figshare.com/files/42772771",
+      "bytes": 191107,
+      "sha256": "2f66cfe95b203e774ad670313ff33a4972ecb0db44bbec7be54d01462424451b"
+    },
+    {
+      "url": "https://api.figshare.com/v2/articles/24356050",
+      "bytes": 15149,
+      "sha256": "28591b6382cc1f5c667c5eab77d62950fc01c5f9d28c964552fdf27008af86f5"
+    }
+  ],
+  "license": {
+    "article": "CC BY 4.0; copyright Dierendonck 2023",
+    "supplement": "CC BY 4.0, separately observed in Figshare article 24356050 metadata",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "scope": "Only DMEE S1 item texts and S5 target grouping used; CSS-T S2/S7/S8 content excluded",
+    "adaptations": "Trimmed whitespace; extracted English author translation; removed excluded56–58 from administrations; standalone descriptive group extracts; new platform guidance and report copy clearly marked"
+  },
+  "dedup": {
+    "baselineSourceJSONCount": 235,
+    "baselineInstrumentTSCount": 258,
+    "authorTitleDOIPattern": "dmee|Dierendonck|1281431|dynamic model of educational effectiveness",
+    "metadataHits": [],
+    "questionTextComparisons": 116,
+    "normalizedQuestionHits": [],
+    "openPRCount": 43,
+    "openPRHeads": [
+      {
+        "number": 556,
+        "head": "170757896e53c66d1e3af74984c488bd58821481"
+      },
+      {
+        "number": 555,
+        "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b"
+      },
+      {
+        "number": 554,
+        "head": "84b802dd591ef623e615194552c800e2f7b78862"
+      },
+      {
+        "number": 553,
+        "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7"
+      },
+      {
+        "number": 552,
+        "head": "51569d88e26ef7d9c58ef93cca206c451159673d"
+      },
+      {
+        "number": 551,
+        "head": "e60bd84e599eb51fed0e7d90f02de463439a8499"
+      },
+      {
+        "number": 550,
+        "head": "21162f30b500011c6b3e9f296fad0d0545b58755"
+      },
+      {
+        "number": 549,
+        "head": "03f0d3409a8499b7cf0db0bb8c4cac67810797bf"
+      },
+      {
+        "number": 548,
+        "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a"
+      },
+      {
+        "number": 547,
+        "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8"
+      },
+      {
+        "number": 546,
+        "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb"
+      },
+      {
+        "number": 545,
+        "head": "783729150611c865cf753bff408288a39a141c6d"
+      },
+      {
+        "number": 544,
+        "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1"
+      },
+      {
+        "number": 543,
+        "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078"
+      },
+      {
+        "number": 542,
+        "head": "2426aee58647236dd6084845ea834f23a95c6b17"
+      },
+      {
+        "number": 541,
+        "head": "2c69a375498b971941aa689ddbf6d684a5b1ab4e"
+      },
+      {
+        "number": 540,
+        "head": "44174789bbf437964cdefea7993d4cce393596ff"
+      },
+      {
+        "number": 539,
+        "head": "0ef13277b8634dcde2fa2e7446486a13c61206b5"
+      },
+      {
+        "number": 538,
+        "head": "f28b87318edec02932e20c61a06562708406c44f"
+      },
+      {
+        "number": 537,
+        "head": "46ff029d9cca20b221208e85257b5fa482eaefa3"
+      },
+      {
+        "number": 529,
+        "head": "cff8728f67818a28b9ab0a2189c30040470dbd6b"
+      },
+      {
+        "number": 515,
+        "head": "70a6b3bc54e30c95c35733a705c6350f929d2a6d"
+      },
+      {
+        "number": 491,
+        "head": "290aa955a3445bcb0b519829423e626d044a2fc1"
+      },
+      {
+        "number": 489,
+        "head": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28"
+      },
+      {
+        "number": 488,
+        "head": "0c526f0529ab47c0054f9470d0bb9217e1d787a5"
+      },
+      {
+        "number": 482,
+        "head": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8"
+      },
+      {
+        "number": 441,
+        "head": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5"
+      },
+      {
+        "number": 413,
+        "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65"
+      },
+      {
+        "number": 412,
+        "head": "4d79bc45d607f8e771eccfacc49a7558b8a3985e"
+      },
+      {
+        "number": 397,
+        "head": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d"
+      },
+      {
+        "number": 383,
+        "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f"
+      },
+      {
+        "number": 379,
+        "head": "333200ade0c6cb42130cbc052189ba9c64691a12"
+      },
+      {
+        "number": 375,
+        "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792"
+      },
+      {
+        "number": 373,
+        "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53"
+      },
+      {
+        "number": 371,
+        "head": "75b956cbd4c45f75beee606fb53257494adc1ca0"
+      },
+      {
+        "number": 370,
+        "head": "bfd6dcbca24567219ec24979481f3da8e0137984"
+      },
+      {
+        "number": 368,
+        "head": "1388d5db6f845b8d907f0e4090e4fd727aea8926"
+      },
+      {
+        "number": 367,
+        "head": "8e4440cac46086f73390f8774c40853beb9a6ddd"
+      },
+      {
+        "number": 362,
+        "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1"
+      },
+      {
+        "number": 360,
+        "head": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2"
+      },
+      {
+        "number": 330,
+        "head": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a"
+      },
+      {
+        "number": 329,
+        "head": "a5effd7f86249a77b7c82606130e5db6f89aae45"
+      },
+      {
+        "number": 328,
+        "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+      }
+    ],
+    "openPRHits": [],
+    "limitations": "Source JSON string equality and normalized inline TS text; language-semantic identity and custom production items require administrator verification",
+    "productionDB": "NOT_ACCESSED",
+    "administratorCustomTools": "NOT_VERIFIED"
+  },
+  "materialsNotInvented": [
+    "French exact response anchors not supplied; no fabricated French administration",
+    "ESEM per-person scoring parameters absent; no invented raw mean/overall score",
+    "No original student/observer parallel form acquired; no person-switching adaptation"
+  ]
+}
