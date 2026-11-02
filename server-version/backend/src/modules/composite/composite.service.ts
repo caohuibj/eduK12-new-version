@@ -29,7 +29,7 @@ import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, train
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
+import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, TRAINING_FLOW_DEFINITION_SELECT, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
@@ -2320,7 +2320,23 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },
     orderBy: { publishedAt: 'desc' },
-    include: {
+    select: {
+      id: true,
+      productKind: true,
+      code: true,
+      name: true,
+      description: true,
+      instruction: true,
+      status: true,
+      opensAt: true,
+      expiresAt: true,
+      maxAttempts: true,
+      reportPackageKey: true,
+      reportPackageVersion: true,
+      reportPackageSnapshotEncrypted: true,
+      trainingVariantFrozen: true,
+      // Missing markers mean UNKNOWN, not legacy. Keep every marker loaded.
+      ...TRAINING_FLOW_DEFINITION_SELECT,
       course: { select: { id: true, title: true, courseCode: true, isLibrary: true } },
       items: {
         orderBy: { position: 'asc' },
@@ -2375,14 +2391,19 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
     // Historical satisfaction is independent of the newest submitted report.
     const latestSatisfiedAttempt = compositeAttempts.find(isTaskSatisfied) ?? null
     const sections = item.formSections ?? []
-    const units = [
-      ...item.items
-        .filter((child: any) => child.type !== 'FORM')
+    const hasTrainingFlow = hasTrainingFlowDefinitionMarkers(item)
+    const hideUnits = item.trainingVariantFrozen != null || hasTrainingFlow
+    const nonFormItems = item.items.filter((child: any) => child.type !== 'FORM')
+    // Reuse one frozen-package decode for both projections. Hidden candidate
+    // unions need only their count; never decode labels or build their units.
+    const packageSlotLabels = hideUnits ? new Map<number, string>() : getFrozenPackageSlotLabels(item)
+    const units = hideUnits ? [] : [
+      ...nonFormItems
         .map((child: any) => ({
           type: child.type === 'SCALE' ? 'scale' as const : child.type === 'COGNITIVE' ? 'cognitive' as const : 'situational' as const,
           id: child.id,
           position: child.position,
-          label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)),
+          label: resolveCompositeItemLabel(child, packageSlotLabels),
           itemCount: 1,
           contextSection: false,
         })),
@@ -2403,7 +2424,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       description: item.description,
       instruction: item.instruction,
       deliveryMode: 'FINAL_ONLY' as const,
-      estimatedModules: hasTrainingFlowDefinitionMarkers(item) ? null : units.length,
+      estimatedModules: hasTrainingFlow ? null : nonFormItems.length + sections.length,
       course: item.course,
       opensAt: item.opensAt,
       expiresAt: item.expiresAt,
@@ -2414,9 +2435,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now(), 
       canContinue,
       admissionPaused: Boolean(admissionPaused),
       weightedVariants: item.trainingVariantFrozen != null,
-      items: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
-      units: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : units,
-      formSections: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : sections,
+      items: hideUnits ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, packageSlotLabels) })),
+      units: hideUnits ? [] : units,
+      formSections: hideUnits ? [] : sections,
       attempt: latestAttempt,
       latestCompletedAttempt: latestCompletedAttempt ? { ...latestCompletedAttempt, taskSatisfied: isTaskSatisfied(latestCompletedAttempt) } : null,
       latestSatisfiedAttempt,
