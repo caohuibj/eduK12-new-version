@@ -15,5 +15,73 @@
     "prFilesRead": 619,
     "prHits": [],
     "readErrors": []
+  },
+  "latestMainReuse": {
+    "base": "52b8a57456cfba1913cf8670b73681f62cebe2aa",
+    "changedFilesSinceInitialBase": 293,
+    "relevantSourceConsumerSchemaDependencyChanges": [],
+    "status": "UNCHANGED_REUSE",
+    "note": "Original complete main/PR scan remains attached; no production query."
+  },
+  "latestOpenPrDelta": {
+    "totalOpenPRs": 55,
+    "newOrChangedHeads": [
+      {
+        "pr": 573,
+        "head": "c04150f7143351b0416f1db5bebd65c6ab09dbdd"
+      },
+      {
+        "pr": 572,
+        "head": "609d2082f452246d7329290745da067290f4c89b"
+      },
+      {
+        "pr": 571,
+        "head": "c400e983540bca0c3e6a33a6ae4f955474cac573"
+      },
+      {
+        "pr": 570,
+        "head": "b50487aea0e9347fd7c7dde34940476cd2ec5e0f"
+      },
+      {
+        "pr": 569,
+        "head": "2a5e57fadbc5b578594b2feb0ab661578e2de379"
+      },
+      {
+        "pr": 568,
+        "head": "9643f01c4cc4449650d7a543ea07755b889273b0"
+      },
+      {
+        "pr": 567,
+        "head": "f5997fffcb4f551059a2c9e5b02d57d27f96e591"
+      },
+      {
+        "pr": 566,
+        "head": "227e2b1a492904da3364aeaa96351f9f76fde763"
+      },
+      {
+        "pr": 565,
+        "head": "7cbe81a72623cc65a80c45217447e43364c3e285"
+      },
+      {
+        "pr": 564,
+        "head": "3a1ffc3c26063f24129e1c6c9995f3743bcc02d0"
+      },
+      {
+        "pr": 563,
+        "head": "61f999db2414bebeea8ad1781439d541933cbf85"
+      },
+      {
+        "pr": 549,
+        "head": "7abc02695f4ac161b9d5517fe124519a595c1c83"
+      },
+      {
+        "pr": 540,
+        "head": "36ddfda56f04edcf8d51aa215d32fe6ba67fd21e"
+      }
+    ],
+    "pathsRead": 193,
+    "sourceContentsRead": 74,
+    "hits": [],
+    "errors": []
   }
 }

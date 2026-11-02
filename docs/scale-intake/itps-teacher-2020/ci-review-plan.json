@@ -1,0 +1,96 @@
+{
+  "scope": "3 public CATALOG_ONLY ITPS teacher identities + generated index + source/report/evidence notes. Private NC item payloads excluded.",
+  "base": "52b8a57456cfba1913cf8670b73681f62cebe2aa",
+  "initialValidationBase": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "runtimeEvidenceReuse": "All listed direct consumer/schema/lock/checker inputs unchanged between initial validation base and rebased base. Private files match attached receipt hashes. No repeat of unaffected native import.",
+  "inputs": [
+    {
+      "path": "server-version/backend/scripts/scale-intake-selected-check.ts",
+      "gitBlob": "8696b823791669bf9369f868ef71200ae55acb27"
+    },
+    {
+      "path": "server-version/backend/scripts/generate-scale-instruments.ts",
+      "gitBlob": "05d8cbf2dbbd6acf9c5ded20f8ca2517a06b6dc4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/materialize.ts",
+      "gitBlob": "0ceeda194d221998f2b20bdd896cb5ba4073d486"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+      "gitBlob": "f7c60d3c512d810d68f913af8bc09659a658eaf1"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/schema.ts",
+      "gitBlob": "b85c05bd0eaf8d05cae670f233bd5d16fb2c01cf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+      "gitBlob": "9e4603c1e626b6d35082af844405af82271703dc"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "gitBlob": "a55d88014baa1c3979d43cb8733acb41ea32a90a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-result.ts",
+      "gitBlob": "9f59bde7913ef0696389713e7f8db7d4b9921b9a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "gitBlob": "50d327f6f36aefd2cbf773660dde513f967707dd"
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "gitBlob": "99ea9850cabaad4a61561bc968384d2149f4ce31"
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "gitBlob": "5ab78f096aaf637987c0e2c53a894e0a48b862c3"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "gitBlob": "a9d8032f6511c4b1a12c31cc72e6a95aab79d491"
+    },
+    {
+      "path": ".github/scripts/scale-intake-scope.mjs",
+      "gitBlob": "1154b4a610f4009162eae4c7190fc82ff920ea61"
+    },
+    {
+      "path": ".github/workflows/scale-onboarding-boundary.yml",
+      "gitBlob": "0d1ffa81b88b9328d25acac110eeba4dfe324ad4"
+    }
+  ],
+  "checks": {
+    "localPrivateNativeSchemaScoringReportTags": "PASS_TARGETED_RESEARCH_EVIDENCE",
+    "localPrivateIsolatedImportReadback": "PASS_THEN_DESTROYED",
+    "localPublicCatalogContract": "PASS",
+    "localGeneratedIndex": "PASS",
+    "localNodeEngineQualification": "NOT_QUALIFIED_v24.19.0_BELOW_24.21.0",
+    "formalCI": "NOT_RUN",
+    "independentReview": "PENDING_COORDINATOR_NOT_SELF_ATTESTED"
+  },
+  "ciPlan": {
+    "route": "pure-scale-intake-light",
+    "jobs": [
+      "scope",
+      "scale-onboarding-boundary / scale-intake",
+      "merge-gate selected aggregation"
+    ],
+    "commands": [
+      "npm run scale:instruments:check",
+      "node --import tsx scripts/scale-intake-selected-check.ts"
+    ],
+    "purpose": "Registry completeness and public catalog-only contract on required Node24.21.0 and locked official dependencies; private NC question definitions intentionally absent.",
+    "activation": "After coordinator independent exact-candidate review; Draft commit carries skip-ci while pending, which is NOT a successful check.",
+    "forbiddenScope": [
+      "frontend build/tests",
+      "full backend app suite",
+      "production database",
+      "production deployment"
+    ],
+    "budgetMinutes": 5
+  },
+  "historyChecklist": "AGENTS CI activation rule and previously read Qiang Notion CI004/CI020: exact input/scope binding, distinguish local evidence from actual CI, never count skipped checks as passed.",
+  "merge": "Coordinator serial only after actual required checks; no merge/deploy by this thread."
+}

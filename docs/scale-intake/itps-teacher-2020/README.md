@@ -41,11 +41,11 @@
 
 ## 已验证和限制
 
-- [dedup.json](dedup.json)：基线main的235份source.json、258份instrument.ts；45个开放PR的6,336条路径、619份工具源内容；同源标识、作者、两个辨识度较高题项均无命中，读取无错。生产/管理员自建库**未查**，不能宣称全系统无重复。
+- [dedup.json](dedup.json)：基线main的235份source.json、258份instrument.ts；45个开放PR的6,336条路径、619份工具源内容；同源标识、作者、两个辨识度较高题项均无命中，读取无错。基线后main已对齐52b8a574，直接来源/消费者/schema/依赖未变，复用原检查；新增/变化的13个PR head也已增量核对，详见同文件。生产/管理员自建库**未查**，不能宣称全系统无重复。
 - [native-contract-validation.json](native-contract-validation.json)：3份私有原生定义和3份公开目录候选结构验证；原生最小/最大/混合计分及报告、标签/题序、28项逐题漏答及全空情况。私有题文和答案只用合成数据，不进入公开收据。
 - [isolated-import-validation.json](isolated-import-validation.json)：现有 `materializeScaleInstrumentContent`、registry readiness/compile和轴冻结；PostgreSQL16.15一次3个隐藏草稿导入，标签、原题号、定义hash、C/P/R和存库定义生成的教师反馈读回。`prisma db push`当前schema加原有轴快照SQL，不声称完整迁移链验证。授权/部署/真实答卷均0。
 - [validation-history.json](validation-history.json)保留两次研发脚本失败和修正：报告locale契约，以及收据末尾误用不存在的响应模型。恢复前回查已导入3行，没有重复建量表或将失败改称通过。
-- 本地Node24.19.0低于仓库要求24.21.0；结果仅为定向研发证据，不替代正式轻CI。未跑全量前后端/部署/生产写库，也未伪造人类独立评审。独立协调审核及真实CI状态以PR为准。
+- 本地Node24.19.0低于仓库要求24.21.0；结果仅为定向研发证据，不替代正式轻CI。未跑全量前后端/部署/生产写库，也未伪造人类独立评审。独立协调审核及真实CI状态以PR为准。Draft当前带skip-ci以等待精确候选独立复核，正式CI为NOT_RUN；这是[AGENTS.md](../../../AGENTS.md)要求的“先准备可审阅的精确 base/head/tree、完整差异…再按既有独立复核及实际授权决定激活”的执行状态，不把跳过算通过。[ci-review-plan.json](ci-review-plan.json)列出定向路线与未执行项。
 
 ## 管理员下一步
 

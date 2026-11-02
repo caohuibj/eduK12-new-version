@@ -13,6 +13,12 @@
       "reason": "Final zero-response assertion referenced non-existent prisma.scaleResponse model; all three content imports had already completed.",
       "fix": "Read actual Assessment model; check existing rows before resume and do not duplicate materialization.",
       "recheck": "Resume reads the three existing hidden drafts and verifies exact content/axis/report, then writes receipt. First log retained in /tmp/itps-a04/import-first-failure.log."
+    },
+    {
+      "check": "read-only latest PR delta scan receipt",
+      "result": "FAILED_TO_WRITE_RECEIPT",
+      "reason": "Relative docs path resolved from backend cwd; source reads completed but receipt was not written.",
+      "fix": "Reran this read-only delta scan from repository root; see dedup.latestOpenPrDelta. No database or source mutation."
     }
   ]
 }
