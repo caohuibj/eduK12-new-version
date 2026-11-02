@@ -52,3 +52,11 @@ API等价入口：`POST /api/admin/permissions/static-sjt/prepare`、`POST /api/
 Draft现有合格项为scope+release-tools；转Ready时现有merge gate仍强制codeql，既有release-tooling CodeQL paths包含backend/src/scripts及本次共享工具。Draft未执行SAST不得写成已经通过；无需扩大为应用编译或增设新门禁。
 
 与#538协调：本分支基于main adad907a，不修改maintenance-repair-scope.mjs、maintenance-repair.test.mjs或ci.yml；未引入其未合入代码。读取#538的c6c415436ed3ff6f3de2cdf320b7c160cc4fd489快照时未发现文件交集。若其随后改动local-validation等共享文件，合入时应保留各自recipe增量，不能以整文件覆盖另一分支；当前修复不依赖#538业务改动。
+
+## 首轮CI失败与定向修正
+
+保留CI run 41368151605 / job 125032745405 / head 8d42d65dfb580fd2a22803607b2e1497823b1c76 的失败结果：83项工具合约中82通过，`consumed code or configuration change fails without automatic retest`失败；后续Git容量命令未执行。无应用编译或全库内容检查。
+
+原因已本地复现：CI导出的HUI_EVIDENCE_BRANCH继承进临时fixture子进程，导致其“同分支输入变化”用例走到“另一分支无证据”分支，尝试执行临时仓库中不存在的真实工具测试。只在两个fixture子进程显式设HUI_EVIDENCE_BRANCH=payload.branch；不修改生产fromEnvironment、签名、输入绑定或拒绝规则。在模拟CI分支环境下定向复验4项通过：同分支成功复用、同分支输入变化拒绝、不同分支旧证据不冒认、完全相同输入跨分支可复用。
+
+原始失败不会标成成功。Notion指定历史错误页当前连接此前404，回写pending；上述脱敏记录可供协调者后补。新提交保持同一8文件范围，仅复验受影响工具路线。
