@@ -1,6 +1,6 @@
 import {afterEach,beforeEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({transaction:vi.fn(),get:vi.fn(),parent:vi.fn(),admission:vi.fn(),section:vi.fn(),persist:vi.fn(),snapshot:vi.fn(),study:vi.fn()}))
-vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction,$queryRaw:mocks.study}}))
+const mocks=vi.hoisted(()=>({transaction:vi.fn(),get:vi.fn(),parent:vi.fn(),admission:vi.fn(),section:vi.fn(),persist:vi.fn(),snapshot:vi.fn(),study:vi.fn(),contextSubject:vi.fn()}))
+vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction,$queryRaw:mocks.study,compositeAssessmentAttempt:{findUnique:mocks.contextSubject}}}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
 vi.mock('../../modules/composite/training-variant-child-scope',async importOriginal=>({...await importOriginal<any>(),
  loadTrainingChildParent:mocks.parent,assertTrainingFormFinalPrincipal:vi.fn(),assertTrainingSectionSelected:mocks.parent,
@@ -48,11 +48,12 @@ function fixture(){
  const body:any={attemptId:'attempt',sectionId:'section',attemptEpoch:1,submissionId:id(7),definitionHash:hash,userId:'user',answers:[{itemId:'grade',value:'1'}]}
  return {run:()=>submitUnifiedCompositeFormSectionFinal(body),read:()=>parent,section:()=>section,reference,db,body,events,control}
 }
-beforeEach(()=>{vi.resetAllMocks();mocks.study.mockResolvedValue([]);vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64));vi.stubEnv('DATA_PSEUDONYM_KEY','b'.repeat(64))})
+beforeEach(()=>{vi.resetAllMocks();mocks.study.mockResolvedValue([]);mocks.contextSubject.mockResolvedValue({subjectUserId:null});vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64));vi.stubEnv('DATA_PSEUDONYM_KEY','b'.repeat(64))})
 afterEach(()=>vi.unstubAllEnvs())
 describe('actual UNIFIED composite context FINAL freezes references inside its transaction',()=>{
  it('writes authentic context and selected binding before section completion/snapshot or next-runner delivery',async()=>{
   const f=fixture(),result=await f.run()
+  expect(mocks.contextSubject).toHaveBeenCalledWith({where:{id:'attempt'},select:{subjectUserId:true}})
   expect(f.events).toEqual(['answers','context','reference','section','snapshot'])
   expect(f.read().trainingReferenceBinding).toMatchObject({contextHash:result.contextSnapshotHash,units:[{references:[{status:'SELECTED'}]}]})
   expect(mocks.get.mock.calls[0][0]).toBe(f.db)

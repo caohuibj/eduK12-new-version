@@ -26,16 +26,19 @@ describe('read-only report rollout inventory', () => {
     mismatch.participantPresentation.testType = 'memory'
     expect(inspectPublishedReportPolicy(assignment(encryptCognitivePayload(mismatch))).state).toBe('unreadable_snapshot')
   })
-  it('checks every real exact identity and declared profile can freeze a two-audience policy', () => {
+  it('checks every real exact identity and profile while retaining historical report policies', () => {
     const entries = listCognitiveRegistryEntries().filter(entry => entry.testType !== 'fake')
-    expect(entries).toHaveLength(28)
+    const key = (entry: { testType: string; engineVersion: string; scoringVersion: string }) => `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
+    expect(entries.map(key).sort()).toEqual([...new Set(cognitiveSeeds.filter(seed => seed.testType !== 'fake').map(key))].sort())
     for (const entry of entries) {
       const seed = cognitiveSeeds.find(seed => seed.testType === entry.testType && seed.engineVersion === entry.engineVersion && seed.scoringVersion === entry.scoringVersion)!
       expect(seed, entry.testType).toBeDefined()
       for (const profile of Object.keys(entry.profiles) as Array<'experience' | 'standard' | 'research'>) {
         const frozen = freezeAssignmentProfile({ entry, baseConfig: seed.config, profile })
         const row = { ...assignment(frozen.resolvedReportSnapshotEncrypted), profile, config: { ...seed, configVersion: seed.configVersion } }
-        expect(inspectPublishedReportPolicy(row).state, `${entry.testType}/${entry.scoringVersion}/${profile}`).toBe('current_two_audiences')
+        const historical = ['seriescomplete', 'cogest'].includes(entry.testType) && entry.engineVersion === '1.1.0' && entry.scoringVersion === '1.1.0'
+        expect(inspectPublishedReportPolicy(row).state, `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}/${profile}`)
+          .toBe(historical ? 'historical_reading' : 'current_two_audiences')
       }
     }
   })

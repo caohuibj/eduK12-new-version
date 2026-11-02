@@ -1,4 +1,4 @@
-import { availableSjtPackages, projectSjtReleaseStatus } from '../modules/situational/authoring/service'
+import { availableSjtPackages, projectSjtReleaseStatus, projectSjtReleaseStatuses } from '../modules/situational/authoring/service'
 import { exportSituationalResearchAttempt } from '../modules/situational/situation-research-export'
 import { Request, Response } from 'express'
 import { logger } from '../utils/logger'
@@ -13,7 +13,9 @@ import {
   getSituationalAttemptResult,
   getSituationalInstrument,
   listSituationalHistory,
+  listSituationalHistorySummaries,
   listSituationalInstruments,
+  listSituationalInstrumentSummaries,
   loadSituationalAttemptRuntime,
   resumeSituationalAttempt,
   startSituationalAttempt,
@@ -48,7 +50,14 @@ export const situationalController = {
 
   async listInstruments(req: Request, res: Response) {
     try {
-      return success(res, { list: listSituationalInstruments((await availableSjtPackages()).filter(p => req.baseUrl.startsWith('/api/teacher/') ? p.definition.respondentType === 'teacher_self_report' : p.definition.respondentType !== 'teacher_self_report')) })
+      const teacherEntry = req.baseUrl.startsWith('/api/teacher/')
+      const packages = (await availableSjtPackages()).filter(p => teacherEntry
+        ? p.definition.respondentType === 'teacher_self_report'
+        : p.definition.respondentType !== 'teacher_self_report')
+      const list = req.query.view === 'summary'
+        ? listSituationalInstrumentSummaries(packages)
+        : listSituationalInstruments(packages)
+      return success(res, { list })
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化题包列表失败')
     }
@@ -145,8 +154,12 @@ export const situationalController = {
 
   async history(req: Request, res: Response) {
     try {
+      if (req.query.view === 'summary') {
+        const data = await listSituationalHistorySummaries(req.user!.userId)
+        return success(res, { ...data, list: await projectSjtReleaseStatuses(data.list) })
+      }
       const data=await listSituationalHistory(req.user!.userId)
-      return success(res,{...data,list:await Promise.all(data.list.map(row=>projectSjtReleaseStatus(row)))})
+      return success(res,{...data,list:await projectSjtReleaseStatuses(data.list)})
     } catch (errorValue) {
       return handleSituationalError(res, errorValue, '获取情境化测评历史失败')
     }

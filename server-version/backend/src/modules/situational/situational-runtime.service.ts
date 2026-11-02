@@ -432,6 +432,20 @@ export const listSituationalInstruments = (available: SituationPackage[] = listS
   })
   .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
 
+/** The catalog must not ship every executable scene and report template. */
+export const listSituationalInstrumentSummaries = (available: SituationPackage[] = listSituationPackages()) =>
+  listSituationalInstruments(available).map(instrument => ({
+    title: instrument.title,
+    key: instrument.key,
+    version: instrument.version,
+    releaseStatus: instrument.releaseStatus,
+    scienceMaturity: instrument.scienceMaturity,
+    sceneCount: instrument.definition.schemaVersion === 2
+      ? new Set(instrument.definition.flow.nodes.flatMap(node => node.nodeType === 'SCENE' ? [node.motherSceneKey] : [])).size
+      : instrument.definition.scenes.length,
+    description: instrument.report.limitations[0] ?? null,
+  }))
+
 export const getSituationalInstrument = (instrumentKey: string, instrumentVersion?: string, available?: SituationPackage[]) => {
   const situationPackage = publishedPackage(instrumentKey, instrumentVersion, available)
   const snapshot = freezeSituationalRuntimeAtAttemptStart({
@@ -653,13 +667,17 @@ export const resumeSituationalAttempt = async (attemptId: string, userId: string
 
 export const getSituationalAttemptResult = resumeSituationalAttempt
 
-export const listSituationalHistory = async (userId: string) => {
-  const rows = await prisma.situationalAttempt.findMany({
+const readSituationalHistoryRows = async (userId: string) => {
+  return prisma.situationalAttempt.findMany({
     where: { userId, compositeAttemptId: null, surveyAttemptId: null },
     orderBy: { startedAt: 'desc' },
     take: 100,
     select: SITUATIONAL_ATTEMPT_SELECT,
   })
+}
+
+export const listSituationalHistory = async (userId: string) => {
+  const rows = await readSituationalHistoryRows(userId)
   return {
     list: rows.map((row) => {
       const snapshot = decryptFrozenSituationalRuntimeSnapshot(row.runtimeSnapshotEncrypted)
@@ -668,4 +686,26 @@ export const listSituationalHistory = async (userId: string) => {
     }),
     total: rows.length,
   }
+}
+
+/** Frozen history cards retain identity and result checks without runner bodies. */
+export const listSituationalHistorySummaries = async (userId: string) => {
+  const rows = await readSituationalHistoryRows(userId)
+  return { total: rows.length, list: rows.map(row => {
+    const snapshot = decryptFrozenSituationalRuntimeSnapshot(row.runtimeSnapshotEncrypted)
+    assertRowMatchesSnapshot(row, snapshot)
+    const stored = row.status === 'COMPLETED' ? decodeStoredResult(row) : null
+    if (row.status === 'COMPLETED' && !stored) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评终态结果缺失，请联系管理员', 500)
+    const primary = stored?.result.metrics.find(metric => metric.role === 'primary')
+    const context = frozenSituationalScientificProjection(snapshot.scientificContext)
+    return {
+      attemptId: row.id,
+      attempt: { instrumentKey: row.instrumentKey, instrumentVersion: row.instrumentVersion, status: row.status, startedAt: row.startedAt },
+      instrument: { title: snapshot.definition.source.title, key: snapshot.instrumentKey, version: snapshot.instrumentVersion,
+        scoringVersion: snapshot.scoringVersion, releaseStatus: getSituationPackage(snapshot.instrumentKey, snapshot.instrumentVersion)?.releaseStatus ?? 'RETIRED',
+        scientificContext: context },
+      hasNarrative: Boolean(stored?.result.narrative),
+      primaryMetric: primary ? { label: primary.label, value: primary.value, displayPrecision: primary.displayPrecision } : null,
+    }
+  }) }
 }

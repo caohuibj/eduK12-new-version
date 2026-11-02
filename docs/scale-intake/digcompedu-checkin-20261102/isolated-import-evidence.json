@@ -1,0 +1,1388 @@
+{
+  "database": "loopback:55432/eduk12_digcompedu_20261102",
+  "schemaSetup": "isolated current Prisma schema db push plus existing 20261001040000_scale_axis_snapshots SQL (table/function/immutable trigger); not a full migration test",
+  "actor": "synthetic local ADMIN author; no real respondent data",
+  "sourceBase": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "checkedAt": "2026-11-02T01:54:56.689Z",
+  "scales": [
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_professional_engagement_en",
+      "id": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 4,
+      "measurementHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+      "axisSnapshots": [
+        {
+          "reportVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "measurementHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "instrumentVersion": "1.0.0",
+          "referenceVersions": [],
+          "instructionVersion": "1.0.0",
+          "localizationVersion": "1.0.0",
+          "catalogManifestVersion": 1
+        }
+      ],
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:professional_engagement"
+      ],
+      "cases": [
+        {
+          "name": "normal",
+          "quality": "interpretable",
+          "score": 8,
+          "interpretations": 1
+        },
+        {
+          "name": "low_experience",
+          "quality": "interpretable",
+          "score": 0,
+          "interpretations": 1
+        },
+        {
+          "name": "maximum",
+          "quality": "interpretable",
+          "score": 16,
+          "interpretations": 1
+        },
+        {
+          "name": "insufficient",
+          "quality": "invalid",
+          "score": null,
+          "interpretations": 0
+        }
+      ],
+      "invalidOptionRejected": true
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_digital_resources_en",
+      "id": "d876297e-f092-4f59-b228-d58769da7972",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 3,
+      "measurementHash": "4e76247f042b301fbfdcbba1f1d92c085fb1e6c657783d0a60c9c475e5c1e922",
+      "axisSnapshots": [
+        {
+          "reportVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "measurementHash": "4e76247f042b301fbfdcbba1f1d92c085fb1e6c657783d0a60c9c475e5c1e922",
+          "instrumentVersion": "1.0.0",
+          "referenceVersions": [],
+          "instructionVersion": "1.0.0",
+          "localizationVersion": "1.0.0",
+          "catalogManifestVersion": 1
+        }
+      ],
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:digital_resources"
+      ],
+      "cases": [
+        {
+          "name": "normal",
+          "quality": "interpretable",
+          "score": 6,
+          "interpretations": 1
+        },
+        {
+          "name": "low_experience",
+          "quality": "interpretable",
+          "score": 0,
+          "interpretations": 1
+        },
+        {
+          "name": "maximum",
+          "quality": "interpretable",
+          "score": 12,
+          "interpretations": 1
+        },
+        {
+          "name": "insufficient",
+          "quality": "invalid",
+          "score": null,
+          "interpretations": 0
+        }
+      ],
+      "invalidOptionRejected": true
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_teaching_learning_en",
+      "id": "effb26a6-fb9c-405c-817e-7ef36500b860",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 4,
+      "measurementHash": "998355bb9aabf632c1fb75e342225cfed81a367132b284cb880d714b5b1b25a4",
+      "axisSnapshots": [
+        {
+          "reportVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "measurementHash": "998355bb9aabf632c1fb75e342225cfed81a367132b284cb880d714b5b1b25a4",
+          "instrumentVersion": "1.0.0",
+          "referenceVersions": [],
+          "instructionVersion": "1.0.0",
+          "localizationVersion": "1.0.0",
+          "catalogManifestVersion": 1
+        }
+      ],
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:teaching_learning"
+      ],
+      "cases": [
+        {
+          "name": "normal",
+          "quality": "interpretable",
+          "score": 8,
+          "interpretations": 1
+        },
+        {
+          "name": "low_experience",
+          "quality": "interpretable",
+          "score": 0,
+          "interpretations": 1
+        },
+        {
+          "name": "maximum",
+          "quality": "interpretable",
+          "score": 16,
+          "interpretations": 1
+        },
+        {
+          "name": "insufficient",
+          "quality": "invalid",
+          "score": null,
+          "interpretations": 0
+        }
+      ],
+      "invalidOptionRejected": true
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_assessment_en",
+      "id": "bef87a9d-36b9-42a5-9127-ca4a3c9e9b81",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 3,
+      "measurementHash": "e2626da4b1d4fd87db9c79611390d05b5b955490ef64d71e6151f4ba36e0d33d",
+      "axisSnapshots": [
+        {
+          "reportVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "measurementHash": "e2626da4b1d4fd87db9c79611390d05b5b955490ef64d71e6151f4ba36e0d33d",
+          "instrumentVersion": "1.0.0",
+          "referenceVersions": [],
+          "instructionVersion": "1.0.0",
+          "localizationVersion": "1.0.0",
+          "catalogManifestVersion": 1
+        }
+      ],
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:assessment"
+      ],
+      "cases": [
+        {
+          "name": "normal",
+          "quality": "interpretable",
+          "score": 6,
+          "interpretations": 1
+        },
+        {
+          "name": "low_experience",
+          "quality": "interpretable",
+          "score": 0,
+          "interpretations": 1
+        },
+        {
+          "name": "maximum",
+          "quality": "interpretable",
+          "score": 12,
+          "interpretations": 1
+        },
+        {
+          "name": "insufficient",
+          "quality": "invalid",
+          "score": null,
+          "interpretations": 0
+        }
+      ],
+      "invalidOptionRejected": true
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_empowering_learners_en",
+      "id": "113386a1-3fb4-4030-8604-3a29e6bf7843",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 3,
+      "measurementHash": "02b02b9b6f90c49dbc4f9aedcd86669acbe2488b844f7a3ff59368b5b14fb752",
+      "axisSnapshots": [
+        {
+          "reportVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "measurementHash": "02b02b9b6f90c49dbc4f9aedcd86669acbe2488b844f7a3ff59368b5b14fb752",
+          "instrumentVersion": "1.0.0",
+          "referenceVersions": [],
+          "instructionVersion": "1.0.0",
+          "localizationVersion": "1.0.0",
+          "catalogManifestVersion": 1
+        }
+      ],
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:empowering_learners"
+      ],
+      "cases": [
+        {
+          "name": "normal",
+          "quality": "interpretable",
+          "score": 6,
+          "interpretations": 1
+        },
+        {
+          "name": "low_experience",
+          "quality": "interpretable",
+          "score": 0,
+          "interpretations": 1
+        },
+        {
+          "name": "maximum",
+          "quality": "interpretable",
+          "score": 12,
+          "interpretations": 1
+        },
+        {
+          "name": "insufficient",
+          "quality": "invalid",
+          "score": null,
+          "interpretations": 0
+        }
+      ],
+      "invalidOptionRejected": true
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_facilitating_digital_competence_en",
+      "id": "613d1cef-80fa-4496-8aed-dfe83fb04b60",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 5,
+      "measurementHash": "46f042ac14468bafb02b4c3f6b896480b0533ba77f78a6c5f5ea1820c87301cf",
+      "axisSnapshots": [
+        {
+          "reportVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "measurementHash": "46f042ac14468bafb02b4c3f6b896480b0533ba77f78a6c5f5ea1820c87301cf",
+          "instrumentVersion": "1.0.0",
+          "referenceVersions": [],
+          "instructionVersion": "1.0.0",
+          "localizationVersion": "1.0.0",
+          "catalogManifestVersion": 1
+        }
+      ],
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:facilitating_digital_competence"
+      ],
+      "cases": [
+        {
+          "name": "normal",
+          "quality": "interpretable",
+          "score": 10,
+          "interpretations": 1
+        },
+        {
+          "name": "low_experience",
+          "quality": "interpretable",
+          "score": 0,
+          "interpretations": 1
+        },
+        {
+          "name": "maximum",
+          "quality": "interpretable",
+          "score": 20,
+          "interpretations": 1
+        },
+        {
+          "name": "insufficient",
+          "quality": "invalid",
+          "score": null,
+          "interpretations": 0
+        }
+      ],
+      "invalidOptionRejected": true
+    }
+  ],
+  "forms": [
+    {
+      "key": "digcompedu_checkin_peerj2023_pre_positioning_en",
+      "id": "205dccb8-7a6f-4bdc-a51a-32f8431a1d0e",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "questions": 1,
+      "answerFields": 1,
+      "noOptionScores": true,
+      "reportPackage": null,
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:pre_positioning"
+      ],
+      "itemMap": [
+        {
+          "sourceQuestion": 2,
+          "sourceItemKey": "dce_context_2",
+          "storedItemKey": "q_2af27512-b065-4d86-a1ee-2ce473b79842",
+          "type": "SINGLE"
+        }
+      ]
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_context_en",
+      "id": "ca6b0ef7-39f4-4bfe-893e-051f5f60f890",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "questions": 14,
+      "answerFields": 21,
+      "noOptionScores": true,
+      "reportPackage": null,
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:context"
+      ],
+      "itemMap": [
+        {
+          "sourceQuestion": 25,
+          "sourceItemKey": "dce_context_25",
+          "storedItemKey": "q_ec3b7ce3-e1d9-4afd-b3bd-8a12adb1342e",
+          "type": "SINGLE"
+        },
+        {
+          "sourceQuestion": 26,
+          "sourceItemKey": "dce_context_26",
+          "storedItemKey": "q_61f7ee63-421e-4352-b5a8-f329098d3326",
+          "type": "SINGLE"
+        },
+        {
+          "sourceQuestion": 27,
+          "sourceItemKey": "dce_context_27",
+          "storedItemKey": "q_60467f4f-fb3d-4493-82fc-c662d8c60928",
+          "type": "NUMBER"
+        },
+        {
+          "sourceQuestion": 28,
+          "sourceItemKey": "dce_context_28",
+          "storedItemKey": "q_38f87d22-068f-4581-8aab-6405bcfc4909",
+          "type": "NUMBER"
+        },
+        {
+          "sourceQuestion": 29,
+          "sourceItemKey": "dce_context_29",
+          "storedItemKey": "q_f7bb6220-7ac0-4974-8146-246357bcc983",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 30,
+          "sourceItemKey": "dce_context_30",
+          "storedItemKey": "q_1887f59b-fe54-4ae4-999a-0947056a87f3",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 31,
+          "sourceItemKey": "dce_context_31",
+          "storedItemKey": "q_76edf5e6-d5b3-44ab-84d3-16a038ca07c3",
+          "type": "NUMBER"
+        },
+        {
+          "sourceQuestion": 32,
+          "sourceItemKey": "dce_context_32",
+          "storedItemKey": "q_1167a0e5-1942-45b3-b4f5-973dc0cc7442",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 33,
+          "sourceItemKey": "dce_context_33",
+          "storedItemKey": "q_1602ed47-5904-4911-8cfa-97dd186649d7",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 34,
+          "sourceItemKey": "dce_context_34",
+          "storedItemKey": "q_86346a84-8c4c-4c2a-a599-049436c6a748",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 35,
+          "sourceItemKey": "dce_context_35",
+          "storedItemKey": "q_2657cdd7-4a34-40b7-96f5-8f8e0ffbecaf",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 36,
+          "sourceItemKey": "dce_context_36",
+          "storedItemKey": "q_6d853b4c-47f3-4b2c-a452-3067143dff36",
+          "type": "MULTIPLE"
+        },
+        {
+          "sourceQuestion": 37,
+          "sourceItemKey": "dce_context_37",
+          "storedItemKey": "q_c644f463-d807-4beb-bd2a-a5e1ce890b51",
+          "type": "MATRIX"
+        },
+        {
+          "sourceQuestion": 38,
+          "sourceItemKey": "dce_context_38",
+          "storedItemKey": "q_988d651a-4f1b-4910-8eba-f8446a2b1c4f",
+          "type": "MATRIX"
+        }
+      ]
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_post_positioning_en",
+      "id": "882a7cc8-e63f-4fe1-bfd0-f4ea99db5ce9",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "questions": 1,
+      "answerFields": 1,
+      "noOptionScores": true,
+      "reportPackage": null,
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "form:post_positioning"
+      ],
+      "itemMap": [
+        {
+          "sourceQuestion": 39,
+          "sourceItemKey": "dce_context_39",
+          "storedItemKey": "q_bfed20c5-a325-4eec-b713-b0036821a7b7",
+          "type": "SINGLE"
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "scenario": "normal",
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "code": "digcompedu_checkin_peerj2023_professional_engagement_en",
+          "name": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          }
+        ],
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "type": "dimension",
+            "label": "Professional Engagement (area raw sum)",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 8,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "Professional Engagement: reflect on your current practice",
+            "label": null,
+            "interpretation": "These answers describe your own perception of practice in professional engagement. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "guidance": [
+              {
+                "text": "Choose one communication task; try one appropriate channel and ask a colleague whether it made collaboration clearer.",
+                "category": "reflection"
+              },
+              {
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team.",
+                "category": "environment"
+              }
+            ],
+            "limitations": [
+              "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+              "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+              "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      }
+    },
+    {
+      "scenario": "low_experience",
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "code": "digcompedu_checkin_peerj2023_professional_engagement_en",
+          "name": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "0",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "0",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "0",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "responseValue": "0",
+            "baseScore": 0,
+            "score": 0
+          }
+        ],
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "type": "dimension",
+            "label": "Professional Engagement (area raw sum)",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 0,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "Professional Engagement: reflect on your current practice",
+            "label": null,
+            "interpretation": "These answers describe your own perception of practice in professional engagement. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "guidance": [
+              {
+                "text": "Choose one communication task; try one appropriate channel and ask a colleague whether it made collaboration clearer.",
+                "category": "reflection"
+              },
+              {
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team.",
+                "category": "environment"
+              }
+            ],
+            "limitations": [
+              "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+              "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+              "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      }
+    },
+    {
+      "scenario": "maximum",
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "code": "digcompedu_checkin_peerj2023_professional_engagement_en",
+          "name": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "DCE_CI_04",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          }
+        ],
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "type": "dimension",
+            "label": "Professional Engagement (area raw sum)",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 16,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "Professional Engagement: reflect on your current practice",
+            "label": null,
+            "interpretation": "These answers describe your own perception of practice in professional engagement. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "guidance": [
+              {
+                "text": "Choose one communication task; try one appropriate channel and ask a colleague whether it made collaboration clearer.",
+                "category": "reflection"
+              },
+              {
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team.",
+                "category": "environment"
+              }
+            ],
+            "limitations": [
+              "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+              "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+              "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      }
+    },
+    {
+      "scenario": "insufficient",
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "code": "digcompedu_checkin_peerj2023_professional_engagement_en",
+          "name": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [
+          {
+            "itemCode": "DCE_CI_01",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "DCE_CI_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "DCE_CI_03",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          }
+        ],
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "type": "dimension",
+            "label": "Professional Engagement (area raw sum)",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": null,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03"
+            ],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      }
+    }
+  ],
+  "notVerified": [
+    "production database duplicates",
+    "independent scientific/human review",
+    "public deployment and authorisation grants",
+    "K12 or Chinese measurement validity",
+    "standalone area psychometrics",
+    "published combination or participant delivery"
+  ],
+  "totals": {
+    "nativeScales": 6,
+    "scoredItems": 22,
+    "nativeUnscoredForms": 3,
+    "unscoredQuestions": 16,
+    "published": 0,
+    "productionWrites": 0
+  },
+  "reportVisibility": [
+    {
+      "scenario": "normal",
+      "authorisedTeacher": {
+        "type": "SCALE",
+        "kind": "scale",
+        "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+        "scaleCode": "digcompedu_checkin_peerj2023_professional_engagement_en",
+        "label": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "scaleName": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "completedAt": null,
+        "totalTime": null,
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "label": "Professional Engagement (area raw sum)",
+            "value": 8,
+            "type": "dimension",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "结果说明",
+            "label": null,
+            "interpretation": "These answers describe your own perception of practice in professional engagement. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one communication task; try one appropriate channel and ask a colleague whether it made collaboration clearer."
+              },
+              {
+                "category": "environment",
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team."
+              }
+            ],
+            "limitations": [
+              "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+              "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+              "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "未提供群体参考。"
+        ],
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      },
+      "deniedKind": "completion",
+      "unknownPolicyKind": "unavailable"
+    },
+    {
+      "scenario": "low_experience",
+      "authorisedTeacher": {
+        "type": "SCALE",
+        "kind": "scale",
+        "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+        "scaleCode": "digcompedu_checkin_peerj2023_professional_engagement_en",
+        "label": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "scaleName": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "completedAt": null,
+        "totalTime": null,
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "label": "Professional Engagement (area raw sum)",
+            "value": 0,
+            "type": "dimension",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "结果说明",
+            "label": null,
+            "interpretation": "These answers describe your own perception of practice in professional engagement. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one communication task; try one appropriate channel and ask a colleague whether it made collaboration clearer."
+              },
+              {
+                "category": "environment",
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team."
+              }
+            ],
+            "limitations": [
+              "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+              "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+              "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "未提供群体参考。"
+        ],
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      },
+      "deniedKind": "completion",
+      "unknownPolicyKind": "unavailable"
+    },
+    {
+      "scenario": "maximum",
+      "authorisedTeacher": {
+        "type": "SCALE",
+        "kind": "scale",
+        "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+        "scaleCode": "digcompedu_checkin_peerj2023_professional_engagement_en",
+        "label": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "scaleName": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "completedAt": null,
+        "totalTime": null,
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "label": "Professional Engagement (area raw sum)",
+            "value": 16,
+            "type": "dimension",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "professional_engagement",
+            "headline": "结果说明",
+            "label": null,
+            "interpretation": "These answers describe your own perception of practice in professional engagement. A higher raw sum means you selected options describing more digital engagement; it does not establish observed competence, student outcomes or teaching quality. Consider which practices worked for your learners and which depended on time, access or institutional support. Fewer opportunities to use technology do not make you a less capable teacher. There is no norm-based high/low category here.",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one communication task; try one appropriate channel and ask a colleague whether it made collaboration clearer."
+              },
+              {
+                "category": "environment",
+                "text": "If access, workload or support is limiting your options, record one specific need and discuss a feasible next step with an appropriate colleague or support team."
+              }
+            ],
+            "limitations": [
+              "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+              "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+              "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons."
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "未提供群体参考。"
+        ],
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      },
+      "deniedKind": "completion",
+      "unknownPolicyKind": "unavailable"
+    },
+    {
+      "scenario": "insufficient",
+      "authorisedTeacher": {
+        "type": "SCALE",
+        "kind": "scale",
+        "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+        "scaleCode": "digcompedu_checkin_peerj2023_professional_engagement_en",
+        "label": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "scaleName": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+        "completedAt": null,
+        "totalTime": null,
+        "scores": [
+          {
+            "key": "professional_engagement",
+            "label": "Professional Engagement (area raw sum)",
+            "value": null,
+            "type": "dimension",
+            "description": "4 item-specific 0–4 responses summed without reversing; range 0–16. Descriptive self-report, not a validated standalone proficiency grade.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "range": {
+              "min": 0,
+              "max": 16
+            },
+            "expectedItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03",
+              "DCE_CI_04"
+            ],
+            "answeredItems": [
+              "DCE_CI_01",
+              "DCE_CI_02",
+              "DCE_CI_03"
+            ],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "interpretations": [],
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "caveats": [
+          "Higher-education English survey published by Ersoy et al. (2024), dated 2023-06-02; this is not the original school Check-In, SELFIEforTEACHERS32 or a validated Chinese edition.",
+          "Area separation and this complete-case missingness policy are project adaptations. Prefer the full original 22-item sequence; no standalone area validation or norm is claimed.",
+          "Self-report is affected by opportunities, resources and interpretation. Do not use for diagnosis, performance ranking, teacher accountability or unsupported comparisons.",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "method": {
+          "scaleId": "19c167af-3189-4a38-bcda-e18f245ba4d0",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "d02e822b7caf13ac8c2fd5ae2e052b43483fe4ab5d9827f33c15d90e686437ab",
+          "referenceVersions": [],
+          "assessmentContext": null
+        },
+        "disclaimer": "Teacher developmental reflection only. Missing/invalid answers mean insufficient evidence for an area score; do not substitute zero. Background and A1–C2 self-positioning forms have no calculated scores. Results remain subject to existing recipient and publication permissions."
+      },
+      "deniedKind": "completion",
+      "unknownPolicyKind": "unavailable"
+    }
+  ],
+  "formPreviews": [
+    {
+      "key": "digcompedu_checkin_peerj2023_pre_positioning_en",
+      "answeredFacts": 1,
+      "blankAllowed": true,
+      "scoreAbsent": true,
+      "previewOnlyNoAttemptWrites": true
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_context_en",
+      "answeredFacts": 14,
+      "blankAllowed": true,
+      "scoreAbsent": true,
+      "previewOnlyNoAttemptWrites": true
+    },
+    {
+      "key": "digcompedu_checkin_peerj2023_post_positioning_en",
+      "answeredFacts": 1,
+      "blankAllowed": true,
+      "scoreAbsent": true,
+      "previewOnlyNoAttemptWrites": true
+    }
+  ],
+  "priorFailures": [
+    {
+      "action": "Form preview harness",
+      "error": "Assertion expected an empty missing-fact list for optional blanks",
+      "resolution": "Existing runtime records optional blanks and non-selected Other as descriptive missing facts. Corrected harness to require accepted preview, no scores and no SHOWN_MISSING for populated fields; did not change required flags or runtime."
+    },
+    {
+      "action": "Report verification harness",
+      "error": "Assertion expected reportKind=full on existing rich collection projection",
+      "resolution": "Inspected existing projection: rich collection preserves kind=scale with allowed scores; corrected harness assertion only, then repeated affected projection preview check."
+    },
+    {
+      "action": "Prisma generate",
+      "error": "EROFS updating /home/agent/.cache/prisma",
+      "resolution": "Reused existing matching locked Prisma5.22.0 engine files via official Prisma engine path environment variables; no dependency/source changes"
+    },
+    {
+      "action": "First native materialization",
+      "error": "42P01 relation scale_axis_snapshots does not exist",
+      "resolution": "db push omits raw SQL tables; applied the existing migration SQL to this isolated database, then repeated the affected import only. No engine/schema change."
+    }
+  ],
+  "artifactSha256": {
+    "server-version/backend/src/modules/scale/instruments/digcompedu_checkin_peerj2023_teaching_learning_en/1.0.0/source.json": "04ddf34e2a62ea132634c4cf8d334f318f11d5526fe139ca2236c2534cb07045",
+    "server-version/backend/src/modules/scale/instruments/digcompedu_checkin_peerj2023_professional_engagement_en/1.0.0/source.json": "593a04d144e5df4b31180ef6abd60515ed1304c4890c6ea0bdc4953c8f21abed",
+    "server-version/backend/src/modules/scale/instruments/digcompedu_checkin_peerj2023_facilitating_digital_competence_en/1.0.0/source.json": "e085678064f4a8fd49136622ac0440aee28c2934c41b53f40e95825ab10f581f",
+    "server-version/backend/src/modules/scale/instruments/digcompedu_checkin_peerj2023_assessment_en/1.0.0/source.json": "8fbb8a3b7bdcddf6afb654b9de8b0abb4ab878706be9663e44686f58c0328bcb",
+    "server-version/backend/src/modules/scale/instruments/digcompedu_checkin_peerj2023_digital_resources_en/1.0.0/source.json": "b9832a5841cba343b13f43d1bd3f2ca8a946f71f274842c20a5e1a399d202558",
+    "server-version/backend/src/modules/scale/instruments/digcompedu_checkin_peerj2023_empowering_learners_en/1.0.0/source.json": "62bee6e3bf9e23e4c7f956dc64de203e4470861e7630a371fc43cad3c026d13a",
+    "docs/scale-intake/digcompedu-checkin-20261102/forms.json": "6b9b42827f1d4e4ade6bf514f4a8a443535cde561ef9c3b5188410346461160c"
+  },
+  "integrationBase": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "integrationEvidenceReuse": "Changes from local runtime base25d812d1 to6cad86d8 only SEEQ content/docs/generated source index; consumed runtime/schema/dependencies and this family inputs unchanged. No repeated local import requested."
+}

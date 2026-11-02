@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { gzipSync } from 'node:zlib'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 
@@ -11,6 +12,7 @@ let forms: typeof import('../../modules/composite/final-submit.service')
 let tasks: typeof import('../../services/studentTasks')
 const teacher = prefix + '-teacher', student = prefix + '-student', other = prefix + '-other'
 let courseId: string
+let summaryScaleId: string | undefined
 const ids: string[] = []
 
 async function fixture(status: 'PUBLISHED' | 'ARCHIVED' | 'DRAFT' = 'PUBLISHED') {
@@ -51,12 +53,13 @@ suite('student archived availability (isolated real PostgreSQL)', () => {
       students: { create: [{ studentId: student, status: 'ACTIVE' }, { studentId: other, status: 'APPROVED' }] },
     } })
     courseId = course.id
-  })
+  }, 60000)
   afterAll(async () => {
     if (!db) return
     try {
       await db.compositeAssessmentAttempt.deleteMany({ where: { compositeAssessmentId: { in: ids } } })
       await db.compositeAssessment.deleteMany({ where: { id: { in: ids } } })
+      if (summaryScaleId) await db.scale.deleteMany({ where: { id: summaryScaleId } })
       if (courseId) await db.course.delete({ where: { id: courseId } })
       await db.user.deleteMany({ where: { id: { in: [teacher, student, other] } } })
     } finally { await db.$disconnect() }
@@ -115,6 +118,39 @@ suite('student archived availability (isolated real PostgreSQL)', () => {
       expect((await runtime.listAvailableForStudent(student)).map(item => item.id)).not.toContain(hidden.id)
     }
   })
+
+  it('reads 475 real catalog rows as summaries without truncating cards or changing authority', async () => {
+    const sampleIds = Array.from({ length: 475 }, (_, index) => prefix + '-summary-' + index)
+    ids.push(...sampleIds)
+    summaryScaleId = prefix + '-summary-scale'
+    await db.scale.create({ data: { id: summaryScaleId, code: summaryScaleId, name: 'Synthetic catalog scale', creatorId: teacher, status: 'DRAFT' } })
+    await db.compositeAssessment.createMany({ data: sampleIds.map((id, index) => ({
+      id, code: id, name: 'Synthetic catalog ' + index, description: 'Synthetic course card', instruction: 'Not needed for a course card',
+      createdBy: teacher, productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', status: 'DRAFT', maxAttempts: 1,
+    })) })
+    await db.questionnaireCourseDelivery.createMany({ data: sampleIds.map(compositeId => ({ compositeId, courseId })) })
+    const sections = sampleIds.flatMap(id => Array.from({ length: 4 }, (_, n) => ({ id: id + '-section-' + n, compositeAssessmentId: id, title: 'Synthetic section ' + n, position: 8 + n, contextSection: false })))
+    await db.compositeFormSection.createMany({ data: sections })
+    for (let start = 0; start < sampleIds.length; start += 25) {
+      await db.compositeAssessmentItem.createMany({ data: sampleIds.slice(start, start + 25).flatMap(id => [
+        ...Array.from({ length: 8 }, (_, n) => ({ compositeAssessmentId: id, type: 'SCALE' as const, position: n, required: true, scaleId: summaryScaleId })),
+        ...Array.from({ length: 12 }, (_, n) => ({ compositeAssessmentId: id, type: 'FORM' as const, position: 8 + n, required: true,
+          formType: 'text_input', formLabel: 'Synthetic field ' + n, formSectionId: id + '-section-' + Math.floor(n / 3), formSectionPosition: n % 3 })),
+      ]) })
+    }
+    await db.compositeAssessment.updateMany({ where: { id: { in: sampleIds } }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
+    const allowed = new Set(sampleIds)
+    const full = (await runtime.listAvailableForStudent(student, Date.now(), courseId)).filter(row => allowed.has(row.id))
+    const summary = (await runtime.listAvailableForStudent(student, Date.now(), courseId, true)).filter(row => allowed.has(row.id))
+    const cards = (rows: any[]) => rows.map(({ instruction, items, units, formSections, ...card }) => card)
+    expect(summary).toHaveLength(475)
+    expect(cards(summary)).toEqual(cards(full))
+    expect(summary.every(row => row.estimatedModules === 12 && row.items.length === 0 && row.units.length === 0 && row.formSections.length === 0)).toBe(true)
+    const bytes = (value: unknown) => ({ json: Buffer.byteLength(JSON.stringify(value)), gzip: gzipSync(JSON.stringify(value)).byteLength })
+    expect(bytes(summary).gzip).toBeLessThan(bytes(full).gzip)
+    process.stdout.write('REAL_PG_SUMMARY_BYTES ' + JSON.stringify({ rows: 475, full: bytes(full), summary: bytes(summary), synthetic: true }) + '\n')
+    expect(await runtime.listAvailableForStudent(student, Date.now(), prefix + '-not-enrolled', true)).toEqual([])
+  }, 30000)
 
   it('keeps emergency collection stops independent of publication and rolls back its synthetic fence', async () => {
     const { assertTrainingScaleCollectionAllowed } = await import('../../modules/scale/scale-collection-guard')

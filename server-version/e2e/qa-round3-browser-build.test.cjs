@@ -22,7 +22,7 @@ test('actual QA fixture transitive bundle has no unresolved import.meta environm
   const result = esbuild.buildSync({
     entryPoints: [path.join(__dirname, 'qa-round3-browser-fixture.tsx')],
     bundle: true, write: false, outfile: '/tmp/qa-round3-fixture.js', format: 'iife', jsx: 'automatic', metafile: true,
-    nodePaths: [path.join(root, 'node_modules')], define,
+    nodePaths: [path.join(root, 'node_modules')], loader: { '.png': 'dataurl', '.webp': 'dataurl', '.avif': 'dataurl' }, define,
   })
   assert.ok(Object.keys(result.metafile.inputs).some(name => name.endsWith('/modules/cognitive/feature.ts')))
   for (const output of result.outputFiles) {

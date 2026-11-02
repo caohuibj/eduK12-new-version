@@ -1,0 +1,48 @@
+{
+  "authorPage": "https://www.shanerogersresearch.com/rpq",
+  "manuals": [
+    {
+      "file": "author.html",
+      "url": "https://www.shanerogersresearch.com/rpq",
+      "finalUrl": "https://www.shanerogersresearch.com/rpq",
+      "bytes": 536179,
+      "sha256": "3bf313bb34b7b5acb6efb7d0005577e66a3f05968ea2dab147093b1bc3a07ed1"
+    },
+    {
+      "file": "rpq2024.docx",
+      "url": "https://www.shanerogersresearch.com/_files/ugd/24b29c_c757e5f757fe432a896e13e8f34308d3.docx",
+      "finalUrl": "https://www.shanerogersresearch.com/_files/ugd/24b29c_c757e5f757fe432a896e13e8f34308d3.docx",
+      "bytes": 33734,
+      "sha256": "77732bd5e67f6248d65ecf521dc1a869fe92df74c3f591b49853ffbcc0c2748d"
+    },
+    {
+      "file": "rpq2018.docx",
+      "url": "https://www.shanerogersresearch.com/_files/ugd/24b29c_e87ef7f1c5b349c1bada06c57969c74b.docx",
+      "finalUrl": "https://www.shanerogersresearch.com/_files/ugd/24b29c_e87ef7f1c5b349c1bada06c57969c74b.docx",
+      "bytes": 41067,
+      "sha256": "b389e92805f155ee6293270c4370d621fb110c370b2c13266eb9d8988957ef02"
+    },
+    {
+      "file": "paper.html",
+      "url": "https://peerj.com/articles/16879/",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "file": "paper.xml",
+      "url": "https://peerj.com/articles/16879.xml",
+      "error": "HTTP Error 403: Forbidden"
+    }
+  ],
+  "articleXML": {
+    "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10859078/fullTextXML",
+    "bytes": 132162,
+    "sha256": "7291cf31392e71c41817357d8981b41efeb7637a443d352707369b54c7d13cf8",
+    "license": "CC BY4.0",
+    "copyright": "©2024 Rogers et al.",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "crossCheck": "All30 item wordings in author2024 DOCX equal articleTable6 after whitespace normalization; short10 equals first10 extended items.",
+  "privateLead": "User research report C06 read via connected Drive; private link and raw report not committed.",
+  "publicRawPolicy": "Source item text within CC BY4.0 retained in native sources with attribution; author Word originals and private research report not copied to Git.",
+  "distributionAttribution": "Each native package includes THIRD_PARTY_LICENSE.md with authors, title, source/DOI, license link and declared project changes; these external notices do not rewrite frozen source or C/P/R."
+}

@@ -254,7 +254,8 @@ describe('PR14 Round 2 release gate contracts', () => {
       const entry = getCognitiveRegistryEntry(testType, '1.0.0', releaseScoringVersion(testType))
       expect(entry, testType).toBeDefined()
       expect(entry?.testType, testType).toBe(testType)
-      expect(entry?.recommendedForCreate, testType).toBe(true)
+      // Retained PR14 identities remain freezeable; later audited engines supersede these two.
+      expect(entry?.recommendedForCreate, testType).toBe(!['matrix', 'reversallearning'].includes(testType))
       expect(entry?.randomizationAlgorithmVersion, testType).toBeTruthy()
       expect(entry?.configSchema.safeParse({ ...BASE_CONFIGS[testType], __pr14Unknown: true }).success, testType)
         .toBe(false)
@@ -454,7 +455,8 @@ describe('PR14 Round 2 release gate contracts', () => {
 
   it('keeps standalone Round 2 tasks create-ready without silently publishing report packages', () => {
     for (const testType of STANDALONE_RELEASE_TASKS) {
-      const entry = getCognitiveRegistryEntry(testType, '1.0.0', releaseScoringVersion(testType))!
+      const engineVersion = testType === 'reversallearning' ? '1.1.0' : '1.0.0'
+      const entry = getCognitiveRegistryEntry(testType, engineVersion, releaseScoringVersion(testType))!
       expect(entry.recommendedForCreate, testType).toBe(true)
     }
     expect(getCognitiveRegistryEntry('bart', '1.0.0', '1.0.0')?.recommendedForCreate).toBe(false)

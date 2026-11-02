@@ -273,3 +273,18 @@ export type SituationalDraftAnswer = {
   historyIdentity?: string
   stageConfirmed?: boolean
 }
+
+/** Lightweight discovery projections; execution still uses the full instrument. */
+export type SituationalInstrumentSummary = Pick<SituationalInstrument,
+  'title' | 'key' | 'version' | 'releaseStatus' | 'scienceMaturity'> & {
+  sceneCount: number
+  description: string | null
+}
+
+export interface SituationalHistorySummary {
+  attemptId: string
+  attempt: Pick<SituationalAttempt, 'instrumentKey' | 'instrumentVersion' | 'status' | 'startedAt'>
+  instrument: Pick<SituationalInstrument, 'title' | 'key' | 'version' | 'scoringVersion' | 'releaseStatus' | 'scientificContext'>
+  hasNarrative: boolean
+  primaryMetric: Pick<SituationalMetric, 'label' | 'value' | 'displayPrecision'> | null
+}

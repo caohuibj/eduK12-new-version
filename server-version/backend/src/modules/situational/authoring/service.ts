@@ -413,6 +413,28 @@ export async function projectSjtReleaseStatus<
 }
 
 
+/** History uses one release lookup for all distinct uploaded versions. */
+export async function projectSjtReleaseStatuses<
+  T extends { instrument: { key: string; version: string; scoringVersion: string; releaseStatus: string } },
+>(rows: T[]): Promise<T[]> {
+  const uploaded = (row: T) => row.instrument.scoringVersion === 'author-key-sum-v1'
+    || row.instrument.scoringVersion.startsWith('sjt-online-')
+  const identity = (key: string, version: string) => JSON.stringify([key, version])
+  const refs = new Map(rows.filter(uploaded).map(row => [identity(row.instrument.key, row.instrument.version),
+    { instrumentKey: row.instrument.key, instrumentVersion: row.instrument.version }]))
+  if (!refs.size) return rows
+  const releases = await prisma.sjtAuthorRelease.findMany({
+    where: { OR: [...refs.values()] },
+    select: { instrumentKey: true, instrumentVersion: true, status: true },
+  })
+  const statuses = new Map(releases.map(release => [identity(release.instrumentKey, release.instrumentVersion), release.status]))
+  return rows.map(row => uploaded(row) ? {
+    ...row,
+    instrument: { ...row.instrument, releaseStatus: statuses.get(identity(row.instrument.key, row.instrument.version)) ?? 'RETIRED' },
+  } : row)
+}
+
+
 export async function setSjtDraftPolicy(actor: SjtAuthorActor, id: string, revision: number,
   authorizationPolicy: typeof SJT_COURSE_GRANT_POLICY | null) {
   assertPolicy(authorizationPolicy)

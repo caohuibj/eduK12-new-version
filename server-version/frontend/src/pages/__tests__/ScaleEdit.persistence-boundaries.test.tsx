@@ -27,11 +27,11 @@ beforeEach(() => {
 describe('Training scale persistence boundaries', () => {
   it('only accepts persistable metadata before creation, then enables definition authoring', async () => {
     const user = userEvent.setup(); mount('new')
-    for (const name of ['响应选项', '题目', '计分', '报告文案']) {
+    for (const name of ['题目', '响应选项', '计分', '报告文案']) {
       const tab = screen.getByRole('button', { name: new RegExp('^' + name + '$') })
       expect(tab).toBeDisabled(); await user.click(tab)
     }
-    expect(screen.getByText(/此步骤仅保存基本元数据/)).toBeInTheDocument()
+    expect(screen.getByText(/这里只保存基本信息/)).toBeInTheDocument()
     expect(screen.queryByLabelText('自有内容 / 授权声明')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '增加题目' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '保存报告定义' })).not.toBeInTheDocument()
@@ -71,7 +71,7 @@ describe('Training scale persistence boundaries', () => {
     await screen.findByDisplayValue('量表')
     expect(screen.queryByLabelText('自有内容 / 授权声明')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /^报告文案$/ }))
-    await user.clear(screen.getByLabelText('自有内容 / 授权声明'))
+    await user.clear(await screen.findByLabelText('自有内容 / 授权声明'))
     await user.type(screen.getByLabelText('自有内容 / 授权声明'), '新声明：允许合成测试')
     await user.click(screen.getByRole('button', { name: /^基本信息$/ }))
     await user.click(screen.getByRole('button', { name: '保存基本信息' }))
@@ -90,7 +90,7 @@ describe('Training scale persistence boundaries', () => {
     api.put.mockImplementation(async () => ({ code: 0, data: structuredClone(stored) }))
     const user = userEvent.setup(); mount()
     await user.click(await screen.findByRole('button', { name: /^报告文案$/ }))
-    await user.clear(screen.getByLabelText('自有内容 / 授权声明'))
+    await user.clear(await screen.findByLabelText('自有内容 / 授权声明'))
     await user.type(screen.getByLabelText('自有内容 / 授权声明'), '必须保存的新声明')
     await user.click(screen.getByRole('button', { name: '保存报告定义' }))
     await screen.findByText(/保存后的授权声明与当前编辑不一致/)
@@ -101,7 +101,7 @@ describe('Training scale persistence boundaries', () => {
   it('preserves numeric, string and empty-string target identities through save and readback', async () => {
     const user = userEvent.setup(); mount()
     await user.click(await screen.findByRole('button', { name: /^题目$/ }))
-    const target = screen.getByRole('combobox', { name: '目标选项 A' })
+    const target = await screen.findByRole('combobox', { name: '目标选项 A' })
     for (const [label, value] of [['文本一', '1'], ['数字一', 1], ['空文本', '']] as const) {
       await user.selectOptions(target, screen.getByRole('option', { name: new RegExp('^' + label + '$') }))
       await user.click(screen.getByRole('button', { name: '保存题目' }))

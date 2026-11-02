@@ -1,0 +1,1241 @@
+{
+  "primaryItemSource": {
+    "title": "SELFIEforTEACHERS fixed 2022 English Toolkit Annex I (32 competences); official 2023 per-item scoring",
+    "citation": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text). Scoring/awareness option: Economou, A. (2023). SELFIEforTEACHERS. Designing and developing a self-reflection tool for teachers’ digital competence. doi:10.2760/561258, JRC131282, p.11 and Annex 1 p.92 (PDF page96).",
+    "url": "https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+    "publicationYear": 2022
+  },
+  "scoringSource": {
+    "citation": "Economou, A. (2023). SELFIEforTEACHERS. Designing and developing a self-reflection tool for teachers’ digital competence. doi:10.2760/561258, JRC131282, p.11 and Annex 1 p.92 (PDF page96).",
+    "url": "https://publications.jrc.ec.europa.eu/repository/bitstream/JRC131282/JRC131282_01.pdf"
+  },
+  "normalization": [
+    {
+      "code": "1.2",
+      "level": "A2",
+      "from": "acc ess",
+      "to": "access"
+    },
+    {
+      "code": "1.8",
+      "level": "A2",
+      "from": "com petence",
+      "to": "competence"
+    },
+    {
+      "code": "1.8",
+      "level": "B1",
+      "from": "competenc e",
+      "to": "competence"
+    },
+    {
+      "code": "1.8",
+      "level": "B1",
+      "from": "pedagogical us e",
+      "to": "pedagogical use"
+    },
+    {
+      "code": "1.8",
+      "level": "B2",
+      "from": "s elf-reflection",
+      "to": "self-reflection"
+    },
+    {
+      "code": "1.8",
+      "level": "C1",
+      "from": "works hops",
+      "to": "workshops"
+    },
+    {
+      "code": "2.1",
+      "level": "B1",
+      "from": "s election",
+      "to": "selection"
+    },
+    {
+      "code": "2.2",
+      "level": "B2",
+      "from": "process es",
+      "to": "processes"
+    },
+    {
+      "code": "3.3",
+      "level": "B2",
+      "from": "assessmentand",
+      "to": "assessment and"
+    },
+    {
+      "code": "4.1",
+      "level": "B1",
+      "from": "assessmentplatforms",
+      "to": "assessment platforms"
+    },
+    {
+      "code": "5.3",
+      "level": "C2",
+      "from": "makers pace",
+      "to": "makerspace"
+    }
+  ],
+  "items": [
+    {
+      "code": "1.1",
+      "intro": "Professional engagement - Organisational communication Using digital technologies to enhance communication with colleagues and/or learners and/or parents.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used for organisational communication (e.g. email, instant messaging, social networks, and online learning platforms)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to help me communicate with colleagues, learners and/or parents (e.g. email, instant messaging, social networks, online learning platforms)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies according to my organisational communication needs (e.g. the communication goal, target and context)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select digital technologies based on their features and suitability for my organisational communication needs (e.g. effective, efficient and personal communication)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I support and provide advice to colleagues on how to use digital technologies for organisational communication (e.g. for effective, efficient, safe, responsible, inclusive communication at school level)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I contribute to developing organisational practices on communication using digital technologies (e.g. for effective, efficient, safe, responsible, inclusive communication)."
+        }
+      ]
+    },
+    {
+      "code": "1.2",
+      "intro": "Professional engagement - Online learning environments Managing online learning environments taking data management and ethics into account.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that when managing online learning environments, ethical issues and use appropriate data management methods should be considered (e.g. open or restricted access, GDPR compliance)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried different settings to ensure that online learning environments to comply with ethical considerations and data management strategy (e.g. protection of users' data, access policy, terms of use, data management, privacy issues)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I administer online learning environments in line with ethical considerations and data management strategy (e.g. administration features, managing content and student data)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse the features of online learning environments and apply the ones that best respond to the ethical considerations and data management strategy of my working context (e.g. security, users and data management, access policy, hosting of data)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I support and provide advice to colleagues on ethical considerations and data management practices when using an online learning environment (e.g. use of passwords, encryptions, security procedures, data management transparency)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote a school level data policy and code of ethical conduct in online learning environments (e.g. personal data management, accessibility for all, security, privacy)."
+        }
+      ]
+    },
+    {
+      "code": "1.3",
+      "intro": "Professional engagement - Professional collaboration Using digital technologies to engage in collaboration and interactions with colleagues and/or other education stakeholders.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used for collaboration and interactions with colleagues and/or other education stakeholders (e.g. exchange content by email attachments)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to collaborate and interact with colleagues and/or other education stakeholders (e.g. exchange content using online services, participate in online professional networks)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to collaborate and interact with colleagues and/or other stakeholders, according to collaboration needs (e.g. sharing content, practices, and/or ideas)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select digital technologies based on their features and how they can support collaboration tasks I need to engage in with colleagues and/or other education stakeholder (e.g. collaborative online activities)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I lead collaborative tasks with colleagues and/or other education stakeholders using digital technologies (e.g. collaboration and co-creation of learning designs, implementation of joint projects)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote collaborative activities between my school and its wider community using digital technologies (e.g. networks, communities and synergies, partnerships with local and wider community)."
+        }
+      ]
+    },
+    {
+      "code": "1.4",
+      "intro": "Professional engagement - Digital technologies and school level infrastructure Using digital technologies (devices, platforms and software) and infrastructure (internet access,local network) available in my school to enhance education.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of digital technologies available in my school that can support my professional practice (e.g. devices, applications, infrastructure)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies available in my school that can support my professional practice (e.g. interactive whiteboards, tablets, intranet)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies available in my school according to my professional practice needs (e.g. learning management system, cloud services)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select digital technologies available in my school based on their features and suitability to enhance my professional practice (e.g. online learning environments, immersive technologies)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I support and provide advice to colleagues on how to use digital technologies available in our school for their professional practice (e.g. giving presentations, organising workshops, developing learning resources)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I propose new digital technologies for professional practice to be used in my school (e.g. emerging technologies, applications, infrastructure)."
+        }
+      ]
+    },
+    {
+      "code": "1.5",
+      "intro": "Professional engagement - Reflective practice Reflecting on my own and collective professional practice with the use of digital technologies.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that reflecting on how I use digital technologies can enhance my professional practice (e.g. online diary, peer-to-peer reflections)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried reflection methods on my use of digital technologies to further develop my digital competence (e.g. online self-reflection tools, reflection diary, digital story telling)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various reflection methods in order to improve and update my professional digital practice (e.g. co-teaching, video recording of lessons, peer-debriefing sessions)"
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse the outcomes of my reflection to improve the use of digital technologies in my professional practice (e.g. analysing peer feedback, using mind mapping tools and other tools that support annotations, audio commentaries, online diaries)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I support and provide advice to colleagues about improving the use of digital technologies in their professional practice through critical reflection (e.g. through discussion forums, blogs, social networks, online professional communities)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and contribute to the development of a reflective learning culture that enhances the use of digital technologies in my school and beyond (e.g. lesson study, collaborative learning design, coaching, mentoring)."
+        }
+      ]
+    },
+    {
+      "code": "1.6",
+      "intro": "Professional engagement - Digital life Contributing positively and ethically in the digital world, considering safe and responsible digital practices.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that my digital activity may have implications for my own reputation and that of my school (e.g. sharing private information, using inappropriate language)"
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I recognise possible risks and threats for my reputation and that of my school relating to my digital activity (e.g. privacy, personal data, bullying, misinformation)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use mitigating measures to maintain a positive digital profile (e.g. understanding the provided terms of use, tracing my digital footprint, managing my privacy settings)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and assess my digital footprint to adjust my behaviour and to help curate my own reputation online and that of my school (e.g. tracing my digital footprint, managing my privacy settings, blocking suspicious content and people, applying school guidelines on digital activities)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I support and provide advice to colleagues on creating and curating ethical and responsible digital profiles (e.g. presentations, workshops, supporting material, activities)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote school-level strategies that encourage staff and students to contribute positively, responsibly and ethically in a digital world (e.g. provide transparent data and content management procedures, develop an ethics code of conduct)."
+        }
+      ]
+    },
+    {
+      "code": "1.7",
+      "intro": "Professional engagement - Professional learning (through digital technologies Using digital technologies for one's own professional learning.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can support and enhance my professional learning (e.g. digital tools and resources, online learning environments and courses)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies for my professional learning (e.g. search for information online, join online courses, use online learning apps, visit online libraries and repositories)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies for my professional learning (e.g. discussions in a forum, uploading material, giving and taking feedback, presenting)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select online learning resources and activities that best suit my learning needs (e.g. webinars, online interactive courses, online learning communities)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I support and provide advice to colleagues on using digital technologies for their professional learning (e.g. online learning communities, online repositories, e-portfolios)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote a plan to support my colleagues’ digitally-enhanced professional learning (e.g. provide webinars, online training, online communities, resources repository, digital badges)."
+        }
+      ]
+    },
+    {
+      "code": "1.8",
+      "intro": "Professional engagement - Professional learning (about digital technologies) Engaging in professional learning activities for the development of teachers’ digital competence.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that engaging in professional learning activities on using digital technologies can develop my digital competence (e.g. webinars or workshops on the use of digital technologies in teaching and learning)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have attended professional learning activities about using digital technologies in order to develop my digital competence (e.g. micro-teaching, workshops on the use of digital technologies in teaching and learning)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I participate in various formal and informal professional learning activities about using digital technologies to develop my digital competence (e.g. hands-on training on the pedagogical use of digital technologies, online learning approaches, digital assessment)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select professional learning activities about using digital technologies based on my needs (e.g. use a self-reflection tool on my digital competence, set learning goals, design my learning, reflect on my learning)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I provide learning activities about using digital technologies and support colleagues on the development of their digital competence (e.g. workshops, informal sessions with colleagues, microteaching on the use of digital technologies)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I contribute to the design of professional learning programmes which aim at developing teachers' digital competence (e.g. project-based learning with the use of digital technologies, digitally-enhanced learning design, exchange of good practices)."
+        }
+      ]
+    },
+    {
+      "code": "1.9",
+      "intro": "Professional engagement – Computational thinking Engaging with computational thinking concepts and processes as part of teacher digital competence.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of computational thinking concepts and processes and how these relate to digital competence (e.g. analysing a problem to find a solution, recognising aspects of computational thinking around us)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using computational thinking processes to explore solutions to a problem (e.g. decomposition of a problem, solution through a definition of steps, analysing a set of instructions applied to a solution)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital tools to explore solutions to a problem following computational thinking processes (e.g. visual programming tools, authoring tools and editors)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select responses generated by algorithms (e.g. rank of search results, advertisements, how a robot can respond)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I lead computational thinking activities in my school to support the development of colleagues’ and students’ digital competence (e.g. programming classes, competitions, hackathons)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I contribute to the design and development of educational digital applications (e.g. games, mobile apps, assessment tools, customisation of virtual environments)."
+        }
+      ]
+    },
+    {
+      "code": "2.1",
+      "intro": "Digital Resources- Searching and selecting Using searching and selection criteria to identify digital resources for teaching and learning.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that I can search for resources online (e.g. using a search engine, following a link, visiting a resource repository)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried searching online to find digital resources (e.g. by following a link, using key words in a search engine, filtering resources in online repositories)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various online tools and portals to search for a wide and diversified set of digital resources that respond to educational needs (e.g. annotated selection of resources, search engines, resource repositories, digital libraries, social networks, learning communities)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse and select digital resources based on criteria that meet specific teaching and learning aims (e.g. pedagogical value, relevance, reliability, validity, quality, licensing)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on my search results and readjust my selection criteria (e.g. taking into consideration that my search results can be affected by my geographical location or previous searches and preferences)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I propose strategies and tools to help colleagues search for and select digital resources from diverse sources in line with curriculum requirements and learning aims (e.g. pools of key words, selection checklists, digital resources evaluation rubrics, references to resources portals)."
+        }
+      ]
+    },
+    {
+      "code": "2.2",
+      "intro": "Digital Resources - Creating Creating digital resources that support and enhance teaching and learning aims.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that I can create resources in digital form (e.g. digital text, images, photos, audio, video)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital tools to create resources (e.g. text editors, audio and visual editing tools, multimedia authoring tools)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital tools according to their features to create digital resources to meet learners’ needs (e.g. interactive text, multimedia presentations, quizzes, games, online activities and lessons)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I apply design principles and processes to create digital resources to meet teaching and learning aims (e.g. identifying a need, design, develop, implement, assess, adjust, share)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I share the digital resources I create and I reflect and readjust them according to feedback that I receive (e.g. incorporating learner-centered pedagogical approaches enhanced by digital technologies affordances)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and contribute to the co-creation of digital educational resources with people and organisations beyond my school (e.g. researchers, educational content publishers, educational technology companies)."
+        }
+      ]
+    },
+    {
+      "code": "2.3",
+      "intro": "Digital Resources – Modifying Modifying existing digital resources to support and enhance teaching and learning aims, respecting copyright and licencing rules.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that when modifying existing digital resources I need to respect copyright and licencing rules (e.g. adding a picture to text, adding new content, editing or deleting parts, adding hyperlinks)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried ways to modify existing digital resources, while respecting their copyright and licence attributes (e.g. editing a presentation, modifying an image, changing format of a video, editing quizzes, adapting general settings)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital tools based on their features to modify and repurpose digital resources to meet educational needs (e.g. customise content of an online lesson, exploit features of a virtual environment, use eBook editors)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select existing digital resources, taking into consideration copyright and distribution licences, to modify and adapt them to meet teaching and learning aims (e.g. open educational resources, content under Creative Common License, content free of copyright, editable resources)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and redesign existing digital reources to integrate them into interactive, learner-centred activities (e.g. adapting digital resources and digitally-enhanced tasks into an online learning course, online assessment, online collaborative project, a wiki, a blog, a virtual learning space)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and contribute to school-level guidance for teachers and students on modifying existing digital resources in line with curriculum requirements and teaching and learning aims (e.g. strategies to revise, improve and repurpose school’s digital resources, copyright licences to be used, agreements with external stakeholders and publishers)."
+        }
+      ]
+    },
+    {
+      "code": "2.4",
+      "intro": "Digital Resources – Managing and protecting Organising digital content, enabling easy and secure access for students, parents and teachers, while protecting sensitive and personal data.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can help me store, organise, and provide secure access to digital content (e.g. local and online storage spaces, password protection, classification of content)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried ways to store, manage and access digital content on and from local and/or online storage spaces (e.g. hard disks, external drives, cloud, online services)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital tools to store, organise and facilitate access to digital content (e.g. tree structures, use of metadata/tags)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I define and apply protection and security measures for the storage, management and access of digital content (e.g. applying strong passwords to sensitive content, assigning access limitation rights, use encryption protocols, have regular backups, select storage and online services based on their data policy, terms of use, safety and security)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I design and develop a strategy to ensure easy, equitable and secure management of and access to digital content for my students and colleagues (e.g. classification of content, access limitation rights to different target users, encryption protocols, regular backups)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote a common digital space at school-level, that facilitates the secure storage, management of and access to digital content for different targeted users (e.g. students, parents, teachers, other school staff)."
+        }
+      ]
+    },
+    {
+      "code": "2.5",
+      "intro": "Digital Resources – Sharing Sharing digital content with respect to intellectual property and copyright rules.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that copyright rules apply to digital resources I use for educational purposes (e.g. images, text, audio, video)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried ways to attribute to the creator of the resources I use (e.g. citing author’s name, link to original source)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I share digital resources attributing the original creators and choosing the most appropriate channels for private, limited or public use (e.g. using email attachment for private and limited use, through a link, in an online repository, a social network, managing tags/metadata)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and apply copyright licences when sharing digital resources I create, supporting open educational resources (e.g. Creative Commons licence)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I design and develop ways for my colleagues and I to share, curate and re-use digital resources to ensure easy and equal access (e.g. developing an ontology to manage resources, specifying ways to curate content, contextualising curated content)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote an online space to share digital educational resources with the school community (e.g. applying key words /tags/metadata, allowing others to comment, rate, modify, or co-create)."
+        }
+      ]
+    },
+    {
+      "code": "3.1",
+      "intro": "Teaching and Learning – Teaching Designing, developing and implementing learning with the use of digital technologies to enhance learning outcomes.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can support and enhance teaching and learning (e.g. software programs and suites, mobile apps and tools, on-line and cloud-based resources)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to support and/or enhance my teaching practice (e.g. software programs and suites, mobile apps and tools, online and cloud-based resources, interactive whiteboards)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies that can support innovative pedagogical approaches, enhancing my students' active involvement in their learning (e.g. inquiry based learning, project based learning, game based learning, peer and self assessment, e-portfolios, student coaches)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and use digital technologies in my learning designs, so as to meet teaching and learning aims (e.g. simulations, digital games, online interactive tools, collaborative environments)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "Together with my students, I reflect on and (re)design the use of digital technologies to enhance teaching practices and innovative learning approaches (e.g. students as coaches, use of emerging technologies, modelling and advice, lesson-study)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote the design and sharing of innovative teaching and learning practices with digital technologies in my school and its wider community (e.g. online workshops, learning design with the use of digital technologies, micro-teaching and co-teaching, reflective discussions on the effectiveness of the use of digital technologies)."
+        }
+      ]
+    },
+    {
+      "code": "3.2",
+      "intro": "Teaching and Learning - Guidance Using digital technologies in order to provide feedback and opportunities for reflection, leading to readjustment of teaching and learning practices for both teeachers and learners.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used to provide and receive feedback and opportunities to reflect on teaching and learning practices (e.g. email, chat, video response)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to provide feedback and support to students (e.g., online tutorials, chat, automated/immediate feedback, links to online Q&A)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to provide students with feedback and opportunities for reflection on their learning, in real-time and /or asynchronously (e.g. chat, discussion forums, video responses, in-class polls/ voting)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and employ digital technologies to provide opportunities for students to engage in self-assessment and peer-assessment and the design of their learning (e.g. online shared documents, recordings of learning activities, scaffolded reflection)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "Together with my students, I reflect on and (re)design teaching and learning, based on evidence captured through digital technologies (e.g. digital polls/surveys outcomes, recordings of learning activities, learning analytics)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote ways in which digital technologies can be used to support feedback and reflection for teachers and students in my school and beyond (e.g. discussion forums, chat, shared documents, Frequently Asked Questions)."
+        }
+      ]
+    },
+    {
+      "code": "3.3",
+      "intro": "Teaching and Learning - Collaborative Learning Using digital technologies to foster and enhance learner collaboration for individual and collective learning.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used to foster and enhance learner collaboration towards individual and collective learning (e.g. on-line collaboration, sharing learning resources)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to support and enhance collaborative activities of students (e.g. shared documents, contributing to forums, wikis)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to support and enhance students' collaborative learning, in face-to-face and/ or online settings (e.g. shared documents, forums, wikis, blogs, co-authoring)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and employ digital technologies in my learning designs based on their features, so as to enhance and support my students' collaborative learning, in face to face and/or online settings (e.g. co-design, co-creation, peer assessment and group reflection, project building, sharing)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "Together with my students, I reflect on and (re)design their use of digital technologies for individual and/or collaborative learning (e.g. edit and develop content, co-create an artefact, participate in collaborative projects, virtual exchanges, use of digital tools for task and time management, communication and sharing)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote the use of digital technologies within my school and its wider community, providing opportunities for collaboration to support individual and collective learning, in and beyond the school (e.g. using synchronous and asynchronous online environments and tools, teach meets, joint projects, co-organising online learning events, co-designing and co-creating learning material)."
+        }
+      ]
+    },
+    {
+      "code": "3.4",
+      "intro": "Teaching and Learning - Self-regulated learning Using digital technologies to enhance students' self-regulated learning processes, fostering active and autonomous learning making students more responsible for their own learning, thereby shifting the focus from teaching to learning.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used to foster active and autonomous learning (e.g. planning, goal setting, recording progress)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to support students in planning their own learning (e.g. planning and scheduling using digital calendars, goal setting using digital journals, recording progress)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to support students plan and regulate their own learning (e.g. online learning environments, online resources repositories, collaborative tools and spaces, learning journals, e-portfolios)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and use digital technologies in my learning designs based on their features, so as to facilitate my students' self-regulated learning skills and learner autonomy (e.g. take initiatives regarding their own learning, be creative and responsive to new learning situations, engage in self-reflections so as to plan and guide their progress)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "Together with my students, I reflect on and support them to (re)design their learning, through and on using digital technologies, promoting their self-regulated learning and learner autonomy (e.g. identify their needs, set their learning goals, describe their strategy for achieving these goals, implement their learning tasks, gather evidence of their learning, reflect on it and share their learning outcomes)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote strategies and practices on how digital technologies can support self-regulated learning in my school and in the wider community (e.g. makerspaces, learning spaces with digital technologies to accommodate hands-on activities, student coaching)."
+        }
+      ]
+    },
+    {
+      "code": "3.5",
+      "intro": "Teaching and Learning - Emerging technologies Using emerging technologies in ethical ways to explore novel learning experiences and content.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of emerging technologies that are being used in educational settings (e.g. simulations, robotics, virtual reality, Artificial Intelligence (AI))."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried emerging technologies to see their relevance for my teaching and my students (e.g. virtual and augmented reality, robots, AI)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various emerging technologies to provide my students with novel learning experiences and new kinds of learning, fostering the development of transversal skills (learning experiences involving e.g. simulating/modelling, gaming, computational thinking, creative and innovative thinking, data-driven decision making)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and use emerging technologies in my learning designs to engage my students in novel learning opportunities, while taking into account ethical implications (e.g. immersive learning, computational thinking, addressing learner agency when interacting with AI)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "Together with my students, I reflect on and (re)design teaching and learning, engaging them in co-design and co-creation of applications using emerging technologies and addressing ethical implications (e.g. designing augmented reality scenarios and 3D expeditions, programming humanoid robots, addressing datafication and AI agency in decision making)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote strategies and practices within my school and its wider community that can support colleagues and students in their use of emerging technologies to provide novel teaching and learning experiences and content, while addressing ethical implications (e.g. customise virtual worlds for learning activities, foster human agency in data-driven decision making, collaboration with technology companies)."
+        }
+      ]
+    },
+    {
+      "code": "4.1",
+      "intro": "Assessment - Assessment strategies Using digital technologies to support formative and summative assessment of learning.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can support both formative and summative assessment(e.g. digital quizzes, online polls)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to support formative and summative assessment(e.g. online quizzes, games, forms, mobile apps)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to support formative and summative assessment (e.g. create a digital test, use assessment platforms that offer timely feedback to students)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select digital technologies to support specific aspects in assessment “of”, “for” and “as” learning and capture best the nature of the learning outcome to be assessed (e.g. self-reflection rubrics, assignments that offer timely feedback to students, shared documents that support peer reviewing/feedback)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and involve my students in the design of digitally-supported assessments, selecting digital technologies that best support the assessment purpose and content (e.g. deciding assessment criteria and modality, co-creation of rubrics, design the format of self and peer assessment, formative or summative assessment scaffolding tools)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I propose and promote strategies and digital technologies within my school and its wider community to support assessment “of”, “for” and “as” learning (e.g. self and peer assessment, promotion of transversal skills, work-based assessment, e-portfolios)."
+        }
+      ]
+    },
+    {
+      "code": "4.2",
+      "intro": "Assessment - Analysing evidence Using digital technologies to collect and analyse evidence on students´ learning processes and outcomes.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can capture students’ learning processes and outcomes (e.g. digital quizzes, online polls, forms, assessment platforms)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to capture evidence about my students' individual and/or group learning activity (e.g. digital quizzes, online polls, surveys)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to collect and analyse evidence of students' individual and/or group learning outcomes and learning processes (e.g. online polls, forms, surveys, learning analytics, spreadsheets)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select digital technologies that facilitate presentation and analysis of learning data to support my reflections on my teaching practice and on my students' learning (e.g. record and visually represent data, automatically generated graphs, mind mapping tools, digital dashboards)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and involve my students in capturing and analysing their learning data, which can be used to plan their future learning (e.g. reflective learning logs, personal goal setting software)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote strategies and practices to help my school and its wider community use digital technologies to evidence learning, and use assessment data to support decision-making for targeted interventions (e.g. pedagogical decisions, administrative decisions such as students' attendance, and data on students' learning such as grades)"
+        }
+      ]
+    },
+    {
+      "code": "4.3",
+      "intro": "Assessment - Feedback and planning Using digital technologies to provide feedback to learners, facilitating planning of further action.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used to provide feedback to learners including automated feedback (e.g. blogs, online polls, online forms, applications using Artificial Intelligence (AI))."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies that support the integration of feedback and reflection on students' learning (e.g. blogs, wikis, video-based feedback, digital annotation on assignments)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to provide timely feedback for learners, including automated feedback (e.g. software applications with automated feedback, online tests with automated scoring, online polls with automated visual representations of results)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select digital technologies that can help in providing, receiving and analysing feedback in order to inform teaching and enhance the design of learning on a continuous basis (e.g. online polls and surveys, dashboards for managing grades and feedback, e-portfolios, context-dependent feedback)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and involve my students in using digital technologies for collection and analysis of feedback for planning further action (e.g. shared documents, blogs, mind mapping tools, reflective learning logs, learning journals, e-portfolios)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote a strategy within my school and its wider community on the use of digital technologies that facilitate giving, receiving and analysing feedback, to support planning for further action (e.g. e-portfolios, context dependent feedback, digital storytelling)."
+        }
+      ]
+    },
+    {
+      "code": "5.1",
+      "intro": "Empowering learners - Accessibility and inclusion Ensuring access to digital resources and learning activities for all students, taking into consideration any contextual, physical or cognitive constraints to their use.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of potential limitations and barriers that students may encounter in relation to digital technologies (e.g. limited access to digital devices and/or to Internet connection, learning difficulties)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried digital technologies that can be adapted to students’ context and needs (e.g. students ’ devices, access to infrastructure, family context, students’ special needs)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to promote equitable and inclusive education for all my students (e.g. adaptive and assistive technologies like screen readers, alternative types of keyboards, build-in accessibility tools)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and employ digital technologies in my learning design, to develop inclusive learning activities and accessible resources according to my students’ needs and capabilities (e.g. integrating different tools, using accessible layout, structure and language)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and redesign teaching and learning with the use of digital technologies to ensure accessible and inclusive approaches that meet the needs and abilities of all my students, including those with special learning needs (e.g. providing multimodal presentations of information, adjusting accessibility features like font size and layout, developing students’ digital skills)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote strategies for equal access and inclusion to education through digital technologies in my school and its wider community (e.g. afternoon digital technology labs for students and parents, collaborations with industry for available infrastructure)."
+        }
+      ]
+    },
+    {
+      "code": "5.2",
+      "intro": "Empowering learners – Differentiation and personalisation Using digital technologies to address diverse learning needs and capabilities, by allowing learners to advance at different levels and speeds, and follow individual learning pathways and objectives.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used to differentiate and personalise learning (e.g. adapt instruction to meet the needs of different groups of learners, providing individual support to students)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried digital technologies that enable differentiation and personalisation of learning (e.g. online quizzes with personalised feedback, educational games with levels of difficulty, online learning environments with adaptive material)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies in teaching and learning to accommodate individual learning needs (e.g. creating playlists for self-guided learning activities, differentiated practice activities, automated individual feedback)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and employ digital technologies in my learning designs based on their features, to develop personalised learning environments (e.g. peer teaching, dynamically tracking and managing the learning needs of all students)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect and (re)design my teaching to involve my students in designing their own learning pathways using digital technologies best suited to their learning needs (e.g. learners use online tools to set their learning goals, monitor their progress, and reflect on learning and summative assessments demonstrating their mastery level)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote the use of digital technologies in ways that allow differentiating and personalising students’ learning experiences in my school and its wider community (e.g. interest group for teachers to share good practices, online platform with resources and live lessons)."
+        }
+      ]
+    },
+    {
+      "code": "5.3",
+      "intro": "Empowering learners - Actively engaging learners Using digital technologies to foster learners’ active and creative engagement in their learning.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that I can use digital technologies to engage students in active learning (e.g. games, interactive activities, virtual worlds, simulations)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies to engage students in active learning (e.g. use of blogs and wikis, e-portfolios, virtual and augmented reality)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital technologies to engage students in active learning (e.g. students exploring virtual objects, peer-review, jigsaw discussions, online debates)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I select and employ digital technologies in my learning designs to foster students’ active engagement in individual and collaborative learning (e.g. collaborative writing, games and simulations, virtual and augmented reality, structured team-based learning)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I (re)design learning activities based on students’ feedback, co-creating new ways for them to interact and actively engage with digital technologies (e.g. involving learners in hands-on activities, experiential learning, online discussions, peer coaching and teaching, constructing their learning and creating artefacts, e-portfolios)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I initiate and promote digitally-enhanced learning spaces within my school and its wider community, where students are actively engaged in learning activities (e.g. makerspace, robotics, programming, AI applications)."
+        }
+      ]
+    },
+    {
+      "code": "5.4",
+      "intro": "Empowering learners –Blended learning Using digital resources and tools, online learning environments and platforms to ensure students' learning within and beyond the classroom.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware that digital technologies can be used to combine on-site and remote, synchronous and asynchronous learning (e.g. digital resources, online meetings, groups in social networks)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried using digital technologies that facilitate learning within and beyond the classroom (e.g. web meeting tools, online learning environments, discussion forums, chats, virtual worlds)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I use various digital tools and platforms to support distance and blended learning approaches, enhancing students’ learning processes and outcomes (e.g. video lessons, social media applications, learning resources)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I analyse digital technologies based on their features and employ them in my learning designs to support distance and blended learning (e.g. online collaborative tools, chats, forums, blogs, social networks)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and redesign teaching and learning for distance and blended learning contexts to ensure my students’ active involvement in the learning process within and beyond the classroom (e.g. online learning, hybrid learning, virtual labs, online collaborative tools, synchronous and asynchronous activities, individual and team work)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "I contribute to the design of a distance and blended learning strategy for my school and support its implementation to facilitate innovative and inclusive learning approaches within and beyond the school (e.g. ensuring access to infrastructure and devices, support for parents ’ and students, regular information exchange, code of conduct for online behaviour and norms, personal data management and safety, communication practices)."
+        }
+      ]
+    },
+    {
+      "code": "6.1",
+      "intro": "Facilitating learners’ digital competence - Information and data literacy Incorporating learning activities, which require learners to use digital technologies to search, evaluate and manage information and data in digital environments.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of learning activities and resources that can enhance students’ information and data literacy (e.g. searching for digital information, evaluating information found, reading graphs, reading and understanding data)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried learning activities that encourage students to search, evaluate and manage information and data in digital environments (e.g. setting search criteria, comparing different sources, interpreting data)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I implement various learning activities that require students to critically search, evaluate and manage information and data from different digital environments, according to their learning needs (e.g. setting selection criteria, identifying inaccuracies, missing information or bias, cross-checking different sources to judge credibility, managing misinformation, racism, and xenophobia)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I design learning to support students to critically search, evaluate and manage information and data (e.g. analysing the choice of the information medium, the source, purpose, transparency of algorithms used to decide what kind of information and data is returned)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I lead project-based initiatives where students, as both recipients and creators of content, go through the process of critically searching, evaluating and managing information and data (e.g. editing the school newsletter, organising information and data access using taxonomies and categories)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "My students and I contribute to the creation of strategies that promote ways to use digital technologies to improve information and data literacy across my school and its wider community (e.g. workshops, debates, experiential activities)."
+        }
+      ]
+    },
+    {
+      "code": "6.2",
+      "intro": "Facilitating learners' digital competence - Communication and collaboration Implementing learning activities that require learners to communicate and collaborate using digital technologies.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of learning activities that can enhance students’ digital communication and collaboration (e.g. using email, instant messaging, social networks, etc. to communicate with teachers and peers)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried learning activities that encourage students to communicate and collaborate with teachers and each other using digital technologies (e.g. using online meetings, discussion forums)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I implement various learning activities that require students to communicate and collaborate in digital contexts according to their learning needs (e.g. use of appropriate medium for students ’ digital communication, use of digital tools that best support students ’ collaboration, managing an online shared space, editing online shared documents)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I design learning to support students to use digital technologies for communication and collaboration respecting behavioural and communication norms (e.g. respecting others ’ ideas and diversity while contributing to team work, sharing messages across multicultural networks, creating positive connections and building contacts)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on the suitability of my teaching practices in view of fostering students ’ digital communication and collaboration, and readjust them accordingly (e.g. exchange good practices with other colleagues, discuss with students communication and collaboration needs, exploring new digital tools)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "My students and I initiate and promote digital communication and collaboration networks with other schools and educational stakeholders (nationally and internationally) to exchange learning experiences, activities and pursue common projects (e.g. participation in and/or co-creation of educational initiatives, competitions)."
+        }
+      ]
+    },
+    {
+      "code": "6.3",
+      "intro": "Facilitating learners' digital competence - Content creation Incorporating learning activities that require learners to express themselves by creating digital artefacts.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of learning activities that encourage students to express themselves through digital means (e.g. in the form of text, photos, images, presentations)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried learning activities that encourage students to create and modify digital content (e.g. text, presentations, audios, videos)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I implement various learning activities that require my students to express and convey their ideas creatively, by using appropriate digital tools (e.g. visualisations, simulations, digital stories)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I design learning to engage students in creative design processes in order to (re)create quality digital content, while respecting copyright rules and licenses (e.g. scaffolding students to go through a design process for content development, facilitating students to select appropriate digital tools, guiding students to understand copyright, attribute licences and give credits)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and (re)design learning activities for fostering students’ digital expression and content (re)creation, while encouraging sharing practices (e.g. digital stories, e-portfolios)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "My students and I initiate and promote strategies across the school and its wider community that allow students to engage in designing, developing and publishing their digital (re)creations, while sharing them in novel ways (e.g. co-creating mobile apps, maintaining makerspaces, promoting audio and video broadcasts)."
+        }
+      ]
+    },
+    {
+      "code": "6.4",
+      "intro": "Facilitating learners' digital competence - Safety and wellbeing Empowering learners to use digital technologies safely, while mitigating risks to ensure physical, psychological and social well-being.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of learning activities that encourage students to use digital technologies safely (e.g. how to protect data privacy, read terms of use, avoid social exclusion, and prevent violence in digital environments)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried learning activities that allow students to consider the safety and wellbeing implications of using digital technologies (e.g. identifying inappropriate behaviour, discussing overuse/addiction issues)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I implement various learning activities to prompt students to act in responsible and ethical ways when creating and consuming digital information (e.g. adjusting the settings of their social media, protecting personal data and privacy, setting strong passwords, block and report individuals who make them feel uncomfortable)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I design learning to help students develop strategies of responsible and ethical use of technologies, to safeguard their reputation, and promote social well-being (e.g. balancing online & offline activities, recognising and facing cyberbullying / sexting / racism, etc. in digital environments)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and (re)design learning activities based on continuous developments on online risks and threats, so as to enable students to follow and adopt positive practices towards their and their peers’ physical, psychological and social well-being (e.g. how companies collect and use data about individuals, how social media affect emotional and social relationships)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "My students and I contribute to create a culture in our school and its wider community, in which the negative and positive uses of digital technologies are openly discussed and ways of avoiding risks and threats (e.g. online safety experiential workshops, digital well-being coaching for peers, teachers and parents)."
+        }
+      ]
+    },
+    {
+      "code": "6.5",
+      "intro": "Facilitating learners' digital competence - Responsible use Empowering learners to use digital technologies responsibly and ethically, managing their digital identity, digital footprint and digital reputation.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of learning activities to empower students to understand the legal and ethical implications of using digital technologies (e.g. sharing personal and others’ sensitive information, managing private settings on online apps)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried learning activities that foster students’ understanding of legal and ethical implications when using digital technologies (e.g. sharing of copyrighted digital content, accepting permissions when installing apps)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I implement various digital learning activities that require students to act in a responsible and ethical way both as consumers and creators of digital information and content (e.g. critically assessing online information, reacting to misinformation, behaving positively online, complying with data protection and copyright rules, respecting diversity and multiple opinions)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I design learning to provide opportunities for students to manage their digital identities and reputations (e.g. tracing their digital footprint, managing their digital identity, being aware of the terms of use of different media and applications, managing application settings)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on and (re)design my learning activities to allow students to consider the ethics and potential impact of their digital behaviours in authentic situations (e.g. considering how something they post online might be hurtful, respectfully sharing a difference of opinion in a comment, online activism)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "My students and I initiate and promote strategies across the school and its wider community that promote ethical and responsible use of digital technologies by staff, students and parents (e.g. workshops, coaching peers, teachers and parents)."
+        }
+      ]
+    },
+    {
+      "code": "6.6",
+      "intro": "Facilitating learners' digital competence - Problem-solving Incorporating learning activities, where learners use digital technologies to understand and solve problems.",
+      "options": [
+        {
+          "level": "A1",
+          "score": 1,
+          "text": "I am aware of learning activities that encourage students to use digital technologies to understand and solve problems (e.g. using a search engine, help features, apps to record and organise information for analysis)."
+        },
+        {
+          "level": "A2",
+          "score": 2,
+          "text": "I have tried learning activities that encourage students to use digital technologies to understand and solve problems (e.g. brainstorming, mapping, using visualisation tools, etc. to analyse a problem and develop a possible solution)."
+        },
+        {
+          "level": "B1",
+          "score": 3,
+          "text": "I implement various learning activities that allow students to apply problem solving processes supported by digital technologies (e.g. finding and organizing information, analysing, inferring, predicting outcomes, making analogies and formulating ideas)."
+        },
+        {
+          "level": "B2",
+          "score": 4,
+          "text": "I design learning to allow students to look for different innovative and creative solutions to be applied in new situations and contexts (e.g. generating/testing new ideas and solutions, simulation, modelling)."
+        },
+        {
+          "level": "C1",
+          "score": 5,
+          "text": "I reflect on my teaching and (re)design teaching and learning activities to enable the co-creation of problem solving processes with my students and finding solutions which involve digital technologies (e.g. representation of abstract models, debugging, decomposing problems in small parts)."
+        },
+        {
+          "level": "C2",
+          "score": 6,
+          "text": "My students and I contribute to exploring and developing innovative and creative solutions to real world challenges within and beyond our school (e.g. social, environmental, technological challenges)."
+        }
+      ]
+    }
+  ],
+  "zeroOption": {
+    "label": "I am not aware of this competence.",
+    "value": "UNAWARE",
+    "score": 0,
+    "source": "JRC131282 p11 and Annex1; Toolkit p28 explicitly describes seventh not-aware response"
+  },
+  "sourceDiscrepancy": "2023 JRC131282 chapter4 item6.5 has only5 level rows; complete A1–C2 wording includingB2 is available in2022 JRC129699 AnnexI. All item wording in this package consistently uses the Toolkit."
+}

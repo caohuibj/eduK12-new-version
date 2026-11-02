@@ -60,7 +60,7 @@ suite('classroom teacher:start concurrency (real PostgreSQL)', () => {
       data: {
         classroomId,
         questionIndex: 1,
-        questionContent: { question: 'Concurrent start?' },
+        questionContent: { question: 'Concurrent start?', correctAnswer: 'A' },
         timeLimit: 60,
       },
     })
@@ -109,7 +109,15 @@ suite('classroom teacher:start concurrency (real PostgreSQL)', () => {
       expect(acknowledgements).toHaveLength(20)
       expect(acknowledgements.every((payload) => (payload?.question as any)?.questionId === questionId)).toBe(true)
       expect(acknowledgements.filter((payload) => payload?.started === true)).toHaveLength(1)
-      expect(socketService.broadcastToRoom).toHaveBeenCalledTimes(1)
+      const broadcasts = vi.mocked(socketService.broadcastToRoom).mock.calls
+      expect(broadcasts.map(([room, event]) => [room, event])).toEqual([
+        ['classroom:' + classroomId + ':students', 'broadcast:question'],
+        ['classroom:' + classroomId + ':teacher', 'broadcast:question'],
+        ['classroom:' + classroomId + ':bigscreen', 'broadcast:question'],
+      ])
+      expect(broadcasts[0][2].questionContent.correctAnswer).toBeUndefined()
+      expect(broadcasts[1][2].questionContent.correctAnswer).toBe('A')
+      expect(broadcasts[2][2].questionContent.correctAnswer).toBe('A')
     } finally {
       socketService.broadcastToRoom = originalBroadcast
     }

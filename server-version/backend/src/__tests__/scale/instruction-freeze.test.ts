@@ -16,7 +16,10 @@ vi.mock('../../modules/scale/onboarding/axis-snapshots', async original => ({
   freezeScaleAxisSnapshot: vi.fn(),
   allowsScaleAxisRevision: vi.fn(() => true),
 }))
-const { getScaleInstrumentSource } = await import('../../modules/scale/onboarding/instrument-registry') as unknown as { getScaleInstrumentSource: ReturnType<typeof vi.fn> }
+const { getScaleInstrumentSource, getScaleInstrumentValidation } = await import('../../modules/scale/onboarding/instrument-registry') as unknown as { getScaleInstrumentSource: ReturnType<typeof vi.fn>; getScaleInstrumentValidation: ReturnType<typeof vi.fn> }
+// The materializer accepts a selected registry, not the wrapper functions.
+// Keep the actual global registry intact for the isolation assertion below.
+const materializationRegistry = { getSource: getScaleInstrumentSource, getValidation: getScaleInstrumentValidation }
 
 const instruction = { schemaVersion: 1 as const, text: '请根据最近两周的真实感受作答。', language: 'zh-CN', version: '1.0.0', source: '官方手册中文工作译稿' }
 // Clone a real generated source so every catalog/executable field keeps its
@@ -98,11 +101,11 @@ describe('frozen scale instruction content contract', () => {
     const {hashScaleDefinition}=await import('../../modules/scale/scale-definition')
     const row={id:'s',status:'PUBLISHED',instrumentClass:'STANDARD',instrumentVersion:'1.0.0',definition:source().executable!.definition,definitionHash:hashScaleDefinition(source().executable!.definition),instruction:instruction.text}
     const db={scale:{findUnique:vi.fn(async()=>row),update:vi.fn(async({data}:any)=>({...row,...data}))},assessmentReferenceSet:{}}
-    await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'})
+    await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'},materializationRegistry)
     expect(db.scale.update).toHaveBeenCalledExactlyOnceWith({where:{id:'s'},data:{instruction:'Revised administration wording'}})
     getScaleInstrumentSource.mockReturnValue(source({instruction:undefined}))
     db.scale.update.mockClear()
-    await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'})
+    await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'},materializationRegistry)
     expect(db.scale.update).not.toHaveBeenCalled()
     expect(row.instruction).toBe(instruction.text)
   })
@@ -118,12 +121,12 @@ describe('frozen scale instruction content contract', () => {
       },
       assessmentReferenceSet: { findUnique: vi.fn(async () => null), create: vi.fn() },
     }
-    const created = await materializeScaleInstrumentContent(db as never, { instrumentKey: 'nfc10_zh_cn', instrumentVersion: '1.0.0', actorUserId: 'admin' })
+    const created = await materializeScaleInstrumentContent(db as never, { instrumentKey: 'nfc10_zh_cn', instrumentVersion: '1.0.0', actorUserId: 'admin' }, materializationRegistry)
     expect(created.created).toBe(true)
     expect(db.scale.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ instruction: instruction.text }) }))
     // Axis revision re-materializes the same source-owned wording for STANDARD rows.
     db.scale.findUnique.mockResolvedValue({ id: 'scale-1', instrumentClass: 'STANDARD', instrumentVersion: '1.0.0', definition: null, definitionHash: null, instruction: instruction.text })
-    const revision = await materializeScaleInstrumentContent(db as never, { instrumentKey: 'nfc10_zh_cn', instrumentVersion: '1.0.0', actorUserId: 'admin' })
+    const revision = await materializeScaleInstrumentContent(db as never, { instrumentKey: 'nfc10_zh_cn', instrumentVersion: '1.0.0', actorUserId: 'admin' }, materializationRegistry)
     expect(revision.created).toBe(false)
     expect(db.scale.update).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ instruction: instruction.text }) }))
   })

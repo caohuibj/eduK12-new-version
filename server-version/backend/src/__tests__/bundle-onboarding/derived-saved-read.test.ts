@@ -34,6 +34,7 @@ it('reads validated saved schema3 facts through the shared projector without rec
   expect(report.view?.derivedView?.conclusions[0].text).toBe('获准的独立说明')
   expect(JSON.stringify(report.view?.derivedView)).not.toContain('00123')
   expect(compute).not.toHaveBeenCalled()
+  expect(db.assessment.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{compositeAttemptId:'attempt',compositeItemId:{in:expect.arrayContaining(['item-ase'])}}}))
  }finally{compute.mockRestore()}
 })
 it('intersects Education current item/metric availability before projecting, preserving independent rows',async()=>{

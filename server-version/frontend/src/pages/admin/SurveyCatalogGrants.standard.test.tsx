@@ -99,10 +99,10 @@ describe('Survey named fixed standard configuration and exact request recovery',
   const value=grant({source,exact:{requestId:id(9),configurationName:'固定体验报告'}}),api=vi.fn(async()=>({list:[value]})),onImport=vi.fn(async()=>{})
   render(<ResearchCatalog api={api as CatalogApi} projectId={id(5)} busy={false} onImport={onImport}/>)
   fireEvent.click(await screen.findByRole('button',{name:'使用此配置：固定体验报告'}));expect(onImport).toHaveBeenCalledWith(value)
-  expect(screen.queryByRole('combobox')).toBeNull()
   const article=screen.getByRole('button',{name:'使用此配置：固定体验报告'}).closest('article')!
-  expect(within(article).getByText('固定体验报告')).toBeInTheDocument()
-  fireEvent.change(screen.getByLabelText('筛选当前页授权工具'),{target:{value:'固定体验'}});expect(api).toHaveBeenCalledTimes(1)
+  expect(within(article).queryByRole('combobox')).toBeNull()
+  expect(within(article).getByText(`${source.kind} · 版本 ${source.sourceVersion} · 固定体验报告`)).toBeInTheDocument()
+  fireEvent.change(within(screen.getByRole('search',{name:'已授权原版工具检索'})).getByLabelText('关键词'),{target:{value:'固定体验'}});expect(api).toHaveBeenCalledTimes(1)
  })
 })
 

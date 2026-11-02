@@ -8,7 +8,7 @@
   "provenance": "Derived from retained v1 golden inputs with an explicit 0/180 equivalent-axis case; v2 expected natural metrics retained.",
   "cases": [
     {
-      "name": "golden-equivalent-axis",
+      "name": "golden",
       "input": {
         "config": {
           "totalTrials": 4,

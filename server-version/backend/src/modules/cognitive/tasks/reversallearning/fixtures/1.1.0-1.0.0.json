@@ -1,0 +1,1075 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "reversallearning",
+    "engineVersion": "1.1.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Synthetic exact-identity fixture, authored 2026-11-02 from existing configVersion 1.1.0 and reversallearningSequence. Fixed seed, complete 120-trial standard protocol including the new practice settings. Perfect-response expectations calculated independently; reward rate counted from frozen rolls. Existing historical fixtures and scoring tests remain authoritative. Reproduce trials with the committed config/randomSeed and correctResponse/500ms, then verify with scoreReversallearningV1; no empirical or scientific qualification claimed.",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 120,
+          "acquisitionTrials": 60,
+          "reversalTrials": 60,
+          "criterionConsecutiveCorrect": 6,
+          "rewardProbability": 0.8,
+          "trialTimeoutMs": 3000,
+          "stimulusSetVersion": "reversal-symbols-v1.0.0",
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          },
+          "practiceTrialCount": 4,
+          "practiceAcquisitionOnly": false
+        },
+        "randomSeed": "synthetic-reversal-v11-onboarding",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 4,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 5,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 6,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 7,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 8,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 9,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 10,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 11,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 12,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 13,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 14,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 15,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 16,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 17,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 18,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 19,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 20,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 21,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 22,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 23,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 24,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 25,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 26,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 27,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 28,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 29,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 30,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 31,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 32,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 33,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 34,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 35,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 36,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 37,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 38,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 39,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 40,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 41,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 42,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 43,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 44,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 45,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 46,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 47,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 48,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 49,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 50,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 51,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 52,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 53,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 54,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 55,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 56,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 57,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 58,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 59,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 60,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 61,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 62,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 63,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 64,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 65,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 66,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 67,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 68,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 69,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 70,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 71,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 72,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 73,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 74,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 75,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 76,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 77,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 78,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 79,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 80,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 81,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 82,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 83,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 84,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 85,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 86,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 87,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 88,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 89,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 90,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 91,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 92,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 93,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 94,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 95,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 96,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 97,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 98,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 99,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 100,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 101,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 102,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 103,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 104,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 105,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 106,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 107,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 108,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 109,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 110,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 111,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 112,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 113,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 114,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 115,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 116,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 117,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 118,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 119,
+            "payload": {
+              "choice": "right",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 100,
+        "metrics": {
+          "acquisitionAccuracy": 1,
+          "reversalAccuracy": 1,
+          "reversalCost": 0,
+          "perseverativeErrorCount": 0,
+          "trialsToAcquisitionCriterion": 6,
+          "trialsToReversalCriterion": 6,
+          "feedbackWinRate": 0.8333,
+          "omissionRate": 0,
+          "medianRtMs": 500,
+          "validResponseCount": 120
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "insufficientAcquisitionTrials": false,
+          "insufficientReversalTrials": false,
+          "lowAccuracy": false,
+          "excessiveOmissions": false,
+          "constantChoice": false,
+          "noAcquisitionCriterion": false,
+          "noReversalCriterion": false,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 120,
+          "acquisitionTrials": 60,
+          "reversalTrials": 60,
+          "criterionConsecutiveCorrect": 6,
+          "rewardProbability": 0.8,
+          "trialTimeoutMs": 3000,
+          "stimulusSetVersion": "reversal-symbols-v1.0.0",
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          },
+          "practiceTrialCount": 4,
+          "practiceAcquisitionOnly": false
+        },
+        "randomSeed": "synthetic-reversal-v11-onboarding",
+        "trials": []
+      },
+      "expectedError": "reversallearning v1 requires the configured trial count"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 120,
+          "acquisitionTrials": 60,
+          "reversalTrials": 60,
+          "criterionConsecutiveCorrect": 6,
+          "rewardProbability": 0.8,
+          "trialTimeoutMs": 3000,
+          "stimulusSetVersion": "reversal-symbols-v1.0.0",
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          },
+          "practiceTrialCount": 4,
+          "practiceAcquisitionOnly": false
+        },
+        "randomSeed": "synthetic-reversal-v11-onboarding",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "choice": "left",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "reversallearning v1 requires the configured trial count"
+    }
+  ]
+}

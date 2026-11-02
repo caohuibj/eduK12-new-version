@@ -1,0 +1,168 @@
+{
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "checkedContentHead": "92e1e0951705c73657eefb5af4369ffd5df1d4ad",
+  "checks": [
+    {
+      "name": "source-wording/manual/license check",
+      "status": "PASS",
+      "scope": "30 authorDOCX items equal publishedTable6 after whitespace only; short10 equals first10; actualCCBY4.0 notice read from officialEuropePMC fulltext XML."
+    },
+    {
+      "name": "native AST/schema/readiness and source golden cases",
+      "status": "PASS",
+      "head": "92e1e0951705c73657eefb5af4369ffd5df1d4ad",
+      "scope": "Four exact Git source wrappers read by existing selected AST/schema function; actual native registry readiness consumes5 source fixtures each; cached validation reused in materialize. No extra selected full-CLI/golden rerun."
+    },
+    {
+      "name": "real isolated native materialization/readback",
+      "status": "PASS",
+      "scope": "4 actual DRAFT/HIDDEN Scale records;4 frozen C/P/R snapshots; common family:rpq tags in existing tags column;0 publication audit rows. Synthetic system-admin creator, direct existing business function, not HTTP/MFA proof."
+    },
+    {
+      "name": "normal/missing actual report builds",
+      "status": "PASS",
+      "scope": "8 buildScaleResult+parse results from DB-stored definitions;4 normal means3.5;4 incomplete meansnull and no interpretations; no references or norms."
+    },
+    {
+      "name": "invalid category7 and axes readback",
+      "status": "PASS_AFTER_FIXTURE_CORRECTION",
+      "scope": "One representative six-option contract rejects7 with exact ScaleAnswerValidationError responseValue issue;4 stored axis records read. Initial assertion incorrectly matched generic error string; only that failed probe retried."
+    },
+    {
+      "name": "generated index --check",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "exact committed diff classifier dry read",
+      "status": "PASS",
+      "head": "92e1e0951705c73657eefb5af4369ffd5df1d4ad",
+      "route": {
+        "scenario": "content",
+        "content": true,
+        "scale_intake_light": true,
+        "frontend_build": false,
+        "codeql": true
+      },
+      "boundary": "Local route only; formalCI is not marked successful."
+    },
+    {
+      "name": "selected static bundle reverse dependencies",
+      "status": "PASS_AFTER_HARNESS_READ_CALLBACK_CORRECTION",
+      "scope": {
+        "status": "PASS",
+        "scoringExecuted": false,
+        "bundleDependencies": [],
+        "builtinDependencies": [],
+        "note": "Existing556 parser, actual selected4 sources, static reverse dependencies only; no duplicate golden or DB execution"
+      }
+    }
+  ],
+  "scope": "Native content only; no shared engine,permissions,CI or Prisma/schema modifications.",
+  "runtime": {
+    "node": "v24.19.0",
+    "postgres": "17.11 (Debian17.11-0+deb13u1)",
+    "postgresSetup": "Official signed Debian trixie repository metadata and aptdownload; extracted in /tmp, no system install/config modified. Empty isolated database with existing migrations only, no full seed.",
+    "dependencies": "Existing backend locked node_modules reused after current lock and Prisma schema byte comparisons passed; no dependency edits/downloads.",
+    "serverState": "Owned local temporary instance stopped cleanly after successful readback; other services not touched.",
+    "postgresDebSha256": "d2ce1ddffafa783f9acda4c92c86fc21e8288bff3782d739294f14fa797d7886"
+  },
+  "nativeImportStatus": "Temporary development isolated DB imported/read back; not production or durable managed library deployment.",
+  "sourceStatuses": "4 DRAFT/PILOT; C/P/R1.0.0 each; no human scientific/QC approval manufactured.",
+  "notionChecklist": {
+    "status": "READ_SUCCESS using existing Qiang connection",
+    "pageId": "404d27635a388186ac80de3593da05a5",
+    "applicable": [
+      "CI-001 owned isolated DB only",
+      "CI-004 existing556 parser, no local checker changes",
+      "CI-006 direct business-function receipt not authorizationHTTP",
+      "CI-007 generator consistency",
+      "CI-020 exact source/base and evidence states"
+    ]
+  },
+  "formalCI": {
+    "status": "NOT_ACTIVATED",
+    "run": null,
+    "note": "Draft [skip ci] for parent exact-candidate review; skip is not pass. Formalselected source checks/CodeQL remain separate from local native evidence."
+  },
+  "notRun": [
+    "Whole platform/frontend/backend compile or browser suite",
+    "Real end-user authorization/MFA route",
+    "Real product delivery or public library publication",
+    "Production duplicate inventory or write",
+    "Ordinary30-item combination creation/delivery",
+    "2018 native import",
+    "Chinese questionnaire translation/validation"
+  ],
+  "retainedFailures": [
+    {
+      "action": "initial native probe startup",
+      "outcome": "ERR_MODULE_NOT_FOUND:tsx from repository-root cwd before script/DB actions; corrected to backend cwd, no source changes."
+    },
+    {
+      "action": "invalid-category fixture assertion",
+      "outcome": "Native code correctly threw ScaleAnswerValidationError; test regex omitted genericChinese回答. Changed fixture to assert exact typed error and responseValue issue, only failed probe retried.4axis-query checks were downstream and first executed on correction."
+    },
+    {
+      "action": "preparation navigation",
+      "outcome": "One missing /tmp cwd request and incorrect source read paths failed before checks; corrected; not counted as product failures or successful tests."
+    },
+    {
+      "action": "source retrieval",
+      "outcome": "PeerJ403/PMCbrowser check retained; authorDOCX and authorized EuropePMC XML provided primary material, no challenge bypass."
+    },
+    {
+      "action": "first direct static-helper invocation",
+      "outcome": "Helper default map contained bundle files only and lacked imported CHEXI constant source; constant-source error before selected matching. Corrected harness to provide existing third read callback exactly as mainCLI does; only static helper retried, no product/parser change or scoring/DB rerun. Not a new556 regression."
+    }
+  ],
+  "sourceInputHashes": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_confidence8_teacher_self_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_confidence8_teacher_self_en/1.0.0/source.json",
+      "sha256": "3147790059c81d0fa5891a7e42196d21490f9082a2bd2171ead606e7a5be7175"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_reflective_practice10_teacher_self_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_reflective_practice10_teacher_self_en/1.0.0/source.json",
+      "sha256": "9392d9760c496392e17e05b49fb297cded53efd4454d5cd4ba17d087394aaa34"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_uncertainty_stress8_teacher_self_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_uncertainty_stress8_teacher_self_en/1.0.0/source.json",
+      "sha256": "18a8d912748f9dcb5bde2423511de5ef3db707d5a0f2180b4afcd6611a1be81f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_work_satisfaction4_teacher_self_en/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/rpq2024_work_satisfaction4_teacher_self_en/1.0.0/source.json",
+      "sha256": "77a8c2ca202397ad56c7ed3bdd2afa58c9169c20181764e6438ec6f0615a77c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "sha256": "12c7073bf5b731497ac3cb2db652d244d8f850dd7e6eb07e2ec60413a238576a"
+    }
+  ],
+  "reuse": "Subsequent evidence/docs commits do not alter these9 scientific/index inputs; no repeated goldens or DB apply to prove idempotence.",
+  "finalMainIntegration": {
+    "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "mergeHead": "3ecb87bbfc83700d362d39ad57621caf0cffaea5",
+    "mainDeltaCount": 297,
+    "mainDeltaGroups": {
+      "docs": 149,
+      "situational declarative content/index": 148
+    },
+    "scope": "Main updates only independent SJT declarative content/index and documentation; no Scale sources/scorer/report/schema/lock/selected-checker changes.9 RPQ scientific/index input hashes remain identical. No SJT tests or RPQ scoring/DB reapply performed."
+  }
+}

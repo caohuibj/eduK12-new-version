@@ -4,6 +4,8 @@ import type { AssessmentVideoCapabilitySources } from '../assessment-media/types
 import type {
   SituationalAttemptResponse,
   SituationalInstrument,
+  SituationalInstrumentSummary,
+  SituationalHistorySummary,
 } from './types'
 
 export interface SituationalFinalSubmitPayload {
@@ -69,7 +71,7 @@ import { situationalBasePath } from './paths'
 const apiBase = () => situationalBasePath().startsWith('/teacher/') ? '/teacher/situational' : '/situational'
 
 export const situationalApi = {
-  listInstruments: () => apiClient.get<{ list: SituationalInstrument[] }>(`${apiBase()}/instruments`),
+  listInstruments: () => apiClient.get<{ list: SituationalInstrumentSummary[] }>(`${apiBase()}/instruments`, { params: { view: 'summary' } }),
   getInstrument: (instrumentKey: string, instrumentVersion?: string) => apiClient.get<SituationalInstrument>(
     `${apiBase()}/instruments/${encodeURIComponent(instrumentKey)}${instrumentVersion ? `?version=${encodeURIComponent(instrumentVersion)}` : ''}`,
   ),
@@ -90,7 +92,7 @@ export const situationalApi = {
   submit: (attemptId: string, payload: SituationalFinalSubmitPayload) => (
     apiClient.post<SituationalAttemptResponse>(`${apiBase()}/attempts/${encodeURIComponent(attemptId)}/submit`, payload)
   ),
-  history: () => apiClient.get<{ list: SituationalAttemptResponse[]; total: number }>(`${apiBase()}/history`),
+  history: () => apiClient.get<{ list: SituationalHistorySummary[]; total: number }>(`${apiBase()}/history`, { params: { view: 'summary' } }),
 }
 
 export const embeddedSituationalApi = (parentAttemptId: string, itemId: string): SituationalRunnerClient => (

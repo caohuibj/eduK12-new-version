@@ -299,7 +299,7 @@ describe('FinalCompositeAssessment provenance sibling placement', () => {
       />,
     )
 
-    await user.click(await screen.findByRole('button', { name: '提交整个区段' }))
+    await user.click(await screen.findByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(submitFormSection).toHaveBeenCalledTimes(1))
 
     const input = submitFormSection.mock.calls[0][2] as Record<string, unknown>
@@ -329,16 +329,16 @@ describe('C04 typed FINAL persistence', () => {
     const props = { ...sharedProps, state: makeState(current), publicMode, recoveryToken: publicMode ? 'synthetic-recovery-token' : undefined, submitFormSection: submit, submitScale: vi.fn() }
     const first = render(<FinalCompositeAssessment {...props} />)
     expect(await screen.findByRole('spinbutton', { name: q.prompt })).toHaveValue(0)
-    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
-    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交本页' })).toBeEnabled())
+    await userEvent.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
     const payload = submit.mock.calls[0][2]
     expect(payload.answers).toEqual([{ formItemId: 'form-item-1', value: 0 }])
     first.unmount()
     render(<FinalCompositeAssessment {...props} />)
-    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交本页' })).toBeEnabled())
     expect(screen.getByRole('spinbutton', { name: q.prompt })).toHaveValue(0)
-    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await userEvent.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(2))
     expect(submit.mock.calls[1][2]).toEqual(payload)
   })
@@ -363,7 +363,7 @@ describe('C04 negative and large text draft restoration', () => {
     first.unmount()
     render(<FinalCompositeAssessment {...props} />)
     await waitFor(() => expect(screen.getByLabelText(q.prompt)).toHaveValue(value))
-    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await userEvent.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
     expect(submit.mock.calls[0][2].answers).toEqual([{ formItemId: 'form-item-1', value }])
   })
@@ -383,15 +383,15 @@ describe('C05 structured FINAL persistence', () => {
     const submit = vi.fn().mockRejectedValueOnce(new Error('暂时断线')).mockResolvedValue({ code: 0 })
     const props = { ...sharedProps, state: makeState(current), publicMode: true, recoveryToken: 'synthetic-recovery-token', submitFormSection: submit, submitScale: vi.fn() }
     const first = render(<FinalCompositeAssessment {...props} />)
-    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
-    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交本页' })).toBeEnabled())
+    await userEvent.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
     const payload = submit.mock.calls[0][2]
     expect(payload.answers).toEqual([{ formItemId: 'form-item-1', value }])
     first.unmount()
     render(<FinalCompositeAssessment {...props} />)
-    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
-    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交本页' })).toBeEnabled())
+    await userEvent.click(screen.getByRole('button', { name: '提交本页' }))
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(2))
     expect(submit.mock.calls[1][2]).toEqual(payload)
   })
@@ -422,7 +422,7 @@ describe('C06 visibility and durable answer cleanup',()=>{
   await user.click(screen.getByRole('button',{name:'上一题'}));await user.click(screen.getByRole('radio',{name:'隐藏'}))
   await waitFor(async()=>expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(a=>a.itemKey==='conditional')).toBe(false))
   expect(prune.mock.calls).toEqual([['composite-form-section:composite-attempt-1:composite-form-section-1', ['conditional']]])
-  await user.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+  await user.click(screen.getByRole('button',{name:'提交本页'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
   expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source',value:'no'}])
  })
 })
@@ -435,18 +435,18 @@ describe('C06 versioned sealed recovery',()=>{
   const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],label:q.prompt,required:true,formDefinition:q,formPolicy:policy,value:{_surveyRefusal:true}}]}
   const submit=vi.fn().mockRejectedValueOnce(new Error('离线')).mockResolvedValue({code:0})
   const props={...sharedProps,state:makeState(current),publicMode,recoveryToken:publicMode?'synthetic-recovery':undefined,submitFormSection:submit,submitScale:vi.fn()}
-  const first=render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+  const first=render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交本页'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交本页'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
   const payload=submit.mock.calls[0][2];expect(payload.answers).toEqual([{formItemId:'form-item-1',value:{_surveyRefusal:true}}]);first.unmount()
-  render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(2));expect(submit.mock.calls[1][2]).toEqual(payload)
+  render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交本页'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交本页'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(2));expect(submit.mock.calls[1][2]).toEqual(payload)
  })
  it('keeps same-frame selection and Other text through offline sealed replay',async()=>{
   const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
   const q={itemKey:'q_other',type:'MULTIPLE' as const,prompt:'同帧其他',required:true,options:[{optionKey:'yes',label:'普通'},{optionKey:'other',label:'其他'}],rows:[],otherOptionKey:'other'}
   const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],type:'multiple_choice',label:q.prompt,required:true,formDefinition:q,formPolicy:policy,options:[{value:'yes',label:'普通'},{value:'other',label:'其他'}]}]}
   const submit=vi.fn().mockRejectedValueOnce(new Error('离线')).mockResolvedValue({code:0});const props={...sharedProps,state:makeState(current),submitFormSection:submit,submitScale:vi.fn()}
-  const first=render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
+  const first=render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交本页'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
   await waitFor(async()=>{const answers=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(answers.find(a=>a.itemKey==='form-item-1')?.value).toEqual(['other']);expect(answers.find(a=>a.itemKey==='form-item-1:other')?.value).toBe('同帧文本')})
-  await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));const payload=submit.mock.calls[0][2];expect(payload.answers).toEqual([{formItemId:'form-item-1',value:['other'],otherText:'同帧文本'}]);first.unmount();render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(2));expect(submit.mock.calls[1][2]).toEqual(payload)
+  await userEvent.click(screen.getByRole('button',{name:'提交本页'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));const payload=submit.mock.calls[0][2];expect(payload.answers).toEqual([{formItemId:'form-item-1',value:['other'],otherText:'同帧文本'}]);first.unmount();render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交本页'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交本页'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(2));expect(submit.mock.calls[1][2]).toEqual(payload)
  })
 })
 
@@ -458,7 +458,7 @@ it('clears hidden selected Other and late same-frame text when a source changes'
  const submit=vi.fn().mockResolvedValue({code:0});render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[source,other]})} submitFormSection={submit} submitScale={vi.fn()}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'下一题'}));await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
  await act(async()=>{void frameHandlers.get('source-frame').onChange('no');void frameHandlers.get('other-frame').onOtherTextChange('晚到文本')})
  await waitFor(async()=>{const rows=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(rows.some(r=>r.itemKey==='other-frame'||r.itemKey==='other-frame:other')).toBe(false);expect(rows.find(r=>r.itemKey==='source-frame')?.value).toBe('no')})
- await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source-frame',value:'no'}])
+ await userEvent.click(screen.getByRole('button',{name:'提交本页'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source-frame',value:'no'}])
 })
 
 it('focuses the first missing anonymous whole-page scale answer without sending a FINAL',async()=>{
@@ -476,7 +476,7 @@ it('focuses the missing anonymous form field without changing required validatio
  const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],required:true}]}
  const submit=vi.fn()
  render(<FinalCompositeAssessment {...sharedProps} state={makeState(current)} publicMode recoveryToken="synthetic-recovery" submitScale={vi.fn()} submitFormSection={submit}/>);
- await userEvent.click(await screen.findByRole('button',{name:'提交整个区段'}))
+ await userEvent.click(await screen.findByRole('button',{name:'提交本页'}))
  await waitFor(()=>expect(document.getElementById('training-anonymous-required:composite-attempt-1:form-item-1')).toHaveFocus())
  expect(screen.getByRole('alert')).toHaveTextContent('还有 1 个必填字段未完成')
  expect(submit).not.toHaveBeenCalled()

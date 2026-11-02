@@ -197,11 +197,18 @@ jobs:
       - name: Cognitive onboarding with frontend acceptances
         if: inputs.focus != 'form-intake'
         run: bash "$GITHUB_WORKSPACE/.github/scripts/cognitive-ci-diagnostics.sh"
-      - name: Bundle content and immutable history
+      - name: Bundle immutable history (declarations checked once by npm build)
         if: inputs.focus != 'form-intake'
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: npx tsx scripts/bundle-content-check.ts
+        run: |
+          node --import tsx --input-type=module <<'JS'
+          import {verifyHistory} from './scripts/bundle-content-check.ts';
+          import {execFileSync} from 'node:child_process';
+          const base=process.env.BUNDLE_CONTENT_BASE_SHA || (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch'
+            ? execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim() : '');
+          verifyHistory(base);
+          JS
       - name: native Form strict input, real HTTP authority and PostgreSQL save/readback
         if: inputs.focus == 'form-intake'
         env:

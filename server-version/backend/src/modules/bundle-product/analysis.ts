@@ -144,11 +144,15 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
     if (canonicalHash(facts) !== row.factsHash || facts.identity.snapshotHash !== target.bundleSnapshot.snapshotHash) throw compositeConflict('报告快照校验失败')
     view = projectBundleAudienceView(facts, audience)
     const {bindings} = readInstance(instance)
-    const scaleAdmissions = await db.assessment.findMany({where:{compositeAttemptId:attemptId},select:{compositeItemId:true,runtimeSnapshotEncrypted:true,respondentType:true,subjectUserId:true,respondentUserId:true}})
+    const scaleSlots = bindings.slots.filter(slot => slot.unitType === 'SCALE')
+    const scaleAdmissions = scaleSlots.length ? await db.assessment.findMany({
+      where: { compositeAttemptId: attemptId, compositeItemId: { in: scaleSlots.map(slot => slot.itemId) } },
+      select: { compositeItemId: true, runtimeSnapshotEncrypted: true, respondentType: true, subjectUserId: true, respondentUserId: true },
+    }) : []
     let restrictSummary = false
     let restrictQuality = false
     const profilePolicies=new Map<string,DisclosureCapabilitiesV1|null>()
-    for (const binding of bindings.slots.filter(slot => slot.unitType === 'SCALE')) {
+    for (const binding of scaleSlots) {
       let policy = binding.scaleDisclosure
       let frozenReportAudience:string|undefined
       let adultSelfReport=false

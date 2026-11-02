@@ -11,9 +11,25 @@ import { GENERATED_SITUATIONAL_INSTRUMENT_SOURCES } from '../../modules/situatio
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-anxiety-golden-zh-cn-v1'
 
 describe('situation package registry', () => {
-  it('exposes installed packages in catalog order and resolves golden identities', () => {
-    expect(listSituationPackages().map(p => [p.key,p.instrumentVersion])).toEqual(
-      GENERATED_SITUATIONAL_INSTRUMENT_SOURCES.map(s=>instrumentSourceSchema.parse(s)).sort((a,b)=>a.content.catalogOrder-b.content.catalogOrder||a.content.identity.instrumentKey.localeCompare(b.content.identity.instrumentKey,'en')).map(s=>[s.content.identity.instrumentKey,s.content.identity.instrumentVersion]))
+  it('retains golden identities, catalog order, uniqueness, and exact version resolution', () => {
+    const packages = listSituationPackages()
+    const identities = packages.map(p => `${p.key}@${p.instrumentVersion}`)
+    expect(identities).toEqual(expect.arrayContaining([
+      'sjt-assertiveness-golden@1.0.0',
+      'sjt-responsibility-golden@1.0.0',
+      'sjt-anxiety-golden@1.0.0',
+    ]))
+    const expectedCatalog = GENERATED_SITUATIONAL_INSTRUMENT_SOURCES
+      .map(source => instrumentSourceSchema.parse(source))
+      .sort((a, b) => a.content.catalogOrder - b.content.catalogOrder
+        || a.content.identity.instrumentKey.localeCompare(b.content.identity.instrumentKey, 'en'))
+      .map(source => [source.content.identity.instrumentKey, source.content.identity.instrumentVersion])
+    expect(packages.map(p => [p.key, p.instrumentVersion])).toEqual(expectedCatalog)
+    expect(new Set(identities).size).toBe(packages.length)
+    for (const p of packages) {
+      expect(hasSituationPackage(p.key, p.instrumentVersion)).toBe(true)
+      expect(getSituationPackage(p.key, p.instrumentVersion)).toBe(p)
+    }
     expect(hasSituationPackage('sjt-anxiety-golden', '1.0.0')).toBe(true)
     expect(hasSituationPackage('sjt-anxiety-golden', '9.9.9')).toBe(false)
     expect(getSituationPackage('sjt-anxiety-golden', '1.0.0')?.key).toBe('sjt-anxiety-golden')

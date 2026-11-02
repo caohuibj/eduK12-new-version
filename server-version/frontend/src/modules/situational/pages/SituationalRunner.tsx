@@ -52,6 +52,7 @@ import { resolveSituationalRunnerRouteContext } from '../runner-context'
 import { isTrainingHost } from '../../../training/context'
 import { useScaleAutoAdvance } from '../../../hooks/useScaleAutoAdvance'
 import { TRAINING_SJT_PAGE, trainingSjtPageCursor, trainingSjtPageIndex } from '../training-navigation'
+import './SituationalRunnerPolish.css'
 
 const responseValueFor = (
   responses: Record<string, SituationalDraftAnswer>,
@@ -676,7 +677,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
 
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text
-      ? <div className="mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
+      ? <div className="sjt-stimulus mt-5 rounded-xl bg-slate-50 p-5 text-base leading-8 text-slate-800">{currentScene.stimulus.text}</div>
       : null
     if (currentScene.stimulus.type === 'TEXT_V1') return textBlock
     if (currentScene.stimulus.type === 'VIDEO') {
@@ -708,12 +709,12 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
   }
 
   const actions = (
-    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="sjt-actions flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
       <button
         type="button"
         onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))}
         disabled={trainingSequential || checkpointBusy || currentIndex === 0 || saving || submitting}
-        className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+        className="sjt-previous inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ChevronLeft className="h-4 w-4" />上一题
       </button>
@@ -744,8 +745,8 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
   )
 
   const navigation = (
-    <nav aria-label="情境导航" className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-      <div className="mb-3 text-sm font-medium text-gray-700">可达情境</div>
+    <nav aria-label="情境导航" className="sjt-navigation rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+      <div className="mb-3 text-sm font-medium text-gray-700">{trainingSequential ? '情境进度' : '可达情境'}</div>
       <div className="flex flex-wrap gap-2">
         {scenes.map((scene, index) => (
           <button
@@ -766,6 +767,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
 
   return (
     <AssessmentShell
+      className={trainingSequential || campus ? `situational-runner-guided${trainingSequential ? ' training-sjt-runner' : ''}` : undefined}
       title={currentScene.title}
       eyebrow={embedded ? '综合测评 · 情境判断' : '情境判断'}
       instructionsSummary={campus?.instructionsSummary ?? (isTrainingHost() && !campus ? '作答说明' : undefined)}
@@ -799,7 +801,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
           }}/> : null}
       {notice ? <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{notice}</div> : null}
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-8" aria-labelledby="situational-scene-content-title">
+      <section className="sjt-scene rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-8" aria-labelledby="situational-scene-content-title">
         <div className="mb-5 flex items-center justify-between gap-4 text-sm text-gray-500">
           <span>{data.instrument.definition.schemaVersion === 1 ? `情境 ${currentIndex + 1} / ${scenes.length}` : '开放路径中的当前情境'}</span>
           <span data-sjt-answer-status={currentAnswerStatus?.state}>{currentAnswerStatus?.answered ? <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="h-4 w-4" />{currentAnswerStatus.label}</span> : currentAnswerStatus?.label ?? '未作答'}</span>

@@ -20,6 +20,42 @@ type Db=Prisma.TransactionClient|typeof prisma
 export const teacherScaleResource=(ref:{family:string;key:string;version:string})=>
   ref.family==='SCALE'&&/^teacher-scale:[a-f0-9-]{36}:(?:INDIVIDUAL|GROUP)$/.test(ref.key)
 
+type TeacherScaleRef = { family: string; key: string; version: string }
+type TeacherScaleReleaseRow = {
+  id:string;scaleId:string;definitionHash:string;resourceKey:string;
+  status:string;entry:Record<string,any>;entryHash:string;
+  createdByUserId:string;reviewedByUserId:string|null;
+  reviewedAt:Date|null;publishedAt:Date|null;
+  scaleCreatorId:string;scaleStatus:string;scaleHash:string;scaleDefinition:unknown
+}
+function validateReleasedTeacherScaleRow(r:TeacherScaleReleaseRow|undefined,ref:TeacherScaleRef){
+  const group=!!r&&ref.key.endsWith(':GROUP')&&isSelfGroupV2Entry(r.entry as unknown as RelationalProductEntryV1)
+  if(!r||(r.entry&&'privateOrigin' in r.entry)||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
+    ||!r.reviewedByUserId||!r.reviewedAt||!r.publishedAt
+    ||r.reviewedByUserId===r.createdByUserId
+    ||r.reviewedByUserId===r.scaleCreatorId
+    ||canonicalHash(r.entry)!==r.entryHash
+    ||r.entry?.applicability?.resourceKind!=='SCALE'
+    ||r.entry?.applicability?.resourceKey!==ref.key
+    ||r.entry?.applicability?.resourceVersion!==ref.version
+    ||(!group&&r.entry?.applicability?.analysisMode!=='INDIVIDUAL_ONLY')
+    ||JSON.stringify(r.entry?.applicability?.subjectRoles)!=='["TEACHER"]'
+    ||JSON.stringify(r.entry?.applicability?.respondentRoles)!=='["TEACHER"]'
+    ||(group?!r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode?.includes('AGGREGATE'):r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode!=='NONE'))
+    return deny('HUITEACHER_SCALE_RELEASE_INVALID',403)
+  const checked=validateScaleDefinition(r.scaleDefinition,{
+    instrumentClass:'CUSTOM_DESCRIPTIVE',forPublish:true,
+  })
+  const def=checked.definition
+  if(!def||checked.issues.some(x=>x.severity==='error')
+    ||def.respondentType!=='teacher_self_report'
+    ||def.license.status!=='self_authored'||def.license.redistribution!=='allowed'
+    ||teacherPilotContentIssues(def).length>0
+    ||hashScaleDefinition(def)!==r.definitionHash)
+    return deny('HUITEACHER_SCALE_SOURCE_INVALID',403)
+  return r
+}
+
 /** Check the exact independently reviewed resource, not just its label/key.
  * This does NOT change or expose any pre-existing Student scale package.
  */
@@ -54,31 +90,31 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
     FOR SHARE OF r,scale
   `
   const r=rows[0]
-  const group=!!r&&ref.key.endsWith(':GROUP')&&isSelfGroupV2Entry(r.entry as unknown as RelationalProductEntryV1)
-  if(!r||(r.entry&&'privateOrigin' in r.entry)||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
-    ||!r.reviewedByUserId||!r.reviewedAt||!r.publishedAt
-    ||r.reviewedByUserId===r.createdByUserId
-    ||r.reviewedByUserId===r.scaleCreatorId
-    ||canonicalHash(r.entry)!==r.entryHash
-    ||r.entry?.applicability?.resourceKind!=='SCALE'
-    ||r.entry?.applicability?.resourceKey!==ref.key
-    ||r.entry?.applicability?.resourceVersion!==ref.version
-    ||(!group&&r.entry?.applicability?.analysisMode!=='INDIVIDUAL_ONLY')
-    ||JSON.stringify(r.entry?.applicability?.subjectRoles)!=='["TEACHER"]'
-    ||JSON.stringify(r.entry?.applicability?.respondentRoles)!=='["TEACHER"]'
-    ||(group?!r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode?.includes('AGGREGATE'):r.entry?.resultDisclosure?.audiences?.ORGANIZATION?.mode!=='NONE'))
-    deny('HUITEACHER_SCALE_RELEASE_INVALID',403)
-  const checked=validateScaleDefinition(r.scaleDefinition,{
-    instrumentClass:'CUSTOM_DESCRIPTIVE',forPublish:true,
-  })
-  const def=checked.definition
-  if(!def||checked.issues.some(x=>x.severity==='error')
-    ||def.respondentType!=='teacher_self_report'
-    ||def.license.status!=='self_authored'||def.license.redistribution!=='allowed'
-    ||teacherPilotContentIssues(def).length>0
-    ||hashScaleDefinition(def)!==r.definitionHash)
-    deny('HUITEACHER_SCALE_SOURCE_INVALID',403)
-  return r
+  return validateReleasedTeacherScaleRow(r,ref)
+}
+
+/** Catalog batch only; reuse the exact single-entry validation and row locks. */
+export async function releasedPersonalTeacherScaleEntries(db:Db,refs:TeacherScaleRef[]){
+  for(const ref of refs){
+    if(!teacherScaleResource(ref)||ref.key.endsWith(':GROUP'))deny('HUITEACHER_SCALE_IDENTITY_INVALID',403)
+  }
+  if(!refs.length)return []
+  const rows=await db.$queryRaw<Array<TeacherScaleReleaseRow & {resourceVersion:string}>>(Prisma.sql`
+    SELECT r."id",r."scale_id" AS "scaleId",r."definition_hash" AS "definitionHash",
+      r."resource_key" AS "resourceKey",r."resource_version" AS "resourceVersion",r."status",
+      r."entry",r."entry_hash" AS "entryHash",r."created_by_user_id" AS "createdByUserId",
+      r."reviewed_by_user_id" AS "reviewedByUserId",r."reviewed_at" AS "reviewedAt",r."published_at" AS "publishedAt",
+      scale."creator_id" AS "scaleCreatorId",scale."status" AS "scaleStatus",
+      scale."definition_hash" AS "scaleHash",scale."definition" AS "scaleDefinition"
+    FROM "registered_assessment_resources" r
+    JOIN "scales" scale ON scale."id"=r."scale_id"
+    WHERE r."status"='PUBLISHED' AND (${Prisma.join(refs.map(ref=>Prisma.sql`(r."resource_key"=${ref.key} AND r."resource_version"=${ref.version})`),' OR ')})
+    ORDER BY r."id"
+    FOR SHARE OF r,scale
+  `)
+  const key=(ref:{key:string;version:string})=>JSON.stringify([ref.key,ref.version])
+  const byRef=new Map(rows.map(row=>[key({key:row.resourceKey,version:row.resourceVersion}),row]))
+  return refs.map(ref=>validateReleasedTeacherScaleRow(byRef.get(key(ref)),ref))
 }
 
 /** License is a deliberately scoped platform action; never implicitly inherited

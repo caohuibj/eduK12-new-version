@@ -5,11 +5,12 @@ import {Settings2,ListChecks,ListOrdered,SlidersHorizontal,MessageSquare,Plus,Ar
 import {applyScaleOptionLabels,parseScaleItemPaste,scaleOptionPresets} from '../modules/assessment-core/scale/authoringInput'
 import {validateRawScoreFeedback} from '../modules/scale/rawScoreFeedback'
 import './survey-scale-studio.css'
+import {ScaleAuthoringHelp} from '../components/assessment-authoring/ScaleAuthoringHelp'
 import { SurveyRawScoreFeedbackEditor } from './SurveyRawScoreFeedbackEditor'
 import type { ScaleDraft } from './builder.types'
 import { researchKey } from './builder.types'
 type ScaleSection='basic'|'responses'|'items'|'scores'|'report'
-const scaleSections=[{key:'basic',label:'基本设置',Icon:Settings2},{key:'responses',label:'响应选项',Icon:ListChecks},{key:'items',label:'题目',Icon:ListOrdered},{key:'scores',label:'计分',Icon:SlidersHorizontal},{key:'report',label:'报告反馈',Icon:MessageSquare}] as const
+const scaleSections=[{key:'basic',label:'基本设置',Icon:Settings2},{key:'items',label:'题目',Icon:ListOrdered},{key:'responses',label:'响应选项',Icon:ListChecks},{key:'scores',label:'计分',Icon:SlidersHorizontal},{key:'report',label:'报告反馈',Icon:MessageSquare}] as const
 export function ResearchScaleEditor({value,onChange,projectId,appearance='standard',onDraftRiskChange,onSave,canSave=false,disabled=false}:{value:ScaleDraft;onChange:(next:ScaleDraft)=>void;projectId?:string;appearance?:'standard'|'studio';onDraftRiskChange?:(dirty:boolean)=>void;onSave?:()=>void;canSave?:boolean;disabled?:boolean}){
   const studio=appearance==='studio',uid=useId()
   const [active,setActive]=useState<ScaleSection>('basic'),[optionPaste,setOptionPaste]=useState(''),[itemPaste,setItemPaste]=useState(''),[inputError,setInputError]=useState(''),[inputNotice,setInputNotice]=useState('')
@@ -143,11 +144,12 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
       </>}
     </section>
   const feedback=<SurveyRawScoreFeedbackEditor value={value} onChange={onChange} projectId={projectId} compact={studio}/>
-  if(!studio)return <div className="space-y-5">{basic}{responses}{dimensions}{items}{total}{feedback}</div>
+  if(!studio)return <div className="survey-scale-inline space-y-5"><ScaleAuthoringHelp section="basic" variant="survey" readOnly={disabled}/>{basic}{items}{responses}{dimensions}{total}{feedback}</div>
   const counts={basic:null,responses:value.responseOptions.length,items:value.items.length,scores:value.dimensions.length+(value.totalScore?1:0),report:value.rawScoreFeedback?.rules.length??0}
   const feedbackIssues=validateRawScoreFeedback(value.rawScoreFeedback,[...value.dimensions.map(d=>d.dimensionKey),...(value.totalScore?[value.totalScore.key]:[])])
   return <div className="survey-scale-studio">
-    <div className="survey-scale-navigation" role="tablist" aria-label="量表编制分区">{scaleSections.map(({key,label,Icon},index)=><button type="button" key={key} role="tab" aria-label={label} aria-selected={active===key} aria-controls={uid+'-'+key} id={uid+'-tab-'+key} tabIndex={active===key?0:-1} onClick={()=>{setActive(key);setInputError('');setInputNotice('')}} onKeyDown={event=>{const offset=event.key==='ArrowRight'?1:event.key==='ArrowLeft'?-1:0;if(!offset&&event.key!=='Home'&&event.key!=='End')return;event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?scaleSections.length-1:(index+offset+scaleSections.length)%scaleSections.length;setActive(scaleSections[next].key);setInputError('');setInputNotice('');event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()}}><Icon size={17} aria-hidden="true"/><span>{label}</span>{counts[key]!==null&&<small aria-hidden="true">{counts[key]}</small>}{key==='report'&&feedbackIssues.length>0&&<span className="survey-scale-error-dot" title="反馈设置有待修正内容" aria-hidden="true"/>}</button>)}</div>
+    <div className="survey-scale-navigation" role="tablist" aria-label="量表编制分区">{scaleSections.map(({key,label},index)=><button type="button" key={key} role="tab" aria-label={label} aria-selected={active===key} aria-controls={uid+'-'+key} id={uid+'-tab-'+key} tabIndex={active===key?0:-1} onClick={()=>{setActive(key);setInputError('');setInputNotice('')}} onKeyDown={event=>{const offset=event.key==='ArrowRight'?1:event.key==='ArrowLeft'?-1:0;if(!offset&&event.key!=='Home'&&event.key!=='End')return;event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?scaleSections.length-1:(index+offset+scaleSections.length)%scaleSections.length;setActive(scaleSections[next].key);setInputError('');setInputNotice('');event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()}}><span className="scale-author-step" aria-hidden="true">{index+1}</span><span>{label}</span>{counts[key]!==null&&<small aria-hidden="true">{counts[key]}</small>}{key==='report'&&feedbackIssues.length>0&&<span className="survey-scale-error-dot" title="反馈设置有待修正内容" aria-hidden="true"/>}</button>)}</div>
+    <ScaleAuthoringHelp section={active} variant="survey" readOnly={disabled}/>
     {inputError&&<p role="alert" className="survey-scale-input-message is-error">{inputError}</p>}{inputNotice&&<p role="status" className="survey-scale-input-message">{inputNotice}</p>}
     <div id={uid+'-basic'} role="tabpanel" aria-labelledby={uid+'-tab-basic'} hidden={active!=='basic'}><fieldset disabled={disabled} className="survey-scale-panel-content">{basic}</fieldset></div>
     <div id={uid+'-responses'} role="tabpanel" aria-labelledby={uid+'-tab-responses'} hidden={active!=='responses'}><fieldset disabled={disabled} className="survey-scale-panel-content">{responses}</fieldset></div>
