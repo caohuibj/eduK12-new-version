@@ -1,0 +1,97 @@
+{
+  "checkedAt": "2026-11-02T01:02:52.944Z",
+  "scope": "Existing typedFormPresentation on persisted native items; high/low frequency labels and null remain descriptive facts; no scoring reports generated",
+  "results": [
+    {
+      "key": "dmee_class_t_orientation_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_structuring_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_questioning_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_modeling_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_application_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_learning_environment_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_assessment_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_differentiation_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    },
+    {
+      "key": "dmee_class_t_retained55_teacher_self_en",
+      "states": [
+        "frequency_7",
+        "frequency_1",
+        "missing_null"
+      ],
+      "nativePresentation": "PASS",
+      "score": null
+    }
+  ],
+  "staleTagCASRejected": true
+}

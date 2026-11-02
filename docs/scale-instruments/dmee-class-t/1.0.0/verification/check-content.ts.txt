@@ -1,0 +1,9 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import {strict as assert} from 'node:assert'
+import {scaleInstrumentSourceV1Schema} from '/workspace/dmee-class-t/server-version/backend/src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from '/workspace/dmee-class-t/server-version/backend/src/modules/scale/onboarding/validate-instrument'
+import {getScaleInstrumentSource,getScaleInstrumentRuntimePolicy} from '/workspace/dmee-class-t/server-version/backend/src/modules/scale/onboarding/instrument-registry'
+const root='/workspace/dmee-class-t/docs/scale-instruments/dmee-class-t/1.0.0';const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));const results=[]
+for(const f of m.forms.filter((f:any)=>!f.key.includes('retained55'))){const s=getScaleInstrumentSource(f.key,'1.0.0');assert(s);scaleInstrumentSourceV1Schema.parse(s);const v=validateScaleInstrumentSource(s);assert(v.valid,JSON.stringify(v.issues));assert.equal(s.executable,undefined);assert.equal(getScaleInstrumentRuntimePolicy(f.key,'1.0.0'),undefined);assert.equal(s.catalog.administration.itemCount,f.itemCount);assert.deepEqual(s.educationApplicability?.administrations,[{population:'TEACHER',responseMode:'SELF'}]);assert(s.catalog.construct.constructOverlapTags.includes('family:dmee-class-t'));results.push({key:f.key,schema:'PASS',registry:'PASS',scoreRuntime:false})}
+assert.equal(results.length,8);fs.writeFileSync(path.join(root,'verification/catalog-check.json'),JSON.stringify({checkedAt:new Date().toISOString(),results,initialAuthoringCorrection:'An initial local candidate used unsupported localization adaptationMethod TRANSLATION; existing validator rejected it. Corrected to existing DIRECT_TRANSLATION before final validation. No shared schema changed.'},null,2)+'\n');console.log(JSON.stringify({catalogCandidates:results.length,valid:true}))
