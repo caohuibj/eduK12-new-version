@@ -1231,11 +1231,15 @@ jobs:
       - name: cognitive task manifests and dependency boundaries
         if: needs.scope.outputs.personal_tracking_draft != 'true'
         run: npm run cognitive:contracts
-      - name: Bundle content and immutable history
+      - name: Bundle immutable history (declarations checked once by npm build)
         if: needs.scope.outputs.personal_tracking_draft != 'true'
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: npx tsx scripts/bundle-content-check.ts
+        run: |
+          node --import tsx --input-type=module <<'JS'
+          import {verifyHistory} from './scripts/bundle-content-check.ts';
+          verifyHistory(process.env.BUNDLE_CONTENT_BASE_SHA);
+          JS
       - name: build (tsc)
         run: |
           if [ "${{ needs.scope.outputs.personal_tracking_draft }}" = "true" ]; then
@@ -1322,11 +1326,15 @@ jobs:
       - name: backend prisma generate
         working-directory: server-version/backend
         run: npx prisma generate
-      - name: Bundle content and immutable history
+      - name: Bundle immutable history (declarations checked once by npm build)
         working-directory: server-version/backend
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.before }}
-        run: npx tsx scripts/bundle-content-check.ts
+        run: |
+          node --import tsx --input-type=module <<'JS'
+          import {verifyHistory} from './scripts/bundle-content-check.ts';
+          verifyHistory(process.env.BUNDLE_CONTENT_BASE_SHA);
+          JS
       - name: backend compile smoke
         working-directory: server-version/backend
         run: npm run build
