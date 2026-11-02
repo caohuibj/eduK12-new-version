@@ -1,0 +1,203 @@
+{
+  "instrument": "Teachers’ Conceptions of School-based Assessment Questionnaire",
+  "sourceYear": 2014,
+  "doi": "10.1080/13803611.2013.877394",
+  "familyTag": "family:yan_sba_2014",
+  "plannedTags": [
+    "role:teacher_self",
+    "language:en",
+    "source_year:2014",
+    "context:hong_kong_secondary",
+    "use:reform_adoption",
+    "use:professional_development"
+  ],
+  "sourceStatus": "ORIGINAL_PAPER_METHODS_AND_TABLE_1_READ_NOT_FULL_QUESTIONNAIRE",
+  "questionnaireURL": "NOT_RESOLVED_AUTHOR_DIRECTORY_TIMEOUT",
+  "initialPoolCount": 49,
+  "paperRetainedCount": 40,
+  "reverseBeforeInitialAnalysis": [
+    "IAT3",
+    "IAT8"
+  ],
+  "reverseItemsRemainInPaperFinalSet": false,
+  "responseFormat": "Six agreement categories coded 1-6; no neutral category. Exact standalone instructions missing.",
+  "scoring": "Paper uses Rasch-calibrated measures; individual conversion/anchor/missing rules not obtained; no raw sum/mean implementation.",
+  "rows": [
+    {
+      "sourcePrefix": "AAT",
+      "label": "情感性态度",
+      "initialItemIds": [
+        "AAT1",
+        "AAT2",
+        "AAT3",
+        "AAT4",
+        "AAT5"
+      ],
+      "paperExcludedItemIds": [],
+      "paperRetainedItemIds": [
+        "AAT1",
+        "AAT2",
+        "AAT3",
+        "AAT4",
+        "AAT5"
+      ],
+      "fullItemTextObtained": false,
+      "runtimeVersionAllocated": false
+    },
+    {
+      "sourcePrefix": "IAT",
+      "label": "工具性态度",
+      "initialItemIds": [
+        "IAT1",
+        "IAT2",
+        "IAT3",
+        "IAT4",
+        "IAT5",
+        "IAT6",
+        "IAT7",
+        "IAT8",
+        "IAT9",
+        "IAT10",
+        "IAT11",
+        "IAT12",
+        "IAT13",
+        "IAT14",
+        "IAT15",
+        "IAT16",
+        "IAT17"
+      ],
+      "paperExcludedItemIds": [
+        "IAT3",
+        "IAT8",
+        "IAT13"
+      ],
+      "paperRetainedItemIds": [
+        "IAT1",
+        "IAT2",
+        "IAT4",
+        "IAT5",
+        "IAT6",
+        "IAT7",
+        "IAT9",
+        "IAT10",
+        "IAT11",
+        "IAT12",
+        "IAT14",
+        "IAT15",
+        "IAT16",
+        "IAT17"
+      ],
+      "fullItemTextObtained": false,
+      "runtimeVersionAllocated": false
+    },
+    {
+      "sourcePrefix": "SNS",
+      "label": "主观规范",
+      "initialItemIds": [
+        "SNS1",
+        "SNS2",
+        "SNS3",
+        "SNS4",
+        "SNS5"
+      ],
+      "paperExcludedItemIds": [
+        "SNS1"
+      ],
+      "paperRetainedItemIds": [
+        "SNS2",
+        "SNS3",
+        "SNS4",
+        "SNS5"
+      ],
+      "fullItemTextObtained": false,
+      "runtimeVersionAllocated": false
+    },
+    {
+      "sourcePrefix": "SEF",
+      "label": "实施自我效能",
+      "initialItemIds": [
+        "SEF1",
+        "SEF2",
+        "SEF3",
+        "SEF4",
+        "SEF5",
+        "SEF6",
+        "SEF7",
+        "SEF8",
+        "SEF9"
+      ],
+      "paperExcludedItemIds": [
+        "SEF2"
+      ],
+      "paperRetainedItemIds": [
+        "SEF1",
+        "SEF3",
+        "SEF4",
+        "SEF5",
+        "SEF6",
+        "SEF7",
+        "SEF8",
+        "SEF9"
+      ],
+      "fullItemTextObtained": false,
+      "runtimeVersionAllocated": false
+    },
+    {
+      "sourcePrefix": "KNO",
+      "label": "自述知识熟悉程度",
+      "initialItemIds": [
+        "KNO1",
+        "KNO2",
+        "KNO3",
+        "KNO4",
+        "KNO5",
+        "KNO6",
+        "KNO7"
+      ],
+      "paperExcludedItemIds": [
+        "KNO1",
+        "KNO5",
+        "KNO7"
+      ],
+      "paperRetainedItemIds": [
+        "KNO2",
+        "KNO3",
+        "KNO4",
+        "KNO6"
+      ],
+      "fullItemTextObtained": false,
+      "runtimeVersionAllocated": false
+    },
+    {
+      "sourcePrefix": "INT",
+      "label": "实施意图",
+      "initialItemIds": [
+        "INT1",
+        "INT2",
+        "INT3",
+        "INT4",
+        "INT5",
+        "INT6"
+      ],
+      "paperExcludedItemIds": [
+        "INT6"
+      ],
+      "paperRetainedItemIds": [
+        "INT1",
+        "INT2",
+        "INT3",
+        "INT4",
+        "INT5"
+      ],
+      "fullItemTextObtained": false,
+      "runtimeVersionAllocated": false
+    }
+  ],
+  "deliverables": {
+    "nativeScale": 0,
+    "nativeForm": 0,
+    "combinations": 0,
+    "executableCPR": 0
+  },
+  "noSyntheticQuestionnaire": true
+}
