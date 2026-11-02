@@ -1,0 +1,167 @@
+{
+  "mother": "Staff Questionnaire on Inclusive Education / 教職員融合教育問卷",
+  "familyTag": "family:yan_sin_inclusive_staff",
+  "status": "RESEARCH_DOSSIER_ONLY_NOT_IMPORT_PAYLOAD",
+  "children": [
+    {
+      "researchId": "attitude",
+      "abbreviation": "ATT",
+      "plannedNamePrefix": "融合教育Staff（Yan/Sin）｜态度｜教师或教职员自评｜语言与原版待定",
+      "plannedMachinePrefix": "yan_sin_inclusive_staff_attitude_",
+      "paper2014ResearchSubsetItemCount": 27,
+      "currentAuthorDownloadItemCount": null,
+      "fullTextObtained": false,
+      "nativeDecision": "UNDECIDED_PENDING_COMPLETE_ITEMS_AND_SCORE_INSTRUCTIONS",
+      "registered": false,
+      "tags": [
+        "family:yan_sin_inclusive_staff",
+        "purpose:teacher_development",
+        "status:research_intake",
+        "rights:unconfirmed",
+        "role:teacher_self",
+        "school_stage:primary_secondary_HK_research"
+      ],
+      "versionAxes": {
+        "content": null,
+        "scoringParameters": null,
+        "runtimeReport": null
+      },
+      "note": "Count refers only to the 2014 research subset; not a current-download item map."
+    },
+    {
+      "researchId": "subjective_norm",
+      "abbreviation": "SNS",
+      "plannedNamePrefix": "融合教育Staff（Yan/Sin）｜主观规范｜教师或教职员自评｜语言与原版待定",
+      "plannedMachinePrefix": "yan_sin_inclusive_staff_subjective_norm_",
+      "paper2014ResearchSubsetItemCount": 4,
+      "currentAuthorDownloadItemCount": null,
+      "fullTextObtained": false,
+      "nativeDecision": "UNDECIDED_PENDING_COMPLETE_ITEMS_AND_SCORE_INSTRUCTIONS",
+      "registered": false,
+      "tags": [
+        "family:yan_sin_inclusive_staff",
+        "purpose:teacher_development",
+        "status:research_intake",
+        "rights:unconfirmed",
+        "role:teacher_self",
+        "school_stage:primary_secondary_HK_research"
+      ],
+      "versionAxes": {
+        "content": null,
+        "scoringParameters": null,
+        "runtimeReport": null
+      },
+      "note": "Count refers only to the 2014 research subset; not a current-download item map."
+    },
+    {
+      "researchId": "perceived_control",
+      "abbreviation": "PBC",
+      "plannedNamePrefix": "融合教育Staff（Yan/Sin）｜感知培训充分性｜教师或教职员自评｜语言与原版待定",
+      "plannedMachinePrefix": "yan_sin_inclusive_staff_perceived_control_",
+      "paper2014ResearchSubsetItemCount": 5,
+      "currentAuthorDownloadItemCount": null,
+      "fullTextObtained": false,
+      "nativeDecision": "UNDECIDED_PENDING_COMPLETE_ITEMS_AND_SCORE_INSTRUCTIONS",
+      "registered": false,
+      "tags": [
+        "family:yan_sin_inclusive_staff",
+        "purpose:teacher_development",
+        "status:research_intake",
+        "rights:unconfirmed",
+        "role:teacher_self",
+        "school_stage:primary_secondary_HK_research"
+      ],
+      "versionAxes": {
+        "content": null,
+        "scoringParameters": null,
+        "runtimeReport": null
+      },
+      "note": "Count refers only to the 2014 research subset; not a current-download item map."
+    },
+    {
+      "researchId": "intention",
+      "abbreviation": "INT",
+      "plannedNamePrefix": "融合教育Staff（Yan/Sin）｜实施意向｜教师或教职员自评｜语言与原版待定",
+      "plannedMachinePrefix": "yan_sin_inclusive_staff_intention_",
+      "paper2014ResearchSubsetItemCount": 6,
+      "currentAuthorDownloadItemCount": null,
+      "fullTextObtained": false,
+      "nativeDecision": "UNDECIDED_PENDING_COMPLETE_ITEMS_AND_SCORE_INSTRUCTIONS",
+      "registered": false,
+      "tags": [
+        "family:yan_sin_inclusive_staff",
+        "purpose:teacher_development",
+        "status:research_intake",
+        "rights:unconfirmed",
+        "role:teacher_self",
+        "school_stage:primary_secondary_HK_research"
+      ],
+      "versionAxes": {
+        "content": null,
+        "scoringParameters": null,
+        "runtimeReport": null
+      },
+      "note": "Count refers only to the 2014 research subset; not a current-download item map."
+    },
+    {
+      "researchId": "practice",
+      "abbreviation": "BEH",
+      "plannedNamePrefix": "融合教育Staff（Yan/Sin）｜实践自陈｜教师或教职员自评｜语言与原版待定",
+      "plannedMachinePrefix": "yan_sin_inclusive_staff_practice_",
+      "paper2014ResearchSubsetItemCount": 5,
+      "currentAuthorDownloadItemCount": null,
+      "fullTextObtained": false,
+      "nativeDecision": "UNDECIDED_PENDING_COMPLETE_ITEMS_AND_SCORE_INSTRUCTIONS",
+      "registered": false,
+      "tags": [
+        "family:yan_sin_inclusive_staff",
+        "purpose:teacher_development",
+        "status:research_intake",
+        "rights:unconfirmed",
+        "role:teacher_self",
+        "school_stage:primary_secondary_HK_research"
+      ],
+      "versionAxes": {
+        "content": null,
+        "scoringParameters": null,
+        "runtimeReport": null
+      },
+      "note": "Count refers only to the 2014 research subset; not a current-download item map."
+    },
+    {
+      "researchId": "knowledge",
+      "abbreviation": "KNOWLEDGE_UNCONFIRMED",
+      "plannedNamePrefix": "融合教育Staff（Yan/Sin）｜知识/认知｜教师或教职员自评｜语言与原版待定",
+      "plannedMachinePrefix": "yan_sin_inclusive_staff_knowledge_",
+      "paper2014ResearchSubsetItemCount": null,
+      "currentAuthorDownloadItemCount": null,
+      "fullTextObtained": false,
+      "nativeDecision": "UNDECIDED_PENDING_COMPLETE_ITEMS_AND_SCORE_INSTRUCTIONS",
+      "registered": false,
+      "tags": [
+        "family:yan_sin_inclusive_staff",
+        "purpose:teacher_development",
+        "status:research_intake",
+        "rights:unconfirmed",
+        "role:staff_self_unverified",
+        "school_stage:unverified"
+      ],
+      "versionAxes": {
+        "content": null,
+        "scoringParameters": null,
+        "runtimeReport": null
+      },
+      "note": "Knowledge is author-site indexed description only; no corresponding named scale established in the retrieved 2014 study."
+    }
+  ],
+  "languageBoundary": "Author index lists EN and Chinese. Exact source files, Chinese script/region and English version validation are unresolved. Create separate fixed identities only after acquisition.",
+  "roleBoundary": "2014 research: teacher self-report. Current website: school staff. Do not generalize all staff roles or rewrite teacher items into student/observer versions.",
+  "tagsPersisted": false,
+  "tagMechanism": "Existing free tags/constructOverlapTags only; no new schema or tag engine. Planned tags are not permission grants.",
+  "optionalOrdinaryComposition": {
+    "status": "NOT_CREATED",
+    "prerequisite": "Complete fixed source order, directions, item map and use scope",
+    "crossToolTotal": null
+  },
+  "intThirdParty": "2014 INT derives from Mahat (2008) MATIES behavioral-intention subscale Chinese translation; exact item/reuse matching remains required."
+}
