@@ -1,0 +1,14 @@
+{
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "files": {
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "d0c1df42dab398269f69c09a21ecb3ae1e800f0c10379440094b417e3e23e82a",
+    "server-version/backend/scripts/scale-intake-selected-check.ts": "92cf4d28ae59611409d3660c3169c28be0f5e9b7913fdc9b4ada389ffc3e209f",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12"
+  },
+  "sourcePDFSHA256": "2677f4f260e9bb5f4b61a7c9dc3710726db3896820b708f474463be92b5fd538",
+  "privateSourceHashes": "inventory.json; private source and items excluded",
+  "client": "Prisma5.22 exact schema client reused after byte comparison",
+  "database": "PostgreSQL16.15-bookworm; empty owned task database on localhost; tmpfs"
+}

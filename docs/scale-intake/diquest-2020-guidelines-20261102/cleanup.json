@@ -1,0 +1,15 @@
+{
+  "ownedContainer": "diquest-intake-20261102",
+  "cleanup": "Removed after separate-process SQL readback; tmpfs database destroyed",
+  "persistentDevelopmentLibraryInstalled": false,
+  "productionWritten": false,
+  "sqlReadback": {
+    "scales": 4,
+    "axisSnapshots": 4,
+    "formTemplates": 1,
+    "questionnaires": 1,
+    "formItems": 8,
+    "deploymentPolicies": 0,
+    "grants": 0
+  }
+}

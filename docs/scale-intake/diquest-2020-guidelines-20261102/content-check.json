@@ -1,0 +1,120 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "key": "diquest2020_gm_teacher_self_en",
+      "contract": {
+        "instrumentKey": "diquest2020_gm_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 5,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "rawAllOneMean": 3.4,
+      "publicCheck": {
+        "instrumentKey": "diquest2020_gm_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagMatch": true
+    },
+    {
+      "key": "diquest2020_ec_teacher_self_en",
+      "contract": {
+        "instrumentKey": "diquest2020_ec_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "rawAllOneMean": 7,
+      "publicCheck": {
+        "instrumentKey": "diquest2020_ec_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagMatch": true
+    },
+    {
+      "key": "diquest2020_fg_teacher_self_en",
+      "contract": {
+        "instrumentKey": "diquest2020_fg_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "rawAllOneMean": 1,
+      "publicCheck": {
+        "instrumentKey": "diquest2020_fg_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagMatch": true
+    },
+    {
+      "key": "diquest2020_oi_teacher_self_en",
+      "contract": {
+        "instrumentKey": "diquest2020_oi_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "rawAllOneMean": 1,
+      "publicCheck": {
+        "instrumentKey": "diquest2020_oi_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagMatch": true
+    }
+  ],
+  "form": {
+    "status": "PASS",
+    "fields": 8,
+    "optionScores": false,
+    "scoring": null,
+    "normalizationShape": [
+      "rawAnswers",
+      "missing"
+    ],
+    "missingShape": [
+      "rawAnswers",
+      "missing"
+    ]
+  },
+  "deps": {
+    "builtin": [],
+    "generated": []
+  },
+  "boundary": "Synthetic content contracts and core Form normalization only; public catalogs non-executable; adaptive Form unscored."
+}

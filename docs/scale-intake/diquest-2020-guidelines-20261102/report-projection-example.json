@@ -1,0 +1,108 @@
+{
+  "boundary": "Synthetic teacher serializer contract; no raw answers/items",
+  "allowed": {
+    "schemaVersion": 1,
+    "instrument": {
+      "scaleId": "b3683cd6-f97c-46dd-93f2-55350019bf3a",
+      "code": "diquest2020_gm_teacher_self_en",
+      "name": "DI-Quest｜成长思维信念｜教师自评｜2020作者指南英文",
+      "instrumentVersion": "1.0.0"
+    },
+    "completedAt": null,
+    "totalTime": null,
+    "kind": "full",
+    "scores": [
+      {
+        "key": "gm",
+        "label": "Growth mindset",
+        "value": 4,
+        "type": "dimension",
+        "description": "Separate descriptive subscale mean; not a latent factor estimate or teaching-quality score.",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "range": {
+          "min": 1,
+          "max": 7
+        },
+        "expectedItems": [
+          "GM1",
+          "GM2",
+          "GM3",
+          "GM4",
+          "GM5"
+        ],
+        "answeredItems": [
+          "GM1",
+          "GM2",
+          "GM3",
+          "GM4",
+          "GM5"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "gm",
+        "headline": "结果说明",
+        "label": null,
+        "interpretation": "This profile describes your reported belief or agreement, not how often a strategy happened. The 1–7 mean is a response-category average, not a percentage, norm, student ability or teaching-quality grade. If a practice is working, identify one piece of learning evidence. If implementation feels difficult, consider curriculum constraints and available support before choosing one feasible adjustment.",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "Choose one recent lesson and ask what pupils said or produced, rather than inferring learning from your intention alone."
+          },
+          {
+            "category": "strategy",
+            "text": "Use one small piece of observed learning evidence to choose a next step; seek collaboration when time or curriculum conditions limit what is possible."
+          }
+        ],
+        "limitations": [
+          "GM and EC describe beliefs/perceived agency; FG is agreement with reported principles; OI is frequency. Do not combine them as one quality score.",
+          "Reverse only author-starred GM1/GM5 and EC1–EC6 using 8 minus the raw response. No moral or performance labels.",
+          "GM mean is described by the author guide; the other subscales use an explicitly declared project equal-weight descriptive mean, not a published latent-factor scoring key.",
+          "Complete-case missing policy is a conservative project choice because the source specifies no missing threshold. Missing and not applicable never become zero.",
+          "No local norms, translated-item validation or standalone administration equivalence claimed. Historical learning-style/learning-profile theory is not advice to match teaching to fixed learner types."
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "caveats": [
+      "GM and EC describe beliefs/perceived agency; FG is agreement with reported principles; OI is frequency. Do not combine them as one quality score.",
+      "Reverse only author-starred GM1/GM5 and EC1–EC6 using 8 minus the raw response. No moral or performance labels.",
+      "GM mean is described by the author guide; the other subscales use an explicitly declared project equal-weight descriptive mean, not a published latent-factor scoring key.",
+      "Complete-case missing policy is a conservative project choice because the source specifies no missing threshold. Missing and not applicable never become zero.",
+      "No local norms, translated-item validation or standalone administration equivalence claimed. Historical learning-style/learning-profile theory is not advice to match teaching to fixed learner types.",
+      "未提供群体参考。"
+    ],
+    "method": {
+      "scaleId": "b3683cd6-f97c-46dd-93f2-55350019bf3a",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "54b88550ebc357fb703f044eeebc637a0dcc93f6cba4c2666cef84b644a7351e",
+      "referenceVersions": [],
+      "assessmentContext": null
+    },
+    "disclaimer": "Research/editorial candidate only within actual content rights and recipient authorization. No teacher appraisal, diagnosis, school ranking or student labels."
+  },
+  "denied": {
+    "schemaVersion": 1,
+    "instrument": {
+      "scaleId": "b3683cd6-f97c-46dd-93f2-55350019bf3a",
+      "code": "diquest2020_gm_teacher_self_en",
+      "name": "DI-Quest｜成长思维信念｜教师自评｜2020作者指南英文",
+      "instrumentVersion": "1.0.0"
+    },
+    "completedAt": null,
+    "totalTime": null,
+    "kind": "completion"
+  },
+  "formCompletionOnly": true
+}

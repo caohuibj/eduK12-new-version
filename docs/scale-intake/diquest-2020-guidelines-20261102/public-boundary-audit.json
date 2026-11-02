@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "itemsCompared": 31,
+  "originalItemMatches": 0,
+  "publicSources": 4,
+  "publicExecutables": 0,
+  "originalPDFIncluded": false,
+  "rawPrivateLogsIncluded": false,
+  "method": "Exact full item stem comparison against private31 originals; no PDF or private source copies in staged scope."
+}

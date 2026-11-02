@@ -1,0 +1,16 @@
+{
+  "route": "content / scale_intake_light",
+  "selectedSources": 4,
+  "localGeneratorIndexCheck": "PASS",
+  "stagedDiffWhitespace": "PASS",
+  "formalCI": "NOT_RUN",
+  "reason": "Independent review and applicable selective CI evidence acceptance pending with coordinator. Skip marker does not mean passed CI.",
+  "affected": "4 metadata-only Scale sources, wrappers, generated index, nonproduction evidence",
+  "notRun": [
+    "full backend/frontend",
+    "HTTP E2E",
+    "deployment",
+    "production database dedup"
+  ],
+  "budget": "~5 minutes selected lightweight checks; no unrelated suites"
+}

@@ -1,0 +1,173 @@
+{
+  "status": "PASS",
+  "mode": "Owned ephemeral PostgreSQL16.15; native Scale materializer, native Form schema + draft ORM persistence, existing ordinary questionnaire; not an HTTP authorization or published adapter test.",
+  "scales": [
+    {
+      "key": "diquest2020_gm_teacher_self_en",
+      "id": "b3683cd6-f97c-46dd-93f2-55350019bf3a",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 5,
+      "definitionHash": "54b88550ebc357fb703f044eeebc637a0dcc93f6cba4c2666cef84b644a7351e",
+      "sourceHash": "9876d92e2203c81215532e6b1edef78a59059d96ac76def1eba984679e2f6b7e",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "54b88550ebc357fb703f044eeebc637a0dcc93f6cba4c2666cef84b644a7351e",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:philosophy",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ]
+    },
+    {
+      "key": "diquest2020_ec_teacher_self_en",
+      "id": "72c7a2c6-2187-4816-96e7-11525418007c",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 6,
+      "definitionHash": "7a7be2562e58167fc053ebf43fd8e668ef7950537d6e18927f9a1e77e1edca1d",
+      "sourceHash": "99e899910ccd1af7d6ee6df2f0b18dd28f1e94b0441ca894711e735d73cf4eb6",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "7a7be2562e58167fc053ebf43fd8e668ef7950537d6e18927f9a1e77e1edca1d",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:philosophy",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ]
+    },
+    {
+      "key": "diquest2020_fg_teacher_self_en",
+      "id": "0e4dcdd0-2fc0-4663-b400-d3b6f9964c76",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "432cf2fd3043f9ebefa15e61fe0878d86aca3bf0c6820873fe2cf9eecdb27124",
+      "sourceHash": "08fc3ea8e3d7d29dd2a9b0733f59cd9e6551b7936a00769c7ac1fbce6c49f07f",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "432cf2fd3043f9ebefa15e61fe0878d86aca3bf0c6820873fe2cf9eecdb27124",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:reported_principle",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ]
+    },
+    {
+      "key": "diquest2020_oi_teacher_self_en",
+      "id": "425bbb4e-50a0-449e-9adf-f0abdbf96d50",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 4,
+      "definitionHash": "349b544d5d2b5c7183be5d89c0f59418a9149086580b901d21188bd21bb609c2",
+      "sourceHash": "ee1846f5604a8831cd0b5eeb6cc0c45cd084b8251ce04bc0fd656777839f69f2",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "349b544d5d2b5c7183be5d89c0f59418a9149086580b901d21188bd21bb609c2",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:reported_frequency",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ]
+    }
+  ],
+  "form": {
+    "key": "diquest2020_at_teacher_self_en_form",
+    "templateId": "0af617fc-887b-42e6-aa77-b12b476166f2",
+    "status": "DRAFT",
+    "contentVersion": "1.0.0",
+    "definitionHash": "e1c71b19e873b51278945bc1ae481ed7ce263c82f9130fffec0b7b0fab1cdb93",
+    "fields": 8,
+    "scoring": null,
+    "report": "COMPLETION_ONLY",
+    "tagBoundary": "Form template has no free tags column; family tag carried by existing parent Questionnaire.tags and intake metadata, without schema changes."
+  },
+  "combination": {
+    "id": "60cc43e5-5147-4ae4-b9f9-0dfdce0fce9c",
+    "status": "DRAFT",
+    "visibility": "HIDDEN",
+    "scaleLinks": 4,
+    "formFields": 8,
+    "totalScore": null,
+    "tags": [
+      "family:diquest",
+      "role:teacher_self",
+      "language:en",
+      "version:2020_guidelines",
+      "use:research"
+    ]
+  },
+  "reportProjection": {
+    "authorizedTeacher": "PASS",
+    "unrelatedTeacher": "completion",
+    "accessDecision": "synthetic contract input, not a real HTTP permission test"
+  },
+  "deploymentPolicies": 0,
+  "grants": 0,
+  "sourceRights": "Source reading and private synthetic evaluation only; actual administration and public redistribution permissions not established.",
+  "reusedClient": "Earlier exact-schema Prisma5.22 client reused after byte-identical schema comparison; no regeneration."
+}

@@ -1,0 +1,172 @@
+{
+  "recordKind": "intake_not_runtime_payload",
+  "mother": "DI-Quest",
+  "familyTag": "family:diquest",
+  "sourceEdition": "2020 author guidelines complementary to original2017; English table31 items",
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "sourcePDF": {
+    "url": "https://www.researchgate.net/profile/Katrien_Struyven/publication/342355130_DI-QUEST_guidelines_for_researchers/links/5ef08f5d299bf1faac6ca5c5/DI-QUEST-guidelines-for-researchers.pdf",
+    "sha256": "2677f4f260e9bb5f4b61a7c9dc3710726db3896820b708f474463be92b5fd538",
+    "bytes": 273741,
+    "pages": 7,
+    "readAll": true,
+    "tablePageImageInspected": 6,
+    "redistributionPermission": "UNCONFIRMED"
+  },
+  "originalArticle": "https://doi.org/10.1016/j.stueduc.2017.02.004",
+  "originalFullArticle": "NOT_OBTAINED publisher403, author repository metadata only, OpenAlex closed, no access bypass",
+  "children": [
+    {
+      "key": "diquest2020_gm_teacher_self_en",
+      "kind": "SCALE",
+      "count": 5,
+      "meaning": "philosophy",
+      "reverseProjectIds": [
+        "GM1",
+        "GM5"
+      ],
+      "public": "CATALOG_ONLY",
+      "privateVersions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:philosophy",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ],
+      "privateSourceSHA256": "63f2f3ef746680a4c86a3f931251a9766ad0e95cc5677c086b5da18fb3527ccd"
+    },
+    {
+      "key": "diquest2020_ec_teacher_self_en",
+      "kind": "SCALE",
+      "count": 6,
+      "meaning": "philosophy",
+      "reverseProjectIds": [
+        "EC1",
+        "EC2",
+        "EC3",
+        "EC4",
+        "EC5",
+        "EC6"
+      ],
+      "public": "CATALOG_ONLY",
+      "privateVersions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:philosophy",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ],
+      "privateSourceSHA256": "79c3782c981343eb07345e5d1251f107369f8cd7f699e8de187c065ee74d705f"
+    },
+    {
+      "key": "diquest2020_fg_teacher_self_en",
+      "kind": "SCALE",
+      "count": 8,
+      "meaning": "reported_principle",
+      "reverseProjectIds": [],
+      "public": "CATALOG_ONLY",
+      "privateVersions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:reported_principle",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ],
+      "privateSourceSHA256": "9e3430766fd6743946d3e081d513513aab09bac883421eac3d14842a3725395f"
+    },
+    {
+      "key": "diquest2020_oi_teacher_self_en",
+      "kind": "SCALE",
+      "count": 4,
+      "meaning": "reported_frequency",
+      "reverseProjectIds": [],
+      "public": "CATALOG_ONLY",
+      "privateVersions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:reported_frequency",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT"
+      ],
+      "privateSourceSHA256": "f2a7500aa6f971f23deb9a3b45499a919608e7c2ec44715da973accd7b308264"
+    },
+    {
+      "key": "diquest2020_at_teacher_self_en_form",
+      "kind": "FORM",
+      "count": 8,
+      "meaning": "unscored_practice",
+      "public": "METADATA_IN_INVENTORY_ONLY_NOT_FAKE_SCALE",
+      "versions": {
+        "content": "1.0.0",
+        "scoring": null,
+        "report": null
+      },
+      "tags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "use:research",
+        "meaning:unscored_practice"
+      ],
+      "blockers": [
+        "AT4_UNSTARRED_IN_SOURCE_NEEDS_OFFICIAL_KEY_CLARIFICATION",
+        "ACTUAL_ADMINISTRATION_AND_REDISTRIBUTION_SCOPE_UNCONFIRMED"
+      ]
+    }
+  ],
+  "unscoredBackground": "Guide lists background-variable topics but gives no exact questions/options; not invented.",
+  "database": "PASS_EPHEMERAL_RESEARCH_IMPORT_READBACK_NOT_PERSISTENT_LIBRARY_INSTALL",
+  "publicBoundary": "No original item text, original PDF, anchors or private full source snapshots published.",
+  "combination": "Existing ordinary questionnaire candidate: four independent Scale units plus one unscored Form; no cross-dimension total or latent path model calculation.",
+  "productionDedup": "NOT_QUERIED",
+  "scoringBoundary": "GM source-explicit average; EC/FG/OI project descriptive equal-weight means only, final 2017 aggregation not reproduced; AT unscored pending key."
+}

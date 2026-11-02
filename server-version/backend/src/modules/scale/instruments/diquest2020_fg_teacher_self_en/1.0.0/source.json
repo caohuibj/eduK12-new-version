@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "diquest2020_fg_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DI-Quest｜灵活分组认同｜教师自评｜2020作者指南英文",
+      "abbreviation": "DI-Quest",
+      "instrumentFamily": "DI-Quest / 2020 author guidelines complementary to 2017 publication"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "灵活分组认同；仅教师自述理念或实践，不是实际教学质量、学生能力或道德评价。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:diquest",
+        "role:teacher_self",
+        "language:en",
+        "version:2020_guidelines",
+        "source_study:2017",
+        "population:teacher",
+        "stage:primary_secondary_source_scope",
+        "use:research",
+        "use:reflection",
+        "meaning:reported_principle",
+        "rights:use_and_redistribution_unconfirmed",
+        "maturity:PILOT",
+        "availability:catalog_only"
+      ]
+    },
+    "population": {
+      "populationNotes": "2020作者研究指南的英文题表，关联原2017比利时研究；不冒称已验证中文版或原研究全部语种/年龄界已核。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "原指南未给固定回忆天数；不自行追加近两周等时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "按作者2020指南Table1原序，题号GM/EC/FG/OI是项目顺序定位码。",
+        "该英文指南与2017原论文、2022香港版、2023中国大陆五点删题版分别管理。",
+        "estimatedMinutes仅为项目粗估，非作者施测时长。",
+        "母工具不合成总分；理念与实践分开解释。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "来源允许读取不等于获得施测或公开再分发授权；当前仅私有合成研究检查。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "English wording in the author-uploaded 2020 guidelines; no instrument translation performed.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "2020 guideline English rendering, not proof of 2017 English-language validation or Chinese validity. Chinese catalog labels/feedback are project editorial text."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "DI-QUEST guidelines for researchers, 2020",
+      "citation": "Struyven, K., Gheyssens, E., Griful-Freixenet, J., & Coubergs, C. (2020). DI-QUEST guidelines for researchers. DOI:10.13140/RG.2.2.16110.43848. Complementary to Coubergs, C., Struyven, K., Vanthournout, G., & Engels, N. (2017), Studies in Educational Evaluation, 53, 41–54. DOI:10.1016/j.stueduc.2017.02.004.",
+      "url": "https://www.researchgate.net/profile/Katrien_Struyven/publication/342355130_DI-QUEST_guidelines_for_researchers/links/5ef08f5d299bf1faac6ca5c5/DI-QUEST-guidelines-for-researchers.pdf",
+      "publicationYear": 2020
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "灵活分组认同"
+      ],
+      "limitations": [
+        "公开包仅元数据，不含题文、锚点或可执行配置。",
+        "理念、原则和频率不得合成教师质量分；真实施测和再分发许可尚未确认。"
+      ],
+      "disclaimer": "完整源文已读；私有合成验证与公开库/生产入库分开记录。"
+    },
+    "blockers": [
+      "ACTUAL_ADMINISTRATION_AND_REDISTRIBUTION_SCOPE_UNCONFIRMED"
+    ]
+  }
+}
