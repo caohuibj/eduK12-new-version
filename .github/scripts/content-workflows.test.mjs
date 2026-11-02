@@ -548,3 +548,23 @@ test('backend regression groups isolate services and retain the complete mandato
   assert.ok(aggregate.includes('assert-release-test-report.mjs'));
   assert.doesNotMatch(aggregate,/continue-on-error:/);
 });
+
+test('backend-only unit edits use a dedicated bounded route with unchanged fixed merge gate',async()=>{
+  const {unitOnly}=await import('./ci-qualification.mjs');
+  const {requiredChecks}=await import('./merge-gate.mjs');
+  const ci=source('ci');
+  const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
+  const gate=fs.readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
+  const workflow=source('ci-backend-unit');
+  const example={file:'server-version/backend/src/__tests__/situational/scientific-governance.test.ts',
+    status:'M',oldMode:'100644',newMode:'100644'};
+  assert.equal(unitOnly([example]),true);
+  assert.equal(unitOnly([example,{...example,file:'server-version/backend/src/modules/situational/runtime.ts'}]),false);
+  assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'backend-unit'}}},false),['scope','backend-unit']);
+  assert.match(scope,/backendUnit \? 'backend-unit'/);
+  assert.match(gate,/recomputed-backend-unit-scope/);
+  assert.match(job(ci,'backend-unit'),/uses: \.\/\.github\/workflows\/ci-backend-unit\.yml/);
+  assert.ok(jobNeeds(job(ci,'merge-gate')).includes('backend-unit'));
+  assert.match(workflow,/node --test \.github\/scripts\/ci-qualification\.test\.mjs/);
+  assert.match(workflow,/ci-backend-unit-runner\.mjs/);
+});

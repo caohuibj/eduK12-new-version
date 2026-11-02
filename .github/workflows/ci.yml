@@ -1354,6 +1354,14 @@ jobs:
         working-directory: server-version/frontend
         run: npm run build
 
+  backend-unit:
+    name: CI backend / exact changed unit tests
+    needs: scope
+    if: ${{ github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'backend-unit' }}
+    uses: ./.github/workflows/ci-backend-unit.yml
+    with:
+      base_sha: ${{ needs.scope.outputs.diff_base }}
+
   backend:
     needs: scope
     name: ${{ (needs.scope.outputs.training_functional_only == 'true' || needs.scope.outputs.admin_permissions_functional_only == 'true') && 'backend (migrate + build + functional gate; performance not executed)' || 'backend (migrate + build + performance gate)' }}
@@ -3970,6 +3978,7 @@ jobs:
       && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
+    - backend-unit
     - maintenance-repair
     - edge-config
     - cognitive-product

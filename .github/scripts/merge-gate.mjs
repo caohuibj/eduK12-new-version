@@ -1,4 +1,5 @@
 import {studentDiscoveryScope} from './student-discovery-scope.mjs';
+import {unitOnly} from './ci-qualification.mjs';
 import {readMaintenanceRepairScope,maintenanceRepairOutputs} from './maintenance-repair-scope.mjs';
 import {readEdgeScope,edgeConfigOutputs} from './edge-config-scope.mjs';
 import {cognitiveProductPlan,cognitiveProductOutputs} from './cognitive-product-scope.mjs';
@@ -118,6 +119,7 @@ export function requiredChecks(needs, draft) {
   if(needs.scope?.outputs?.application_route==='maintenance-repair')return ['scope','maintenance-repair'];
   if(needs.scope?.outputs?.application_route==='edge-config')return ['scope','edge-config'];
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='backend-unit')return ['scope','backend-unit'];
   if(scope.application_route==='cognitive-product')return draft?['scope']:['scope','cognitive-product','docker','codeql'];
   if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
   if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
@@ -216,6 +218,11 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='backend-unit'){
+    if(scope.scenario!=='backend-unit'||scope.codeql!=='false'||scope.frontend!=='false'||scope.content!=='false'
+      ||scope.presentation!=='false'||scope.documentation!=='false'||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='maintenance-repair'){if(draft||Object.entries(maintenanceRepairOutputs()).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');return [...new Set(failed)];}
   if(scope.application_route==='edge-config'){if(draft||Object.entries(edgeConfigOutputs()).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');return [...new Set(failed)];}
   if(scope.application_route==='cognitive-product'){
@@ -572,6 +579,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='backend-unit'){
+    try {const {changedEntries}=await import('./content-scope.mjs');
+      if(!unitOnly(changedEntries(process.env.CI_BASE_SHA)))failed.push('recomputed-backend-unit-scope');
+    }catch{failed.push('recomputed-backend-unit-scope');}
+  }
   if(needs.scope?.outputs?.scenario==='content'&&needs.scope.outputs.content==='true'){
     const {changedEntries}=await import('./content-scope.mjs');
     const {declarationReaders}=await import('./declarative-content.mjs');
