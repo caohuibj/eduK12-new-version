@@ -1,10 +1,8 @@
 {
   "checkedContentCommit": "bf2be1216aa68b5a2e4a3dc42521a0d48fde9919",
   "checkedContentTree": "996a29c0bb87c1503546479c929d737cc5eff580",
-  "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
   "sourceAndOriginalDocumentParity": "PASS: every original tool file except the generated registry has the same Git blob as its reviewed tool head",
   "originalHeadsPreserved": "PASS: all thirteen original current heads are Git ancestors",
-  "newSources": 156,
   "newExecutableScales": 7,
   "newExecutableStatus": "DRAFT only; all other sources CATALOG_ONLY",
   "registryCheck": {
@@ -24,7 +22,7 @@
   },
   "selectedSourceAndScoringTests": "NOT_RUN_LOCALLY: delegate once to official exact-union selected check; do not repeat owner full suites",
   "isolatedImports": "Original WIHIC/QTI/PISA evidence retained; no new DB import, publication, deployment or production write",
-  "formalCI": "NOT_RUN_AT_PREPARATION; actual run and head must be read back",
+  "formalCI": "NOT_RUN for union; separate #549/#540/#541 successful runs do not qualify this union",
   "notionCICommonErrors": {
     "read": true,
     "account": "Qiang",
@@ -37,5 +35,16 @@
   },
   "budget": "Existing selected content normally under 5 minutes; existing full CodeQL previously about 9 minutes, retained as required rather than bypassed",
   "sourceInputChangesAfterCheck": "Only this preflight evidence file; no source or registry inputs changed",
-  "originalPRStates": "Read actual GitHub merged flag only after main contains original head; no manual close as merged"
+  "originalPRStates": "Read actual GitHub merged flag only after main contains original head; no manual close as merged",
+  "checkedContentBase": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "currentBase": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+  "originalIntegratedSourceCount": 156,
+  "remainingSourcesInCurrentDiff": 144,
+  "remainingMotherTools": 12,
+  "registryEvidenceReuse": {
+    "validatedRegistryBlob": "1f90752a8e69ef494598b3cf0191b73590619e33",
+    "currentRegistryBlob": "1f90752a8e69ef494598b3cf0191b73590619e33",
+    "same": true,
+    "reason": "DESE merged separately; incoming main contains its same original source and registry subset. Complete union registry and all tool source blobs unchanged."
+  }
 }

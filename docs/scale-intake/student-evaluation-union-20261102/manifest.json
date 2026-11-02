@@ -1,6 +1,6 @@
 {
   "recordFormat": "integration provenance, not an importer payload or new gate",
-  "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "base": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
   "previouslyMerged": [
     {
       "pr": 549,
@@ -9,20 +9,15 @@
     {
       "pr": 540,
       "mergeSHA": "6cad86d8f721a45a47a91290edf1523519d1d239"
+    },
+    {
+      "pr": 541,
+      "mergeSHA": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+      "head": "1c52bd020441814092ee5314491c7655f82050bc",
+      "CI": 41374276673
     }
   ],
   "remainingMotherTools": [
-    {
-      "pr": 541,
-      "head": "1c52bd020441814092ee5314491c7655f82050bc",
-      "originalReviewedHead": "2c69a375498b971941aa689ddbf6d684a5b1ab4e",
-      "originalContentAndDocsUnchanged": true,
-      "integrationCommit": "e785b42eede111e2165a3cfa91e6949b80d29fe2",
-      "nativeSources": 12,
-      "executableScales": 0,
-      "statusesPreserved": "CATALOG_ONLY, CANDIDATE/PILOT; seven WIHIC DRAFT scales only",
-      "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
-    },
     {
       "pr": 542,
       "head": "2426aee58647236dd6084845ea834f23a95c6b17",
@@ -156,7 +151,7 @@
       "priorValidation": "per-tool source/schema/report/form/isolated evidence retained; no reinstallation or publication"
     }
   ],
-  "nativeSourcesAdded": 156,
+  "nativeSourcesAdded": 144,
   "nativeExecutableScalesAdded": 7,
   "nativeExecutableScaleReleaseStatus": "DRAFT",
   "newRuntimeLogic": false,
@@ -170,5 +165,59 @@
     "selected": "existing scale-intake AST/schema, seven WIHIC scorers/report fixtures, static bundle dependencies, registry --check, required CodeQL and aggregate as actually routed",
     "notRepeatedLocally": "owner scoring/form/import checks with unchanged source blobs; no full backend/frontend/DB/browser tests",
     "CI": "NOT_RUN_AT_PREPARATION"
-  }
+  },
+  "originalCollectedHeads": [
+    {
+      "pr": 541,
+      "head": "1c52bd020441814092ee5314491c7655f82050bc"
+    },
+    {
+      "pr": 542,
+      "head": "2426aee58647236dd6084845ea834f23a95c6b17"
+    },
+    {
+      "pr": 543,
+      "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078"
+    },
+    {
+      "pr": 544,
+      "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d"
+    },
+    {
+      "pr": 546,
+      "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb"
+    },
+    {
+      "pr": 547,
+      "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8"
+    },
+    {
+      "pr": 548,
+      "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a"
+    },
+    {
+      "pr": 550,
+      "head": "21162f30b500011c6b3e9f296fad0d0545b58755"
+    },
+    {
+      "pr": 552,
+      "head": "51569d88e26ef7d9c58ef93cca206c451159673d"
+    },
+    {
+      "pr": 553,
+      "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7"
+    },
+    {
+      "pr": 554,
+      "head": "84b802dd591ef623e615194552c800e2f7b78862"
+    },
+    {
+      "pr": 555,
+      "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b"
+    }
+  ]
 }
