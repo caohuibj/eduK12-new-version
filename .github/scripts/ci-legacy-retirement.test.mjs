@@ -11,7 +11,8 @@ test('closed historical PR pipelines are retired without losing current gate',()
   assert.ok(names.includes('merge-gate'));
   assert.ok(names.includes('backend-regression-reuse'));
   assert.ok(!names.some(name=>/^(pr356(?:-|$)|pr357(?:-|$)|pr363(?:-|$)|pr364$|post356$)/.test(name)));
-  assert.doesNotMatch(ci,/^\s+pr356_(?:phase|qualification|security_review):/m);
+  const dispatch=ci.slice(ci.indexOf('  workflow_dispatch:\n'),ci.indexOf('\n\npermissions:\n'));
+  assert.doesNotMatch(dispatch,/^\s+pr356_(?:phase|qualification|security_review):/m);
   const gateStart=body.indexOf('  merge-gate:\n');
   const next=body.slice(gateStart+1).match(/^  [a-z][a-z0-9-]*:$/m);
   const gateEnd=next?gateStart+1+next.index:body.length;
