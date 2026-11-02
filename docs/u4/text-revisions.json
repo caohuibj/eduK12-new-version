@@ -1,0 +1,131 @@
+{
+  "scope": "Four-mode source audit: 14 minimal candidate revisions; Form changes packaged here, CJX01 in separate SJT candidate. Human content review remains pending.",
+  "changes": [
+    {
+      "stable_id": "TR-T05-03",
+      "source_document_id": "1iABSyxGDb3wreSjcEylU6njrV-BYHbtDmVZtvGEoE1s",
+      "source_revision_id": "AHj4eMTfrQJ2kAJFKTw40KfoF-UohPsqqwNvt5YOqD5TIWQ62vFHLxi9X-p9wgnpRRxgBs865aSJLcPsX08rZoTSQVnf0I5Q92lVa5k7fV0",
+      "before": "我检查哪些学生一直没有进入主要学习任务。",
+      "after": "我检查哪些学生还没有开始主要学习任务。",
+      "reason": "“一直没有进入”时间范围和心理参与含糊；缩为可回忆的任务开始检查，明确未覆盖持续认知参与。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "TR-T08-01",
+      "source_document_id": "1iABSyxGDb3wreSjcEylU6njrV-BYHbtDmVZtvGEoE1s",
+      "source_revision_id": "AHj4eMTfrQJ2kAJFKTw40KfoF-UohPsqqwNvt5YOqD5TIWQ62vFHLxi9X-p9wgnpRRxgBs865aSJLcPsX08rZoTSQVnf0I5Q92lVa5k7fV0",
+      "before": "我给出学生能够着手修改的一项具体建议。",
+      "after": "我给出指向一处具体修改的建议。",
+      "reason": "原“学生能够着手”混入对学生能力的推断；改为教师实际建议内容，效果另由SR/作品核对。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "TR-T11-01",
+      "source_document_id": "1iABSyxGDb3wreSjcEylU6njrV-BYHbtDmVZtvGEoE1s",
+      "source_revision_id": "AHj4eMTfrQJ2kAJFKTw40KfoF-UohPsqqwNvt5YOqD5TIWQ62vFHLxi9X-p9wgnpRRxgBs865aSJLcPsX08rZoTSQVnf0I5Q92lVa5k7fV0",
+      "before": "开始或转换活动时，我让学生清楚下一步做什么。",
+      "after": "开始或转换活动时，我说明学生下一步要做什么。",
+      "reason": "“让学生清楚”混合教师行为与学生理解结果；改为可自报说明动作，结果由SR报告。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-T04-01",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "我遇到困难时，老师会先弄清楚我卡在哪里。",
+      "after": "我向老师说遇到困难时，老师会询问或查看我卡在哪一步。",
+      "reason": "原“先弄清楚”要求学生知道教师诊断是否成功；改成自己亲历的询问/查看，明确触发与动作。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-T07-02",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "对我是否理解还不清楚时，老师会换一个问题或方式再了解一下。",
+      "after": "我已经作答后，老师还会换一个问题或方式，让我说明自己的理解。",
+      "reason": "原“对我是否理解还不清楚时”要求猜教师内部判断；改可观察的再次取证，频率不再条件于教师内心不确定。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-T09-01",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "老师愿意听我把学习上的想法或困难说明白。",
+      "after": "我向老师说明学习上的想法或困难时，老师会听我说完。",
+      "reason": "原“愿意听”涉及教师意图；改亲历倾听行动，同时与体验X04的愿意帮助保持边界。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-X05",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "我能说出这门课所学内容值得学习的一个理由。",
+      "after": "我觉得这门课所学内容值得学习。",
+      "reason": "原“我能说出一个理由”主要测理由可表达性，未必是认同价值；改为本人价值判断以匹配该体验标签。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-X08",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "这门课的学习要求常让我感到来不及消化。",
+      "after": "这门课的学习节奏让我感到来不及理解所学内容。",
+      "reason": "原“常”将频率嵌入符合程度，“学习要求/消化”含糊；改清晰节奏体验，仍不反向计入教师质量。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "P08",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "老师给了建议以后，我有机会改一改、再试试。（T08）",
+      "after": "老师给了建议以后，我有机会改一改或再试一试。（T08）",
+      "reason": "原顿号可能被理解为修改和重试必须都做；改“或”明确替代行为。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-K2-I02",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "什么时候知道下一步做什么？",
+      "after": "想一想刚才这节课，换活动的时候，你是怎么知道接下来做什么的？",
+      "reason": "“什么时候”可能问时间而非线索；改成回忆具体活动转换的开放问法。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "SR-K2-I04",
+      "source_document_id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "source_revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "before": "你有哪些自己尝试的机会？",
+      "after": "想一想刚才这节课，有没有哪一步是你自己试着做的？可以说说那时候的事吗？",
+      "reason": "保留独立尝试主题；低龄抽象“机会”建议具体事件追问。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "X3B2B",
+      "source_document_id": "1yds8s1qzjKwoq4yzFLBM4bqwG-gNG3Y3RC6hj0xFttM",
+      "source_revision_id": "AHj4eMTZNqmNvkxRsIsBY_IWigz1xQkM9nAhIo4pfo0Tq8rLTQD054iZI_ehN_iulwJvgcFKthhwh6GS0mKaIx74XYrX4jTrsw-Ki7NFUG8",
+      "before": "用计算完成情况作为暂时进度依据，同时明确解释能力仍待核查。",
+      "after": "用已有的计算或问题筛选记录说明本课做到哪一步，同时明确统计解释能力仍待核查。",
+      "reason": "原措辞假定已有计算记录，R1D→R2BD只有问题讨论也能到达；必须按已有记录条件化，不能虚构路径。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "CJX01-R3B1",
+      "source_document_id": "1yds8s1qzjKwoq4yzFLBM4bqwG-gNG3Y3RC6hj0xFttM",
+      "source_revision_id": "AHj4eMTZNqmNvkxRsIsBY_IWigz1xQkM9nAhIo4pfo0Tq8rLTQD054iZI_ehN_iulwJvgcFKthhwh6GS0mKaIx74XYrX4jTrsw-Ki7NFUG8",
+      "before": "R3B1｜回到解释，但可参与条件并不一致\n进入条件：R2B为A或C。短回答显示有些学生理解比较，但长文字表达困难；另一些人写得流畅却把样本结论推广到所有家庭。剩3分钟。",
+      "after": "R3B1｜回到解释，但可参与条件并不一致\n进入条件：R2B为A或C。简短口头追问显示，有些学生能解释比较，却难以写成长句；另一些人写得流畅却把样本结论推广到所有家庭。剩3分钟。",
+      "reason": "“有些学生理解比较但长文字困难”的判断来源原未说明；补简短口头追问信息，可供有限条件下选择，不当真实课堂观测。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    },
+    {
+      "stable_id": "CJX01-R3B2",
+      "source_document_id": "1yds8s1qzjKwoq4yzFLBM4bqwG-gNG3Y3RC6hj0xFttM",
+      "source_revision_id": "AHj4eMTZNqmNvkxRsIsBY_IWigz1xQkM9nAhIo4pfo0Tq8rLTQD054iZI_ehN_iulwJvgcFKthhwh6GS0mKaIx74XYrX4jTrsw-Ki7NFUG8",
+      "before": "R3B2｜本课证据不足，怎样安排下一步？\n进入条件：R2B为B或D。本节主要完成计算或问题讨论，学生愿意参与，但还不能据此判断是否理解统计解释。临近下课。",
+      "after": "R3B2｜本课证据不足，怎样安排下一步？\n进入条件：R2B为B或D。本节主要完成计算或问题讨论，学生愿意参与，但还不能据此判断是否理解统计解释。剩3分钟。教师手边有公共练习数据及已算好的平均数和中位数，可直接展示。",
+      "reason": "原只说临近下课，且不同路径材料不同；固定3分钟及可用统计量材料，使X3B2C可行性可评。",
+      "status": "candidate_minimal_revision_requires_new_content_version"
+    }
+  ]
+}

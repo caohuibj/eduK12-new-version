@@ -25,7 +25,7 @@ const frozen=createFrozenActiveSlotSet({schemaVersion:1,runtimeGeneration:'UNIFI
  {slotKey:'scale:scale',unitType:'SCALE',required:true,sourceDefinitionIdentity:{key:'scale',version:'1',hash:nativeHash},sourceBinding:{compositeItemId:'scale'}},
  {slotKey:'form-section:section',unitType:'FORM_SECTION',required:true,sourceDefinitionIdentity:{key:'form',version:'1',hash},sourceBinding:{sectionId:'section'}},
 ]})
-function fixture(){
+function fixture(definition:FormDraft=form){
  const parents=Array.from({length:5},(_,n)=>({id:'parent-'+n,userId:'student-'+n,subjectUserId:'teacher',respondentUserId:'student-'+n,attemptEpoch:1,
   contextSnapshotHash:null,frozenSlots:encryptFrozenActiveSlotSet(frozen),frozenSlotsHash:frozen.snapshotHash}))
  const sections=parents.map(parent=>({id:parent.id+'-section',attemptId:parent.id,attemptEpoch:1,sectionId:'section',submissionId:parent.id+'-form-submit'}))
@@ -44,7 +44,7 @@ function fixture(){
  const identity={origin:{variantKey:'TEACHER:STUDENT_REPORT',contentHash:hash},compositeId:'sealed-runtime',binding:{manifestHash,unitReports:[ceiling('visible','scale-v',true),ceiling('hidden','hidden-v',false)]},
   manifest:[scaleBlock,formBlock,hiddenBlock],units:[{itemId:'scale',scaleId:'native-scale',definitionHash:nativeHash,measurementHash:'e'.repeat(64)},{itemId:'hidden',scaleId:'private-scale',definitionHash:nativeHash,measurementHash:'f'.repeat(64)}]}
  const query=vi.fn().mockResolvedValueOnce([{key:'fixed',version:'1.0.0',policy:{},policyHash:hash}])
-  .mockResolvedValueOnce([{blockId:'visible',definition:null,scores:[{key:'total',label:'Support',displayPrecision:1}]},{blockId:'form',definition:form,scores:null},{blockId:'hidden',definition:null,scores:[{key:'total',label:'Secret'}]}])
+  .mockResolvedValueOnce([{blockId:'visible',definition:null,scores:[{key:'total',label:'Support',displayPrecision:1}]},{blockId:'form',definition,scores:null},{blockId:'hidden',definition:null,scores:[{key:'total',label:'Secret'}]}])
   .mockResolvedValueOnce(parents).mockResolvedValueOnce([])
  const tx={$queryRaw:query,assessmentUnitSnapshot:{findMany:vi.fn().mockResolvedValue(finals)},compositeFormSectionAttempt:{findMany:vi.fn().mockResolvedValue(sections)},assessment:{findMany:vi.fn().mockResolvedValue(children)}}
  m.identity.mockResolvedValue(identity);m.results.mockResolvedValue(canonical);m.reader.mockResolvedValue({})
@@ -62,6 +62,23 @@ describe('Student composition report reads final canonical sources without scori
   expect(JSON.stringify(report.units)).not.toMatch(/student-|PRIVATE identifiable text|sourceAttempt|opaque-canonical|canonicalResult/)
   expect(m.reader).toHaveBeenCalledTimes(1);expect(m.results).toHaveBeenCalledTimes(1)
   expect(f.tx.assessment.findMany.mock.calls[0][0].where.compositeItemId.in).toEqual(['scale'])
+ })
+ it('computes optional student topic means per complete respondent before protected aggregation; NA never becomes zero',async()=>{
+  const described:FormDraft=structuredClone(form)
+  described.pages[0].questions[1]={...structuredClone(described.pages[0].questions[0]),itemKey:'note',prompt:'Private note'}
+  for(const q of described.pages[0].questions)q.options.push({optionKey:'na',label:'Not encountered'})
+  described.descriptive={version:'ordinal-description-v1',selfAudience:'NONE',exploratoryMeans:true,
+   items:['q','note'].map(itemKey=>({itemKey,values:[{optionKey:'yes',code:0},{optionKey:'no',code:1}],nonresponseOptionKeys:['na']})),
+   groups:[{key:'topic',label:'Content topic',itemKeys:['q','note']}]}
+  for(const incomplete of [false,true]){
+   const f=fixture(described)
+   for(const [i,final] of f.finals.filter(f=>f.unitType==='FORM_SECTION').entries())final.collectionFactsEncrypted=encryptUnifiedRuntimePayload(createPolicyFormSectionCollectionFacts({sectionKey:'section',items:[
+    {key:'question',label:'Clarity',state:'ANSWERED',value:'yes'},
+    {key:'comment',label:'Private note',state:'ANSWERED',value:incomplete&&i===0?'na':'no'},
+   ]}))
+   const report=await collectStudentCompositionFinals(f.tx as any,input),unit=report.units[1]
+   expect(unit.exploratoryMeans).toMatchObject(incomplete?[{status:'WITHHELD',mean:null}]:[{status:'READY',mean:.5,validN:5,missingN:0}])
+  }
  })
  it('refuses duplicate respondents, incomplete parents and an earlier epoch instead of returning partial group statistics',async()=>{
   for(const mutation of ['duplicate','incomplete','epoch']){

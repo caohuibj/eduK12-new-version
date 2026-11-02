@@ -1,3 +1,4 @@
+import {U4CandidateChooser} from './U4CandidateChooser'
 import {deferredPage} from '../page-loading/deferredPage'
 import {RefreshCw,Info} from 'lucide-react'
 import {SchoolPrivateToolCollection,type SchoolPrivateToolControls} from '../../school/SchoolPrivateToolCollection'
@@ -178,6 +179,7 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
    {uncertainCreate&&<p role="alert">创建结果尚未确认，已暂停重复创建。请重新读取列表，核对是否已有本次工具，再决定是否创建。</p>}
    {busy&&<p role="status">正在读取或保存，请稍候…</p>}
    {!list.length&&!busy&&<p>暂无私有工具，可先创建一份量表或表单。</p>}
+   <U4CandidateChooser onBusy={onImportBusy} key={organizationId+':'+actorId} api={api} organizationId={organizationId} disabled={busy||importBusy||mediaCount>0||sharingState.writing||uncertainCreate} onCreated={value=>{apply(value);setVersions([]);setVersionsCursor(null);setNotice('候选草稿已创建。请审阅题文、检查并固定版本，再按实际施测角色独立投放。')}}/>
    <div className="education-private-list">{list.map(item=><article key={item.id}><div><h3>{item.title}</h3><p>{item.kind==='SCALE'?'量表':'表单'} · 草稿修订 {item.revision} · 作者私有</p></div><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing} aria-label={'编辑 '+item.title} onClick={()=>open(item.id)}>编辑 {item.title}</button></article>)}</div>
    {cursor&&<button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing} onClick={()=>void refreshList(cursor)}>加载更多工具</button>}
   </>:<>
@@ -186,6 +188,10 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
    <SchoolLayout entry={entry} className="education-private-editor-controls"><label className="education-private-title-field">工具名称<input value={tool.title} maxLength={200} disabled={busy||importBusy||mediaCount>0||sharingState.writing} onChange={event=>{if(!locked.current)setTool({...tool,title:event.target.value})}}/></label>
    <div className="education-private-toolbar education-private-actions" role="group" aria-label="草稿与版本操作"><button type="button" className={checked?undefined:'education-private-primary'} disabled={busy||importBusy||mediaCount>0||sharingState.writing||bulkPending||csvPending||!tool.title.trim()} onClick={()=>void save()}>保存草稿</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||bulkPending||csvPending||dirty} onClick={check}>检查定义</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||!checked} onClick={()=>{setPreviewing(value=>!value);setPreviewResult(null)}}>{previewing?'返回编辑':'试填预览'}</button><button type="button" disabled={busy||importBusy||mediaCount>0||sharingState.writing||!checked} className={checked?'education-private-primary':undefined} onClick={freeze}>固定私有版本</button></div></SchoolLayout>
    <p className="education-private-step-help">{dirty?'请先保存修改，再检查定义。':checked?'定义检查已通过。建议试填核对后固定版本；活动发布仍在活动工作区单独完成。':'保存后检查定义，检查通过后可试填和固定版本。'}</p></SchoolLayout>
+   {entry==='TEACHER'&&tool.kind==='FORM'&&!previewing&&(tool.definition as FormDraft).descriptive&&<section aria-label="有序回答描述规则">
+    <p>此候选按固定类别和非回答规则描述，不补零。修改题目或选项后必须重新检查规则；已有固定版本保持原样。</p>
+    {!!(tool.definition as FormDraft).descriptive!.groups.length&&<label><input type="checkbox" disabled={busy||importBusy||mediaCount>0||sharingState.writing} checked={(tool.definition as FormDraft).descriptive!.exploratoryMeans} onChange={e=>setTool({...tool,definition:{...tool.definition,descriptive:{...(tool.definition as FormDraft).descriptive!,exploratoryMeans:e.target.checked}}})}/>预先启用完整题专题均值（探索描述；缺一题不算，不生成总分）</label>}
+   </section>}
    {entry==='TEACHER'&&tool.kind==='SCALE'&&!previewing&&<label>量表原版施测声明<select disabled={busy||importBusy||csvPending||mediaCount>0||sharingState.writing} value={(tool.definition as ScaleDefinition).respondentType} onChange={event=>{
     const definition=tool.definition as ScaleDefinition;if(event.target.value===definition.respondentType)return
     if(!window.confirm('改变施测声明会清除本草稿的旧受众声明，请核对题目适用性后保存并固定新版本。原固定版本保持不变。'))return

@@ -62,7 +62,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
     'sourceProvider',b->>'sourceProvider','groupAuthorLicense',CASE WHEN b->>'sourceProvider'='PRIVATE_VERSION' THEN s.definition->'license' ELSE NULL END,
     'longitudinal',COALESCE((SELECT block->'longitudinal' FROM jsonb_array_elements(v.definition->'blocks') block WHERE block->>'blockId'=b->>'blockId'),'false'::jsonb),
     'sourceLongitudinalMetricKeys',COALESCE(s.definition#>'{report,audienceContract,longitudinalMetricKeys}',std.snapshot#>'{definition,report,audienceContract,longitudinalMetricKeys}',library.snapshot#>'{compiledDefinition,report,audienceContract,longitudinalMetricKeys}'),
-    'audience',CASE WHEN b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE') THEN CASE v.entry WHEN 'SCHOOL' THEN 'student' ELSE 'teacher' END ELSE COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}') END,
+    'audience',CASE WHEN b->>'kind'='FORM' AND b->>'sourceProvider'='PRIVATE_VERSION' AND s.definition#>>'{descriptive,selfAudience}'='TEACHER' THEN 'teacher' WHEN b->>'sourceProvider' IN ('COGNITIVE_CONFIG','SJT_RELEASE') THEN CASE v.entry WHEN 'SCHOOL' THEN 'student' ELSE 'teacher' END ELSE COALESCE(s.definition#>>'{report,audienceContract,audience}',std.snapshot#>>'{definition,report,audienceContract,audience}',library.snapshot#>>'{compiledDefinition,report,audienceContract,audience}') END,
     'reportRespondent',COALESCE(s.definition#>>'{report,audienceContract,respondent}',std.snapshot#>>'{definition,report,audienceContract,respondent}',library.snapshot#>>'{compiledDefinition,report,audienceContract,respondent}'),
     'reportScoreKeys',COALESCE(s.definition#>'{report,scoreOrder}',std.snapshot#>'{definition,report,scoreOrder}',library.snapshot#>'{compiledDefinition,report,scoreOrder}'),
     'subjectNumeric',std.snapshot#>'{parts,CONTENT,reference,metadata,disclosure,audiences,subject,numericScores}',
@@ -136,7 +136,7 @@ export async function readPrivateCompositionRunSources(tx:Tx,c:PrivateToolContex
   })}):null
  const student=isStudentComposition(origin)
  const binding=educationCompositionPolicyBindingSchema.parse({origin,manifestHash:row.manifestHash,
-   unitReports:leaves.filter(leaf=>leaf.kind!=='FORM').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
+   unitReports:leaves.filter(leaf=>leaf.kind!=='FORM'||leaf.audience==='teacher'&&origin.entry==='TEACHER').map(leaf=>({blockId:leaf.blockId,versionId:leaf.versionId,
     contentHash:leaf.contentHash,respondent:variant.responseMode==='SELF'&&leaf.audience===(origin.entry==='SCHOOL'?'student':'teacher')
      ?{mode:'INDIVIDUAL_SUMMARY',metricKeys:leaf.metricKeys,longitudinalMetricKeys:leaf.longitudinal&&leaf.subjectNumeric!==false?leaf.metricKeys.filter(key=>leaf.sourceLongitudinalMetricKeys==null||leaf.sourceLongitudinalMetricKeys.includes(key)):[]}:none,
     ...(student?{subject:studentCompositionSubjectCeiling(leaf)}:{})}))})

@@ -343,7 +343,7 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         participationRate:Number((n/assigned).toFixed(3)),
         minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
         releasedAt:rows[0].releasedAt,
-        distributions:unitReports?[]:discloseProtectedFormItems(items,n),...(unitReports?{units:unitReports,comparableKeys}:{}),
+        distributions:unitReports?[]:discloseProtectedFormItems(items,n,undefined,STUDENT_FORM_PRIVACY_FLOOR),...(unitReports?{units:unitReports,comparableKeys}:{}),
         withheldFreeText:true,reportMode:unitReports?'COMPOSITION_DESCRIPTIVE_AGGREGATE' as const:'FORM_DESCRIPTIVE_AGGREGATE' as const,
         note:unitReports?'按固定工具分别展示描述性群体统计；量表沿用原有计分，表单不计分，个人答案与开放意见受到保护。':
          '身份受保护的学生评教。每题按符合披露规则的选项频数汇总；不足最低样本数、小单元、拒答及开放意见受到抑制。不构成经科学验证的教学能力分数。',
@@ -365,7 +365,7 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         ?null:Number((n/assigned).toFixed(3)),
       minimumRespondents:minimumN,
       releasedAt:new Date().toISOString(),
-      distributions:unitReports?[]:discloseProtectedFormItems(items,n,frozen.options),...(unitReports?{units:unitReports,comparableKeys}:{}),
+      distributions:unitReports?[]:discloseProtectedFormItems(items,n,frozen.options,minimumN),...(unitReports?{units:unitReports,comparableKeys}:{}),
       withheldFreeText:true,reportMode:unitReports?'COMPOSITION_DESCRIPTIVE_AGGREGATE' as const:'FORM_DESCRIPTIVE_AGGREGATE' as const,
       privacyPolicy:'FROZEN_TEACHER_V2' as const,
       note:unitReports?'按固定工具分别展示描述性群体统计；量表复用原有计分，表单不计分。个人答案、开放意见和个人报告解释不向教师开放，不生成跨工具总分。':

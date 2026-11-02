@@ -1,3 +1,4 @@
+import {listU4Candidates,createU4Candidate} from './u4-candidates.service'
 import {listEducationLibrarySources} from './library-source.catalog'
 import {readEducationLibraryScalePreview} from './library-source.preview'
 import {importPrivateForm} from './private-tool.form-import.service'
@@ -75,6 +76,10 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)
   return (query.kind==='FORM'?service.listPrivateFormRuntimeCandidates:service.listPrivateScaleRuntimeCandidates)(context(req),query.cursor)
  }))
+ if(entry==='TEACHER'){
+  router.get('/u4-candidates',handle(req=>{z.object({}).strict().parse(req.query);return listU4Candidates(context(req))}))
+  router.post('/u4-candidates',handle(req=>createU4Candidate(context(req),req.body)))
+ }
  router.get('/:toolId',handle(req=>service.readPrivateTool(context(req),toolId(req))))
  router.put('/:toolId',handle(req=>service.updatePrivateTool(context(req),toolId(req),req.body)))
  router.post('/:toolId/import/preview',handle(req=>importPrivateToolCsv(context(req),toolId(req),req.body)))

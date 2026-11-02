@@ -7,7 +7,11 @@ import {teacherResourceMinimum} from './privacyV2'
 import type {FormDraft} from '../assessment-core/form/definition'
 
 export const studentCompositionRef=(versionId:string):RunResourceRef=>({family:'BUNDLE',key:`education-composition:TEACHER:${versionId}:TEACHER:STUDENT_REPORT:1.0.0`,version:'1.0.0'})
-export const studentFormComparableKey=(definition:FormDraft)=>'FORM:'+canonicalHash({kind:'FORM',definition})
+// Report-only switches must not create a new population comparison identity.
+export const studentFormComparableKey=(definition:FormDraft)=>{
+ const {descriptive:_reportConfig,...content}=definition
+ return 'FORM:'+canonicalHash({kind:'FORM',definition:content})
+}
 export type StudentEvaluationSourceConfig={formId:string|null;definitionDigest:string|null;compositionVersionId:string|null;compositionContentHash:string|null}
 export function studentEvaluationConfigMatches(config:StudentEvaluationSourceConfig,ref:{family:string;key:string;version:string;contentHash?:string}){
  return config.compositionVersionId!==null

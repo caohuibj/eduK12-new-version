@@ -77,7 +77,7 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     // Keep new shared pure modules explicit; no adapter/database/HTTP directory allowances.
     const moduleDependencies:Record<string,readonly string[]>={
       'form/import-builder.ts':['./import-parser'],
-      'form/definition.ts':['../../assessment-media/material'],
+      'form/definition.ts':['../../assessment-media/material','./descriptive'],
       'flow/training.ts':['../materials/definition','./compiler'],
       'materials/definition.ts':['../flow/compiler','../flow/definition'],
       'scale/import-parser.ts':['../form/import-parser','../../scale/scale-definition'],

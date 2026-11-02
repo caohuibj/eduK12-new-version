@@ -1,0 +1,2607 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "tr-t01",
+      "title": "T01 目标、任务与学习意义",
+      "questions": [
+        {
+          "itemKey": "tr-t01-01",
+          "type": "SINGLE",
+          "prompt": "我在安排主要任务前，向学生说明这项任务要学会什么。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t01-02",
+          "type": "SINGLE",
+          "prompt": "我用学生完成的作品或解释核对任务是否实现了预定学习目标。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t01-03",
+          "type": "SINGLE",
+          "prompt": "我给学生机会说明正在学的内容与已有知识或真实问题有什么联系。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ],
+      "description": "组织者须在发放时固定并显示教师、班级、课程及起止日期。默认最近四个实际教学周，不足四周照实记录。不要将不同课程或单课版混用。 请按有适用机会时实际发生的情况作答。0从未表示有机会但没有发生；没有机会／不适用选NA，记不清选U。所有题可跳过或明确拒答。频率代码不是能力等级。"
+    },
+    {
+      "pageKey": "tr-t02",
+      "title": "T02 内容准确、解释清晰与概念联系",
+      "questions": [
+        {
+          "itemKey": "tr-t02-01",
+          "type": "SINGLE",
+          "prompt": "我备课时核查容易混淆的概念或例子的适用条件。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t02-02",
+          "type": "SINGLE",
+          "prompt": "我讲解新内容时说明它与已经学过内容的联系。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t02-03",
+          "type": "SINGLE",
+          "prompt": "学生表示不理解时，我换用另一种例子或表征解释同一要点。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t03",
+      "title": "T03 解释、论证与认知挑战",
+      "questions": [
+        {
+          "itemKey": "tr-t03-01",
+          "type": "SINGLE",
+          "prompt": "我要求学生说明答案背后的理由。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t03-02",
+          "type": "SINGLE",
+          "prompt": "我安排学生比较两种解法、解释或观点所依据的证据。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t03-03",
+          "type": "SINGLE",
+          "prompt": "出现不同证据时，我请学生重新检查原来的判断。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t04",
+      "title": "T04 按需支持、支架与独立迁移",
+      "questions": [
+        {
+          "itemKey": "tr-t04-01",
+          "type": "SINGLE",
+          "prompt": "我先了解学生卡在什么地方，再决定给什么帮助。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t04-02",
+          "type": "SINGLE",
+          "prompt": "我按学生当前困难调整提示、材料或任务的进入方式。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t04-03",
+          "type": "SINGLE",
+          "prompt": "提供帮助后，我安排学生在减少提示的情况下独立尝试。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t05",
+      "title": "T05 可及、公平与实质参与",
+      "questions": [
+        {
+          "itemKey": "tr-t05-01",
+          "type": "SINGLE",
+          "prompt": "我在要求公开回答前给学生独立思考或准备的机会。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t05-02",
+          "type": "SINGLE",
+          "prompt": "我提供不止一种表达理解的渠道，例如口头、书写或图示。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t05-03",
+          "type": "SINGLE",
+          "prompt": "我检查哪些学生还没有开始主要学习任务。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t06",
+      "title": "T06 自主支持与自我调节学习",
+      "questions": [
+        {
+          "itemKey": "tr-t06-01",
+          "type": "SINGLE",
+          "prompt": "在共同学习目标范围内，我允许学生选择有实质差异的解决路径。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t06-02",
+          "type": "SINGLE",
+          "prompt": "我让学生用明确标准检查自己的学习进展。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t06-03",
+          "type": "SINGLE",
+          "prompt": "我请学生依据自检结果决定下一步怎样调整。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t07",
+      "title": "T07 诊断取证与审慎判断",
+      "questions": [
+        {
+          "itemKey": "tr-t07-01",
+          "type": "SINGLE",
+          "prompt": "我使用能显示学生思路的任务，而不只检查答案对错。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t07-02",
+          "type": "SINGLE",
+          "prompt": "我从不同参与表现的学生那里收集理解证据。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t07-03",
+          "type": "SINGLE",
+          "prompt": "新的学生表现与原判断不一致时，我重新核对原因。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t08",
+      "title": "T08 反馈使用、重试与教学调适",
+      "questions": [
+        {
+          "itemKey": "tr-t08-01",
+          "type": "SINGLE",
+          "prompt": "我给出指向一处具体修改的建议。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t08-02",
+          "type": "SINGLE",
+          "prompt": "我在后续学习活动中安排学生使用收到的反馈。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t08-03",
+          "type": "SINGLE",
+          "prompt": "我查看学生修改或重试后的表现，以判断下一步是否需要调整教学。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t09",
+      "title": "T09 尊重、持续关怀与安全表达",
+      "questions": [
+        {
+          "itemKey": "tr-t09-01",
+          "type": "SINGLE",
+          "prompt": "学生答错或提出异议时，我围绕观点或做法回应，而不评价其人格。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t09-02",
+          "type": "SINGLE",
+          "prompt": "我为不愿公开表达困难的学生提供私下说明的渠道。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t09-03",
+          "type": "SINGLE",
+          "prompt": "学生表达过困难后，我在后续接触中询问支持是否仍然需要。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t10",
+      "title": "T10 协作对话、互惠与共同建构",
+      "questions": [
+        {
+          "itemKey": "tr-t10-01",
+          "type": "SINGLE",
+          "prompt": "我安排需要成员相互解释或整合信息的合作任务。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t10-02",
+          "type": "SINGLE",
+          "prompt": "合作结束时，我检查不同成员各自的理解。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t10-03",
+          "type": "SINGLE",
+          "prompt": "我发现合作中有人包办或互助负担失衡时，调整成员的参与安排。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t11",
+      "title": "T11 流程、节奏与资源组织",
+      "questions": [
+        {
+          "itemKey": "tr-t11-01",
+          "type": "SINGLE",
+          "prompt": "开始或转换活动时，我说明学生下一步要做什么。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t11-02",
+          "type": "SINGLE",
+          "prompt": "出现进度差异时，我为等待的学生安排与目标相关的任务。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t11-03",
+          "type": "SINGLE",
+          "prompt": "资源或设备不可用时，我改用能保留核心学习目标的替代方式。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "pageKey": "tr-t12",
+      "title": "T12 支持性规范、相称回应与重返学习",
+      "questions": [
+        {
+          "itemKey": "tr-t12-01",
+          "type": "SINGLE",
+          "prompt": "我用学生能执行的具体做法说明课堂规则。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t12-02",
+          "type": "SINGLE",
+          "prompt": "课堂出现中断时，我说明接下来可以怎样重新参与。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "tr-t12-03",
+          "type": "SINGLE",
+          "prompt": "作出提醒或处理后，我查看被提醒学生是否重新进入学习。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [
+            {
+              "optionKey": "f0",
+              "label": "从未"
+            },
+            {
+              "optionKey": "f1",
+              "label": "少数时候"
+            },
+            {
+              "optionKey": "f2",
+              "label": "约一半时候"
+            },
+            {
+              "optionKey": "f3",
+              "label": "多数时候"
+            },
+            {
+              "optionKey": "f4",
+              "label": "几乎每次"
+            },
+            {
+              "optionKey": "na",
+              "label": "本时段没有相关机会／不适用"
+            },
+            {
+              "optionKey": "u",
+              "label": "记不清或无法判断"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    }
+  ],
+  "descriptive": {
+    "version": "ordinal-description-v1",
+    "selfAudience": "TEACHER",
+    "items": [
+      {
+        "itemKey": "tr-t01-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t01-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t01-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t02-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t02-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t02-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t03-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t03-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t03-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t04-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t04-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t04-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t05-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t05-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t05-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t06-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t06-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t06-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t07-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t07-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t07-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t08-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t08-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t08-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t09-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t09-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t09-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t10-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t10-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t10-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t11-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t11-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t11-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t12-01",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t12-02",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      },
+      {
+        "itemKey": "tr-t12-03",
+        "values": [
+          {
+            "optionKey": "f0",
+            "code": 0
+          },
+          {
+            "optionKey": "f1",
+            "code": 1
+          },
+          {
+            "optionKey": "f2",
+            "code": 2
+          },
+          {
+            "optionKey": "f3",
+            "code": 3
+          },
+          {
+            "optionKey": "f4",
+            "code": 4
+          }
+        ],
+        "nonresponseOptionKeys": [
+          "na",
+          "u"
+        ]
+      }
+    ],
+    "exploratoryMeans": false,
+    "groups": [
+      {
+        "key": "tr-t01",
+        "label": "T01 目标、任务与学习意义",
+        "itemKeys": [
+          "tr-t01-01",
+          "tr-t01-02",
+          "tr-t01-03"
+        ]
+      },
+      {
+        "key": "tr-t02",
+        "label": "T02 内容准确、解释清晰与概念联系",
+        "itemKeys": [
+          "tr-t02-01",
+          "tr-t02-02",
+          "tr-t02-03"
+        ]
+      },
+      {
+        "key": "tr-t03",
+        "label": "T03 解释、论证与认知挑战",
+        "itemKeys": [
+          "tr-t03-01",
+          "tr-t03-02",
+          "tr-t03-03"
+        ]
+      },
+      {
+        "key": "tr-t04",
+        "label": "T04 按需支持、支架与独立迁移",
+        "itemKeys": [
+          "tr-t04-01",
+          "tr-t04-02",
+          "tr-t04-03"
+        ]
+      },
+      {
+        "key": "tr-t05",
+        "label": "T05 可及、公平与实质参与",
+        "itemKeys": [
+          "tr-t05-01",
+          "tr-t05-02",
+          "tr-t05-03"
+        ]
+      },
+      {
+        "key": "tr-t06",
+        "label": "T06 自主支持与自我调节学习",
+        "itemKeys": [
+          "tr-t06-01",
+          "tr-t06-02",
+          "tr-t06-03"
+        ]
+      },
+      {
+        "key": "tr-t07",
+        "label": "T07 诊断取证与审慎判断",
+        "itemKeys": [
+          "tr-t07-01",
+          "tr-t07-02",
+          "tr-t07-03"
+        ]
+      },
+      {
+        "key": "tr-t08",
+        "label": "T08 反馈使用、重试与教学调适",
+        "itemKeys": [
+          "tr-t08-01",
+          "tr-t08-02",
+          "tr-t08-03"
+        ]
+      },
+      {
+        "key": "tr-t09",
+        "label": "T09 尊重、持续关怀与安全表达",
+        "itemKeys": [
+          "tr-t09-01",
+          "tr-t09-02",
+          "tr-t09-03"
+        ]
+      },
+      {
+        "key": "tr-t10",
+        "label": "T10 协作对话、互惠与共同建构",
+        "itemKeys": [
+          "tr-t10-01",
+          "tr-t10-02",
+          "tr-t10-03"
+        ]
+      },
+      {
+        "key": "tr-t11",
+        "label": "T11 流程、节奏与资源组织",
+        "itemKeys": [
+          "tr-t11-01",
+          "tr-t11-02",
+          "tr-t11-03"
+        ]
+      },
+      {
+        "key": "tr-t12",
+        "label": "T12 支持性规范、相称回应与重返学习",
+        "itemKeys": [
+          "tr-t12-01",
+          "tr-t12-02",
+          "tr-t12-03"
+        ]
+      }
+    ]
+  }
+}

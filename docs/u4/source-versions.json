@@ -1,0 +1,103 @@
+{
+  "framework": "eduk12-u4",
+  "sourceVersion": "v0.1",
+  "contentVersion": "0.2.0",
+  "candidatePackagingVersion": "0.3.0",
+  "descriptiveReportVersion": "ordinal-description-v1",
+  "scoringVersion": null,
+  "scientificValidation": false,
+  "humanContentReview": false,
+  "productionInstalled": false,
+  "sources": [
+    {
+      "index": 0,
+      "id": "1DitTGn_1b3UHlMj_H75uVP2Uyc4XBMDjN47JzUSHdFk",
+      "title": "00｜四模式公共框架｜六领域十二专题、理论依据与整合决策｜v0.1",
+      "url": "https://docs.google.com/document/d/1DitTGn_1b3UHlMj_H75uVP2Uyc4XBMDjN47JzUSHdFk/edit",
+      "modified_time": "2026-11-02T01:44:43.768Z",
+      "revision_id": "AHj4eMSUJ0dDRKvFaLLBBxNO0nm5SuAbOHd-FveXM3iC5iuyYTNfhcPNFw4ePVMewYhxi10f-esAnw-7-jhwGbD6SsgjsMcqFDptSpjiulU",
+      "tabs": [
+        "t.0"
+      ],
+      "native_chars": 9800,
+      "fetch_chars": 9835,
+      "normalized_text_equal": true,
+      "sha256_original": "df5d0777907bea4cf2199fe8666972f6b0209ac1a86c49f08fae621f27cc7e07"
+    },
+    {
+      "index": 1,
+      "id": "1iABSyxGDb3wreSjcEylU6njrV-BYHbtDmVZtvGEoE1s",
+      "title": "01｜教师自评模块｜36题实践自报与专属反思表｜v0.1",
+      "url": "https://docs.google.com/document/d/1iABSyxGDb3wreSjcEylU6njrV-BYHbtDmVZtvGEoE1s/edit",
+      "modified_time": "2026-11-02T01:40:41.633Z",
+      "revision_id": "AHj4eMTfrQJ2kAJFKTw40KfoF-UohPsqqwNvt5YOqD5TIWQ62vFHLxi9X-p9wgnpRRxgBs865aSJLcPsX08rZoTSQVnf0I5Q92lVa5k7fV0",
+      "tabs": [
+        "t.0"
+      ],
+      "native_chars": 4493,
+      "fetch_chars": 4493,
+      "normalized_text_equal": true,
+      "sha256_original": "fe634e5aa074366761b5e6dccdb88f8427779bc35ab639a605ddaef7433a739a"
+    },
+    {
+      "index": 2,
+      "id": "1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us",
+      "title": "02｜学生评教模块｜24题课堂经历、8题体验补充与低龄版｜v0.1",
+      "url": "https://docs.google.com/document/d/1uWfSOxrkSCXKEZDz7Fl6svByn4WAICnXPpim3OqN3us/edit",
+      "modified_time": "2026-11-02T01:41:08.068Z",
+      "revision_id": "AHj4eMSu3IQhSncXLt1yj-gDZluGF_Vf5_iVLzX44xukIZiDTkwMe9skBQKXruVw6OFJTNnFpVmAxYSrqJ-efeVIURwIj_mGuYPh1aBVWaw",
+      "tabs": [
+        "t.0"
+      ],
+      "native_chars": 4806,
+      "fetch_chars": 4806,
+      "normalized_text_equal": true,
+      "sha256_original": "91efa32d4477395cbeeb31326b93b1b9de2183bb406f400e6ae1a323a317c586"
+    },
+    {
+      "index": 3,
+      "id": "1CD0pMatJIeRYcH80_ts8omLR_jgPQ_cMB-UvKwwd61k",
+      "title": "03｜课堂观察模块｜24条行为线索、扩展提示与证据表单｜v0.1",
+      "url": "https://docs.google.com/document/d/1CD0pMatJIeRYcH80_ts8omLR_jgPQ_cMB-UvKwwd61k/edit",
+      "modified_time": "2026-11-02T01:41:48.606Z",
+      "revision_id": "AHj4eMQSG1wg_6DhPsIc79Yg9i7yoK29nu3oTYaKTG4TkrsPEk2mqcEFddab1lknpEfDi8Gg7RF7lcNNkN60REaKhtHNwzb20Pr2XR97ptc",
+      "tabs": [
+        "t.0"
+      ],
+      "native_chars": 5055,
+      "fetch_chars": 5055,
+      "normalized_text_equal": true,
+      "sha256_original": "00f1f832d1fc1cc87e14b07bf56c3c3d3963a99593412b46d52326cf40fa8f87"
+    },
+    {
+      "index": 4,
+      "id": "1yds8s1qzjKwoq4yzFLBM4bqwG-gNG3Y3RC6hj0xFttM",
+      "title": "04｜课堂SJT模块｜24情境继承、扩展蓝图与完整三回合范例｜v0.1",
+      "url": "https://docs.google.com/document/d/1yds8s1qzjKwoq4yzFLBM4bqwG-gNG3Y3RC6hj0xFttM/edit",
+      "modified_time": "2026-11-02T01:42:11.128Z",
+      "revision_id": "AHj4eMTZNqmNvkxRsIsBY_IWigz1xQkM9nAhIo4pfo0Tq8rLTQD054iZI_ehN_iulwJvgcFKthhwh6GS0mKaIx74XYrX4jTrsw-Ki7NFUG8",
+      "tabs": [
+        "t.0"
+      ],
+      "native_chars": 6239,
+      "fetch_chars": 6239,
+      "normalized_text_equal": true,
+      "sha256_original": "9124817c05f46575efe7efcd2aeb73b6fafdaa8786f8741944ddb0249f914c40"
+    },
+    {
+      "index": 5,
+      "id": "1aFlX5bJAbBHOxjbMME-t4T9YbxUCTzmst3PSARiihQ4",
+      "title": "05｜四模式联合报告、数据映射与验证路线｜v0.1",
+      "url": "https://docs.google.com/document/d/1aFlX5bJAbBHOxjbMME-t4T9YbxUCTzmst3PSARiihQ4/edit",
+      "modified_time": "2026-11-02T01:42:35.571Z",
+      "revision_id": "AHj4eMT8ytNCvEZzahKRzhPr8IRSBQQEvK6Uo60ltUZrH41YqlCcHUQqoJLDazxWpFlYpJ7zpXYbhs8F5UwfH2_BM5rKoq32go3e-Wh04w8",
+      "tabs": [
+        "t.0"
+      ],
+      "native_chars": 5715,
+      "fetch_chars": 5715,
+      "normalized_text_equal": true,
+      "sha256_original": "b412d9bb6970511e33704f415bf4a1d44f236d40b8037ce043416795e8a84a9d"
+    }
+  ]
+}

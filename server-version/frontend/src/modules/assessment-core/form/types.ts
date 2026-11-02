@@ -15,7 +15,8 @@ export type FormQuestion<TImage>={
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[];
   displayIf?:Condition
 }
-export type FormDraft<TImage>={schemaVersion:1|2;pages:{pageKey:string;title:string;description?:string;questions:FormQuestion<TImage>[]}[]}
+export type FormDescriptive={version:'ordinal-description-v1';selfAudience:'TEACHER'|'NONE';items:Array<{itemKey:string;values:Array<{optionKey:string;code:number}>;nonresponseOptionKeys:string[]}>;exploratoryMeans:boolean;groups:Array<{key:string;label:string;itemKeys:string[]}>}
+export type FormDraft<TImage>={schemaVersion:1|2;descriptive?:FormDescriptive;pages:{pageKey:string;title:string;description?:string;questions:FormQuestion<TImage>[]}[]}
 
 export type ProfessionalAnswer=string|number|string[]|Record<string,number>|{_surveyRefusal:true}|null
 export type ProfessionalQuestion={

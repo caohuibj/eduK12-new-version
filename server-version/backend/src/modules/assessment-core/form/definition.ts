@@ -1,3 +1,4 @@
+import {formDescriptiveSchema,formDescriptiveIssues} from './descriptive'
 import {materialListSchema} from '../../assessment-media/material'
 import { z } from 'zod'
 import { canonicalHash } from '../../assessment-runtime/canonical'
@@ -86,6 +87,7 @@ export const formQuestionSchema=z.object({
 export type FormQuestion=z.infer<typeof formQuestionSchema>
 export const formDraftSchema=z.object({
   schemaVersion:z.union([z.literal(1),z.literal(2)]),
+  descriptive:formDescriptiveSchema.optional(),
   pages:z.array(z.object({
     pageKey:key,title:label,description:z.string().max(8000).optional(),
     questions:z.array(formQuestionSchema).max(80),
@@ -153,7 +155,7 @@ export const validateFormDefinition=(input:unknown,options:{
     path:x.path.join('.')||'definition',message:x.message,severity:'error' as const,
   }))}
   const definition=parsed.data
-  const issues:Issue[]=[]
+  const issues:Issue[]=[...formDescriptiveIssues(definition)]
   const d=definition as FormDraft
   const items=d.pages.flatMap(p=>p.questions)
   if(items.length>300)err(issues,'pages','单份 Form 最多包含 300 道题目')

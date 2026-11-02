@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "tr-reflection",
+      "title": "反思与下一次尝试",
+      "questions": [
+        {
+          "itemKey": "tr-x01",
+          "type": "LONG_TEXT",
+          "prompt": "设计依据：请选择本次最关注的一个专题。您原本希望学生学会什么？为什么选择这项任务或策略？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "tr-x02",
+          "type": "LONG_TEXT",
+          "prompt": "实施条件：本时段有哪些资源、班额、时间、课程要求或权限限制影响了实施？请区分已确认限制和个人预期。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "tr-x03",
+          "type": "LONG_TEXT",
+          "prompt": "具体证据：选一份去标识的作品、一次原话或一段事件，说明它支持或不支持您的自报。可以只写简短描述，不强制上传。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "tr-x04",
+          "type": "LONG_TEXT",
+          "prompt": "替代解释：若学生反馈或观察与自评不同，还可能有哪些时间窗、对象、机会或理解差异？什么证据会改变您的判断？",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        },
+        {
+          "itemKey": "tr-x05",
+          "type": "LONG_TEXT",
+          "prompt": "下一次尝试：只选一个准备调整的动作，写明适用情境、需要的支持，以及准备查看的学生证据。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1200
+        }
+      ],
+      "description": "可留空，不影响实践自报。只填去标识事实；不自动分析人格、诚实度或情绪。"
+    }
+  ]
+}
