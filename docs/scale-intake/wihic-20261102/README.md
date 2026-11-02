@@ -1,13 +1,13 @@
 # WIHIC 母工具：英文实际课堂版拆分与入库准备
 
-状态：**7 个英文原生子量表已入隔离开发库（DRAFT/HIDDEN）；3 个母工具/语言/形式目录候选待审。生产未入库。** 基线 `adad907a4b68606ce71bb1a4f2d7c511c872c715`。仅增加内容声明、生成索引和本目录说明，不改变引擎、权限、数据库 schema、既有冻结版本或普通组合协议。
+状态：**7 个英文原生子量表已入隔离开发库（DRAFT/HIDDEN）；1 个英文实际母目录索引；中文/理想版因缺完整题本已停止并移出注册。生产未入库。** 基线 `adad907a4b68606ce71bb1a4f2d7c511c872c715`。仅增加内容声明、生成索引和本目录说明，不改变引擎、权限、数据库 schema、既有冻结版本或普通组合协议。
 
 ## 原始来源与许可
 
 1. Barry J. Fraser (2023), *The Evolution of the Field of Learning Environments Research*, Education Sciences 13(3), 257. [文章](https://www.mdpi.com/2227-7102/13/3/257)，[DOI](https://doi.org/10.3390/educsci13030257)，[出版社正式 PDF](https://mdpi-res.com/d_attachment/education/education-13-00257/article_deploy/education-13-00257.pdf)。2026-11-02 实际读取全部10页，附录 A 表 A1（第7–8页）完整56题。PDF SHA-256 `975eb0c9f917e23b9e3af8ad8b924bbed3a77f46606b24578642e405ba54b50a`。主站网页及网页PDF入口返回429，出版社CDN正式文件成功。论文首页明确 © Barry J. Fraser 2023、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)，附录无另列限制署名。公开提交仅复用该附录英文题文和选项；各子项保留署名、原链接和改造说明。不包含整份PDF、出版社标志或真实答卷。
-2. Yicen Meng (2026), *Psychometric validation of the Chinese version of the What Is Happening In this Class? (WIHIC) questionnaire in Mainland Chinese adolescents*, Learning Environments Research 29, 27，[正式正文](https://link.springer.com/article/10.1007/s10984-026-09583-2)。已读 Method、Results、Acknowledgements、Rights and permissions。研究删去原位置6、19、23、24，形成7维52题；但**未取得完整正式简体中文题本及全部六处修订措辞**。文章本身CC BY 4.0，致谢另说明取得Jill Aldridge中文问卷使用许可；这不证明本项目可取得和再分发缺失题本。只登记元数据，不用英文删四题后翻译来伪造中文版。研究摘要年龄14–18，Method写15–18；保留不一致，未造常模。
+2. Yicen Meng (2026), *Psychometric validation of the Chinese version of the What Is Happening In this Class? (WIHIC) questionnaire in Mainland Chinese adolescents*, Learning Environments Research 29, 27，[正式正文](https://link.springer.com/article/10.1007/s10984-026-09583-2)。已读 Method、Results、Acknowledgements、Rights and permissions。研究删去原位置6、19、23、24，形成7维52题；但**未取得完整正式简体中文题本及全部六处修订措辞**。文章本身CC BY 4.0，致谢另说明取得Jill Aldridge中文问卷使用许可；这不证明本项目可取得和再分发缺失题本。仅保留原检索说明，不注册该版本；不用英文删四题后翻译来伪造中文版。研究摘要年龄14–18，Method写15–18；保留不一致，未造常模。
 
-附录 A 的五级标签依次是 **Almost Never / Seldom / Sometimes / Often / Almost Always**，对应1–5。正文第3页 Table 1 把最高标签写作 Very Often；本次锁定附录 A，不能混改。同一论文对实际/理想课堂的研究讨论不等于完整理想版题本，理想版仅目录候选。未取得正式指导语全文；数字实际课堂指导语、独立分施测、完整作答均分和反馈均明确标为项目改造。
+附录 A 的五级标签依次是 **Almost Never / Seldom / Sometimes / Often / Almost Always**，对应1–5。正文第3页 Table 1 把最高标签写作 Very Often；本次锁定附录 A，不能混改。同一论文对实际/理想课堂的研究讨论不等于完整理想版题本，理想版仅保留缺项记录，已停止注册。未取得正式指导语全文；数字实际课堂指导语、独立分施测、完整作答均分和反馈均明确标为项目改造。
 
 ## 子项与版本
 
@@ -29,11 +29,11 @@
 
 **无计分表单：0。** 已核附录仅含56道可描述计分题；没有正式事实/描述表单需要转换，不编造人口学题或开放评教题凑成母工具。
 
-母目录均1.0.0、CATALOG_ONLY、无可执行计分：
+仅保留1.0.0、CATALOG_ONLY的英文实际母目录索引，无可执行计分：
 
 - `wihic56_actual_en_lower_secondary_student`：组合索引；不另装56题副本。
-- `wihic56_preferred_en_lower_secondary_student`：缺完整理想版题本/指导语/计分。
-- `wihic52_actual_zh_cn_upper_secondary_student`：高中10–11年级中文研究候选；缺正式完整题本和再分发范围。
+
+已停止且不注册：`wihic56_preferred_en_lower_secondary_student`（缺完整理想版题本/指导语），`wihic52_actual_zh_cn_upper_secondary_student`（缺正式完整中文52题和全部修订措辞）。原检索资料只保留作缺项记录，不继续推动其合并或施测。
 
 ## 原组卷与报告接收者
 
@@ -62,3 +62,10 @@ CI规则参考页读取失败：Notion fetch及get_tool_access均返回 `This ap
 3. 按已有生命周期、受众授权与普通组合编辑流程处理审定子项；需要保留56题时引用7个既有子项装配上述清单，独立反馈、不加总。
 4. 核实学生个人可见条件与教师群体汇总消费者/匿名条件后，再按既有流程发布/分配。本次未替管理员执行生产安装、合并或部署。
 5. 中文52题、理想版及其他学段/语言/填答者版本待合法取得各自正式题本及许可范围后独立建版；不从当前英文重写或删题生成。
+
+
+## 全文范围收敛（2026-11-02）
+
+按最新要求，本PR仅交付完整且已有CC BY 4.0依据的英文实际版：七个8题DRAFT/PILOT子量表与一个无计分的完整56题母目录索引。中文52题和理想版的两份source及包装已移出注册清单；不使用#595的多工具集成历史。七个可执行来源及署名文件与原2426aee提交逐blob一致，C/计分/R/指导语/本地化仍为1.0.0，参照none，未公开发布。
+
+原10来源的本地/隔离验证记录保留为历史证据，不声称当前仍注册10项。旧同输入的7项计分、学生报告和隔离DRAFT/HIDDEN导入证据复用；新候选仅核最新main交集、完整registry与既有必要CI。缺题本版本停止，不为它们造题、造选项或创建占位可施测项。原生目录合并仍不等于生产安装或发布。

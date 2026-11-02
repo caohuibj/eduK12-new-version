@@ -82,8 +82,18 @@
   ],
   "unscoredForms": [],
   "catalogOnly": [
-    "wihic56_actual_en_lower_secondary_student",
-    "wihic56_preferred_en_lower_secondary_student",
-    "wihic52_actual_zh_cn_upper_secondary_student"
+    "wihic56_actual_en_lower_secondary_student"
+  ],
+  "stoppedNotRegistered": [
+    {
+      "instrumentKey": "wihic56_preferred_en_lower_secondary_student",
+      "status": "STOPPED_MISSING_FULL_FORM",
+      "reason": "完整理想版题本/指导语未取得；移出注册，不推进为施测项。"
+    },
+    {
+      "instrumentKey": "wihic52_actual_zh_cn_upper_secondary_student",
+      "status": "STOPPED_MISSING_FULL_FORM",
+      "reason": "完整正式中文52题及修订措辞未取得；移出注册，不用自行翻译补齐。"
+    }
   ]
 }
