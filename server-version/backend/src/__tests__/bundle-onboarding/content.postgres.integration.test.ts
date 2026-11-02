@@ -9,6 +9,9 @@ import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
 import { INTEGRATED_ADULT_AGE_CONTEXT_DEFINITION_V1 } from '../../modules/assessment-bundle/bundles/integrated-adult-age-context-v1'
 import { readSmoke } from '../../../scripts/bundle-content-check'
 import { discoverPackages } from '../../modules/assessment-bundle/onboarding/loader'
+import { publicDeclarationDependencies } from '../../modules/assessment-bundle/onboarding/public-check'
+import { verifyPackageFixtures } from '../../modules/assessment-bundle/onboarding/fixtures'
+import { dependencyBlockers } from '../../modules/assessment-bundle/onboarding/dependencies'
 import { hashDeclarativePackage } from '../../modules/assessment-bundle/onboarding/contract'
 import { packageEntry } from '../../modules/assessment-bundle/onboarding/catalog'
 import { canonicalJsonString, canonicalHash } from '../../modules/assessment-runtime/canonical'
@@ -32,6 +35,23 @@ vi.mock('node:crypto', async importOriginal => {
 })
 
 const packages = discoverPackages(path.resolve(__dirname, '../../modules/assessment-bundle/packages'))
+const declarations = packages.map(pack => {
+  const dependencies = publicDeclarationDependencies(pack)
+  // Only the existing exact public-DRAFT exception can defer a lifecycle.
+  // Unknown identities and other dependency failures still fail collection.
+  if (dependencies.blockers.length) throw new Error(dependencies.blockers.join('; '))
+  return { name: pack.manifest.definition.bundleKey + '@' + pack.manifest.definition.bundleVersion, pack, ...dependencies }
+})
+const runnable = declarations.filter(p => p.unavailablePrivateSources.length === 0)
+const publicDrafts = declarations.filter(p => p.unavailablePrivateSources.length > 0)
+describe('public DRAFT declarations without private source text (not lifecycle evidence)', () => {
+  it.each(publicDrafts.map(p => [p.name, p] as const))('%s: declaration fixtures valid; private lifecycle unavailable', (_name, { pack, unavailablePrivateSources }) => {
+    expect(() => verifyPackageFixtures(pack)).not.toThrow()
+    expect(pack.manifest.definition.status).toBe('DRAFT')
+    expect(pack.publication.requestedStatus).toBe('DRAFT')
+    expect(dependencyBlockers(pack)).toEqual(unavailablePrivateSources)
+  })
+})
 // Exercise every generic driver branch without publishing another product.
 function mixedDriverCase() {
   const pack = scaffoldPackage('c4_driver_' + randomUUID().replace(/-/g, ''))
@@ -57,7 +77,15 @@ function mixedDriverCase() {
   fixture.slots.cognitive = {type:'COGNITIVE',trials:gonogoSequence(fixture.randomSeed,120,0.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1300,endedAtPerfMs:trialIndex*1300+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))}
   return {name:'synthetic four-type driver',pack,fixture}
 }
-const cases = [...packages.map(pack => ({name:pack.manifest.definition.bundleKey+'@'+pack.manifest.definition.bundleVersion,pack,fixture:readSmoke(pack.manifest.definition.bundleKey,pack.manifest.definition.bundleVersion)})), mixedDriverCase()]
+// Exact immutable DRAFTs lack the declared age context required by their
+// population. Adult 0.2.0 versions supply it; the adolescent candidate remains
+// unsupported. Retain these artifacts and prove refusal, never readiness.
+const blockedDraftIdentities = new Set([
+  'emotion_beliefs_strategies_adult_zh_cn@0.1.0',
+  'adult_interests_exploration_zh_cn@0.1.0',
+  'cognitive_self_regulation_adolescent_en_v1@1.0.0',
+])
+const cases = [...runnable.map(({ name, pack }) => ({name: blockedDraftIdentities.has(name) ? 'blocked DRAFT candidate: ' + name : name,pack,fixture:readSmoke(pack.manifest.definition.bundleKey,pack.manifest.definition.bundleVersion)})), mixedDriverCase()]
 const url = integrationDatabaseUrl('BUNDLE_PRODUCT_TEST_DATABASE_URL')
 const suite = url ? describe : describe.skip
 suite('actual content packages: install, FINAL, canonical report and audiences', () => {
@@ -66,6 +94,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
   const secret = 'isolated-c4-review-key-' + suffix, oldKey = process.env.BUNDLE_REVIEW_SIGNING_KEY
   let db: PrismaClient, courseId: string
   const scaleStatuses = new Map<string, any>(), configIds: string[] = [], deploymentIds: string[] = []
+  const cognitiveStatuses = new Map<string, any>()
   beforeAll(async () => {
     process.env.DATABASE_URL = url!; process.env.BUNDLE_PRODUCTS_ENABLED = 'true'; process.env.BUNDLE_REVIEW_SIGNING_KEY = secret
     requireIsolatedReleaseDatabase(url!)
@@ -88,6 +117,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       await db.assessment.deleteMany({ where: { compositeAttemptId: { in: attempts } } })
       await db.compositeAssessment.deleteMany({ where: { id: { in: ids } } })
       await db.cognitiveAssignment.deleteMany({ where: { createdBy: actor.userId } })
+      for (const [id, status] of cognitiveStatuses) await db.cognitiveTestConfig.update({ where: { id }, data: { status } })
       await db.cognitiveTestConfig.deleteMany({ where: { id: { in: configIds } } })
       for (const id of deploymentIds) await db.$executeRaw`DELETE FROM scale_deployment_policies WHERE id=${id}::uuid`
       for (const [id, status] of scaleStatuses) await db.scale.update({ where: { id }, data: { status } })
@@ -100,8 +130,10 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
     }
     if (oldKey === undefined) delete process.env.BUNDLE_REVIEW_SIGNING_KEY; else process.env.BUNDLE_REVIEW_SIGNING_KEY = oldKey
   }, 60000)
-  it('has at least one package; no empty-green content suite', () => expect(packages.length).toBeGreaterThan(0))
-  it.each(cases)('$name', async ({ pack, fixture }) => {
+  it('has at least one runnable package; no empty-green lifecycle suite', () => expect(runnable.some(p => !blockedDraftIdentities.has(p.name))).toBe(true))
+  // %s preserves the exact identity; object interpolation truncates long keys
+  // and makes adjacent immutable versions indistinguishable in test reports.
+  it.each(cases.map(c => [c.name, c] as const))('%s', async (_name, { pack, fixture }) => {
     const d = pack.manifest.definition
     const installed = await installPackage(db, actor.userId, pack)
     // A shared/non-isolated database must never have an existing release overwritten.
@@ -122,9 +154,9 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
         let row = await db.scale.findUnique({ where: { code: slot.instrumentKey } })
         if (row) { if (!scaleStatuses.has(row.id)) scaleStatuses.set(row.id, row.status); row = await db.scale.update({ where: { id: row.id }, data: { status: 'PUBLISHED' } }) }
         else row = await db.scale.create({ data: { code: slot.instrumentKey, name: slot.instrumentKey, creatorId: actor.userId, status: 'PUBLISHED', visibility: 'HIDDEN', instrumentClass: 'STANDARD', instrumentVersion: slot.instrumentVersion, definition: p.definition as any, definitionHash: hashScaleDefinition(p.definition), itemCount: p.definition.items.length, dimensionCount: p.definition.scoring.scores.length } })
-        // New STANDARD sources require an explicit synthetic deployment in
-        // addition to their published measurement and Training entry policy.
-        if (!getLegacyScaleCompatibilityProfile(slot.instrumentKey, slot.instrumentVersion) && !await readActiveScaleDeployment(db, row.id)) {
+        // Declared measurement contexts also require managed admission, even
+        // when the source retains a legacy compatibility profile.
+        if ((!getLegacyScaleCompatibilityProfile(slot.instrumentKey, slot.instrumentVersion) || slot.admissionContext) && !await readActiveScaleDeployment(db, row.id)) {
           const runtimePolicy = getScaleInstrumentRuntimePolicy(slot.instrumentKey, slot.instrumentVersion)!
           const id = randomUUID()
           await db.$transaction(tx => activateScaleDeploymentRevision({ db: tx, id, scaleId: row!.id, createdByUserId: actor.userId,
@@ -138,7 +170,13 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
         const dep = pack.manifest.cognitiveDependencies.find(v => v.slotKey === slot.slotKey)!
         const seed = cognitiveSeeds.find(v => v.testType === slot.instrumentKey && v.configVersion === dep.configVersion)!
         let cfg = await db.cognitiveTestConfig.findUnique({ where: { testType_configVersion: { testType: slot.instrumentKey, configVersion: dep.configVersion } } })
-        if (!cfg) { cfg = await db.cognitiveTestConfig.create({ data: { ...seed, config: seed.config as any, accessPolicy: 'OPEN' } }); configIds.push(cfg.id) }
+        // Synthetic publication setup in the explicitly isolated DB, matching
+        // the scale setup above. Registry/seed release status stays unchanged.
+        if (!cfg) { cfg = await db.cognitiveTestConfig.create({ data: { ...seed, status: 'PUBLISHED', config: seed.config as any, accessPolicy: 'OPEN' } }); configIds.push(cfg.id) }
+        else if (cfg.status !== 'PUBLISHED') {
+          if (!cognitiveStatuses.has(cfg.id)) cognitiveStatuses.set(cfg.id, cfg.status)
+          cfg = await db.cognitiveTestConfig.update({ where: { id: cfg.id }, data: { status: 'PUBLISHED' } })
+        }
         const entry = requireCognitiveRegistryEntry(slot.instrumentKey, dep.engineVersion, dep.scoringVersion)
         const frozen = freezeAssignmentProfile({ entry, profile: dep.profile, baseConfig: cfg.config as any })
         binding.resourceId = (await db.cognitiveAssignment.create({ data: { configId: cfg.id, courseId, createdBy: actor.userId, title: slot.slotKey, status: 'PUBLISHED', listedStandalone: true, ...freezeDataForWrite(frozen) } })).id
@@ -149,11 +187,40 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       bindings.push(binding)
     }
     const material = { contentHash: hashDeclarativePackage(pack), reviewerId: reviewer, expiresAt: new Date(Date.now() + 3600000).toISOString(), claims: ['independent_summary', 'cross_source_condition', 'joint_conclusion'], scientific: true, rights: true, language: true, report: true }
-    await publishPackage(db, actor.userId, d.bundleKey, d.bundleVersion, { ...material, signature: createHmac('sha256', secret).update(canonicalJsonString(material)).digest('hex') })
+    const review = { ...material, signature: createHmac('sha256', secret).update(canonicalJsonString(material)).digest('hex') }
     const provider = new BundleDefinitionProvider([packageEntry(pack)])
+    if (d.bundleKey === 'cognitive_self_regulation_adolescent_en_v1' && d.bundleVersion === '1.0.0') {
+      expect(d.status).toBe('DRAFT')
+      expect(pack.publication.requestedStatus).toBe('DRAFT')
+      expect(getExecutableScalePackage('texi_self_en', '1.0.0')!.releaseStatus).toBe('DRAFT')
+      // The source-release gate is reached before runtime creation. The age
+      // blocker is a separate static assertion, not a claimed dynamic result.
+      expect(provider.publicationBlockers(d.bundleKey, d.bundleVersion)).toContain('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
+      await expect(publishPackage(db, actor.userId, d.bundleKey, d.bundleVersion, review)).rejects.toThrow('BUNDLE_SCALE_DEPENDENCY_UNAVAILABLE')
+      const saved = await db.bundlePackageRelease.findUniqueOrThrow({ where: { bundleKey_bundleVersion: { bundleKey: d.bundleKey, bundleVersion: d.bundleVersion } } })
+      expect(saved.status).toBe('DRAFT')
+      expect(saved.publishedBy).toBeNull()
+      expect(await db.bundleInstance.count({ where: { bundleKey: d.bundleKey, bundleVersion: d.bundleVersion, composite: { createdBy: actor.userId } } })).toBe(0)
+      return
+    }
+    await publishPackage(db, actor.userId, d.bundleKey, d.bundleVersion, review)
     const { createBundleProductService, readInstance } = await import('../../modules/bundle-product/service')
     const product = createBundleProductService(provider), runtime = await import('../../modules/composite/composite.service')
-    let row = await product.create(actor, { requestId: randomUUID(), bundleKey: d.bundleKey, bundleVersion: d.bundleVersion, name: d.name, courseId, bindings })
+    const createInput = { requestId: randomUUID(), bundleKey: d.bundleKey, bundleVersion: d.bundleVersion, name: d.name, courseId, bindings }
+    if (blockedDraftIdentities.has(d.bundleKey + '@' + d.bundleVersion)) {
+      expect(d.status).toBe('DRAFT')
+      expect(pack.publication.requestedStatus).toBe('DRAFT')
+      expect(provider.publicationBlockers(d.bundleKey, d.bundleVersion)).toContain('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
+      // Synthetic package publication above succeeded; runtime creation still
+      // must fail before any composite or frozen Bundle instance is persisted.
+      const where = { bundleKey_bundleVersion: { bundleKey: d.bundleKey, bundleVersion: d.bundleVersion } }
+      expect((await db.bundlePackageRelease.findUniqueOrThrow({ where })).status).toBe('PUBLISHED')
+      await expect(product.create(actor, createInput)).rejects.toMatchObject({ statusCode: 409, message: 'AGE_POPULATION_REQUIRES_DECLARED_CONTEXT' })
+      expect(await db.compositeAssessment.findUnique({ where: { creationKey: 'bundle:' + actor.userId + ':' + createInput.requestId } })).toBeNull()
+      expect(await db.bundleInstance.count({ where: { bundleKey: d.bundleKey, bundleVersion: d.bundleVersion, composite: { createdBy: actor.userId } } })).toBe(0)
+      return
+    }
+    let row = await product.create(actor, createInput)
     row = await product.publish(actor, row.id, row.revision)
     // Fix only test admission entropy, then restore it before submission. The
     // authoritative scorer still validates trials against the real frozen seed.
