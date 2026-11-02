@@ -1,0 +1,64 @@
+import assert from 'node:assert/strict'
+import {readFileSync,writeFileSync} from 'node:fs'
+import {createHash} from 'node:crypto'
+import {prisma} from './src/config/database'
+import {requireIsolatedReleaseDatabase} from './src/__tests__/integration/integration-env'
+import {createFormTemplate,addItem,create,importFormTemplate,detail} from './src/modules/questionnaire-product/service'
+import {updateCatalogTags} from './src/modules/training-catalog/tags'
+import {validateFormDefinition} from './src/modules/assessment-core/form/definition'
+import {dryRunSurveyForm} from './src/modules/survey/final.compute'
+const folder='../../docs/scale-intake/iatpdi-2024-20261102/'
+const bytes=readFileSync(folder+'native-forms.json'),pack=JSON.parse(bytes.toString())
+const request=(key:string)=>{const h=createHash('sha256').update('iatpdi:'+key).digest('hex');return h.slice(0,8)+'-'+h.slice(8,12)+'-4'+h.slice(13,16)+'-a'+h.slice(17,20)+'-'+h.slice(20,32)}
+async function main(){
+ requireIsolatedReleaseDatabase(process.env.DATABASE_URL!)
+ assert.equal(new URL(process.env.DATABASE_URL!).pathname,'/eduk12_iatpdi_test')
+ const user=await prisma.user.upsert({where:{username:'iatpdi-content-fixture-20261102'},create:{username:'iatpdi-content-fixture-20261102',passwordHash:'synthetic-not-a-login',role:'TEACHER',accountDomain:'TRAINING',teacherApproved:true},update:{}})
+ const actor={userId:user.id,role:'TEACHER' as const},forms:any[]=[]
+ for(const r of pack.resources){
+  assert.ok(r.tags.length<=10&&r.tags.every((x:string)=>x.length<=20))
+  const checked=validateFormDefinition(r.definition,{forPreview:true});assert.ok(checked.definition);assert.deepEqual(checked.issues.filter(i=>i.severity==='error'),[])
+  assert.ok(r.addItem.formDefinition.options.every((o:any)=>o.score===undefined))
+  let saved=await createFormTemplate(actor,{...r.create,requestId:request(r.instrumentKey)})
+  if(saved.items.length===0)saved=await addItem(actor,saved.id,{revision:saved.revision,item:r.addItem})
+  assert.equal(saved.items.length,1)
+  const tags=await prisma.compositeAssessment.updateMany({where:{id:saved.id,createdBy:user.id,status:'DRAFT',productKind:'FORM_TEMPLATE'},data:{tags:r.tags,code:r.instrumentKey}})
+  assert.equal(tags.count,1)
+  const row=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:saved.id},include:{items:true}})
+  assert.equal(row.code,r.instrumentKey);assert.deepEqual(row.tags,r.tags);assert.equal(row.publicEnabled,false);assert.equal(row.status,'DRAFT');assert.equal(row.items[0].scaleId,null)
+  const q=row.items[0].formDefinition as any,{itemKey,...body}=q;assert.deepEqual(body,r.addItem.formDefinition)
+  const d={schemaVersion:2,pages:[{pageKey:'check',title:row.name,questions:[q]}]}
+  let checks=0
+  if(q.type==='MATRIX'){
+   for(const option of ['r1','r3','r4']){const raw=Object.fromEntries(q.rows.map((x:any)=>[q.itemKey+':'+x.rowKey,option]));const result=dryRunSurveyForm(d,raw);assert.equal(result.missing.length,0);assert.deepEqual(Object.values(result.rawAnswers[q.itemKey] as any),q.rows.map(()=>option));checks++}
+   assert.equal(dryRunSurveyForm(d,{}).missing.length,q.rows.length);checks++
+   assert.equal(dryRunSurveyForm(d,{[q.itemKey+':'+q.rows[0].rowKey]:'r2'}).missing.length,q.rows.length-1);checks++
+   assert.throws(()=>dryRunSurveyForm(d,{[q.itemKey+':'+q.rows[0].rowKey]:'r5'}));checks++
+  }else{
+   assert.equal(dryRunSurveyForm(d,{[q.itemKey]:'A synthetic example without learner identifiers.'}).missing.length,0);checks++
+   assert.equal(dryRunSurveyForm(d,{}).missing.length,1);checks++
+   assert.throws(()=>dryRunSurveyForm(d,{[q.itemKey]:42}));checks++
+   assert.throws(()=>dryRunSurveyForm(d,{[q.itemKey]:'a'.repeat(5001)}));checks++
+  }
+  assert.equal((dryRunSurveyForm(d,{}) as any).scores,undefined)
+  assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:row.id}}),0)
+  assert.equal(await prisma.compositeAssessmentAccessToken.count({where:{compositeAssessmentId:row.id}}),0)
+  forms.push({key:r.instrumentKey,id:row.id,code:row.code,nativeRevision:row.revision,status:row.status,tags:row.tags,sourceItemIds:r.sourceItemIds,answerChecks:checks,scoringVersion:null,reportVersion:null})
+ }
+ const combo=pack.ordinaryCombinations[0]
+ let target=await create(actor,{name:combo.name,questionnaireType:'GENERAL',requestId:request(combo.key)})
+ if(target.items.length===0)for(const key of combo.sourceOrder){const source=forms.find(x=>x.key===key);target=await importFormTemplate(actor,target.id,{revision:target.revision,source:{id:source.id,kind:'COMPOSITE',revision:source.nativeRevision}})}
+ const stored=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:target.id}})
+ await updateCatalogTags(actor,target.id,{kind:'QUESTIONNAIRE',tags:combo.tags,expectedTags:stored.tags})
+ const result=await detail(actor,target.id)
+ assert.equal(result.items.length,4);assert.equal(result.reportMode,'COLLECTION_ONLY');assert.ok(result.items.every((x:any)=>x.type==='FORM'));assert.equal(result.publicEnabled,false)
+ const read=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:target.id},include:{items:true}})
+ const q=read.items.map(x=>x.formDefinition as any)
+ assert.equal(q.reduce((n,x)=>n+x.rows.length,0),34)
+ assert.ok(q.every(x=>x.rows.every((r:any)=>r.rowKey!=='b08')))
+ const all=q.flatMap(x=>x.rows.map((r:any)=>r.rowKey));assert.equal(new Set(all).size,34)
+ assert.equal(read.reportPackageKey,null);assert.equal(read.analysisProtocolKey,null);assert.deepEqual(read.tags,combo.tags)
+ const e={status:'PASS',baseSha:'688d61eb61094fe692ad8c6e6ce41315c8bc3402',scope:'actual native Form create/add/read, existing tags/code metadata, ordinary combination import and response boundaries',database:'isolated disposable loopback PostgreSQL16.15 / eduk12_iatpdi_test',schemaPreparation:'current unchanged Prisma schema db push; not migrations or deployment validation',nativeForms:forms,ordinaryCombination:{key:combo.key,id:read.id,nativeRevision:read.revision,status:read.status,items:4,retainedRows:34,excludedB08:true,tags:read.tags,reportMode:'COLLECTION_ONLY'},answerChecks:forms.reduce((n,x)=>n+x.answerChecks,0),scoringExecutions:0,respondentData:'synthetic fixture only; no actual respondent Attempt/FINAL/token or public delivery',reportRendering:'NOT_EXECUTED_UNSCORED_FORMS; teacher growth copy is editorial draft',tagLimitation:'FORM_TEMPLATE tags/code set on existing columns for same owner DRAFT only; current tag editor does not support this kind. Ordinary QUESTIONNAIRE uses existing tag API.',nativePayloadSha256:createHash('sha256').update(bytes).digest('hex')}
+ writeFileSync(folder+'validation.json',JSON.stringify(e,null,2)+'\n');console.log(JSON.stringify({status:e.status,forms:6,ordinaryCombinations:1,retainedM2Items:34,answerChecks:e.answerChecks,scoringExecutions:0}))
+}
+main().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>prisma.$disconnect())

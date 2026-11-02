@@ -1,0 +1,22 @@
+{
+  "scope": "Representative native adapter and classification only; no Survey/School/Huiteacher delivery authorization or UI claim",
+  "tags": [
+    {
+      "id": "sjt-construct:cpj_t01_a_explicit_action",
+      "label": "cpj_t01_a_explicit_action",
+      "facet": "construct"
+    },
+    {
+      "id": "sjt-construct:cpj_t01_b_explicit_action",
+      "label": "cpj_t01_b_explicit_action",
+      "facet": "construct"
+    }
+  ],
+  "respondentType": "teacher_self_report",
+  "adapter": {
+    "status": "PASS_DESCRIPTOR_ONLY",
+    "adapterVersion": "survey-catalog-sjt-native-v1",
+    "definitionDigest": "ac9b766eb543f6fceb3af1746d9a702bd93130d2cf224df143fe8f2bc1930ab3",
+    "scoringDigest": "f6a95a0738207876817d2df4b422506d6eaa395276deefd333f38273d349466f"
+  }
+}

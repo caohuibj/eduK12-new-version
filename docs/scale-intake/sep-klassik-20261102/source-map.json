@@ -1,0 +1,661 @@
+{
+  "sources": {
+    "math": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=2026-01/Item%C3%BCbersicht+Mathematik_Eigenperspektive+.pdf",
+      "sha256": "37191c01134456b5c73949c1e897c6607490ea8b4c502fcfb3e7ecef9720ef15",
+      "title": "SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "3-6",
+      "itemCount": 35,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "Cover visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.; DE is the source label, not a claimed separate 4.0 jurisdiction port."
+    },
+    "sinus": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-10/SINUS-Skala_Lernmotivation.pdf",
+      "sha256": "16e2ac0d3698add5df24f0754f9fabc86f92b60aed3326b3fd7576356114bcb3",
+      "title": "Bausteine SEP-Klassik SINUS-Skala zur Lernmotivation — teacher column",
+      "resourceRevision": "2026-10_resource_path_no_printed_revision",
+      "role": "teacher_report",
+      "gradeBand": "primary_secondary_as_listed_by_portal",
+      "itemCount": 18,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "First page visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.",
+      "originalCitation": "Seidel et al. (2003), Technischer Bericht zur Videostudie Lehr-Lern-Prozesse im Physikunterricht, p.317 ff.; teacher adaptation and positive rewording by ISQ, not the untouched 2003 instrument."
+    },
+    "media": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Medienbildung%20SEP-Klassik%20Sek%20I-D.pdf",
+      "sha256": "69a14d32f0173f2d293ea897e8619e1815f0c01b6714d551d8dd80a94cfd3576",
+      "title": "Bausteine SEP-Klassik Medienbildung Sek I, RLP 1-10, Niveaustufe D — teacher column",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "secondary_I_level_D",
+      "itemCount": 38,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "First-page CC BY NC SA pictogram and 4.0 DE visually verified.",
+      "responseOptionsSource": "https://sep-klassik.isq.berlin/de_DE/fragebogen/voransicht/SMS2627/vollst%C3%A4ndig.html",
+      "note": "PDF teacher items preserved verbatim, including De typo in module6 item1 and no final period in module4 item5; common response anchors verified in matching official public preview."
+    }
+  },
+  "mathModules": [
+    {
+      "module": 1,
+      "title": "Mathematisch argumentieren",
+      "description": "Dieser Baustein thematisiert, wie Sie und Ihre Schüler*innen Anlässe zum mathematischen Argumentieren in Ihrem Unterricht einschätzen. Es geht dabei um das Hinterfragen und Prüfen mathematischer Aussagen, das Entwickeln von Vermutungen sowie das Aufstellen und Nachvollziehen von Begründungen. Trifft Trifft Kann Trifft ich über- Trifft voll",
+      "sourcePage": 2,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen sollen immer überprüfen, ob ihr Ergebnis sinnvoll ist."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Ich achte darauf, dass die Schüler*innen ihre Antwort begründen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Ich ermutige meine Schüler*innen, eigene Ideen zu entwickeln."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "extended",
+          "prompt": "Bei falsch bearbeiteten Aufgaben sollen die Schüler*innen die Fehler finden und erklären."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "extended",
+          "prompt": "Wenn die Schüler*innen eine Idee haben, sollen sie ihre Gedanken genauer erklären."
+        }
+      ]
+    },
+    {
+      "module": 2,
+      "title": "Mathematisch kommunizieren",
+      "description": "Dieser Baustein misst, in welchem Maße Sie und Ihre Schüler*innen zustimmen, dass Ihre Schüler*innen durch Ihren Unterricht zum Verstehen mathematischer Inhalte und zum Mitteilen eigener mathematischer Gedanken befähigt werden. Zum mathematischen Kommunizieren gehört neben dem verstehenden Lesen mathematikhaltiger Texte und Grafiken beispielsweise auch das Beschreiben eigener Vorgehensweisen, das Darstellen und gemeinsame Reflektieren von Lösungswegen. Trifft Trifft Kann Trifft ich über- Trifft voll",
+      "sourcePage": 3,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Um Begriffe, Rechenregeln oder Aufgaben besser zu verstehen, geben die Schüler*innen sie mit eigenen Worten wieder."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Wenn jemand etwas nicht gut verstanden hat, erklärt einer Mitschülerin/einem Mitschüler es noch einmal."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen erläutern einer anderen Schülerin/einem anderen Schüler unseren eigenen Lösungsweg."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Ich lasse im Unterricht Lösungswege von Schüler*innen präsentieren."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen bearbeiten auch Aufgaben im Team."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": "extended",
+          "prompt": "Ich lege Wert darauf, dass die Schüler*innen Lösungswege übersichtlich notieren."
+        },
+        {
+          "sourceNumber": 7,
+          "tier": "extended",
+          "prompt": "Die Schüler*innen diskutieren in kleinen Gruppen, wie sie eine Aufgabe bearbeiten können."
+        },
+        {
+          "sourceNumber": 8,
+          "tier": "extended",
+          "prompt": "Für kleinere Vorträge fertigen die Schüler*innen manchmal Plakate oder Folien an."
+        }
+      ]
+    },
+    {
+      "module": 3,
+      "title": "Probleme mathematisch lösen",
+      "description": "Dieser Baustein erfasst, in welchem Maße Sie und Ihre Schüler*innen zustimmen, dass Ihr Unterricht Anlässe bietet, um allein oder gemeinsam Lösungen für mathematische Probleme zu erarbeiten oder zu bewerten. Das mathematische Problemlösen beinhaltet beispielsweise das Entwickeln und Nutzen geeigneter Lösungsansätze für problemhaltige Aufgaben (z. B. systematisches Probieren, Rückwärtsarbeiten) oder das Übertragen bekannter Zusammenhänge auf neue Sachverhalte. Trifft Trifft Kann Trifft ich über- Trifft voll",
+      "sourcePage": 4,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen können sich aussuchen, wie sie eine Aufgabe lösen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Ich möchte, dass die Schüler*innen eigene Lösungswege und Ideen ausprobieren."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen besprechen manchmal mehrere Lösungswege für eine Aufgabe."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Im Unterricht bearbeiten die Schüler*innen auch Aufgaben, bei denen der Lösungsweg nicht sofort zu erkennen ist."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen üben Wege, die ihnen helfen, Aufgaben zu lösen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": "extended",
+          "prompt": "Im Unterricht beschäftigen die Schüler*innen sich mit Aufgaben, die unterschiedliche Lösungswege (z. B. rechnen, probieren, zeichnen oder beschreiben) zulassen."
+        },
+        {
+          "sourceNumber": 7,
+          "tier": "extended",
+          "prompt": "Bei Aufgaben, die die Schüler*innen nicht gleich lösen können, zeige ich ihnen, wie man Hilfsmittel (z. B. Tabelle, Skizze) nutzen kann."
+        }
+      ]
+    },
+    {
+      "module": 4,
+      "title": "Mathematisch modellieren",
+      "description": "Dieser Baustein misst, wie Sie und Ihre Schüler*innen Gelegenheiten zum mathematischen Beschreiben von alltäglichen Situationen und Gegenständen sowie zum Bearbeiten von Sachproblemen in Ihrem Unterricht einschätzen. Beim Mathematischen Modellieren geht es darum, Realsituationen mithilfe der Mathematik zu beschreiben, die Problemstellung innerhalb des Modells zu lösen und das Ergebnis auf den realen Kontext zu übertragen. Trifft Trifft Kann Trifft ich über- Trifft voll",
+      "sourcePage": 5,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen lösen oft Sachaufgaben."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen bearbeiten Aufgaben, in denen Texte, Bilder und Zeichnungen vorkommen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen erfinden zu kleinen Texten, Figuren oder Bildern selbst Aufgaben."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen beschreiben ihre Umgebung (z. B. ihr Klassenzimmer) mit mathematischen Begriffen."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "extended",
+          "prompt": "Die Schüler*innen bearbeiten Aufgaben und Probleme aus dem Alltag."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": "extended",
+          "prompt": "Die Schüler*innen überprüfen, ob ihre Ergebnisse sinnvoll sind."
+        }
+      ]
+    },
+    {
+      "module": 5,
+      "title": "Mathematisches Darstellen",
+      "description": "Dieser Baustein thematisiert, inwieweit Sie und Ihre Schüler*innen zustimmen, dass Ihr Unterricht Gelegenheiten zur vielfältigen Nutzung mathematischer Darstellungen (z. B. Tabellen, Diagramme, Skizzen) schafft. Es geht dabei sowohl um das Entwickeln geeigneter Darstellungen, als auch das Vergleichen und Bewerten verschiedener Darstellungsformen. Trifft Trifft Kann Trifft ich über- Trifft voll",
+      "sourcePage": 6,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Im Mathematikunterricht fertigen die Schüler*innen Zeichnungen und Skizzen an."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen können selbst entscheiden, wie sie die Ergebnisse einer Aufgabe darstellen (z. B. als Tabelle oder als Zeichnung)."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Im Mathematikunterricht üben die Schüler*innen, Tabellen und Diagramme anzufertigen."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen besprechen, welche Darstellung für eine Aufgabe am besten ist."
+        }
+      ]
+    },
+    {
+      "module": 6,
+      "title": "Mit mathematischen Objekten und Werkzeugen arbeiten",
+      "description": "Dieser Baustein thematisiert, inwiefern Sie und Ihre Schüler*innen zustimmen, dass im Unterricht mit mathematischen Werkzeugen und Objekten gearbeitet wird. Hierbei geht es neben der richtigen Verwendung von Fachbegriffen beispielsweise auch um die Nutzung von Zeichengeräten und digitalen Werkzeugen. Trifft Trifft Kann Trifft ich über- Trifft voll",
+      "sourcePage": 7,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen beschreiben, was Symbole (z. B. +, -, >, <, =) oder Rechnungen im Mathematikunterricht bedeuten."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen übersetzen Texte in Rechnungen (z. B. „Sarah bekommt im Monat 5€ Taschengeld. Wie viel Geld hat sie in 6 Monaten bekommen?“ wird zu 6*5€=30€)."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Ich achte darauf, dass die Schüler*innen die mathematischen Fachwörter (z. B. Addition, Subtraktion, Summe, Produkt) richtig benutzen."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen üben den Umgang mit Zeichengeräten (z. B. Lineal und Zirkel)."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "extended",
+          "prompt": "Ich zeige den Schüler*innen, wie sie digitale Werkzeuge (z. B. Computerprogramme, Apps) zur Lösung von Aufgaben nutzen können."
+        }
+      ]
+    }
+  ],
+  "sinusTeacherModules": [
+    {
+      "module": 1,
+      "title": "Amotivierte/ externale Lernmotivation",
+      "sourcePage": 2,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde hatten die Schülerinnen und Schüler Lust, sich am Unterricht zu beteiligen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde hatten die Schülerinnen und Schüler Lust, sich mit den Lerninhalten auseinander zu setzen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde waren die Schülerinnen und Schüler auf den Unterrichtsinhalt fokussiert."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mehr getan, als von ihnen verlangt wurde."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mitgearbeitet, auch wenn sie nicht dazu aufgefordert wurden."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler durchgängig beteiligt."
+        }
+      ]
+    },
+    {
+      "module": 2,
+      "title": "Introjizierte Lernmotivation",
+      "sourcePage": 3,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mitgearbeitet, weil sie es immer so machen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler angestrengt, weil sie gerne alles richtig machen wollen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben sich die Schülerinnen und Schüler beteiligt, weil es sich so für Schülerinnen und Schüler gehört."
+        }
+      ]
+    },
+    {
+      "module": 3,
+      "title": "Identifizierte Lernmotivation",
+      "sourcePage": 4,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mitgearbeitet, weil sie die Inhalte später gebrauchen können."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde war den Schülerinnen und Schülern der Unterricht wichtig, weil er auch für viele Dinge im Alltag sinnvoll ist."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde haben die Schülerinnen und Schüler mitgearbeitet, damit sie sich später in dem Fach auskennen."
+        }
+      ]
+    },
+    {
+      "module": 4,
+      "title": "Intrinsische/ interessierte Lernmotivation",
+      "sourcePage": 5,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde fanden die Schülerinnen und Schüler die behandelten Inhalte richtig spannend."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde waren die Schülerinnen und Schüler mit Freude dabei."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde hat den Schülerinnen und Schülern der Unterricht Spaß gemacht."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde hätten die Schülerinnen und Schüler gern mehr über dieses Thema erfahren."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde bekamen die Schülerinnen und Schüler Lust, sich weiter damit zu beschäftigen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "In der Unterrichtsstunde hätten die Schülerinnen und Schüler mir gern noch viele Fragen gestellt."
+        }
+      ]
+    }
+  ],
+  "mediaTeacherModules": [
+    {
+      "module": 1,
+      "title": "Informieren",
+      "sourcePage": 2,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, verschiedene Informationsquellen zielführend auszuwählen und zu nutzen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, Suchmaschinen gezielt zur Suche nach Informationen zu nutzen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler die Nutzung unterschiedlicher Suchstrategien."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, auf das Urheberrecht von lizenzierten Inhalten (Texte, Audio-/ Bild-/ Videomaterial) zu achten."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, zu allen Informationen (z. B. Texte, Bilder, Statistiken) eine Quellenangabe zu machen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht Kriterien, um Informationsquellen auf ihre Glaubwürdigkeit hin zu überprüfen und diese anzuwenden."
+        }
+      ]
+    },
+    {
+      "module": 2,
+      "title": "Kommunizieren",
+      "sourcePage": 3,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, Umgangsformen digitaler Interaktion und Kommunikation anzuwenden."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler diskutieren in meinem Unterricht über Chancen und Risiken digitaler Kommunikation."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, zwischen öffentlichen und privaten Daten zu unterscheiden."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "In meinem Unterricht setze ich Plattformen zur digitalen Kooperation ein, auf denen die Schülerinnen und Schüler ihre Dokumente gemeinsam bearbeiten und diese austauschen."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In meinem Unterricht beschreiben die Schülerinnen und Schüler, wie sie digitale Medien im Alltag für sich nutzen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "In meinem Unterricht beschreiben und diskutieren die Schülerinnen und Schüler, wie die Gesellschaft sich durch Medien verändert."
+        },
+        {
+          "sourceNumber": 7,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, bei der Kommunikation auf ausgewählte Aspekte des Urheber- und Persönlichkeitsrechts sowie des Datenschutzes zu achten."
+        }
+      ]
+    },
+    {
+      "module": 3,
+      "title": "Präsentieren",
+      "sourcePage": 4,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, unterschiedliche Möglichkeiten zur Präsentation zu nutzen (z. B. Plakat, Präsentationssoftware)."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht die Vor- und Nachteile unterschiedlicher Möglichkeiten zur Präsentation kennen."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler Kriterien für eine gute Präsentation kennen und anzuwenden."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, passende Elemente (z. B. Text, Bild, Video) für ihre Präsentation auszuwählen."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In meinem Unterricht präsentieren die Schülerinnen und Schüler ihre Arbeitsergebnisse in Form mediengestützter Präsentationen."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, ihren Mitschülerinnen und -schülern kriterienorientiert Rückmeldung zu ihren Präsentationen zu geben und diese auch selbst anzunehmen."
+        },
+        {
+          "sourceNumber": 7,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, das Urheberrecht von lizenzierten Inhalten (Texte, Audio-/ Bild-/ Videomaterial) in ihren Präsentationen zu respektieren."
+        },
+        {
+          "sourceNumber": 8,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, das Persönlichkeitsrecht von anderen in ihren Präsentationen zu respektieren."
+        }
+      ]
+    },
+    {
+      "module": 4,
+      "title": "Produzieren",
+      "sourcePage": 5,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, Hard- und Software zielgerichtet für schulische Aufgaben einzusetzen."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler nutzen in meinem Unterricht Standardsoftware zur Bearbeitung und Produktion von Medien altersangemessen (z. B. Film-, Bild- und Präsentationswerkzeuge)."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, lizenzfreie Bilder, Videos, Grafiken etc. in ihren selbsterstellten Medien zu nutzen."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht kompetent Medienprodukte in Einzel- und in Gruppenarbeit zu erstellen und orientieren sich dabei an vorhandenen Kriterien."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, kriterienorientierte Rückmeldungen zu ihren Produkten zur Verbesserung ihrer Arbeit zu nutzen"
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler, wie sie eigene Produkte unter Berücksichtigung des Urheber- und Persönlichkeitsrechts sowie des Datenschutzes veröffentlichen können."
+        }
+      ]
+    },
+    {
+      "module": 5,
+      "title": "Analysieren",
+      "sourcePage": 6,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, Merkmale, Gemeinsamkeiten und Unterschiede von verschiedenen Medienarten zu beschreiben."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht, passende Medienangebote für sich auszuwählen (z. B. Onlinezeitung, Nutzung von Videotutorials)."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler untersuchen in meinem Unterricht die Gestaltungsmittel und Botschaft von Werbung."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler analysieren in meinem Unterricht, wie verschiedene Medienarten gestaltet werden."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In meinem Unterricht beschreiben die Schülerinnen und Schüler die Wirkung verschiedener Medienarten."
+        },
+        {
+          "sourceNumber": 6,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler benennen die Unterschiede fiktionaler und nicht-fiktionaler Medien in meinem Unterricht."
+        }
+      ]
+    },
+    {
+      "module": 6,
+      "title": "Reflektieren",
+      "sourcePage": 7,
+      "items": [
+        {
+          "sourceNumber": 1,
+          "tier": null,
+          "prompt": "De Schülerinnen und Schüler beschreiben in meinem Unterricht die Bedeutung von Medienangeboten für ihren Alltag (z. B. von Apps, Computerspielen, sozialen Netzwerken)."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": null,
+          "prompt": "In meinem Unterricht diskutieren die Schülerinnen und Schüler Chancen und Risiken des eigenen und fremden Mediengebrauchs."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": null,
+          "prompt": "Die Schülerinnen und Schüler lernen in meinem Unterricht die Beeinflussung durch Medien in ihrem Alltag zu erkennen und zu beschreiben (z. B. Cybermobbing, öffentliche Meinungsbildung)."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": null,
+          "prompt": "In meinem Unterricht reflektieren die Schülerinnen und Schüler den Einfluss von Medien auf ihren Alltag."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": null,
+          "prompt": "In meinem Unterricht lernen die Schülerinnen und Schüler beim eigenen Mediengebrauch zwischen Privatsphäre und Öffentlichkeit zu unterscheiden."
+        }
+      ]
+    }
+  ],
+  "mathOptions": [
+    {
+      "optionKey": "a1",
+      "label": "Trifft überhaupt nicht zu"
+    },
+    {
+      "optionKey": "a2",
+      "label": "Trifft eher nicht zu"
+    },
+    {
+      "optionKey": "a3",
+      "label": "Trifft eher zu"
+    },
+    {
+      "optionKey": "a4",
+      "label": "Trifft voll und ganz zu"
+    },
+    {
+      "optionKey": "cannot_judge",
+      "label": "Kann ich nicht beurteilen"
+    }
+  ],
+  "sinusOptions": [
+    {
+      "optionKey": "c1",
+      "label": "1 — trifft zu"
+    },
+    {
+      "optionKey": "c2",
+      "label": "2"
+    },
+    {
+      "optionKey": "c3",
+      "label": "3"
+    },
+    {
+      "optionKey": "c4",
+      "label": "4 — trifft nicht zu"
+    }
+  ],
+  "sourceLanguage": "de",
+  "optionNotes": "Math cannot_judge is an actual separate response, not zero/missing; SINUS only printed endpoints are verbalized, no fabricated intermediate anchors. All options have no score."
+}

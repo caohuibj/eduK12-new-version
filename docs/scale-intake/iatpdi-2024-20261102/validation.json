@@ -1,0 +1,221 @@
+{
+  "status": "PASS",
+  "baseSha": "826f8e2ee5171acfff644efdd9e8527d41a8238f",
+  "scope": "actual native Form create/add/read, existing tags/code metadata, ordinary combination import and response boundaries",
+  "database": "isolated disposable loopback PostgreSQL16.15 / eduk12_iatpdi_test",
+  "schemaPreparation": "current unchanged Prisma schema db push; not migrations or deployment validation",
+  "nativeForms": [
+    {
+      "key": "iatpdi_2024_m2_assessment7_teacher_self_en",
+      "id": "f93fc461-3343-45c7-a51e-5a80a44dd0a8",
+      "code": "iatpdi_2024_m2_assessment7_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "sourceItemIds": [
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B05",
+        "B06",
+        "B07"
+      ],
+      "answerChecks": 6,
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "iatpdi_2024_m2_content10_teacher_self_en",
+      "id": "594b51ee-7239-43cd-b125-e4d6d950a69f",
+      "code": "iatpdi_2024_m2_content10_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "sourceItemIds": [
+        "B09",
+        "B10",
+        "B11",
+        "B12",
+        "B13",
+        "B14",
+        "B15",
+        "B16",
+        "B17",
+        "B18"
+      ],
+      "answerChecks": 6,
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "iatpdi_2024_m2_process10_teacher_self_en",
+      "id": "5e9ad553-791d-44d8-8b2c-4440974a6207",
+      "code": "iatpdi_2024_m2_process10_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "sourceItemIds": [
+        "B19",
+        "B20",
+        "B21",
+        "B22",
+        "B23",
+        "B24",
+        "B25",
+        "B26",
+        "B27",
+        "B28"
+      ],
+      "answerChecks": 6,
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "iatpdi_2024_m2_product7_teacher_self_en",
+      "id": "67b7066e-8d47-43ca-b7a7-03bc4b368b93",
+      "code": "iatpdi_2024_m2_product7_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-m2",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "sourceItemIds": [
+        "B29",
+        "B30",
+        "B31",
+        "B32",
+        "B33",
+        "B34",
+        "B35"
+      ],
+      "answerChecks": 6,
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "iatpdi_2024_summative_item8_teacher_self_en",
+      "id": "2be28e5f-44a6-4be5-b749-960f7094043e",
+      "code": "iatpdi_2024_summative_item8_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-extra",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "sourceItemIds": [
+        "B08"
+      ],
+      "answerChecks": 6,
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "iatpdi_2024_qualitative_reflection_teacher_self_en",
+      "id": "6c368ee3-278e-4484-8117-7677c7174cc5",
+      "code": "iatpdi_2024_qualitative_reflection_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:iatpdi",
+        "role:teacher_self",
+        "level:k12",
+        "lang:en",
+        "version:2024-extra",
+        "use:reflection",
+        "state:research",
+        "license:ccby4"
+      ],
+      "sourceItemIds": [
+        "discussion_qualitative_prompt"
+      ],
+      "answerChecks": 4,
+      "scoringVersion": null,
+      "reportVersion": null
+    }
+  ],
+  "ordinaryCombination": {
+    "key": "iatpdi_2024_m2_four_groups_teacher_self_en",
+    "id": "fd5e13c6-27b4-4384-bc9e-ef93b1ad7f00",
+    "nativeRevision": 4,
+    "status": "DRAFT",
+    "items": 4,
+    "retainedRows": 34,
+    "excludedB08": true,
+    "tags": [
+      "family:iatpdi",
+      "role:teacher_self",
+      "level:k12",
+      "lang:en",
+      "version:2024-m2",
+      "use:reflection"
+    ],
+    "reportMode": "COLLECTION_ONLY"
+  },
+  "answerChecks": 34,
+  "scoringExecutions": 0,
+  "respondentData": "synthetic fixture only; no actual respondent Attempt/FINAL/token or public delivery",
+  "reportRendering": "NOT_EXECUTED_UNSCORED_FORMS; teacher growth copy is editorial draft",
+  "tagLimitation": "FORM_TEMPLATE tags/code set on existing columns for same owner DRAFT only; current tag editor does not support this kind. Ordinary QUESTIONNAIRE uses existing tag API.",
+  "nativePayloadSha256": "16d248da9e989476cee496578b5eb3393c069f5deed5061a9331baf4cc1f3d00",
+  "sourceTextCheck": "PASS: 35 original Table1 English item texts, frequency anchors from §3.2, original reflection prompt from §5; exact XML text mapping",
+  "nodeVersion": "v24.21.0",
+  "inputSha256": {
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "0dd47cd9be36adf776936d1c561443d78e2fbcbbd3e5a63df91cd5194598a0d0"
+  },
+  "environment": "same lock and Prisma schema as independent TALIS2024 worktree; reused installed node_modules without writing or regenerating it",
+  "unexecuted": [
+    "official dimensional aggregation or factor scoring",
+    "full backend/frontend build or tests",
+    "browser or HTTP route",
+    "production/admin-private dedup",
+    "actual respondent delivery/FINAL",
+    "runtime scored reports"
+  ],
+  "executionBaseSha": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "baseUpdateReuse": "Main advanced with SJT content; recorded Form/combination services, schema and lock inputs match existing execution byte hashes; no native Form path changes or repeated answer checks."
+}
