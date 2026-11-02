@@ -153,8 +153,14 @@ describe('versioned participant report interpretation', () => {
       const metrics = Object.fromEntries(Object.keys(definition.metrics).map(key => [key, 1]))
       const report = project(entry.testType, entry.scoringVersion, metrics, { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 1, scorerVersion: entry.scoringVersion } }, 'research', {}, entry.engineVersion, policy.version)
       expect([...report.headline, ...report.user, ...report.detail].some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
-      expect((report.reading!.professional?.metrics ?? []).some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
-      expect((report.reading!.professional?.withheld ?? []).some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      if (policy.professional) {
+        expect(report.reading?.professional, `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}/${policy.version}`).toBeDefined()
+        expect(report.reading!.professional!.metrics.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+        expect(report.reading!.professional!.withheld.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      } else {
+        // Only the two exact historical R1.1 variants enumerated below lack this block.
+        expect(report.reading?.professional).toBeUndefined()
+      }
     }
     expect(historicalWithoutAudiences.sort()).toEqual(['cogest/1.1.0/1.1.0/1.1.0', 'seriescomplete/1.1.0/1.1.0/1.1.0'])
     expect([...coveredIdentities].sort()).toEqual(listCognitiveRegistryEntries().filter(entry => entry.testType !== 'fake').map(entry => `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`).sort())
