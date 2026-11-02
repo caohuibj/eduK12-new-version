@@ -280,7 +280,7 @@ test('new release consumers retain explicit DB opt-ins and an independent empty 
     const step = steps.find(step => step.startsWith(start));
     assert.ok(step?.includes(report), start);
   }
-  const required = steps.find(step => step.startsWith('hosted critical integration suites must not skip\n'));
+  const required = source('ci-backend-regression').split('      - name: ').find(step => step.startsWith('hosted critical integration suites must not skip\n'));
   for (const suite of [file, 'src/__tests__/cognitive/assignment-publication-race.postgres.integration.test.ts',
     'src/__tests__/assessment-bundle/child-cross-method.postgres.integration.test.ts']) assert.ok(required.includes(suite));
 });
@@ -294,7 +294,7 @@ test('parent authority has draft unit coverage and non-skipping full integration
   assert.ok(release.includes('export MINI_OPERATIONS_TEST_REDIS_URL="$REDIS_URL"'));
   assert.ok(release.includes('src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts'));
   for (const file of ['parentPortal', 'miniprogramParentHttp', 'miniprogramOperationsHttp']) {
-    assert.ok(regression.includes('src/__tests__/integration/' + file + '.postgres.integration.test.ts'));
+    assert.ok(source('ci-backend-regression').includes('src/__tests__/integration/' + file + '.postgres.integration.test.ts'));
   }
 });
 
@@ -514,4 +514,36 @@ test('content source selection checks its reverse reference and leaves unrelated
  });
  assert.deepEqual(report.selected,[root+'/affected/1.0.0']);
  assert.equal(calls.length,1);assert.equal(calls[0].at(-1),root+'/affected/1.0.0');
+});
+
+test('backend regression groups isolate services and retain the complete mandatory report union',()=>{
+  const workflow=source('ci-backend-regression'),groups=job(workflow,'backend-regression');
+  assert.match(groups,/timeout-minutes: 45/);
+  assert.match(groups,/fail-fast: false/);
+  assert.ok(groups.indexOf('uses: actions/setup-node@v4') < groups.indexOf('name: validate disjoint regression report controls'));
+  assert.ok(groups.includes('["fixtures","shard-1","shard-2","shard-3","shard-4"]'));
+  assert.ok(groups.includes('["focused"]'));
+  assert.match(groups,/services:\n      postgres:/);assert.match(groups,/      redis:/);
+  const steps=groups.split('      - name: ');
+  for(const step of steps.slice(1).filter(step=>step.includes("inputs.focus == 'full'"))){
+    if(step.startsWith('preflight explicit')||step.startsWith('full functional regression'))continue;
+    assert.ok(step.includes("matrix.group == 'fixtures'"),step.split('\n')[0]);
+  }
+  const main=steps.find(step=>step.startsWith('full functional regression\n'));
+  assert.ok(main.includes("steps.training-course.outcome == 'success' && steps.teacher-groups.outcome == 'success'"));
+  assert.ok(main.includes("matrix.group != 'fixtures' && steps.regression-data.outcome == 'success'"));
+  assert.ok(main.includes('backend-regression-selection.mjs'));
+  const aggregate=job(workflow,'backend-regression-reports');
+  assert.match(aggregate,/needs: backend-regression/);assert.match(aggregate,/if: always\(\) && inputs.focus == 'full'/);
+  assert.match(aggregate,/pattern: backend-regression-group-\*-run-\$\{\{ github.run_id \}\}-attempt-\*/);
+  assert.ok(aggregate.includes('REGRESSION_GROUP_RESULT: ${{ needs.backend-regression.result }}'));
+  assert.ok(aggregate.includes('--collect'));
+  assert.ok(aggregate.includes('name: backend-vitest-report-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}'));
+  assert.ok(groups.includes("continue-on-error: ${{ matrix.group == 'focused' }}"));
+  assert.ok(groups.includes("if-no-files-found: ${{ matrix.group == 'fixtures' && 'error' || 'ignore' }}"));
+  assert.ok(groups.includes("if: matrix.group == 'fixtures' || matrix.group == 'focused'"));
+  assert.doesNotMatch(aggregate,/\n\s+(run-id|repository|github-token):/);
+  assert.ok(aggregate.includes('hosted critical integration suites must not skip'));
+  assert.ok(aggregate.includes('assert-release-test-report.mjs'));
+  assert.doesNotMatch(aggregate,/continue-on-error:/);
 });
