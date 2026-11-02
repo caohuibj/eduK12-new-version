@@ -125,15 +125,16 @@
         "当前仅来源元数据，不可作答、不计分、不生成学生或教师结果。",
         "官方学校群体百分比不等于学生能力分；无跨工具总分、常模或教师排名。",
         "2026为新基线，不套用旧年份计分、中文效度或纵向比较。",
-        "学生版与教师群体版示例见docs/scale-intake/nyc-school-survey-2026-20261102/report-examples.md；仅内容草稿，不改变接收者授权。"
+        "学生版与教师群体版示例见docs/scale-intake/nyc-school-survey-2026-20261102/report-examples.md；仅内容草稿，不改变接收者授权。",
+        "补充核查：完整原卷61题及13子项已作私有无分原生Form验证，公开目录仍不可施测；见resolution-20261102.md。"
       ],
       "disclaimer": "许可、题号和独立施测证据按实际状态分别处理；目录登记不等于公共库授权或数据库安装。"
     },
     "blockers": [
       "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
-      "EXECUTABLE_CONTENT_NOT_PREPARED",
       "STANDALONE_ADMINISTRATION_VALIDITY_NOT_ESTABLISHED",
-      "OFFICIAL_QUESTION_NUMBER_CONFLICT"
+      "OFFICIAL_QUESTION_NUMBER_CONFLICT",
+      "PUBLIC_CATALOG_HAS_NO_EXECUTABLE_SCALE_PRIVATE_UNSCORED_FORM_VERIFIED"
     ]
   }
 }

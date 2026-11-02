@@ -1,0 +1,124 @@
+{
+  "status": "PASS",
+  "sources": [
+    {
+      "instrumentKey": "nyc_school_survey_2026_academic_press_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_course_clarity_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_cultural_awareness_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_guidance_ms_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_guidance_hs_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_inclusive_environment_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_personal_attention_support_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_preventing_bullying_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_safety_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_social_emotional_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_student_teacher_trust_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_facilities_services_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "nyc_school_survey_2026_additional_experiences_student_en_us",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    }
+  ],
+  "consumer": "Existing #556 corrected static reader from25d812d main checkout; source callback reads this PR worktree, no parser changes on PR554.",
+  "formalCI": "NOT_RUN"
+}

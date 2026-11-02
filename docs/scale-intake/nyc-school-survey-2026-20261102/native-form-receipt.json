@@ -1,0 +1,372 @@
+{
+  "status": "PASS",
+  "sourceVariant": "Official paper sample2025–26 /2026, NOT report workbook numbering",
+  "privateForms": [
+    {
+      "key": "nyc_school_survey_2026_complete_student_en_us_form",
+      "templateId": "55c2e455-51fd-4607-98c0-0a9b266c8bef",
+      "questionnaireId": "943cae22-505c-4231-9678-4f87f8d55067",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 61,
+      "definitionHash": "7b6d13717276c6444823f9f2e21f1666fffaee1819c8047155012de3b80c4791",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_academic_press_student_en_us_form",
+      "templateId": "372994f5-9a0e-434c-aeff-a0d03f4108ec",
+      "questionnaireId": "1b61101f-d557-4f4e-b3fb-7cedae2132f0",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 4,
+      "definitionHash": "85ea7148741528f724df53d4d8b1fd3f4b3d7f17845ba31d5df8fb91909d256c",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_course_clarity_student_en_us_form",
+      "templateId": "b8e110f8-ee18-4cd3-8c3f-ddf81d1fe777",
+      "questionnaireId": "7ea2b560-5ae9-4d3a-8851-9fe155b79dbd",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 4,
+      "definitionHash": "d3167208e98fb664548cbc0f6ea9ad020fb99dc7b54e619b87d85606d62deed1",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_cultural_awareness_student_en_us_form",
+      "templateId": "6752821d-1917-45b4-b932-fecff1049457",
+      "questionnaireId": "c4dcd16f-eff3-4548-b24e-770fa377581e",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 5,
+      "definitionHash": "bfc87a89dc63ff4c6ab8c1efee316946dcbc93dca70a064318bd0151d3c63e75",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_guidance_ms_student_en_us_form",
+      "templateId": "47b0c8d2-9572-4500-8113-1a75955e0890",
+      "questionnaireId": "b68894a6-d867-43eb-ab8d-81e6750408f8",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 3,
+      "definitionHash": "627e10068fc9a3da341e8c2782bf58eecc3dd3d9816b011cd0bb8597db786ca7",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_guidance_hs_student_en_us_form",
+      "templateId": "7ffa350c-d973-4d3a-9869-d739bce2daca",
+      "questionnaireId": "b1af67f1-75d9-47e6-b49b-6eabfdcaee81",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 5,
+      "definitionHash": "9c5f17e480174101233234946a718d76cb93e4f1add1c21f9c50d46f78f90c41",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_inclusive_environment_student_en_us_form",
+      "templateId": "366a0266-d107-4704-97b5-e67edc99ca7b",
+      "questionnaireId": "356329a8-feb6-404d-84e9-b644cd4abad5",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 5,
+      "definitionHash": "a5e56eaaf836f90c736aff24f2fca6bef47dfac07910156f199ded8c34c61324",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_personal_attention_support_student_en_us_form",
+      "templateId": "40de2e89-b745-4ffb-ac37-fc74e0067dd1",
+      "questionnaireId": "36cf73ad-e068-45f8-88b1-bd40825e204b",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 4,
+      "definitionHash": "6e41a151adfad28cb608acac8911d09065a4d360239b8e51c665bd9ee20d34d0",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_preventing_bullying_student_en_us_form",
+      "templateId": "beea3284-2a00-445c-96ff-5999308abed4",
+      "questionnaireId": "fe121b6d-d38d-4c59-8b6d-31fefa2a5d1b",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 12,
+      "definitionHash": "9a9ec3c15da2ce97c892d924a56e64f0e26084547609b22580e695c68f689060",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_safety_student_en_us_form",
+      "templateId": "b35a1056-642f-40b3-8f37-23dafdeb2ffc",
+      "questionnaireId": "5c5f764a-8727-4e72-8a68-973d7953a3c4",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 7,
+      "definitionHash": "e1a8afd140e18a28953168982d26c28f3fad63fc322a24e028866908345a4aae",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_social_emotional_student_en_us_form",
+      "templateId": "afa4834d-5943-4430-8107-7c3013c12658",
+      "questionnaireId": "d76f8854-4a59-4453-b002-b0b65017077d",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 4,
+      "definitionHash": "691793f026de57a32927530f05d464712c14f96aec8122fb7b25bca09183eada",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_student_teacher_trust_student_en_us_form",
+      "templateId": "efaf179a-bab1-4523-8cdd-9835cfbc54b2",
+      "questionnaireId": "34727846-6d20-4e49-90db-a05cd0cc1afb",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 5,
+      "definitionHash": "8a071f67fa92a597d58bd92317cb868eff7ff593067bf4ff00af3bd3ec4b6ac0",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_facilities_services_student_en_us_form",
+      "templateId": "fae88b7e-1457-4859-9a69-25379d96bdc2",
+      "questionnaireId": "faa313b8-32c4-4a9c-b057-ad6dd9821e67",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 2,
+      "definitionHash": "996059a8fb55048a2a9555a1000ad0c126eba8ef04c60cadc4bd2d2f053225f6",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_additional_experiences_student_en_us_form",
+      "templateId": "ccf9977a-b1b3-4198-ac31-69d6185e9cd5",
+      "questionnaireId": "4140f5b1-59cb-4720-b6c8-16e4e9597159",
+      "status": "DRAFT",
+      "questionnaireStatus": "DRAFT",
+      "visibility": "HIDDEN",
+      "fields": 3,
+      "definitionHash": "f0c5add33a800ab959b031442e82f78fcc116753f80d4a4ac8c889feac5ab364",
+      "contentVersion": "1.0.0",
+      "scoring": null,
+      "report": null
+    }
+  ],
+  "counts": {
+    "templates": 14,
+    "questionnaires": 14,
+    "masterFields": 61,
+    "subsetFields": 63,
+    "totalPersistedFormFields": 124,
+    "scaleLinks": 0,
+    "scales": 0,
+    "deploymentPolicies": 0,
+    "grants": 0
+  },
+  "nativeChecks": [
+    {
+      "key": "nyc_school_survey_2026_complete_student_en_us_form",
+      "fields": 61,
+      "pages": 7,
+      "definitionHash": "7b6d13717276c6444823f9f2e21f1666fffaee1819c8047155012de3b80c4791",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_academic_press_student_en_us_form",
+      "fields": 4,
+      "pages": 1,
+      "definitionHash": "85ea7148741528f724df53d4d8b1fd3f4b3d7f17845ba31d5df8fb91909d256c",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_course_clarity_student_en_us_form",
+      "fields": 4,
+      "pages": 1,
+      "definitionHash": "d3167208e98fb664548cbc0f6ea9ad020fb99dc7b54e619b87d85606d62deed1",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_cultural_awareness_student_en_us_form",
+      "fields": 5,
+      "pages": 1,
+      "definitionHash": "bfc87a89dc63ff4c6ab8c1efee316946dcbc93dca70a064318bd0151d3c63e75",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_guidance_ms_student_en_us_form",
+      "fields": 3,
+      "pages": 1,
+      "definitionHash": "627e10068fc9a3da341e8c2782bf58eecc3dd3d9816b011cd0bb8597db786ca7",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_guidance_hs_student_en_us_form",
+      "fields": 5,
+      "pages": 1,
+      "definitionHash": "9c5f17e480174101233234946a718d76cb93e4f1add1c21f9c50d46f78f90c41",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_inclusive_environment_student_en_us_form",
+      "fields": 5,
+      "pages": 1,
+      "definitionHash": "a5e56eaaf836f90c736aff24f2fca6bef47dfac07910156f199ded8c34c61324",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_personal_attention_support_student_en_us_form",
+      "fields": 4,
+      "pages": 1,
+      "definitionHash": "6e41a151adfad28cb608acac8911d09065a4d360239b8e51c665bd9ee20d34d0",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_preventing_bullying_student_en_us_form",
+      "fields": 12,
+      "pages": 1,
+      "definitionHash": "9a9ec3c15da2ce97c892d924a56e64f0e26084547609b22580e695c68f689060",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_safety_student_en_us_form",
+      "fields": 7,
+      "pages": 1,
+      "definitionHash": "e1a8afd140e18a28953168982d26c28f3fad63fc322a24e028866908345a4aae",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_social_emotional_student_en_us_form",
+      "fields": 4,
+      "pages": 1,
+      "definitionHash": "691793f026de57a32927530f05d464712c14f96aec8122fb7b25bca09183eada",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_student_teacher_trust_student_en_us_form",
+      "fields": 5,
+      "pages": 1,
+      "definitionHash": "8a071f67fa92a597d58bd92317cb868eff7ff593067bf4ff00af3bd3ec4b6ac0",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_facilities_services_student_en_us_form",
+      "fields": 2,
+      "pages": 1,
+      "definitionHash": "996059a8fb55048a2a9555a1000ad0c126eba8ef04c60cadc4bd2d2f053225f6",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    },
+    {
+      "key": "nyc_school_survey_2026_additional_experiences_student_en_us_form",
+      "fields": 3,
+      "pages": 1,
+      "definitionHash": "f0c5add33a800ab959b031442e82f78fcc116753f80d4a4ac8c889feac5ab364",
+      "status": "PASS",
+      "scoring": null,
+      "report": null
+    }
+  ],
+  "missingAndNA": "All optional; omitted, substantive No, Not sure and selected N/A retained separately; no individual favorability or scores",
+  "tagBoundary": "Native Form template has no tags column. Existing ordinary Questionnaire wrappers carry shared family tag; names and private intake manifest identify all siblings.",
+  "sourceLayout": "7-page complete form retains paper sequence. 13 subset forms are optional source layouts, no independent validity claim; never concatenate both Guidance variants or count Q18/Q29 twice in master.",
+  "instructions": "Paper source instructions preserved privately. Native synthetic draft uses limited source frequency/time context plus accurate research disclaimer; no copied official anonymity promise, logos or graphics.",
+  "consumer": "Actual validateFormDefinition, normalizeFormAnswers, existing SurveyToolTemplate and Questionnaire ORM persistence; no HTTP/admin UI/real report disclosure/E2E claim",
+  "reusedClient": "Prisma5.22 generated client reused after byte-identical schema comparison; original shared client unchanged",
+  "rights": "Private synthetic content feasibility only; administration, distribution, commercial and translation permissions not inferred from accessibility",
+  "database": "Owned ephemeral PostgreSQL16.15; independent SQL readback confirmed14 templates/14 questionnaires/124 fields/20 sections, scales/deployments/grants0; task container removed and tmpfs destroyed",
+  "sourceHashes": {
+    "studentPDF": "daa73b2fb9329b26d0920b925e24a727a9a36d44a9997fd8aaa430bf0b64c645",
+    "reportWorkbook": "3185e1e7e4ba9c0de4fd7b7c9e91b7c11f15f6f8ecaac14cd199a582efdadf8e"
+  },
+  "consumerFingerprints": {
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591"
+  },
+  "formalCI": "NOT_RUN",
+  "fixtureFailureHistory": "Initial official Excel check assumed tabs had identical row order and its identity assertion failed before conclusions; fixed by joining DBN keys. New native Form check/import passed first execution. Old source-metadata checker failure retained in original verification.md.",
+  "privateSourceHashes": {
+    "nyc_school_survey_2026_complete_student_en_us_form": "7b6d13717276c6444823f9f2e21f1666fffaee1819c8047155012de3b80c4791",
+    "nyc_school_survey_2026_academic_press_student_en_us_form": "85ea7148741528f724df53d4d8b1fd3f4b3d7f17845ba31d5df8fb91909d256c",
+    "nyc_school_survey_2026_course_clarity_student_en_us_form": "d3167208e98fb664548cbc0f6ea9ad020fb99dc7b54e619b87d85606d62deed1",
+    "nyc_school_survey_2026_cultural_awareness_student_en_us_form": "bfc87a89dc63ff4c6ab8c1efee316946dcbc93dca70a064318bd0151d3c63e75",
+    "nyc_school_survey_2026_guidance_ms_student_en_us_form": "627e10068fc9a3da341e8c2782bf58eecc3dd3d9816b011cd0bb8597db786ca7",
+    "nyc_school_survey_2026_guidance_hs_student_en_us_form": "9c5f17e480174101233234946a718d76cb93e4f1add1c21f9c50d46f78f90c41",
+    "nyc_school_survey_2026_inclusive_environment_student_en_us_form": "a5e56eaaf836f90c736aff24f2fca6bef47dfac07910156f199ded8c34c61324",
+    "nyc_school_survey_2026_personal_attention_support_student_en_us_form": "6e41a151adfad28cb608acac8911d09065a4d360239b8e51c665bd9ee20d34d0",
+    "nyc_school_survey_2026_preventing_bullying_student_en_us_form": "9a9ec3c15da2ce97c892d924a56e64f0e26084547609b22580e695c68f689060",
+    "nyc_school_survey_2026_safety_student_en_us_form": "e1a8afd140e18a28953168982d26c28f3fad63fc322a24e028866908345a4aae",
+    "nyc_school_survey_2026_social_emotional_student_en_us_form": "691793f026de57a32927530f05d464712c14f96aec8122fb7b25bca09183eada",
+    "nyc_school_survey_2026_student_teacher_trust_student_en_us_form": "8a071f67fa92a597d58bd92317cb868eff7ff593067bf4ff00af3bd3ec4b6ac0",
+    "nyc_school_survey_2026_facilities_services_student_en_us_form": "996059a8fb55048a2a9555a1000ad0c126eba8ef04c60cadc4bd2d2f053225f6",
+    "nyc_school_survey_2026_additional_experiences_student_en_us_form": "f0c5add33a800ab959b031442e82f78fcc116753f80d4a4ac8c889feac5ab364"
+  },
+  "publicBoundaryAudit": {
+    "itemsCompared": 61,
+    "originalPromptMatches": 0,
+    "publicNativeExecutableDefinitions": 0,
+    "originalPDFIncluded": false,
+    "dataWorkbookIncluded": false,
+    "privateLogsIncluded": false
+  },
+  "metadataCheckSetupFailure": "The current #556 reader lives in another checkout whose dependency symlink had already been removed; initial module resolution failed before source checks. Final invocation used existing shared node_modules through command-scoped NODE_PATH and13 source checks passed; no package changes."
+}

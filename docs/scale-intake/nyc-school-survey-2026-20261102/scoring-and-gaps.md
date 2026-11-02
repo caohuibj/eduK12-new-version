@@ -1,4 +1,6 @@
-# 2026计分核对与未解决项
+# 2026首轮计分核对与历史未解决项
+
+更新：以下是首轮记录。三选项规则已用官方数据表补齐，五处题号已建立跨载体映射；详见[2026-11-02补充核查](resolution-20261102.md)。所有题已完成私有原生无分Form验证；依然没有官方群体计分P版本。
 
 本文件是来源分析，**没有可执行P版本**。官方[2026技术指南](https://infohub.nyced.org/docs/default-source/default-document-library/2026-framework-and-school-survey-scoring-technical-guide.pdf)印刷p3、pp23–25为本年规则依据，Appendix A为题集定位；不得套旧年份。官方[学生题本](https://infohub.nyced.org/docs/default-source/default-document-library/2026-nyc-school-survey-student-survey.pdf)确定题号及显示选项，原序不改。
 

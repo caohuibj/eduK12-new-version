@@ -42,7 +42,7 @@
   "rights": {
     "status": "REDISTRIBUTION_UNCONFIRMED",
     "policyUrl": "https://infohub.nyced.org/privacy-policy",
-    "notes": "网站声明内容受版权保护；未发现题项公开再分发授权。无联系、签约、接受需签署条款或上传原PDF。"
+    "notes": "Copyright statement applies to site content; explicit permission sentence concerns images/graphics. No blanket prohibition or open text license inferred. Legal public access and limited private synthetic processing kept distinct from administration/redistribution/commercial/translation."
   },
   "children": [
     {
@@ -73,7 +73,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_academic_press_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_course_clarity_student_en_us",
@@ -102,7 +106,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_course_clarity_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_cultural_awareness_student_en_us",
@@ -132,7 +140,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_cultural_awareness_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_guidance_ms_student_en_us",
@@ -160,7 +172,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_guidance_ms_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_guidance_hs_student_en_us",
@@ -190,7 +206,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_guidance_hs_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_inclusive_environment_student_en_us",
@@ -222,7 +242,12 @@
       "status": "CATALOG_ONLY",
       "sourceBlockers": [
         "OFFICIAL_QUESTION_NUMBER_CONFLICT",
-        "Q17_TOPIC_SUBGROUP_RESTRICTION",
+        "Q17_TOPIC_SUBGROUP_RESTRICTION"
+      ],
+      "nativeFormKey": "nyc_school_survey_2026_inclusive_environment_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": [
         "THREE_OPTION_FAVORABILITY_UNRESOLVED"
       ]
     },
@@ -254,7 +279,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_personal_attention_support_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_preventing_bullying_student_en_us",
@@ -291,7 +320,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_preventing_bullying_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_safety_student_en_us",
@@ -325,7 +358,11 @@
       "status": "CATALOG_ONLY",
       "sourceBlockers": [
         "OFFICIAL_QUESTION_NUMBER_CONFLICT"
-      ]
+      ],
+      "nativeFormKey": "nyc_school_survey_2026_safety_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_social_emotional_student_en_us",
@@ -354,7 +391,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": [
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_social_emotional_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": [
         "THREE_OPTION_FAVORABILITY_UNRESOLVED"
       ]
     },
@@ -386,7 +427,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": []
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_student_teacher_trust_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     },
     {
       "instrumentKey": "nyc_school_survey_2026_facilities_services_student_en_us",
@@ -413,7 +458,11 @@
         "report": null
       },
       "status": "CATALOG_ONLY",
-      "sourceBlockers": [
+      "sourceBlockers": [],
+      "nativeFormKey": "nyc_school_survey_2026_facilities_services_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": [
         "THREE_OPTION_FAVORABILITY_UNRESOLVED"
       ]
     },
@@ -445,11 +494,15 @@
       "status": "CATALOG_ONLY",
       "sourceBlockers": [
         "OFFICIAL_QUESTION_NUMBER_CONFLICT"
-      ]
+      ],
+      "nativeFormKey": "nyc_school_survey_2026_additional_experiences_student_en_us_form",
+      "nativeFormContentVersion": "1.0.0",
+      "nativeFormStatus": "PRIVATE_DRAFT_UNSCORED_VERIFIED",
+      "resolvedSourceBlockers": []
     }
   ],
   "database": {
-    "development": "NOT_IMPORTED_CATALOG_ONLY",
+    "development": "EPHEMERAL_PRIVATE_NATIVE_FORMS_VERIFIED_AND_REMOVED_NO_PERSISTENT_LIBRARY_INSTALL",
     "production": "NOT_QUERIED_NOT_WRITTEN"
   },
   "combinationPlan": {
@@ -486,5 +539,28 @@
     "itemOrder": "原题序；Q18/Q29仅回答一次，不把官方主题排列作为新施测顺序。",
     "totalScore": null,
     "fallback": "合法取得内容后，缺原生可表达的官方群体算法或冲突未解决时，只做既有无计分Form，不开发群体计分引擎。"
+  },
+  "followup20261102": {
+    "scope": "Existing PR554 resolution only",
+    "completeItems": "61 from official 2026 paper sample; proof/demo markings retained as source provenance, no online-admin journey claim",
+    "nativeFormContentVersion": "1.0.0",
+    "scoringVersion": null,
+    "reportVersion": null,
+    "privateNativeForms": 14,
+    "masterFields": 61,
+    "subsetFields": 63,
+    "familyTag": "family:nyc_school_survey",
+    "runtimeStatus": "DRAFT/HIDDEN_EPHEMERAL_VERIFIED_NOT_PERSISTENTLY_INSTALLED",
+    "formTemplateTagSupport": "No free tags column; existing Questionnaire.tags wrappers carry mother tag; source manifest/name prefix retain identity",
+    "threeChoiceGap": "Resolved against official2026 raw/positive-negative counts; Q14 differs from Q35/Q38",
+    "numberingGap": "Paper numbering pinned and crosswalk explicit, not an official erratum",
+    "remainingForOfficialMetrics": [
+      "zero-denominator/topic handling",
+      "authorized IEP/ELL restriction for Q17",
+      "confirmation if requesting officially equivalent scoring across sample/report variants"
+    ],
+    "remainingForDistribution": [
+      "Rights scope for real administration, public item redistribution, commercial use and translations remains unconfirmed, not a blanket ban"
+    ]
   }
 }

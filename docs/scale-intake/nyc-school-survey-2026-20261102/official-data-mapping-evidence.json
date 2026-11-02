@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "officialURL": "https://infohub.nyced.org/docs/default-source/default-document-library/2026-public-data-file-student.xlsx",
+  "sha256": "3185e1e7e4ba9c0de4fd7b7c9e91b7c11f15f6f8ecaac14cd199a582efdadf8e",
+  "bytes": 22490269,
+  "method": "Join school-level official workbook tabs by DBN; never assume row positions align. Count matches where source No/Not sure/Yes counts are numeric and Not sure/Yes >0. Header grouping and numeric counts both checked. No real respondent data used.",
+  "threeChoice": {
+    "Q14": {
+      "eligibleRecords": 1054,
+      "positiveEqualsYes": 1054,
+      "negativeEqualsNo": 0,
+      "negativeEqualsNoPlusNotSure": 1054
+    },
+    "Q35": {
+      "eligibleRecords": 1036,
+      "positiveEqualsYes": 1036,
+      "negativeEqualsNo": 1036,
+      "negativeEqualsNoPlusNotSure": 0
+    },
+    "Q38": {
+      "eligibleRecords": 1039,
+      "positiveEqualsYes": 1039,
+      "negativeEqualsNo": 1039,
+      "negativeEqualsNoPlusNotSure": 0
+    }
+  },
+  "conclusions": {
+    "paperQ14": "Yes favorable; No and Not sure unfavorable; denominator includes Not sure.",
+    "paperQ35": "Yes favorable; No unfavorable; Not sure excluded.",
+    "paperQ38": "Yes favorable; No unfavorable; Not sure excluded."
+  },
+  "paperToGuideAndWorkbook": {
+    "57": 58,
+    "58": 59,
+    "59": 60,
+    "60": 61,
+    "61": 57
+  },
+  "notClaimed": "No source document was silently corrected; table is a project crosswalk between paper-sample and report variants. No individual or official group score engine implemented."
+}

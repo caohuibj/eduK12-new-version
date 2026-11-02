@@ -1,3 +1,5 @@
+补充说明：本文件保留首轮检查及未执行状态。新增私有14个无分Form的实际定向检查、隔离导入与回读见[native-form-receipt.json](native-form-receipt.json)及[resolution-20261102.md](resolution-20261102.md)；不把首轮NOT_RUN改写成当时已通过。
+
 # 验证、候选触发边界与续办
 
 修改范围固定为13个NYC 2026学生版原生目录声明及JSON、现有生成索引、此目录的来源/拆分/原创报告文档。新增内容不会生成executable、运行计分、报告版本、授权或数据库行；不修改旧冻结版本、schema、引擎、依赖、CI、权限或普通组合运行器。
