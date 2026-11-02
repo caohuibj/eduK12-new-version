@@ -121,9 +121,10 @@ function isAncestor(source,target){
   mustSha(source);mustSha(target);
   try{execFileSync('git',['merge-base','--is-ancestor',source,target]);return true;}catch{return false;}
 }
-function knownJob(jobs,name){
-  const a=jobs.filter(j=>j.name===name&&j.status==='completed'&&j.conclusion==='success');
-  assert.equal(a.length,1,'Successful official job missing or ambiguous: '+name);
+export function knownJob(jobs,name){
+  const official='backend regression (isolated job database) / '+name;
+  const a=jobs.filter(j=>j.name===official&&j.status==='completed'&&j.conclusion==='success');
+  assert.equal(a.length,1,'Successful official job missing or ambiguous: '+official);
   return a[0];
 }
 
@@ -153,6 +154,11 @@ export async function verifiedBackendRegression({token,repo,pr,branch,prHead,bas
       assert.equal(artifact.workflow_run?.id,run.id);
       const zip=await download(artifact.id,artifact.digest,token,repo);
       const testedSha=inventoriesFromZip(zip,run.id,run.run_attempt);
+      for(const j of [summary,...regressionGroups.map(group=>
+        knownJob(jobs,'backend regression ('+group+', isolated job database)'))]){
+        if(j.run_attempt!==undefined&&j.run_attempt!==null)
+          assert.equal(j.run_attempt,run.run_attempt,'Regressed job attempt mismatch');
+      }
       fetchHistoricalCommit(testedSha);
       const sourceTree=treeFor(testedSha);
       if(closureDigest('backend-regression',sourceTree)!==currentFingerprint)continue;

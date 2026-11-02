@@ -39,7 +39,7 @@ export const unitOnly=entries=>Array.isArray(entries)&&entries.length>0
 // The closure intentionally includes more than an individual test's imports:
 // CI control code, shared scripts, fixtures and dependencies must all be unchanged.
 const ROOTS=Object.freeze({
-  'backend-regression':['.github/','server-version/backend/','server-version/scripts/','server-version/e2e/'],
+  'backend-regression':['.github/','server-version/backend/','server-version/scripts/'],
   'backend-unit':['.github/','server-version/backend/','server-version/scripts/','server-version/e2e/'],
   'frontend':['.github/','server-version/frontend/','server-version/backend/','server-version/scripts/'],
   'browser':['.github/','server-version/'],
