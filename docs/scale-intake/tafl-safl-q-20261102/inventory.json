@@ -1,0 +1,209 @@
+{
+  "recordType": "research_intake_not_runtime_payload",
+  "motherTool": "TAFL-Q / SAFL-Q",
+  "base": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "chapterSha256": "b913dae55c0b2a1599b4f0984c683cca642785aadaf1900c69d835a0eb66aa23",
+  "source": "https://scholarlypublications.universiteitleiden.nl/handle/1887/19934",
+  "children": [
+    {
+      "key": "tafl_safl_q_teacher_monitoring_en",
+      "version": "1.0.0",
+      "role": "teacher",
+      "language": "en",
+      "subscale": "monitoring",
+      "itemCount": 16,
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeVersions": {
+        "content": "1.0.0",
+        "parameters": "1.0.0",
+        "report": "1.0.0"
+      },
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:en",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:monitoring"
+      ]
+    },
+    {
+      "key": "tafl_safl_q_teacher_scaffolding_en",
+      "version": "1.0.0",
+      "role": "teacher",
+      "language": "en",
+      "subscale": "scaffolding",
+      "itemCount": 12,
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeVersions": {
+        "content": "1.0.0",
+        "parameters": "1.0.0",
+        "report": "1.0.0"
+      },
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:en",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ]
+    },
+    {
+      "key": "tafl_safl_q_teacher_monitoring_nl",
+      "version": "1.0.0",
+      "role": "teacher",
+      "language": "nl",
+      "subscale": "monitoring",
+      "itemCount": 16,
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeVersions": {
+        "content": "1.0.0",
+        "parameters": "1.0.0",
+        "report": "1.0.0"
+      },
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:monitoring"
+      ]
+    },
+    {
+      "key": "tafl_safl_q_teacher_scaffolding_nl",
+      "version": "1.0.0",
+      "role": "teacher",
+      "language": "nl",
+      "subscale": "scaffolding",
+      "itemCount": 12,
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeVersions": {
+        "content": "1.0.0",
+        "parameters": "1.0.0",
+        "report": "1.0.0"
+      },
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ]
+    },
+    {
+      "key": "tafl_safl_q_student_monitoring_nl",
+      "version": "1.0.0",
+      "role": "student",
+      "language": "nl",
+      "subscale": "monitoring",
+      "itemCount": 16,
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeVersions": {
+        "content": "1.0.0",
+        "parameters": "1.0.0",
+        "report": "1.0.0"
+      },
+      "tags": [
+        "family:tafl_safl_q",
+        "role:student",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:monitoring"
+      ]
+    },
+    {
+      "key": "tafl_safl_q_student_scaffolding_nl",
+      "version": "1.0.0",
+      "role": "student",
+      "language": "nl",
+      "subscale": "scaffolding",
+      "itemCount": 12,
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeVersions": {
+        "content": "1.0.0",
+        "parameters": "1.0.0",
+        "report": "1.0.0"
+      },
+      "tags": [
+        "family:tafl_safl_q",
+        "role:student",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ]
+    }
+  ],
+  "missingVersions": [
+    "SAFL-Q English original item text not obtained",
+    "No validated Chinese form obtained"
+  ],
+  "forms": [],
+  "formsReason": "Original annexes contain scale items only. No original unscored form identified. Missing platform reuse scope is not bypassed by making a Form.",
+  "combinations": [
+    {
+      "role": "teacher",
+      "language": "en",
+      "itemCount": 28,
+      "subscales": [
+        "monitoring",
+        "scaffolding"
+      ],
+      "status": "PROPOSED_NOT_CREATED",
+      "totalScore": false
+    },
+    {
+      "role": "teacher",
+      "language": "nl",
+      "itemCount": 28,
+      "subscales": [
+        "monitoring",
+        "scaffolding"
+      ],
+      "status": "PROPOSED_NOT_CREATED",
+      "totalScore": false
+    },
+    {
+      "role": "student",
+      "language": "nl",
+      "itemCount": 28,
+      "subscales": [
+        "monitoring",
+        "scaffolding"
+      ],
+      "status": "PROPOSED_NOT_CREATED",
+      "totalScore": false
+    }
+  ],
+  "rights": {
+    "metadata": "Repository policy permits metadata reuse with original-record link.",
+    "fulltext": "Unchanged full-item research/educational/non-profit copies with attribution; not a commercial-sale grant.",
+    "digitalQuestionnaireExtraction": "UNCONFIRMED",
+    "publicItemTextIncluded": false,
+    "termsSigned": false
+  },
+  "publication": "New teacher-batch approval received. Public item text remains excluded because extracted questionnaire reuse scope is unconfirmed; Draft and bounded CI prepared.",
+  "productionDeduplication": "NOT_DONE"
+}

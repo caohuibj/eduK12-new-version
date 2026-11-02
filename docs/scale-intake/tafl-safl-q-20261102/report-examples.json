@@ -1,0 +1,73 @@
+{
+  "status": "EDITORIAL_EXAMPLES_NOT_RUNTIME_REPORTS_OR_CHINESE_SCALE",
+  "reportVersion": null,
+  "visibility": "Existing recipient authorization, confidentiality, anonymity and minimum group size rules apply; no new access.",
+  "examples": [
+    {
+      "audience": "teacher",
+      "scenario": "normal",
+      "scenarioIsThreshold": false,
+      "title": "保留一个有效的反馈做法",
+      "body": "您认为自己已经提供了一些学习监测或支架支持。这是实践感知，不是教学质量评级，也不代表学生一定有相同体验。",
+      "microActions": [
+        "选一次具体任务，看看学生根据反馈实际改了什么；保留其中有效的一步。"
+      ],
+      "score": null
+    },
+    {
+      "audience": "teacher",
+      "scenario": "difficult",
+      "scenarioIsThreshold": false,
+      "title": "先了解一个互动卡点",
+      "body": "如果您觉得实践推进困难，不必把结果当成能力不足。课时、任务设计、班级规模和资源支持都可能影响实施；这份自评不能判断原因。",
+      "microActions": [
+        "选一个可调整环节，如把评价要求变成一个可见示例，并请学生说明下一步准备怎么做。"
+      ],
+      "score": null
+    },
+    {
+      "audience": "teacher",
+      "scenario": "insufficient",
+      "scenarioIsThreshold": false,
+      "title": "本次信息还不足",
+      "body": "缺失作答或版本不适用时，暂不生成可靠分数和解释。不要把缺失当0，也不据此评价教师。",
+      "microActions": [
+        "可以先记录一个希望了解的课堂问题，补齐需要的信息后再讨论。"
+      ],
+      "score": null
+    },
+    {
+      "audience": "student",
+      "scenario": "normal",
+      "scenarioIsThreshold": false,
+      "title": "看见对学习有帮助的支持",
+      "body": "你的回答描述了你感受到的学习经历。有些帮助对你有用，也不意味着每一次反馈都很清楚。这不是给你或老师评好坏。",
+      "microActions": [
+        "找出一条最能帮你修改作业的反馈，想想你是怎样用它的。"
+      ],
+      "score": null
+    },
+    {
+      "audience": "student",
+      "scenario": "difficult",
+      "scenarioIsThreshold": false,
+      "title": "不清楚下一步时，可以寻求帮助",
+      "body": "如果你常常不明白反馈或学习要求，这不说明你能力差，也不意味着问题都该由你解决。你的经历值得被听见。",
+      "microActions": [
+        "如果你愿意并觉得安全，可以问“能给我看一个例子吗”；若事情让你不舒服，可以请可信的成人陪你商量。"
+      ],
+      "score": null
+    },
+    {
+      "audience": "student",
+      "scenario": "insufficient",
+      "scenarioIsThreshold": false,
+      "title": "现在先不作判断",
+      "body": "这次的信息还不足以给出可靠结果。没有分数，不表示你的感受不重要，也不影响你寻求帮助。",
+      "microActions": [
+        "有学习上的具体困难时，可以把问题告诉一位信任的老师、家长或学校支持人员。"
+      ],
+      "score": null
+    }
+  ]
+}

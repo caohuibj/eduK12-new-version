@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tafl_safl_q_teacher_scaffolding_nl",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TAFL-Q／SAFL-Q｜学习支架｜教师自评｜荷兰语原版（2012附录）",
+      "abbreviation": "TAFL-SCAFFOLDING-NL",
+      "instrumentFamily": "TAFL-Q / SAFL-Q — Pat-El et al.; 2012 thesis Chapter 2, 2013 published study"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "形成性评价实践中学习支架的教师自评感知，不是实际教学质量或教师能力总分。两维度独立登记，但缺少单独16题/12题施测验证不阻止内容研究；正式使用优先保留原28题组卷。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原研究为荷兰低年级职业中等教育，学生11–18岁，中位数14；教师22–65岁。年龄是研究样本范围，不是所有中国K12适用性或常模。英语附录明确为基于荷兰语原版的译稿，不继承荷兰语版本验证。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "当前班级的实际评价实践；原文未给固定回顾天数，不改为意图、自信或理想教学。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "原附录Scaffolding下序号1–12；原28题为16+12。",
+        "原研究五点作答，仅方法中明确1=strongly disagree、5=strongly agree；中间三个文字标签、原完整指导语未在附录印出。",
+        "原文讨论分量表均分；本地原型使用等权完整作答均分，缺失不插补是项目保守规则而非原作者缺失手册。",
+        "作者未注明反向题，按原题方向处理；不造0–100、常模阈值、跨角色总分。",
+        "完整28题约25分钟；独立子项10分钟为目录估计，不是原文实测。",
+        "当前仅公开目录元数据；原题文保留在本线程个人研究临时夹具，电子抽取及公开再分发范围未确认。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原荷兰语配套版本研究已读；单独拆分、本电子形式及英语译稿的效度与再使用范围不等于原研究。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "nl",
+    "targetLocale": "nl",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Pat El, R. J. (2012). Lost in translation: congruency of teacher and student perceptions of assessment as a predictor of intrinsic motivation in ethnodiverse classrooms. Leiden University doctoral thesis, Chapter 2, Appendices A–C, pp.21–26. Published study: Pat-El et al. (2013), BJEP 83(1), 98–113, doi:10.1111/j.2044-8279.2011.02057.x (online 2011).",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英语教师稿为作者附录A现成译稿，不是本项目新译或已验证英语版；荷兰语教师/学生分别为附录B/C。没有英语学生题本或中文版；不从配对关系机械改写。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Validation of Assessment for Learning Questionnaires for Teachers and Students",
+      "citation": "Pat El, R. J. (2012). Lost in translation: congruency of teacher and student perceptions of assessment as a predictor of intrinsic motivation in ethnodiverse classrooms. Leiden University doctoral thesis, Chapter 2, Appendices A–C, pp.21–26. Published study: Pat-El et al. (2013), BJEP 83(1), 98–113, doi:10.1111/j.2044-8279.2011.02057.x (online 2011).",
+      "url": "https://scholarlypublications.universiteitleiden.nl/handle/1887/19934",
+      "publicationYear": 2012
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "学习支架"
+      ],
+      "limitations": [
+        "公开条目无可施测题文、计分器或报告；本地研究夹具结果不授予公开发布权。",
+        "教师自评是自己的实践感知，学生版是学习经历；接收者不因共同family标签自动互相开放。",
+        "只作同母工具筛选及并列分析，不造跨角色/跨语言总分或中国K12等值。"
+      ],
+      "disclaimer": "候选待审。题本已取得；电子提取及公开再分发权限未确认，非缺整个题本。"
+    },
+    "blockers": [
+      "DIGITAL_EXTRACTION_AND_PLATFORM_REUSE_SCOPE_UNCONFIRMED",
+      "EXTERNAL_ELECTRONIC_ADMINISTRATION_UNCONFIRMED",
+      "ORIGINAL_FULL_RESPONSE_LABELS_AND_INSTRUCTIONS_NOT_PRINTED"
+    ]
+  }
+}

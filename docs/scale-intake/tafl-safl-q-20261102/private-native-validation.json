@@ -1,0 +1,128 @@
+{
+  "status": "PRIVATE_NATIVE_SOURCE_SCORING_REPORT_CHECKS_PASS",
+  "node": "v24.19.0",
+  "rows": [
+    {
+      "instrumentKey": "tafl_safl_q_student_monitoring_nl",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 3,
+      "scoringExecutions": 5,
+      "referencePolicy": "none",
+      "issues": [],
+      "sourceSha256": "094e20b93ea9e2261aa44f9703ed6eefe0d9456ad3e4068af41615a84df287f7",
+      "measurementHash": "232359e634d6eae61f50fbfea595764541f8fddb2957aba904bdf9241cc462d8",
+      "reportAudience": "student",
+      "scenarioChecks": {
+        "normalMean": 3,
+        "difficultMean": 1,
+        "insufficientScore": null,
+        "insufficientInterpretations": 0
+      },
+      "publication": "PRIVATE_RESEARCH_FIXTURE_NOT_ADMINISTRATION_AUTHORIZATION"
+    },
+    {
+      "instrumentKey": "tafl_safl_q_student_scaffolding_nl",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 3,
+      "scoringExecutions": 5,
+      "referencePolicy": "none",
+      "issues": [],
+      "sourceSha256": "b713e5b44f4c72e9e78d3d6efbe9faed6b1ea952d39878919a39e594f61451ff",
+      "measurementHash": "c24575311502d1377c099a09259fb3ba16d1339847a13118d91d85a3fc7e2c14",
+      "reportAudience": "student",
+      "scenarioChecks": {
+        "normalMean": 3,
+        "difficultMean": 1,
+        "insufficientScore": null,
+        "insufficientInterpretations": 0
+      },
+      "publication": "PRIVATE_RESEARCH_FIXTURE_NOT_ADMINISTRATION_AUTHORIZATION"
+    },
+    {
+      "instrumentKey": "tafl_safl_q_teacher_monitoring_en",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 3,
+      "scoringExecutions": 5,
+      "referencePolicy": "none",
+      "issues": [],
+      "sourceSha256": "3f10c9858ac94488ff1dd6d974817891e8726f599cedd55f5a221041558aa5c2",
+      "measurementHash": "5a47ad3538470fc7b65783f7e91116a332c39d51f54f59e9ea216ee6378cb921",
+      "reportAudience": "teacher",
+      "scenarioChecks": {
+        "normalMean": 3,
+        "difficultMean": 1,
+        "insufficientScore": null,
+        "insufficientInterpretations": 0
+      },
+      "publication": "PRIVATE_RESEARCH_FIXTURE_NOT_ADMINISTRATION_AUTHORIZATION"
+    },
+    {
+      "instrumentKey": "tafl_safl_q_teacher_monitoring_nl",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 3,
+      "scoringExecutions": 5,
+      "referencePolicy": "none",
+      "issues": [],
+      "sourceSha256": "ca61c416fea5229a562eac9b9dea198f7383b3457f902c05b9141da3444cf4f2",
+      "measurementHash": "d4e652f0004f3bad56e5fb35e527f1cc848cbe127f71839b78f891f744ab581d",
+      "reportAudience": "teacher",
+      "scenarioChecks": {
+        "normalMean": 3,
+        "difficultMean": 1,
+        "insufficientScore": null,
+        "insufficientInterpretations": 0
+      },
+      "publication": "PRIVATE_RESEARCH_FIXTURE_NOT_ADMINISTRATION_AUTHORIZATION"
+    },
+    {
+      "instrumentKey": "tafl_safl_q_teacher_scaffolding_en",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 3,
+      "scoringExecutions": 5,
+      "referencePolicy": "none",
+      "issues": [],
+      "sourceSha256": "10b8d74609d8300a9ca1c88655c883c19ccbe02fb24fccbbc74c8b2920ad762e",
+      "measurementHash": "03c82b606971cbab7f3949230e2d8e0226b5fbc0ba23e8cbe4de711ac971dd47",
+      "reportAudience": "teacher",
+      "scenarioChecks": {
+        "normalMean": 3,
+        "difficultMean": 1,
+        "insufficientScore": null,
+        "insufficientInterpretations": 0
+      },
+      "publication": "PRIVATE_RESEARCH_FIXTURE_NOT_ADMINISTRATION_AUTHORIZATION"
+    },
+    {
+      "instrumentKey": "tafl_safl_q_teacher_scaffolding_nl",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 3,
+      "scoringExecutions": 5,
+      "referencePolicy": "none",
+      "issues": [],
+      "sourceSha256": "e133ab1fbdeb1e2957f281cd1d89f3607e446e7d7cf67f23d708b34fee18915a",
+      "measurementHash": "774cfd0d245149d1c2dbb6bb1767109087397d7d7c91b346c3397cbd42a1f75e",
+      "reportAudience": "teacher",
+      "scenarioChecks": {
+        "normalMean": 3,
+        "difficultMean": 1,
+        "insufficientScore": null,
+        "insufficientInterpretations": 0
+      },
+      "publication": "PRIVATE_RESEARCH_FIXTURE_NOT_ADMINISTRATION_AUTHORIZATION"
+    }
+  ],
+  "boundary": "Local lawful research preparation with unchanged original item text; private fixtures are outside Git. No norm, standalone-validation or platform-reuse approval is asserted.",
+  "initialPreparationFailure": "A preliminary schema probe omitted required golden cases and was rejected. Three fixed min/mid/max golden cases were then prepared; this record is the first complete native-source/scoring/report check."
+}

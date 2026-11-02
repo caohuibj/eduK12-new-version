@@ -1,0 +1,11 @@
+{
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "openPrMetadataCount": 42,
+  "openPrTitleBodyBranchHits": [],
+  "baseSourceIdentityAuthorItemHits": [],
+  "sourceCountBefore": 258,
+  "boundary": "Main source/inline declarations plus current open PR title/body/branch metadata and separate GitHub indexed keyword query. This is not production/admin-custom-library deduplication or an exhaustive inspection of all unindexed PR file bytes.",
+  "productionDatabaseChecked": false,
+  "finalBase": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "baseRefreshImpact": "Only shared CI/tooling changes from #551/#556; complete scale instruments tree unchanged between initial and final base."
+}
