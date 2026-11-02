@@ -1,6 +1,6 @@
 # CJX01 显式无分原生 SJT
 
-本候选基于 `fe4ddcb88e9f4f50de08149f5bfa4929312576f0`。范围是 SJT 原生定义、冻结与 FINAL、既有独立报告卡、普通教师 SELF 组合、Survey 原生消费；不实现四模式联合报告，不修改旧 CPJ 内容或身份，不启动 CI、合并或部署。
+本候选最初基于 `fe4ddcb88e9f4f50de08149f5bfa4929312576f0`。范围是 SJT 原生定义、冻结与 FINAL、既有独立报告卡、普通教师 SELF 组合、Survey 原生消费；不实现四模式联合报告，不修改旧 CPJ 内容或身份。正式 CI 跟进见文末；未生产部署。
 
 ## 可审阅内容与发布边界
 
@@ -25,7 +25,7 @@ Measurement release 仅显式无分 SJT 可无指标，核心重新校验执行�
 
 这是业务及共享测评运行时变化，按 release README 的 C 路线记录，不能走纯内容 CI。主要检查在本机：定义/分支/科学 gate 与 212 路径；冻结/FINAL/canonical/报告的受影响回归；隔离 PostgreSQL 的 standalone、Teacher SELF HTTP、Survey 子 FINAL 与父 FINAL；前后端 TypeScript；报告卡/导出测试。旧内容及其他平台模块不做全量复验。必要预算约 5 分钟（不含编写与故障修复）。
 
-隔离 PostgreSQL 16.15 使用本次临时 `u4_test` 数据库及 main 对应完整 migrations；无生产数据，合成账户使用随机标识。Teacher 与 Survey fixture 遵循现有集成测试方式保留合成审计/发布事实，容器由协调者统一清理；未 truncate、未停止共用容器。发布审阅与 CI 未激活、未通过，不能以本机证据声称正式 gate 成功。
+初次本地验证使用隔离 PostgreSQL 16.15、临时 `u4_test` 数据库及 main 对应完整 migrations；无生产数据，合成账户使用随机标识。Teacher 与 Survey fixture 遵循现有集成测试方式保留合成审计/发布事实，容器由协调者统一清理；未 truncate、未停止共用容器。当时正式 CI 尚未激活，不能以本机证据声称正式 gate 成功。
 
 测试清单、结果和受影响文件摘要由本次交付附带的验证日志记录。复用只限完全相同源码、fixture、依赖和数据库 schema 输入；发生变化时只使相关检查失效。
 
@@ -39,3 +39,11 @@ Measurement release 仅显式无分 SJT 可无指标，核心重新校验执行�
 - 本机 Node `24.19.0`，仓库 engines 要求 `>=24.21.0 <25`：上述为该本机环境的真实证据，不宣称已经在声明版本或正式 CI 成功。依赖来自协调者准备的隔离目录，Prisma 按基准 main 生成；没有修改 lockfile。
 
 完整首错及修复日志位于交付附件 `sjt-implementation-evidence/`，包括 `summary.json` 的逐日志 SHA-256。无新平台全量检查。后续正式验证须按精确 base/head/tree 和这份差异范围决定缺失检查，不以 `[skip ci]` Draft 代替合并门禁。
+
+## 2026-11-02 正式 CI 与集成测试收集修复
+
+经用户明确授权，PR601 已转 Ready 并运行现有正式 CI：run `41386537065`。该轮失败；后端回归 job `125088754854` 超过既有 45 分钟上限，未完整执行。已输出的 Teacher 无分 SJT 两项和无分 SJT 合同四项通过，不代表整个 job 通过。
+
+两份新 standalone/Survey 集成测试在收集阶段显示 `0 test`：它们只接受本地 `U4_SJT_INTEGRATION_DATABASE_URL`，而正式工作流没有设置此变量。修复保留该本地显式入口，并分别接受工作流已有的 `SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL` 与 `SURVEY_NATIVE_SJT_TEST_DATABASE_URL`；仍由原 `requireIsolatedReleaseDatabase` 校验与主连接一致的隔离 loopback 测试库，没有通用 `DATABASE_URL` 兜底或生产数据库回退。
+
+Node 24.21.0、`CI=true`、明确移除 U4 专用变量，仅提供两个既有领域 opt-in 后，Vitest 实际收集这两份文件共 6 个测试，退出 0。此次只验证收集与变量接入，不声称重新执行了 PostgreSQL 断言；原先本地 6 项原生/Survey 数据库检查仍保留原执行身份。按协调要求，此修复与共享基线修复一起回流后再完成正式必要检查，不因每个补丁单独重跑平台。

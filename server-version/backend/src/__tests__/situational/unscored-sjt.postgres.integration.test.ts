@@ -10,7 +10,7 @@ import {decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/sec
 import {createSjtNativeStagedFinalFixture} from '../fixtures/sjt-native-staged.fixture'
 import {hashSituationRuntimeDefinition} from '../../modules/situational/situation-runtime-definition'
 import {compositeItemSlotKey} from '../../modules/assessment-runtime/slot-set'
-const url=integrationDatabaseUrl('U4_SJT_INTEGRATION_DATABASE_URL')
+const url=integrationDatabaseUrl('U4_SJT_INTEGRATION_DATABASE_URL','SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL')
 const suite=url?describe:describe.skip
 // Registry publication is injected only inside this isolated test. Committed content remains DRAFT.
 const packages=[sd,wd].map(content=>({...projectSituationPackage(instrumentSourceSchema.parse({content,publication:{releaseStatus:'DRAFT'},scientific})),releaseStatus:'PUBLISHED' as const}))

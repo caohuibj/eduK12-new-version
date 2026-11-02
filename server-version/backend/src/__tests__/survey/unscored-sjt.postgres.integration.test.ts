@@ -22,7 +22,7 @@ vi.mock('../../modules/situational/onboarding/instruments.generated',async origi
  return {GENERATED_SITUATIONAL_INSTRUMENT_SOURCES:actual.GENERATED_SITUATIONAL_INSTRUMENT_SOURCES.map(source=>instrumentSourceSchema.parse(source)).map(source=>source.content.identity.instrumentKey.startsWith('u4-cjx01-')?{...source,publication:{releaseStatus:'PUBLISHED',review:{kind:'github-review',reviewUrl:'https://github.com/caohuibj/eduK12-new-version/pull/0#pullrequestreview-0',contentDigest:publicationContentDigest(source.content)}}}:source)}
 })
 
-const url=integrationDatabaseUrl('U4_SJT_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
+const url=integrationDatabaseUrl('U4_SJT_INTEGRATION_DATABASE_URL','SURVEY_NATIVE_SJT_TEST_DATABASE_URL'),suite=url?describe:describe.skip
 suite('CJX01 native Survey real PostgreSQL receipt and parent FINAL',()=>{
  let db:PrismaClient,admin:string,owner:string,projectId:string,publicId:string,draftId:string,ordinal=0
  const pkg=getSituationPackage('u4-cjx01-sd','0.3.0')!
