@@ -14,13 +14,21 @@ it('shows zero and nonresponse without a fake score, optional incomplete mean re
 })
 it('labels submitted and valid denominators separately and never renders withheld values',()=>{
  const report={teacherName:'教师',formTitle:'反馈',releasedAt:'2026-11-02',definitionDigest:'abc',minimumRespondents:5,independentRespondents:30,frozenPopulation:40,participationRate:.75,
-  distributions:[{itemKey:'q',prompt:'支持',type:'SINGLE',status:'READY',cells:[{key:'na',label:'未遇到',count:5}],descriptive:{version:'ordinal-description-v1',validN:10,submittedN:30,frequencies:[{key:'f0',label:'从未',percentage:50}]}},
+  distributions:[{itemKey:'q',prompt:'支持',type:'SINGLE',status:'READY',cells:[{key:'na',label:'未遇到',count:5,percentage:25}],descriptive:{version:'ordinal-description-v1',validN:10,submittedN:30,frequencies:[{key:'f0',label:'从未',percentage:50}]}},
   {itemKey:'x',prompt:'抑制项',type:'SINGLE',status:'WITHHELD',reason:'SMALL_CELL',cells:[{key:'secret',label:'不应显示',count:1}]}],note:'描述性报告'} as StudentFeedbackReport
- render(<HuiteacherStudentFeedbackView report={report}/>)
+ const {rerender}=render(<HuiteacherStudentFeedbackView report={report}/>)
  expect(screen.getByText(/提交 30 人；本题有效类别回答 10 人/)).toBeInTheDocument()
  expect(screen.getByText('从未：50%')).toBeInTheDocument()
+ expect(screen.getByText('未遇到：5 人（25%）')).toBeInTheDocument()
  expect(screen.getByText(/以提交人数为分母/)).toBeInTheDocument()
  expect(screen.queryByText(/不应显示/)).not.toBeInTheDocument()
+ const restricted=structuredClone(report)
+ restricted.independentRespondents=null;restricted.frozenPopulation=null;restricted.participationRate=null
+ restricted.distributions[0].cells=[{key:'na',label:'未遇到',percentage:30}]
+ restricted.distributions[0].descriptive={...restricted.distributions[0].descriptive!,validN:null,submittedN:null}
+ rerender(<HuiteacherStudentFeedbackView report={restricted}/>)
+ expect(screen.getByText('未遇到：30%')).toBeInTheDocument()
+ expect(screen.queryByText(/5 人（/)).not.toBeInTheDocument()
 })
 it('loads on request and creates only the explicitly selected independent candidate once',async()=>{
  const created=vi.fn(),onBusy=vi.fn(),api=vi.fn(async(_path:string,method?:string)=>method==='POST'?{id:'draft'}:{list:[

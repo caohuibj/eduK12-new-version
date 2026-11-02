@@ -24,7 +24,9 @@ export function HuiteacherStudentFeedbackView({report}:{report:StudentFeedbackRe
           ?'部分选项或其补集人数过少，本题整体抑制。'
           :'尚无受控披露的群体统计结果。'}</p>
       :<><div className="ht-units">{item.cells?.map(cell=>
-        <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count??(cell.percentage===undefined?'受限':cell.percentage+'%')}</span>
+        <span className="ht-tag" key={cell.key}>{cell.label}：{item.descriptive
+          ?<>{cell.count!==undefined?`${cell.count} 人（`:''}{cell.percentage===undefined?'比例受限':cell.percentage.toLocaleString('zh-CN',{maximumFractionDigits:1})+'%'}{cell.count!==undefined?'）':''}</>
+          :cell.count??(cell.percentage===undefined?'受限':cell.percentage+'%')}</span>
       )}</div>{item.descriptive&&<div aria-label="有效回答频率分布"><p>提交 {item.descriptive.submittedN??'受限'} 人；本题有效类别回答 {item.descriptive.validN??'受限'} 人。下列频率比例以本题有效回答人数为分母：</p>
        {item.descriptive.frequencies.map(cell=><span className="ht-tag" key={cell.key}>{cell.label}：{cell.percentage.toLocaleString('zh-CN',{maximumFractionDigits:1})}%</span>)}
        <p>上方全部类别、未遇到／无法判断、拒答及跳过比例以提交人数为分母；受限统计按披露精度显示。</p></div>}</>}
