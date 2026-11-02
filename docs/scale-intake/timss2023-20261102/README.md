@@ -4,6 +4,10 @@
 
 基线为 main `adad907a4b68606ce71bb1a4f2d7c511c872c715`。修改范围只有新目录声明、现有生成索引和本目录说明。来源合同与生成索引 → 发现非法声明、错误身份及过期索引 → 选中内容检查和原生目录只读验证；约2分钟。正式CI若激活，沿现有纯Scale内容轻量路线，约5分钟定位阈值，不修改控制、不启动应用全量检查。
 
+## 针对性复核
+
+[五栏缺口与解决方案](resolution.md)：本范围实际英语题本和原选项完整，PCM/WLE不是题本缺失。许可获准后可先以现有原生无分Form处理8个课堂体验模块及4个活动模块（共66题），无需等待计分引擎。当前没有实际创建Form或导入；非商业、内部数字化、公开再分发、商业及翻译范围分别核实，不要求内部使用一定获得公共GitHub题文分发许可。
+
 ## 来源与许可
 
 实际读取了 [NCES美国问卷入口](https://nces.ed.gov/timss/questionnaire.asp)、四／八年级美国英语学生原始PDF、[国际英语四年级和八年级综合科学题本](https://timss2023.org/results/context-questionnaires/)，以及 Yin & Reynolds (2024) [技术报告第15章](https://timss2023.org/wp-content/uploads/2024/12/T23_TR_Chap15.pdf)。八个指数的原项参数、转换常数、原始分等值表分别核对了官方Exhibits 15.3–15.10的对应工作表。下载URL、字节数和SHA-256见 [sources.json](sources.json)。没有把研究附件、摘要或二手论文当题本。

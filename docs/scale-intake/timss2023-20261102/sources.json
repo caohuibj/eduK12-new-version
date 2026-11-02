@@ -96,5 +96,60 @@
       "sha256": "1698912be28a927256d03a56dae09b4293eebaf0f8ddad7b1ba478bd9973693a",
       "examined": "Original questionnaire, official methods narrative, or selected scale sheets; no claim of unrelated full-survey audit."
     }
-  ]
+  ],
+  "targetedRightsReview": {
+    "checkedDate": "2026-11-02",
+    "conclusion": "FULL_TEXT_AVAILABLE; native unscored Forms technically feasible; operational questionnaire reuse scope awaiting user-led permission process",
+    "rightsSeparated": {
+      "legalAccess": "Public official PDFs accessible; research/citation evidence available; not a blanket reuse grant",
+      "internalDigitalProcessing": "Digital reconstruction, hosting and collection of new answers not covered by an identified automatic grant; specify in request",
+      "publicTextRedistribution": "Not granted; not necessary if a permitted private deployment is chosen",
+      "commercialUse": "Not granted; describe actual platform context and request explicit clarification",
+      "translationAdaptation": "Not granted; independent request scope"
+    },
+    "currentOfficialFetches": [
+      {
+        "key": "nces-current",
+        "url": "https://nces.ed.gov/timss/questionnaire.asp",
+        "finalUrl": "https://nces.ed.gov/timss/questionnaire.asp",
+        "status": 200,
+        "bytes": 34934,
+        "sha256": "3cea8af951af0800dedfdb974af8d49f07a982c8f1aaad33ea7fa369874f61ad"
+      },
+      {
+        "key": "guidelines",
+        "url": "https://www.iea.nl/data-tools/permission-request-guidelines",
+        "finalUrl": "https://www.iea.nl/data-tools/permission-request-guidelines",
+        "status": 200,
+        "bytes": 73953,
+        "sha256": "e84ab6ee17379d0fb656880c93c5625a3f9482ffcfed9611ea47b56e3566f1cd"
+      },
+      {
+        "key": "using",
+        "url": "https://www.iea.nl/data-tools/using-study-materials",
+        "finalUrl": "https://www.iea.nl/data-tools/using-study-materials",
+        "status": 200,
+        "bytes": 53002,
+        "sha256": "a6f2bef9948ec127004bb782fc89f38cc3f0f9ff0a65022418f11f6782263715"
+      },
+      {
+        "key": "disclaimer",
+        "url": "https://www.iea.nl/sites/default/files/2023-08/IEA%20Permission%20Request%20Disclaimer.pdf",
+        "finalUrl": "https://www.iea.nl/sites/default/files/2023-08/IEA%20Permission%20Request%20Disclaimer.pdf",
+        "status": 200,
+        "bytes": 491121,
+        "sha256": "abf5b700d3c80274e84f6dc963ad7bf2bbe0debf030650c779edfb436f3a7f0e"
+      }
+    ],
+    "requestForm": "https://www.iea.nl/data-tools/permission-requests",
+    "nationalCoordination": "IEA guidelines allow IEA to seek national-centre permission; NCES offers a coordination route. Joint scope required, not necessarily two independent letters.",
+    "actionsNotTaken": [
+      "request submission",
+      "acceptance of legal terms",
+      "rights-holder contact",
+      "protected item upload",
+      "native Form creation"
+    ],
+    "resolution": "resolution.md"
+  }
 }
