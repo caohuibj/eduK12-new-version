@@ -376,7 +376,7 @@ describe('ScaleEdit explicit version lineage', () => {
     fireEvent.click(await screen.findByRole('button', { name: '修订为新版本' }))
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/scales/source/revise', {}))
     expect(api.post).not.toHaveBeenCalledWith('/scales/source/copy', expect.anything())
-    expect(await screen.findByText('版本谱系')).toBeInTheDocument()
+    expect(await screen.findByText('版本历史与来源')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '查看来源工具 / 版本' })).toHaveAttribute('href', '/scales/source')
     const source = screen.getByRole('complementary', { name: '量表副本来源' })
     fireEvent.click(within(source).getByText('复制来源 · 版本修订'))
