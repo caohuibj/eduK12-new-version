@@ -1,0 +1,133 @@
+{
+  "familyTag": "family:rttq",
+  "sourceYear": 2019,
+  "authors": [
+    "S. Chee Choy",
+    "Mun Yee Lee",
+    "Daljeet Singh Sedhu"
+  ],
+  "doi": "10.55016/ojs/ajer.v65i1.56416",
+  "source": "Original published paper, Appendix pp49-50 and Table 2, read in author-uploaded ResearchGate full text. Publisher PDF fetch403; no raw PDF bytes/hash obtained.",
+  "initialVersionItems": 33,
+  "finalAppendixItems": 32,
+  "initialDeletedItemIdentity": "NOT_ESTABLISHED_DO_NOT_GUESS",
+  "language": "en",
+  "responseFormat": {
+    "values": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "labels": [
+      "Strongly disagree",
+      "Disagree",
+      "Neutral",
+      "Agree",
+      "Strongly agree"
+    ]
+  },
+  "groups": [
+    {
+      "candidateSuffix": "lifelong_learning",
+      "sourceLabel": "Developing lifelong learning skills",
+      "projectChineseLabelDraft": "终身学习技能",
+      "appendixOriginalItemIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "itemCount": 8,
+      "fullItemTextRead": true,
+      "digitalReuseScopeVerified": false,
+      "individualScoring": "NOT_IMPLEMENTED_REVERSE_AGGREGATION_MISSING_RULES_UNRESOLVED",
+      "runtimeVersionAllocated": false
+    },
+    {
+      "candidateSuffix": "self_assessment",
+      "sourceLabel": "Ability to self-assess",
+      "projectChineseLabelDraft": "自我评估",
+      "appendixOriginalItemIds": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "itemCount": 13,
+      "fullItemTextRead": true,
+      "digitalReuseScopeVerified": false,
+      "individualScoring": "NOT_IMPLEMENTED_REVERSE_AGGREGATION_MISSING_RULES_UNRESOLVED",
+      "runtimeVersionAllocated": false
+    },
+    {
+      "candidateSuffix": "belief_self_efficacy",
+      "sourceLabel": "Belief about self and self-efficacy",
+      "projectChineseLabelDraft": "自我信念与效能",
+      "appendixOriginalItemIds": [
+        22,
+        23,
+        24,
+        25
+      ],
+      "itemCount": 4,
+      "fullItemTextRead": true,
+      "digitalReuseScopeVerified": false,
+      "individualScoring": "NOT_IMPLEMENTED_REVERSE_AGGREGATION_MISSING_RULES_UNRESOLVED",
+      "runtimeVersionAllocated": false
+    },
+    {
+      "candidateSuffix": "teaching_awareness",
+      "sourceLabel": "Awareness of how one teaches",
+      "projectChineseLabelDraft": "对自身教学方式的觉察",
+      "appendixOriginalItemIds": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "itemCount": 7,
+      "fullItemTextRead": true,
+      "digitalReuseScopeVerified": false,
+      "individualScoring": "NOT_IMPLEMENTED_REVERSE_AGGREGATION_MISSING_RULES_UNRESOLVED",
+      "runtimeVersionAllocated": false
+    }
+  ],
+  "nonConflation": [
+    "RPQ is not this instrument",
+    "Choy & Oo 2012 initial33 is not the 2019 appendix32",
+    "Kember reflective-thinking scale/levels are not RTTQ four factors",
+    "Project Chinese labels are not a validated Chinese questionnaire"
+  ],
+  "plannedTags": [
+    "role:teacher_self",
+    "language:en",
+    "source_year:2019",
+    "use:professional_reflection",
+    "rights:scope_unverified"
+  ],
+  "deliverables": {
+    "scale": 0,
+    "form": 0,
+    "combination": 0,
+    "executableCPR": 0
+  },
+  "rights": "No reader/digital-item redistribution license established. Article-page publication agreement grants journal rights, not a project grant."
+}
