@@ -1,0 +1,31 @@
+{
+  "node": "v24.21.0",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "candidate": "46ff029d9cca20b221208e85257b5fa482eaefa3",
+  "productionChange": "existing Git helper maxBuffer=8MiB only",
+  "method": "TypeScript AST extracts the actual CLI git initializer, transpiles it, then executes real git; no copied replacement helper and no scorer/full-content suite",
+  "originalActualCandidate": "ENOBUFS",
+  "fixedActualCandidate": {
+    "bytes": 3099475,
+    "identity": {
+      "instrumentKey": "tosa-teacher-wd-full",
+      "instrumentVersion": "0.4.2"
+    },
+    "sha256": "bcd88f7160a694eafab7d827d3752d84263211d26398a855829c5b404fbcc880",
+    "exactBytesPreserved": true
+  },
+  "smallPublishedFile": {
+    "bytes": 233,
+    "exactOldNewMatch": true
+  },
+  "boundaries": [
+    {
+      "bytes": 8388607,
+      "result": "complete identical read"
+    },
+    {
+      "bytes": 8454144,
+      "result": "ENOBUFS, not truncated success"
+    }
+  ]
+}
