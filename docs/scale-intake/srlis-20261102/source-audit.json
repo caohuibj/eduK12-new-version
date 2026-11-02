@@ -1,0 +1,102 @@
+{
+  "recordType": "source_research_not_runtime_payload",
+  "motherTool": "SRLIS",
+  "registeredSourceCandidate": {
+    "instrumentKey": "srlis2018_teacher_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "tags": [
+    "family:srlis",
+    "role:teacher_self",
+    "school_stage:primary_secondary",
+    "language:en",
+    "edition:yan2018",
+    "use:research",
+    "maturity:PILOT",
+    "availability:source_candidate",
+    "rights:unconfirmed"
+  ],
+  "sourceFacts": {
+    "finalItemCount": 10,
+    "initialItemPool": 13,
+    "structure": "Single SRL instructional-practice dimension; SRLTBS belief subscales are a different instrument.",
+    "originalResponseAnchors": {
+      "1": "Strongly Disagree",
+      "2": "Disagree",
+      "3": "Slightly Disagree",
+      "4": "Slightly Agree",
+      "5": "Agree",
+      "6": "Strongly Agree"
+    },
+    "originalScore": "Rasch-calibrated person measure; not raw mean",
+    "sourceSample": {
+      "HongKongPrimaryTeachers": 429,
+      "HongKongSecondaryTeachers": 444
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.yanzi.hk/instruments",
+      "status": "Official indexed instrument entry found; live content unavailable due upstream TLS certificate failure."
+    },
+    {
+      "url": "https://www.yanzi.hk/assets/instruments/self-regulated-learning-instruction-scale-en.pdf",
+      "status": "Official indexed English PDF URL located; actual bytes not obtained. HTTPS 503 upstream CERTIFICATE_VERIFY_FAILED; web open timeout. No TLS bypass."
+    },
+    {
+      "url": "https://repository.eduhk.hk/en/publications/how-teachers-beliefs-and-demographic-variables-impact-on-self-reg/",
+      "status": "Official original-study abstract and bibliographic metadata read; only EdUHK-users-only full-text link listed, not used."
+    },
+    {
+      "url": "https://www.researchgate.net/publication/319997982_How_teachers%27_beliefs_and_demographic_variables_impact_on_self-regulated_learning_instruction",
+      "status": "Author-uploaded original article method/results read as HTML; it states full SRLIS is available by request and does not print all 10 items. PDF link returned 404; no restricted copy published."
+    },
+    {
+      "url": "https://doi.org/10.1080/03055698.2017.1382331",
+      "status": "Publisher DOI request returned 403; no paywall/authentication bypass."
+    }
+  ],
+  "unregisteredVersionCandidates": [
+    {
+      "language": "Chinese",
+      "source": "Author instruments page / expanded report A02",
+      "status": "Exact download URL, item text/count, Chinese script and version/anchors not verified; no source identity registered."
+    }
+  ],
+  "missing": [
+    "Full numbered final 10-item English questionnaire and instruction",
+    "Author Chinese questionnaire actual file and version",
+    "Reuse/electronic administration/redistribution permission",
+    "Rasch item calibrations and operational scoring/missing rules or explicit alternative raw-score guidance"
+  ],
+  "nativeScaleCreated": false,
+  "nativeFormCreated": false,
+  "formsNote": "No original unscored form identified. Once full permitted items are obtained, an unscored native Form may be prepared if scoring remains unavailable; no empty or fabricated form now.",
+  "combinations": [],
+  "installedVersions": {
+    "content": null,
+    "parameters": null,
+    "report": null
+  },
+  "databases": {
+    "isolatedImport": "NOT_RUN_NO_QUESTIONNAIRE",
+    "development": "NOT_IMPORTED",
+    "production": "NOT_ACCESSED"
+  },
+  "deduplication": {
+    "mainSourceMatches": 0,
+    "openPrMetadataCount": 45,
+    "openPrSourceKeywordMatches": 0,
+    "existingSrlo44": "Broadbent et al. 2023/online2022 SRL-O44, student online-learning self-regulation; different authors, respondent, instrument and DOI. Not reused as SRLIS.",
+    "productionAndAdminCustomLibraryChecked": false
+  },
+  "license": "UNCONFIRMED; author public download and article upload do not establish platform/redistribution permission; no terms signed or permission request sent.",
+  "initialBase": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "finalBase": "826f8e2ee5171acfff644efdd9e8527d41a8238f",
+  "integrationRefresh": {
+    "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "reason": "Resolve generated registry conflict with latest main using existing generator; original source and research boundary evidence unchanged.",
+    "sameSourceOnRefreshedMain": false,
+    "generatorCheckPrimaryLocation": "CI"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "status": "EDITORIAL_TEACHER_FEEDBACK_PLANS_NOT_EXECUTABLE_REPORTS",
+  "reportVersion": null,
+  "score": null,
+  "visibleWhen": "Existing teacher-recipient authorization and report publication permit access; this source candidate cannot generate a report.",
+  "examples": [
+    {
+      "scenario": "normal",
+      "isScoreThreshold": false,
+      "title": "保留一个帮助学生自我检查的做法",
+      "body": "如果您已经在课堂中提供策略示范，可以结合学生的一次真实任务看看它怎样被使用。自报有实施，不等于每位学生已经掌握，也不是教学质量等级。",
+      "microActions": [
+        "挑一个最近任务，看看学生怎样说明自己理解了哪里、下一步准备怎样调整。"
+      ]
+    },
+    {
+      "scenario": "difficult",
+      "isScoreThreshold": false,
+      "title": "从一个可观察的小步骤开始",
+      "body": "推动自主学习可能受到任务、课时和资源条件影响。推进困难不等于您能力不足，也不能把责任全部交给学生。",
+      "microActions": [
+        "选一项策略先做一次简短示范，再请学生用自己的话说出检查理解的方法。",
+        "和同事讨论一个具体卡点，选择当前可行的支持。"
+      ]
+    },
+    {
+      "scenario": "insufficient",
+      "isScoreThreshold": false,
+      "title": "本次暂不生成结果",
+      "body": "完整题本或有效信息不足时，不计算分数、不把缺失当零，也不对教师或学生作判断。当前只有来源候选，不能据目录题量生成报告。",
+      "microActions": [
+        "可以先记下一次课堂互动和一个希望进一步了解的问题。"
+      ]
+    }
+  ],
+  "limitations": [
+    "不是学生对应版或中文版题本。",
+    "不以正常/困难设原量表高低阈值，不生成Rasch logits、排名或跨工具总分。"
+  ]
+}
