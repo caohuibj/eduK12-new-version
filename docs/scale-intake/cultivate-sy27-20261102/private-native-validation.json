@@ -1,0 +1,360 @@
+{
+  "status": "PASS",
+  "scope": "private technical research preparation: actual native Form definition/authoring schema and answer runtime; no database import, public item text or actual administration",
+  "nativePreparationForms": 23,
+  "answerUnits": 75,
+  "answerChecks": 179,
+  "scoringExecutions": 0,
+  "databaseImports": 0,
+  "publicItemText": false,
+  "privatePayloadSha256": "a34db1ebc1040c37fb828529067c4e60611e414ddccb202535321c04dd819e4e",
+  "runtimeCommit": "645160ccd6719931e3ef0757cc1adb8e767658c5",
+  "results": [
+    {
+      "sourceBlock": 1,
+      "kind": "MULTIPLE",
+      "sourceItemIds": [
+        "Q01"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 2,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q02_01",
+        "Q02_02",
+        "Q02_03",
+        "Q02_04",
+        "Q02_05"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 3,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q03_01",
+        "Q03_02",
+        "Q03_03",
+        "Q03_04"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 4,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q04_01",
+        "Q04_02",
+        "Q04_03",
+        "Q04_04"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 5,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q05_01",
+        "Q05_02",
+        "Q05_03",
+        "Q05_04",
+        "Q05_05"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 6,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q06_01",
+        "Q06_02",
+        "Q06_03",
+        "Q06_04",
+        "Q06_05"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 7,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q07_01",
+        "Q07_02",
+        "Q07_03",
+        "Q07_04",
+        "Q07_05",
+        "Q07_06"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 8,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q08_01",
+        "Q08_02",
+        "Q08_03"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 9,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q09_01",
+        "Q09_02",
+        "Q09_03",
+        "Q09_04"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 10,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q10_01",
+        "Q10_02",
+        "Q10_03",
+        "Q10_04"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 11,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q11_01",
+        "Q11_02",
+        "Q11_03"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 12,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q12_01",
+        "Q12_02",
+        "Q12_03"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 13,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q13_01",
+        "Q13_02",
+        "Q13_03"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 14,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q14_01",
+        "Q14_02"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 15,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q15_01",
+        "Q15_02",
+        "Q15_03"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 16,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q16_01",
+        "Q16_02",
+        "Q16_03"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 17,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q17_01",
+        "Q17_02"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 18,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q18_01",
+        "Q18_02"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 19,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q19_01",
+        "Q19_02"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 20,
+      "kind": "SINGLE",
+      "sourceItemIds": [
+        "Q20"
+      ],
+      "answerChecks": 7,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 21,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q21_01",
+        "Q21_02",
+        "Q21_03",
+        "Q21_04"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 22,
+      "kind": "SINGLE",
+      "sourceItemIds": [
+        "Q22_01"
+      ],
+      "answerChecks": 4,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    },
+    {
+      "sourceBlock": 23,
+      "kind": "MATRIX",
+      "sourceItemIds": [
+        "Q23_01",
+        "Q23_02",
+        "Q23_03",
+        "Q23_04",
+        "Q23_05"
+      ],
+      "answerChecks": 8,
+      "status": "PASS",
+      "contentVersion": "1.0.0-private-preparation",
+      "scoringVersion": null,
+      "reportVersion": null
+    }
+  ],
+  "notExecuted": [
+    "Official measure scoring/reverse/missing/2024 benchmarking",
+    "Official roster-driven target-class random assignment and Q1 external metadata routing",
+    "Database import, participant submission and report rendering",
+    "Commercial or public item redistribution",
+    "Translation",
+    "Full platform CI/build/deployment"
+  ],
+  "preparedBase": "88e3328d44d29fa3bc2afd12486e8505bd932ede",
+  "runtimeInputSha256": {
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/src/modules/assessment-core/form/answers.ts": "172eb777fc670d6b2fa421474d77a75b607b84fbfd43c91cc25bca02e4477716",
+    "server-version/backend/src/modules/survey/final.compute.ts": "2cfd50b03964bb511e2b4d476d35375e38537b16e558ba949d7840b1954e2c23",
+    "server-version/backend/src/modules/composite/composite.schema.ts": "6cf06740d91944ddfb8b793e066483c5b0ef1188b0ea2c3940421ec635f4c5f6",
+    "server-version/backend/src/modules/assessment-runtime/typed-form.ts": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d"
+  },
+  "baseAdvanceReuse": "Consumed Form/schema/runtime files unchanged from private check runtime commit; no repeated answer checks after main integration. Generated declaration index regenerated separately; all 329 main entries preserved plus the nine existing Cultivate catalog candidates."
+}
