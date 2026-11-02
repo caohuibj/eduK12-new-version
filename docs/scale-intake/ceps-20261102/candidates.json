@@ -6,7 +6,7 @@
   "candidates": [
     {
       "candidateId": "ceps_baseline_2013_2014_g7_student_zh_cn",
-      "metadataRevision": "2026-11-02.1",
+      "metadataRevision": "2026-11-02.2",
       "name": "CEPS｜学生评教与学校经历待拆分目录｜7年级基线｜学生",
       "status": "SOURCE_RETRIEVAL_PENDING",
       "nativeRegistered": false,
@@ -57,7 +57,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         },
         {
           "reservedId": "ceps_baseline_2013_2014_g7_student_zh_cn_classroom_experience",
@@ -67,7 +67,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         },
         {
           "reservedId": "ceps_baseline_2013_2014_g7_student_zh_cn_school_experience",
@@ -77,7 +77,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         }
       ],
       "scoring": {
@@ -97,14 +97,14 @@
       "blockers": [
         "OFFICIAL_FULL_TEXT_NOT_RETRIEVED",
         "EXACT_BLOCKS_AND_RESPONSE_OPTIONS_UNVERIFIED",
-        "SCORING_AND_INDEPENDENT_ADMINISTRATION_EVIDENCE_UNVERIFIED",
+        "SCORED_SCALE_RULES_UNVERIFIED_NOT_A_FORM_IMPORT_BLOCKER",
         "ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
         "PRODUCTION_AND_ADMIN_CUSTOM_DUPLICATION_NOT_CHECKED"
       ]
     },
     {
       "candidateId": "ceps_baseline_2013_2014_g9_student_zh_cn",
-      "metadataRevision": "2026-11-02.1",
+      "metadataRevision": "2026-11-02.2",
       "name": "CEPS｜学生评教与学校经历待拆分目录｜9年级基线｜学生",
       "status": "SOURCE_RETRIEVAL_PENDING",
       "nativeRegistered": false,
@@ -155,7 +155,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         },
         {
           "reservedId": "ceps_baseline_2013_2014_g9_student_zh_cn_classroom_experience",
@@ -165,7 +165,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         },
         {
           "reservedId": "ceps_baseline_2013_2014_g9_student_zh_cn_school_experience",
@@ -175,7 +175,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         }
       ],
       "scoring": {
@@ -195,14 +195,14 @@
       "blockers": [
         "OFFICIAL_FULL_TEXT_NOT_RETRIEVED",
         "EXACT_BLOCKS_AND_RESPONSE_OPTIONS_UNVERIFIED",
-        "SCORING_AND_INDEPENDENT_ADMINISTRATION_EVIDENCE_UNVERIFIED",
+        "SCORED_SCALE_RULES_UNVERIFIED_NOT_A_FORM_IMPORT_BLOCKER",
         "ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
         "PRODUCTION_AND_ADMIN_CUSTOM_DUPLICATION_NOT_CHECKED"
       ]
     },
     {
       "candidateId": "ceps_followup_2014_2015_g8_student_zh_cn",
-      "metadataRevision": "2026-11-02.1",
+      "metadataRevision": "2026-11-02.2",
       "name": "CEPS｜学生评教与学校经历待拆分目录｜8年级追访｜学生",
       "status": "SOURCE_RETRIEVAL_PENDING",
       "nativeRegistered": false,
@@ -253,7 +253,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         },
         {
           "reservedId": "ceps_followup_2014_2015_g8_student_zh_cn_classroom_experience",
@@ -263,7 +263,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         },
         {
           "reservedId": "ceps_followup_2014_2015_g8_student_zh_cn_school_experience",
@@ -273,7 +273,7 @@
           "itemCount": null,
           "responseOptions": null,
           "nativeType": "UNDECIDED",
-          "decisionRule": "取得原题及适用计分依据才可确定量表；否则经授权后按原题制作无计分事实/描述表单。主题是检索目标，非已核原生子量表。"
+          "decisionRule": "原题与实际使用范围核实后，缺官方计分、常模或独立施测验证时可制作原生无分表单，保留原题/选项/来源。只有有适用计分依据的完整题组才确定为计分量表；主题为待查目标，非已核子量表。"
         }
       ],
       "scoring": {
@@ -293,7 +293,7 @@
       "blockers": [
         "OFFICIAL_FULL_TEXT_NOT_RETRIEVED",
         "EXACT_BLOCKS_AND_RESPONSE_OPTIONS_UNVERIFIED",
-        "SCORING_AND_INDEPENDENT_ADMINISTRATION_EVIDENCE_UNVERIFIED",
+        "SCORED_SCALE_RULES_UNVERIFIED_NOT_A_FORM_IMPORT_BLOCKER",
         "ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
         "PRODUCTION_AND_ADMIN_CUSTOM_DUPLICATION_NOT_CHECKED"
       ]
