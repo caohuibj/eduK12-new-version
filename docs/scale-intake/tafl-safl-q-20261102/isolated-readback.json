@@ -1,0 +1,142 @@
+{
+  "status": "ISOLATED_PRIVATE_RESEARCH_MATERIALIZATION_PASS",
+  "recordedAt": "2026-11-02T01:03:38.846Z",
+  "engine": "existing materializeScaleInstrumentContent with an explicit private research source registry; existing Prisma Scale.tags update; no runtime/gate/schema source changes",
+  "database": "dedicated local Docker PostgreSQL16.15 / tafl_safl_fixture; no inherited DATABASE_URL fallback",
+  "schema": "current main Prisma schema via db push plus unchanged scale-axis-snapshot migration; not a production migration/recovery qualification",
+  "rows": [
+    {
+      "key": "tafl_safl_q_student_monitoring_nl",
+      "version": "1.0.0",
+      "itemCount": 16,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:tafl_safl_q",
+        "role:student",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:monitoring"
+      ],
+      "measurementHash": "232359e634d6eae61f50fbfea595764541f8fddb2957aba904bdf9241cc462d8",
+      "idempotentReadback": true,
+      "publicRegistry": "CATALOG_ONLY_NO_RUNTIME_POLICY"
+    },
+    {
+      "key": "tafl_safl_q_student_scaffolding_nl",
+      "version": "1.0.0",
+      "itemCount": 12,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:tafl_safl_q",
+        "role:student",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ],
+      "measurementHash": "c24575311502d1377c099a09259fb3ba16d1339847a13118d91d85a3fc7e2c14",
+      "idempotentReadback": true,
+      "publicRegistry": "CATALOG_ONLY_NO_RUNTIME_POLICY"
+    },
+    {
+      "key": "tafl_safl_q_teacher_monitoring_en",
+      "version": "1.0.0",
+      "itemCount": 16,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:en",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:monitoring"
+      ],
+      "measurementHash": "5a47ad3538470fc7b65783f7e91116a332c39d51f54f59e9ea216ee6378cb921",
+      "idempotentReadback": true,
+      "publicRegistry": "CATALOG_ONLY_NO_RUNTIME_POLICY"
+    },
+    {
+      "key": "tafl_safl_q_teacher_monitoring_nl",
+      "version": "1.0.0",
+      "itemCount": 16,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:monitoring"
+      ],
+      "measurementHash": "d4e652f0004f3bad56e5fb35e527f1cc848cbe127f71839b78f891f744ab581d",
+      "idempotentReadback": true,
+      "publicRegistry": "CATALOG_ONLY_NO_RUNTIME_POLICY"
+    },
+    {
+      "key": "tafl_safl_q_teacher_scaffolding_en",
+      "version": "1.0.0",
+      "itemCount": 12,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:en",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ],
+      "measurementHash": "03c82b606971cbab7f3949230e2d8e0226b5fbc0ba23e8cbe4de711ac971dd47",
+      "idempotentReadback": true,
+      "publicRegistry": "CATALOG_ONLY_NO_RUNTIME_POLICY"
+    },
+    {
+      "key": "tafl_safl_q_teacher_scaffolding_nl",
+      "version": "1.0.0",
+      "itemCount": 12,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:tafl_safl_q",
+        "role:teacher_self",
+        "school_stage:lower_vocational_secondary",
+        "language:nl",
+        "edition:2012_thesis_ch2",
+        "use:research",
+        "maturity:PILOT",
+        "rights:platform_extraction_unconfirmed",
+        "subscale:scaffolding"
+      ],
+      "measurementHash": "774cfd0d245149d1c2dbb6bb1767109087397d7d7c91b346c3397cbd42a1f75e",
+      "idempotentReadback": true,
+      "publicRegistry": "CATALOG_ONLY_NO_RUNTIME_POLICY"
+    }
+  ],
+  "snapshotCount": 6,
+  "deploymentPolicies": 0,
+  "realParticipants": 0,
+  "productionAccess": false,
+  "developmentLibraryInstall": false,
+  "cleanup": "PASS: task-owned --rm container removed; exact task anonymous volume mount/unmount/destroy events correlated with the task container, then volume absence read back. Initial immediate post-stop absence assertion raced asynchronous removal; subsequent readback confirmed cleanup.",
+  "rights": "Only internal personal/non-commercial research preparation; no external electronic administration or extracted-item redistribution grant"
+}
