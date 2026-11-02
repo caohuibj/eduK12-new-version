@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dis_pozas2022_reported14_apm_teacher_self_en_metadata",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DIS｜学习进展监测｜教师自评｜德国2022所报14题体系（题本待补）",
+      "abbreviation": "DIS",
+      "instrumentFamily": "Differentiated Instruction Scale / Roy, Guay & Valois / distinct manuscript-12 and Germany-2022-reported-14 identities"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师自报学习进展监测实践的频率。教学调适与学习进展监测是两个相关构念，不能把自报频率改称实际质量或教学能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:dis_roy",
+        "role:teacher_self",
+        "stage:mixed_school_tracks",
+        "language:en_publication_only",
+        "source_version:pozas2022_reported14",
+        "use:reflection",
+        "status:PILOT",
+        "license:redistribution_unverified",
+        "availability:catalog_only"
+      ]
+    },
+    "population": {
+      "populationNotes": "Pozas等2022：168名德国不同学校轨道在职教师；完整问卷、施测语言、译适记录未取得，不能冒原版或已验证德文题本。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "the precise reference period and original instructions were not obtained",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅目录候选，无可施测题文、计分参数或运行报告；英文为已读论文语言，不证明原施测语言或中文版验证。",
+        "Roy机构库手稿最终Table 2/3保留12项（IA8/APM4）；2022德国论文方法描述IA10/APM4。出版定稿与两项差异未核，版本不得合并。",
+        "手稿Table 2与Table 3项目排序不同；未来按表名+行号+题文身份映射，不能只凭同号对齐。",
+        "手稿可读不等于再分发许可；机构库仅列开放获取标识，License栏空白。另一份PDF标受限，不绕过获取。",
+        "已读来源为5级频率，端点1从不、5非常频繁；中间锚点未核，不从其他DI工具补齐。",
+        "频率较高不自动代表实践适切、教学质量较高或学生受益；不建跨维度/跨来源教学质量总分。",
+        "分维度聚合、反向键、个体缺失处理及允许独立施测须核原协议；研究分析用FIML不是个人缺失值补分规则。",
+        "没有常模不妨碍合法完整内容做无分表单；当前停止点是再分发范围与版本/反应协议。",
+        "3分钟仅目录规划估计，不是实测时长。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究维度有内部结构证据；本项目无可施测版本，本地及单独拆开施测证据未建立。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "将来仅在内容和许可齐备后用于具体实践反思；当前不生成分数。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "英文论文元数据；原问卷施测语言和中文适配未核。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "只登记候选，未公开题文，未声明任何译本验证。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Confident, positive, but interested? Exploring the role of teachers’ interest in their practice of differentiated instruction",
+      "citation": "Pozas, M., Letzel, V., Bost, N. & Reichertz, J. (2022). Frontiers in Education 7:964341. DOI:10.3389/feduc.2022.964341. Article CC BY; complete 14-item questionnaire absent.",
+      "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2022.964341/full",
+      "publicationYear": 2022
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "学习进展监测"
+      ],
+      "limitations": [
+        "仅目录候选，无可施测题文、计分参数或运行报告；英文为已读论文语言，不证明原施测语言或中文版验证。",
+        "Roy机构库手稿最终Table 2/3保留12项（IA8/APM4）；2022德国论文方法描述IA10/APM4。出版定稿与两项差异未核，版本不得合并。",
+        "手稿Table 2与Table 3项目排序不同；未来按表名+行号+题文身份映射，不能只凭同号对齐。",
+        "手稿可读不等于再分发许可；机构库仅列开放获取标识，License栏空白。另一份PDF标受限，不绕过获取。",
+        "已读来源为5级频率，端点1从不、5非常频繁；中间锚点未核，不从其他DI工具补齐。",
+        "频率较高不自动代表实践适切、教学质量较高或学生受益；不建跨维度/跨来源教学质量总分。",
+        "分维度聚合、反向键、个体缺失处理及允许独立施测须核原协议；研究分析用FIML不是个人缺失值补分规则。",
+        "没有常模不妨碍合法完整内容做无分表单；当前停止点是再分发范围与版本/反应协议。"
+      ],
+      "disclaimer": "只提供待审的教师成长文案。没有实际计分报告、绩效排名或跨工具总分。"
+    },
+    "blockers": [
+      "REDISTRIBUTION_PERMISSION_UNVERIFIED",
+      "PUBLISHED_VERSION_AND_12_VS_14_MAPPING_UNRESOLVED",
+      "INDIVIDUAL_SCORING_AND_RESPONSE_PROTOCOL_NOT_VERIFIED",
+      "FULL_14_ITEM_QUESTIONNAIRE_NOT_OBTAINED"
+    ]
+  }
+}
