@@ -1,7 +1,7 @@
 # 验证记录与未完成项
 
 - 固定base：`adad907a4b68606ce71bb1a4f2d7c511c872c715`。
-- 实际检查内容提交：`23fbab029e587620e759a410adcde82b2b20886c`。其后只追加此记录及 validation.json，没有改变source、索引、schema、计分、依赖或工具输入；不重复已通过检查。
+- 实际检查内容提交：`23fbab029e587620e759a410adcde82b2b20886c`。初轮其后只追加记录和validation.json。后续blocker文字调整重新在12671f4a0执行选中source诊断，另存validation-followup.json；原source检查不外推修改后的字节，索引/工具输入未变的证据按交接说明复用。
 - 改动范围：10个新目录source.json及其数据wrapper、自动生成索引、`docs/scale-intake/seeq-20261102`。旧source、runtime、权限、依赖、workflow均未修改。主要验证位置为本环境，预计数秒；无前后端构建、无全量测试、无DB、无生产连接。
 
 已通过：
