@@ -43,6 +43,7 @@ export function recipe(check,base,head) {
  const commands=check==='release-tools'&&adapterOnly(base,head)?[['node','--test','.github/scripts/local-validation.integration.test.mjs']]:structuredClone(recipes[check]);
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
+  if(files.some(file=>file==='.github/workflows/ci-backend.yml'||file==='.github/scripts/content-workflows.test.mjs'))commands.push(['node','--test','--test-name-pattern=^content declarations keep pure schema/fixture/reference checks without database lifecycles','.github/scripts/content-workflows.test.mjs']);
   if(files.some(file=>file==='.github/scripts/dependency-scope.mjs'||file==='.github/scripts/dependency-routing.test.mjs'))commands.push(['node','--test','.github/scripts/dependency-routing.test.mjs']);
   if(files.some(imageBuildFile)){
    commands.push(['node','--test','.github/scripts/ci-image-plan.test.mjs']);

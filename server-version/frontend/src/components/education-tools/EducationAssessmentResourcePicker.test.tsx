@@ -1,4 +1,4 @@
-import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {act,cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {EducationAssessmentResourcePicker} from './EducationAssessmentResourcePicker'
 import {educationAssessmentResourceId,type EducationAssessmentResourceAdapter,type EducationAssessmentDirectory,type EducationAssessmentScope} from '../../api/educationAssessmentResources'
@@ -64,9 +64,9 @@ describe('education authorized assessment picker',()=>{
       {...good,units:[{...good.units[0],references:[good.units[0].measurement]}]},
     ].map((row,index)=>({...row,title:`禁止投放 ${index}`}))
     setup(assessmentScope,{list:vi.fn(async()=>assessmentDirectory(assessmentScope,[good,...bad] as typeof good[])),addTrack:vi.fn()})
-    await open()
-    expect(screen.getAllByRole('option')).toHaveLength(2)
-    expect(screen.queryByRole('option',{name:/禁止投放/})).not.toBeInTheDocument()
+    const choices=within(await open())
+    expect(choices.getAllByRole('option')).toHaveLength(2)
+    expect(choices.queryByRole('option',{name:/禁止投放/})).not.toBeInTheDocument()
   })
 
   it('describes an empty authorized directory without claiming the system lacks a tool family',async()=>{
