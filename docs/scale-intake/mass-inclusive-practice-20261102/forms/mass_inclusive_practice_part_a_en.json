@@ -1,0 +1,309 @@
+{
+  "requestId": "ed12e861-ac29-5564-b507-cbb88076d733",
+  "toolKey": "mass_inclusive_practice_part_a_en",
+  "version": "0.1.0",
+  "title": "Massachusetts Inclusive Practice｜A·证据与实践反思｜教师自评｜EN·2017指南无分表单",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "mass_a_context",
+        "title": "Part A: Inclusive Practice: Self-Assessment Form",
+        "description": "© 2017 Massachusetts Department of Elementary and Secondary Education. Reproduced for non-commercial educational purposes with attribution under the permission in the official Guidebook. Commercial embedding and translation permission are not established. Digital transcription for teacher reflection. You may leave any field blank. No score is calculated. Use de-identified evidence; do not enter student names or identifying case details. Narrative fields have a project technical limit of 2000 characters. This is not a signed evaluation form.",
+        "questions": [
+          {
+            "itemKey": "mass_a_context_1",
+            "type": "LONG_TEXT",
+            "prompt": "Educator—Name/Title:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_context_2",
+            "type": "LONG_TEXT",
+            "prompt": "Primary Evaluator—Name/Title:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_context_3",
+            "type": "LONG_TEXT",
+            "prompt": "Supervising Evaluator, if any—Name/Title/Role in evaluation:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_context_4",
+            "type": "LONG_TEXT",
+            "prompt": "School(s):",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_a_part1",
+        "title": "Part 1: Analysis of Student Learning, Growth, and Achievement",
+        "description": "Briefly summarize areas of strength and high-priority concerns for students under your responsibility for the upcoming school year. Cite evidence such as results from available assessments. This form should be individually submitted by the educator, but Part 1 can also be used by individuals and teams who jointly review and analyze student data. 603 CMR 35.06 (2)(a)1",
+        "questions": [
+          {
+            "itemKey": "mass_a_p1_1",
+            "type": "LONG_TEXT",
+            "prompt": "What are my sources of evidence?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_2",
+            "type": "LONG_TEXT",
+            "prompt": "What student needs do I want to address this year based on this evidence?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_3",
+            "type": "LONG_TEXT",
+            "prompt": "What practices will best help me address those needs?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_4",
+            "type": "LONG_TEXT",
+            "prompt": "How I do know that these practices are effective?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_5",
+            "type": "LONG_TEXT",
+            "prompt": "What supports do I expect ALL students to need?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_6",
+            "type": "LONG_TEXT",
+            "prompt": "What supports do I expect SOME students to need?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_7",
+            "type": "LONG_TEXT",
+            "prompt": "What supports do I expect A FEW students to need?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_team",
+            "type": "LONG_TEXT",
+            "prompt": "Team, if applicable:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p1_team_members",
+            "type": "LONG_TEXT",
+            "prompt": "List Team Members below:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      },
+      {
+        "pageKey": "mass_a_part2",
+        "title": "Part 2: Assessment of Practice Against Performance Standards",
+        "description": "Citing your district’s performance rubric, briefly summarize areas of strength and high-priority areas for growth. Use the annotated descriptions in the Inclusive Practice Tools: Rubric Resource document. Areas may target specific standards, indicators, or elements, or span multiple indicators or elements within or across standards. The form should be individually submitted by educator, but Part 2 can also be used by teams in preparation for proposing team goals. 603 CMR 35.06 (2)(a)2",
+        "questions": [
+          {
+            "itemKey": "mass_a_p2_educator",
+            "type": "LONG_TEXT",
+            "prompt": "Educator—Name/Title:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_1",
+            "type": "LONG_TEXT",
+            "prompt": "What are my areas of strength around inclusive practice?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_2",
+            "type": "LONG_TEXT",
+            "prompt": "What aspects of Social Emotional Learning do I want to develop this year?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_3",
+            "type": "LONG_TEXT",
+            "prompt": "What aspects of Positive Behavior Interventions and Supports do I want to develop this year?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_4",
+            "type": "LONG_TEXT",
+            "prompt": "What aspects of Universal Design for Learning do I want to develop this year?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_5",
+            "type": "LONG_TEXT",
+            "prompt": "What supports do I expect SOME students to need?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_6",
+            "type": "LONG_TEXT",
+            "prompt": "What supports do I expect A FEW students to need?",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_team",
+            "type": "LONG_TEXT",
+            "prompt": "Team, if applicable:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          },
+          {
+            "itemKey": "mass_a_p2_team_members",
+            "type": "LONG_TEXT",
+            "prompt": "List Team Members below:",
+            "required": false,
+            "allowRefusal": true,
+            "maxLength": 2000,
+            "options": [],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "Faithful English transcription of Massachusetts DESE Tool 2d, for non-commercial educational teacher reflection under the 2017 Guidebook copying permission; original authorship and rights remain with Massachusetts DESE. No scoring or commercial permission claimed. Part A signature workflow is retained in the source, not simulated here.",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot",
+    "language_validation:content_en"
+  ],
+  "reference": {
+    "tags": [
+      "family:mass_inclusive_practice",
+      "role:teacher_self",
+      "stage:k12",
+      "language:en",
+      "source_version:guidebook2017_2d_pdf20261102",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none",
+      "license:noncommercial_educational"
+    ],
+    "source": {
+      "url": "https://www.doe.mass.edu/edeval/guidebook/2d-teacherselfassess.pdf",
+      "pdfSha256": "e5d4ebf240ec79e71df9c30f12aa6cc4ed271a64e4ff3e1eb58b2e057bdd2722",
+      "permissionSource": "https://www.doe.mass.edu/edeval/guidebook/guidebook.docx",
+      "guidebookSha256": "7cdc21aa2882c5216c6b8c1600e1a18771f2e87c44ac1f67eb165dc3d89a6a92",
+      "edition": "2017 Guidebook; 7-page standalone PDF retrieved 2026-11-02, no printed revision number",
+      "locale": "en",
+      "author": "Massachusetts Department of Elementary and Secondary Education",
+      "permission": "copy any or all parts for non-commercial educational purposes with attribution; no commercial authorization claimed",
+      "part": "part_a",
+      "pages": [
+        2,
+        3
+      ]
+    },
+    "license": {
+      "scope": "non-commercial educational reproduction only",
+      "attribution": "© 2017 Massachusetts Department of Elementary and Secondary Education. Reproduced for non-commercial educational purposes with attribution under the permission in the official Guidebook. Commercial embedding and translation permission are not established.",
+      "commercialEmbedding": "NOT_AUTHORIZED_BY_THIS_PERMISSION",
+      "translation": "NOT_CLAIMED"
+    },
+    "recipient": "teacher_self_only_under_existing_release_permissions",
+    "scoring": {
+      "mode": "none",
+      "parametersVersion": null,
+      "reportVersion": null
+    },
+    "digitalChanges": [
+      "One source field per native question; page breaks become pages.",
+      "Optional fields and refusal supported by existing Form engine.",
+      "2000-character project technical text limit, not a source scoring or completeness rule.",
+      "Part A signature/date receipt fields are not imported as answer items; existing authorization is unchanged.",
+      "Visible teacher labels are used; hidden administrator labels in DOCX/PDF extraction are excluded.",
+      "No project Chinese translation of source items; Chinese names are catalog metadata only."
+    ]
+  }
+}

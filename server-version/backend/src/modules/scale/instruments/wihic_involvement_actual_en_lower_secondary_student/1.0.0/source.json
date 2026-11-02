@@ -1,0 +1,693 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "wihic_involvement_actual_en_lower_secondary_student",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "WIHIC｜课堂参与（实际·英文8题）｜初中｜学生填答",
+      "abbreviation": "WIHIC-INVOLVEMENT",
+      "instrumentFamily": "What Is Happening In this Class? (WIHIC), Fraser 2023 Appendix A, English actual-class project digital split"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Student discussion, questions and exchange of ideas in class. Eight-item project split from the 56-item questionnaire; original grouping retained by the companion ordinary-composite recipe.",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "family:wihic",
+        "学生评教",
+        "评价对象:课堂",
+        "评价对象:课堂互动",
+        "population:lower_secondary_student",
+        "age:12_15_project_scope",
+        "response:student_self_perception",
+        "locale:en",
+        "form:actual",
+        "source:fraser2023_appendix_a",
+        "license:cc_by_4_0",
+        "maturity:pilot",
+        "standalone_validation:not_established",
+        "scoring:project_complete_raw_mean"
+      ]
+    },
+    "population": {
+      "minAge": 12,
+      "maxAge": 15,
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 9
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Initial project scope: students aged 12–15 in grades 7–9 who can understand the original English. The source reviews junior-secondary WIHIC use, but does not validate this separate 8-item digital form or define these ages as empirical cut-offs. This is student perception of their own classroom, not an expert observation protocol."
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "The current class; no fixed day/week recall period was specified in Appendix A.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Keep these eight items in original Appendix A order. Use the seven-unit ordinary composite in the recorded order to retain all 56 original items.",
+        "Appendix A labels are Almost Never, Seldom, Sometimes, Often, Almost Always (1–5). Main-text Table 1 instead uses Very Often at 5; this package deliberately freezes the appendix version.",
+        "Separate administration, project instructions and complete-response arithmetic means have not been validated as the original full protocol.",
+        "The estimated duration is a project estimate, not a measured completion time."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Project digital split; standalone validity and target-population validation are not established."
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Developmental reflection on perceived classroom experiences only."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Fraser, B. J. (2023). The Evolution of the Field of Learning Environments Research. Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257. Appendix A, Table A1, pp. 7–8.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Original English item text is unchanged. The digital split, administration instruction, missing-answer rule, descriptive mean and student feedback are project adaptations. No Chinese item translation is provided."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "wihic_involvement_actual_en_lower_secondary_student-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 144,
+        "maxExclusive": 192
+      },
+      "grades": [
+        "7",
+        "8",
+        "9"
+      ]
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "wihic_involvement_actual_en_lower_secondary_student-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "wihic_involvement_actual_en_lower_secondary_student-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© Barry J. Fraser 2023. CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. English items and response labels reproduced from Appendix A, Table A1, pp. 7–8 of https://doi.org/10.3390/educsci13030257. No separate restrictive credit line accompanies the appendix. Project changes: seven separate 8-item digital units, instructions, complete-response descriptive means and original student feedback. No author endorsement, validated standalone administration or validated Chinese version is claimed."
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "WIHIC English 56-item Appendix A (Fraser, 2023)",
+        "citation": "Fraser, B. J. (2023). The Evolution of the Field of Learning Environments Research. Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257. Appendix A, Table A1, pp. 7–8.",
+        "url": "https://www.mdpi.com/2227-7102/13/3/257",
+        "publicationYear": 2023
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Barry J. Fraser 2023. CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. English items and response labels reproduced from Appendix A, Table A1, pp. 7–8 of https://doi.org/10.3390/educsci13030257. No separate restrictive credit line accompanies the appendix. Project changes: seven separate 8-item digital units, instructions, complete-response descriptive means and original student feedback. No author endorsement, validated standalone administration or validated Chinese version is claimed."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "appendix_a_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "Almost Never",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Seldom",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Sometimes",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "Often",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "Almost Always",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "WIHIC17",
+          "content": "I discuss ideas in class.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC18",
+          "content": "I give my opinions during class discussions.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC19",
+          "content": "The teacher asks me questions.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC20",
+          "content": "My ideas and suggestions are used during classroom discussions.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC21",
+          "content": "I ask the teacher questions.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC22",
+          "content": "I explain my ideas to other students.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC23",
+          "content": "Students discuss with me how to go about solving problems.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "WIHIC24",
+          "content": "I am asked to explain how I solve problems.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "appendix_a_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "WIHIC17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "WIHIC24",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "involvement",
+            "type": "dimension",
+            "label": "Involvement (descriptive item mean)",
+            "description": "Eight equally weighted responses 1–5; higher means more frequent perceived experiences. Project complete-response mean, not a norm or validated standalone score.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "WIHIC17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "WIHIC24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "involvement"
+        ],
+        "scoreOrder": [
+          "involvement"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "involvement",
+            "headline": "Involvement: reflecting on this class",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This describes how often you experience opportunities to discuss ideas, ask questions and explain your thinking. A higher mean means you reported these activities more often; speaking less does not mean you care less about learning. The displayed value is the mean of eight complete responses on a 1–5 frequency scale. There are no high/low categories or comparison norms.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When is it easiest for you to share an idea: in writing, with a partner or in a class discussion?"
+              },
+              {
+                "category": "environment",
+                "text": "Suggest one way to make room for different forms of participation, with support from a trusted adult."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Your answers describe your perspective in this particular class. They cannot establish a teacher’s quality, classmates’ intentions or the causes of an experience.",
+          "These original English items are separated from the 56-item WIHIC. Standalone eight-item administration and this digital feedback have not been validated. This is not a validated Chinese questionnaire.",
+          "A score is shown only when all eight answers are present. Missing answers are not scored as zero or filled in. No local norms, thresholds or rankings are supplied.",
+          "An uncomfortable or unfair experience is not your fault. This questionnaire does not ask you to challenge a teacher or fix the classroom on your own; a trusted adult can help you decide what feels safe."
+        ],
+        "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "STUDENT_SELF",
+          "audience": "student",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "wihic_involvement_actual_en_lower_secondary_student",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "WIHIC17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC24",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 1
+          },
+          "totalScoreKeys": [
+            "involvement"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "WIHIC17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC18",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC19",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC20",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC22",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC24",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 5
+          },
+          "totalScoreKeys": [
+            "involvement"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "WIHIC17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "WIHIC20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "WIHIC21",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "WIHIC22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "WIHIC23",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC24",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "involvement": 2.625
+          },
+          "totalScoreKeys": [
+            "involvement"
+          ]
+        }
+      },
+      {
+        "name": "missing_one",
+        "answers": [
+          {
+            "itemCode": "WIHIC17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC18",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC19",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC21",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC22",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "WIHIC23",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": null
+          },
+          "totalScoreKeys": [
+            "involvement"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "involvement": null
+          },
+          "totalScoreKeys": [
+            "involvement"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Think about what actually happens in the class you are answering about. For each statement, choose how often it happens: Almost Never (1), Seldom (2), Sometimes (3), Often (4), or Almost Always (5). These eight statements are one part of WIHIC. This instruction and separate digital presentation are project adaptations; the statements and frequency labels come from Appendix A (Fraser, 2023). There are no right or wrong answers. Answer from your own experience.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "Project-written digital actual-class instruction using Fraser 2023 Appendix A response anchors; not an author-issued full administration script."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

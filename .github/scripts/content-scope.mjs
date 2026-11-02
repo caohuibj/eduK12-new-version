@@ -7,6 +7,7 @@ import {personalTrackingReadyPlan,personalTrackingReadyOutputs} from './personal
 import {personalTrackingDraftScope} from './personal-tracking-draft-scope.mjs';
 import {selectCognitiveIntake, cognitiveTaskRoot} from './cognitive-intake-scope.mjs';
 import {selectScaleIntake} from './scale-intake-scope.mjs';
+import {declarationReaders,verifiedDeclarativeContent} from './declarative-content.mjs';
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
 import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
 import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
@@ -89,6 +90,8 @@ export function domainFor(file) {
   if (new RegExp(`^${modules}cognitive/tasks/[^/]+/(seeds|participant-presentation|governance|scientific)\\.ts$`).test(file)) return 'cognitive';
   return null;
 }
+
+export const contentCodeqlRequired=(entries,readers={})=>!verifiedDeclarativeContent(entries,readers,domainFor);
 
 // Exact engineering/guidance documents only; other scientific/publication
 // and deployment behavior paths keep their existing domain/platform checks.
@@ -600,7 +603,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
   const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend && !affectedFrontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
   const codeql = catalogDiscovery || Boolean(copy?.sast) || surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || backendModules || scenario === 'platform' || frontend
-    || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
+    || (result.content && contentCodeqlRequired(entries,declarationReaders(base)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   const output = { backend_focus:result.backend_focus||'full', bundle_family:catalogDiscovery&&bundleFamilyScope(entries), bundle_runtime:catalogDiscovery&&bundleRuntimeScope(entries), personal_tracking_draft:personalTrackingDraftScope(entries,{event,draft:process.env.CI_IS_DRAFT==='true',forceFull:process.env.CI_FORCE_FULL==='true'}), admin_permissions_functional_only:Boolean(adminFunctional), admin_permissions_functional_plan:JSON.stringify(adminFunctional), training_functional_only:Boolean(trainingFunctional), run_performance_tests:!(catalogDiscovery || trainingFunctional || adminFunctional), training_functional_plan:JSON.stringify(trainingFunctional), survey_mac_ui_plan:JSON.stringify(surveyMac), reviewed_candidate_plan:JSON.stringify(reviewedCandidate), survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:trainingFunctional || adminFunctional ? 'legacy' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, diff_base:base, codeql, scenario, image_build:imageBuild, frontend_affected:affectedFrontend||catalogDiscovery,
