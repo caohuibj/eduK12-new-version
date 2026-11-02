@@ -8,8 +8,12 @@ import scientific1 from '../instruments/sjt-assertiveness-golden/1.0.0/scientifi
 import instrument2 from '../instruments/sjt-responsibility-golden/1.0.0/instrument.json'
 import publication2 from '../instruments/sjt-responsibility-golden/1.0.0/publication.json'
 import scientific2 from '../instruments/sjt-responsibility-golden/1.0.0/scientific.json'
+import instrument3 from '../instruments/tosa-teacher-wd-full/0.4.2/instrument.json'
+import publication3 from '../instruments/tosa-teacher-wd-full/0.4.2/publication.json'
+import scientific3 from '../instruments/tosa-teacher-wd-full/0.4.2/scientific.json'
 export const GENERATED_SITUATIONAL_INSTRUMENT_SOURCES: readonly unknown[] = [
   { content: instrument0, publication: publication0, scientific: scientific0 },
   { content: instrument1, publication: publication1, scientific: scientific1 },
   { content: instrument2, publication: publication2, scientific: scientific2 },
+  { content: instrument3, publication: publication3, scientific: scientific3 },
 ]
