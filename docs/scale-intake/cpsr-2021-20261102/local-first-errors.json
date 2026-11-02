@@ -1,0 +1,20 @@
+{
+  "staticDependencyInvocation": {
+    "status": "FAIL_THEN_FIXED_CALLER",
+    "error": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:child-chexi-observer-zh-cn-v1.ts:constant-source",
+    "cause": "Temporary caller omitted main #556 third read(file) callback for imported identity constants. Main checker and CHEXI files unchanged.",
+    "repair": "Supply exact-worktree read callback. Final dependency check passed with no selected references.",
+    "originalLogSHA256": "982234c60eaad6a97ae366df69a4a24536dee4bca67c97b1f91d002adae39162",
+    "boundary": "First combined invocation did not save earlier per-source results before exception; it is not claimed as a complete PASS. Final source/parameter/report evidence saved on corrected bounded invocation."
+  },
+  "prismaGenerate": {
+    "status": "FAIL_THEN_FIXED_PRIVATE_TOOL_LAYOUT",
+    "error": "Prisma auto-install could not find package.json near private schema, attempted npm i prisma@5.22.0 and exited1.",
+    "completedBeforeFailure": "Owned empty isolated schema sync succeeded; no Scale rows yet.",
+    "repair": "Private package.json/node_modules selector plus PRISMA_GENERATE_SKIP_AUTOINSTALL=1, generate exact-schema client into private directory. Original backend client, lock and source unchanged.",
+    "result": "Client generate PASS and original axis snapshot migration PASS; one materialization invocation then imported 12 candidates."
+  },
+  "checksNotRun": [
+    "No full platform tests, app build, browser, production import, publication or human independent review."
+  ]
+}

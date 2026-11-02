@@ -1,0 +1,37 @@
+{
+  "baseCommit": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "node": "v24.19.0",
+  "inputSHA256": {
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/scripts/scale-intake-selected-check.ts": "92cf4d28ae59611409d3660c3169c28be0f5e9b7913fdc9b4ada389ffc3e209f",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "d0c1df42dab398269f69c09a21ecb3ae1e800f0c10379440094b417e3e23e82a",
+    "server-version/backend/src/modules/scale/projection/scale-result.projector.ts": "3631f95e824f50115a9beaa71e6764b3163a647e64e65502e1306aef4ab262be",
+    "server-version/backend/src/modules/scale/library/catalog-discovery.ts": "0a8f01e1582e9e65b2620843e81f7df8124e9c00f5a45f5890cd3474c6d92bf7",
+    "server-version/backend/prisma/migrations/20261001040000_scale_axis_snapshots/migration.sql": "fdc3b9d5e4ca5831d18330100c00886d2f5c73921e899651c9b2161b8e768475"
+  },
+  "dependencies": {
+    "tsx": {
+      "installed": "4.23.12",
+      "locked": "4.23.12"
+    },
+    "typescript": {
+      "installed": "5.9.3",
+      "locked": "5.9.3"
+    },
+    "zod": {
+      "installed": "4.6.7",
+      "locked": "4.6.7"
+    },
+    "@prisma/client": {
+      "installed": "5.22.0",
+      "locked": "5.22.0"
+    },
+    "prisma": {
+      "installed": "5.22.0",
+      "locked": "5.22.0"
+    }
+  },
+  "unchangedInputBoundary": "Shared existing node_modules used for content checks; required dependency versions read and matched current lock. Original shared generated client unchanged; separate exact-current-schema Prisma5.22 client generated privately for DB checks. Not a clean full npm ci or whole dependency-byte attestation.",
+  "privacy": "No original item text, anchors, raw answers, original source_snapshot, actual credentials or real personal records in public evidence."
+}

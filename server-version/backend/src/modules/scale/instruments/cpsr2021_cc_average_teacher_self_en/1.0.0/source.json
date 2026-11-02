@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cpsr2021_cc_average_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "CPS-R｜挑战与选择｜教师自评｜2021英文／平均学业表现组",
+      "abbreviation": "CPS-R",
+      "instrumentFamily": "Classroom Practices Survey–Revised / 2017 revision / 2021 publication"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师自述对平均学业表现组实施挑战与选择策略的频率；不是教学质量、能力、效果或学生的固定能力标签。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:cpsr",
+        "role:teacher_self",
+        "population:teacher",
+        "student_achievement_group:average",
+        "language:en",
+        "version:2021",
+        "revision:2017",
+        "use:research",
+        "use:reflection",
+        "stage:school_teachers_grade_range_not_fixed",
+        "construct:differentiation_practice_frequency",
+        "rights:research_use_attribution_public_redistribution_unconfirmed",
+        "maturity:PILOT",
+        "availability:catalog_only"
+      ]
+    },
+    "population": {
+      "populationNotes": "学校教师自评，学生为实践所针对的群体而非填答者；原研究739教师。所读原件没有提供可用作本产品硬界的逐年级/年龄范围，不泛称全科效度。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 11,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "原附录未规定回忆天数；使用原频率锚点，不加入近两周等新时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Appendix B CC1–CC11，固定Average Achieving原列。",
+        "单列数字化为项目版式拆分；三列原表共40策略/120回答格，不把选用子量表当新短版效度。",
+        "如未教授该组或无法判断，不用Never替代不适用；可以跳过该工具，不自动计零。",
+        "estimatedMinutes为项目每题20秒的粗估，非作者时长、未实测。",
+        "原题本无额外背景题，不凭理论增加事实题；本母工具无原生无分表单子项。",
+        "公开包不含题文、锚点或executable；完整英文研究包在本任务私有目录中，仅供授权研究性隔离验证。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原语、单列选用研究候选；不宣称独立施测等值或跨文化验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original English Appendix B item content; Chinese catalog names and separate feedback examples are project editorial text, not a Chinese instrument.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "No translation of instrument items or cross-cultural validation claimed. Single-column digital layout is a project adaptation."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "CPS-R (2021), Appendix B / CC / Average Achieving",
+      "citation": "Pereira, N., Tay, J., Desmet, O., Maeda, Y., & Gentry, M. (2021). Validity Evidence for the Revised Classroom Practices Survey: An Instrument to Measure Teachers’ Differentiation Practices. Journal for the Education of the Gifted, 44(1), 31–55. https://doi.org/10.1177/0162353220978304. Appendix B (CPS-R, 2017 revision).",
+      "url": "https://journals.sagepub.com/doi/suppl/10.1177/0162353220978304/suppl_file/sj-pdf-1-jeg-10.1177_0162353220978304.pdf",
+      "publicationYear": 2021
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "挑战与选择"
+      ],
+      "limitations": [
+        "公开目录不可施测。私有研究候选及其隔离验证不等于公共库或生产入库。",
+        "教师自述实践频率，非能力或教学质量；不合成总分，不宣称已验证中文或独立短版。"
+      ],
+      "disclaimer": "题本和锚点已实际读取；公开再分发范围未确认，故公开包仅元数据和原创反馈说明。"
+    },
+    "blockers": [
+      "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED"
+    ]
+  }
+}

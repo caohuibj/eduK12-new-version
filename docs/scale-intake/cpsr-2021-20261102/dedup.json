@@ -1,0 +1,379 @@
+{
+  "baseCommit": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "mainSearch": "All Scale instrument declarations/source files searched for CPS-R, Classroom Practices Survey, DOI, Nielsen Pereira, challenges and choices; no same-source match.",
+  "openPRCount": 45,
+  "openPRs": [
+    {
+      "headRefName": "content/sefu-teacher-self-20261102",
+      "headRefOid": "80f44193c09d61841b40c1707a1323c1552a01cb",
+      "number": 561,
+      "title": "docs(SEfU): 教师自评三视角来源、缺项与导入准备",
+      "filesRead": 8,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/emu-intake-20261102",
+      "headRefOid": "fb17b18d5804bce4a550dc53b1d33c3a069dbed6",
+      "number": 560,
+      "title": "EMU：35个无分表单来源候选与角色映射（许可待确认、未入库）",
+      "filesRead": 76,
+      "matches": [
+        {
+          "filename": "docs/scale-intake/emu-20261102/inventory.json",
+          "matchedText": [
+            "differentiation"
+          ]
+        }
+      ]
+    },
+    {
+      "headRefName": "content/k12-feedback-literacy-intake-20261102",
+      "headRefOid": "87fbe2eefd34aa79fc8983d8c5a2c726b667aa25",
+      "number": 559,
+      "title": "content: 中国K12教师反馈素养四维双语无分表单与计分候选",
+      "filesRead": 32,
+      "matches": []
+    },
+    {
+      "headRefName": "content/tpi-teacher-self-20261102",
+      "headRefOid": "5e57ff4fa40d0b462bc9aee69facd3dd6c8b8b9d",
+      "number": 558,
+      "title": "content: TPI 2018 高校教师自评实践指标、表单候选与评分审计",
+      "filesRead": 26,
+      "matches": []
+    },
+    {
+      "headRefName": "content/danielson-self-reflection-20261102",
+      "headRefOid": "0a0cd827f92e445b4bb56d775a82e05bebc36437",
+      "number": 557,
+      "title": "docs(Danielson): 自我反思来源、许可边界与教师反馈候选（缺授权原件）",
+      "filesRead": 5,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/pals-2000-intake-20261102",
+      "headRefOid": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b",
+      "number": 555,
+      "title": "content(scale): PALS2000 子量表目录、事实表单与分接收者报告草稿",
+      "filesRead": 71,
+      "matches": []
+    },
+    {
+      "headRefName": "content/nyc-school-survey-2026-20261102",
+      "headRefOid": "84b802dd591ef623e615194552c800e2f7b78862",
+      "number": 554,
+      "title": "content(scale): NYC School Survey 2026 学生版拆分候选与分接收者反馈",
+      "filesRead": 35,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/colorado-sps-intake-20261102",
+      "headRefOid": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7",
+      "number": 553,
+      "title": "Colorado SPS：11项来源候选、题键及分受众报告草案（许可待审）",
+      "filesRead": 28,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/pisa2022-classroom-intake-20261102",
+      "headRefOid": "51569d88e26ef7d9c58ef93cca206c451159673d",
+      "number": 552,
+      "title": "content: PISA 2022 美国英文课堂体验拆分与无计分导入准备",
+      "filesRead": 16,
+      "matches": []
+    },
+    {
+      "headRefName": "content/timss2023-student-classroom-catalog-20261102",
+      "headRefOid": "21162f30b500011c6b3e9f296fad0d0545b58755",
+      "number": 550,
+      "title": "content(scale): TIMSS 2023 学生课堂体验模块与报告候选 [skip ci]",
+      "filesRead": 24,
+      "matches": []
+    },
+    {
+      "headRefName": "content/ceps-student-candidates-20261102",
+      "headRefOid": "03f0d3409a8499b7cf0db0bb8c4cac67810797bf",
+      "number": 549,
+      "title": "docs(CEPS): 分波次学生资料候选与学生/教师反馈草稿（缺题本）",
+      "filesRead": 4,
+      "matches": []
+    },
+    {
+      "headRefName": "content/mi-student-voice-2026-27",
+      "headRefOid": "7820b248cc8aae4a97f583c761b462eae2f9a54a",
+      "number": 548,
+      "title": "content(scale): MI Student Voice 2026–27 学生版目录与表单候选 [skip ci]",
+      "filesRead": 16,
+      "matches": []
+    },
+    {
+      "headRefName": "content/harvard-tsr-intake-20261102",
+      "headRefOid": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8",
+      "number": 547,
+      "title": "content(scale): Harvard TSR 2011 四个子量表目录候选与分接收者报告文稿",
+      "filesRead": 14,
+      "matches": []
+    },
+    {
+      "headRefName": "content/lcq-intake-20261102",
+      "headRefOid": "64cbe6a78fc42292f80d780200bd8882034d7bcb",
+      "number": 546,
+      "title": "content(scale): LCQ 15/6题及教师指称目录候选与双接收者报告示例",
+      "filesRead": 13,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/qti-sun2018-zh-20261102",
+      "headRefOid": "783729150611c865cf753bff408288a39a141c6d",
+      "number": 545,
+      "title": "content: 中文QTI Sun2018完整题本、八维候选与原生无计分表单",
+      "filesRead": 40,
+      "matches": []
+    },
+    {
+      "headRefName": "content/cultivate-sy27-candidates-20261102",
+      "headRefOid": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1",
+      "number": 544,
+      "title": "content(Cultivate): SY27九类课堂条件目录候选与学生/教师报告草稿",
+      "filesRead": 23,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/panorama-student-survey-catalog-20261102",
+      "headRefOid": "12acadbed9944c2d04dfaadb44d24682c2aa5078",
+      "number": 543,
+      "title": "content(scale): Panorama 学生反馈38模块目录与分接收者报告草稿",
+      "filesRead": 82,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/wihic-intake-20261102",
+      "headRefOid": "2426aee58647236dd6084845ea834f23a95c6b17",
+      "number": 542,
+      "title": "content(scale): WIHIC 七维英文拆分、学生报告及候选目录 [skip ci]",
+      "filesRead": 37,
+      "matches": []
+    },
+    {
+      "headRefName": "content/mass-dese-feedback-20261102",
+      "headRefOid": "e70c178a2a939fb6e495336f017908eec00a149e",
+      "number": 541,
+      "title": "content: Massachusetts DESE 分版目录候选与适龄报告草案",
+      "filesRead": 31,
+      "matches": []
+    },
+    {
+      "headRefName": "content/seeq-he-candidates-20261102",
+      "headRefOid": "9e7c43efc02e60bd6704b8974f77dfb74d54e9f6",
+      "number": 540,
+      "title": "content: SEEQ 高校英文版分拆目录候选与分受众反馈示例",
+      "filesRead": 27,
+      "matches": []
+    },
+    {
+      "headRefName": "content/cpj-sjt-pilot-20261102",
+      "headRefOid": "fd5be2a6a899524ad2fdb962095a58e5591cb3ca",
+      "number": 539,
+      "title": "content(sjt): CPJ-SJT 课堂观察原生试用题库与发布清单",
+      "filesRead": 277,
+      "matches": []
+    },
+    {
+      "headRefName": "content/tosa-teacher-wd-042",
+      "headRefOid": "bd863704646a80355599436b0e4a171a7c980622",
+      "number": 537,
+      "title": "content(sjt): TOSA 教师担责 0.4.2 试用候选与入库清单",
+      "filesRead": 17,
+      "matches": []
+    },
+    {
+      "headRefName": "fix/frontend-nginx-main-20261101",
+      "headRefOid": "cff8728f67818a28b9ab0a2189c30040470dbd6b",
+      "number": 529,
+      "title": "fix(frontend): version the container Nginx main configuration",
+      "filesRead": 5,
+      "matches": []
+    },
+    {
+      "headRefName": "loadtest-20261101",
+      "headRefOid": "70a6b3bc54e30c95c35733a705c6350f929d2a6d",
+      "number": 515,
+      "title": "loadtest-20261101: 压测工具与容量基线报告（无生产改动）",
+      "filesRead": 6,
+      "matches": []
+    },
+    {
+      "headRefName": "ui/cua-deep-pages-20261101",
+      "headRefOid": "290aa955a3445bcb0b519829423e626d044a2fc1",
+      "number": 491,
+      "title": "fix(ui): Training 深层报告主题与空状态 [skip ci]",
+      "filesRead": 4,
+      "matches": []
+    },
+    {
+      "headRefName": "ui/cua-catalog-review-20261101",
+      "headRefOid": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28",
+      "number": 489,
+      "title": "fix(ui): 目录主题与 Training 深色编制可读性 [skip ci]",
+      "filesRead": 3,
+      "matches": []
+    },
+    {
+      "headRefName": "ui/cua-admin-review-20261101",
+      "headRefOid": "0c526f0529ab47c0054f9470d0bb9217e1d787a5",
+      "number": 488,
+      "title": "fix(admin): 区分草稿列表读取失败与空目录",
+      "filesRead": 3,
+      "matches": []
+    },
+    {
+      "headRefName": "reports/cognitive-47-polish-20261101",
+      "headRefOid": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8",
+      "number": 482,
+      "title": "认知47项：版本化报告与模式修订",
+      "filesRead": 310,
+      "matches": []
+    },
+    {
+      "headRefName": "cognitive/twelve-new-tasks-20261028",
+      "headRefOid": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5",
+      "number": 441,
+      "title": "feat(cognitive): 32 个新认知测验 + 智力评估路线图 v2.0 实施（阶段一 PR0-PR3 + 阶段二工程侧 PR4-PR7）",
+      "filesRead": 693,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/scale-intake-cumulative-20261030",
+      "headRefOid": "0f8057fa75bcb89215275f6ad7695f189fcf0e65",
+      "number": 413,
+      "title": "feat(scale): cumulative reviewed Scale intake — keep open until all batches finish",
+      "filesRead": 15,
+      "matches": []
+    },
+    {
+      "headRefName": "fix/scale-frozen-instruction-import-20261030",
+      "headRefOid": "4d79bc45d607f8e771eccfacc49a7558b8a3985e",
+      "number": 412,
+      "title": "fix(scale): break frozen instruction schema import cycle",
+      "filesRead": 1,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/jdr-report-locale-gate-20261030",
+      "headRefOid": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d",
+      "number": 397,
+      "title": "fix(scale): decouple report language from questionnaire locale",
+      "filesRead": 2,
+      "matches": []
+    },
+    {
+      "headRefName": "work/scale-test-anxiety-intake-20261029",
+      "headRefOid": "5454a7d7630a4ccb7125d0c621fa10317dc6924f",
+      "number": 383,
+      "title": "draft(scale): intake CTAS-12 zh-CN, TAS-37 zh-CN and CTAS-2 en",
+      "filesRead": 5,
+      "matches": []
+    },
+    {
+      "headRefName": "integration/scale-26-b0-main-20261028",
+      "headRefOid": "333200ade0c6cb42130cbc052189ba9c64691a12",
+      "number": 379,
+      "title": "feat(scale): integrate 26 validated instrument packages, version metadata and respondent reports",
+      "filesRead": 272,
+      "matches": []
+    },
+    {
+      "headRefName": "content/scale-content-batch3-20261028",
+      "headRefOid": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792",
+      "number": 375,
+      "title": "content(scale): audit candidate queue and prepare 17 versioned packages [skip ci]",
+      "filesRead": 374,
+      "matches": []
+    },
+    {
+      "headRefName": "content/scale-ipip-batch2-20261028",
+      "headRefOid": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53",
+      "number": 373,
+      "title": "content(scale): audit three IPIP packages and bind traced instructions [skip ci]",
+      "filesRead": 61,
+      "matches": []
+    },
+    {
+      "headRefName": "content/scale-ipip-batch1-20261028",
+      "headRefOid": "75b956cbd4c45f75beee606fb53257494adc1ca0",
+      "number": 371,
+      "title": "content(scale): audit and intake three IPIP packages [skip ci]",
+      "filesRead": 208,
+      "matches": []
+    },
+    {
+      "headRefName": "content/scale-bps9-intake-20261028",
+      "headRefOid": "bfd6dcbca24567219ec24979481f3da8e0137984",
+      "number": 370,
+      "title": "content(scale): bind BPS9 instruction and verify isolated intake [skip ci]",
+      "filesRead": 66,
+      "matches": []
+    },
+    {
+      "headRefName": "feat/dot-cognitive-content-integration-20261028",
+      "headRefOid": "1388d5db6f845b8d907f0e4090e4fd727aea8926",
+      "number": 368,
+      "title": "WIP: integrate existing cognitive candidates and repair report structure",
+      "filesRead": 2101,
+      "matches": []
+    },
+    {
+      "headRefName": "content/scale-structural-batch1-20261028",
+      "headRefOid": "8e4440cac46086f73390f8774c40853beb9a6ddd",
+      "number": 367,
+      "title": "feat(scale): onboard ARS30 and improve scale report presentation",
+      "filesRead": 136,
+      "matches": []
+    },
+    {
+      "headRefName": "release/dbt-wccl59-v1-0-2-20261027",
+      "headRefOid": "e2b23122e1a41f52f61719fdd31a6daf338b97e1",
+      "number": 362,
+      "title": "content(scale): approve DBT-WCCL59 zh-CN v1.0.2 as noncommercial publication candidate",
+      "filesRead": 9,
+      "matches": []
+    },
+    {
+      "headRefName": "cognitive-next-three-core-20261026",
+      "headRefOid": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+      "number": 360,
+      "title": "feat(cognitive): expand reviewed cognitive content candidates",
+      "filesRead": 1269,
+      "matches": []
+    },
+    {
+      "headRefName": "public-library/cognitive-20261022",
+      "headRefOid": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a",
+      "number": 330,
+      "title": "Public cognitive library: staged Simon source-only materials",
+      "filesRead": 15,
+      "matches": []
+    },
+    {
+      "headRefName": "public-library/sjt-20261022",
+      "headRefOid": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+      "number": 329,
+      "title": "Public SJT library: staged E-SPIN bilingual research materials",
+      "filesRead": 62,
+      "matches": []
+    },
+    {
+      "headRefName": "public-library/scales-20261022",
+      "headRefOid": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+      "number": 328,
+      "title": "Public scale library: construct classification foundation and staged imports",
+      "filesRead": 73,
+      "matches": []
+    }
+  ],
+  "matchedPRDisposition": "Only PR560 has generic word differentiation in EMU metadata; different mother tool, no CPS-R identity/DOI/author/items.",
+  "limitations": [
+    "PR patch search is bounded by GitHub-provided patch text; no-PR remote branches not exhaustively scanned.",
+    "Production DB and administrator-created instruments not queried. Final target-side source/item/version dedup remains required."
+  ]
+}

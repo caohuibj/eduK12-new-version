@@ -1,0 +1,89 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "instrumentKey": "cpsr2021_qt_low_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_qt_average_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_qt_high_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_low_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_average_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_high_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_low_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_average_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_high_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_low_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_average_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_high_teacher_self_en",
+      "astSchema": "PASS",
+      "registered": true,
+      "executable": false,
+      "runtimePolicy": false
+    }
+  ]
+}

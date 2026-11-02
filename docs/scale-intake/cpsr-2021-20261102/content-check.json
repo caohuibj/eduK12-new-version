@@ -1,0 +1,326 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "instrumentKey": "cpsr2021_qt_low_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_qt_low_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.5,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_qt_average_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_qt_average_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.5,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_qt_high_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_qt_high_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.5,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_low_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_cc_low_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.272727272727273,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_average_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_cc_average_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.272727272727273,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_high_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_cc_high_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.272727272727273,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_low_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_rw_low_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.5,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_average_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_rw_average_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.5,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_high_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_rw_high_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.5,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_low_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_cm_low_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.272727272727273,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_average_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_cm_average_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.272727272727273,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_high_teacher_self_en",
+      "status": "PASS",
+      "selected": {
+        "instrumentKey": "cpsr2021_cm_high_teacher_self_en",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 2,
+        "scoringExecutions": 4,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "mixedMean": 2.272727272727273,
+      "reportInterpretations": 1,
+      "familyTagDiscoverable": true
+    }
+  ],
+  "publicChecks": [
+    {
+      "instrumentKey": "cpsr2021_qt_low_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_qt_average_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_qt_high_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_low_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_average_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_cc_high_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_low_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_average_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_rw_high_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_low_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_average_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "cpsr2021_cm_high_teacher_self_en",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    }
+  ],
+  "failures": [],
+  "dependencies": {
+    "builtin": [],
+    "generated": []
+  },
+  "boundary": "Synthetic native scoring and report structures, tag discovery and selected source contracts only; private item text omitted from public evidence.",
+  "subsequentChange": "After this scorer/mean/tag evidence, private source teacher audience disclosure was aligned with existing teacher report audience; measurement/scoring/report bodies unchanged. Exact final policy/schema/compile/registry validation and authorized/denied serializer contracts passed during native materialization. No scorer rerun requested solely for this disclosure edit."
+}
