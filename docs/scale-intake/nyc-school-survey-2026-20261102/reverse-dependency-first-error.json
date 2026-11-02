@@ -1,0 +1,23 @@
+{
+  "status": "FAIL",
+  "phase": "local_static_reverse_dependencies",
+  "error": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape",
+  "target": "server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts",
+  "checker": "server-version/backend/scripts/scale-intake-selected-check.ts",
+  "sourceBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "unchangedInputs": {
+    "server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts": {
+      "sha256": "6911d8d27ea4bb3aa1896636dc27053b18e3b9c3b24b9ca19ad8022ae2d7c341",
+      "matchesBase": true
+    },
+    "server-version/backend/scripts/scale-intake-selected-check.ts": {
+      "sha256": "a6e02bd0b7fe4071ecd1050e35f8ad988873ef841b5c2b1e5821b51838ec1831",
+      "matchesBase": true
+    }
+  },
+  "reason": "Existing helper accepts literal / specific arrow factory shapes; this unchanged builtin uses an exported function and imported CHEXI_IDENTITY properties. Failure arises before establishing relation to the selected NYC candidates.",
+  "completed": "13 selected source AST/schema/native registry checks PASS; generated index check PASS",
+  "notCompleted": "complete static reverse-dependency assurance, full selected CLI, formal CI and database import",
+  "action": "Preserve original error; do not widen CI or alter shared checker in this mother-tool content PR. Needs parent/mainline assessment before official CI.",
+  "operationOutcome": "Check failed; no mutation or uncertain database write."
+}
