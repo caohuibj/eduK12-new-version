@@ -287,7 +287,7 @@ async function main() {
             await page.getByText('暂无匹配练习', { exact: true }).waitFor()
           }
         }, 'assignment-list-states')
-        assignmentResults.push({ state, passed: true })
+        if (scope === 'full' || scope === 'assignment-list-states') assignmentResults.push({ state, passed: true })
       }
       for (const state of ['loading', 'empty', 'error', 'populated']) {
         await scenario(width, 'STUDENT', async page => {
