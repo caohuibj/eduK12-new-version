@@ -28,7 +28,8 @@
     "nativeReportRendering": "NOT_RUN_NO_DEFINITION",
     "isolatedDatabaseImport": "NOT_RUN_MISSING_ORIGINAL_ITEMS",
     "formalCI": "NOT_RUN",
-    "independentHumanReview": "NOT_PERFORMED"
+    "independentHumanReview": "NOT_PERFORMED",
+    "rawDiffScope": "PASS_SCALE_NOTES_ONLY_NOT_SELECTED_LIGHT"
   },
   "localEnvironment": "Node24.19.0; below repository24.21.0 engine. Metadata exploration only, not formal qualification. No dependency install or lock change.",
   "sourceAccessLimits": [
@@ -55,6 +56,71 @@
     "deployment": false,
     "authorizationCreated": false
   },
-  "scope": "PENDING_FINAL_RAW_DIFF",
+  "scope": {
+    "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "pathCount": 7,
+    "entries": [
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/README.md",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/dedup.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/material-request.md",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/sources.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/teacher-report-drafts.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/verification.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      },
+      {
+        "file": "docs/scale-intake/korean-teacher-professional-self2014/version-and-split-plan.json",
+        "oldMode": "000000",
+        "newMode": "100644",
+        "status": "A"
+      }
+    ],
+    "classification": {
+      "maintenance": false,
+      "documentation": false,
+      "content": true,
+      "frontend": false,
+      "presentation": false,
+      "domains": [
+        "scale"
+      ],
+      "backend_focus": "full",
+      "cognitive_intake_light": false,
+      "cognitive_intake_plan": null,
+      "scale_intake_light": false,
+      "frontend_affected": false,
+      "backend_modules": false,
+      "frontend_test": false
+    },
+    "selectedNativeSources": 0
+  },
   "ciPlan": "Notes-only source dossier, no native sources; existing scale-content broad route is not selected light. Keep skip-ci pending coordinator exact-candidate review; do not start full application/tool tests or count skip as pass."
 }
