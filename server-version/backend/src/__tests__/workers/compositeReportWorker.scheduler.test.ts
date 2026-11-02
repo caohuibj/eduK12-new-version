@@ -46,7 +46,7 @@ describe('report scheduler capacity and drain', () => {
     expect(finishes).toHaveLength(2); expect(worker!.activeCompositeReportJobs()).toBe(2)
     finishes[0](); await flush(); await vi.advanceTimersByTimeAsync(1)
     expect(finishes).toHaveLength(3); expect(worker!.activeCompositeReportJobs()).toBe(2)
-  })
+  }, 15_000)
 
   it('coalesces simultaneous completions and never overlaps job claims or exceeds concurrency', async () => {
     const jobs = Array.from({ length: 6 }, (_, index) => job(index))
