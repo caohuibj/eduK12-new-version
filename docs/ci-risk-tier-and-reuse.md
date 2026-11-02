@@ -23,8 +23,8 @@ backend-unit 仅在 PR 完整差异全由白名单 backend/src/__tests__/situati
 
 ci-qualification.mjs 提供 closureDigest 和 verifyHistoricalSuccess。跨 commit 复用必须同时证明：
 
-1. 官方 GitHub Actions 来源的相同仓库、相同 PR、相同 base，已完成且成功的 run/job。
-2. 源提交位于当前 PR 历史；不能跨 PR、跨主分支或使用失败/取消的证据。
+1. 官方 GitHub Actions 来源的相同仓库、相同 PR、相同 base，已完成的 run（允许整体 failure）、已完成且成功的具体 job。
+2. 源 run 必须关联当前 PR，源提交位于当前 PR 历史；不能跨 PR、跨主分支或使用失败/取消的证据。
 3. 72 小时以内的未过期 artifact；原始归档字节与 GitHub 官方摘要一致。
 4. 原始与当前的所有资格输入 blob SHA/文件模式一致，包含 .github、相关代码、测试、夹具和共享脚本。
 5. 复核必须产生当前 HEAD 绑定的 REUSED_VERIFIED，不能把旧 HEAD 的绿色 check status 复制给新 HEAD。

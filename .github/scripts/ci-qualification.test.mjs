@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {classifyQualification,unitOnly,closureDigest,verifyHistoricalSuccess} from './ci-qualification.mjs';
 const item=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
 const sha=c=>c.repeat(40);
@@ -44,22 +45,26 @@ test('cross-run checkpoint accepts only official success with unchanged full clo
   {path:'server-version/frontend/src/editor.test.tsx',mode:'100644',type:'blob',sha:sha('c')}
  ];
  const sourceSha=sha('1'),headSha=sha('2');
+ const archiveBytes=Buffer.from('synthetic ZIP archive bytes');
+ const archiveDigest=createHash('sha256').update(archiveBytes).digest('hex');
  const current={repository:'caohuibj/eduK12-new-version',pr:601,baseSha:sha('3'),
   headSha,workflowPath:'.github/workflows/ci.yml',workflowDigest:digest('4'),prHeadHistory:[sourceSha,headSha]};
  const proof={schema:1,outcome:'success',check:'backend-regression',repository:current.repository,
   pr:601,baseSha:current.baseSha,sourceSha,workflowPath:current.workflowPath,workflowDigest:current.workflowDigest,
   inputDigest:closureDigest('backend-regression',tree),runId:10,jobId:20,jobName:'backend regression',
-  artifactId:30,archiveDigest:digest('5')};
- const run={id:10,head_sha:sourceSha,event:'pull_request',status:'completed',conclusion:'success',repository:{full_name:current.repository}};
- const job={id:20,run_id:10,status:'completed',conclusion:'success',name:'backend regression',
+  artifactId:30,archiveDigest};
+ const run={id:10,head_sha:sourceSha,event:'pull_request',status:'completed',conclusion:'failure',repository:{full_name:current.repository},pull_requests:[{number:601}]};
+ const job={id:20,run_id:10,head_sha:sourceSha,status:'completed',conclusion:'success',name:'backend regression',
   completed_at:'2026-11-02T11:00:00Z'};
- const artifact={id:30,workflow_run:{id:10},expired:false,digest:'sha256:'+digest('5')};
- const args={proof,run,job,artifact,archiveDigest:digest('5'),current,sourceTree:tree,currentTree:tree,now};
+ const artifact={id:30,workflow_run:{id:10},expired:false,digest:'sha256:'+archiveDigest};
+ const args={proof,run,job,artifact,archiveBytes,current,sourceTree:tree,currentTree:tree,now};
  assert.equal(verifyHistoricalSuccess(args).outcome,'REUSED_VERIFIED');
  assert.throws(()=>verifyHistoricalSuccess({...args,currentTree:[tree[0],{...tree[1],sha:sha('e')},tree[2]]}));
  assert.throws(()=>verifyHistoricalSuccess({...args,job:{...job,conclusion:'failure'}}));
  assert.throws(()=>verifyHistoricalSuccess({...args,run:{...run,conclusion:'cancelled'}}));
  assert.throws(()=>verifyHistoricalSuccess({...args,artifact:{...artifact,digest:'sha256:'+digest('6')}}));
+ assert.throws(()=>verifyHistoricalSuccess({...args,archiveBytes:Buffer.from('tampered archive')}));
+ assert.throws(()=>verifyHistoricalSuccess({...args,run:{...run,pull_requests:[{number:600}]}}));
  assert.throws(()=>verifyHistoricalSuccess({...args,current:{...current,baseSha:sha('7')}}));
  assert.throws(()=>verifyHistoricalSuccess({...args,current:{...current,prHeadHistory:[headSha]}}));
  assert.throws(()=>verifyHistoricalSuccess({...args,now:now+80*3600*1000}));

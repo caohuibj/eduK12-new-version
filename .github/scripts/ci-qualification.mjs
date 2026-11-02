@@ -69,22 +69,29 @@ export function closureDigest(check,tree){
 // A proof is never authorization by itself. The caller MUST independently fetch
 // the original official run, job and artifact, and verify the archive's bytes.
 // No source SHA rewrite, green-status copying, or acceptance of cancelled runs.
-export function verifyHistoricalSuccess({proof,run,job,artifact,archiveDigest,current,sourceTree,currentTree,now=Date.now()}){
+export function verifyHistoricalSuccess({proof,run,job,artifact,archiveBytes,current,sourceTree,currentTree,now=Date.now()}){
   assert(proof?.schema===1&&proof.outcome==='success','Only finalized passing checkpoints qualify');
   assert(CHECKS.includes(proof.check),'Unsupported checkpoint lane');
   for(const key of ['repository','pr','baseSha','workflowPath','workflowDigest'])
     assert.equal(proof[key],current[key],'Checkpoint context changed: '+key);
   assert(/^[a-f0-9]{40}$/.test(proof.sourceSha)&&/^[a-f0-9]{40}$/.test(current.headSha),'Invalid source/head');
   assert.equal(run.id,proof.runId);assert.equal(run.head_sha,proof.sourceSha);
-  assert.equal(run.event,'pull_request');assert.equal(run.status,'completed');assert.equal(run.conclusion,'success');
+  assert.equal(run.event,'pull_request');assert.equal(run.status,'completed');
+  // The overall run may fail because another unrelated job failed. Only this
+  // individual completed successful job and its immutable artifact can qualify.
+  assert(['success','failure'].includes(run.conclusion),'Cancelled or incomplete source run');
+  assert(Array.isArray(run.pull_requests)&&run.pull_requests.some(p=>p.number===current.pr),'Foreign PR run');
   assert.equal(run.repository?.full_name,current.repository,'Foreign source run');
   assert.equal(job.id,proof.jobId);assert.equal(job.run_id,proof.runId);
+  assert.equal(job.head_sha,proof.sourceSha,'Source job SHA differs');
   assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
   assert.equal(job.name,proof.jobName);
   assert.equal(artifact.id,proof.artifactId);assert.equal(artifact.workflow_run?.id,proof.runId);
-  assert.equal(artifact.expired,false);assert.equal(artifact.digest,'sha256:'+archiveDigest);
-  assert.equal(proof.archiveDigest,archiveDigest,'Archive bytes differ from official artifact');
-  assert.match(archiveDigest,/^[a-f0-9]{64}$/);
+  assert.equal(artifact.expired,false);
+  assert(archiveBytes instanceof Uint8Array && archiveBytes.length>0,'Original official artifact bytes required');
+  const archiveDigest=createHash('sha256').update(archiveBytes).digest('hex');
+  assert.equal(artifact.digest,'sha256:'+archiveDigest,'Original archive differs from GitHub official artifact');
+  assert.equal(proof.archiveDigest,archiveDigest,'Checkpoint digest differs from official artifact');
   const completed=Date.parse(job.completed_at);
   assert(Number.isFinite(completed)&&now>=completed&&now-completed<=72*3600*1000,'Checkpoint expired');
   const source=closureDigest(proof.check,sourceTree),target=closureDigest(proof.check,currentTree);
