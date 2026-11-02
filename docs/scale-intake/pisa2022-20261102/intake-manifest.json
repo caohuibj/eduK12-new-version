@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 1,
+  "motherTool": "PISA 2022",
+  "scope": "USA English Main Survey student classroom-experience extraction; 2022 wave only",
+  "status": "PUBLIC_NATIVE_FORM_PACKAGE_AND_CATALOG_ONLY_WLE_CANDIDATES",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "contentLocale": "en-US",
+  "sourceReadAt": "2026-11-02",
+  "sourceEvidence": [
+    {
+      "url": "https://nces.ed.gov/surveys/pisa/pisa2022/questionnaires/P22_StuQ-USA.html",
+      "localBytes": 264867,
+      "sha256": "c99ec6dd1d8981502f0790703a2efebca65762d574cbdf02e2b9a424f7087e72"
+    },
+    {
+      "url": "https://webfs.oecd.org/pisa2022/CY08MSP_CODEBOOK_27thJune24.xlsx",
+      "sha256": "e130e8ea3bb328d09a02789291673531300870967e236dd8f658e7052e12c974"
+    },
+    {
+      "url": "https://stat.link/v6uq1n",
+      "resolvedUrl": "https://stat.link/files/01820d6d-en/v6uq1n.xlsx",
+      "sha256": "b9b24600ca63fa68a6e24aa93c7114fdee85ac98e7e9e23a34055f8bb8bd91de"
+    },
+    {
+      "url": "https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/03/pisa-2022-technical-report_599753f0/01820d6d-en.pdf",
+      "readVia": "official PDF, browser text, Chapter 19 pp.378–399 and Annex 19.A; 2025 revised edition"
+    }
+  ],
+  "children": [
+    {
+      "catalogKey": "pisa2022_relatst_usa_en_student",
+      "catalogVersion": "1.0.0",
+      "name": "PISA 2022｜师生关系｜中学15岁目标群体｜学生填答（美国英文）",
+      "officialIndex": "RELATST",
+      "formCandidateKey": "pisa2022_st267_usa_en_student_form",
+      "formContentVersion": "1.0.0",
+      "sourceBlock": "ST267",
+      "itemCodes": [
+        "ST267Q01JA",
+        "ST267Q02JA",
+        "ST267Q03JA",
+        "ST267Q04JA",
+        "ST267Q05JA",
+        "ST267Q06JA",
+        "ST267Q07JA",
+        "ST267Q08JA"
+      ],
+      "itemCount": 8,
+      "officialModel": "GPCM",
+      "officialEstimator": "WLE",
+      "annexTable": "19.A.23",
+      "withinConstructMatrixSampling": true,
+      "officialReverseItems": [
+        "ST267Q04JA",
+        "ST267Q08JA"
+      ],
+      "officialDirection": "Higher official index values indicate more positive perceived student–teacher relationships.",
+      "rawResponseCodeRange": [
+        1,
+        4
+      ],
+      "rawCodesAreScores": false,
+      "formReverseItems": [],
+      "formScores": [],
+      "formScoringParameters": null,
+      "formReportVersion": null,
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
+    },
+    {
+      "catalogKey": "pisa2022_disclim_usa_en_student",
+      "catalogVersion": "1.0.0",
+      "name": "PISA 2022｜数学课堂纪律体验｜中学15岁目标群体｜学生填答（美国英文）",
+      "officialIndex": "DISCLIM",
+      "formCandidateKey": "pisa2022_st273_usa_en_student_form",
+      "formContentVersion": "1.0.0",
+      "sourceBlock": "ST273",
+      "itemCodes": [
+        "ST273Q01JA",
+        "ST273Q02JA",
+        "ST273Q03JA",
+        "ST273Q04JA",
+        "ST273Q05JA",
+        "ST273Q06JA",
+        "ST273Q07JA"
+      ],
+      "itemCount": 7,
+      "officialModel": "PCM",
+      "officialEstimator": "WLE",
+      "annexTable": "19.A.50",
+      "withinConstructMatrixSampling": true,
+      "officialReverseItems": [],
+      "officialDirection": "Higher official index values indicate a more favourable disciplinary climate, not more frequent disruptions.",
+      "rawResponseCodeRange": [
+        1,
+        4
+      ],
+      "rawCodesAreScores": false,
+      "formReverseItems": [],
+      "formScores": [],
+      "formScoringParameters": null,
+      "formReportVersion": null,
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
+    },
+    {
+      "catalogKey": "pisa2022_teachsup_usa_en_student",
+      "catalogVersion": "1.0.0",
+      "name": "PISA 2022｜数学教师支持｜中学15岁目标群体｜学生填答（美国英文）",
+      "officialIndex": "TEACHSUP",
+      "formCandidateKey": "pisa2022_st270_usa_en_student_form",
+      "formContentVersion": "1.0.0",
+      "sourceBlock": "ST270",
+      "itemCodes": [
+        "ST270Q01JA",
+        "ST270Q02JA",
+        "ST270Q03JA",
+        "ST270Q04JA"
+      ],
+      "itemCount": 4,
+      "officialModel": "PCM",
+      "officialEstimator": "WLE",
+      "annexTable": "19.A.22",
+      "withinConstructMatrixSampling": false,
+      "officialReverseItems": [
+        "ST270Q01JA",
+        "ST270Q02JA",
+        "ST270Q03JA",
+        "ST270Q04JA"
+      ],
+      "officialDirection": "Higher official index values indicate more frequent perceived teacher support.",
+      "rawResponseCodeRange": [
+        1,
+        4
+      ],
+      "rawCodesAreScores": false,
+      "formReverseItems": [],
+      "formScores": [],
+      "formScoringParameters": null,
+      "formReportVersion": null,
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
+    },
+    {
+      "catalogKey": "pisa2022_cogacrco_usa_en_student",
+      "catalogVersion": "1.0.0",
+      "name": "PISA 2022｜数学认知激活：促进推理｜中学15岁目标群体｜学生填答（美国英文）",
+      "officialIndex": "COGACRCO",
+      "formCandidateKey": "pisa2022_st285_usa_en_student_form",
+      "formContentVersion": "1.0.0",
+      "sourceBlock": "ST285",
+      "itemCodes": [
+        "ST285Q01JA",
+        "ST285Q02JA",
+        "ST285Q03JA",
+        "ST285Q04JA",
+        "ST285Q05JA",
+        "ST285Q06JA",
+        "ST285Q07JA",
+        "ST285Q08JA",
+        "ST285Q09JA"
+      ],
+      "itemCount": 9,
+      "officialModel": "GPCM",
+      "officialEstimator": "WLE",
+      "annexTable": "19.A.48",
+      "withinConstructMatrixSampling": true,
+      "officialReverseItems": [],
+      "officialDirection": "Higher official index values indicate more frequent perceived reasoning-oriented teaching behaviours.",
+      "rawResponseCodeRange": [
+        1,
+        5
+      ],
+      "rawCodesAreScores": false,
+      "formReverseItems": [],
+      "formScores": [],
+      "formScoringParameters": null,
+      "formReportVersion": null,
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
+    },
+    {
+      "catalogKey": "pisa2022_cogacmco_usa_en_student",
+      "catalogVersion": "1.0.0",
+      "name": "PISA 2022｜数学认知激活：鼓励数学思考｜中学15岁目标群体｜学生填答（美国英文）",
+      "officialIndex": "COGACMCO",
+      "formCandidateKey": "pisa2022_st283_usa_en_student_form",
+      "formContentVersion": "1.0.0",
+      "sourceBlock": "ST283",
+      "itemCodes": [
+        "ST283Q01JA",
+        "ST283Q02JA",
+        "ST283Q03JA",
+        "ST283Q04JA",
+        "ST283Q05JA",
+        "ST283Q06JA",
+        "ST283Q07JA",
+        "ST283Q08JA",
+        "ST283Q09JA"
+      ],
+      "itemCount": 9,
+      "officialModel": "GPCM",
+      "officialEstimator": "WLE",
+      "annexTable": "19.A.49",
+      "withinConstructMatrixSampling": true,
+      "officialReverseItems": [],
+      "officialDirection": "Higher official index values indicate more frequent perceived encouragement of mathematical thinking.",
+      "rawResponseCodeRange": [
+        1,
+        5
+      ],
+      "rawCodesAreScores": false,
+      "formReverseItems": [],
+      "formScores": [],
+      "formScoringParameters": null,
+      "formReportVersion": null,
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
+    }
+  ],
+  "ordinaryCombinationCandidates": [
+    {
+      "name": "PISA 2022｜数学课堂经历｜中学15岁目标群体｜学生填答（美国英文）",
+      "childFormKeys": [
+        "pisa2022_st273_usa_en_student_form",
+        "pisa2022_st270_usa_en_student_form",
+        "pisa2022_st285_usa_en_student_form",
+        "pisa2022_st283_usa_en_student_form"
+      ],
+      "order": [
+        "ST273",
+        "ST270",
+        "ST285",
+        "ST283"
+      ],
+      "combinedScore": null,
+      "status": "PLAN_ONLY_NOT_INSTALLED",
+      "notes": "Each full block retained once; original order retained within this selected classroom subset. No IRT or cross-source score."
+    },
+    {
+      "name": "PISA 2022｜学校师生关系与数学课堂经历｜中学15岁目标群体｜学生填答（美国英文）",
+      "childFormKeys": [
+        "pisa2022_st267_usa_en_student_form",
+        "pisa2022_st273_usa_en_student_form",
+        "pisa2022_st270_usa_en_student_form",
+        "pisa2022_st285_usa_en_student_form",
+        "pisa2022_st283_usa_en_student_form"
+      ],
+      "order": [
+        "ST267",
+        "ST273",
+        "ST270",
+        "ST285",
+        "ST283"
+      ],
+      "combinedScore": null,
+      "status": "PLAN_ONLY_NOT_INSTALLED",
+      "notes": "Optional inclusion of ST267; disclosure settings must follow the actual recipient and existing policy."
+    }
+  ],
+  "notIncluded": [
+    "Identity, birthday, gender, ethnicity, race, household, parents, migration and other sensitive background blocks",
+    "ST275/ST276 content exposure: outside the selected teacher/classroom-process scope",
+    "ST265/ST266 safety: separate sensitive school-climate scope",
+    "Other countries/languages, paper-based, une-heure, 2012/2018/2025 waves",
+    "No official or project cross-tool total"
+  ],
+  "permissions": {
+    "questionnaire": "English native Form payloads included under OECD written-content terms §1.2 with attribution/adaptation notice; actual specific/third-party exceptions excluded if identified. Commercial translation not included.",
+    "oecdTerms": "https://www.oecd.org/en/about/terms-conditions.html §1.2 allows use/copy/distribution and adaptation of solely OECD-owned pre-July-2024 written content; third-party rights and exact USA national material still require verification. Not a CC BY claim for the 2022 questionnaire.",
+    "technicalReport": "2025 revised Technical Report declares CC BY 4.0; metadata below paraphrases it.",
+    "productionDedup": "NOT_CHECKED",
+    "productionWrites": false
+  },
+  "versionPlan": {
+    "candidateMetadata": "1.0.0",
+    "formContent": "1.0.0 public native Form submission + CSV payload; not installed/published",
+    "scoringParameters": "NOT_CREATED (FORM has no scoring)",
+    "report": "NOT_INSTALLED; receiver-specific prose examples only",
+    "motherRuntime": "NOT_CREATED; use ordinary composition after approved child versions exist"
+  }
+}

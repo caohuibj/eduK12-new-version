@@ -1,0 +1,132 @@
+{
+  "base": "88e3328d44d29fa3bc2afd12486e8505bd932ede",
+  "forms": [
+    {
+      "key": "pisa2022_st267_usa_en_student_form",
+      "version": "1.0.0",
+      "fields": 8,
+      "nativeSubmissionSchema": "PASS",
+      "formSchema": "PASS",
+      "artifactCompilation": "PASS",
+      "rawQuestionIdentityUnchanged": true,
+      "inDefinitionSourceNotice": true,
+      "noScoreReport": true,
+      "definitionSha256": "160752ac7ad99a70dcfe2b7257bfd78dc4426651fdce54bd03959173178dec69",
+      "requestId": "52277547-138b-54b2-9a63-1d7483015161",
+      "csvImportRequestBytesUnchanged": true,
+      "standaloneCsvParsedFieldsUnchanged": true
+    },
+    {
+      "key": "pisa2022_st273_usa_en_student_form",
+      "version": "1.0.0",
+      "fields": 7,
+      "nativeSubmissionSchema": "PASS",
+      "formSchema": "PASS",
+      "artifactCompilation": "PASS",
+      "rawQuestionIdentityUnchanged": true,
+      "inDefinitionSourceNotice": true,
+      "noScoreReport": true,
+      "definitionSha256": "e2b49ab6448abff26974983ae091cc12ffa3b2cc3e77248f84b05db78458e19c",
+      "requestId": "a4857310-8d4f-58b0-ac9f-70aa44132e0f",
+      "csvImportRequestBytesUnchanged": true,
+      "standaloneCsvParsedFieldsUnchanged": true
+    },
+    {
+      "key": "pisa2022_st270_usa_en_student_form",
+      "version": "1.0.0",
+      "fields": 4,
+      "nativeSubmissionSchema": "PASS",
+      "formSchema": "PASS",
+      "artifactCompilation": "PASS",
+      "rawQuestionIdentityUnchanged": true,
+      "inDefinitionSourceNotice": true,
+      "noScoreReport": true,
+      "definitionSha256": "8f1aa794cdd868fa348c3c5206eeb0a3ffa02d4fb0b3c13741fa640e0d107119",
+      "requestId": "865570a7-7418-5fae-a990-bd03d6da05b9",
+      "csvImportRequestBytesUnchanged": true,
+      "standaloneCsvParsedFieldsUnchanged": true
+    },
+    {
+      "key": "pisa2022_st285_usa_en_student_form",
+      "version": "1.0.0",
+      "fields": 9,
+      "nativeSubmissionSchema": "PASS",
+      "formSchema": "PASS",
+      "artifactCompilation": "PASS",
+      "rawQuestionIdentityUnchanged": true,
+      "inDefinitionSourceNotice": true,
+      "noScoreReport": true,
+      "definitionSha256": "66c8ab234c57439bf8147482e1570866ac6a770bb7f46f1b362be3f9258bb83d",
+      "requestId": "02b88621-e382-5b83-a05f-e229409c6aca",
+      "csvImportRequestBytesUnchanged": true,
+      "standaloneCsvParsedFieldsUnchanged": true
+    },
+    {
+      "key": "pisa2022_st283_usa_en_student_form",
+      "version": "1.0.0",
+      "fields": 9,
+      "nativeSubmissionSchema": "PASS",
+      "formSchema": "PASS",
+      "artifactCompilation": "PASS",
+      "rawQuestionIdentityUnchanged": true,
+      "inDefinitionSourceNotice": true,
+      "noScoreReport": true,
+      "definitionSha256": "e4a227532fd8b0c9033d4eb68a09b20f61c0425a1dc09e2cff4d39eee4c92952",
+      "requestId": "7cb5db37-b4cd-50b7-9b48-9897d6bde79c",
+      "csvImportRequestBytesUnchanged": true,
+      "standaloneCsvParsedFieldsUnchanged": true
+    }
+  ],
+  "originalAnswerRuntimeAndIsolatedDbEvidence": "REUSED, raw questions/keys/options/required flags and CSV input unchanged; no repeat of 37 answer/missing/35 invalid fixtures or original isolated persistence",
+  "newChecks": "source/adaptation page metadata, complete native governed FORM submission schema and pure artifact compilation; no submission or database side effects",
+  "notRun": [
+    "Service authorization or governed database submission",
+    "Public release or production install",
+    "Official WLE",
+    "Commercial Chinese item translation",
+    "Full platform/backend/frontend tests"
+  ],
+  "registry": {
+    "main": 329,
+    "candidate": 334,
+    "added": [
+      "../instruments/pisa2022_cogacmco_usa_en_student/1.0.0/instrument",
+      "../instruments/pisa2022_cogacrco_usa_en_student/1.0.0/instrument",
+      "../instruments/pisa2022_disclim_usa_en_student/1.0.0/instrument",
+      "../instruments/pisa2022_relatst_usa_en_student/1.0.0/instrument",
+      "../instruments/pisa2022_teachsup_usa_en_student/1.0.0/instrument"
+    ],
+    "removed": []
+  },
+  "reusedInputBlobs": {
+    "originalHead": "51569d88e26ef7d9c58ef93cca206c451159673d",
+    "reviewBase": "88e3328d44d29fa3bc2afd12486e8505bd932ede",
+    "unchanged": [
+      "server-version/backend/src/modules/assessment-core/form/definition.ts",
+      "server-version/backend/src/modules/assessment-core/form/runtime.ts",
+      "server-version/backend/src/modules/assessment-core/form/import-builder.ts",
+      "server-version/backend/src/modules/assessment-core/form/import-parser.ts",
+      "server-version/backend/src/modules/survey/builder.import.ts",
+      "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "server-version/backend/package.json",
+      "server-version/backend/package-lock.json"
+    ]
+  },
+  "csvExportPresentation": {
+    "standaloneCsvLineEndings": "LF for Git whitespace compatibility; original import.json content retains original CRLF bytes",
+    "parsedFieldEquality": "5/5 PASS",
+    "rawQuestionOrAnswerSemanticChanges": false
+  },
+  "localPreflightCorrections": [
+    {
+      "check": "git diff --cached --check",
+      "initial": "FAIL: original CRLF CSV export treated as trailing whitespace",
+      "resolution": "Normalize standalone .csv.txt line endings only; retain original import.json content and compare parsed CSV fields exactly"
+    },
+    {
+      "check": "scope command from Node stdin",
+      "initial": "NOT_EXECUTED: existing main SJT generator import inspects process.argv[1], which was dash",
+      "resolution": "Use actual temporary .mjs file; no checker modification or platform tests"
+    }
+  ]
+}
