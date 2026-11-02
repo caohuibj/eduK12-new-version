@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "recordedOn": "2026-11-02",
   "initialBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
-  "integratedBase": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "integratedBase": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
   "sharedFixes": "main #551/#556; no tool/CI edits relative to integratedBase",
   "originalSpsWorkPreserved": {
     "branch": "feat/colorado-sps-intake-20261102",
@@ -870,5 +870,7 @@
     "docs/scale-intake/emu-20261102/inventory.json": "98abbc15e797fc5124a6e6d9b3039e3ebe51df66d78deee8066884f78ce00f66",
     "docs/scale-intake/emu-20261102/sources.json": "cf01d52b63837523563d013d840ecf5347e81a1f61f4511aae6554082a7673ad",
     "docs/scale-intake/emu-20261102/feedback-examples.md": "bd07a3a6db251866aca86efa935c4f0f28a656e3d18df9a0e36884411ef01a26"
-  }
+  },
+  "nativeValidationBase": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "baseUpdate": "Before PR creation integrated latest observed main688d; upstream changes do not modify EMU sources/index, native catalog/materialize consumers, dependency locks, or Scale tables. Original local source/consumer evidence retained; no unrelated platform regression repeated."
 }
