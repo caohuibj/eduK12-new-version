@@ -1,0 +1,85 @@
+{
+  "status": "VERIFIED_PRIMARY_SOURCES_READ",
+  "article": {
+    "url": "https://www.nature.com/articles/s41599-025-04927-4",
+    "htmlSha256": "282ade8714035dabf17920e864b5f717a6b2a389981864a1541939d4b2abf155",
+    "pdfSha256": "08e4f89fd9ce9e51a38a98a8d6abf5ef15578d645fb1e31de37a1c40fcafd596",
+    "pages": 10,
+    "allSectionsRead": true,
+    "finalEnglishItems": "All 30 independently present in HTML Table 2 and publisher PDF Tables 2–3",
+    "rights": "CC BY 4.0; author-created table item text, no separate restrictive credit line"
+  },
+  "supplement": {
+    "url": "https://static-content.springer.com/esm/art%3A10.1057%2Fs41599-025-04927-4/MediaObjects/41599_2025_4927_MOESM1_ESM.docx",
+    "bytes": 32917,
+    "sha256": "07bd52c217a77a0c21cf3390f922c3f8d2b31b1b5bed5c910a559ff9212ba2b5",
+    "allOOXMLPartsInspected": true,
+    "documentText": "Title/authors and Appendix A: The information function curves of the scale and subscales",
+    "chartParts": 5,
+    "originalChineseItemsPresent": false,
+    "responseKeyPresent": false,
+    "scoringManualPresent": false,
+    "redistribution": "Only this structural inspection is committed, no DOCX/chart copies"
+  },
+  "knownItemKeys": {
+    "knowledge": [
+      "K1",
+      "K2",
+      "K3",
+      "K4",
+      "K5",
+      "K6",
+      "K7"
+    ],
+    "skills": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8"
+    ],
+    "values": [
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8"
+    ],
+    "actionability": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6",
+      "A7"
+    ]
+  },
+  "scoringGaps": [
+    "Exact teacher response labels and numeric encoding",
+    "Original arithmetic aggregation, reverse-key and missing policy",
+    "IRT discrimination/threshold parameter set and scoring procedure",
+    "Complete original Chinese administration form"
+  ],
+  "expertRatingAnchors": "The 1–5 not appropriate at all to highly appropriate scale is for 24 experts assessing item suitability. It is not adopted as teacher self-report response anchors.",
+  "notionHistory": {
+    "status": "READ_WITH_QIANG_CONNECTION",
+    "pageId": "404d27635a388186ac80de3593da05a5",
+    "applicableIds": [
+      "CI-003",
+      "CI-004",
+      "CI-006",
+      "CI-020"
+    ],
+    "knownSharedBlocker": "Resolved by merged PR556, incorporated via main ae05ed2e70691bda817ab323130f9caf4dff26ca; not changed in this content branch"
+  },
+  "originalScoredScaleStatus": "NOT_EXECUTABLE",
+  "nativeReflectionAdaptationStatus": "see isolated-import-receipt.json",
+  "toolingBase": "ae05ed2e70691bda817ab323130f9caf4dff26ca"
+}

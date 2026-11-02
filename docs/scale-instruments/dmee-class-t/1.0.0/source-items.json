@@ -1,0 +1,586 @@
+{
+  "citation": "Dierendonck C (2023). Frontiers in Education 8:1281431. doi:10.3389/feduc.2023.1281431",
+  "source": "Supplementary Table S1 and final target grouping Table S5; Table S2/S7/S8 CSS-T excluded from this package",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "changes": "Whitespace trimmed; French and author English translation preserved, no project Chinese item translation. Items 56–58 retained for provenance only, absent from all administrations.",
+  "items": [
+    {
+      "originalItemNumber": 1,
+      "initialFactor": "Orientation",
+      "fr": "Je présente explicitement aux élèves les objectifs d’apprentissage au début de la leçon/activité.",
+      "enAuthorTranslation": "I explicitly present the learning objectives to the students at the beginning of the lesson/activity.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 2,
+      "initialFactor": "Orientation",
+      "fr": "Au cours de la leçon/activité, j’explique à quoi sert chaque tâche que je propose.",
+      "enAuthorTranslation": "During the lesson/activity, I explain the purpose of each task I propose.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 3,
+      "initialFactor": "Orientation",
+      "fr": "Je vérifie que les élèves comprennent bien la signification et l’intérêt des leçons/activités que je propose.",
+      "enAuthorTranslation": "I check that the students understand the meaning and interest of the lessons/activities I propose.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 4,
+      "initialFactor": "Orientation",
+      "fr": "J’interroge les élèves sur leur perception des raisons pour lesquelles les leçons/activités sont proposées.",
+      "enAuthorTranslation": "I ask the students about their perception of the reasons why the lessons/activities are proposed.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 5,
+      "initialFactor": "Orientation",
+      "fr": "Les élèves connaissent la finalité ou l'objectif de la leçon/activité en cours.",
+      "enAuthorTranslation": "Students know the purpose or objective of the lesson/activity in progress.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 6,
+      "initialFactor": "Orientation",
+      "fr": "Les élèves savent pourquoi ils font telle ou telle activité.",
+      "enAuthorTranslation": "Students know why they are doing a particular activity.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 7,
+      "initialFactor": "Orientation",
+      "fr": "Les élèves comprennent pourquoi ils sont en train de réaliser une tâche spécifique.",
+      "enAuthorTranslation": "Students understand why they are doing a specific task.",
+      "finalFactor": "orientation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 8,
+      "initialFactor": "Orientation",
+      "fr": "Je modifie les objectifs et les attentes pour les élèves en difficulté.",
+      "enAuthorTranslation": "I modify goals and expectations for students with difficulties.",
+      "finalFactor": "differentiation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 9,
+      "initialFactor": "Structuration",
+      "fr": "En début de leçon/activité, je fais un bref résumé/rappel de la leçon/activité précédente.",
+      "enAuthorTranslation": "At the start of each lesson/activity, I give a brief summary/review of the previous lesson/activity.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 10,
+      "initialFactor": "Structuration",
+      "fr": "Je fais des liens entre les différentes activités que je propose aux élèves.",
+      "enAuthorTranslation": "I make links between the different activities I propose to the students.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 11,
+      "initialFactor": "Structuration",
+      "fr": "J’attire l’attention des élèves sur les éléments principaux de la leçon/activité.",
+      "enAuthorTranslation": "I draw the students' attention to the main points of the lesson/activity.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 12,
+      "initialFactor": "Structuration",
+      "fr": "En fin de leçon/activité, je fais un résumé de ce qui a été vu/travaillé.",
+      "enAuthorTranslation": "At the end of the lesson/activity, I summarise what has been seen/worked on.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 13,
+      "initialFactor": "Structuration",
+      "fr": "Les élèves font des liens entre la leçon/activité en cours et d'autres leçons/activités précédentes.",
+      "enAuthorTranslation": "The students make links between the lesson/activity in progress and other previous lessons/activities.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 14,
+      "initialFactor": "Structuration",
+      "fr": "Les élèves sont capables de réexpliquer ce qui s'est passé lors de la leçon/activité précédente.",
+      "enAuthorTranslation": "Students are able to explain what happened in the previous lesson/activity.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 15,
+      "initialFactor": "Structuration",
+      "fr": "En fin de leçon/activité, les élèves font un résumé de ce qui a été vu/travaillé.",
+      "enAuthorTranslation": "At the end of the lesson/activity, the students summarise what they have seen/worked on.",
+      "finalFactor": "structuring",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 16,
+      "initialFactor": "Structuration",
+      "fr": "J'ajuste la quantité de travail aux capacités des élèves.",
+      "enAuthorTranslation": "I adjust the amount of work required in accordance with students' capabilities.",
+      "finalFactor": "differentiation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 17,
+      "initialFactor": "Structuration",
+      "fr": "Je prévois des tâches différentes en fonction des capacités des élèves.",
+      "enAuthorTranslation": "I plan different assignments to match students’ abilities.",
+      "finalFactor": "differentiation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 18,
+      "initialFactor": "Questioning",
+      "fr": "Je pose des questions orales collectives (adressées à l'ensemble de la classe).",
+      "enAuthorTranslation": "I ask group oral questions (addressed to the whole class).",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 19,
+      "initialFactor": "Questioning",
+      "fr": "Je pose des questions orales individuelles (adressées spécifiquement à certains élèves).",
+      "enAuthorTranslation": "I ask individual oral questions (addressed specifically to certain students).",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 20,
+      "initialFactor": "Questioning",
+      "fr": "Je pose des questions par écrit.",
+      "enAuthorTranslation": "I ask written questions.",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 21,
+      "initialFactor": "Questioning",
+      "fr": "Je pose des questions ouvertes qui demandent une réponse argumentée/élaborée.",
+      "enAuthorTranslation": "I ask open questions that require a developed/elaborated response.",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 22,
+      "initialFactor": "Questioning",
+      "fr": "Les questions que je pose sont comprises par les élèves.",
+      "enAuthorTranslation": "The questions I ask are understood by the students.",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 23,
+      "initialFactor": "Questioning",
+      "fr": "Les élèves répondent correctement aux questions que je leur pose individuellement.",
+      "enAuthorTranslation": "Students respond correctly to the questions I ask them individually.",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 24,
+      "initialFactor": "Questioning",
+      "fr": "Les élèves veulent répondre lorsque je pose une question collective à la classe.",
+      "enAuthorTranslation": "Students want to answer when I ask the class a collective question.",
+      "finalFactor": "questioning",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 25,
+      "initialFactor": "Modeling",
+      "fr": "J’explique des stratégies et des procédures aux élèves, puis je leur demande de les mettre en œuvre.",
+      "enAuthorTranslation": "I explain strategies and procedures to students and then ask them to apply them.",
+      "finalFactor": "modeling",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 26,
+      "initialFactor": "Modeling",
+      "fr": "Lorsqu’un élève éprouve une difficulté particulière lors d’un exercice, je lui montre la bonne stratégie ou procédure à utiliser.",
+      "enAuthorTranslation": "If a student is having particular difficulty with an exercise, I show him/her the correct strategy or procedure to use.",
+      "finalFactor": "modeling",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 27,
+      "initialFactor": "Modeling",
+      "fr": "Pour réaliser un exercice ou résoudre une situation-problème, je demande aux élèves d’utiliser les stratégies et procédures que j’ai montrées.",
+      "enAuthorTranslation": "To complete an exercise or solve a problem, I ask the students to use the strategies and procedures I have shown them.",
+      "finalFactor": "modeling",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 28,
+      "initialFactor": "Modeling",
+      "fr": "Face à un exercice ou une situation-problème, les élèves proposent leurs propres stratégies ou procédures de résolution.",
+      "enAuthorTranslation": "When faced with an exercise or a problem, the students come up with their own strategies or procedures for solving it.",
+      "finalFactor": "modeling",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 29,
+      "initialFactor": "Modeling",
+      "fr": "Face à un exercice ou une situation-problème, les élèves appliquent correctement les stratégies et procédures que je leur ai montrées.",
+      "enAuthorTranslation": "When faced with an exercise or problem situation, the students correctly apply the strategies and procedures I have shown them.",
+      "finalFactor": "modeling",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 30,
+      "initialFactor": "Modeling",
+      "fr": "Les élèves comprennent aisément les stratégies et procédures que je leur explique.",
+      "enAuthorTranslation": "The students easily understand the strategies and procedures I explain to them.",
+      "finalFactor": "modeling",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 31,
+      "initialFactor": "Application",
+      "fr": "Je donne par écrit des exercices d'application à faire individuellement.",
+      "enAuthorTranslation": "I give written application exercises to be done individually.",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 32,
+      "initialFactor": "Application",
+      "fr": "Je donne par écrit des exercices d'application à faire en duo.",
+      "enAuthorTranslation": "I give you written exercises to do in pairs.",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 33,
+      "initialFactor": "Application",
+      "fr": "Je donne par écrit des exercices d'application à faire en groupes.",
+      "enAuthorTranslation": "I give written exercises to be done in groups.",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 34,
+      "initialFactor": "Application",
+      "fr": "Je donne oralement des exercices d'application de ce qui vient d'être enseigné.",
+      "enAuthorTranslation": "I give oral exercises to apply what has just been taught.",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 35,
+      "initialFactor": "Application",
+      "fr": "Les exercices d'application que je donne sont spécifiques (ils visent une habileté ou un type de tâche en particulier).",
+      "enAuthorTranslation": "The exercises I give are specific (they target a particular skill or type of task).",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 36,
+      "initialFactor": "Application",
+      "fr": "Les exercices d'application que je donne impliquent l'intégration de plusieurs habiletés.",
+      "enAuthorTranslation": "The exercises I give involve the integration of several skills.",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 37,
+      "initialFactor": "Application",
+      "fr": "Les exercices que je donne sont corrigés collectivement en classe ou par mes soins pendant ou après l'école.",
+      "enAuthorTranslation": "The exercises I give are corrected collectively in class or by myself during or after school.",
+      "finalFactor": "application",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 38,
+      "initialFactor": "Application",
+      "fr": "Je varie la complexité des tâches en fonction des capacités des élèves (par exemple : porter un jugement sur un texte, le résumer, reconnaître le thème principal).",
+      "enAuthorTranslation": "I vary the complexity of assignments to match students’ abilities (e.g. make judgments about a text or summarize, recognize the main theme).",
+      "finalFactor": "differentiation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 39,
+      "initialFactor": "Learning environment",
+      "fr": "Je veille à ce que chaque élève participe à la leçon/activité.",
+      "enAuthorTranslation": "I make sure that every pupil participates in the lesson/activity.",
+      "finalFactor": "learning_environment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 40,
+      "initialFactor": "Learning environment",
+      "fr": "Je donne des feedbacks positifs aux élèves.",
+      "enAuthorTranslation": "I give positive feedback to the students.",
+      "finalFactor": "learning_environment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 41,
+      "initialFactor": "Learning environment",
+      "fr": "L’ambiance de travail en classe est calme et sereine.",
+      "enAuthorTranslation": "The classroom atmosphere is calm and serene.",
+      "finalFactor": "learning_environment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 42,
+      "initialFactor": "Learning environment",
+      "fr": "J’encourage les élèves à me dire lorsqu’ils ne comprennent pas quelque chose.",
+      "enAuthorTranslation": "I encourage students to tell me when they don't understand something.",
+      "finalFactor": "learning_environment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 43,
+      "initialFactor": "Learning environment",
+      "fr": "J'utilise du matériel alternatif pour correspondre aux niveaux de compétences des élèves (par exemple, des livres adaptés aux besoins des élèves de niveau de compétences inférieur ou supérieur).",
+      "enAuthorTranslation": "I use alternative materials to match students’ abilities (e.g. books adapted to the needs of lower and higher skill levels).",
+      "finalFactor": "differentiation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 44,
+      "initialFactor": "Learning environment",
+      "fr": "Je fournis aux élèves les plus faibles des aides et des outils supplémentaires (par exemple des supports visuels contenant les informations essentielles).",
+      "enAuthorTranslation": "I provide weaker students with additional aids and tools (e.g. visual aids containing essential information).",
+      "finalFactor": "differentiation",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 45,
+      "initialFactor": "Learning environment",
+      "fr": "Mes évaluations sont réellement formatives pour les élèves.",
+      "enAuthorTranslation": "My assessments are truly formative for the students.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 46,
+      "initialFactor": "Learning environment",
+      "fr": "J'analyse les erreurs les plus fréquemment commises lors des évaluations afin d'identifier précisément ce qui doit être travaillé en priorité avec tous les élèves ou certains d'entre eux.",
+      "enAuthorTranslation": "I analyze the most common mistakes made during assessments in order to identify precisely what needs to be worked on as a priority with all or some of the students.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 47,
+      "initialFactor": "Learning environment",
+      "fr": "J'observe les élèves pendant qu'ils effectuent une tâche particulière en classe et je leur donne un retour direct sur leur travail.",
+      "enAuthorTranslation": "I observe the students while they are doing a particular task in class and give them direct feedback on their work.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 48,
+      "initialFactor": "Learning environment",
+      "fr": "Après chaque évaluation, je donne un feedback aux élèves sur les aspects qu'ils ont bien maîtrisés et sur ceux pour lesquels ils doivent faire des efforts supplémentaires.",
+      "enAuthorTranslation": "After each assessment, I provide feedback to the students on which aspects they have mastered well and on which aspects they need to make further efforts.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 49,
+      "initialFactor": "Learning environment",
+      "fr": "Après chaque évaluation, je donne des explications supplémentaires aux élèves qui ont des difficultés.",
+      "enAuthorTranslation": "After each assessment, I give additional explanations to students who are struggling.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 50,
+      "initialFactor": "Learning environment",
+      "fr": "Après chaque évaluation, je conçois des activités de remédiation (mise en place d'une procédure corrective) pour les élèves en difficulté.",
+      "enAuthorTranslation": "After each assessment, I design remedial activities (set up a corrective procedure) for students in difficulty.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 51,
+      "initialFactor": "Learning environment",
+      "fr": "J'adapte les évaluations au niveau scolaire de chaque élève (en proposant des questions différentes ou en modulant mon niveau d'exigence).",
+      "enAuthorTranslation": "I adapt evaluations to match students’ abilities (by proposing different questions or by modulating my level of requirement).",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 52,
+      "initialFactor": "Learning environment",
+      "fr": "J'évalue les progrès des élèves faibles.",
+      "enAuthorTranslation": "I assess the progress of weak students.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 53,
+      "initialFactor": "Learning environment",
+      "fr": "J'analyse les données relatives aux progrès scolaires des élèves.",
+      "enAuthorTranslation": "I analyze data about students' academic progress.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 54,
+      "initialFactor": "Learning environment",
+      "fr": "J'évalue l'efficacité de mes pratiques pédagogiques (par exemple, en faisant un monitoring des résultats et des progrès réalisés).",
+      "enAuthorTranslation": "I evaluate the effectiveness of teaching adjustments (e.g. monitor subsequent achievement and progress).",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 55,
+      "initialFactor": "Learning environment",
+      "fr": "J'utilise les données collectées au sujet des compétences des élèves pour décider des ajustements à opérer au niveau de mon enseignement.",
+      "enAuthorTranslation": "I use students’ data to make decisions about teaching adjustments.",
+      "finalFactor": "assessment",
+      "status": "RETAINED"
+    },
+    {
+      "originalItemNumber": 56,
+      "initialFactor": "Learning environment",
+      "fr": "Sur une leçon/activité, le temps disponible est amputé de 5 minutes ou plus, pour des questions d’organisation ou de gestion des comportements.",
+      "enAuthorTranslation": "During a lesson/activity, the time available is reduced by 5 minutes or more, for organisational or behaviour management reasons.",
+      "finalFactor": null,
+      "status": "EXCLUDED_TIME_MANAGEMENT_ALPHA_0_29"
+    },
+    {
+      "originalItemNumber": 57,
+      "initialFactor": "Learning environment",
+      "fr": "La leçon/activité prévue se termine avec plusieurs minutes d'avance sur ce que j'avais prévu.",
+      "enAuthorTranslation": "The planned lesson/activity finishes several minutes ahead of schedule.",
+      "finalFactor": null,
+      "status": "EXCLUDED_TIME_MANAGEMENT_ALPHA_0_29"
+    },
+    {
+      "originalItemNumber": 58,
+      "initialFactor": "Learning environment",
+      "fr": "La leçon/activité dépasse de plusieurs minutes la durée que j'avais prévue.",
+      "enAuthorTranslation": "The lesson/activity goes on several minutes longer than I had planned.",
+      "finalFactor": null,
+      "status": "EXCLUDED_TIME_MANAGEMENT_ALPHA_0_29"
+    }
+  ],
+  "finalFactors": [
+    {
+      "factor": "Orientation",
+      "key": "orientation",
+      "labelZh": "目标导向",
+      "originalItems": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "factor": "Structuration",
+      "key": "structuring",
+      "labelZh": "结构组织",
+      "originalItems": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "factor": "Questioning",
+      "key": "questioning",
+      "labelZh": "提问",
+      "originalItems": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "factor": "Modeling",
+      "key": "modeling",
+      "labelZh": "策略示范",
+      "originalItems": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ]
+    },
+    {
+      "factor": "Application",
+      "key": "application",
+      "labelZh": "应用练习",
+      "originalItems": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37
+      ]
+    },
+    {
+      "factor": "Learning environment",
+      "key": "learning_environment",
+      "labelZh": "学习环境",
+      "originalItems": [
+        39,
+        40,
+        41,
+        42
+      ]
+    },
+    {
+      "factor": "Assessment",
+      "key": "assessment",
+      "labelZh": "评价",
+      "originalItems": [
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55
+      ]
+    },
+    {
+      "factor": "Differentiation",
+      "key": "differentiation",
+      "labelZh": "差异化",
+      "originalItems": [
+        8,
+        16,
+        17,
+        38,
+        43,
+        44
+      ]
+    }
+  ]
+}

@@ -32,7 +32,7 @@ test('continues the saved EVC FINAL using a new native mapping and preserves the
     expect(initial.status).toBe('UNAVAILABLE')
     const originalHash=initial.factsHash
     const actor={userId:parent.compositeAssessment.createdBy!,role:UserRole.ADMIN},tag=randomUUID(),reviewer='evc-repair-review-'+tag
-    await db.user.create({data:{id:reviewer,username:reviewer,passwordHash:'synthetic-review-only',role:'ADMIN',accountDomain:'TRAINING'}})
+    await db.user.create({data:{id:reviewer,username:reviewer,passwordHash:'synthetic-review-only',role:'ADMIN',accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN'}})
     const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1'))
     const installed=await installPackage(db,actor.userId,pack);expect(installed.status).toBe('DRAFT')
     const review={contentHash:hashDeclarativePackage(pack),reviewerId:reviewer,expiresAt:new Date(Date.now()+3600000).toISOString(),claims:['cross_source_condition'],scientific:true,rights:true,language:true,report:true}

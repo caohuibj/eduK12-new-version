@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "dmee_class_t_orientation_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "DMEE-Class-T｜目标导向｜教师自评｜2023作者英译（量表计分待补，已备无分Form）",
+      "abbreviation": "DMEE-Class-T",
+      "instrumentFamily": "DMEE-Class-T 2023 teacher self-report"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师对目标导向相关课堂实践频率的自我描述；最终八因素结构来自S5，不能将自报频率改名为实际教学质量或学生学习结果。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "family:dmee-class-t",
+        "role:teacher_self",
+        "stage:basic_school",
+        "lang:en",
+        "version:2023",
+        "use:reflection",
+        "status:pilot",
+        "carrier:form",
+        "source:author_en",
+        "license:cc-by-4.0",
+        "scoring:ESEM_not_installed"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原研究为卢森堡公立基础学校教师，法文施测，分析样本1418；本条是作者英译题项候选，不能继承英文或中国教师验证。年级/年龄不据国家学制推填。"
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "题表未给固定回顾时窗；不擅自增加过去一周/月；项目指导语另行标为新增。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "estimatedMinutes=5仅项目排程预算，不是原文实测。",
+        "最终S5目标因素题号：[1, 2, 3, 4, 5, 6, 7]。保留原题号，不将跨载荷当反向或最高载荷重新归类。",
+        "S1中法文原题和作者英译分别保留；本目录为英译候选，不是验证后的英文量表。",
+        "实际可用候选为同key的原生无分Form，不提供ESEM因素分数。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究支持发展性反思的可能用途；本作者英译与独立因素施测没有直接验证，不据此禁止合法无分描述。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "fr",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://doi.org/10.3389/feduc.2023.1281431.s001 Table S1, author-provided English translations of French administered items",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "未编写中文题目；英文为作者附表翻译，未声称英/法等值。法文施测锚点的精确措辞不在所读题表中。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "DMEE-Class-T Orientation — final Table S5 grouping",
+      "citation": "Dierendonck C (2023). Measuring the classroom level of the Dynamic Model of Educational Effectiveness through teacher self-report: development and validation of a new instrument. Front. Educ. 8:1281431. doi:10.3389/feduc.2023.1281431",
+      "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2023.1281431/full",
+      "publicationYear": 2023
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "目标导向（仅内容分组）"
+      ],
+      "limitations": [
+        "论文用ESEM因素分数，附表载荷不是个体计分系数；不自创均分替代官方模型。",
+        "无分Form报告仅描述实际作答与反思，正常/困难/信息不足均不生成分数或教师标签。",
+        "自报频率不能独立证明教学质量、学生体验或学生成绩。",
+        "不因缺常模或独立施测证据而拒绝合法无分Form；完整55题默认保留原组卷。"
+      ],
+      "disclaimer": "量表计分未安装；已有真实原生无分Form候选，安装/公开状态另见验证记录。"
+    },
+    "blockers": [
+      "ESEM_INDIVIDUAL_SCORING_COEFFICIENTS_NOT_PROVIDED"
+    ]
+  }
+}

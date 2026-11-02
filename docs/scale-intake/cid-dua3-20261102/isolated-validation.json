@@ -1,0 +1,39 @@
+{
+  "status": "NATIVE_UNSCORED_FORM_IMPORTED_AND_READ_BACK",
+  "database": "eduk12_form_intake_test_5be3addfac2f48d3",
+  "governedToolId": "58a016bc-0db1-5d12-8f40-dc34d19d8e6b",
+  "governedState": "SUBMITTED",
+  "governedHash": "d415370d5633cbe28467151faecbc0a925a293847c484d684d110ff8471f0231",
+  "approvedBy": null,
+  "templateId": "a8b00a41-76cc-476e-b0e2-7925b8c88a6f",
+  "templateState": "DRAFT",
+  "templateKind": "FORM_TEMPLATE",
+  "questionCount": 15,
+  "preservedPublishedStatements": 12,
+  "projectQuestions": 3,
+  "tags": [
+    "family:cid_dua3",
+    "role:teacher_self",
+    "stage:mixed_teaching_contexts",
+    "language:en",
+    "source_version:2026_revised_12",
+    "use:reflection",
+    "status:PILOT",
+    "license:cc_by_4_0"
+  ],
+  "familyTagQueryMatched": true,
+  "idempotentSubmission": true,
+  "parameters": null,
+  "report": null,
+  "scoringDigest": null,
+  "trialCount": 0,
+  "runtimeCases": {
+    "completeMissing": 0,
+    "blankMissing": 15,
+    "limitedMissing": 14,
+    "unknownFieldRejected": true
+  },
+  "actualTeacherOrStudentData": false,
+  "originalScaleImported": false,
+  "productionTouched": false
+}

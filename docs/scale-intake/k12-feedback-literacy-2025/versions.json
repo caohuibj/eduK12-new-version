@@ -1,0 +1,120 @@
+{
+  "mother": "中国K12教师反馈素养 (Kang et al. 2025)",
+  "sharedTag": "family:k12_tfl2025",
+  "forms": [
+    {
+      "key": "k12_tfl2025_knowledge_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "en",
+      "itemCount": 7,
+      "sha256": "1d65b18b733457f44bde16007cce0a95ccfb358abe08f6509dd0512d48f2104d"
+    },
+    {
+      "key": "k12_tfl2025_skills_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "en",
+      "itemCount": 8,
+      "sha256": "107b0be4e521e21a4c5fa478bec4ff8ff0fb932c327f85221de5f2bec36da2a3"
+    },
+    {
+      "key": "k12_tfl2025_values_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "en",
+      "itemCount": 8,
+      "sha256": "1a3cd20398f4523568b5d3d9a187ed7b02c4f801a67c1c9494a4bb3725cd1ea4"
+    },
+    {
+      "key": "k12_tfl2025_actionability_en_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "en",
+      "itemCount": 7,
+      "sha256": "3867c500fa74a069fd8cef5c9113084d6f1836372c81684f28bd32c073b586fa"
+    },
+    {
+      "key": "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "zh-CN",
+      "itemCount": 7,
+      "sha256": "4f65149e0690fbcc7581674ee3ae3280b7f94982a07385260bfafd5bdedb9369"
+    },
+    {
+      "key": "k12_tfl2025_skills_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "zh-CN",
+      "itemCount": 8,
+      "sha256": "aadbaa7e02bd16dd7e6e3f71728151a3eca28f16aed2fe95200147f6fd3e2d28"
+    },
+    {
+      "key": "k12_tfl2025_values_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "zh-CN",
+      "itemCount": 8,
+      "sha256": "e7dbfdbcacd931ade64f2cb76b0c8dd3c626b727fe488b8e58bf601344b2640e"
+    },
+    {
+      "key": "k12_tfl2025_actionability_zh_cn_working_teacher_self_form",
+      "contentVersion": "1.0.0",
+      "schemaVersion": 2,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "locale": "zh-CN",
+      "itemCount": 7,
+      "sha256": "498f657371e0fdec2817098a8e24121eaa8e8d7baab5b3416c881dbf378ec7df"
+    }
+  ],
+  "scoredCatalogCandidateVersions": [
+    {
+      "instrumentKey": "k12_tfl2025_30_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "executable": false
+    },
+    {
+      "instrumentKey": "k12_tfl2025_knowledge_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "executable": false
+    },
+    {
+      "instrumentKey": "k12_tfl2025_values_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "executable": false
+    },
+    {
+      "instrumentKey": "k12_tfl2025_actionability_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "executable": false
+    },
+    {
+      "instrumentKey": "k12_tfl2025_30_zh_cn_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "executable": false
+    },
+    {
+      "instrumentKey": "k12_tfl2025_skills_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "executable": false
+    }
+  ],
+  "noTotalOrNorms": true,
+  "productionInstalled": false
+}

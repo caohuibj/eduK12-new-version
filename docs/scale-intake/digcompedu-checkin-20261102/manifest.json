@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "family": "digcompedu_checkin",
+  "status": "PILOT",
+  "scales": [
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_professional_engagement_en",
+      "instrumentVersion": "1.0.0",
+      "name": "DigCompEdu Check-In｜专业参与｜教师自评｜高教英文2023（PeerJ2024）",
+      "items": [
+        "DCE_CI_01",
+        "DCE_CI_02",
+        "DCE_CI_03",
+        "DCE_CI_04"
+      ],
+      "sourceQuestions": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "range": [
+        0,
+        16
+      ],
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:professional_engagement"
+      ]
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_digital_resources_en",
+      "instrumentVersion": "1.0.0",
+      "name": "DigCompEdu Check-In｜数字资源｜教师自评｜高教英文2023（PeerJ2024）",
+      "items": [
+        "DCE_CI_05",
+        "DCE_CI_06",
+        "DCE_CI_07"
+      ],
+      "sourceQuestions": [
+        7,
+        8,
+        9
+      ],
+      "range": [
+        0,
+        12
+      ],
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:digital_resources"
+      ]
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_teaching_learning_en",
+      "instrumentVersion": "1.0.0",
+      "name": "DigCompEdu Check-In｜教学与学习｜教师自评｜高教英文2023（PeerJ2024）",
+      "items": [
+        "DCE_CI_08",
+        "DCE_CI_09",
+        "DCE_CI_10",
+        "DCE_CI_11"
+      ],
+      "sourceQuestions": [
+        10,
+        11,
+        12,
+        13
+      ],
+      "range": [
+        0,
+        16
+      ],
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:teaching_learning"
+      ]
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_assessment_en",
+      "instrumentVersion": "1.0.0",
+      "name": "DigCompEdu Check-In｜评价｜教师自评｜高教英文2023（PeerJ2024）",
+      "items": [
+        "DCE_CI_12",
+        "DCE_CI_13",
+        "DCE_CI_14"
+      ],
+      "sourceQuestions": [
+        14,
+        15,
+        16
+      ],
+      "range": [
+        0,
+        12
+      ],
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:assessment"
+      ]
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_empowering_learners_en",
+      "instrumentVersion": "1.0.0",
+      "name": "DigCompEdu Check-In｜赋能学习者｜教师自评｜高教英文2023（PeerJ2024）",
+      "items": [
+        "DCE_CI_15",
+        "DCE_CI_16",
+        "DCE_CI_17"
+      ],
+      "sourceQuestions": [
+        17,
+        18,
+        19
+      ],
+      "range": [
+        0,
+        12
+      ],
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:empowering_learners"
+      ]
+    },
+    {
+      "instrumentKey": "digcompedu_checkin_peerj2023_facilitating_digital_competence_en",
+      "instrumentVersion": "1.0.0",
+      "name": "DigCompEdu Check-In｜促进学习者数字能力｜教师自评｜高教英文2023（PeerJ2024）",
+      "items": [
+        "DCE_CI_18",
+        "DCE_CI_19",
+        "DCE_CI_20",
+        "DCE_CI_21",
+        "DCE_CI_22"
+      ],
+      "sourceQuestions": [
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "range": [
+        0,
+        20
+      ],
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "tags": [
+        "family:digcompedu_checkin",
+        "role:teacher_self",
+        "language:en",
+        "version:peerj2023_2024",
+        "context:higher_education",
+        "construct:self_perceived_digital_competence",
+        "use:individual_reflection",
+        "use:research",
+        "status:pilot",
+        "license:cc_by_4_0",
+        "area:facilitating_digital_competence"
+      ]
+    }
+  ],
+  "combination": {
+    "kind": "ordinary_questionnaire_plan",
+    "order": [
+      "pre_positioning",
+      "digcompedu_checkin_peerj2023_professional_engagement_en",
+      "digcompedu_checkin_peerj2023_digital_resources_en",
+      "digcompedu_checkin_peerj2023_teaching_learning_en",
+      "digcompedu_checkin_peerj2023_assessment_en",
+      "digcompedu_checkin_peerj2023_empowering_learners_en",
+      "digcompedu_checkin_peerj2023_facilitating_digital_competence_en",
+      "context",
+      "post_positioning"
+    ],
+    "aggregateScore": null,
+    "note": "A plan only; not an installed/published combination or a new report package. Original complete22 scores may have historical global levels, but this split implementation produces separate area sums only."
+  }
+}
