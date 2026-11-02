@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "seeq_ll9515_assignments_he_student_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "SEEQ｜作业与阅读｜高校｜学生填答（目录候选）",
+      "abbreviation": "SEEQ",
+      "instrumentFamily": "SEEQ / Learning Lab file 9515 / English higher education / metadata only"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学生感知的阅读和作业贡献；仅登记题目定位，不提供题文或分数。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "seeq_ll9515_assignments_he_student_en",
+        "source:SEEQ",
+        "source:Marsh1982",
+        "source:LearningLab9515",
+        "population:higher_education",
+        "age:university_population_no_fixed_cutoff",
+        "respondent:student",
+        "evaluation:student_evaluation_of_teaching",
+        "evaluation_target:teacher",
+        "evaluation_target:course",
+        "language:en",
+        "rights:public_item_redistribution_scope_unresolved",
+        "availability:catalog_only",
+        "maturity:PILOT",
+        "use:research",
+        "candidate_type:scale"
+      ]
+    },
+    "population": {
+      "populationNotes": "高校课程的学生评教；不设置小学/中学年级，不从高校推导固定年龄下限。学生为填答者，评价对象为课程/课堂及教师，非教师自评。独立拆分效度和本地适用性待核。",
+      "respondentTypes": [
+        "OBSERVER"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "课程学习经历；原母题本未提供完整指导语，本目录不可施测",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "原始题组：Assignments；题号：28, 29。",
+        "唯一定位ID：seeq_ll9515_assignments_28, seeq_ll9515_assignments_29。",
+        "原件有36个题目位置，题号11/12/13跨组重复；不可按题号去重。",
+        "2分钟为目录规划估计，不是实测施测时长。",
+        "当前只有目录元数据；没有可作答内容、实际得分、报告或施测许可。",
+        "仅高校学生填答的英文题本定位；不是K12版本，不是已验证中文版。",
+        "公开下载不等于取得数字施测、翻译或公开Git题文再分发授权。",
+        "维度拆分是导入准备；单独施测效度未核定，未来应保留母工具原组卷语境和顺序。",
+        "原组卷内的维度分组已定位；均分/加总、反向题和缺失阈值尚无本版计分手册核定。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅作研究准备目录；不是独立施测或授权确认。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "英文来源定位；中文仅为目录标签，不含翻译题文。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Learning Lab 9515 与1996年香港九点版分开管理；不移植其他版本计分。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "SEEQ — Learning Lab file 9515, higher education English item-group metadata",
+      "citation": "Marsh (1982), BJEP 52, 77–95, doi:10.1111/j.2044-8279.1982.tb02505.x; Coffey & Gibbs (2001), AEEHE 26, 89–93. Learning Lab file 9515 is an undated secondary-hosted item sheet; exact equivalence is unverified.",
+      "url": "https://learninglab.uni-due.de/file/9515/download?token=3i1SCuT5"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "作业与阅读"
+      ],
+      "limitations": [
+        "当前只有目录元数据；没有可作答内容、实际得分、报告或施测许可。",
+        "仅高校学生填答的英文题本定位；不是K12版本，不是已验证中文版。",
+        "公开下载不等于取得数字施测、翻译或公开Git题文再分发授权。",
+        "维度拆分是导入准备；单独施测效度未核定，未来应保留母工具原组卷语境和顺序。",
+        "原组卷内的维度分组已定位；均分/加总、反向题和缺失阈值尚无本版计分手册核定。",
+        "学生与教师报告接收者分别审阅；学生版解释学习体验并给微行动，教师版仅在现有授权、匿名与最小人数规则满足时呈现群体改进反馈。当前不启用报告。"
+      ],
+      "disclaimer": "候选待审；没有已生成报告。未来仅作课程发展性反馈，不作常模、教师排名或跨工具总分。"
+    },
+    "blockers": [
+      "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "VERSION_SPECIFIC_SCORING_MANUAL_NOT_VERIFIED",
+      "STANDALONE_ADMINISTRATION_VALIDITY_UNVERIFIED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED"
+    ]
+  }
+}
