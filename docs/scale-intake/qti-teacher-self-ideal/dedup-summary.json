@@ -1,0 +1,82 @@
+{
+  "base": "3818f2b399e805ec0cbcad803b832ad4ec4fbc02",
+  "sourceJsonCount": 235,
+  "instrumentModuleCount": 258,
+  "mainHits": [],
+  "openPrCount": 42,
+  "openPrFiles": 6486,
+  "errors": [],
+  "relevantPrs": [
+    {
+      "number": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "title": "content: 中文QTI Sun2018完整题本、八维候选与原生无计分表单",
+      "matchingFiles": 39,
+      "scope": "Student Sun2018 Chinese40, not current teacher forms"
+    }
+  ],
+  "productionDb": "NOT_QUERIED",
+  "openPrSourceContentFilesRead": 517,
+  "openPrSourceContentErrors": [],
+  "openPrSourceContentHits": [
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_40_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_compliant_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_confrontational_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_directing_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_dissatisfied_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_helpful_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_imposing_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_uncertain_zh_cn/1.0.0/source.json"
+    },
+    {
+      "pr": 545,
+      "head": "783729150611c865cf753bff408288a39a141c6d",
+      "path": "server-version/backend/src/modules/scale/instruments/qti_sun2018_understanding_zh_cn/1.0.0/source.json"
+    }
+  ],
+  "currentMainBaseline": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "mainSourceTreeReuse": {
+    "server-version/backend/src/modules/scale/instruments": {
+      "initial": "1a04fd036a8e7293883668c85ddb578047ca9129",
+      "current": "1a04fd036a8e7293883668c85ddb578047ca9129",
+      "status": "IDENTICAL_INPUT_REUSED"
+    },
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": {
+      "initial": "62cbf77099739773099015f71b0420eb43c276f3",
+      "current": "62cbf77099739773099015f71b0420eb43c276f3",
+      "status": "IDENTICAL_INPUT_REUSED"
+    }
+  },
+  "openPrReadbackNote": "42-PR snapshot before public checker PR556 merge; includes exact heads; source-content results are not a production DB audit."
+}
