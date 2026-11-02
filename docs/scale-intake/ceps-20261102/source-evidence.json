@@ -46,7 +46,7 @@
     "scoringBoundary": "No score, scorer, parameters, thresholds or report runtime created",
     "developmentDatabaseImport": "NOT_ATTEMPTED_NO_VERIFIED_OR_AUTHORIZED_ITEMS",
     "productionWrite": "NOT_ATTEMPTED",
-    "ci": "NOT_ACTIVATED_PR_CREATION_DENIED_PENDING_MAIN_THREAD_COORDINATION",
+    "ci": "PULL_REQUEST_CREATED_READ_ACTUAL_RUN_RESULTS",
     "notionBlocker": {
       "target": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
       "action": "Read CI common errors before CI activation",
@@ -81,17 +81,22 @@
       },
       "reportDraftReview": "Six original unscored examples; student/teacher audiences and existing visibility conditions stated; runtime consumer untested"
     },
-    "ciHistory": "Initial pushed commit contained [skip ci]; not evidence of qualification. Current continuation does not rely on a skip marker. No PR created.",
+    "ciHistory": "Initial pushed commit contained [skip ci]; not evidence of qualification. Subsequent heads omit skip directives. Draft PR created after new explicit user authorization; actual CI results must be read separately.",
     "formImportBoundary": "Lack of scoring, norms or independent administration evidence does not prevent an authorized unscored native Form. No verified questionnaire text is currently available.",
     "prCreation": {
-      "status": "DENIED",
+      "status": "CREATED_DRAFT",
       "action": "Create Draft pull request",
       "repository": "caohuibj/eduK12-new-version",
       "base": "main",
       "head": "content/ceps-student-candidates-20261102",
-      "reason": "Auto-review did not recognize explicit user authorization for repository/destination/PR creation and identified external commitment and content-sharing risk.",
-      "verifiedAbsent": true,
-      "retry": "PAUSED_PENDING_NEW_AUTHORIZATION_EVIDENCE"
+      "retry": "ONE_RETRY_AFTER_EXPLICIT_BATCH_AUTHORIZATION_AND_ABSENCE_CHECK_SUCCEEDED",
+      "historicalStatus": "DENIED",
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/549",
+      "number": 549,
+      "createdAt": "2026-11-02T00:36:52Z",
+      "headAtCreation": "f5119effa587532d72bf3039787b566a3e255074",
+      "verifiedAbsentBeforeRetry": true,
+      "historicalRejectionReason": "Auto-review did not recognize explicit user authorization for repository/destination/PR creation and identified external commitment and content-sharing risk."
     }
   },
   "privateContentCommitted": false
