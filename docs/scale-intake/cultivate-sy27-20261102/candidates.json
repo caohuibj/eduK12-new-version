@@ -478,5 +478,22 @@
     "crossToolTotalScore": false
   },
   "databaseStatus": "NOT_IMPORTED_CATALOG_ONLY",
-  "productionDedupStatus": "NOT_CHECKED"
+  "productionDedupStatus": "NOT_CHECKED",
+  "resolutionFollowup": {
+    "document": "resolution-20261102.md",
+    "sourceCompleteness": "Q1-Q23 / 75 answer units complete",
+    "permissionInterpretation": "Explicit CC BY-NC3.0 grant supports defined noncommercial school-improvement/research use; no standalone authorization letter is universally required. Actual EduK12 use facts remain unspecified; extra permission for commercial use and any unresolved custom approval scope must be confirmed as applicable.",
+    "privateNativePreparation": {
+      "forms": 23,
+      "answerUnits": 75,
+      "answerChecks": 179,
+      "status": "PASS_SCHEMA_AND_RUNTIME",
+      "originalItemTextInGit": false,
+      "databaseImports": 0,
+      "mapping": "digital-mapping.json",
+      "validation": "private-native-validation.json"
+    },
+    "officialScoring": "Not obtained; not a blocker for unscored Form",
+    "requiredNextFact": "project purpose, commercial/fee bundle, audience, redistribution and translation scope"
+  }
 }
