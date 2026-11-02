@@ -1,0 +1,4 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+SINGLE,可选课后回顾（已看反馈）：当学生的解释与你预设不同时，你最担心什么？,false,讨论失去方向||科学表述留下错误||器材不足以给答案||学生因不确定而失去兴趣||其他||无法判断||不愿回答,,,,,,,,,,,,
+LONG_TEXT,原选择保护了什么目标？有哪些代价或现实限制？,false,,,,,,,,,,,,,
+LONG_TEXT,哪一项新证据会使你改变？下一课愿意试的一小步是什么？如何确认是否有帮助？,false,,,,,,,,,,,,,

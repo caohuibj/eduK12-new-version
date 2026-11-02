@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "s_reflection",
+      "title": "中国K12反馈素养｜反馈技能无分反思｜教师自评｜项目中文工作译文",
+      "description": "下列陈述来自教师反馈素养研究，中文为项目工作译文，不是原研究正式中文版。请任选陈述，描述一个实例、学习需要或疑问；可以留空或拒答。不填等级、不计分、不生成能力评语。这是项目改编的无分反思表单，原教师作答选项和计分说明尚未核得。自我认识不能证明学生实际收到的反馈质量。请勿填写学生姓名或可识别的作业信息。 来源：Kang、Huang、Liu、Yin（2025），DOI 10.1057/s41599-025-04927-4，表2–3；原作者CC BY 4.0 https://creativecommons.org/licenses/by/4.0/。改动：拆分、可选文字反思、项目指导语和中文工作翻译；不表示原作者认可。",
+      "questions": [
+        {
+          "itemKey": "s1",
+          "type": "LONG_TEXT",
+          "prompt": "S1: 我能根据学生的需要设计个别化反馈。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s2",
+          "type": "LONG_TEXT",
+          "prompt": "S2: 我能恰当地运用积极反馈和建设性批评。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s3",
+          "type": "LONG_TEXT",
+          "prompt": "S3: 我曾能够让学生积极参与反馈过程。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s4",
+          "type": "LONG_TEXT",
+          "prompt": "S4: 我曾能够召集学生组成学习小组，开展学生之间的评价。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s5",
+          "type": "LONG_TEXT",
+          "prompt": "S5: 我能运用反馈帮助学生学习新的知识和技能。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s6",
+          "type": "LONG_TEXT",
+          "prompt": "S6: 我能设计反馈，帮助学生发现差距并弥补差距。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s7",
+          "type": "LONG_TEXT",
+          "prompt": "S7: 我能确保我的反馈帮助学生实现学习目标。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "s8",
+          "type": "LONG_TEXT",
+          "prompt": "S8: 我能确保所提供的反馈具有可行性，让学生通过改进开展学习。",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}

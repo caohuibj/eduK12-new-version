@@ -1,0 +1,253 @@
+{
+  "requestId": "7322ed58-131f-5ef6-bed4-5b12249305a3",
+  "toolKey": "sep_klassik_math_m6_teacher_de",
+  "version": "0.1.0",
+  "title": "SEP-Klassik｜数学对象与工具｜教师自评｜DE·数学3–6年级·2026-01",
+  "definition": {
+    "schemaVersion": 2,
+    "pages": [
+      {
+        "pageKey": "sep_klassik_math_m6_teacher_de",
+        "title": "Mit mathematischen Objekten und Werkzeugen arbeiten",
+        "description": "Source: Institut für Schulqualität des Landes Berlin e.V. (ISQ), SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft, PDF p.7. CC BY-NC-SA 4.0, https://creativecommons.org/licenses/by-nc-sa/4.0/. Digitale Übertragung für nichtkommerzielle Reflexion; unveränderte deutsche Itemtexte, freiwillige Antworten, keine Punktwerte. Änderungen: Modultrennung, technische Itemschlüssel, optionale Antworten und Verweigerung. Kein validierter chinesischer Fragebogen. Inwieweit stimmen Sie den folgenden Aussagen zu? Dieser Baustein thematisiert, inwiefern Sie und Ihre Schüler*innen zustimmen, dass im Unterricht mit mathematischen Werkzeugen und Objekten gearbeitet wird. Hierbei geht es neben der richtigen Verwendung von Fachbegriffen beispielsweise auch um die Nutzung von Zeichengeräten und digitalen Werkzeugen. Trifft Trifft Kann Trifft ich über- Trifft voll Basis- und weiterführende Items bleiben in der ursprünglichen Reihenfolge; die gesamte Modulversion enthält beide Gruppen.",
+        "questions": [
+          {
+            "itemKey": "sep_math_6_1",
+            "type": "SINGLE",
+            "prompt": "Die Schüler*innen beschreiben, was Symbole (z. B. +, -, >, <, =) oder Rechnungen im Mathematikunterricht bedeuten.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_6_2",
+            "type": "SINGLE",
+            "prompt": "Die Schüler*innen übersetzen Texte in Rechnungen (z. B. „Sarah bekommt im Monat 5€ Taschengeld. Wie viel Geld hat sie in 6 Monaten bekommen?“ wird zu 6*5€=30€).",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_6_3",
+            "type": "SINGLE",
+            "prompt": "Ich achte darauf, dass die Schüler*innen die mathematischen Fachwörter (z. B. Addition, Subtraktion, Summe, Produkt) richtig benutzen.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_6_4",
+            "type": "SINGLE",
+            "prompt": "Die Schüler*innen üben den Umgang mit Zeichengeräten (z. B. Lineal und Zirkel).",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          },
+          {
+            "itemKey": "sep_math_6_5",
+            "type": "SINGLE",
+            "prompt": "Ich zeige den Schüler*innen, wie sie digitale Werkzeuge (z. B. Computerprogramme, Apps) zur Lösung von Aufgaben nutzen können.",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a1",
+                "label": "Trifft überhaupt nicht zu"
+              },
+              {
+                "optionKey": "a2",
+                "label": "Trifft eher nicht zu"
+              },
+              {
+                "optionKey": "a3",
+                "label": "Trifft eher zu"
+              },
+              {
+                "optionKey": "a4",
+                "label": "Trifft voll und ganz zu"
+              },
+              {
+                "optionKey": "cannot_judge",
+                "label": "Kann ich nicht beurteilen"
+              }
+            ],
+            "rows": []
+          }
+        ]
+      }
+    ]
+  },
+  "statement": "Attributed non-commercial digital adaptation of the specifically CC BY-NC-SA 4.0 labelled ISQ PDF, distributed under the same license. Only exact original teacher-column items are used; no scored report or validation transfer claimed. No copyrighted portal-only teacher wording is borrowed.",
+  "classificationTags": [
+    "population:teacher",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "language_validation:maturity_pilot"
+  ],
+  "reference": {
+    "tags": [
+      "family:sep_klassik",
+      "role:teacher_self",
+      "language:de",
+      "stage:3-6",
+      "source_version:math_202601",
+      "use:developmental_reflection",
+      "state:pilot",
+      "scoring:none",
+      "license:cc_by_nc_sa_4_0"
+    ],
+    "source": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=2026-01/Item%C3%BCbersicht+Mathematik_Eigenperspektive+.pdf",
+      "sha256": "37191c01134456b5c73949c1e897c6607490ea8b4c502fcfb3e7ecef9720ef15",
+      "title": "SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "3-6",
+      "itemCount": 35,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "Cover visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.; DE is the source label, not a claimed separate 4.0 jurisdiction port.",
+      "module": 6,
+      "moduleTitle": "Mit mathematischen Objekten und Werkzeugen arbeiten",
+      "page": 7,
+      "sourceItems": [
+        {
+          "sourceNumber": 1,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen beschreiben, was Symbole (z. B. +, -, >, <, =) oder Rechnungen im Mathematikunterricht bedeuten."
+        },
+        {
+          "sourceNumber": 2,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen übersetzen Texte in Rechnungen (z. B. „Sarah bekommt im Monat 5€ Taschengeld. Wie viel Geld hat sie in 6 Monaten bekommen?“ wird zu 6*5€=30€)."
+        },
+        {
+          "sourceNumber": 3,
+          "tier": "basis",
+          "prompt": "Ich achte darauf, dass die Schüler*innen die mathematischen Fachwörter (z. B. Addition, Subtraktion, Summe, Produkt) richtig benutzen."
+        },
+        {
+          "sourceNumber": 4,
+          "tier": "basis",
+          "prompt": "Die Schüler*innen üben den Umgang mit Zeichengeräten (z. B. Lineal und Zirkel)."
+        },
+        {
+          "sourceNumber": 5,
+          "tier": "extended",
+          "prompt": "Ich zeige den Schüler*innen, wie sie digitale Werkzeuge (z. B. Computerprogramme, Apps) zur Lösung von Aufgaben nutzen können."
+        }
+      ],
+      "locale": "de"
+    },
+    "license": {
+      "identifier": "CC-BY-NC-SA-4.0",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "author": "Institut für Schulqualität des Landes Berlin e.V. (ISQ)",
+      "adaptationLicense": "CC-BY-NC-SA-4.0",
+      "commercialUse": "NOT_AUTHORIZED",
+      "changes": [
+        "digital format and module split",
+        "optional answering/refusal",
+        "technical identifiers and Chinese catalog names only; no item translation"
+      ]
+    },
+    "respondent": "teacher",
+    "recipient": "teacher_under_existing_authorization",
+    "construct": "teacher self-report of mathematics classroom opportunities",
+    "scoring": {
+      "mode": "none",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "reason": "No complete aggregation and missing-response contract for these digital module versions; for SINUS the positive rewording/coding and first-module direction statement also require clarification. Not a lack-of-norms decision."
+    },
+    "notAuthoritativeIndependentValidation": true
+  }
+}

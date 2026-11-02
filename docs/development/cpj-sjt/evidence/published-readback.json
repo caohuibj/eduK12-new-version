@@ -1,0 +1,104 @@
+{
+  "sourceCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "node": "v24.21.0",
+  "production": false,
+  "oldReleaseHashesAndPointersUnchanged": 48,
+  "historicalReportDeepEqual": true,
+  "otherUserReport": {
+    "denied": true,
+    "status": 403,
+    "message": "无权限操作此情境化测评"
+  },
+  "nonAdminReview": {
+    "denied": true,
+    "status": 403,
+    "message": "仅管理员可审核发布"
+  },
+  "reviewerRole": "ADMIN",
+  "authorRole": "TEACHER",
+  "reviewerDistinct": true,
+  "current": {
+    "key": "cpj-cj01-sd-baseline",
+    "version": "0.4.3",
+    "contentDigest": "6ec455da80e9022547e9e99b5ee0f8e7fc379dc0e3eff2abb2e5fbd71f1433f5",
+    "definitionHash": "ac9b766eb543f6fceb3af1746d9a702bd93130d2cf224df143fe8f2bc1930ab3",
+    "measurementHash": "77acc022edf5f73ea3533448ca7189112541f66f9ca00015c899090d75ddf2d3",
+    "scope": {
+      "kind": "PLATFORM",
+      "owner": "synthetic author; no production identity"
+    },
+    "authorizationPolicy": null,
+    "scoringVersion": "author-key-sum-v1",
+    "reportVersion": "sjt-narrative-v1",
+    "license": {
+      "note": "私有原稿v0.2→文字修订v0.3→内容编码v0.4；24个母情境独立选用。本库为原创候选自述来源，授权状态待人工核对；不公开再分发。",
+      "status": "unknown",
+      "redistribution": "restricted"
+    },
+    "metrics": [
+      {
+        "key": "T01_A_explicit_count",
+        "construct": "cpj_t01_a_explicit_action",
+        "direction": "descriptive"
+      },
+      {
+        "key": "T01_B_explicit_count",
+        "construct": "cpj_t01_b_explicit_action",
+        "direction": "descriptive"
+      }
+    ]
+  },
+  "migrations": 273,
+  "reflectionAttempts": [
+    {
+      "status": "COMPLETED",
+      "taskSatisfaction": "SATISFIED",
+      "completedItems": 1,
+      "progress": 100
+    },
+    {
+      "status": "IN_PROGRESS",
+      "taskSatisfaction": null,
+      "completedItems": 0,
+      "progress": 0
+    },
+    {
+      "status": "IN_PROGRESS",
+      "taskSatisfaction": null,
+      "completedItems": 0,
+      "progress": 0
+    },
+    {
+      "status": "IN_PROGRESS",
+      "taskSatisfaction": null,
+      "completedItems": 0,
+      "progress": 0
+    }
+  ],
+  "reflectionSections": [
+    {
+      "status": "IN_PROGRESS",
+      "taskSatisfaction": null,
+      "submissionPayloadHash": null,
+      "answers": []
+    },
+    {
+      "status": "IN_PROGRESS",
+      "taskSatisfaction": null,
+      "submissionPayloadHash": null,
+      "answers": []
+    },
+    {
+      "status": "IN_PROGRESS",
+      "taskSatisfaction": null,
+      "submissionPayloadHash": null,
+      "answers": []
+    },
+    {
+      "status": "COMPLETED",
+      "taskSatisfaction": "SATISFIED",
+      "submissionPayloadHash": "30a04bb53f2a8d27cbfd7db2f6c8447c70af429884865c0ebf6d38e1f686de37",
+      "answers": []
+    }
+  ]
+}

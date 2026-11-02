@@ -1,0 +1,277 @@
+{
+  "scope": "official teaching download index, 26 entries including a repeated same SINUS PDF; public role/source metadata only; no school-management instruments processed",
+  "entries": [
+    {
+      "index": 0,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Allgemeiner%20fachunspezifischer%20Fragebogen%20zur%20Unterrichtsqualit%C3%A4t_Primarstufe.pdf",
+      "status": 200,
+      "sha256": "f7bca0d94dc2d6acb92c2f54234659a11dad14ba7ce9aeca0d7cb0b412eafa20",
+      "pages": 7,
+      "filename": "Allgemeiner fachunspezifischer Fragebogen zur Unterrichtsqualität_Primarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 1,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/F%C3%B6rderung%20der%20Medienkompetenz%20%28Primarstufe%29.pdf",
+      "status": 200,
+      "sha256": "79d3f77c54cb7b4addcacf54eeb9a317d23bfa96197ddb4a5a540e5b28b03dfb",
+      "pages": 4,
+      "filename": "Förderung der Medienkompetenz (Primarstufe).pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 2,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-10/SINUS-Skala_Lernmotivation.pdf",
+      "status": 200,
+      "sha256": "16e2ac0d3698add5df24f0754f9fabc86f92b60aed3326b3fd7576356114bcb3",
+      "pages": 5,
+      "filename": "SINUS-Skala_Lernmotivation.pdf",
+      "roleEvidence": "TEACHER_AND_STUDENT_COLUMNS",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 3,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Deutsch.pdf",
+      "status": 200,
+      "sha256": "3fb56bc132d98b66ea4e02526124084751d98c79672ff7ba0e80e54e412acac5",
+      "pages": 4,
+      "filename": "Fachspezifischer Fragebogen Deutsch.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 4,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Item%C3%BCbersicht%20Mathematik_Fremdperspektive%20_0.pdf",
+      "status": 200,
+      "sha256": "faed7a52bad085028d5238e3fd5785cdd5f30fdc06abffa1640b6c90853a02e8",
+      "pages": 7,
+      "filename": "Itemübersicht Mathematik_Fremdperspektive _0.pdf",
+      "roleEvidence": "OTHER_OR_UNCONFIRMED",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 5,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fragebogen%20Moderne%20Fremdsprachen.pdf",
+      "status": 200,
+      "sha256": "9f19c3e18046836e6e62f7eae53634d7b78012355fe31a35aca52c9fd412fb20",
+      "pages": 5,
+      "filename": "Fragebogen Moderne Fremdsprachen.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 6,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fragebogen%20Sachunterricht.pdf",
+      "status": 200,
+      "sha256": "beed919c551b01e3d4f3063507fccea71fddc0201ad67d7d550f24af32885135",
+      "pages": 3,
+      "filename": "Fragebogen Sachunterricht.pdf",
+      "roleEvidence": "OTHER_OR_UNCONFIRMED",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 7,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fragebogen%20Geschichte.pdf",
+      "status": 200,
+      "sha256": "f74ed1cb16a183b2c94b0a205c8caa045469faa26e0c0223daaefc5653d3a866",
+      "pages": 3,
+      "filename": "Fragebogen Geschichte.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 8,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fragebogen%20Musik.pdf",
+      "status": 200,
+      "sha256": "1256f2cb71b0084e692177ebff0f110d6a42da81289f49a09fd784c05794d016",
+      "pages": 2,
+      "filename": "Fragebogen Musik.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 9,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fragebogen%20Naturwissenschaften%20Primarstufe.pdf",
+      "status": 200,
+      "sha256": "981725d9da998fe5294318838d5d4e3abe21a9772580ac8ce4915d882db6de6c",
+      "pages": 2,
+      "filename": "Fragebogen Naturwissenschaften Primarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 10,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Allgemeiner%20fachunspezifischer%20Fragebogen%20zur%20Unterrichtsqualit%C3%A4t_Sekundarstufe.pdf",
+      "status": 200,
+      "sha256": "b7271a1d7af2e70644b79a82989ebc74d4819c53248297766ccb31ba76fee490",
+      "pages": 7,
+      "filename": "Allgemeiner fachunspezifischer Fragebogen zur Unterrichtsqualität_Sekundarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 11,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-10/SINUS-Skala_Lernmotivation.pdf",
+      "status": 200,
+      "sha256": "16e2ac0d3698add5df24f0754f9fabc86f92b60aed3326b3fd7576356114bcb3",
+      "pages": 5,
+      "filename": "SINUS-Skala_Lernmotivation.pdf",
+      "roleEvidence": "TEACHER_AND_STUDENT_COLUMNS",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 12,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Medienbildung%20SEP-Klassik%20Sek%20I-D.pdf",
+      "status": 200,
+      "sha256": "69a14d32f0173f2d293ea897e8619e1815f0c01b6714d551d8dd80a94cfd3576",
+      "pages": 8,
+      "filename": "Medienbildung SEP-Klassik Sek I-D.pdf",
+      "roleEvidence": "OTHER_OR_UNCONFIRMED",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 13,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Deutsch_Sekundarstufe.pdf",
+      "status": 200,
+      "sha256": "c2ba3d38c5d973734f570f1bf2a8db88df610eaa7f333717510d54aaaaaf268b",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen Deutsch_Sekundarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 14,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Mathematik_Sekundarschule.pdf",
+      "status": 200,
+      "sha256": "b5fb8cd8dddf5ce241d55683df11b7898391210063d6a90c14447fad8ceb9fa2",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen Mathematik_Sekundarschule.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 15,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Moderne%20Fremdsprachen_Sekundarstufe.pdf",
+      "status": 200,
+      "sha256": "6821829960738f49b3654f14b6802cfdc09a7092f1f62367c1be02948932d672",
+      "pages": 5,
+      "filename": "Fachspezifischer Fragebogen Moderne Fremdsprachen_Sekundarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 16,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20NaWi_Sekundarstufe.pdf",
+      "status": 200,
+      "sha256": "659038196c1faead486612643a9a6f0e2528973e7296006f8acd690d080084e6",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen NaWi_Sekundarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 17,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Ethik.pdf",
+      "status": 200,
+      "sha256": "84ee85974870d3ae2ca2fcd0ea710e013264099b1587e4aeeb20ab7ff03d74d6",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen Ethik.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 18,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Geschichte_Sekundarstufe.pdf",
+      "status": 200,
+      "sha256": "35ba631e08051fbdc72c8b7c24e216da0fd06c58758c2a9bc23cc54911e65695",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen Geschichte_Sekundarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 19,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Geografie.pdf",
+      "status": 200,
+      "sha256": "88c66982951b9e661a8ae59a178fa24e54ff4ac7dacffcc59db8fbc1980de2bd",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen Geografie.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 20,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Politische%20Bildung%20_%20Sozialkunde%20.pdf",
+      "status": 200,
+      "sha256": "2b5d4cc0505ab56a1ed7e6b05abbe68c696735bbfffdf8d489a75a477519a2cd",
+      "pages": 3,
+      "filename": "Fachspezifischer Fragebogen Politische Bildung _ Sozialkunde .pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 21,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Kunst.pdf",
+      "status": 200,
+      "sha256": "44d90116205b116c45200d8a7f3be58ecffd36fabdb229002331e47c6b5cfa8d",
+      "pages": 4,
+      "filename": "Fachspezifischer Fragebogen Kunst.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 22,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Musik_Sekundarstufe.pdf",
+      "status": 200,
+      "sha256": "5720dfaa67fcd95159a86ec8d523c4cd8015a363a4db0424d0afcd483c6d36c4",
+      "pages": 2,
+      "filename": "Fachspezifischer Fragebogen Musik_Sekundarstufe.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 23,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Sport.pdf",
+      "status": 200,
+      "sha256": "592e13c5fe9b617d3e522edfbfe5642dbf52077f23ea9bd2aee383e556b4995c",
+      "pages": 2,
+      "filename": "Fachspezifischer Fragebogen Sport.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 24,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Latein.pdf",
+      "status": 200,
+      "sha256": "3a29841615fe2b442293c0785a7d5e866cafc8e9c6c83fba935542688256cffb",
+      "pages": 2,
+      "filename": "Fachspezifischer Fragebogen Latein.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    },
+    {
+      "index": 25,
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Fachspezifischer%20Fragebogen%20Griechisch.pdf",
+      "status": 200,
+      "sha256": "8a05fc6102c1ac6d541820b8b212cd340e97a99975d719294aa47abdcae2bfd0",
+      "pages": 2,
+      "filename": "Fachspezifischer Fragebogen Griechisch.pdf",
+      "roleEvidence": "STUDENT_VIEW_LABEL",
+      "scope": "inventory_only_not_native_import"
+    }
+  ],
+  "separateTeacherMathSource": {
+    "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=2026-01/Item%C3%BCbersicht+Mathematik_Eigenperspektive+.pdf",
+    "sha256": "37191c01134456b5c73949c1e897c6607490ea8b4c502fcfb3e7ecef9720ef15",
+    "title": "SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft",
+    "resourceRevision": "2026-01_resource_path_no_printed_revision",
+    "role": "teacher_self",
+    "gradeBand": "3-6",
+    "itemCount": 35,
+    "license": "CC BY-NC-SA 4.0",
+    "licenseEvidence": "Cover visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.; DE is the source label, not a claimed separate 4.0 jurisdiction port."
+  },
+  "portalTerms": "https://sep-klassik.isq.berlin/de_DE/start/nutzungsbedingungen.html"
+}

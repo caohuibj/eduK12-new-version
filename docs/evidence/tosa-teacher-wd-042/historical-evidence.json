@@ -1,0 +1,23 @@
+{
+  "label": "Historical development evidence; not formal CI or production acceptance",
+  "baseline": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "componentGoldens": 960,
+  "fullGoldens": 76,
+  "componentServiceCases": 17,
+  "fullServiceCases": 1,
+  "fullBrowserActionRounds": 42,
+  "fullBrowserResponses": 126,
+  "fullBrowserEvents": 252,
+  "nonanswerEdges": 96,
+  "nonanswerPaths": 2,
+  "admission": "Vitest-only published test view; native service + isolated PostgreSQL; loopback synthetic browser bridge, not authenticated application HTTP",
+  "priorDependencyDifferences": [
+    "Node24.19.0",
+    "follow-redirects1.16.1 versus locked1.16.2",
+    "older generated Prisma schema outside used models",
+    "system Chromium versus Playwright bundle"
+  ],
+  "reuseBoundary": "Unchanged candidate bytes and source adapters; does not replace current locked-dependency checks or real publication authority",
+  "productionImport": false,
+  "realTeacherData": false
+}

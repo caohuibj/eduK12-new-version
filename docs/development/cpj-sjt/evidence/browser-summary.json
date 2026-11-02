@@ -1,0 +1,49 @@
+{
+  "sourceCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "node": "v24.21.0",
+  "actualBrowser": "Chromium / real native API / isolated PostgreSQL; no mocked API",
+  "instrument": "cpj-cj01-sd-baseline@0.4.3",
+  "checks": [
+    "Blank core blocked before FINAL; no score or submission generated",
+    "Narrative report contains timing distinction, no ranking/progress bar; training instruction is conditional",
+    "R1 UNABLE_TO_JUDGE FINAL metrics are null, not zero"
+  ],
+  "finalSubmissionResponses": [
+    {
+      "httpStatus": 200,
+      "code": 0,
+      "metricValues": [
+        3,
+        3
+      ]
+    },
+    {
+      "httpStatus": 200,
+      "code": 0,
+      "metricValues": [
+        null,
+        null
+      ]
+    }
+  ],
+  "pageErrors": [],
+  "optionalReflection": {
+    "nativeFormQuestions": 3,
+    "completedBlankFinal": true,
+    "finalParentStatus": "COMPLETED",
+    "taskSatisfaction": "SATISFIED",
+    "reportMissingLabels": 3,
+    "noNumericalScores": true,
+    "recoveryLinkSavedAndUsed": true,
+    "separateAnonymousEntry": true,
+    "autoLinkedToSjt": false,
+    "transientUiLimitation": "Intermediate page briefly displayed 已交卷，任务未达成; final persistence and recovered report were SATISFIED. Not fixed in this content-only candidate."
+  },
+  "fixtureLimitations": [
+    "Three additional incomplete anonymous attempts were opened during browser-context recovery; no answers or final scores persisted. Playwright storageState does not preserve sessionStorage.",
+    "Initial run failed because shared Prisma client predated current schema; regenerated from exact baseline and reran only representative loop.",
+    "One dependency version follow-redirects was 1.16.1 vs locked 1.16.2; repaired exact official tarball after sha512 integrity verification in backend/frontend.",
+    "One initial radio click raced stage readiness; harness now waits for enabled confirmation and checked radio. No application or scoring source changed.",
+    "All-browser and all-48 reruns not performed; full prior golden path and native workbook results reused within their documented inputs."
+  ]
+}

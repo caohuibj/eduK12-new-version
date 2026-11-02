@@ -1,0 +1,392 @@
+[
+  {
+    "file": "forms/CJ01-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": true,
+    "browserTested": true,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ02-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ03-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ04-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ05-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ06-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ07-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ08-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ09-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ10-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ11-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ12-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ13-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ14-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ15-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ16-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ17-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ18-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ19-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ20-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ21-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ22-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ23-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/CJ24-post-final.csv.txt",
+    "optional": true,
+    "kind": "POST_FINAL_REFLECTION",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T01-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T02-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T03-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T04-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T05-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T06-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T07-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T08-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T09-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T10-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T11-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/T12-observation.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/during-lesson.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/pre-lesson.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  },
+  {
+    "file": "forms/post-lesson.csv.txt",
+    "optional": true,
+    "kind": "OBSERVATION_UNSCORED",
+    "nativeParseValidated": true,
+    "developmentPersisted": false,
+    "browserTested": false,
+    "productionImported": false,
+    "format": "CSV text; restore .csv extension for any future authorized import"
+  }
+]

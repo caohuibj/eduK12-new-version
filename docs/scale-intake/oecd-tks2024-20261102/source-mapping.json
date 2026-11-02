@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "originalPdfSha256": "93b8ecdf49bec06df4987b5842ec9fd3c7be93455db8667d29bf0628f3744d45",
+  "newFormRows": 22,
+  "reusedSourcePositions": 18,
+  "comparison": "Actual TKS PDF page text; case/whitespace/punctuation removed for matching, source question text unchanged in payload. TKS contextual cluster labels mapped to Appendix H of Technical Report V3 (pp826–828); response codes are not scores. Shared TALIS ISCED2 wording and anchors compared directly with TKS pp18–19.",
+  "checks": [
+    {
+      "key": "tks2024_assessment_methods_isced2_teacher_self_en",
+      "pdfPage": 20,
+      "rowCount": 6,
+      "sourceTextMatch": "PASS"
+    },
+    {
+      "key": "tks2024_adaptive_learning_isced2_teacher_self_en",
+      "pdfPage": 21,
+      "rowCount": 5,
+      "sourceTextMatch": "PASS"
+    },
+    {
+      "key": "tks2024_progression_learning_isced2_teacher_self_en",
+      "pdfPage": 22,
+      "rowCount": 4,
+      "sourceTextMatch": "PASS"
+    },
+    {
+      "key": "tks2024_lesson_aims_isced2_teacher_self_en",
+      "pdfPage": 23,
+      "rowCount": 7,
+      "sourceTextMatch": "PASS"
+    },
+    {
+      "key": "talis2024_time_allocation_isced2_teacher_self_en",
+      "tksQuestion": "Q22",
+      "existingQuestionDefinitionHash": "8a638ae593a5ba4ae0285d7dda27a1b38804e9e4348f261f11a3026204379f1f",
+      "sourceTextMatch": "PASS",
+      "operation": "reuse"
+    },
+    {
+      "key": "talis2024_clarity_isced2_teacher_self_en",
+      "tksQuestion": "Q23",
+      "existingQuestionDefinitionHash": "c3ad785c681c5adfc84ac5479fac279e0a815931b0d4f395d69c1f7fbd688ecc",
+      "sourceTextMatch": "PASS",
+      "operation": "reuse"
+    },
+    {
+      "key": "talis2024_cognitive_activation_isced2_teacher_self_en",
+      "tksQuestion": "Q23",
+      "existingQuestionDefinitionHash": "52ef78766a03a9005f16fc8ffdc7336b53bcc9d703f36a4b307b5ddf9d5468d0",
+      "sourceTextMatch": "PASS",
+      "operation": "reuse"
+    },
+    {
+      "key": "talis2024_classroom_management_isced2_teacher_self_en",
+      "tksQuestion": "Q23",
+      "existingQuestionDefinitionHash": "06ad505aca36f3c1355d31e01dd57ba4dd3bcba680ea46bf14ef8283cad0df53",
+      "sourceTextMatch": "PASS",
+      "operation": "reuse"
+    },
+    {
+      "key": "talis2024_other_practices_isced2_teacher_self_en",
+      "tksQuestion": "Q23",
+      "existingQuestionDefinitionHash": "e7bf95b6fa7d71f1b86813c8af21d7947bb260a3fbaa295464eaf7971bdffd83",
+      "sourceTextMatch": "PASS",
+      "operation": "reuse"
+    }
+  ]
+}
