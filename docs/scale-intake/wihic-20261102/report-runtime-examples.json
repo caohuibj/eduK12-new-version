@@ -1,0 +1,425 @@
+[
+  {
+    "case": "normal_complete",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-wihic-example",
+        "code": "wihic_teacher_support_actual_en_lower_secondary_student",
+        "name": "WIHIC｜教师支持（实际·英文8题）｜初中｜学生填答",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-wihic-example",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "e29a5f4471a9209250f0d81bada28c922dc0b7adfe0d3cf1a376de788b7632a9",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "WIHIC09",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC10",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC11",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC12",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC13",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC14",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC15",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "WIHIC16",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        }
+      ],
+      "scores": [
+        {
+          "key": "teacher_support",
+          "type": "dimension",
+          "label": "Teacher Support (descriptive item mean)",
+          "description": "Eight equally weighted responses 1–5; higher means more frequent perceived experiences. Project complete-response mean, not a norm or validated standalone score.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 5
+          },
+          "expectedItems": [
+            "WIHIC09",
+            "WIHIC10",
+            "WIHIC11",
+            "WIHIC12",
+            "WIHIC13",
+            "WIHIC14",
+            "WIHIC15",
+            "WIHIC16"
+          ],
+          "answeredItems": [
+            "WIHIC09",
+            "WIHIC10",
+            "WIHIC11",
+            "WIHIC12",
+            "WIHIC13",
+            "WIHIC14",
+            "WIHIC15",
+            "WIHIC16"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "teacher_support",
+          "headline": "Teacher Support: reflecting on this class",
+          "label": null,
+          "interpretation": "This describes how often you notice your teacher taking an interest in you and helping you learn. A higher mean means these experiences were reported more often; it is not a judgement of the teacher’s ability or intentions. The displayed value is the mean of eight complete responses on a 1–5 frequency scale. There are no high/low categories or comparison norms.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Which kind of help would make a current learning task clearer for you?"
+            },
+            {
+              "category": "environment",
+              "text": "If it feels safe, ask for one specific kind of help or share the need through a trusted adult."
+            }
+          ],
+          "limitations": [
+            "Your answers describe your perspective in this particular class. They cannot establish a teacher’s quality, classmates’ intentions or the causes of an experience.",
+            "These original English items are separated from the 56-item WIHIC. Standalone eight-item administration and this digital feedback have not been validated. This is not a validated Chinese questionnaire.",
+            "A score is shown only when all eight answers are present. Missing answers are not scored as zero or filled in. No local norms, thresholds or rankings are supplied.",
+            "An uncomfortable or unfair experience is not your fault. This questionnaire does not ask you to challenge a teacher or fix the classroom on your own; a trusted adult can help you decide what feels safe."
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "Your answers describe your perspective in this particular class. They cannot establish a teacher’s quality, classmates’ intentions or the causes of an experience.",
+        "These original English items are separated from the 56-item WIHIC. Standalone eight-item administration and this digital feedback have not been validated. This is not a validated Chinese questionnaire.",
+        "A score is shown only when all eight answers are present. Missing answers are not scored as zero or filled in. No local norms, thresholds or rankings are supplied.",
+        "An uncomfortable or unfair experience is not your fault. This questionnaire does not ask you to challenge a teacher or fix the classroom on your own; a trusted adult can help you decide what feels safe.",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total."
+    }
+  },
+  {
+    "case": "low_experience_complete",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-wihic-example",
+        "code": "wihic_teacher_support_actual_en_lower_secondary_student",
+        "name": "WIHIC｜教师支持（实际·英文8题）｜初中｜学生填答",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-wihic-example",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "e29a5f4471a9209250f0d81bada28c922dc0b7adfe0d3cf1a376de788b7632a9",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "WIHIC09",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC10",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC11",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC12",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC13",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC14",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC15",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "WIHIC16",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "teacher_support",
+          "type": "dimension",
+          "label": "Teacher Support (descriptive item mean)",
+          "description": "Eight equally weighted responses 1–5; higher means more frequent perceived experiences. Project complete-response mean, not a norm or validated standalone score.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 5
+          },
+          "expectedItems": [
+            "WIHIC09",
+            "WIHIC10",
+            "WIHIC11",
+            "WIHIC12",
+            "WIHIC13",
+            "WIHIC14",
+            "WIHIC15",
+            "WIHIC16"
+          ],
+          "answeredItems": [
+            "WIHIC09",
+            "WIHIC10",
+            "WIHIC11",
+            "WIHIC12",
+            "WIHIC13",
+            "WIHIC14",
+            "WIHIC15",
+            "WIHIC16"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "teacher_support",
+          "headline": "Teacher Support: reflecting on this class",
+          "label": null,
+          "interpretation": "This describes how often you notice your teacher taking an interest in you and helping you learn. A higher mean means these experiences were reported more often; it is not a judgement of the teacher’s ability or intentions. The displayed value is the mean of eight complete responses on a 1–5 frequency scale. There are no high/low categories or comparison norms.",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "Which kind of help would make a current learning task clearer for you?"
+            },
+            {
+              "category": "environment",
+              "text": "If it feels safe, ask for one specific kind of help or share the need through a trusted adult."
+            }
+          ],
+          "limitations": [
+            "Your answers describe your perspective in this particular class. They cannot establish a teacher’s quality, classmates’ intentions or the causes of an experience.",
+            "These original English items are separated from the 56-item WIHIC. Standalone eight-item administration and this digital feedback have not been validated. This is not a validated Chinese questionnaire.",
+            "A score is shown only when all eight answers are present. Missing answers are not scored as zero or filled in. No local norms, thresholds or rankings are supplied.",
+            "An uncomfortable or unfair experience is not your fault. This questionnaire does not ask you to challenge a teacher or fix the classroom on your own; a trusted adult can help you decide what feels safe."
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "Your answers describe your perspective in this particular class. They cannot establish a teacher’s quality, classmates’ intentions or the causes of an experience.",
+        "These original English items are separated from the 56-item WIHIC. Standalone eight-item administration and this digital feedback have not been validated. This is not a validated Chinese questionnaire.",
+        "A score is shown only when all eight answers are present. Missing answers are not scored as zero or filled in. No local norms, thresholds or rankings are supplied.",
+        "An uncomfortable or unfair experience is not your fault. This questionnaire does not ask you to challenge a teacher or fix the classroom on your own; a trusted adult can help you decide what feels safe.",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total."
+    }
+  },
+  {
+    "case": "insufficient_evidence",
+    "synthetic": true,
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-wihic-example",
+        "code": "wihic_teacher_support_actual_en_lower_secondary_student",
+        "name": "WIHIC｜教师支持（实际·英文8题）｜初中｜学生填答",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-wihic-example",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0",
+        "definitionHash": "e29a5f4471a9209250f0d81bada28c922dc0b7adfe0d3cf1a376de788b7632a9",
+        "referenceVersions": [],
+        "assessmentContext": null
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [
+        {
+          "itemCode": "WIHIC09",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "WIHIC10",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "WIHIC11",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "WIHIC12",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "WIHIC13",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "WIHIC14",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "WIHIC15",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        }
+      ],
+      "scores": [
+        {
+          "key": "teacher_support",
+          "type": "dimension",
+          "label": "Teacher Support (descriptive item mean)",
+          "description": "Eight equally weighted responses 1–5; higher means more frequent perceived experiences. Project complete-response mean, not a norm or validated standalone score.",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 5
+          },
+          "expectedItems": [
+            "WIHIC09",
+            "WIHIC10",
+            "WIHIC11",
+            "WIHIC12",
+            "WIHIC13",
+            "WIHIC14",
+            "WIHIC15",
+            "WIHIC16"
+          ],
+          "answeredItems": [
+            "WIHIC09",
+            "WIHIC10",
+            "WIHIC11",
+            "WIHIC12",
+            "WIHIC13",
+            "WIHIC14",
+            "WIHIC15"
+          ],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "Your answers describe your perspective in this particular class. They cannot establish a teacher’s quality, classmates’ intentions or the causes of an experience.",
+        "These original English items are separated from the 56-item WIHIC. Standalone eight-item administration and this digital feedback have not been validated. This is not a validated Chinese questionnaire.",
+        "A score is shown only when all eight answers are present. Missing answers are not scored as zero or filled in. No local norms, thresholds or rankings are supplied.",
+        "An uncomfortable or unfair experience is not your fault. This questionnaire does not ask you to challenge a teacher or fix the classroom on your own; a trusted adult can help you decide what feels safe.",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "For research and supportive reflection on classroom experiences. Do not use for teacher appraisal, school ranking, diagnosis or student selection. Discuss concerns with a trusted adult regardless of the score. There is no combined WIHIC total."
+    }
+  }
+]

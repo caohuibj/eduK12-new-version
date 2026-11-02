@@ -648,7 +648,10 @@ jobs:
           JS
       - name: install pinned release classification tools
         if: steps.pr356-entry.outputs.candidate != 'true' && steps.documentation-scope.outputs.lightweight != 'true'
-        run: npm ci --ignore-scripts --prefix .github/release-tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          mkdir -p server-version/backend/node_modules
+          test -e server-version/backend/node_modules/typescript || ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/backend/node_modules/typescript
       - id: scope
         env:
           GH_TOKEN: ${{ github.token }}
@@ -847,6 +850,9 @@ jobs:
       NODE_ENV: test
       DATABASE_URL: postgresql://ptool:ci-isolated-only@localhost:5432/eduk12_ci_test?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ci-isolated-only@localhost:5432/eduk12_ci_test?schema=public
+      COGNITIVE_ASSIGNMENT_INTEGRATION_DB_URL: postgresql://ptool:ci-isolated-only@localhost:5432/eduk12_ci_test?schema=public
+      CI_BASE_SHA: ${{ needs.scope.outputs.diff_base }}
+      REPAIR_RESULTS_DIR: /tmp/maintenance-repair-results
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org
       NPM_CONFIG_REPLACE_REGISTRY_HOST: always
     steps:
@@ -856,15 +862,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.21.0
+      - name: Select affected checks from the complete raw diff
+        id: repair
+        run: node .github/scripts/maintenance-repair-scope.mjs --plan "$CI_BASE_SHA"
       - name: Install the unchanged locked dependencies once
         run: |
-          npm ci --prefix .github/release-tools --ignore-scripts --no-audit --no-fund
           npm ci --prefix server-version/backend --ignore-scripts --no-audit --no-fund
+      - name: Prepare only affected legacy inventory tooling
+        if: steps.repair.outputs.legacy == 'true'
+        run: |
+          npm ci --prefix .github/release-tools --ignore-scripts --no-audit --no-fund
           mkdir -p server-version/frontend/node_modules
           ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/frontend/node_modules/typescript
-      - name: Check routing, receipt ownership and inventory semantics
+      - name: Check bounded routing, test selection and required outcomes
+        run: node --test .github/scripts/maintenance-repair.test.mjs
+      - name: Check affected legacy receipt ownership and inventory semantics
+        if: steps.repair.outputs.legacy == 'true'
         run: |
-          node --test .github/scripts/maintenance-repair.test.mjs .github/scripts/post356-scope.test.mjs .github/scripts/local-validation.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/merge-gate.test.mjs
+          node --test .github/scripts/post356-scope.test.mjs .github/scripts/local-validation.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/merge-gate.test.mjs
           node --test server-version/miniprogram-v2/tests/feature-inventory.test.cjs
           node server-version/frontend/scripts/product-route-inventory.mjs --check
       - name: Prepare only the isolated database and generated client
@@ -876,35 +891,24 @@ jobs:
         working-directory: server-version/backend
         run: node --max-old-space-size=4096 node_modules/typescript/bin/tsc --noEmit
       - name: Verify the actual affected security transitions and draft boundary
+        run: node .github/scripts/maintenance-repair-scope.mjs --test "$CI_BASE_SHA"
+      - name: Check affected legacy public declarations
+        if: steps.repair.outputs.legacy == 'true'
         working-directory: server-version/backend
-        shell: bash
         run: |
-          files=(
-            src/__tests__/reporting/group-service-disclosure.test.ts
-            src/__tests__/reporting/reporting-leaf-source.test.ts
-            src/__tests__/reporting/campus-absent-disclosure.test.ts
-            src/__tests__/services/classroomSocketHandler.security.test.ts
-            src/__tests__/services/socketService.revalidation.test.ts
-            src/__tests__/controllers/password-change-canonical.test.ts
-            src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts
-            src/__tests__/integration/huiteacherConsensus.postgres.integration.test.ts
-            src/__tests__/assessment-bundle/public-declarations.test.ts
-            src/__tests__/cognitive/acceptance-execution.test.ts
-          )
-          node node_modules/vitest/vitest.mjs run "${files[@]}" --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/maintenance-repair-tests.json
-          node scripts/assert-release-test-report.mjs /tmp/maintenance-repair-tests.json "${files[@]}"
           node --import tsx src/scripts/bundle-onboarding.ts manifest-check
           node --import tsx src/scripts/bundle-onboarding.ts check-public
       - name: Verify monitoring behavior and the actual Prometheus expressions
+        if: steps.repair.outputs.legacy == 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p test_monitor.py -v
           docker run --rm --entrypoint /bin/promtool -v "$PWD/server-version/monitoring:/rules:ro" -w /rules prom/prometheus:v2.54.1 check rules alert_rules.yml
           docker run --rm --entrypoint /bin/promtool -v "$PWD/server-version/monitoring:/rules:ro" -w /rules prom/prometheus:v2.54.1 test rules alert_rules.test.yml
       - name: Select the changed runtime and check-control sources for SAST
-        run: node .github/scripts/maintenance-repair-scope.mjs --codeql-config > ./.maintenance-repair-codeql.json
+        run: node .github/scripts/maintenance-repair-scope.mjs --codeql-config "$CI_BASE_SHA" > ./.maintenance-repair-codeql.json
       - uses: github/codeql-action/init@v3
         with:
-          languages: javascript-typescript,python
+          languages: ${{ steps.repair.outputs.languages }}
           build-mode: none
           config-file: ./.maintenance-repair-codeql.json
       - uses: github/codeql-action/analyze@v3
@@ -914,7 +918,7 @@ jobs:
         if: always()
         with:
           name: maintenance-repair-test-results
-          path: /tmp/maintenance-repair-tests.json
+          path: /tmp/maintenance-repair-results/*.json
           if-no-files-found: ignore
 
   maintenance:
@@ -4087,7 +4091,10 @@ jobs:
         != ''training-appearance'' && needs.scope.outputs.application_route != ''survey-cloud'' && needs.scope.outputs.documentation != ''true'' && needs.scope.outputs.scenario
         != ''release-tooling'' && !(needs.scope.outputs.application_route == ''training-workspace'' && fromJSON(needs.scope.outputs.training_workspace_plan || ''{}'').candidate
         == ''mac-followup''))'
-      run: npm ci --ignore-scripts --prefix .github/release-tools
+      run: |
+        npm ci --ignore-scripts --prefix .github/release-tools
+        mkdir -p server-version/backend/node_modules
+        test -e server-version/backend/node_modules/typescript || ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/backend/node_modules/typescript
     - name: require exact success for the selected route
       if: ${{ !inputs.complete_training || (github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref ==
         'fix/runtime-time-and-validation-20261025')) || github.ref_name == 'fix/runtime-time-and-validation-20261025' }}

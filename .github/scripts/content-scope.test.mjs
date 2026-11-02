@@ -593,10 +593,10 @@ test('actual Git diffs select different documentation, presentation, content, fr
     git('init','-q');writeFileSync(join(fixture,'base.txt'),'base\n');git('add','.');
     git('-c','user.name=CI','-c','user.email=ci@example.invalid','commit','-qm','base');
     const base=git('rev-parse','HEAD');
-    for(const [file,scenario,codeql] of [
+    for(const [file,scenario,codeql,body='fixture\n'] of [
       ['README.md','documentation',false],
       ['server-version/frontend/src/components/Card.css','presentation',false],
-      [sjt,'content',false], [cognitive,'unsupported-cognitive',true],
+      [sjt,'content',false,'{}\n'], [sjt,'content',true,'not-json\n'], [cognitive,'unsupported-cognitive',true],
       ['server-version/frontend/src/pages/Teacher.tsx','frontend',true],
       ['server-version/frontend/src/pages/__tests__/Teacher.test.tsx','frontend-test',false],
       ['server-version/frontend/src/modules/cognitive/core/runner.ts','platform',true],
@@ -605,7 +605,7 @@ test('actual Git diffs select different documentation, presentation, content, fr
       ['.github/workflows/unknown.yml','platform',true],
     ]) {
       git('reset','--hard',base);
-      const path=join(fixture,file);mkdirSync(dirname(path),{recursive:true});writeFileSync(path,'fixture\n');
+      const path=join(fixture,file);mkdirSync(dirname(path),{recursive:true});writeFileSync(path,body);
       git('add','.');git('-c','user.name=CI','-c','user.email=ci@example.invalid','commit','-qm','case');
       if(scenario==='unsupported-cognitive') {
         assert.throws(()=>execFileSync(process.execPath,[new URL('./content-scope.mjs',import.meta.url).pathname],{cwd:fixture,encoding:'utf8',stdio:['ignore','pipe','pipe'],env:{...process.env,CI_EVENT:'pull_request',CI_BASE_SHA:base,CI_PR_REPOSITORY:'owner/repo',GITHUB_REPOSITORY:'owner/repo',CI_FORCE_FULL:'false',GITHUB_OUTPUT:''}}),/UNSUPPORTED_COGNITIVE_INTAKE:missing-task-package/);

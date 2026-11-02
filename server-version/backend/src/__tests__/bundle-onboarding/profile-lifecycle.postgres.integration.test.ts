@@ -32,7 +32,7 @@ suite('EVC normal install to durable FINAL and saved report',{timeout:120000},()
     const tag=randomUUID(),password=randomBytes(24).toString('hex')
     const actor={userId:'evc-admin-'+tag,role:UserRole.ADMIN},reviewer='evc-review-'+tag,student='evc-student-'+tag,browserStudent='evc-browser-'+tag
     for(const [id,role] of [[actor.userId,'ADMIN'],[reviewer,'ADMIN'],[student,'STUDENT'],[browserStudent,'STUDENT']] as const){
-      await db.user.create({data:{id,username:id,passwordHash:await bcrypt.hash(password,4),role,accountDomain:'TRAINING',...(id===actor.userId?{platformRole:'SYSTEM_ADMIN' as const}:{})}})
+      await db.user.create({data:{id,username:id,passwordHash:await bcrypt.hash(password,4),role,accountDomain:'TRAINING',...(role==='ADMIN'?{platformRole:'SYSTEM_ADMIN' as const}:{})}})
     }
     const course=await db.course.create({data:{creatorId:actor.userId,title:'合成EVC学习支持',courseCode:'EVC-'+tag,courseType:'TRAINING_COURSE',status:'PUBLISHED'}})
     await db.courseStudent.createMany({data:[student,browserStudent].map(studentId=>({courseId:course.id,studentId,status:'ACTIVE'}))})

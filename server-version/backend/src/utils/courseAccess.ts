@@ -22,8 +22,8 @@ export async function hasActiveCourseMembership(courseId: string, studentId: str
 
   if (membership) return true
   // Campus participation is NOT a CourseStudent enrollment. Verify SCHOOL,
-  // approved class, current membership and currently OPEN activity in one
-  // batch SQL predicate; do not trust the client Course ID or a stale JWT.
+  // approved class, current membership, active School subscription and OPEN
+  // activity in one query; a prior task listing is not a current access grant.
   const rows=await prisma.$queryRaw<Array<{allowed:boolean}>>`
     SELECT EXISTS(
       SELECT 1 FROM "campus_activity_participants" p
@@ -31,6 +31,8 @@ export async function hasActiveCourseMembership(courseId: string, studentId: str
         AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
       JOIN "organizations" o ON o."id"=a."organization_id"
         AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
+      JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
       JOIN "organization_memberships" m ON m."id"=p."membership_id"
         AND m."organization_id"=p."organization_id"
         AND m."user_id"=${studentId}
@@ -55,7 +57,8 @@ export async function hasActiveCourseMembership(courseId: string, studentId: str
       WHERE p."course_id"=${courseId} AND p."status"='ACTIVE'
         AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
           WHERE d."organization_id"=o."id" AND d."user_id"=${studentId}
-            AND d."lifted_at" IS NULL AND d."permission" IN ('*','ACTIVITY_READ','RUN_START'))
+            AND d."lifted_at" IS NULL
+            AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
     ) AS "allowed"
   `
   return rows[0]?.allowed===true

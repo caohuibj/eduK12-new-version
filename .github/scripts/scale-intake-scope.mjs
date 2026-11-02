@@ -3,6 +3,7 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 export const scaleIntakeToolingInputs = Object.freeze([
+ '.github/scripts/declarative-content.mjs',
  '.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs',
  '.github/workflows/scale-onboarding-boundary.yml',
  'server-version/backend/scripts/scale-intake-selected-check.ts',

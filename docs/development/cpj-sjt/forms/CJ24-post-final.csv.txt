@@ -1,0 +1,4 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+SINGLE,可选课后回顾（已看反馈）：同伴称赞课堂安静时，你最在意哪一点？,false,管理得到认可||学生是否真的在学习||维持邻班的正常秩序||规则是否能长期执行||其他||无法判断||不愿回答,,,,,,,,,,,,
+LONG_TEXT,原选择保护了什么目标？有哪些代价或现实限制？,false,,,,,,,,,,,,,
+LONG_TEXT,哪一项新证据会使你改变？下一课愿意试的一小步是什么？如何确认是否有帮助？,false,,,,,,,,,,,,,
