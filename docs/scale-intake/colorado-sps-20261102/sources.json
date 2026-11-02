@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "toolkit": "https://www.coloradoedinitiative.org/Resources/student-perception-survey-toolkit/",
+  "sources": {
+    "technical": {
+      "title": "Student Perception Survey Technical Report",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/technical-report-CEI.pdf",
+      "sourceDateOrHostingContext": "2013-08-29",
+      "retrievedOn": "2026-11-02",
+      "bytes": 6442601,
+      "sha256": "b5b7eadd931736569883e8e825f89ede6ee4b9f1fc40ce4b79f734494a3b3d03",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "student_3_5": {
+      "title": "SPS grades 3–5 final item-to-element overview",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2015/02/SPS_Administration_survey-instrument-3-5-CEI.pdf",
+      "sourceDateOrHostingContext": "copyright 2014; hosted 2015/02",
+      "retrievedOn": "2026-11-02",
+      "bytes": 356052,
+      "sha256": "3008cdf37eea91777f1351f65a91b64a1b21afa1a4f9fb69a857b6d69f52c825",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "student_6_12": {
+      "title": "SPS grades 6–12 final item-to-element overview",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_Administration_survey-instrument-6-12-CEI.pdf",
+      "sourceDateOrHostingContext": "copyright 2014",
+      "retrievedOn": "2026-11-02",
+      "bytes": 356894,
+      "sha256": "1b2a043ba72584770dd46db1d24f1d2a6b916deaf46355902e175677bbee38f3",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "admin_3_5": {
+      "title": "SPS grades 3–5 paper/pencil administration",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_Administration_survey-instrument_paper.pencil-versions-3-5-CEI1.docx",
+      "sourceDateOrHostingContext": "hosted 2014/09",
+      "retrievedOn": "2026-11-02",
+      "bytes": 59694,
+      "sha256": "b993f7809a695f05cce7f5c82d6e87d3a03db94c662ab7ec8fa14548c806fad8",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "admin_6_12": {
+      "title": "SPS grades 6–12 paper/pencil administration",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_Administration_survey-instrument_paper.pencil-versions-6-12-CEI.docx",
+      "sourceDateOrHostingContext": "hosted 2014/09",
+      "retrievedOn": "2026-11-02",
+      "bytes": 37698,
+      "sha256": "c359b6266f938ced9408b5666ba7b4004187bab4bc8d2e5b0d0b57858fd6be69",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "teacher_3_5": {
+      "title": "Teacher Self-Assessment for Grades 3–5; Thompson School District",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_results_self-assessment-3-5_CEI.pdf",
+      "sourceDateOrHostingContext": "undated; hosted 2014/09",
+      "retrievedOn": "2026-11-02",
+      "bytes": 330886,
+      "sha256": "0a2c37da9ce91758bfae163af30617ef8d74d5f1f42b90ca03662d5ed36fc893",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "teacher_6_12": {
+      "title": "Teacher Self-Assessment for Grades 6–12; Thompson School District",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_results_self-assessment-6-12_CEI.pdf",
+      "sourceDateOrHostingContext": "undated; hosted 2014/09",
+      "retrievedOn": "2026-11-02",
+      "bytes": 331209,
+      "sha256": "e2502f70f4fea2ad076930806095a5b1e5cf626b3154782902e6eec9adff8442",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    },
+    "reflection": {
+      "title": "Student Perception Survey Reflection Guide",
+      "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2016/02/SPS-Reflection-Guide.docx",
+      "sourceDateOrHostingContext": "undated; hosted 2016/02",
+      "retrievedOn": "2026-11-02",
+      "bytes": 143570,
+      "sha256": "a3a7572fe9eb0a71ea13df8e99938556313b974a7ac2bff799bfc9132c8a86c9",
+      "publicPayload": "bibliographic metadata, item identifiers and limitations only; source file not committed"
+    }
+  },
+  "rights": {
+    "status": "PERMISSION_NOT_ESTABLISHED",
+    "studentInstrumentNotice": "Copyright 2014 CEI; all rights reserved; welcomes noncommercial sharing but directs users to request permission for print/electronic excerpting or sharing. No platform redistribution/adaptation grant obtained.",
+    "contact": "publications@coloradoedinitiative.org",
+    "technicalReport": "Copyright CEI; acknowledges items adapted in part from MET materials made available for noncommercial use. This is not a grant covering this platform.",
+    "teacherSelfAssessment": "Developed by Thompson School District; hosted by CEI. No explicit platform redistribution/adaptation license located in these PDFs.",
+    "reflectionGuide": "No explicit license located in the DOCX body. Rights must be resolved separately.",
+    "noActionsTaken": [
+      "no rights holder contacted",
+      "no terms accepted",
+      "no source files or original item wording pushed"
+    ]
+  }
+}
