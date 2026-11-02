@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-11-02",
+  "dedup": {
+    "baseCommit": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "registeredInstrumentVersions": 268,
+    "openPrCount": 54,
+    "repositoryTerms": [
+      "ART000979189",
+      "JAKO200517347322344",
+      "Development and Application of Self-Evaluation Test Items",
+      "중등 과학교사의 전문성",
+      "김성원",
+      "ksse2005"
+    ],
+    "sourceIdTitleAuthorMatches": 0,
+    "openPrFilesAndVisiblePatchesScanned": 54,
+    "openPrMatches": 0,
+    "prScanErrors": 0,
+    "limits": [
+      "Production DB and administrator-created instruments not inspected",
+      "Complete final item bank unavailable for exhaustive item-level equivalence checking"
+    ],
+    "related2020Tool": "Distinct year, authors/source identity, 54 items and 9 factors; not reused as 77-item source",
+    "initialBaseCommit": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "latestOpenPrCount": 54,
+    "additionalOpenPrFilesAndVisiblePatchesScanned": [
+      574
+    ]
+  },
+  "sources": [
+    {
+      "id": "kci",
+      "url": "https://www.kci.go.kr/kciportal/landing/article.kci?arti_id=ART000979189",
+      "result": "Search-index bibliographic record available; direct retrieval blocked by WAF; no bypass attempted"
+    },
+    {
+      "id": "scienceon",
+      "url": "https://scienceon.kisti.re.kr/srch/selectPORSrchArticle.do?cn=JAKO200517347322344",
+      "result": "Primary institutional abstract/metadata; HTML retrieved"
+    },
+    {
+      "id": "dbpia",
+      "url": "https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09044383",
+      "result": "Bibliographic metadata and bilingual abstract; no login/subscription accepted"
+    },
+    {
+      "id": "author_publication_page",
+      "url": "https://www.researchgate.net/publication/264112387_Development_and_Application_of_Self-Evaluation_Test_Items_for_Secondary_Science_Teacher_Professional_Growth",
+      "result": "Author-profile public scan link retrieved; no registration/login"
+    },
+    {
+      "id": "scan_download",
+      "url": "https://www.researchgate.net/profile/Sung-Won-Kim-2/publication/264112387_Development_and_Application_of_Self-Evaluation_Test_Items_for_Secondary_Science_Teacher_Professional_Growth/links/5411c8030cf2fa878ad38e14/Development-and-Application-of-Self-Evaluation-Test-Items-for-Secondary-Science-Teacher-Professional-Growth",
+      "result": "Public octet-stream response containing HTML wrapper and embedded PDF; PDF extracted and all 10 pages visually inspected",
+      "pdfBytes": 654213,
+      "pdfSha256": "c8626efb3b895ad827335321f53c5a762e4822d8670a5073142249293b4ae212",
+      "pages": 10,
+      "journalPages": "736-745",
+      "isScannedImagePdf": true,
+      "embeddedTextLayerUsable": false,
+      "completePaperRetrieved": true,
+      "completeQuestionnaireRetrieved": false,
+      "originalBytesPublished": false
+    },
+    {
+      "id": "journal_rights_registry",
+      "url": "https://copyright.oak.go.kr/search/copyInfo.do?jourCopySeq=356",
+      "result": "National Library of Korea journal-level registry lists society copyright ownership and no CC license. Does not itself prove a 2005 article-specific reuse grant or prohibition. Electronic platform use, translation and redistribution remain unresolved.",
+      "observedLastModifiedField": "2026-10-26",
+      "scope": "JOURNAL_LEVEL_NOT_ARTICLE_SPECIFIC"
+    }
+  ],
+  "originalPaperChecks": {
+    "p736": "Korean/English title and author attribution; English abstract gives subdomain alpha .76-.86",
+    "p740": "Development and 2004 administration to 220 middle-school science teachers in Seoul/Gyeonggi",
+    "p741Table5": "Six domains with counts 14/17/9/10/15/12; all sum to 77",
+    "p741Body": "Appendix described as two examples per domain; Korean body gives total alpha .95 and subdomain alpha .54-.69",
+    "pp743_744": "Higher score described positively; self-report leniency and professional-development use discussed",
+    "p745Appendix": "12 examples only, not the full final questionnaire; printed response numbering conflicts with stated score direction",
+    "reliabilityConflict": "Preserve English abstract vs Korean body discrepancy; do not select favorable alpha or claim resolved psychometrics",
+    "notClaimed": [
+      "Full final 77-item questionnaire",
+      "Validated independent six-short-scale administration",
+      "Validated Chinese translation",
+      "Current norms or competence diagnosis"
+    ]
+  },
+  "validation": {
+    "changeScope": "Four documentation/research metadata files only; no runtime, registry, schema, dependencies or workflow changes",
+    "nativeSchema": "NOT_SUBMITTED_NO_LAWFUL_COMPLETE_NATIVE_PAYLOAD",
+    "scoringTests": "NOT_RUN_NO_SCORER",
+    "reportRuntimeTests": "NOT_RUN_DRAFT_PROSE_ONLY",
+    "isolatedDbImport": "NOT_ATTEMPTED_INCOMPLETE_FINAL_ITEM_BANK_AND_UNRESOLVED_RIGHTS",
+    "developmentDbImport": "NOT_ATTEMPTED",
+    "productionWrite": "NOT_ATTEMPTED",
+    "notionCiReference": {
+      "title": "CI 常见错误清单",
+      "pageId": "404d27635a388186ac80de3593da05a5",
+      "status": "READ_SUCCEEDED",
+      "asOf": "2026-11-02T00:46:19.526Z",
+      "applicable": [
+        "CI-004",
+        "CI-020"
+      ]
+    },
+    "formalCi": "NOT_ACTIVATED_AT_METADATA_PREPARATION; actual PR results recorded separately",
+    "independentHumanReview": "NOT_CLAIMED",
+    "expectedRoute": "Existing content scale boundary; no selected native instrument and no full platform run",
+    "localChecks": {
+      "jsonParse": "PASS",
+      "domainCountAndSum": "PASS: 6 domains / 77 reported items / 12 printed examples",
+      "uniqueCandidateIds": "PASS: 6",
+      "latestMainDedup": "PASS: no source identity match at updated main; production/admin and full item equivalence unverified",
+      "reportDraft": "REVIEWED: three teacher prose scenarios; no numeric classifications or runtime consumer",
+      "privateSourceExclusion": "PASS: no PDF, image, OCR, items or credentials in proposed files",
+      "existingRouter": {
+        "content": true,
+        "domains": [
+          "scale"
+        ],
+        "scaleIntakeLight": false,
+        "frontend": false
+      }
+    }
+  }
+}
