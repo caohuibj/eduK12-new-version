@@ -1,3 +1,4 @@
+import {studentDiscoveryScope} from './student-discovery-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 export const catalogChecks=JSON.parse(readFileSync(new URL('../config/catalog-discovery-checks.json',import.meta.url)));
@@ -31,7 +32,7 @@ export function bundleRuntimeSelectionMatches(entries,outputs){
  return (outputs.bundle_runtime||'false')===String(bundleRuntimeScope(entries))
   &&!(outputs.bundle_runtime==='true'&&outputs.bundle_family==='true');
 }
-export function catalogDiscoveryScope(entries){return catalogSurfaceScope(entries)||bundleFamilyScope(entries)||bundleRuntimeScope(entries);}
+export function catalogDiscoveryScope(entries,readers={}){return catalogSurfaceScope(entries)||bundleFamilyScope(entries)||bundleRuntimeScope(entries)||studentDiscoveryScope(entries,readers);}
 
 // The event can retain the PR's creation-time base while refs/pull/N/merge
 // already uses current main. Select that parent only for this bounded diff.
@@ -39,5 +40,5 @@ export function catalogDiffBase(eventBase,head,entriesFor,env=process.env,read=(
  if(env.CI_EVENT!=='pull_request'||!env.CI_SOURCE_HEAD)return eventBase;
  const parents=read('cat-file','-p',head).split('\n').filter(line=>line.startsWith('parent ')).map(line=>line.slice(7));
  if(parents.length!==2||parents[1]!==env.CI_SOURCE_HEAD)return eventBase;
- return catalogDiscoveryScope(entriesFor(parents[0]))?parents[0]:eventBase;
+ return catalogDiscoveryScope(entriesFor(parents[0]),{readBaseFile:file=>read('show',parents[0]+':'+file),readHeadFile:file=>read('show',head+':'+file)})?parents[0]:eventBase;
 }
