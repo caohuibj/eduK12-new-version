@@ -82,7 +82,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
     WHERE p."status"='ACTIVE'
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id"=o."id" AND d."user_id"=${actor.userId}
-          AND d."lifted_at" IS NULL AND d."permission" IN ('*','ACTIVITY_READ','RUN_START'))
+          AND d."lifted_at" IS NULL
+          AND d."permission" IN ('*','EDUCATION_ACCESS','HUISCHOOL_ACCESS','ACTIVITY_READ','RUN_START'))
     ORDER BY a."course_id" LIMIT 201
   `
   const authorized=input.activityId?activityRows.filter(a=>a.courseId===input.activityId):activityRows
