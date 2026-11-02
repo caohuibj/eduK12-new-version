@@ -1,0 +1,12 @@
+{
+  "anonymousDrafts": 401,
+  "otherAuthorDraft": 403,
+  "teacherReview": 403,
+  "nativeMultipartValidate": {
+    "status": 200,
+    "code": 0,
+    "contentDigest": "6ec455da80e9022547e9e99b5ee0f8e7fc379dc0e3eff2abb2e5fbd71f1433f5",
+    "definitionHash": "ac9b766eb543f6fceb3af1746d9a702bd93130d2cf224df143fe8f2bc1930ab3",
+    "maturity": "PILOT"
+  }
+}
