@@ -1,0 +1,75 @@
+{
+  "motherKey": "selfie4t_2022tk_32_en_teacher_self",
+  "familyTag": "family:selfie4t",
+  "fixedOriginal": "JRC129699 December 2022 English Toolkit + JRC131282 official common seventh option and scoring",
+  "units": [
+    {
+      "key": "selfie4t_2022tk_32_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "parameterReference": "none",
+      "status": "CATALOG_ONLY",
+      "itemCount": 32
+    },
+    {
+      "key": "selfie4t_2022tk_assessment_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "status": "DRAFT",
+      "itemCount": 3
+    },
+    {
+      "key": "selfie4t_2022tk_digital_resources_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "status": "DRAFT",
+      "itemCount": 5
+    },
+    {
+      "key": "selfie4t_2022tk_empowering_learners_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "status": "DRAFT",
+      "itemCount": 4
+    },
+    {
+      "key": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "status": "DRAFT",
+      "itemCount": 6
+    },
+    {
+      "key": "selfie4t_2022tk_professional_engagement_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "status": "DRAFT",
+      "itemCount": 9
+    },
+    {
+      "key": "selfie4t_2022tk_teaching_learning_en_teacher_self",
+      "contentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "parameterReference": "none",
+      "status": "DRAFT",
+      "itemCount": 5
+    }
+  ],
+  "chineseItems": "NOT_CREATED",
+  "independentAreaEquivalence": "NOT_ESTABLISHED",
+  "currentOnlineEquivalence": "NOT_VERIFIED",
+  "forms": 0,
+  "studentCompanion": "NOT_APPLICABLE_TO_THIS_TEACHER_SELF_TOOL"
+}
