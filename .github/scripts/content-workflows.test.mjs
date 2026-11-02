@@ -567,3 +567,28 @@ test('backend-only unit edits use a dedicated bounded route with unchanged fixed
   const refs=[...ci.matchAll(/uses:\s+\.\/\.github\/workflows\/([^\s]+)/g)].map(row=>row[1]);
   assert.ok(new Set(refs).size<=46,'No additional reusable-workflow fanout until legacy CI is simplified');
 });
+
+test('authenticated regression reuse executes only with a current-HEAD verifier and cannot bypass the merge gate',async()=>{
+  const {requiredChecks,failedChecks}=await import('./merge-gate.mjs');
+  const ci=source('ci');
+  const candidate=job(ci,'backend-regression-reuse');
+  const regression=job(ci,'backend-regression');
+  assert.match(candidate,/actions: read/);
+  assert.match(candidate,/ci-backend-regression-reuse\.mjs/);
+  assert.match(regression,/reuse_backend_regression != 'true'/);
+  assert.ok(jobNeeds(job(ci,'merge-gate')).includes('backend-regression-reuse'));
+  const base={scope:{result:'success',outputs:{application_route:'legacy',scenario:'platform'}}};
+  const notReused={...base,'backend-regression-reuse':{result:'success',outputs:{
+    reuse_backend_regression:'false',source_run:'',evidence_digest:''}}};
+  assert.ok(requiredChecks(notReused,false).includes('backend-regression'));
+  const reused={...base,'backend-regression-reuse':{result:'success',outputs:{
+    reuse_backend_regression:'true',source_run:'12345',evidence_digest:'a'.repeat(64)}}};
+  assert.ok(!requiredChecks(reused,false).includes('backend-regression'));
+  assert.ok(requiredChecks(reused,false).includes('backend-regression-reuse'));
+  assert.ok(failedChecks({...reused,'backend-regression-reuse':{
+    result:'failure',outputs:reused['backend-regression-reuse'].outputs}},false).includes('backend-regression-reuse'));
+  assert.ok(failedChecks({...reused,'backend-regression-reuse':{
+    result:'success',outputs:{reuse_backend_regression:'true',source_run:'',evidence_digest:''}}},false)
+    .includes('backend-regression-reuse-evidence'));
+  assert.ok(failedChecks({...notReused,'backend-regression':{result:'failure'}},false).includes('backend-regression'));
+});
