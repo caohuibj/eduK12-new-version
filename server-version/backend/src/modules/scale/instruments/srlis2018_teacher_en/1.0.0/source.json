@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "srlis2018_teacher_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "SRLIS｜自主学习策略教学实践｜教师自评｜Yan 2018来源候选（题本待取）",
+      "abbreviation": "SRLIS-2018",
+      "instrumentFamily": "Self-Regulated Learning Instruction Scale / Yan (2018; online 2017)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师自报教授学生自我监控与自主调节学习策略的实践；不是学生自身在线学习自调、教师自我效能或实际教学质量评级。原研究最终10题、单维，不把理论策略主题再造为子量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:srlis",
+        "role:teacher_self",
+        "school_stage:primary_secondary",
+        "language:en",
+        "edition:yan2018",
+        "use:research",
+        "maturity:PILOT",
+        "availability:source_candidate",
+        "rights:unconfirmed"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原研究873名香港教师，小学429、中学444；不把样本证据外推为全国K12等值或常模。本记录描述2018研究，不代表作者当前独立PDF题本已取得或语言版本已固定。"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "原研究问教师的SRL教学实践；完整指导语未取得，不添加统一回顾天数。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "10题数量来自原研究：13项初池经试测筛选保留10题；不是可施测题本。",
+        "原研究方法明确六点同意程度1–6；不能以别的研究换锚点或补出缺题。",
+        "论文只刊举例，没有全部10题；作者英文PDF当前TLS校验失败，中文PDF具体链接和完整内容尚未取得。",
+        "SRLTBS为Lombaerts等开发的另一个10题教师信念工具；其5+5分量不属SRLIS。",
+        "作者原研究使用Rasch校准person measures，不把原始均分或总和冒称原Rasch结果。",
+        "5分钟仅目录阅读估计，非原文已核完成时长。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅来源/版本核查。尚无完整、获许可的本项目施测题本、可执行参数或报告。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Yan, Z. (2018; online 28 September 2017). How teachers' beliefs and demographic variables impact on self-regulated learning instruction. Educational Studies, 44(5), 564–577. https://doi.org/10.1080/03055698.2017.1382331 English publication metadata only; full independent English questionnaire not obtained.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "目录英文表示所核论文/来源语言，不表示英文题本已核。作者网站中文下载为待取线索，尚不固定脚本、年份、题量或选项，不注册假定的中文版。没有本项目题文翻译。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "How teachers' beliefs and demographic variables impact on self-regulated learning instruction",
+      "citation": "Yan, Z. (2018; online 28 September 2017). How teachers' beliefs and demographic variables impact on self-regulated learning instruction. Educational Studies, 44(5), 564–577. https://doi.org/10.1080/03055698.2017.1382331",
+      "url": "https://doi.org/10.1080/03055698.2017.1382331",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "自主学习策略教学实践"
+      ],
+      "limitations": [
+        "题本待取，没有可计算结果；目录itemCount不构成导入或施测成功。",
+        "教师成长反馈只描述自报实践，不评价学生能力、教师好坏、绩效或诊断。",
+        "原Rasch校准参数和操作细则未齐，不由类别阈值自行重建模型，也不新增评分引擎。",
+        "若取得允许处理的完整原题但无可执行官方计分依据，可沿现有原生无分Form保留反思；缺题时不创建空Form。"
+      ],
+      "disclaimer": "来源候选；未取得完整题本，开发/隔离/生产均未导入。"
+    },
+    "blockers": [
+      "FULL_10_ITEM_QUESTIONNAIRE_NOT_OBTAINED",
+      "AUTHOR_DOWNLOAD_TLS_CERTIFICATE_VERIFICATION_FAILURE",
+      "QUESTIONNAIRE_REUSE_PERMISSION_UNCONFIRMED",
+      "FIXED_RASCH_SCORING_PARAMETERS_NOT_OBTAINED"
+    ]
+  }
+}

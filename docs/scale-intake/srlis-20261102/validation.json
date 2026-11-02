@@ -1,0 +1,32 @@
+{
+  "status": "SOURCE_CANDIDATE_BOUNDARY_PASS",
+  "recordedAt": "2026-11-02T01:23:54.954Z",
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "node": "v24.19.0",
+  "instrumentKey": "srlis2018_teacher_en",
+  "metadataVersion": "1.0.0",
+  "catalogValidation": "PASS",
+  "discoverable": true,
+  "administrable": false,
+  "runtimePolicy": null,
+  "reportEligible": false,
+  "materialization": "REJECTED_BEFORE_DB_ACCESS",
+  "databaseReads": 0,
+  "reportPlanExamples": 3,
+  "sourceSha256": "55c622b88d58a494b4e3900e66f0d338bd13c9a189202dafb9ccd73a73a481e7",
+  "notRun": [
+    "real item/schema/scoring/report rendering (questionnaire not obtained)",
+    "native Form import (no full permitted item content)",
+    "isolated database import",
+    "development/production import",
+    "browser/full-platform tests",
+    "formal GitHub CI at this recording time"
+  ],
+  "notClaimed": [
+    "Full questionnaire obtained",
+    "Rasch scoring reconstructed",
+    "Validated Chinese version",
+    "Rights approval",
+    "Human scientific review"
+  ]
+}
