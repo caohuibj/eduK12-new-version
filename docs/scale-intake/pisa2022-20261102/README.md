@@ -57,4 +57,4 @@ manifest给出两个普通组合候选：4个数学课堂题块，或另含ST267
 
 `csv/*.csv.txt`为原生CSV题块内容（下载后可按CSV导入），`*.import.json`保留原batchId的CSV预览/应用请求，重建原问题/行/选项key；页面标题及来源声明需随同native JSON保留，单独导CSV时按包内页面description补入既有说明字段。未新增导入器、权限或数据库结构。共同 `mother:PISA_2022` 保留在5份来源目录标签与表单reference；FORM提交流程的classificationTags只使用现有字典 `response:self`、`use:research`，不冒称自由family标签已作为字典分类持久化。
 
-[public-package-validation.json](public-package-validation.json)证明5份提交schema及原生artifact编译通过；与原私有定义相比仅新增页面标题/来源说明，37项、选项、required标志和CSV字节完全相同，原分类回答、缺失、35非法值及隔离库回读证据复用，不重复执行。尚未调用服务写库或公开发布，不声称生产已入库。
+[public-package-validation.json](public-package-validation.json)证明5份提交schema及原生artifact编译通过；与原私有定义相比仅新增页面标题/来源说明，37项、选项、required标志和CSV导入请求内容完全相同（单独CSV文本仅统一LF换行，解析字段一致），原分类回答、缺失、35非法值及隔离库回读证据复用，不重复执行。尚未调用服务写库或公开发布，不声称生产已入库。
