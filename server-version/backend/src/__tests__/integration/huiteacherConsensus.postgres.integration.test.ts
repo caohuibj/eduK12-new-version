@@ -200,4 +200,74 @@ suite('Huiteacher PR4 human consensus — distinct experts, matching signature, 
       actorUserId:manager.id,consensusId:draft.id,
     })).status).toBe('SUBMITTED')
   })
+  it.each(['organization','entitlement'] as const)('requires current %s access for exact-ID approvals and replays, preserving restored history',async boundary=>{
+    const manager=await actor(),a=await actor(),b=await actor()
+    const org=await db.organization.create({data:{id:randomUUID(),name:'consensus-current-'+randomUUID(),
+      productDomain:'SCHOOL',createdByUserId:manager.id}})
+    const member=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:org.id,
+      userId:manager.id,orgRole:'ORG_ADMIN'}})
+    await db.educationProductEntitlement.create({data:{organizationId:org.id,product:'HUITEACHER',
+      status:'ACTIVE',grantedByUserId:manager.id}})
+    await db.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId:org.id,membershipId:member.id,
+      product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:manager.id}})
+    const target=await createHuiteacherTarget({organizationId:org.id,actorUserId:manager.id,kind:'TEAM',name:'合成观察团队'})
+    const event=await createHuiteacherEvent({organizationId:org.id,actorUserId:manager.id,targetId:target.id,
+      kind:'MEETING',title:'合成共识范围核验'})
+    for(const observer of [a,b]){
+      const invitation=await inviteHuiteacherObserver({organizationId:org.id,eventId:event.id,actorUserId:manager.id,
+        observerUserId:observer.id,role:'EXPERT',expiresAt:new Date(Date.now()+86400000)})
+      await acceptHuiteacherObserver({userId:observer.id,invitationId:invitation.id})
+    }
+    // Invited external experts retain their original grant path without membership.
+    expect(await db.organizationMembership.count({where:{organizationId:org.id,userId:{in:[a.id,b.id]}}})).toBe(0)
+    await transitionHuiteacherEvent({organizationId:org.id,actorUserId:manager.id,eventId:event.id,action:'OPEN',expectedVersion:1})
+    const sourceRecordIds:string[]=[]
+    for(const observer of [a,b]){
+      const note=await createHuiteacherObservation({organizationId:org.id,eventId:event.id,actorUserId:observer.id,
+        kind:'FORMAL_FEEDBACK',content:'合成独立观察依据'})
+      await submitHuiteacherObservation({id:note.id,actorUserId:observer.id,expectedRevision:note.revision})
+      sourceRecordIds.push(note.id)
+    }
+    await transitionHuiteacherEvent({organizationId:org.id,actorUserId:manager.id,eventId:event.id,action:'CLOSE',expectedVersion:2})
+    const draft=await createHuiteacherFieldConsensus({organizationId:org.id,eventId:event.id,actorUserId:manager.id,
+      title:'合成已审议共识',content:'保留独立观察及既有签署，不生成数值评价。',sourceRecordIds})
+    const approval=(actorUserId:string)=>approveHuiteacherFieldConsensus({actorUserId,consensusId:draft.id,
+      expectedRevision:draft.revision,expectedDigest:draft.digest})
+    const signoffs=()=>db.huiteacherFieldConsensusApproval.findMany({where:{consensusId:draft.id},orderBy:{observerUserId:'asc'}})
+    const setSuspended=async(suspended:boolean)=>{
+      const data={status:suspended?'SUSPENDED':'ACTIVE',suspendedAt:suspended?new Date():null}
+      if(boundary==='organization')await db.organization.update({where:{id:org.id},data})
+      else await db.educationProductEntitlement.update({where:{organizationId_product:{organizationId:org.id,product:'HUITEACHER'}},data})
+    }
+    expect(await approval(a.id)).toMatchObject({approved:true,replayed:false})
+    const firstSignoff=await signoffs()
+    expect(firstSignoff).toHaveLength(1)
+    await setSuspended(true)
+    try{
+      expect((await myHuiteacherConsensusReviews(a.id)).list.some(row=>row.id===draft.id)).toBe(false)
+      // Exercise known consensus IDs directly: both a new signature and a replay must fail.
+      for(const reviewer of [b,a])await expect(approval(reviewer.id)).rejects.toMatchObject({
+        code:'HUITEACHER_CONSENSUS_EVENT_NOT_FOUND',statusCode:404})
+      expect(await signoffs()).toEqual(firstSignoff)
+      await expect(readHuiteacherFieldConsensus({actorUserId:manager.id,consensusId:draft.id})).rejects.toThrow()
+    }finally{await setSuspended(false)}
+    expect(await approval(a.id)).toMatchObject({approved:true,replayed:true})
+    expect(await signoffs()).toEqual(firstSignoff)
+    expect(await approval(b.id)).toMatchObject({approved:true,replayed:false})
+    const official=await submitHuiteacherFieldConsensus({actorUserId:manager.id,consensusId:draft.id,expectedRevision:draft.revision})
+    const history=await readHuiteacherFieldConsensus({actorUserId:manager.id,consensusId:draft.id})
+    expect(history).toMatchObject({status:'SUBMITTED',revision:official.revision,approvalCount:2,digest:draft.digest})
+    const historicalSignoffs=await signoffs()
+    const historicalRecord=await db.huiteacherFieldConsensus.findUnique({where:{id:draft.id}})
+    await setSuspended(true)
+    try{
+      await expect(approval(a.id)).rejects.toMatchObject({code:'HUITEACHER_CONSENSUS_EVENT_NOT_FOUND',statusCode:404})
+      await expect(readHuiteacherFieldConsensus({actorUserId:manager.id,consensusId:draft.id})).rejects.toThrow()
+      expect(await signoffs()).toEqual(historicalSignoffs)
+      expect(await db.huiteacherFieldConsensus.findUnique({where:{id:draft.id}})).toEqual(historicalRecord)
+    }finally{await setSuspended(false)}
+    expect(await readHuiteacherFieldConsensus({actorUserId:manager.id,consensusId:draft.id})).toEqual(history)
+    expect(await signoffs()).toEqual(historicalSignoffs)
+    expect(await db.organizationMembership.count({where:{organizationId:org.id,userId:{in:[a.id,b.id]}}})).toBe(0)
+  })
 })
