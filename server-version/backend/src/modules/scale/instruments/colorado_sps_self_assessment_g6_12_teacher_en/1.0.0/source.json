@@ -111,9 +111,7 @@
       "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2014/09/SPS_results_self-assessment-6-12_CEI.pdf"
     },
     "reportPlan": {
-      "dimensionLabels": [
-        "教师自评（无计分）"
-      ],
+      "dimensionLabels": [],
       "limitations": [
         "CATALOG_ONLY: source metadata, not an administrable instrument or report.",
         "Original English only; Chinese names/report examples are editorial, not a validated Chinese translation.",

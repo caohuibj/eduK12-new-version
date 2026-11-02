@@ -1,0 +1,712 @@
+{
+  "schemaVersion": 1,
+  "recordedOn": "2026-11-02",
+  "contentBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "verifiedContentCommit": "48794a1a1660e24c9eed9029301a89be15292d86",
+  "inputBinding": "Initial checked content commit 48794a1a1660e24c9eed9029301a89be15292d86 is preserved. Follow-up changes are README/evidence notes and only the three unscored-form reportPlan.dimensionLabels arrays (one descriptive label -> empty). Eight scale sources, every wrapper, generated index, report-examples, inventory and source references are unchanged. The three changed JSON files received the separate fresh selected-source and native read-model checks recorded below. Native materialize refusal still depends only on absent executable, which did not change. No signed CI evidence claimed.",
+  "sha256": {
+    "docs/scale-intake/colorado-sps-20261102/README.md": "6a7d7c4b43f12c2e92d7c6a6bd3e6fb3cb75f03d4f51eabc6377e0d5ad9f4307",
+    "docs/scale-intake/colorado-sps-20261102/inventory.json": "9336675c995c87a98cb3daba36aaeb4b729166fe8f0a2663cc64b59fc3d390b2",
+    "docs/scale-intake/colorado-sps-20261102/report-examples.md": "a6bbe1f3dd2471c29f4d2643b7dd236f420d18b22d2f6b0c93b2858f1b65f8f2",
+    "docs/scale-intake/colorado-sps-20261102/sources.json": "68b9e81efa57cdf799c0c3f7c57c4d4ead390092f5c1db019f71cdb0e610f2f0",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_community_g3_5_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_community_g3_5_student_en/1.0.0/source.json": "0324675530be970822078e70b2f32e9c2e2a5470e5ffbf47de172010b6f0017f",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_community_g6_12_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_community_g6_12_student_en/1.0.0/source.json": "f725175e84f3b2d4b4878dfb76ec56ec414e8ebcebae926e20baaf7b1bba2bdd",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_management_g3_5_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_management_g3_5_student_en/1.0.0/source.json": "7656e4d913d66f38596e37bd0ea12806b893a78bf3d13702a017ffaf200fcbb8",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_management_g6_12_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_classroom_management_g6_12_student_en/1.0.0/source.json": "e018e7f64a9d9e31229b1e2d1d8746ca0724307ec760ab543930eaab6e8bcde9",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_reflection_g3_12_teacher_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_reflection_g3_12_teacher_en/1.0.0/source.json": "2a20b09fbabf4ec8b61d7ec58b054cfdf0336452214a243e9b24bb86998c4706",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_self_assessment_g3_5_teacher_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_self_assessment_g3_5_teacher_en/1.0.0/source.json": "8d162cec75b4567475f3a91e3671f5198516958ea53ddab6c098d53f0c416407",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_self_assessment_g6_12_teacher_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_self_assessment_g6_12_teacher_en/1.0.0/source.json": "7f258f3d2fddebaa9343f201d33d6640815506c89237d78191bb06df5b1fdc4f",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_centered_environment_g3_5_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_centered_environment_g3_5_student_en/1.0.0/source.json": "a7e33ccddd3928a6f83779ff38bd2e723c1f4a2ea2f3a6c2221f1082bd763e84",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_centered_environment_g6_12_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_centered_environment_g6_12_student_en/1.0.0/source.json": "8e6ac89513a93bb17c2ef48de3529ea0526572d8b167aacde1401d9102b05fd8",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_learning_g3_5_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_learning_g3_5_student_en/1.0.0/source.json": "53695af35525982f8d69eda4668a5f1aa39f1d0fdcbe91dd8ce0d7d972b32920",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_learning_g6_12_student_en/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/colorado_sps_student_learning_g6_12_student_en/1.0.0/source.json": "da53e48d025fdc3dfd14a3cc7135acfbc6b74af22da0247eecaa9af6e2bcb73a",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "c7b90b685e03380a14e5a64b29fae6da7a7c4e7fa84331d9d1146d2d50d14e6e"
+  },
+  "commands": [
+    {
+      "command": "git diff --cached --check",
+      "status": "PASSED",
+      "scope": "27 source/document/index files before content commit"
+    },
+    {
+      "command": "node scripts/generate-scale-instruments.ts --check",
+      "status": "PASSED",
+      "runtime": "Node 24.21.0",
+      "warning": "Node typeless module notice only; no dependency/config change"
+    },
+    {
+      "command": "SCALE_INTAKE_BASE_SHA=<base> SCALE_INTAKE_HEAD_SHA=<verifiedContentCommit> node --import tsx scripts/scale-intake-selected-check.ts",
+      "status": "FAILED",
+      "error": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape",
+      "evidenceOrigin": "stderr returned by execution tool; selected-check.json was empty because the script emits its final JSON after the failing dependency phase. No fabricated PASS log.",
+      "sourcePhase": "All 11 selected source schema/validate/catalog-only checks completed before the failure in checkSelectedBuiltinDependencies at main line323, per the exact script control flow. Whole selected command did not pass.",
+      "unchangedToolSha256": "a6e02bd0b7fe4071ecd1050e35f8ad988873ef841b5c2b1e5821b51838ec1831",
+      "resolution": "Kept failure; no unrelated checker/Bundle edits; no broader platform test run."
+    }
+  ],
+  "nativeCatalogAndLocalMaterialize": {
+    "status": "NATIVE_CATALOG_AND_LOCAL_REFUSAL_PASSED",
+    "candidates": 11,
+    "visibleCatalogCandidates": 11,
+    "executablePackages": 0,
+    "launchLinks": 0,
+    "rightsApproval": false,
+    "localDatabase": {
+      "host": "127.0.0.1",
+      "port": "55432",
+      "database": "eduk12_dev",
+      "scalesBefore": 17,
+      "scalesAfter": 17
+    },
+    "nativeMaterializeExpectedRefusals": 11,
+    "writes": 0,
+    "partitions": [
+      {
+        "span": "3_5",
+        "sourceItems": 34,
+        "finalItems": 34,
+        "unique": true,
+        "deletedStudyQ": 27
+      },
+      {
+        "span": "6_12",
+        "sourceItems": 34,
+        "finalItems": 34,
+        "unique": true,
+        "deletedStudyQ": 25
+      }
+    ],
+    "limits": "No successful import/scoring/report execution or production authorization was asserted."
+  },
+  "localDbDedup": {
+    "host": "127.0.0.1",
+    "port": 55432,
+    "database": "eduk12_dev",
+    "scalesCount": 17,
+    "familyMatches": 0,
+    "governanceSubmissionsTableExists": false,
+    "coverage": "name, code and description only; no production data accessed; not semantic/author proof"
+  },
+  "repositoryDedup": {
+    "baseWrappers": 258,
+    "baseSourceJson": 235,
+    "familyKeywordMatches": 0,
+    "normalizedItemFragments": {
+      "scope": "line fragments >=25 normalized characters; full family-name search separately; not semantic equivalence proof",
+      "fragments": 101,
+      "sourceJsonCount": 235,
+      "hits": []
+    },
+    "openPrReview": [
+      {
+        "pr": 539,
+        "status": "READ",
+        "changedFiles": 277,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 538,
+        "status": "READ",
+        "changedFiles": 33,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 537,
+        "status": "READ",
+        "changedFiles": 17,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 529,
+        "status": "READ",
+        "changedFiles": 5,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 515,
+        "status": "READ",
+        "changedFiles": 6,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 491,
+        "status": "READ",
+        "changedFiles": 4,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 489,
+        "status": "READ",
+        "changedFiles": 3,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 488,
+        "status": "READ",
+        "changedFiles": 3,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 482,
+        "status": "FILES_API_READ",
+        "changedFiles": 310,
+        "familyTermMatch": false,
+        "familyPathMatches": [],
+        "patchMissing": 0,
+        "sourceFilesMissingPatch": []
+      },
+      {
+        "pr": 441,
+        "status": "FILES_API_READ",
+        "changedFiles": 693,
+        "familyTermMatch": false,
+        "familyPathMatches": [],
+        "patchMissing": 2,
+        "sourceFilesMissingPatch": []
+      },
+      {
+        "pr": 413,
+        "status": "READ",
+        "changedFiles": 15,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 412,
+        "status": "READ",
+        "changedFiles": 1,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 397,
+        "status": "READ",
+        "changedFiles": 2,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 383,
+        "status": "READ",
+        "changedFiles": 5,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 379,
+        "status": "FILES_API_READ",
+        "changedFiles": 272,
+        "familyTermMatch": false,
+        "familyPathMatches": [],
+        "patchMissing": 29,
+        "sourceFilesMissingPatch": [
+          "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+          "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json"
+        ]
+      },
+      {
+        "pr": 375,
+        "status": "FILES_API_READ",
+        "changedFiles": 374,
+        "familyTermMatch": false,
+        "familyPathMatches": [],
+        "patchMissing": 75,
+        "sourceFilesMissingPatch": [
+          "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/scorer.ts",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/instrument.ts",
+          "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json"
+        ]
+      },
+      {
+        "pr": 373,
+        "status": "READ",
+        "changedFiles": 61,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 371,
+        "status": "READ",
+        "changedFiles": 208,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 370,
+        "status": "READ",
+        "changedFiles": 66,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 368,
+        "status": "FILES_API_READ",
+        "changedFiles": 2101,
+        "familyTermMatch": false,
+        "familyPathMatches": [],
+        "patchMissing": 446,
+        "sourceFilesMissingPatch": []
+      },
+      {
+        "pr": 367,
+        "status": "READ",
+        "changedFiles": 136,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 362,
+        "status": "READ",
+        "changedFiles": 9,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 360,
+        "status": "FILES_API_READ",
+        "changedFiles": 1269,
+        "familyTermMatch": false,
+        "familyPathMatches": [],
+        "patchMissing": 302,
+        "sourceFilesMissingPatch": []
+      },
+      {
+        "pr": 330,
+        "status": "READ",
+        "changedFiles": 15,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 329,
+        "status": "READ",
+        "changedFiles": 62,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      },
+      {
+        "pr": 328,
+        "status": "READ",
+        "changedFiles": 73,
+        "familyTermMatch": false,
+        "familyPathMatches": []
+      }
+    ],
+    "missingPatchSourceBlobReview": [
+      {
+        "sha": "14ad739f89a99c41baddc8b31441704b18c3f850",
+        "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "d02efb4fbfd47618675fa952ea0332c78e709417",
+        "file": "server-version/backend/src/modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.1/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "65fa7348627e396ff8aa04331e05c66a6d084f69",
+        "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_cn_research/1.0.2/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "e4ec1b8ae0051a2277e4d277179a39fc6daec43f",
+        "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.0/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "4bc4ca86144ce287e750f2b91410c16b2beaf14d",
+        "file": "server-version/backend/src/modules/scale/instruments/dbt_wccl59_zh_tw_official_research/1.0.1/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "1a90a50926821211bf865acf419b15bf9c7a0f15",
+        "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+        "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/instrument.ts",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "af278ab324ed7bd18ee65b56f27736247c2c4855",
+        "file": "server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.1/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "8901cc70b49f34bce955541a93bab8a0a03c81e0",
+        "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "c887b6529869f2c7467a61e02c460abe3436d10d",
+        "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.0/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "007ad1dfd5b3aeb606f22d447ac36b4a2c52b39c",
+        "file": "server-version/backend/src/modules/scale/instruments/psyflex6_zh_cn_research/1.0.1/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "f6b2d12726e0fbd8d7fc0cff4a591776f5304289",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "513de03d05051f9a26692bed14e10650c87a40e8",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "410e10f564ec0020204d40956c320776253fd086",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "10670b9b23fd9fcb8b8f512d8d9cdde538647120",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/instrument.ts",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "c2cb9e5b4206443a0e1f44a6456358fb16fee65b",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.1/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+        "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "0e909b68004afa246aae3f41971bef90bce58970",
+        "file": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.1/source.json",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "f9c63ff5f4e851663b58e01877df85af53699772",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/instrument.ts",
+        "status": "READ",
+        "familyTermMatch": false
+      },
+      {
+        "sha": "81b5a5b8b2c388432382d2deb15cfe2cb231b352",
+        "file": "server-version/backend/src/modules/scale/instruments/spane12_zh_cn_research/1.0.0/scorer.ts",
+        "status": "READ",
+        "familyTermMatch": false
+      }
+    ]
+  },
+  "completeDataMathematicalBoundaryReview": {
+    "status": "PASSED_EXPECTATIONS_ONLY",
+    "notNativeScoring": true,
+    "cases": [
+      {
+        "key": "colorado_sps_student_learning_g3_5_student_en",
+        "n": 15,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          15,
+          60
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_student_centered_environment_g3_5_student_en",
+        "n": 10,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          10,
+          40
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_classroom_community_g3_5_student_en",
+        "n": 5,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          5,
+          20
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_classroom_management_g3_5_student_en",
+        "n": 4,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          4,
+          16
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_student_learning_g6_12_student_en",
+        "n": 15,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          15,
+          60
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_student_centered_environment_g6_12_student_en",
+        "n": 7,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          7,
+          28
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_classroom_community_g6_12_student_en",
+        "n": 8,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          8,
+          32
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      },
+      {
+        "key": "colorado_sps_classroom_management_g6_12_student_en",
+        "n": 4,
+        "completeObservedMeanRange": [
+          1,
+          4
+        ],
+        "completeObservedSumMathOnly": [
+          4,
+          16
+        ],
+        "topTwoResponsePercentRange": [
+          0,
+          100
+        ]
+      }
+    ],
+    "missing": "No source-based partial-response threshold or weighting rule installed. Missing is not zero/Never. No real response data or synthetic scorer implementation used."
+  },
+  "reportReview": {
+    "status": "EDITORIAL_REVIEW_ONLY",
+    "studentGradeBands": [
+      "3-5",
+      "6-12"
+    ],
+    "scenarios": [
+      "ordinary_experience",
+      "low_experience",
+      "insufficient_evidence"
+    ],
+    "teacherAggregateScenarios": 3,
+    "unscoredFormNotices": 3,
+    "permissionConditions": "Existing anonymous/recipient release/count/disclosure rules only; no access changes.",
+    "nativeReportExecution": "NOT_APPLICABLE_NO_EXECUTABLE_OR_R_VERSION"
+  },
+  "ci": {
+    "activated": false,
+    "status": "PENDING",
+    "skipMarker": "[skip ci]",
+    "notionRead": {
+      "status": "BLOCKED_TOOL_UNAVAILABLE",
+      "target": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+      "attempt1": "id argument returned non-empty link_id required",
+      "attempt2": "link_id argument returned Unknown tool({name:notion.fetch})",
+      "reason": "AGENTS.md requires reading the current CI error checklist before activating CI. Tool unavailable, and selected local CLI already has a preserved unrelated failure.",
+      "approvalState": "Not denied by auto-review; no pending permission request; no CI activated."
+    },
+    "plannedRoute": "existing scale_intake_light route; requires maintainer resolution of the unrelated static dependency-parser failure before qualification; no full backend/frontend/image/runtime work."
+  },
+  "remaining": [
+    "rights for platform redistribution/adaptation not established",
+    "source missing-response and weighting contract not finalized",
+    "independent subscale administration validity not established",
+    "C/P/R and actual native Form import not instantiated",
+    "production and administrator-authored semantic duplicate audit not completed",
+    "local snapshot lacks current governance tables",
+    "official CI not activated; selected CLI failure preserved"
+  ],
+  "notExecuted": [
+    "full backend/frontend tests",
+    "application build",
+    "migration",
+    "deployment",
+    "production DB read/write",
+    "real student data",
+    "successful executable installation",
+    "native scoring/report execution",
+    "Chinese item translation",
+    "author contact or terms acceptance"
+  ],
+  "freshUnscoredFormCheck": {
+    "status": "THREE_CHANGED_UNSCORED_FORM_CANDIDATES_PASSED",
+    "scope": "Only the three form reportPlan.dimensionLabels changed after verifiedContentCommit; eight scale sources and import guard inputs unchanged.",
+    "results": [
+      {
+        "instrumentKey": "colorado_sps_reflection_g3_12_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": [],
+        "projectedScoreCount": 0,
+        "numericReportEligible": false
+      },
+      {
+        "instrumentKey": "colorado_sps_self_assessment_g3_5_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": [],
+        "projectedScoreCount": 0,
+        "numericReportEligible": false
+      },
+      {
+        "instrumentKey": "colorado_sps_self_assessment_g6_12_teacher_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": [],
+        "projectedScoreCount": 0,
+        "numericReportEligible": false
+      }
+    ],
+    "inputs": {
+      "server-version/backend/src/modules/scale/instruments/colorado_sps_reflection_g3_12_teacher_en/1.0.0/source.json": "25404f031f5a44c1ecfb04802d7f52d4b7e93578793e3d34021a59b7ef6346c1",
+      "server-version/backend/src/modules/scale/instruments/colorado_sps_self_assessment_g3_5_teacher_en/1.0.0/source.json": "a666c7d1dcd0f36e59509517fabbfada0de4d2f735c44e5fa242f56cb496f663",
+      "server-version/backend/src/modules/scale/instruments/colorado_sps_self_assessment_g6_12_teacher_en/1.0.0/source.json": "cdb00421e1158692e5c16f8d0fb65825d36f289755d4c7a4219679208b51fd2c"
+    }
+  },
+  "tools": {
+    "node": "24.21.0",
+    "tsx": "4.23.12",
+    "typescript": "5.9.3",
+    "fullRuntimeEnvironmentManifest": "not captured; no formal CI attestation"
+  }
+}

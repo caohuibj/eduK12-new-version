@@ -8,7 +8,7 @@
 
 来源基线 `adad907a4b68606ce71bb1a4f2d7c511c872c715`，258 个 instrument.ts、235 个 source.json。按 Colorado/CEI、Student Perception Survey、Thompson School District、来源域名与路径检索无同源条目；101 个长度至少 25 个规范化字符的原题片段与现有 source.json 比对无命中。这是辅助排重，不能证明所有同义改编均不存在。主线既有 teacher_subject_liking 与 TALIS 不作为本工具复用版本。
 
-2026-11-02 复查 26 个开放 PR 的标题/分支无本工具命中；主线先前已查 24 个 PR 及 10 个内容 PR 的路径。本次开放 PR 的新增内容仍须按文件路径核对，最终结果见 evidence.json。隔离本地开发库 17 个 scales 行，家族名/来源描述匹配为 0；该快照尚无 scale_library_submissions 表，无法证明管理员治理记录不存在。**生产数据库、生产管理员自建及生产题项语义重合未核实**。正式安装前再次按作者、来源、题项、语言及波次比对；如有同义既有 ID，改为引用，不能重复安装。
+2026-11-02 复查 26 个开放 PR 的标题/分支无本工具命中；主线先前已查 24 个 PR 及 10 个内容 PR 的路径。本次已读取20个PR diff，并对6个超限diff改用分页Files API核对全部路径与可得patch，未发现家族命中；又按blob SHA补取20个被省略的Scale来源文件，未命中；非Scale大patch的省略部分不视为已审全文，具体覆盖见 evidence.json。隔离本地开发库 17 个 scales 行，家族名/来源描述匹配为 0；该快照尚无 scale_library_submissions 表，无法证明管理员治理记录不存在。**生产数据库、生产管理员自建及生产题项语义重合未核实**。正式安装前再次按作者、来源、题项、语言及波次比对；如有同义既有 ID，改为引用，不能重复安装。
 
 所有候选稳定 ID 以 `colorado_sps_` 开头，名称统一“Colorado SPS｜子项｜学段｜填答者”。[inventory.json](inventory.json) 是完整清单，候选身份版本 1.0.0、目录 manifest 版本 1、原语言 en。源目录的 `localizationVersion: 1.0.0` 是来源语言目录元数据，并非已验证的翻译。**原生 C 内容版本、P 计分参数版本、R 报告版本均未创建**；不得将候选身份版本报成可施测 C/P/R。
 
@@ -59,6 +59,6 @@
 
 学生官方文件保留 CEI 版权并要求摘录/电子分享前联系 publications@coloradoedinitiative.org；MET 非商业使用背景不是 EduK12 公开分发、改编、商业或中文版许可。教师自评署名 Thompson，反思指南未见明确再分发许可，须分别核定。未联系作者、未代用户接受条款，管理员审核不替代授权。许可范围未明确前，这11项都停留 CATALOG_ONLY，原题文不进入公开 Git，合法公开的来源元数据不假装施测包。
 
-候选沿已有 source.json / instrument.ts / instruments.generated.ts 静态目录流程注册；没有改引擎、权限、schema 或既有冻结源。检查只涉及本批候选 schema、原生目录读取、阻止候选被 materialize/评分、原题号分区/计分数学边界和报告文案，无全后端/前端/构建。真实执行与未执行项见 evidence.json；源码检查不是版权/科学效度/生产准入批准。
+候选沿已有 source.json / instrument.ts / instruments.generated.ts 静态目录流程注册；没有改引擎、权限、schema 或既有冻结源。检查只涉及本批候选 schema、原生目录读取、阻止候选被 materialize/评分、原题号分区/计分数学边界和报告文案，无全后端/前端/构建。原生目录读取和本地11次预期拒绝安装通过；三个无分表单候选的原生目录投影scoreCount为0、没有数值报告资格；现有 selected-check 在无关 child-chexi Bundle 工厂静态扫描处失败，整条命令未通过。Notion CI清单读取工具不可用，未激活CI，提交用 [skip ci] 防止未经前置核对启动；此标记不代表检查通过。真实执行与未执行项见 evidence.json；源码检查不是版权/科学效度/生产准入批准。
 
 管理员下一步：在目标库完成作者/题项/波次去重 → 取得覆盖具体语言、用途、平台分发及必要改编的许可 → 确认完整原顺序和缺失/聚合细则 → 复用原生 Scale 的 C/P/R、Form 与普通组合编辑 → 在隔离库实际导入、回读和计分/接收者投影验证 → 按已有发布规则审阅。需独立施测时补证据，缺证据保持完整组卷。PR 保持 Draft；不合并、不部署、不写生产。

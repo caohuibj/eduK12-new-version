@@ -111,9 +111,7 @@
       "url": "https://www.coloradoedinitiative.org/wp-content/uploads/2016/02/SPS-Reflection-Guide.docx"
     },
     "reportPlan": {
-      "dimensionLabels": [
-        "结果反思（无计分）"
-      ],
+      "dimensionLabels": [],
       "limitations": [
         "CATALOG_ONLY: source metadata, not an administrable instrument or report.",
         "Original English only; Chinese names/report examples are editorial, not a validated Chinese translation.",
