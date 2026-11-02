@@ -1,0 +1,45 @@
+{
+  "status": "PASS_METADATA_AND_DOC_REVIEW_ONLY",
+  "originalHead": "7820b248cc8aae4a97f583c761b462eae2f9a54a",
+  "originalSourceAndWrapperBlobParity": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_behavior_student_en/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_behavior_student_en/1.0.0/source.json",
+      "blob": "c76aa6aaa7fae8d8ab2fd170af4a3881039ab8c0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_belonging_student_en/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_belonging_student_en/1.0.0/source.json",
+      "blob": "7f37785cc44639b5b7f99d43f2a2c83d3f1210bd"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_engagement_student_en/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_engagement_student_en/1.0.0/source.json",
+      "blob": "91882553ec28b816c3ebd5d6c6a6333b4006e260"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_sel_student_en/1.0.0/instrument.ts",
+      "blob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mi_student_voice_2026_27_sel_student_en/1.0.0/source.json",
+      "blob": "d09dc75fa13bbffa2dec2c4488442eec7e1ca99f"
+    }
+  ],
+  "jsonSyntax": "PASS",
+  "fiveColumnReviewRows": 8,
+  "newExecutableFormOrScale": false,
+  "nativeRuntimeOrDatabaseReplay": "NOT_RUN_UNCHANGED_OR_NO_EXECUTABLE",
+  "privateOriginalsOutsideRepository": true,
+  "CI": "NOT_YET_ACTIVATED_NOT_CLAIMED",
+  "mainMergeOrDeployment": false
+}
