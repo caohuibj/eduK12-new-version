@@ -1,0 +1,121 @@
+{
+  "status": "DRAFT",
+  "response_format": "SINGLE_CHOICE",
+  "model": "AUTHOR_KEY_SUM",
+  "key_meaning": "Trait direction, not correctness or excellence",
+  "metrics": [
+    {
+      "key": "self-consciousness",
+      "label_zh": "自我意识",
+      "item_ids": [
+        "N_01",
+        "N_02",
+        "N_03",
+        "N_04",
+        "N_05",
+        "N_06",
+        "N_07",
+        "N_08"
+      ],
+      "range": [
+        0,
+        8
+      ],
+      "aggregation": "sum",
+      "direction": "descriptive"
+    },
+    {
+      "key": "gregariousness",
+      "label_zh": "乐群性",
+      "item_ids": [
+        "E_01",
+        "E_02",
+        "E_03",
+        "E_04",
+        "E_05",
+        "E_06",
+        "E_07",
+        "E_08"
+      ],
+      "range": [
+        0,
+        8
+      ],
+      "aggregation": "sum",
+      "direction": "descriptive"
+    },
+    {
+      "key": "openness to ideas",
+      "label_zh": "观念开放",
+      "item_ids": [
+        "O_01",
+        "O_02",
+        "O_03",
+        "O_04",
+        "O_05",
+        "O_06",
+        "O_07",
+        "O_08"
+      ],
+      "range": [
+        0,
+        8
+      ],
+      "aggregation": "sum",
+      "direction": "descriptive"
+    },
+    {
+      "key": "compliance",
+      "label_zh": "依从性",
+      "item_ids": [
+        "A_01",
+        "A_02",
+        "A_03",
+        "A_04",
+        "A_05",
+        "A_06",
+        "A_07",
+        "A_08"
+      ],
+      "range": [
+        0,
+        8
+      ],
+      "aggregation": "sum",
+      "direction": "descriptive"
+    },
+    {
+      "key": "self-discipline",
+      "label_zh": "自律性",
+      "item_ids": [
+        "C_01",
+        "C_02",
+        "C_03",
+        "C_04",
+        "C_05",
+        "C_06",
+        "C_07",
+        "C_08"
+      ],
+      "range": [
+        0,
+        8
+      ],
+      "aggregation": "sum",
+      "direction": "descriptive"
+    }
+  ],
+  "total_score": null,
+  "reverse_scoring": false,
+  "per_item_keys": "Use each selected item key; all A/B=1 and C/D=0 in this frozen version.",
+  "evidence": {
+    "workbook": "scoring rule of Study 3 worksheet, row3",
+    "quote": "Scores on the scale level were computed by summing up the 8 items pertaining to one facet.",
+    "article": "section6.2.1 p10",
+    "no_total": "Five distinct facet sums only; do not sum across all40 into a purported BigFive total."
+  },
+  "source_url": "https://osf.io/download/gj76w/",
+  "missing_rule": "Author rule not located. Platform draft guardrail: incomplete facet has no score; no imputation or prorating. This is not an author rule.",
+  "norms": null,
+  "cutoffs": null
+}

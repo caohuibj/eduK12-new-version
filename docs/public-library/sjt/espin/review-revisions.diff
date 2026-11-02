@@ -1,0 +1,102 @@
+--- espin-bilingual-draft.json before
++++ espin-bilingual-draft.json after
+@@ -29,7 +29,7 @@
+     {
+       "id": "A",
+       "source_label_en": "taking no action",
+-      "label_zh_Hans": "暂不采取行动",
++      "label_zh_Hans": "不采取行动",
+       "scoring_label_en": "taking no action",
+       "author_description": {
+         "en": "In response to obstacles, demands, and opportunities in engineering, you prefer to wait to see how something will unfold before taking action. The strength of this approach is that you have energy to use to support other aspects of your life within or beyond school because you are not responding to your immediate surroundings. The drawback of this approach is that the situation you are facing could get worse if you do nothing about it, potentially creating more problems for you in the future. Overall, not responding to some situations is likely okay, but a balanced approach is optimal where you seek out support for situations that are the most troublesome for you. Navigating engineering is hard and reaching out for support can make it easier!",
+@@ -322,7 +322,7 @@
+           "id": "C",
+           "category_id": "C",
+           "en": "Talk to family and friends from home to have familiar social interactions",
+-          "zh_Hans": "与家乡的家人和朋友交谈，保持熟悉的社交互动。"
++          "zh_Hans": "与来自原有生活圈的家人和朋友交谈，进行熟悉的社交互动。"
+         },
+         {
+           "id": "D",
+@@ -497,7 +497,7 @@
+       "web_id": 7,
+       "stem": {
+         "en": "You are taking a difficult course load and begin feeling overwhelmed",
+-        "zh_Hans": "你选修的课程负担很重、难度很高，开始感到难以应付。"
++        "zh_Hans": "你承担的课程学习任务很有挑战性，开始感到难以应付。"
+       },
+       "options": [
+         {
+@@ -1074,7 +1074,7 @@
+       "web_id": 19,
+       "stem": {
+         "en": "You have family or personal problems that are distracting you from school",
+-        "zh_Hans": "家庭或个人问题使你无法专心于学业。"
++        "zh_Hans": "家庭或个人问题使你在学业上分心。"
+       },
+       "options": [
+         {
+--- espin-bilingual-draft.md before
++++ espin-bilingual-draft.md after
+@@ -79,7 +79,7 @@
+    加入工程领域之外的学生组织。
+ 
+ C. Talk to family and friends from home to have familiar social interactions
+-   与家乡的家人和朋友交谈，保持熟悉的社交互动。
++   与来自原有生活圈的家人和朋友交谈，进行熟悉的社交互动。
+ 
+ D. Join an engineering student organization
+    加入工程类学生组织。
+@@ -154,7 +154,7 @@
+ 
+ You are taking a difficult course load and begin feeling overwhelmed
+ 
+-你选修的课程负担很重、难度很高，开始感到难以应付。
++你承担的课程学习任务很有挑战性，开始感到难以应付。
+ 
+ A. Push through your challenging courses knowing the semester will eventually end
+    知道学期终究会结束，因此继续坚持应付这些有挑战性的课程。
+@@ -406,7 +406,7 @@
+ 
+ You have family or personal problems that are distracting you from school
+ 
+-家庭或个人问题使你无法专心于学业。
++家庭或个人问题使你在学业上分心。
+ 
+ A. Try to stay focused on your school work and hope that your personal problems will resolve on their own
+    尽量继续专注于学业，希望个人问题会自行解决。
+@@ -427,7 +427,7 @@
+ 
+ These are translations of Appendix D author descriptions, not empirical conclusions about a respondent. These general comments are not to be presented as validated personal advice. 下文为附录 D 作者描述的翻译，并非针对作答者的实证结论，也不应作为经过验证的个体建议。
+ 
+-### A · taking no action · 暂不采取行动
++### A · taking no action · 不采取行动
+ 
+ In response to obstacles, demands, and opportunities in engineering, you prefer to wait to see how something will unfold before taking action. The strength of this approach is that you have energy to use to support other aspects of your life within or beyond school because you are not responding to your immediate surroundings. The drawback of this approach is that the situation you are facing could get worse if you do nothing about it, potentially creating more problems for you in the future. Overall, not responding to some situations is likely okay, but a balanced approach is optimal where you seek out support for situations that are the most troublesome for you. Navigating engineering is hard and reaching out for support can make it easier!
+ 
+--- translation-notes.md before
++++ translation-notes.md after
+@@ -34,7 +34,7 @@
+ 1. Appendix 8 stem: “do not know any faculty well enough to ask them.” Draft “不便向他们提出请求” conveys a relational obstacle, but could sound like reluctance rather than insufficient familiarity. Reviewer should consider “但你与任何教师都不够熟悉，无法向他们提出这样的请求。” without overstrengthening impossibility.
+ 2. Appendix 13 B: “Work on campus in a busy area” is ambiguous between employment, academic work and doing tasks. Draft “在校园里人多的地方做事” intentionally preserves breadth; do not invent a paid job or an academic study space.
+ 3. Appendix 12: “workload inflexible” rendered as existing learning workload being hard to adjust, not a claim about administrative prohibition. The later prioritization option remains a genuine alternative.
+-4. Appendix 16: “from home” rendered 家乡; this may mean familiar people from one's home community, not necessarily the literal hometown. Reviewer should decide whether “家里的家人和朋友” or “原来生活圈中的家人和朋友” is clearer without adaptation.
++4. Appendix 16 C / web 3 C: independent-review revision uses “与来自原有生活圈的家人和朋友交谈，进行熟悉的社交互动。” This preserves familiar social connections without narrowing “from home” to the literal hometown.
+ 5. Appendix 22 B retains a free/low-cost PDF textbook search as a source option. It does not recommend infringement or supply unauthorized files. A general lawful-resource note may be shown outside the item, but adding “合法” inside the translated option changes the stimulus and requires explicit adaptation tracking.
+ 6. Appendix 22 C “Ask a friend to borrow the books you need” is linguistically ambiguous. Draft treats it as borrowing needed books from a friend, not asking the friend to borrow books from someone else. Reviewer must confirm intended interpretation; no silent source repair.
+ 7. Appendix 24 D retains the limitation “in their class”; do not expand to general institutional reporting.
+@@ -50,3 +50,14 @@
+ - Most and least must be DIFFERENT in each scene. UI guidance is insufficient: authoritative submission/scoring enforcement is required before deployment. Not implemented here.
+ - Complete 19 paired responses; count most and least separately; report all maximum ties separately; domain counts use most only. No reverse scores, differences, norms, ability scores, clinical conclusions or right/wrong grading.
+ - Later mathematical review must inspect complete paired vectors independently. Nothing here authorizes administration, publication, repository import, commit/push, CI, merge or Notion writes.
++
++## Independent-review revisions (2026-10-21)
++
++Four requested Chinese-only corrections applied consistently to bilingual JSON and Markdown:
++
++- Category A: 暂不采取行动 → 不采取行动, avoiding an added temporary qualifier in the category label.
++- Appendix 16 C / web 3 C: 与家乡的家人和朋友交谈，保持熟悉的社交互动。 → 与来自原有生活圈的家人和朋友交谈，进行熟悉的社交互动。
++- Appendix 23 / web 19 stem: 家庭或个人问题使你无法专心于学业。 → 家庭或个人问题使你在学业上分心。
++- Appendix 1 / web 7 stem: 你选修的课程负担很重、难度很高，开始感到难以应付。 → 你承担的课程学习任务很有挑战性，开始感到难以应付。
++
++All English source text, IDs, mappings, options and scoring specifications remain unchanged. This revision remains unpublished and pending independent re-review. No product source or CI was touched.

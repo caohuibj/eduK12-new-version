@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "check": "single bounded copy/string preservation and five facet0/8 boundary data check",
+  "items": 40,
+  "options": 160,
+  "source_strings_identical": true,
+  "boundary_cases": {
+    "all_A": {
+      "self-consciousness": 8,
+      "gregariousness": 8,
+      "openness to ideas": 8,
+      "compliance": 8,
+      "self-discipline": 8
+    },
+    "all_B": {
+      "self-consciousness": 8,
+      "gregariousness": 8,
+      "openness to ideas": 8,
+      "compliance": 8,
+      "self-discipline": 8
+    },
+    "all_C": {
+      "self-consciousness": 0,
+      "gregariousness": 0,
+      "openness to ideas": 0,
+      "compliance": 0,
+      "self-discipline": 0
+    },
+    "all_D": {
+      "self-consciousness": 0,
+      "gregariousness": 0,
+      "openness to ideas": 0,
+      "compliance": 0,
+      "self-discipline": 0
+    }
+  },
+  "not_run": [
+    "runtime",
+    "CI",
+    "repeated semantic review"
+  ]
+}

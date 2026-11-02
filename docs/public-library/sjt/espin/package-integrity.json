@@ -1,0 +1,65 @@
+{
+  "status": "COPY_INTEGRITY_AND_JSON_PARSE_ONLY",
+  "source_content_review": "GO_FOR_DRAFT_CONTENT relayed by parent after independent re-review; not rerun here",
+  "branch": "public-library/sjt-20261022",
+  "base": "eb08515a",
+  "files": [
+    {
+      "file": "espin-bilingual-draft.json",
+      "bytes": 47202,
+      "sha256": "fd33e8921542c4f78119f511d3d98b10d3a0cdd622bc87ab690fb270c6107802",
+      "copy_byte_identical": true
+    },
+    {
+      "file": "espin-bilingual-draft.md",
+      "bytes": 27578,
+      "sha256": "c31f776eddcc1711ef8b052921fadcd492f522de95da8e6aa8c2e44c671e711a",
+      "copy_byte_identical": true
+    },
+    {
+      "file": "english-extraction.json",
+      "bytes": 18512,
+      "sha256": "8b521b965531ed1f5eb6395090d6045a5ae02a2c292df8c00be2fd09cce0a4af",
+      "copy_byte_identical": true
+    },
+    {
+      "file": "translation-notes.md",
+      "bytes": 9023,
+      "sha256": "8667aec2b60c770da9ff3cdeb2ddb35f8942e6df1b5bcdfac321a304e5f8958a",
+      "copy_byte_identical": true
+    },
+    {
+      "file": "report-and-vector-design-spec.md",
+      "bytes": 5801,
+      "sha256": "44c526257878dea728b90ebaf355da9838247c604782d4702eec0a42e0374d9a",
+      "copy_byte_identical": true
+    },
+    {
+      "file": "review-revisions.diff",
+      "bytes": 8430,
+      "sha256": "5af4998558775f432b01b72d2fda311260c9b99cd4b0d48d3019c99ae87d93ae",
+      "copy_byte_identical": true
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 1354,
+      "sha256": "737758e067bc2702426b4fe6ff32ec10e4d8754a8b33013a4dad5062c55a1448",
+      "copy_byte_identical": true
+    }
+  ],
+  "json_parsed": [
+    "english-extraction.json",
+    "espin-bilingual-draft.json",
+    "manifest.json",
+    "scoring-contract.json"
+  ],
+  "not_run": [
+    "content review rerun",
+    "runtime tests",
+    "CI",
+    "commit",
+    "push",
+    "merge",
+    "deployment"
+  ]
+}

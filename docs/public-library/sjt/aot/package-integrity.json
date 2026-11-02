@@ -1,0 +1,49 @@
+{
+  "status": "COPY_INTEGRITY_AND_JSON_PARSE_ONLY",
+  "review": "GO_FOR_DRAFT_CONTENT; runtime HOLD",
+  "copied_files": [
+    {
+      "file": "aot-bilingual-draft.json",
+      "sha256": "4bafbcc14384e4f1ad2d55a134dc71a84da934d713dfb1c501d400b6f7530fcc",
+      "bytes": 56310,
+      "byte_identical": true
+    },
+    {
+      "file": "aot-bilingual-draft.md",
+      "sha256": "2c4880c71c7ad633df77c4598f20a54684e727643f0a35c4f9015de612d10728",
+      "bytes": 43777,
+      "byte_identical": true
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "ea0d7955d91f24f1e87f48579b8a5b7ba100a619d9e0bbd413c294bf5b1edbb3",
+      "bytes": 939,
+      "byte_identical": true
+    },
+    {
+      "file": "report-draft.md",
+      "sha256": "5152b3ce7cd0119afc1fedf5b45b9727f460c216fedb18f0e503e65fa4b42202",
+      "bytes": 4316,
+      "byte_identical": true
+    },
+    {
+      "file": "translation-notes.md",
+      "sha256": "8b060b860a0309d03de4b8d2c2c600d278127c1f9ed3891906a19457f1238b4b",
+      "bytes": 9085,
+      "byte_identical": true
+    }
+  ],
+  "json_parsed": [
+    "aot-bilingual-draft.json",
+    "manifest.json",
+    "scoring-contract.json"
+  ],
+  "not_run": [
+    "English source review rerun",
+    "runtime tests",
+    "CI",
+    "commit",
+    "push",
+    "merge"
+  ]
+}
