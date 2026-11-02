@@ -1,10 +1,11 @@
 import {fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {describe,expect,it,vi} from 'vitest'
 import {EducationCompositionStudio} from './EducationCompositionStudio'
+import {EducationPublicFormChooser} from './EducationPublicFormChooser'
 import type {PrivateToolApi} from './privateToolClient'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,hash=(x:string)=>x.repeat(64)
 describe('exact selected configuration: public exact Standard ordinary questionnaire adapter',()=>{
- it('persists administrator binding and hides technical axes: shows C/P/R and required context, saves only references, reopens explicit background fields, previews just that leaf and freezes',async()=>{
+ it('persists administrator binding, shows the business configuration without technical axes, restores context, previews and freezes',async()=>{
   const org=id(1),rootId=id(2),sourceId=id(3),base=`/organizations/${org}/private-tools`,sourceHash=hash('a')
   let created=false,fixed=false,root:any={id:rootId,kind:'COMPOSITION',title:'公共量表普通问卷',revision:1,contentHash:hash('b'),definition:{schemaVersion:1,adapterVersion:'1.0.0',administration:{population:'STUDENT',responseMode:'SELF'},instruction:'',blocks:[]}}
   const selectedBinding={bindingHash:'e'.repeat(64),configurationHash:'f'.repeat(64),authorizationId:id(90),authorizationRevision:1}
@@ -46,3 +47,13 @@ describe('exact selected configuration: public exact Standard ordinary questionn
   expect(api.mock.calls.some(([path])=>path.endsWith('/validate')||path.endsWith('/preview')||path.includes('/tracks'))).toBe(false)
  })
 })
+
+ it('keeps C/P/R visible for the original unbound fixed-version chooser path',async()=>{
+  const source={catalogKey:'unbound-standard',kind:'SCALE',sourceProvider:'STANDARD_SCALE',sourceId:id(30),contentHash:hash('a'),title:'未选业务配置的原量表',language:'zh-CN',versions:{content:'C-2',parameters:'P-3',report:'R-4'},allowedActions:['REFERENCE_FIXED_VERSION'],canEditOriginal:false,canDistribute:false}
+  const onChoose=vi.fn(),api=vi.fn(async()=>({list:[source],nextCursor:null}))
+  render(<EducationPublicFormChooser api={api as PrivateToolApi} entry="SCHOOL" organizationId={id(1)} actorId={id(4)} kind="SCALE" onChoose={onChoose}/>)
+  const card=(await screen.findByText(source.title)).closest('article')!
+  expect(card).toHaveTextContent('固定版本 C-2');expect(card).toHaveTextContent('P P-3');expect(card).toHaveTextContent('R R-4')
+  fireEvent.click(within(card).getByRole('button',{name:'加入公共量表'}))
+  expect(onChoose).toHaveBeenCalledWith(source)
+ })
