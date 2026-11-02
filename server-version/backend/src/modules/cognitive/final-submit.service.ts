@@ -304,6 +304,10 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   if (child.runtimeGeneration === 'UNIFIED_V1') {
     return {
       ...(await submitUnifiedCognitiveSessionFinal(input, child)),
+      // Canonical child FINAL is already committed. Non-async parents still
+      // need their completeness check, after releasing the UNIT permit.
+      shouldFinalize: Boolean(child.compositeAttemptId),
+      finalizeCompositeAttemptId: child.compositeAttemptId ?? null,
       internalContext,
     }
   }

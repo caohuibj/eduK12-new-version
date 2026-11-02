@@ -255,6 +255,8 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
       : await submitUnifiedScaleAssessmentFinal(input, child)
     return {
       ...data,
+      shouldFinalize: !receiptOnly && Boolean(child.compositeAttemptId || child.questionnaireAssessmentId),
+      finalizeAssessment: receiptOnly ? null : child,
       internalContext: {
         compositeAttemptId: child.compositeAttemptId ?? null,
         attemptEpoch: child.attemptEpoch,

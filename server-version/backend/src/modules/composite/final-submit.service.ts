@@ -482,7 +482,8 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const selectedParent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: route })
   if (route.runtimeGeneration === 'UNIFIED_V1') {
     const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
-    return submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
+    const result = await submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, selectedParent)
+    return { ...result, shouldFinalize: true, finalizeCompositeAttemptId: input.attemptId }
   }
   const attempt = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },

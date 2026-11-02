@@ -141,7 +141,8 @@ function SchoolApplication(){
       'home')
   const [focusPublic,setFocusPublic]=useState(false)
   const [staffRole,setStaffRole]=useState<'TEACHER'|'COUNSELOR'|'ADMIN'>('TEACHER')
-  const [landingSection,setLandingSection]=useState<string|null>(null)
+  const [landingSection,setLandingSection]=useState<string|null>(()=>
+    window.location.pathname==='/'&&window.location.hash==='#hs-features'?'hs-features':null)
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [username,setUsername]=useState('')

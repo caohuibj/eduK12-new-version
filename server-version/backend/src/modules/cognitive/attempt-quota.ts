@@ -7,6 +7,40 @@ import {trainingContentAttemptBindingSchema,trainingContentSnapshotSchema} from 
 
 type Tx = Prisma.TransactionClient
 
+/** Persisted course identity, never a hostname or a caller-supplied mode. */
+export async function isTrainingTaskCourse(db: Tx, courseId?: string | null) {
+  if (!courseId) return false
+  const course = await db.course.findUnique({ where: { id: courseId }, select: { courseType: true, isLibrary: true } })
+  return course?.courseType === 'TRAINING_COURSE' && !course.isLibrary
+}
+
+async function admitTrainingCompositeSlot(db: Tx, userId: string, assignmentId: string, scope: CompositeCognitiveQuotaScope) {
+  const parent = await db.compositeAssessmentAttempt.findUnique({ where: { id: scope.compositeAttemptId }, include: { compositeAssessment: true } })
+  if (!parent) throw CONFLICT('组合认知任务的作答记录不存在')
+  const composite = parent?.compositeAssessment
+  const courseId = parent?.deliveryCourseId ?? composite?.courseId
+  if (!composite || !['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE', 'LEGACY_COMPOSITE'].includes(composite.productKind)
+    || parent?.assignmentRef
+    || !await isTrainingTaskCourse(db, courseId)) return false
+  if (!parent || parent.userId !== userId || parent.subjectUserId && parent.subjectUserId !== userId
+    || parent.respondentUserId && parent.respondentUserId !== userId || parent.status !== 'IN_PROGRESS'
+    || parent.deliveryMode !== 'FINAL_ONLY' || parent.runtimeGeneration !== 'UNIFIED_V1'
+    || !Number.isSafeInteger(parent.attemptEpoch) || parent.attemptEpoch < 1) throw CONFLICT('组合认知任务的作答范围不匹配')
+  const item = await db.compositeAssessmentItem.findUnique({ where: { id: scope.compositeItemId } })
+  if (!item || item.type !== 'COGNITIVE' || item.compositeAssessmentId !== composite.id || !item.cognitiveAssignmentId) throw CONFLICT('组合认知任务的题目来源不匹配')
+  const [actual, selected] = await Promise.all([cognitiveQuotaSource(db, assignmentId), cognitiveQuotaSource(db, item.cognitiveAssignmentId)])
+  if (actual.id !== selected.id) throw CONFLICT('组合认知任务的工具来源不匹配')
+  if (composite.personalTrackingBaselineId) await trainingWaveScope(db, userId, assignmentId, actual, scope)
+  const parentsUsed = await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: composite.id, userId } })
+  if (!Number.isInteger(composite.maxAttempts) || composite.maxAttempts < 1 || parentsUsed > composite.maxAttempts) throw CONFLICT('已达到综合测评最大次数')
+  // The parent admission already owns the delivery's maxAttempts check and
+  // participant lock. Each exact slot may materialize once within that attempt.
+  await db.$queryRawUnsafe('SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended($1, 0))', `cognitive-task-slot:${parent.id}:${item.id}`)
+  const existing = await db.cognitiveSession.count({ where: { userId, compositeAttemptId: parent.id, compositeItemId: item.id } })
+  if (existing > 0) throw CONFLICT('本次组合内的认知作答已存在，请继续已有作答')
+  return true
+}
+
 export async function cognitiveQuotaSource(db: Tx, assignmentId: string) {
   const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
   if (!assignment) throw NOT_FOUND('认知任务不存在')
@@ -25,7 +59,8 @@ export async function lockCognitiveQuota(db: Tx, userId: string, sourceId: strin
 export async function readCognitiveQuota(db: Tx, userId: string, assignmentId: string, waveScope?: {compositeAssessmentId:string;compositeItemId:string}) {
   const source = await cognitiveQuotaSource(db, assignmentId)
   const waveId=waveScope?await trainingWaveScope(db,userId,assignmentId,source,waveScope):null
-  const where = { userId,...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}), OR: [
+  const independentTask = !waveScope && await isTrainingTaskCourse(db, source.courseId)
+  const where = { userId,...(independentTask ? { compositeAttemptId: null } : {}),...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}), OR: [
     { assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } },
     { compositeItem: { cognitiveAssignmentId: source.id } }, { compositeItem: { cognitiveAssignment: { quotaSourceAssignmentId: source.id } } },
   ] }
@@ -85,18 +120,20 @@ async function trainingWaveScope(db:Tx,userId:string,assignmentId:string,source:
  return wave.id
 }
 
-/** Caller holds this lock until session insertion. Ordinary entry still counts
- * every source copy globally. A verified frozen Training plan uses the same
- * original maxAttempts per published wave; all parents/statuses/epochs count. */
+/** Locks remain held through insertion. Training independent deliveries count
+ * standalone aliases only; their composites use parent limits and exact slots.
+ * Other products retain their existing source/wave quota semantics. */
 export async function admitCognitiveAttempt(db: Tx, userId: string, assignmentId: string, compositeScope?:CompositeCognitiveQuotaScope) {
+  if (compositeScope && await admitTrainingCompositeSlot(db, userId, assignmentId, compositeScope)) return
   const source = await cognitiveQuotaSource(db, assignmentId)
   await lockCognitiveQuota(db, userId, source.id)
   const waveId=compositeScope?await trainingWaveScope(db,userId,assignmentId,source,compositeScope):null
+  const independentTask = !compositeScope && await isTrainingTaskCourse(db, source.courseId)
   const used = await db.cognitiveSession.count({ where: { userId, OR: [
     { assignmentId: source.id },
     { assignment: { quotaSourceAssignmentId: source.id } },
     { compositeItem: { cognitiveAssignmentId: source.id } },
     { compositeItem: { cognitiveAssignment: { quotaSourceAssignmentId: source.id } } },
-  ],...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}) } })
-  if (used >= source.maxAttempts) throw CONFLICT('已达到该认知任务最大次数。独立入口和组合测评共用次数；可继续已有作答。')
+  ],...(independentTask ? { compositeAttemptId: null } : {}),...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}) } })
+  if (used >= source.maxAttempts) throw CONFLICT(independentTask ? '已达到本次独立测评任务的最大次数；可继续已有作答。' : '已达到该认知任务最大次数。独立入口和组合测评共用次数；可继续已有作答。')
 }
