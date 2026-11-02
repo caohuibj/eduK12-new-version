@@ -154,7 +154,7 @@
       }
     },
     {
-      "name": "answered-denominator",
+      "name": "golden",
       "input": {
         "config": {
           "endowments": [
@@ -225,6 +225,57 @@
           "interrupted": false
         }
       }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "sharegame v2 requires every planned round; absent trials are not zero choices"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "endowments": [
+            20,
+            50,
+            100
+          ],
+          "fixationMs": 400,
+          "timeoutMs": 20000,
+          "report": {
+            "reportVersion": "2.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "endowment": 20,
+              "response": "choice",
+              "given": 0,
+              "rtMs": 250,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "sharegame v2 requires every planned round; absent trials are not zero choices"
     }
   ]
 }

@@ -219,6 +219,54 @@
           "interrupted": false
         }
       }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "embeddedfigures-zh-v1.1.0",
+          "showTargetMs": 3000,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 400,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": []
+      },
+      "expectedError": "embeddedfigures1.1.0 requires the complete planned sequence"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "stimulusSetVersion": "embeddedfigures-zh-v1.1.0",
+          "showTargetMs": 3000,
+          "timeoutMs": 15000,
+          "validRtFloorMs": 400,
+          "report": {
+            "reportVersion": "1.1.0",
+            "referenceMode": "none"
+          }
+        },
+        "randomSeed": "fixture-seed-1",
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "itemIndex": 0,
+              "clickedShapeId": "s3",
+              "rtMs": 900,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "embeddedfigures1.1.0 requires the complete planned sequence"
     }
   ]
 }
