@@ -45,3 +45,9 @@ Backend Regression 使用独立的 `backend-regression-reuse` 任务，检索相
 无法取得任何证明时任务输出 `reuse_backend_regression=false`，原 Backend Regression 照常执行；复核过程发生异常、未完成或缺乏报告时不准绕过门禁。所有结果都经当前 HEAD 的固定 merge gate 校验。不采用旧提交的 success status 作为新提交的结果。
 
 注意：这是真实接线的 **Backend Regression 一个 lane**；其他昂贵检查仍使用原执行方式。分级和检查点机制将逐步扩展，不应将单 lane 的复用描述成全 CI 全自动复用。
+
+## 已关闭历史 PR 的 CI 清理
+
+#356、#357、#363、#364 已关闭并合并（#356 的 post-merge 资格链路也已结束）。从在线的 `.github/workflows/ci.yml` DAG 移除了共 39 个只为这些历史提交服务的顶层 job 和 5 个僵尸 merge-gate `needs`，并取消 PR356 手动参数入口。主 CI 从约 6,639 行减少到约 3,206 行；原有 Backend/Frontend/Browser/CodeQL/Docker 等常规检查及固定 required gate 仍保留。
+
+专用归档测试和脚本尚保留作为历史证据，不意味着历史路由仍可作为新 PR 的资格通道；剩余历史字符串需要谨慎逐步替换，以免误放行新工作流。新增的 `ci-legacy-retirement.test.mjs` 检查被移除的 job 不会被重新引入，以及当前 `needs` 不引用不存在的 job。

@@ -393,7 +393,7 @@ jobs:
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',...new Set(refs)],{stdio:'inherit'});
           JS
       - name: verify bounded risk-tier routing and historical evidence refusal
-        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs
+        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs .github/scripts/ci-legacy-retirement.test.mjs
       - name: fetch the exact diff base without full history
         env:
           CI_EVENT: ${{ github.event_name }}
