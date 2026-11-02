@@ -1,0 +1,874 @@
+{
+  "independentRater": false,
+  "reason": "Count planned future actions consistently; separate explicit presence from appropriateness; clarify roles/return-to-task boundaries.",
+  "changes": [
+    {
+      "episode": "CJ01",
+      "node": "R1",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ01",
+      "node": "R1",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ01",
+      "node": "R2A",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ01",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "00",
+      "after": "11"
+    },
+    {
+      "episode": "CJ01",
+      "node": "R3A2",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ01",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ01",
+      "node": "R3B1",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ02",
+      "node": "R1",
+      "letter": "A",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ02",
+      "node": "R1",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ02",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "01",
+      "after": "11"
+    },
+    {
+      "episode": "CJ02",
+      "node": "R3A2",
+      "letter": "B",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ02",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ04",
+      "node": "R2A",
+      "letter": "C",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ04",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ05",
+      "node": "R2B",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ05",
+      "node": "R3A2",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ05",
+      "node": "R3B2",
+      "letter": "C",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ05",
+      "node": "R3B2",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R1",
+      "letter": "B",
+      "before": "10",
+      "after": "00"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3A1",
+      "letter": "B",
+      "before": "10",
+      "after": "01"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "10",
+      "after": "00"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3B1",
+      "letter": "B",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ06",
+      "node": "R3B2",
+      "letter": "B",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R1",
+      "letter": "C",
+      "before": "10",
+      "after": "01"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R1",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R2B",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R2B",
+      "letter": "B",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "00",
+      "after": "11"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R3A2",
+      "letter": "A",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ07",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ08",
+      "node": "R1",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ08",
+      "node": "R2A",
+      "letter": "A",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ08",
+      "node": "R3A2",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ08",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ08",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ09",
+      "node": "R2B",
+      "letter": "B",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ09",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ09",
+      "node": "R3A2",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ10",
+      "node": "R2B",
+      "letter": "B",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ10",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ10",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ11",
+      "node": "R1",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ11",
+      "node": "R2A",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ11",
+      "node": "R2B",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ11",
+      "node": "R2B",
+      "letter": "C",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ11",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ11",
+      "node": "R3B1",
+      "letter": "D",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ12",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ12",
+      "node": "R3B1",
+      "letter": "C",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ13",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ14",
+      "node": "R1",
+      "letter": "B",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ14",
+      "node": "R3A1",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ14",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ14",
+      "node": "R3B1",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ14",
+      "node": "R3B2",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ15",
+      "node": "R2A",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ15",
+      "node": "R2B",
+      "letter": "B",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ15",
+      "node": "R3B1",
+      "letter": "B",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ15",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ16",
+      "node": "R2A",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ16",
+      "node": "R2B",
+      "letter": "A",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ16",
+      "node": "R2B",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ16",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ16",
+      "node": "R3A2",
+      "letter": "B",
+      "before": "10",
+      "after": "00"
+    },
+    {
+      "episode": "CJ16",
+      "node": "R3B1",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ17",
+      "node": "R2B",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ17",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R2B",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3A1",
+      "letter": "B",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3A1",
+      "letter": "C",
+      "before": "01",
+      "after": "11"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3A2",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3A2",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3A2",
+      "letter": "C",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3B1",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3B1",
+      "letter": "C",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ18",
+      "node": "R3B1",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ19",
+      "node": "R1",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ19",
+      "node": "R3A2",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ19",
+      "node": "R3A2",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ19",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ20",
+      "node": "R1",
+      "letter": "D",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ20",
+      "node": "R2A",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ20",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ20",
+      "node": "R3B1",
+      "letter": "C",
+      "before": "10",
+      "after": "01"
+    },
+    {
+      "episode": "CJ20",
+      "node": "R3B2",
+      "letter": "A",
+      "before": "01",
+      "after": "11"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R1",
+      "letter": "D",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R2A",
+      "letter": "B",
+      "before": "01",
+      "after": "11"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R2A",
+      "letter": "D",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R2B",
+      "letter": "A",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R2B",
+      "letter": "D",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R3A2",
+      "letter": "D",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ21",
+      "node": "R3B2",
+      "letter": "D",
+      "before": "00",
+      "after": "10"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R1",
+      "letter": "B",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R2A",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R2A",
+      "letter": "D",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R2B",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R3B1",
+      "letter": "B",
+      "before": "10",
+      "after": "11"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R3B1",
+      "letter": "C",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ22",
+      "node": "R3B1",
+      "letter": "D",
+      "before": "00",
+      "after": "11"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R2A",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R2A",
+      "letter": "B",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R2B",
+      "letter": "A",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3A1",
+      "letter": "C",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3A2",
+      "letter": "A",
+      "before": "01",
+      "after": "11"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3B1",
+      "letter": "A",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3B1",
+      "letter": "B",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ23",
+      "node": "R3B2",
+      "letter": "D",
+      "before": "11",
+      "after": "01"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R2A",
+      "letter": "B",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R2B",
+      "letter": "B",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3A1",
+      "letter": "A",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3A1",
+      "letter": "B",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3A1",
+      "letter": "C",
+      "before": "11",
+      "after": "10"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3A1",
+      "letter": "D",
+      "before": "01",
+      "after": "00"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3A2",
+      "letter": "C",
+      "before": "00",
+      "after": "01"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3A2",
+      "letter": "D",
+      "before": "00",
+      "after": "11"
+    },
+    {
+      "episode": "CJ24",
+      "node": "R3B1",
+      "letter": "C",
+      "before": "00",
+      "after": "10"
+    }
+  ]
+}
