@@ -70,5 +70,55 @@
     }
   ],
   "ci": "NOT_ACTIVATED_NOT_PASSED",
-  "database": "NOT_IMPORTED_RIGHTS_AND_VERSION_BLOCKED"
+  "database": "NOT_IMPORTED_RIGHTS_AND_VERSION_BLOCKED",
+  "mainAlignmentCheck": {
+    "selected": {
+      "builtinDependencies": [],
+      "bundleDependencies": [],
+      "status": "SCALE_INTAKE_SELECTED_PASSED",
+      "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+      "head": "d5f89b1ea9af4f48ca9b97db1823b3869e355169",
+      "checked": 4,
+      "results": [
+        {
+          "instrumentKey": "dis_pozas2022_reported14_apm_teacher_self_en_metadata",
+          "instrumentVersion": "1.0.0",
+          "status": "CATALOG_ONLY",
+          "administrable": false,
+          "goldenCases": 0,
+          "scoringExecutions": 0,
+          "issues": []
+        },
+        {
+          "instrumentKey": "dis_pozas2022_reported14_ia_teacher_self_en_metadata",
+          "instrumentVersion": "1.0.0",
+          "status": "CATALOG_ONLY",
+          "administrable": false,
+          "goldenCases": 0,
+          "scoringExecutions": 0,
+          "issues": []
+        },
+        {
+          "instrumentKey": "dis_roy_ms12_apm_teacher_self_en_metadata",
+          "instrumentVersion": "1.0.0",
+          "status": "CATALOG_ONLY",
+          "administrable": false,
+          "goldenCases": 0,
+          "scoringExecutions": 0,
+          "issues": []
+        },
+        {
+          "instrumentKey": "dis_roy_ms12_ia_teacher_self_en_metadata",
+          "instrumentVersion": "1.0.0",
+          "status": "CATALOG_ONLY",
+          "administrable": false,
+          "goldenCases": 0,
+          "scoringExecutions": 0,
+          "issues": []
+        }
+      ],
+      "boundary": "content-contract-only; generator checked separately; no scientific, copyright, publication or deployment approval"
+    },
+    "indexCheck": "PASS; 268 main declarations retained plus 4 DIS; no source changes"
+  }
 }
