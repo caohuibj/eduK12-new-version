@@ -1,6 +1,7 @@
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import express from 'express'
+import bcrypt from 'bcryptjs'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ find: vi.fn(), update: vi.fn(), compare: vi.fn(), hash: vi.fn(), clear: vi.fn(), principal: vi.fn(), revoked: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { $queryRaw: mocks.principal, user: { findUnique: mocks.find, updateMany: mocks.update } } }))
@@ -16,7 +17,7 @@ import { changeOwnPassword } from '../../services/passwordChangeService'
 import { UserRole } from '../../types'
 import { generateToken } from '../../utils/jwt'
 function response() { const res: any = { statusCode: 200 }; res.status = (code: number) => { res.statusCode = code; return res }; res.json = (body: any) => { res.body = body; return res }; return res }
-beforeEach(() => { vi.clearAllMocks(); mocks.find.mockResolvedValue({ passwordHash: 'previous', tokenVersion: 3 }); mocks.compare.mockResolvedValue(true); mocks.hash.mockResolvedValue('new-hash'); mocks.update.mockResolvedValue({ count: 1 }) })
+beforeEach(() => { vi.clearAllMocks(); mocks.find.mockResolvedValue({ passwordHash: 'previous', tokenVersion: 3 }); mocks.compare.mockImplementation(async password => password === 'OldPass1'); mocks.hash.mockResolvedValue('new-hash'); mocks.update.mockResolvedValue({ count: 1 }) })
 describe('one password mutation contract', () => {
   it('exports exactly the same handler for both URL aliases', () => { expect(authController.changePassword).toBe(userController.changePassword) })
   it.each([authController.changePassword, userController.changePassword])('invalidates existing sessions and clears first-login state through either alias', async handler => {
@@ -24,6 +25,7 @@ describe('one password mutation contract', () => {
     await handler({ user: { userId: 'one' }, body: { oldPassword: 'OldPass1', newPassword: 'NewPass2' } } as any, res)
     expect(res.body.code).toBe(0)
     expect(mocks.compare).toHaveBeenCalledWith('OldPass1', 'previous')
+    expect(mocks.compare).toHaveBeenCalledWith('NewPass2', 'previous')
     expect(mocks.update).toHaveBeenCalledWith({ where: { id: 'one', tokenVersion: 3 }, data: { passwordHash: 'new-hash', tokenVersion: { increment: 1 }, mustChangePassword: false } })
     expect(mocks.clear).toHaveBeenCalledOnce()
   })
@@ -49,6 +51,30 @@ describe('one password mutation contract', () => {
     const res = response()
     await userController.changePassword({ user: { userId: 'one' }, body: { oldPassword: 'WrongPass1', newPassword: 'NewPass2' } } as any, res)
     expect(res.statusCode).toBe(400); expect(mocks.update).not.toHaveBeenCalled(); expect(mocks.clear).not.toHaveBeenCalled()
+    expect(mocks.compare).toHaveBeenCalledExactlyOnceWith('WrongPass1', 'previous')
+  })
+
+  it('rejects a different UTF-8 password that bcrypt treats as the same credential', async () => {
+    const oldPassword = 'Aa1' + '界'.repeat(23)
+    const newPassword = oldPassword + '2'
+    expect(Buffer.byteLength(oldPassword, 'utf8')).toBe(72)
+    expect(oldPassword.length).toBeLessThan(72)
+    expect(Buffer.byteLength(newPassword, 'utf8')).toBe(73)
+    expect(newPassword).not.toBe(oldPassword)
+    const passwordHash = await bcrypt.hash(oldPassword, 4)
+    expect(await bcrypt.compare(newPassword, passwordHash)).toBe(true)
+    const state = { passwordHash, tokenVersion: 3, mustChangePassword: true }
+    mocks.find.mockResolvedValue(state)
+    mocks.compare.mockImplementation(async (password: string, hash: string) => bcrypt.compare(password, hash))
+
+    await expect(changeOwnPassword('one', oldPassword, newPassword)).rejects.toMatchObject({
+      statusCode: 400, message: '新密码不能与旧密码相同',
+    })
+    expect(mocks.compare).toHaveBeenNthCalledWith(1, oldPassword, passwordHash)
+    expect(mocks.compare).toHaveBeenNthCalledWith(2, newPassword, passwordHash)
+    expect(mocks.hash).not.toHaveBeenCalled()
+    expect(mocks.update).not.toHaveBeenCalled()
+    expect(state).toEqual({ passwordHash, tokenVersion: 3, mustChangePassword: true })
   })
 
   it.each(['verify', 'hash'])('preserves a trusted reset committed while the old-password change waits to %s', async phase => {
@@ -63,7 +89,7 @@ describe('one password mutation contract', () => {
     let entered!: () => void
     const waiting = new Promise<void>(resolve => { entered = resolve })
     const paused = new Promise<void>(resolve => { unblock = resolve })
-    if (phase === 'verify') mocks.compare.mockImplementation(async () => { entered(); await paused; return true })
+    if (phase === 'verify') mocks.compare.mockImplementation(async password => { if (password !== 'OldPass1') return false; entered(); await paused; return true })
     else mocks.hash.mockImplementation(async () => { entered(); await paused; return 'new-hash' })
     const res = response()
     const pending = authController.changePassword({ user: { userId: 'one' }, body: { oldPassword: 'OldPass1', newPassword: 'NewPass2' } } as any, res)
