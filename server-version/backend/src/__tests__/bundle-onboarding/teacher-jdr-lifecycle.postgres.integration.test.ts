@@ -32,7 +32,7 @@ test('installs, reviews, grants the whole fixed JD-R bundle and preserves five s
   const save=()=>{if(checkpointPath)fs.writeFileSync(checkpointPath,JSON.stringify(c),{mode:0o600})};save()
   const previousKey=process.env.BUNDLE_REVIEW_SIGNING_KEY,previousEnabled=process.env.BUNDLE_PRODUCTS_ENABLED
   process.env.BUNDLE_REVIEW_SIGNING_KEY=c.key;process.env.BUNDLE_PRODUCTS_ENABLED='true'
-  const actor={userId:'jdr-author-'+c.tag,role:UserRole.ADMIN},reviewer={userId:'jdr-review-'+c.tag,role:UserRole.ADMIN},owner={userId:'jdr-owner-'+c.tag,role:UserRole.TEACHER},participant='jdr-participant-'+c.tag,courseId='jdr-course-'+c.tag
+  const actor={userId:'jdr-author-'+c.tag,role:UserRole.ADMIN,platformRole:'SYSTEM_ADMIN' as const},reviewer={userId:'jdr-review-'+c.tag,role:UserRole.ADMIN,platformRole:'SYSTEM_ADMIN' as const},owner={userId:'jdr-owner-'+c.tag,role:UserRole.TEACHER},participant='jdr-participant-'+c.tag,courseId='jdr-course-'+c.tag
   const pack=teacherJdrPackage(),definitionHash=hashDeclarativePackage(pack),key=pack.manifest.definition.bundleKey,version=pack.manifest.definition.bundleVersion
   const smoke=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../modules/assessment-bundle/ci-fixtures/teacher_jdr_workplace_zh_cn/0.1.0.json'),'utf8')) as {slots:Record<string,{answers:Array<{itemCode:string;responseValue:string}>}>}
   try{

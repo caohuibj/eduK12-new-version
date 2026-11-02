@@ -11,7 +11,10 @@ import { installPackage, publishPackage } from './package-release'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import type { BundleActor } from './service'
 
-const administrator = (actor: BundleActor) => { if (actor.role !== 'ADMIN') throw compositeForbidden('只有管理员可以制作和审批固定测评包') }
+type BundleAdministrator = BundleActor & { platformRole?: 'SYSTEM_ADMIN' | 'STANDARD' }
+const administrator = (actor: BundleAdministrator) => {
+  if (actor.platformRole !== 'SYSTEM_ADMIN') throw compositeForbidden('只有系统管理员可以制作和审批固定测评包')
+}
 const releaseConflicts: Record<string, string> = {
   BUNDLE_VERSION_IMMUTABLE: '该版本内容已锁定，请更换版本号后保存',
   BUNDLE_LEGACY_IDENTITY_RESERVED: '该包标识和版本已被历史定义占用，请使用新的标识或版本',
@@ -35,7 +38,7 @@ function releaseError(cause: unknown): never {
   }
   throw cause
 }
-function previewValidatedPackage(actor: BundleActor, raw: unknown) {
+function previewValidatedPackage(actor: BundleAdministrator, raw: unknown) {
   administrator(actor)
   const p = parseDeclarativePackage(raw)
   const entry = packageEntry(p)
@@ -53,7 +56,7 @@ function previewValidatedPackage(actor: BundleActor, raw: unknown) {
     })),
   }
 }
-export function previewPackage(actor: BundleActor, raw: unknown) {
+export function previewPackage(actor: BundleAdministrator, raw: unknown) {
   administrator(actor)
   try { return previewValidatedPackage(actor, raw) }
   catch (cause: any) {
@@ -61,18 +64,18 @@ export function previewPackage(actor: BundleActor, raw: unknown) {
     throw compositeBadRequest('固定包定义未通过校验：' + cause.message)
   }
 }
-export async function savePackage(db: PrismaClient, actor: BundleActor, raw: unknown) {
+export async function savePackage(db: PrismaClient, actor: BundleAdministrator, raw: unknown) {
   const preview = previewPackage(actor, raw)
   if (preview.blockers.length) throw compositeConflict(preview.blockers.join('; '))
   const row = await installPackage(db, actor.userId, raw).catch(releaseError)
   return getPackageDraft(db, actor, row.bundleKey, row.bundleVersion)
 }
-export async function listPackageDrafts(db: PrismaClient, actor: BundleActor) {
+export async function listPackageDrafts(db: PrismaClient, actor: BundleAdministrator) {
   administrator(actor)
   return db.bundlePackageRelease.findMany({ orderBy: [{ bundleKey: 'asc' }, { bundleVersion: 'asc' }],
     select: { id: true, bundleKey: true, bundleVersion: true, status: true, contentHash: true, installedBy: true, publishedBy: true, createdAt: true } })
 }
-export async function getPackageDraft(db: PrismaClient, actor: BundleActor, key: string, version: string) {
+export async function getPackageDraft(db: PrismaClient, actor: BundleAdministrator, key: string, version: string) {
   administrator(actor)
   const row = await db.bundlePackageRelease.findUnique({ where: { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: version } } })
   if (!row) throw compositeNotFound('固定包版本不存在')
@@ -80,7 +83,7 @@ export async function getPackageDraft(db: PrismaClient, actor: BundleActor, key:
 }
 const approval = z.object({ contentHash: z.string().regex(/^[a-f0-9]{64}$/), scientific: z.literal(true), rights: z.literal(true), language: z.literal(true), report: z.literal(true),
   claims: z.array(z.enum(['independent_summary', 'cross_source_condition', 'joint_conclusion'])).max(3) }).strict()
-export async function approvePackage(db: PrismaClient, actor: BundleActor, key: string, version: string, raw: unknown) {
+export async function approvePackage(db: PrismaClient, actor: BundleAdministrator, key: string, version: string, raw: unknown) {
   administrator(actor)
   const checked = approval.parse(raw)
   const row = await getPackageDraft(db, actor, key, version)
