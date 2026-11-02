@@ -38,12 +38,34 @@
     "warning": "URL basename says 2020 but retrieved file is updated; item-version binding not established."
   },
   "rights": {
-    "status": "SCOPE_UNRESOLVED",
+    "status": "PARTIAL_POSITIVE_EVIDENCE_SCHOOL_USE_AND_RESOURCE_SHARING_STRUCTURED_COMMERCIAL_TRANSLATION_SCOPE_UNRESOLVED",
     "publicItemRedistributionConfirmed": false,
     "commercialDigitalAdministrationConfirmed": false,
     "translationPermissionConfirmed": false,
     "authorizationRecordCreated": false,
-    "note": "公开可读与可供学校选模块使用，不等于本项目公开再分发或商用数字题库许可。未签署条款、联系作者或提交表单。"
+    "note": "No independent authorization letter is treated as a universal prerequisite. Legal public access, private engineering preparation, sharing official resources, public structured redistribution, commercial integration and translation are separate scopes. No new agreement accepted or rights-holder contacted.",
+    "publicResourceSharingSupported": true,
+    "publicStructuredItemBankScopeConfirmed": false,
+    "commercialUseScope": "NOT_ESTABLISHED_NOT_A_FINDING_OF_PROHIBITION",
+    "internalPrivateEngineeringPreparation": "COMPLETED_WITHOUT_DISTRIBUTION_OR_PARTICIPANTS",
+    "evidenceSources": [
+      {
+        "url": "https://www.gse.harvard.edu/ideas/usable-knowledge/14/10/making-feedback-count",
+        "date": "2014-10-01",
+        "shortQuote": "free, downloadable, open-source tool",
+        "scope": "Research partner describes school use; not a specific current-file commercial license."
+      },
+      {
+        "url": "https://www.panoramaed.com/products/surveys/teacher-retention-survey",
+        "shortQuote": "Panorama offers all of our survey instruments open-source",
+        "scope": "Current rights-holder general policy; no named software license or commercial/translation detail located."
+      },
+      {
+        "url": "https://www.panoramaed.com/blog/school-climate-survey",
+        "shortQuote": "download and share our open-source",
+        "scope": "Explicit encouragement to share the official climate survey resource; structured public JSON corpus conditions not stated."
+      }
+    ]
   },
   "modules": [
     {
@@ -2375,11 +2397,13 @@
         "panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en"
       ],
       "optionalFormKeys": [
-        "panorama_ss_guide_classroom_open_g3_5_en",
-        "panorama_ss_guide_background_g3_5_en"
+        "panorama_ss_guide_classroom_open_g3_5_en"
       ],
       "totalScore": null,
-      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+      "notes": "Core complete modules can be selected without any background questions. Missing official background choices do not block this plan; do not invent categories or infer them from another district/version. Open responses remain optional. No new runtime or cross-module score. Public structured-content/commercial/translation scope remains separate from private engineering preparation.",
+      "deferredOptionalFormKeys": [
+        "panorama_ss_guide_background_g3_5_en"
+      ]
     },
     {
       "key": "panorama_ss_guide_school_combo_g3_5_en",
@@ -2392,11 +2416,13 @@
         "panorama_ss_guide_school_safety_g3_5_en"
       ],
       "optionalFormKeys": [
-        "panorama_ss_guide_school_open_g3_5_en",
-        "panorama_ss_guide_background_g3_5_en"
+        "panorama_ss_guide_school_open_g3_5_en"
       ],
       "totalScore": null,
-      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+      "notes": "Core complete modules can be selected without any background questions. Missing official background choices do not block this plan; do not invent categories or infer them from another district/version. Open responses remain optional. No new runtime or cross-module score. Public structured-content/commercial/translation scope remains separate from private engineering preparation.",
+      "deferredOptionalFormKeys": [
+        "panorama_ss_guide_background_g3_5_en"
+      ]
     },
     {
       "key": "panorama_ss_guide_classroom_combo_g6_12_en",
@@ -2409,11 +2435,13 @@
         "panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en"
       ],
       "optionalFormKeys": [
-        "panorama_ss_guide_classroom_open_g6_12_en",
-        "panorama_ss_guide_background_g6_12_en"
+        "panorama_ss_guide_classroom_open_g6_12_en"
       ],
       "totalScore": null,
-      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+      "notes": "Core complete modules can be selected without any background questions. Missing official background choices do not block this plan; do not invent categories or infer them from another district/version. Open responses remain optional. No new runtime or cross-module score. Public structured-content/commercial/translation scope remains separate from private engineering preparation.",
+      "deferredOptionalFormKeys": [
+        "panorama_ss_guide_background_g6_12_en"
+      ]
     },
     {
       "key": "panorama_ss_guide_school_combo_g6_12_en",
@@ -2426,11 +2454,13 @@
         "panorama_ss_guide_school_safety_g6_12_en"
       ],
       "optionalFormKeys": [
-        "panorama_ss_guide_school_open_g6_12_en",
-        "panorama_ss_guide_background_g6_12_en"
+        "panorama_ss_guide_school_open_g6_12_en"
       ],
       "totalScore": null,
-      "notes": "仅普通组合清单；4模块位于指南建议4–7主题范围。保留整模块、年级、对象、语言与三轴版本；所有子项取得合法内容并核计分后才可通过现有编辑器组卷。"
+      "notes": "Core complete modules can be selected without any background questions. Missing official background choices do not block this plan; do not invent categories or infer them from another district/version. Open responses remain optional. No new runtime or cross-module score. Public structured-content/commercial/translation scope remains separate from private engineering preparation.",
+      "deferredOptionalFormKeys": [
+        "panorama_ss_guide_background_g6_12_en"
+      ]
     }
   ],
   "dedup": {
@@ -2461,5 +2491,23 @@
     "productionInstalled": false,
     "published": false,
     "fullLocalSelectedCli": "FAIL_EXISTING_BUILTIN_STATIC_FACTORY_SHAPE"
-  }
+  },
+  "privateNativePreparation": {
+    "kind": "UNSCORED_FORM_PRIVATE_ENGINEERING_ONLY",
+    "status": "PASS_PRIVATE_ENGINEERING_ONLY",
+    "forms": 38,
+    "itemInstances": 179,
+    "optionLabelsMapped": 903,
+    "sevenOptionItems": 4,
+    "contentDraftVersion": "0.1.0",
+    "parameterVersion": null,
+    "reportVersion": null,
+    "privateRoot": "/workspace/private-panorama543-20261102",
+    "publicRawPayloads": false,
+    "databaseWrite": false,
+    "participantAdministration": false,
+    "evidence": "private-preparation-evidence.json",
+    "noInstalledVersionClaim": true
+  },
+  "resolutionReview": "resolution-review.md"
 }

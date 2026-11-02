@@ -1,0 +1,819 @@
+{
+  "status": "PASS_PRIVATE_ENGINEERING_ONLY",
+  "checkedAt": "2026-11-02T04:04:54.331Z",
+  "sourceGuideSha256": "f7588c4bac98f7c915f0b4961f6618e8d4487208ee017dbf6ce4cd4b35e6db2e",
+  "runtimeSourceCommit": "12acadbed9944c2d04dfaadb44d24682c2aa5078",
+  "forms": 38,
+  "itemInstances": 179,
+  "optionLabelsMapped": 903,
+  "sevenOptionItems": 4,
+  "nativeFormCompile": "PASS_38_existing_originalFormArtifact",
+  "representativeAnswerCases": 12,
+  "representativeScope": "ordinary5/mixed5and7/negative-worded-safety; raw options preserved, no recoding/scoring",
+  "invalidOptionAndNumericAnswerRejected": true,
+  "privatePreparationRoot": "/workspace/private-panorama543-20261102",
+  "publicItemTextIncluded": false,
+  "participantAdministration": false,
+  "databaseWrite": false,
+  "sourceModuleValidityClaim": "NONE_NEW_not_a_validated_digital_or_Chinese_version",
+  "permissionClaim": "No new institutional authorization, public corpus or commercial permission is created by private engineering preparation",
+  "formalCI": "NOT_RUN_NOT_CLAIMED",
+  "records": [
+    {
+      "key": "panorama_ss_guide_classroom_pedagogical_effectiveness_g3_5_en",
+      "page": 8,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 7,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "129417602c1e745e95afca29383f1921dd6237ef143f3b6b2dc06f15051d53c1",
+      "payloadSha256": "7d3be9662701c04db7f2a848d395ab933ad0e4b7df9cec0177c9a3d31fef234d",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_pedagogical_effectiveness_g6_12_en",
+      "page": 8,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 9,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "bb4b0d61403b8d3d2cd346cf11e26c893d38ac9027285bca2653a039e5dfffad",
+      "payloadSha256": "583a50cdb5266373c2fa85560a38a2a3cab8c4af5b2d4e908362c233e0a96817",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_climate_g3_5_en",
+      "page": 9,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        7,
+        5
+      ],
+      "definitionDigest": "6376ea4412abb4bd35e7dc445273521a9477e94938e540d2945e4d773e785d10",
+      "payloadSha256": "5e5df82a452cd7363517f3277d562477f0f17a1e2447f11b36079e8e4cf5e6a2",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_climate_g6_12_en",
+      "page": 9,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        7,
+        5
+      ],
+      "definitionDigest": "73880b8194f76838dfba99cc210c2717d89fde0eef7a1cd48f11caa83a0a8840",
+      "payloadSha256": "65e100972a6baacc2b6d7c1229f7ca52e5541d49b9c098a63ac127b56b43baa1",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_rigorous_expectations_g3_5_en",
+      "page": 10,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "2b6ee0b5695f2c33fc263a321c5e282237dcabee8a28f627760f633f3174b08e",
+      "payloadSha256": "47e44304ff07bfccd0df445df5d101d02d2388ca0167769c8b3254f479794acb",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_rigorous_expectations_g6_12_en",
+      "page": 10,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "31a0ed7b4951212487004a3098d3d5d48290b5f20afee052b7874a672856aaa7",
+      "payloadSha256": "627fe8fa847b0fe3b822ed0d69054b6f86f64b34f7fc1a1a41737c4627bfd3fc",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_engagement_g3_5_en",
+      "page": 11,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "eaaeeff2af0e15667580407045cfb27df4de478b95d8ec662279cb31c2f4cb21",
+      "payloadSha256": "998cbffd7406a70711743139041a2cfe349a831b06f0184752d578c006685490",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_engagement_g6_12_en",
+      "page": 11,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "41b3997091bf2553ee07f0157a61d66361b8797d5e2c8ce8d185a776c585f5d7",
+      "payloadSha256": "15cae5e6526e3cfa43674bc54d783460afc9f9c711b53673092ed60b0560f3d4",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en",
+      "page": 12,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "dcab33040293af11e9f5a820a33d60ff4674c14b92d4d070183d43383fad692b",
+      "payloadSha256": "a34a8f7eb8849a77ed97f2f8ec6a637f59d4eacc6c48b115e5e8c96819610fae",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en",
+      "page": 12,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "1aa63b2c5c1e8a9bce57701fa79bf12fbe1e034c76751150e49e2fb45cc04302",
+      "payloadSha256": "679651917aa46ea4c34a4563a079410479b3ef30e641c09628f5d9338d401e20",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_belonging_g3_5_en",
+      "page": 13,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "75545132aa47e4dfb4197db9cd546518e5cb043da3be3123267df08d8eb7a980",
+      "payloadSha256": "e1de8754c4b97d3b086bb643d517245eb77ffe8678b817fb7577caf01220aad8",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_belonging_g6_12_en",
+      "page": 13,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "557548e5f93465321c329b41e484216ee68a267259839ab5e58cf50c1a8b5745",
+      "payloadSha256": "8fbfe5c36ceea9bd617bd1a5be01d5a6ae98b23c571c6cffec2f7c5dc8cda3aa",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_valuing_subject_g3_5_en",
+      "page": 14,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "af2c229e64b92b9af1c9b3459b3fcab8e920c938524077643aeaadc1b99fb774",
+      "payloadSha256": "f9cafcd57f4446fc314756db97b3519a51063bc6d162f028e48b3f62879f2253",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_valuing_subject_g6_12_en",
+      "page": 14,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "4033ffb6e9b1f60b2add2332fa3b283d15a4d0e710d17a9a0d8d940703574e3b",
+      "payloadSha256": "efae223993c099e806882cb0c52226a9d4fe161efe3fcb8f2b4511283c8a5cfd",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_learning_strategies_g3_5_en",
+      "page": 15,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "74028ec28c39170f500dfe8de1d6048d24463a1524a8bf02d30558c444a262c3",
+      "payloadSha256": "41fa1039a625ac67dd00b8e5e11d92f3b5855fa3fa30f00f69567f635ee88ba0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_learning_strategies_g6_12_en",
+      "page": 15,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "30ab1c11e4adabaa7e2d97ca072215793bf9bff35492b8ad9a2fecdc4045ced4",
+      "payloadSha256": "a7fcf086b0e7e6c3b9e0f089972e3f7e0262559355490070508b5eb8f504b459",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_mindset_g3_5_en",
+      "page": 16,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "42dc22f6909512b1d427a6d465ae3b80f54e6c52f09dfe89304cf091b1e38532",
+      "payloadSha256": "2940f22ef1e4ceb29405833480f49e893f11ae3dd0caf243143b989579549b86",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_classroom_mindset_g6_12_en",
+      "page": 16,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "74ba00a216caa2259685bb1feebbffa15af15f07d0ca58eb1047298d7a7bf33f",
+      "payloadSha256": "07814dc49d9ee87b5e190eea16d148740704a6811e33e7441137781e190e3b75",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_climate_g3_5_en",
+      "page": 17,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        7,
+        5,
+        5
+      ],
+      "definitionDigest": "845c5626c74f803ee1a03882748e163edc4d585e1e0f698c48b469e39abb9136",
+      "payloadSha256": "0cefcc2bf70ecd1c5344a2301db29ca19073639f3cd4bfc7c58fb530f34dc0bd",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_climate_g6_12_en",
+      "page": 17,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        7,
+        5,
+        5
+      ],
+      "definitionDigest": "44378c2bcb67958bedc0e7b2bdeba7ba815ef7cb0ed61f7b858b859565d8363b",
+      "payloadSha256": "1b8250aba6df31ace422938d3b8b1d9aec9cd5b5a37bdd7e6b9242ba7c2d8e80",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_rigorous_expectations_g3_5_en",
+      "page": 18,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "4fbc8422e9754c9dfac305a27bb31b25d3478eb050ba283a1d88ffea0ced9fc7",
+      "payloadSha256": "08ccc741bafbb17db77471f9114180903688493be822992d8a5bec7922f6c867",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_rigorous_expectations_g6_12_en",
+      "page": 18,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "4dac0eac75152a1849ee025454eef955f9a9f5bf8133582bc917756a9bdd1087",
+      "payloadSha256": "a1b94468064fd7fb2fd10f69c22f32bf9282afd9649c453f46fa0679e5e907d2",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_engagement_g3_5_en",
+      "page": 19,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "90beec2926585579798193b1cadeeb353ad10294d4c527dd6dd6f0e9683d9388",
+      "payloadSha256": "2c0be01999bccebfbcd3903aaa501751cd4db5e812deeed9aa63fffad9766b1d",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_engagement_g6_12_en",
+      "page": 19,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "dee768289fba2738a595600434b2991b7942693c9e09b1398e542243b18d07be",
+      "payloadSha256": "e02d63a8a345109f23586ed21ca08212e755aeee2b8642aad9e597eeb59aef03",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_teacher_student_relationships_g3_5_en",
+      "page": 20,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "ea2f0d40033fce40892c0f848db07f72ddb627e306fc3f4a8ef7b171a3c177a9",
+      "payloadSha256": "18dad11345383da6b13acdd51c2db832c22e46135b2017427542e956f9307212",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_teacher_student_relationships_g6_12_en",
+      "page": 20,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "850b6753ed245654b2aff95bfeb26bd8a756e7202103a45765ab4e2bf004808f",
+      "payloadSha256": "9b786769b9f1395b6325a1295cc0e70c86bfc0455531123773cdc7d9fbf75cf7",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_belonging_g3_5_en",
+      "page": 21,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "a914b6e10e8d3c8340b85fbf3506851f58f35c40324834290eff04065cdf8828",
+      "payloadSha256": "594a72fd4cbd9f7884ae835468ff7671275d130e932bb5316cb99d8a2c114f7d",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_belonging_g6_12_en",
+      "page": 21,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "487c52ebc75ce6eb72ece0525f72b306e15f1694c4db3e0bf8d7116f33b333fc",
+      "payloadSha256": "ae55900e4a3dc4c1fb014e363532e3e7a03be9d2ec8761a64f671df31aff0c0c",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_valuing_g3_5_en",
+      "page": 22,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "252d33bde6093d489cf51db5308e3456e9fdd8c2f83af3856a0fac642140a600",
+      "payloadSha256": "7a1862d97b9b65ec7c0576de5e73ee043ef22c7fd08b4d0a2b185bf0499d123b",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_valuing_g6_12_en",
+      "page": 22,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "97656fe1ae70be680447a7836b8a02210a78b7c243245fbf727430f5bc533a44",
+      "payloadSha256": "e54381c4de8d224b005cfe7bed138ea1689b06c7b814f32cfed3f39a1494eb40",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_learning_strategies_g3_5_en",
+      "page": 23,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "cc9f22c1fbcfffc580c20be23967971f9be9a588da915a0536bf11a603489c6c",
+      "payloadSha256": "53c3b6cc74bb2b88a01b653fa4cb2aee7d8e5ccfcc8326ab62ada279b2db90b2",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_learning_strategies_g6_12_en",
+      "page": 23,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "cce8645709c9277aa0be8a55993a682735f0493febd2aa4ed6b41c93108a3d87",
+      "payloadSha256": "425793291a2f43f05fe9fb6d760350f93e4e2be84979aaf7217adb999061e1c0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_mindset_g3_5_en",
+      "page": 24,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "68dc144956751dc13fa5791f7626df6d17a48faa1675cdbfd38d9dc8c6daad21",
+      "payloadSha256": "ef4426959e8809c3492ed97d9908b3dfeff62dd2950d098f50e0f83500519d83",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_mindset_g6_12_en",
+      "page": 24,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 4,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "4c866502d4accb10a3dca1402d42c82ee00894d15464b7c41f9c973d4a564339",
+      "payloadSha256": "6ee6b9b5c3f5ee03e6a02d56580530ff7e8f1a37e3807a77d8de2e9c42371aba",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_perseverance_g3_5_en",
+      "page": 25,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "c2e0863be2d6599ba32a0c0daa116262750313a80e146330bba1b0cb58541d13",
+      "payloadSha256": "29948495dffad18c05cac28af5dd6010409a160caa5c04f2332ab190422354df",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_perseverance_g6_12_en",
+      "page": 25,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "8b6087189b651f65a1685997d2af1dd3dceb1c019373aea2bd676cc3fdd21701",
+      "payloadSha256": "0873d0aed1ff059a83d988eef685222a1646b6e855bdc55b4f8b234e5c1a6c87",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_safety_g3_5_en",
+      "page": 26,
+      "gradeRange": [
+        3,
+        5
+      ],
+      "itemCount": 5,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "8337115f7cdf284453a959731105b8ad5a1ab4783edc7cd96ad0cd1385e9d6c1",
+      "payloadSha256": "1c0bf1053d6c4a045595ac3e64e32a212e6f8a1d05c924f8579479083f18560d",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    },
+    {
+      "key": "panorama_ss_guide_school_safety_g6_12_en",
+      "page": 26,
+      "gradeRange": [
+        6,
+        12
+      ],
+      "itemCount": 6,
+      "optionCounts": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "definitionDigest": "bd2edccf003ec20dd7f5e6e3b9c983a5cdb7b07caf2963d67b8c25ec6a0c2642",
+      "payloadSha256": "41cd1d52b201c8d372869b844e9f23a50fd14bf392ec67bce34df1602d4ad009",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "compiled": true
+    }
+  ],
+  "publicEvidenceScope": "Non-expressive IDs/counts/digests only. The native Form definitions and all question/option text remain outside Git in a private directory. This is compile/dry-run preparation, not database import, legal licensing approval or participant administration.",
+  "sourceExtractionChecks": {
+    "questionCountsMatchAll38OriginalModuleTables": true,
+    "optionCountsMatchEachOriginalItem": true,
+    "fontAndCoordinatesUsedInsteadOfUniformColumnAssumption": true,
+    "quotedQuestionInsideItemPreserved": true,
+    "numericOrdinalScoresNotAdded": true,
+    "note": "PDF extraction initially detected layout/font/embedded-quotation differences and was corrected before the successful native check. No altered item wording or guessed option labels were used."
+  }
+}
