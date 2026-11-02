@@ -1,0 +1,133 @@
+{
+  "motherTool": "Inclusive Teaching Practices Scale",
+  "sharedTag": "family:itps",
+  "variants": [
+    {
+      "instrumentKey": "itps_teacher_general_en_2020",
+      "instrumentVersion": "1.0.0",
+      "name": "ITPS｜完整14题｜教师自评｜2020英文附录",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "scoreKeys": [
+        "personalisation",
+        "differentiation",
+        "overall"
+      ],
+      "itemCount": 14,
+      "tags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ],
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeStatus": "DRAFT_HIDDEN_NONCOMMERCIAL_RESEARCH",
+      "versionAxes": {
+        "content": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.0",
+        "localization": "1.0.0"
+      },
+      "privateNativeFileSha256": "a67738c5fe61f5e7756ab68b08a4941487a383bd106a9fb91fb29a5a953cb61f"
+    },
+    {
+      "instrumentKey": "itps_teacher_personalisation_en_2020",
+      "instrumentVersion": "1.0.0",
+      "name": "ITPS｜个别化7题｜教师自评｜2020英文附录",
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        9,
+        10,
+        14
+      ],
+      "scoreKeys": [
+        "personalisation"
+      ],
+      "itemCount": 7,
+      "tags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ],
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeStatus": "DRAFT_HIDDEN_NONCOMMERCIAL_RESEARCH",
+      "versionAxes": {
+        "content": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.0",
+        "localization": "1.0.0"
+      },
+      "privateNativeFileSha256": "fc326c63d468228adc025aadae9e867654f3a88882d19b06430d9d7f609210de"
+    },
+    {
+      "instrumentKey": "itps_teacher_differentiation_en_2020",
+      "instrumentVersion": "1.0.0",
+      "name": "ITPS｜差异化7题｜教师自评｜2020英文附录",
+      "sourceItemNumbers": [
+        5,
+        6,
+        7,
+        8,
+        11,
+        12,
+        13
+      ],
+      "scoreKeys": [
+        "differentiation"
+      ],
+      "itemCount": 7,
+      "tags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ],
+      "publicStatus": "CATALOG_ONLY",
+      "privatePrototypeStatus": "DRAFT_HIDDEN_NONCOMMERCIAL_RESEARCH",
+      "versionAxes": {
+        "content": "1.0.0",
+        "scoring": "1.0.0",
+        "report": "1.0.0",
+        "localization": "1.0.0"
+      },
+      "privateNativeFileSha256": "52e6ff07edea9afebecf474bdae015be14d17baaa87f78e51af93ac6f9ec64c4"
+    }
+  ],
+  "unscoredForms": [],
+  "unscoredFormReason": "No separate original factual form supplied in Appendix A. Do not invent context questions or replace valid scoring solely for lack of norms.",
+  "optionalOrdinaryCombination": {
+    "preferred": "one full14 Scale in ordinary GENERAL questionnaire to preserve original order; not yet created in shared development database",
+    "splitPair": "two7 Scale slots for clearly labelled exploratory reflection only; this groups items and does not reproduce original14 order",
+    "crossToolTotal": false
+  }
+}

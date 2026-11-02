@@ -1,0 +1,18 @@
+{
+  "failures": [
+    {
+      "check": "private native selected source contract",
+      "result": "FAILED_BEFORE_CORRECTION",
+      "reason": "AUDIENCE_LANGUAGE_QC_REQUIRED: report declared zh-CN while item content/versionAxes locale was en",
+      "fix": "Keep native English Appendix source and use original English teacher report with matching locale=en. Chinese report examples remain clearly labelled separate editorial drafts. No checker or permission rule changed.",
+      "recheck": "See native-contract-validation.json; prior failed invocation retained in /tmp/itps-a04/native-check-first-failure.log"
+    },
+    {
+      "check": "isolated native materialize/readback receipt",
+      "result": "FAILED_AFTER_3_DRAFT_IMPORTS",
+      "reason": "Final zero-response assertion referenced non-existent prisma.scaleResponse model; all three content imports had already completed.",
+      "fix": "Read actual Assessment model; check existing rows before resume and do not duplicate materialization.",
+      "recheck": "Resume reads the three existing hidden drafts and verifies exact content/axis/report, then writes receipt. First log retained in /tmp/itps-a04/import-first-failure.log."
+    }
+  ]
+}

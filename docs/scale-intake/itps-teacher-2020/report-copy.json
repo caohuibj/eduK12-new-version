@@ -1,0 +1,96 @@
+{
+  "status": "PROJECT_CHINESE_FEEDBACK_DRAFT_NOT_VALIDATED_TRANSLATION",
+  "reportVersion": "1.0.0",
+  "receiver": "teacher_self",
+  "visibility": "Own teacher respondent under existing run/result authorization only; other teachers/managers receive nothing automatically. Existing anonymity, publication and minimum-group rules unchanged.",
+  "interpretations": [
+    {
+      "scoreKey": "overall",
+      "headline": "整体自述实践：用具体课堂证据支持下一步",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "这个1–4均分概括你对所列课堂实践的自述符合程度，分数越大表示更认同这些描述。它不是实践频率百分比、课堂观察结论或教师能力等级；也不同于融合教学自我效能。\n\n若多数描述符合，可以选一项最近实施过的做法，看看哪些学生获得了参与机会；若描述不太符合，先识别时间、资源或协作条件，不把困难归为个人失败。没有足够完整回答时不生成该项数值或解释。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "从最近一节课选一个例子，记录采用的做法、学生参与的可见证据，以及仍需要什么支持。"
+        },
+        {
+          "category": "support",
+          "text": "下一节课只尝试一项小调整，例如提供一种额外的表达方式或一次具体反馈；依据学生实际反应再决定是否保留。需要资源时可与可信同事商量。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "personalisation",
+      "headline": "个别化：用具体课堂证据支持下一步",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "这个1–4均分概括你对所列课堂实践的自述符合程度，分数越大表示更认同这些描述。它不是实践频率百分比、课堂观察结论或教师能力等级；也不同于融合教学自我效能。\n\n若多数描述符合，可以选一项最近实施过的做法，看看哪些学生获得了参与机会；若描述不太符合，先识别时间、资源或协作条件，不把困难归为个人失败。没有足够完整回答时不生成该项数值或解释。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "从最近一节课选一个例子，记录采用的做法、学生参与的可见证据，以及仍需要什么支持。"
+        },
+        {
+          "category": "support",
+          "text": "下一节课只尝试一项小调整，例如提供一种额外的表达方式或一次具体反馈；依据学生实际反应再决定是否保留。需要资源时可与可信同事商量。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "differentiation",
+      "headline": "差异化：用具体课堂证据支持下一步",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "这个1–4均分概括你对所列课堂实践的自述符合程度，分数越大表示更认同这些描述。它不是实践频率百分比、课堂观察结论或教师能力等级；也不同于融合教学自我效能。\n\n若多数描述符合，可以选一项最近实施过的做法，看看哪些学生获得了参与机会；若描述不太符合，先识别时间、资源或协作条件，不把困难归为个人失败。没有足够完整回答时不生成该项数值或解释。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "从最近一节课选一个例子，记录采用的做法、学生参与的可见证据，以及仍需要什么支持。"
+        },
+        {
+          "category": "support",
+          "text": "下一节课只尝试一项小调整，例如提供一种额外的表达方式或一次具体反馈；依据学生实际反应再决定是否保留。需要资源时可与可信同事商量。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "2020研究施测德文教师版；此候选保留附录英文，不是已验证英文或中文版。",
+    "两维题号继承自Schwab/Sharma/Hoffmann 2019 Table 3并逐号与2020 Appendix A交叉核对；2020正文没有另列教师版题号键，仍需作者确认。",
+    "拆成7题是内容提取，未证明独立施测等价；正式研究优先保持14题原序。",
+    "原文第8题含学习风格措辞，保留原文不表示认可按固定学习风格分型或匹配教学的有效性。反馈只建议依据任务、学习需要和观察证据调整。",
+    "第9题原文的me照录，未擅自改为students；作者澄清后须另记内容版本。",
+    "原文未给缺失规则；本项目保守要求该分数所有条目齐全，漏答不补零。无常模、临床阈值或优秀教师界线。",
+    "本来源为CC BY-NC4.0；只在隔离非商业研究中处理，不代表平台已获商业授权。"
+  ],
+  "cases": [
+    {
+      "case": "normal_complete",
+      "input": "synthetic complete answers with mean 3.0",
+      "message": "你较认同这次列出的课堂做法。可以选一个最近实施过的例子，看看哪些学生因此更容易参与，再决定保留什么。这个分数不是优秀教师评定。",
+      "automaticThreshold": false
+    },
+    {
+      "case": "difficulty_complete",
+      "input": "synthetic complete answers with mean 1.0",
+      "message": "你这次较少认同这些描述。这可能反映课堂条件、资源或尚未形成的做法，不能据此认定你不适合教学。先选一个可控的小调整，并和可信同事商量所需支持。",
+      "automaticThreshold": false
+    },
+    {
+      "case": "insufficient",
+      "input": "one or more required-for-score source items unanswered",
+      "message": "这项信息还不完整，系统不把漏答算作零，也不推断你的教学水平。你可以自愿补充；暂不补充也可保留一条自己的课堂观察。",
+      "numericScore": null,
+      "interpretationGenerated": false
+    }
+  ],
+  "studentReport": "Not applicable to this teacher-self version. No student role or recipient is created."
+}

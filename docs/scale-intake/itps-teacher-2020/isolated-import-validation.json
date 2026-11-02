@@ -1,0 +1,189 @@
+{
+  "status": "PASS_ISOLATED_NATIVE_SCALE_MATERIALIZE_AND_READBACK",
+  "scope": "Noncommercial research prototype only. Existing materializeScaleInstrumentContent + registry compile/readiness + axis snapshots. No install/activate/publication or rights grant.",
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "database": {
+    "host": "127.0.0.1",
+    "port": 55462,
+    "name": "eduk12_itps_validation",
+    "postgres": "16.15",
+    "provisioning": "prisma db push current schema plus exact existing scale_axis_snapshots migration; not full migration-chain validation",
+    "cleanup": "DONE: isolated PostgreSQL container and anonymous volume removed after readback; shared development and production untouched"
+  },
+  "receipts": [
+    {
+      "instrumentKey": "itps_teacher_general_en_2020",
+      "scaleId": "3f38d4fb-e11d-4902-9a9a-ddce60b93c79",
+      "itemCount": 14,
+      "dimensionCount": 2,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ],
+      "instrumentVersion": "1.0.0",
+      "definitionHash": "70d8a4b7a2dd93e689e9c7519199d1e62cb5a83f588202156068e774c3d900f2",
+      "axisHash": "2819137375fb36d018be75222ee4500aee593917bf282cc00f279f3c410538ae",
+      "sourceHash": "5528c1ff05beef1808748397490eff16e06129d7f474676ec23b7b4b16fa78d9",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "70d8a4b7a2dd93e689e9c7519199d1e62cb5a83f588202156068e774c3d900f2",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "readback": "PASS_NATIVE_CONTENT_AND_REPORT",
+      "readbackItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "reportAudience": "teacher",
+      "reportLocale": "en",
+      "scores": [
+        {
+          "key": "personalisation",
+          "value": 3
+        },
+        {
+          "key": "differentiation",
+          "value": 3
+        },
+        {
+          "key": "overall",
+          "value": 3
+        }
+      ],
+      "privateFileSha256": "a67738c5fe61f5e7756ab68b08a4941487a383bd106a9fb91fb29a5a953cb61f"
+    },
+    {
+      "instrumentKey": "itps_teacher_personalisation_en_2020",
+      "scaleId": "493ede80-fd97-4e65-9637-4f2115cda788",
+      "itemCount": 7,
+      "dimensionCount": 1,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ],
+      "instrumentVersion": "1.0.0",
+      "definitionHash": "5309a49fbd226b6bb14e787386c34dc8cf79969526544387c96d71e3c31a2b0a",
+      "axisHash": "b73c9544f46a15aa6f6723fbd601cdcaac6af8ea86d75e0b21a5117da496d398",
+      "sourceHash": "bc2d4825c4a37b01df71500a58372a6784647604005b61cd00999d5f450d8ba1",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "5309a49fbd226b6bb14e787386c34dc8cf79969526544387c96d71e3c31a2b0a",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "readback": "PASS_NATIVE_CONTENT_AND_REPORT",
+      "readbackItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        9,
+        10,
+        14
+      ],
+      "reportAudience": "teacher",
+      "reportLocale": "en",
+      "scores": [
+        {
+          "key": "personalisation",
+          "value": 3
+        }
+      ],
+      "privateFileSha256": "fc326c63d468228adc025aadae9e867654f3a88882d19b06430d9d7f609210de"
+    },
+    {
+      "instrumentKey": "itps_teacher_differentiation_en_2020",
+      "scaleId": "cd1bc481-6ab9-4174-90c5-4cf7728b8a04",
+      "itemCount": 7,
+      "dimensionCount": 1,
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "tags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ],
+      "instrumentVersion": "1.0.0",
+      "definitionHash": "9b4c21e6c4ce081e2816351eee1ca84e845f0247a8a4513fecd37479ebf92607",
+      "axisHash": "9c72c87c5579f1de7b7c7617ff199057c4ebefcc59f45b1a2967bbe7bf98981f",
+      "sourceHash": "6a9e8e380a67caed74e5675754e9f7e3535ee849477cf67af1389cd157e965e4",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "9b4c21e6c4ce081e2816351eee1ca84e845f0247a8a4513fecd37479ebf92607",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "instructionVersion": "1.0.0",
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      },
+      "readback": "PASS_NATIVE_CONTENT_AND_REPORT",
+      "readbackItemNumbers": [
+        5,
+        6,
+        7,
+        8,
+        11,
+        12,
+        13
+      ],
+      "reportAudience": "teacher",
+      "reportLocale": "en",
+      "scores": [
+        {
+          "key": "differentiation",
+          "value": 3
+        }
+      ],
+      "privateFileSha256": "52e6ff07edea9afebecf474bdae015be14d17baaa87f78e51af93ac6f9ec64c4"
+    }
+  ],
+  "authorizationRows": 0,
+  "deploymentPolicyRows": 0,
+  "participantResponses": 0,
+  "realParticipantData": false,
+  "sharedDevelopmentDatabaseTouched": false,
+  "productionTouched": false
+}

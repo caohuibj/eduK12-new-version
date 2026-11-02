@@ -1,0 +1,457 @@
+{
+  "status": "PASS_PRIVATE_NATIVE_AND_PUBLIC_CATALOG_CONTRACTS",
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "node": "v24.19.0",
+  "qualification": "Local targeted development evidence; Node v24.19.0 is below repository engine >=24.21.0. Not formal CI success.",
+  "scope": "Private noncommercial research only; public source is catalog-only and contains no item text.",
+  "receipts": [
+    {
+      "instrumentKey": "itps_teacher_general_en_2020",
+      "privateFileSha256": "a67738c5fe61f5e7756ab68b08a4941487a383bd106a9fb91fb29a5a953cb61f",
+      "privateNativeContractCheck": {
+        "instrumentKey": "itps_teacher_general_en_2020",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 3,
+        "scoringExecutions": 8,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "publicCatalogContractCheck": {
+        "instrumentKey": "itps_teacher_general_en_2020",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagFilter": "PASS",
+      "originalNumberOrder": "PASS",
+      "scenarios": [
+        {
+          "syntheticAllResponses": 1,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "personalisation",
+              "value": 1
+            },
+            {
+              "key": "differentiation",
+              "value": 1
+            },
+            {
+              "key": "overall",
+              "value": 1
+            }
+          ],
+          "interpretations": 3
+        },
+        {
+          "syntheticAllResponses": 3,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "personalisation",
+              "value": 3
+            },
+            {
+              "key": "differentiation",
+              "value": 3
+            },
+            {
+              "key": "overall",
+              "value": 3
+            }
+          ],
+          "interpretations": 3
+        },
+        {
+          "syntheticAllResponses": 4,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "personalisation",
+              "value": 4
+            },
+            {
+              "key": "differentiation",
+              "value": 4
+            },
+            {
+              "key": "overall",
+              "value": 4
+            }
+          ],
+          "interpretations": 3
+        }
+      ],
+      "empty": {
+        "quality": "invalid",
+        "scoreValues": [
+          null,
+          null,
+          null
+        ],
+        "interpretations": 0
+      },
+      "singleOmissions": [
+        {
+          "omittedSourceItem": "ITPS-T01",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T02",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T03",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T04",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T05",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T06",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T07",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T08",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T09",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T10",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T11",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T12",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T13",
+          "unavailableScoreKeys": [
+            "differentiation",
+            "overall"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T14",
+          "unavailableScoreKeys": [
+            "personalisation",
+            "overall"
+          ],
+          "quality": "invalid"
+        }
+      ],
+      "platformRedistributionAuthorized": false
+    },
+    {
+      "instrumentKey": "itps_teacher_personalisation_en_2020",
+      "privateFileSha256": "fc326c63d468228adc025aadae9e867654f3a88882d19b06430d9d7f609210de",
+      "privateNativeContractCheck": {
+        "instrumentKey": "itps_teacher_personalisation_en_2020",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 3,
+        "scoringExecutions": 5,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "publicCatalogContractCheck": {
+        "instrumentKey": "itps_teacher_personalisation_en_2020",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagFilter": "PASS",
+      "originalNumberOrder": "PASS",
+      "scenarios": [
+        {
+          "syntheticAllResponses": 1,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "personalisation",
+              "value": 1
+            }
+          ],
+          "interpretations": 1
+        },
+        {
+          "syntheticAllResponses": 3,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "personalisation",
+              "value": 3
+            }
+          ],
+          "interpretations": 1
+        },
+        {
+          "syntheticAllResponses": 4,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "personalisation",
+              "value": 4
+            }
+          ],
+          "interpretations": 1
+        }
+      ],
+      "empty": {
+        "quality": "invalid",
+        "scoreValues": [
+          null
+        ],
+        "interpretations": 0
+      },
+      "singleOmissions": [
+        {
+          "omittedSourceItem": "ITPS-T01",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T02",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T03",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T04",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T09",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T10",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T14",
+          "unavailableScoreKeys": [
+            "personalisation"
+          ],
+          "quality": "invalid"
+        }
+      ],
+      "platformRedistributionAuthorized": false
+    },
+    {
+      "instrumentKey": "itps_teacher_differentiation_en_2020",
+      "privateFileSha256": "52e6ff07edea9afebecf474bdae015be14d17baaa87f78e51af93ac6f9ec64c4",
+      "privateNativeContractCheck": {
+        "instrumentKey": "itps_teacher_differentiation_en_2020",
+        "instrumentVersion": "1.0.0",
+        "status": "DRAFT",
+        "administrationEligibility": "not-evaluated",
+        "goldenCases": 3,
+        "scoringExecutions": 5,
+        "referencePolicy": "none",
+        "issues": []
+      },
+      "publicCatalogContractCheck": {
+        "instrumentKey": "itps_teacher_differentiation_en_2020",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      "tagFilter": "PASS",
+      "originalNumberOrder": "PASS",
+      "scenarios": [
+        {
+          "syntheticAllResponses": 1,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "differentiation",
+              "value": 1
+            }
+          ],
+          "interpretations": 1
+        },
+        {
+          "syntheticAllResponses": 3,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "differentiation",
+              "value": 3
+            }
+          ],
+          "interpretations": 1
+        },
+        {
+          "syntheticAllResponses": 4,
+          "quality": "interpretable",
+          "scores": [
+            {
+              "key": "differentiation",
+              "value": 4
+            }
+          ],
+          "interpretations": 1
+        }
+      ],
+      "empty": {
+        "quality": "invalid",
+        "scoreValues": [
+          null
+        ],
+        "interpretations": 0
+      },
+      "singleOmissions": [
+        {
+          "omittedSourceItem": "ITPS-T05",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T06",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T07",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T08",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T11",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T12",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        },
+        {
+          "omittedSourceItem": "ITPS-T13",
+          "unavailableScoreKeys": [
+            "differentiation"
+          ],
+          "quality": "invalid"
+        }
+      ],
+      "platformRedistributionAuthorized": false
+    }
+  ],
+  "productionTouched": false,
+  "realParticipantData": false
+}

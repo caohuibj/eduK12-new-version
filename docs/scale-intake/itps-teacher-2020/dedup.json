@@ -1,0 +1,19 @@
+{
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "mainSourceJson": 235,
+  "mainInstrumentModules": 258,
+  "mainHits": [],
+  "openPrs": 45,
+  "openPrPaths": 6336,
+  "openPrSourceContentsRead": 619,
+  "openPrSourceHits": [],
+  "errors": [],
+  "productionDb": "NOT_QUERIED",
+  "authorAndDistinctiveItemScan": {
+    "mainFilesRead": 493,
+    "mainHits": [],
+    "prFilesRead": 619,
+    "prHits": [],
+    "readErrors": []
+  }
+}

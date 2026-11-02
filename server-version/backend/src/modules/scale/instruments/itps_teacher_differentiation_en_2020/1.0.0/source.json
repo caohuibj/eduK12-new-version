@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "itps_teacher_differentiation_en_2020",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "ITPS｜差异化7题｜教师自评｜2020英文附录",
+      "abbreviation": "ITPS-T",
+      "instrumentFamily": "Inclusive Teaching Practices Scale"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "教师自述对个别化与差异化课堂实践描述的符合程度；不是观察评定的实际教学质量，也不是能力感或态度。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:itps",
+        "role:teacher_self",
+        "stage:k12",
+        "lang:en",
+        "version:2020",
+        "use:reflection",
+        "license:cc-by-nc4",
+        "status:pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人在职教师；2020奥地利德文施测样本221人，涵盖小学、中学和其他学校。英文附录内容仅作PILOT；不将学校学段当填答者年龄。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "课堂实践；原文未指定固定回忆天数",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原题号、相对题序和四级符合程度选项，题干During the lesson…不变。",
+        "时长为项目估计，不是作者验证。",
+        "完整14题才保留原组卷；7题提取不宣称独立施测效度。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "附录英文及数字拆分尚未建立独立语言/施测证据。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Published English Appendix A in Schwab & Alnahdi (2020); study actually administered German. Project Chinese feedback is original editorial text, not a validated Chinese instrument.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Exact appendix wording retained, including item 9 me and item 8 learning styles. Split versions lack independent administration evidence."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "itps_teacher_differentiation_en_2020-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "itps_teacher_differentiation_en_2020-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© 2020 The Authors. CC BY-NC 4.0, verified in University of Vienna institutional record. Noncommercial research prototype only; no commercial/platform distribution authorization asserted. Original English Appendix A retained; digital structure and original project feedback added. https://ucrisportal.univie.ac.at/en/publications/do-they-practise-what-they-preach-factors-associated-with-teacher/ https://creativecommons.org/licenses/by-nc/4.0/",
+      "Existing InstrumentAuthorization remains rights source of truth. No grant or authorization row fabricated."
+    ]
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Inclusive Teaching Practices Scale – Teacher General Version",
+      "citation": "Schwab, S., & Alnahdi, G. H. (2020). Do they practise what they preach? Factors associated with teachers’ use of inclusive teaching practices among in-service teachers. Journal of Research in Special Educational Needs, 20(4), 321–330. https://doi.org/10.1111/1471-3802.12492",
+      "url": "https://nasenjournals.onlinelibrary.wiley.com/doi/full/10.1111/1471-3802.12492",
+      "publicationYear": 2020
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "差异化"
+      ],
+      "limitations": [
+        "2020研究施测德文教师版；此候选保留附录英文，不是已验证英文或中文版。",
+        "两维题号继承自Schwab/Sharma/Hoffmann 2019 Table 3并逐号与2020 Appendix A交叉核对；2020正文没有另列教师版题号键，仍需作者确认。",
+        "拆成7题是内容提取，未证明独立施测等价；正式研究优先保持14题原序。",
+        "原文第8题含学习风格措辞，保留原文不表示认可按固定学习风格分型或匹配教学的有效性。反馈只建议依据任务、学习需要和观察证据调整。",
+        "第9题原文的me照录，未擅自改为students；作者澄清后须另记内容版本。",
+        "原文未给缺失规则；本项目保守要求该分数所有条目齐全，漏答不补零。无常模、临床阈值或优秀教师界线。",
+        "本来源为CC BY-NC4.0；只在隔离非商业研究中处理，不代表平台已获商业授权。"
+      ],
+      "disclaimer": "目录候选，不可施测。私有非商业研究原型已另行核查；公开仓库未包含题文，不能据此生成可施测量表。"
+    },
+    "blockers": [
+      "Platform/public item redistribution scope is not established under CC BY-NC 4.0; obtain applicable authorization or establish genuinely noncommercial deployment before activation.",
+      "Author confirmation of inherited 2019 factor key and Appendix item 9 wording remains pending; no independent split-form or English-language validation claimed."
+    ]
+  }
+}
