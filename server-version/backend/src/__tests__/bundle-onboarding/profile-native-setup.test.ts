@@ -7,7 +7,7 @@ import {profileGradeForm} from '../../modules/assessment-bundle/profile/admissio
 import {parseBundleContextDefinition} from '../../modules/assessment-bundle/context'
 it('exposes the native model and required theory claim through the existing setup preview',()=>{
   const pack=loadPackage(path.resolve(__dirname,'../../modules/assessment-bundle/packages/learning_motivation_math_support/0.1.1'))
-  const preview=previewPackage({userId:'synthetic-author',role:UserRole.ADMIN},pack)
+  const preview=previewPackage({userId:'synthetic-author',role:UserRole.ADMIN,platformRole:'SYSTEM_ADMIN'},pack)
   expect(preview.blockers).toEqual([])
   expect(preview.requiredClaims).toEqual(['cross_source_condition'])
   expect(preview.profile).toMatchObject({key:'learning_motivation_math_support',version:'0.1.0',mappingVersion:'0.1.1',maturity:'EXPERIMENTAL'})

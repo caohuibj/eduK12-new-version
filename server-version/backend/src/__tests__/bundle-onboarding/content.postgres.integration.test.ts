@@ -71,7 +71,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
     requireIsolatedReleaseDatabase(url!)
     db = new PrismaClient({ datasources: { db: { url } } })
     for (const [id, role] of [[actor.userId, 'ADMIN'], [reviewer, 'ADMIN'], [student, 'STUDENT']] as const) {
-      await db.user.create({ data: { id, username: id, passwordHash: 'synthetic-only', role } })
+      await db.user.create({ data: { id, username: id, passwordHash: 'synthetic-only', role, ...(role === 'ADMIN' ? { platformRole: 'SYSTEM_ADMIN' as const } : {}) } })
     }
     courseId = (await db.course.create({ data: { creatorId: actor.userId, title: 'C4 synthetic content smoke', courseCode: 'C4-' + suffix, courseType:'TRAINING_COURSE', status: 'PUBLISHED' } })).id
     await db.courseStudent.create({ data: { courseId, studentId: student, status: 'ACTIVE' } })

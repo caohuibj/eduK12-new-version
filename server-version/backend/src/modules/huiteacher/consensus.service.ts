@@ -321,6 +321,8 @@ export async function approveHuiteacherFieldConsensus(input:{
 }){
   return prisma.$transaction(async tx=>{
     const r=await load(tx,input.consensusId)
+    // New signatures and receipt replays use the same locked live event scope.
+    await fieldEvent(tx,r.organizationId,r.eventId)
     const src=await readSources(tx,{organizationId:r.organizationId,eventId:r.eventId,consensusId:r.id})
     await eligibleReviewer(tx,r,src,input.actorUserId)
     if(r.status!=='DRAFT'||r.revision!==input.expectedRevision
