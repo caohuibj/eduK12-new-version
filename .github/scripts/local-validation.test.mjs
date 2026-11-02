@@ -43,7 +43,7 @@ test('consumed code or configuration change fails without automatic retest',()=>
  const signed=seal(payload,keys.privateKey);
  fs.writeFileSync('.github/scripts/contract.mjs','export const v=3;\n');git('add','.');git('commit','-m','changed consumed input');const next=git('rev-parse','HEAD');
  assert.throws(()=>admit(signed,pub,base,next),/inputs changed/);
- const r=spawnSync(process.execPath,[script,'ci','release-tools'],{encoding:'utf8',env:{...process.env,CI_BASE_SHA:base,HUI_LOCAL_VALIDATION_PUBLIC_KEY:pub,HUI_LOCAL_VALIDATION_EVIDENCE:JSON.stringify(signed)}});
+ const r=spawnSync(process.execPath,[script,'ci','release-tools'],{encoding:'utf8',env:{...process.env,HUI_EVIDENCE_BRANCH:payload.branch,CI_BASE_SHA:base,HUI_LOCAL_VALIDATION_PUBLIC_KEY:pub,HUI_LOCAL_VALIDATION_EVIDENCE:JSON.stringify(signed)}});
  assert.notEqual(r.status,0);assert.match(r.stderr,/inputs changed/);assert.doesNotMatch(r.stdout,/TAP version/);
 }));
 test('unrelated documentation does not invalidate tooling evidence',()=>fixture(({base,payload})=>{
