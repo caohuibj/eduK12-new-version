@@ -30,6 +30,7 @@ import {
   createCustomScaleDefinition,
   hashScaleDefinition,
   validateScaleDefinition,
+  validateCustomScaleDraft,
   type ScaleDefinitionV2,
 } from '../modules/scale/scale-definition'
 import { getScalePackage, validateScalePackage } from '../modules/scale/scale-package.registry'
@@ -363,7 +364,7 @@ export const scaleController = {
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表 definition 由代码 package 管理，不能通过网页修改')
       if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以修改 definition', -1, 409)
 
-      const validation = validateScaleDefinition(parsedBody.data.definition, { instrumentClass: 'CUSTOM_DESCRIPTIVE' })
+      const validation = validateCustomScaleDraft(parsedBody.data.definition)
       if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
         return error(res, definitionIssuesMessage(validation.issues))
       }

@@ -25,7 +25,7 @@ const help: Record<Section, { title: string; intro: string; points: Array<[strin
   },
   items: {
     title: '题目怎么录入？',
-    intro: '可逐题新增，也可一次粘贴多道题。批量内容需先追加到列表，才会进入待保存的量表定义。',
+    intro: '可逐题新增，也可一次粘贴多道题。先追加到列表，再保存题目为草稿；无需先完成选项和计分。预览和发布前仍需完成全部配置。',
     points: [
       ['每行一道题', '直接粘贴题干，不必自行填写系统标识。追加后题号自动排列，默认必答、正向计分。'],
       ['怎样标记反向题', '在题干首尾加 [反向] 或 (R)，或在题目卡片中勾选“反向计分”。题目文字本身不会判断是否反向。'],
@@ -64,7 +64,7 @@ const surveyHelp: Record<Section, (typeof help)[Section]> = {
     ['逐题与整份', '逐题呈现可记录浏览器逐题时间；整份呈现一次展示全部题目，不推定逐题反应时间。'],
     ['保存与版本', '保存会一并保存各分区的修改。工具草稿不等于已投放；发布时采用的冻结版本和项目设置决定实际施测。'],
   ] },
-  items: { ...help.items, points: [ ...help.items.points.slice(0, 3), ['录完之后做什么', '到“响应选项”核对文字与分值，再到“计分”核对归属。新增内容题默认归入第一个维度（如有）；后续新增题目不会自动加入已启用的独立总分。'] ] },
+  items: { ...help.items, intro: '可逐题新增，也可一次粘贴多道题。批量内容需先追加到列表，才会进入待保存的量表定义。', points: [ ...help.items.points.slice(0, 3), ['录完之后做什么', '到“响应选项”核对文字与分值，再到“计分”核对归属。新增内容题默认归入第一个维度（如有）；后续新增题目不会自动加入已启用的独立总分。'] ] },
   responses: { ...help.responses, points: [ ...help.responses.points, ['数量与保存', 'Survey 支持 2–15 个选项。批量粘贴后先应用，再保存量表；切换分区会保留尚未应用的文字。'] ] },
   scores: { title: '维度分与总分怎么设置？', intro: '先为维度选择内容题；需要整份汇总时，再启用独立总分并核对纳入题目。', points: [
     ['维度分', '每个维度分别选择题目；上方的求和／平均方式供所有维度共同使用。修改后请核对预计分数范围。'],
@@ -83,7 +83,7 @@ function guidance(section: Section, variant: Variant) {
   if (variant === 'education') {
     if (section === 'scores') return { ...help.scores, points: help.scores.points.slice(0, -1).concat([['怎样核对结果', '保存草稿后，使用“检查定义”和“试填预览”核对计分。确认后再固定私有版本；固定版本本身不启动作答。'] as [string, string]]) }
     if (section === 'report') return { ...help.report, points: help.report.points.slice(0, -1).concat([['固定版本之前', '保存草稿，检查定义并试填预览，再固定私有版本。用于活动时仍需明确引用该版本；草稿修改不改写已冻结版本。'] as [string, string]]) }
-    if (section === 'items') return { ...help.items, points: help.items.points.slice(0, -1).concat([['下一步与保存', '先核对“响应选项”，再选择计分题目。新增题目不会自动加入已有计分项；“保存草稿”会保存当前工具的编辑。'] as [string, string]]) }
+    if (section === 'items') return { ...help.items, intro: '可逐题新增，也可一次粘贴多道题。批量内容需先追加到列表，才会进入待保存的量表定义。', points: help.items.points.slice(0, -1).concat([['下一步与保存', '先核对“响应选项”，再选择计分题目。新增题目不会自动加入已有计分项；“保存草稿”会保存当前工具的编辑。'] as [string, string]]) }
   }
   return help[section]
 }

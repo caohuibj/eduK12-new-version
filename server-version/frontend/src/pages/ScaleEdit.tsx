@@ -328,7 +328,9 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     }
     const operation = beginWrite()
     if (operation === null) return
-    try { await persistDefinition(operation) }
+    try {
+      if (await persistDefinition(operation) && activeTab === 'items') setIssues([{ path: '题目', message: '已保存，并重新读取确认题目草稿。可继续编制响应选项和计分；当前量表尚未发布。', severity: 'success' }])
+    }
     catch (error) { await reportWriteError(error, 'definition', operation) }
     finally { finishWrite(operation) }
   }
