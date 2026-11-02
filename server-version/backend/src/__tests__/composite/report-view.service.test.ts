@@ -53,6 +53,13 @@ describe('opt-in participant report view', () => {
     expect(view.report).toBeNull()
     expect(db.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
   })
+  it.each(['FAILED', 'CANCELLED'])('does not project a %s report job as processing', async status => {
+    state.parent.status = 'IN_PROGRESS'; state.parent.completedAt = null; state.parent.asyncReportEpoch = 1
+    state.job = { ...readyFeedbackJob(state.parent), status, wholeSubmissionId: null, requestedRevision: 1 }
+    const view = await getCompositeReportView('attempt-1', { userId: 'student-1' })
+    expect(view.generation).toMatchObject({ reportStatus: { state: status }, participantFeedback: { state: 'WAITING_SUBMISSION' } })
+    expect(view.report).toBeNull()
+  })
   it('keeps a genuinely incomplete unit set waiting without exposing a report', async () => {
     state.parent.status = 'IN_PROGRESS'; state.parent.completedAt = null; state.parent.asyncReportEpoch = 1
     state.job = { ...readyFeedbackJob(state.parent), status: 'WAITING', wholeSubmissionId: null, requestedRevision: 1 }

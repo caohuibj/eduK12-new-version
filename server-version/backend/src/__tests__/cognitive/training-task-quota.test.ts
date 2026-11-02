@@ -33,6 +33,23 @@ describe('Training participation quotas belong to the delivery task', () => {
     await expect(admitCognitiveAttempt(tx, 'student', 'copy')).rejects.toMatchObject({ statusCode: 409 })
     expect(db.cognitiveSession.count.mock.calls.at(-1)![0].where.compositeAttemptId).toBeNull()
   })
+  it.each([null, 'other-course'])('uses the delivered course when the canonical source course is %s', async sourceCourse => {
+    db.cognitiveAssignment.findUnique.mockImplementation(async ({ where }) => where.id === 'task'
+      ? { ...root, courseId: sourceCourse }
+      : { ...root, id: 'copy', courseId: 'course', quotaSourceAssignmentId: 'task' })
+    db.cognitiveSession.count.mockImplementation(async ({ where }) => where.compositeAttemptId === null ? 0 : 1)
+    expect(await readCognitiveQuota(tx, 'student', 'copy')).toMatchObject({ usedAttempts: 0, remainingAttempts: 1 })
+    await expect(admitCognitiveAttempt(tx, 'student', 'copy')).resolves.toBeUndefined()
+    expect(db.$queryRawUnsafe).toHaveBeenCalledWith(expect.any(String), 'cognitive-quota:task:student')
+  })
+  it('does not apply Training isolation to a non-Training delivery with a Training source', async () => {
+    db.cognitiveAssignment.findUnique.mockImplementation(async ({ where }) => where.id === 'task'
+      ? root : { ...root, id: 'copy', courseId: 'other-course', quotaSourceAssignmentId: 'task' })
+    db.course.findUnique.mockImplementation(async ({ where }) => where.id === 'course' ? course : { courseType: 'LEGACY_COURSE', isLibrary: false })
+    await readCognitiveQuota(tx, 'student', 'copy')
+    await admitCognitiveAttempt(tx, 'student', 'copy')
+    expect(db.cognitiveSession.count.mock.calls.every(([args]) => !('compositeAttemptId' in args.where))).toBe(true)
+  })
   it('does not consume a standalone task allowance when entering a legitimate bundle slot', async () => {
     db.cognitiveSession.count.mockImplementation(async ({ where }) => where.compositeAttemptId === 'parent' ? 0 : 99)
     await admitCognitiveAttempt(tx, 'student', 'copy', scope)

@@ -5667,7 +5667,7 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
   // completion. A queued job must not strand the learner on "continue" while
   // generation runs; genuinely incomplete unit sets retain WAITING.
   if (release?.configured && release.state === 'WAITING_SUBMISSION' && job &&
-    (job.wholeSubmissionId || job.requestedRevision > 0) && job.status !== 'WAITING') release.state = 'REPORT_PROCESSING'
+    (job.wholeSubmissionId || job.requestedRevision > 0) && (job.status === 'PENDING' || job.status === 'PROCESSING')) release.state = 'REPORT_PROCESSING'
   return {
     ...(release?.configured ? { participantFeedback: { state: release.state, releaseAt: release.releaseAt } } : {}),
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),

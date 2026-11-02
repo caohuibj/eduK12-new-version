@@ -52,6 +52,12 @@ export async function cognitiveQuotaSource(db: Tx, assignmentId: string) {
   return source
 }
 
+async function isStandaloneTrainingAssignment(db: Tx, assignmentId: string) {
+  const assignment = await db.cognitiveAssignment.findUnique({ where: { id: assignmentId }, select: { courseId: true } })
+  if (!assignment) throw NOT_FOUND('认知任务不存在')
+  return isTrainingTaskCourse(db, assignment.courseId)
+}
+
 export async function lockCognitiveQuota(db: Tx, userId: string, sourceId: string) {
   await db.$queryRawUnsafe('SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended($1, 0))', `cognitive-quota:${sourceId}:${userId}`)
 }
@@ -59,7 +65,7 @@ export async function lockCognitiveQuota(db: Tx, userId: string, sourceId: strin
 export async function readCognitiveQuota(db: Tx, userId: string, assignmentId: string, waveScope?: {compositeAssessmentId:string;compositeItemId:string}) {
   const source = await cognitiveQuotaSource(db, assignmentId)
   const waveId=waveScope?await trainingWaveScope(db,userId,assignmentId,source,waveScope):null
-  const independentTask = !waveScope && await isTrainingTaskCourse(db, source.courseId)
+  const independentTask = !waveScope && await isStandaloneTrainingAssignment(db, assignmentId)
   const where = { userId,...(independentTask ? { compositeAttemptId: null } : {}),...(waveId?{compositeAttempt:{compositeAssessmentId:waveId,userId,assignmentRef:null}}:{}), OR: [
     { assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } },
     { compositeItem: { cognitiveAssignmentId: source.id } }, { compositeItem: { cognitiveAssignment: { quotaSourceAssignmentId: source.id } } },
@@ -128,7 +134,7 @@ export async function admitCognitiveAttempt(db: Tx, userId: string, assignmentId
   const source = await cognitiveQuotaSource(db, assignmentId)
   await lockCognitiveQuota(db, userId, source.id)
   const waveId=compositeScope?await trainingWaveScope(db,userId,assignmentId,source,compositeScope):null
-  const independentTask = !compositeScope && await isTrainingTaskCourse(db, source.courseId)
+  const independentTask = !compositeScope && await isStandaloneTrainingAssignment(db, assignmentId)
   const used = await db.cognitiveSession.count({ where: { userId, OR: [
     { assignmentId: source.id },
     { assignment: { quotaSourceAssignmentId: source.id } },
