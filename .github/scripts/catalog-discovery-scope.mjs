@@ -32,7 +32,13 @@ export function bundleRuntimeSelectionMatches(entries,outputs){
  return (outputs.bundle_runtime||'false')===String(bundleRuntimeScope(entries))
   &&!(outputs.bundle_runtime==='true'&&outputs.bundle_family==='true');
 }
-export function catalogDiscoveryScope(entries,readers={}){return catalogSurfaceScope(entries)||bundleFamilyScope(entries)||bundleRuntimeScope(entries)||studentDiscoveryScope(entries,readers);}
+export const authoringPolishChecks=JSON.parse(readFileSync(new URL('../config/scale-authoring-polish-checks.json',import.meta.url)));
+export function authoringPolishScope(entries){
+ const allowed=new Set([...authoringPolishChecks.sources,...authoringPolishChecks.tests,...authoringPolishChecks.controls]);
+ return entries.some(e=>authoringPolishChecks.sources.includes(e.file))&&entries.every(e=>allowed.has(e.file)
+  &&e.newMode==='100644'&&(e.status==='M'&&e.oldMode==='100644'||e.status==='A'&&e.oldMode==='000000'));
+}
+export function catalogDiscoveryScope(entries,readers={}){return catalogSurfaceScope(entries)||bundleFamilyScope(entries)||bundleRuntimeScope(entries)||studentDiscoveryScope(entries,readers)||authoringPolishScope(entries);}
 
 // The event can retain the PR's creation-time base while refs/pull/N/merge
 // already uses current main. Select that parent only for this bounded diff.

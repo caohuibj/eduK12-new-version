@@ -43,9 +43,9 @@ describe('计分定义保存与回读', () => {
     const view = render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
     await user.click(await screen.findByRole('button', { name: '+ 总分' }))
-    for (const code of ['Q1', 'Q2', 'Q3']) {
-      expect(screen.getByRole('button', { name: code })).toHaveAttribute('aria-pressed', 'false')
-      await user.click(screen.getByRole('button', { name: code }))
+    for (const [index, code] of ['Q1', 'Q2', 'Q3'].entries()) {
+      expect(screen.getByRole('button', { name: `第 ${index + 1} 题：${code}` })).toHaveAttribute('aria-pressed', 'false')
+      await user.click(screen.getByRole('button', { name: `第 ${index + 1} 题：${code}` }))
     }
     await user.click(screen.getByRole('button', { name: '保存计分定义' }))
     await screen.findByText(/已保存，并重新读取确认/)
@@ -53,7 +53,7 @@ describe('计分定义保存与回读', () => {
     view.unmount()
     render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
-    for (const code of ['Q1', 'Q2', 'Q3']) expect(screen.getByRole('button', { name: code })).toHaveAttribute('aria-pressed', 'true')
+    for (const [index, code] of ['Q1', 'Q2', 'Q3'].entries()) expect(screen.getByRole('button', { name: `第 ${index + 1} 题：${code}` })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('keeps a newly selected Q1 when repairing a Q2/Q3 definition', async () => {
@@ -63,11 +63,11 @@ describe('计分定义保存与回读', () => {
     const user = userEvent.setup()
     render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
-    await user.click(screen.getByRole('button', { name: 'Q1' }))
+    await user.click(screen.getByRole('button', { name: '第 1 题：Q1' }))
     await user.click(screen.getByRole('button', { name: '保存计分定义' }))
     await waitFor(() => expect(stored.scoring.scores[0].source.items).toHaveLength(3))
     await screen.findByText(/已保存，并重新读取确认/)
-    expect(screen.getByRole('button', { name: 'Q1' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '第 1 题：Q1' })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('reports a mismatched readback and retains the unsaved selection', async () => {
@@ -76,10 +76,10 @@ describe('计分定义保存与回读', () => {
     const user = userEvent.setup()
     render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
-    await user.click(screen.getByRole('button', { name: 'Q1' }))
+    await user.click(screen.getByRole('button', { name: '第 1 题：Q1' }))
     await user.click(screen.getByRole('button', { name: '保存计分定义' }))
     await screen.findByText(/保存后的计分题目与当前选择不一致/)
-    expect(screen.getByRole('button', { name: 'Q1' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '第 1 题：Q1' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.queryByText(/已保存，并重新读取确认/)).not.toBeInTheDocument()
   })
   it('explains stable identity and primary scores while preserving editable direction and aggregation on save', async () => {

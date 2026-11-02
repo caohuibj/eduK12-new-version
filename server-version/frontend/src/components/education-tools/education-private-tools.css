@@ -1,4 +1,19 @@
 .education-private-tools { --private-accent: #276760; --private-bg: #f3f7f3; --private-line: #dbe2e3; display: grid; grid-template-columns: minmax(0, 1fr); gap: .85rem; min-width: 0; }
+.education-private-tools .scale-edit-help { padding:0; border:1px solid var(--private-line); }
+.education-private-tools .education-private-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:6px; border:1px solid var(--private-line); border-radius:12px; background:var(--private-bg); align-items:stretch; }
+.education-private-tools .education-private-tabs button { display:flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:9px; font-size:16px; border-color:transparent; }
+.education-private-tools .education-private-tabs .scale-author-step { display:grid; place-items:center; width:23px; height:23px; flex-shrink:0; border:1px solid currentColor; border-radius:50%; font-size:12px; }
+.education-private-tools .scale-score-item-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.education-private-tools .scale-score-item-options button { display:flex; align-items:flex-start; gap:9px; text-align:left; min-width:0; }
+.education-private-tools .scale-score-item-label { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.education-private-tools .scale-score-item-label strong { font-size:14px; }
+.education-private-tools .scale-score-item-label>span { font-size:14px; line-height:1.65; overflow-wrap:anywhere; }
+.education-private-tools :is(.scale-author-heading,.scale-scoring-header) h2 { font-size:22px; line-height:1.5; margin-bottom:6px; }
+.education-private-tools :is(.scale-author-heading,.scale-scoring-header) p { font-size:15px; line-height:1.8; }
+@media(max-width:640px) {
+ .education-private-tools .education-private-tabs button { flex-direction:column; gap:4px; font-size:14px; }
+ .education-private-tools .scale-score-item-options { grid-template-columns:minmax(0,1fr); }
+}
 .education-private-tools--teacher { --private-accent: var(--ht-copper, #944638); --private-bg: var(--ht-bg, #fbf4ed); --private-line: var(--ht-line, #e5d5ca); }
 .education-private-tools header h2 { margin: 0 0 .5rem; }
 .education-private-tools p { line-height: 1.7; }

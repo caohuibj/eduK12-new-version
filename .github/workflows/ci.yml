@@ -354,6 +354,7 @@ jobs:
       bundle_family: ${{ steps.scope.outputs.bundle_family }}
       bundle_runtime: ${{ steps.scope.outputs.bundle_runtime }}
       student_discovery: ${{ steps.scope.outputs.student_discovery }}
+      authoring_polish: ${{ steps.scope.outputs.authoring_polish }}
       diff_base: ${{ steps.scope.outputs.diff_base }}
       application_route: ${{ steps.scope.outputs.application_route }}
       release_plan: ${{ steps.scope.outputs.release_plan }}
@@ -713,8 +714,12 @@ jobs:
           node --test .github/scripts/training-workspace-scope.test.mjs
           if [ -f .github/scripts/training-student-bindings.json ]; then node --test .github/scripts/training-student.test.mjs; fi
           if [ -f .github/scripts/training-followup-bindings.json ]; then node --test .github/scripts/training-followup-scope.test.mjs; fi
+      - name: bounded authoring recipe routing
+        if: steps.scope.outputs.authoring_polish == 'true'
+        run: node --test .github/scripts/scale-authoring-polish-scope.test.mjs .github/scripts/catalog-discovery-scope.test.mjs .github/scripts/student-discovery-scope.test.mjs
+
       - name: legacy routing contracts only for the legacy route
-        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.bundle_runtime != 'true' && steps.scope.outputs.scenario != 'frontend-performance' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation' && steps.scope.outputs.scenario != 'maintenance'
+        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.authoring_polish != 'true' && steps.scope.outputs.bundle_runtime != 'true' && steps.scope.outputs.scenario != 'frontend-performance' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation' && steps.scope.outputs.scenario != 'maintenance'
         run: node --test .github/scripts/admin-permissions-functional.test.mjs .github/scripts/training-functional.test.mjs .github/scripts/training-functional-report.test.mjs .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/ci-browser-plan.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
 
       - name: frontend startup and paging scope and fail-closed contracts
@@ -1392,6 +1397,7 @@ jobs:
       bundle_family: ${{ needs.scope.outputs.bundle_family == 'true' }}
       bundle_runtime: ${{ needs.scope.outputs.bundle_runtime == 'true' }}
       student_discovery: ${{ needs.scope.outputs.student_discovery == 'true' }}
+      authoring_polish: ${{ needs.scope.outputs.authoring_polish == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
       survey_selection: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' }}
       affected_only: ${{ needs.scope.outputs.frontend_affected == 'true' }}
@@ -3892,6 +3898,7 @@ jobs:
       BUNDLE_FAMILY: ${{ needs.scope.outputs.bundle_family }}
       BUNDLE_RUNTIME: ${{ needs.scope.outputs.bundle_runtime }}
       STUDENT_DISCOVERY: ${{ needs.scope.outputs.student_discovery }}
+      AUTHORING_POLISH: ${{ needs.scope.outputs.authoring_polish }}
       TRAINING_ARCHIVE_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       SITUATIONAL_PRB_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -3935,15 +3942,15 @@ jobs:
         working-directory: server-version/backend
         run: npx prisma migrate deploy
       - name: changed image build controls
-        if: needs.scope.outputs.bundle_family != 'true' && needs.scope.outputs.bundle_runtime != 'true'
-        run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs .github/scripts/student-discovery-scope.test.mjs
+        if: needs.scope.outputs.bundle_family != 'true' && needs.scope.outputs.bundle_runtime != 'true' && needs.scope.outputs.authoring_polish != 'true'
+        run: node --test .github/scripts/ci-image-plan.test.mjs .github/scripts/catalog-discovery-scope.test.mjs .github/scripts/student-discovery-scope.test.mjs .github/scripts/scale-authoring-polish-scope.test.mjs
       - name: existing catalog unit and temporary-table PostgreSQL contracts
         working-directory: server-version/backend
         run: |
           node --input-type=module <<'JS'
           import {readFileSync} from 'node:fs';
           import {execFileSync} from 'node:child_process';
-          const recipe=process.env.STUDENT_DISCOVERY==='true'?'student-discovery-checks.json':process.env.BUNDLE_RUNTIME==='true'?'bundle-runtime-checks.json':process.env.BUNDLE_FAMILY==='true'?'bundle-family-checks.json':'catalog-discovery-checks.json';
+          const recipe=process.env.AUTHORING_POLISH==='true'?'scale-authoring-polish-checks.json':process.env.STUDENT_DISCOVERY==='true'?'student-discovery-checks.json':process.env.BUNDLE_RUNTIME==='true'?'bundle-runtime-checks.json':process.env.BUNDLE_FAMILY==='true'?'bundle-family-checks.json':'catalog-discovery-checks.json';
           const {backendChecks}=JSON.parse(readFileSync('../../.github/config/'+recipe,'utf8'));
           const files=[...backendChecks.unitFiles,...backendChecks.postgresFiles];
           execFileSync('npm',['test','--',...files,'--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/tmp/catalog-backend.json'],{stdio:'inherit'});

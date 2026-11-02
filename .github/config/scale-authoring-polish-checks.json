@@ -1,0 +1,59 @@
+{
+  "scenario": "scale-authoring-polish",
+  "sources": [
+    "server-version/backend/src/controllers/scaleController.ts",
+    "server-version/backend/src/modules/scale/scale-definition.ts",
+    "server-version/frontend/src/components/assessment-authoring/ScaleAuthoringHelp.tsx",
+    "server-version/frontend/src/components/assessment-authoring/scale-authoring-help.css",
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx",
+    "server-version/frontend/src/components/education-tools/education-private-tools.css",
+    "server-version/frontend/src/components/questionnaire/FormPlayer.tsx",
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx",
+    "server-version/frontend/src/modules/situational/pages/SituationalRunnerPolish.css",
+    "server-version/frontend/src/pages/ScaleDefinitionEditor.tsx",
+    "server-version/frontend/src/pages/ScaleEdit.tsx",
+    "server-version/frontend/src/pages/ScaleEditPolish.css",
+    "server-version/frontend/src/pages/admin/ScaleComponentManager.tsx",
+    "server-version/frontend/src/survey/ResearchScaleEditor.tsx",
+    "server-version/frontend/src/survey/survey-scale-studio.css"
+  ],
+  "tests": [
+    "server-version/backend/src/__tests__/scale/scale-authoring-feedback.test.ts",
+    "server-version/backend/src/__tests__/scale/scale-draft-completeness.test.ts",
+    "server-version/backend/src/__tests__/scale/scale-draft-write-guard.test.ts",
+    "server-version/backend/src/__tests__/scale/scale-v2.test.ts",
+    "server-version/backend/src/__tests__/scale/structural-admission.test.ts",
+    "server-version/backend/src/__tests__/scale/unscored-supplement.test.ts",
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+    "server-version/frontend/src/components/__tests__/FinalCompositePresentationReuse.test.tsx",
+    "server-version/frontend/src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+    "server-version/frontend/src/components/education-tools/EducationSharedAuthoring.test.tsx",
+    "server-version/frontend/src/components/questionnaire/__tests__/FormPlayer.test.tsx",
+    "server-version/frontend/src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx",
+    "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+    "server-version/frontend/src/survey/ResearchScaleEditor.studio.test.tsx"
+  ],
+  "controls": [
+    ".github/config/scale-authoring-polish-checks.json",
+    ".github/scripts/catalog-discovery-scope.mjs",
+    ".github/scripts/scale-authoring-polish-scope.test.mjs",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    ".github/workflows/ci-frontend.yml"
+  ],
+  "backendChecks": {
+    "unitFiles": [
+      "src/__tests__/scale/scale-authoring-feedback.test.ts",
+      "src/__tests__/scale/scale-draft-completeness.test.ts",
+      "src/__tests__/scale/scale-draft-write-guard.test.ts",
+      "src/__tests__/scale/scale-v2.test.ts",
+      "src/__tests__/scale/structural-admission.test.ts",
+      "src/__tests__/scale/unscored-supplement.test.ts"
+    ],
+    "postgresFiles": []
+  },
+  "scope": "Authoring presentation and custom draft completeness; no runtime scoring, publication permission, database or dependency changes. Existing application executors only."
+}

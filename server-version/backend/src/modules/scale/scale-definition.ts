@@ -193,6 +193,27 @@ export const scaleDefinitionSchema = z.object({
 })
 export type ScaleDefinitionV2 = z.infer<typeof scaleDefinitionSchema>
 
+// Authoring may stop between steps. Relax collection completeness only for
+// custom draft writes; native field types, references and product constraints
+// still apply. Runtime, preview, validation and publication use the full schema.
+const customScaleDraftSchema = scaleDefinitionSchema.extend({
+  responseSets: z.array(scaleResponseSetSchema.extend({ options: z.array(scaleResponseOptionSchema) })).min(1),
+  items: z.array(scaleItemDefinitionSchema),
+  scoring: scaleDefinitionSchema.shape.scoring.extend({
+    itemRules: z.array(scaleItemRuleSchema),
+    scores: z.array(scaleScoreDefinitionSchema.extend({
+      source: z.union([
+        itemSourceSchema.extend({ items: z.array(itemSourceSchema.shape.items.element) }),
+        scoreSourceSchema,
+      ]),
+    })),
+  }),
+  report: scaleReportDefinitionSchema.extend({
+    primaryScoreKeys: z.array(z.string().min(1)),
+    scoreOrder: z.array(z.string().min(1)),
+  }),
+})
+
 export interface DefinitionIssue {
   path: string
   message: string
@@ -216,8 +237,18 @@ const hasText = (value: unknown): value is string => typeof value === 'string' &
 export const validateScaleDefinition = (
   value: unknown,
   options: DefinitionValidationOptions = {},
+): { definition?: ScaleDefinitionV2; issues: DefinitionIssue[] } => validateDefinition(value, options)
+
+export const validateCustomScaleDraft = (
+  value: unknown,
+): { definition?: ScaleDefinitionV2; issues: DefinitionIssue[] } => validateDefinition(value, { instrumentClass: 'CUSTOM_DESCRIPTIVE' }, true)
+
+const validateDefinition = (
+  value: unknown,
+  options: DefinitionValidationOptions,
+  allowIncomplete = false,
 ): { definition?: ScaleDefinitionV2; issues: DefinitionIssue[] } => {
-  const parsed = scaleDefinitionSchema.safeParse(value)
+  const parsed = (allowIncomplete ? customScaleDraftSchema : scaleDefinitionSchema).safeParse(value)
   if (!parsed.success) {
     return {
       issues: parsed.error.issues.map((issue) => ({ path: issue.path.join('.') || 'definition', message: issue.message, severity: 'error' })),
@@ -268,7 +299,7 @@ export const validateScaleDefinition = (
     if (item.attentionTarget !== undefined && !responseSets.get(item.responseSetKey)?.options.some(option => sameResponseValue(option.value, item.attentionTarget!))) issues.push({ path: `items.${index}.attentionTarget`, message: '目标选项必须属于该题响应集', severity: 'error' })
     if (isScaleQualityItem(item) && options.instrumentClass === 'STANDARD') issues.push({ path: `items.${index}.purpose`, message: '标准量表不得添加自编质量题', severity: 'error' })
   })
-  if (!definition.items.some(isScaleContentItem)) issues.push({ path: 'items', message: '量表至少需要一道计分内容题', severity: 'error' })
+  if (!allowIncomplete && !definition.items.some(isScaleContentItem)) issues.push({ path: 'items', message: '量表至少需要一道计分内容题', severity: 'error' })
 
   const ruleByItem = new Map<string, ScaleItemRule>()
   definition.scoring.itemRules.forEach((rule, ruleIndex) => {
@@ -364,7 +395,7 @@ export const validateScaleDefinition = (
   definition.scoring.scores.forEach((score) => visit(score.key, new Set<string>(), visited))
 
   const canonicalScores = definition.scoring.scores.filter((score) => score.canonical)
-  if (canonicalScores.length === 0) issues.push({ path: 'scoring.scores', message: '至少需要一个 canonical score', severity: 'error' })
+  if (!allowIncomplete && canonicalScores.length === 0) issues.push({ path: 'scoring.scores', message: '至少需要一个 canonical score', severity: 'error' })
   const reportScoreKeys = new Set(definition.report.scoreOrder)
   definition.report.scoreOrder.forEach((key, index) => {
     if (!scoreKeys.has(key)) issues.push({ path: `report.scoreOrder.${index}`, message: `报告引用了不存在的 score：${key}`, severity: 'error' })

@@ -64,7 +64,11 @@ describe('education editor reload boundary',()=>{
   render(<EducationPrivateToolStudio api={api} organizationId="a" entry="SCHOOL"/>)
   fireEvent.click(await screen.findByRole('button',{name:'编辑 重读工具'}))
   await waitFor(()=>expect(screen.getByRole('button',{name:'保存草稿'})).toBeEnabled())
-  const input=screen.getByLabelText('选项批量内容')
+  if(kind==='SCALE'){
+   expect(screen.getByRole('button',{name:'题目'})).toHaveAttribute('aria-pressed','true')
+   fireEvent.click(screen.getByRole('button',{name:'响应选项'}))
+  }
+  const input=await screen.findByLabelText('选项批量内容')
   fireEvent.change(input,{target:{value:'待应用内容'}})
   expect(screen.getByRole('button',{name:'保存草稿'})).toBeDisabled()
   const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
@@ -72,6 +76,10 @@ describe('education editor reload boundary',()=>{
   expect(input).toHaveValue('待应用内容')
   confirm.mockReturnValue(true)
   fireEvent.click(screen.getByRole('button',{name:'重新读取草稿'}))
+  if(kind==='SCALE'){
+   await waitFor(()=>expect(screen.getByRole('button',{name:'题目'})).toHaveAttribute('aria-pressed','true'))
+   fireEvent.click(screen.getByRole('button',{name:'响应选项'}))
+  }
   await waitFor(()=>expect(screen.getByLabelText('选项批量内容')).toHaveValue(''))
   expect(screen.getByRole('button',{name:'保存草稿'})).toBeEnabled()
   fireEvent.change(screen.getByLabelText('选项批量内容'),{target:{value:'新的待应用内容'}})

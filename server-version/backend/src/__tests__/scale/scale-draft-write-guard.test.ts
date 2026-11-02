@@ -6,12 +6,33 @@ vi.mock('../../modules/scale/scale-image.adapter', () => ({ retainScaleAssessmen
 import { scaleController } from '../../controllers/scaleController'
 import { scaleImageController } from '../../controllers/scaleImageController'
 import { scaleDefinitionFor } from '../integration/mini-scale-definition'
+import { createCustomScaleDefinition } from '../../modules/scale/scale-definition'
 const definition = scaleDefinitionFor(3, 'TR')
 const draft = { id: 'scale', creatorId: 'owner', status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE', updatedAt: new Date('2026-10-17T00:00:00Z'), definitionHash: 'draft-hash', definition }
 const response = () => { const r: any = { statusCode: 200 }; r.status = vi.fn((code) => { r.statusCode = code; return r }); r.json = vi.fn((value) => { r.value = value; return r }); return r }
 const request = (body: unknown) => ({ params: { id: 'scale' }, user: { userId: 'owner', role: 'TEACHER' }, body }) as any
 beforeEach(() => { vi.clearAllMocks(); db.scale.findUnique.mockResolvedValue(draft); db.scale.update.mockResolvedValue(draft); db.$transaction.mockImplementation(async (fn) => fn(db)) })
 describe('Scale draft mutation atomic guards', () => {
+  it('saves question-first drafts without inventing options or scoring, but refuses publication', async () => {
+    const incomplete = createCustomScaleDefinition()
+    incomplete.responseSets[0].options = []
+    incomplete.items = [{ itemCode: 'q1', content: '先录入的题目', type: 'single', required: true, sortOrder: 1, responseSetKey: 'default', randomizeOptions: false }]
+    incomplete.scoring.itemRules = [{ itemCode: 'q1', transform: { type: 'reverse' } }]
+    const r = response()
+    await scaleController.updateDefinition(request({ definition: incomplete, expectedUpdatedAt: draft.updatedAt.toISOString() }), r)
+    expect(r.statusCode).toBe(200)
+    expect(r.value.data.definition).toEqual(incomplete)
+    expect(db.scale.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE', updatedAt: draft.updatedAt }),
+      data: expect.objectContaining({ definition: incomplete }),
+    }))
+    db.scale.update.mockClear()
+    db.scale.findUnique.mockResolvedValue({ ...draft, definition: incomplete })
+    const publish = response()
+    await scaleImageController.publish(request({}), publish)
+    expect(publish.statusCode).toBe(400)
+    expect(db.scale.update).not.toHaveBeenCalled()
+  })
   it.each(['definition', 'metadata'])('binds %s write to the current DRAFT and custom class', async (kind) => { const r = response(); if (kind === 'definition') await scaleController.updateDefinition(request({ definition }), r); else await scaleController.update(request({ name: 'Updated' }), r); expect(r.statusCode).toBe(200); expect(db.scale.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'scale', status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' } })) })
   it.each(['definition', 'metadata'])('maps a publish race during %s save to 409', async (kind) => { db.scale.update.mockRejectedValue(Object.assign(new Error('guard'), { code: 'P2025' })); const r = response(); if (kind === 'definition') await scaleController.updateDefinition(request({ definition }), r); else await scaleController.update(request({ name: 'Updated' }), r); expect(r.statusCode).toBe(409); expect(r.value.data).toBeNull() })
   it.each(['definition', 'metadata'])('reports an already-published %s draft as 409', async (kind) => { db.scale.findUnique.mockResolvedValue({ ...draft, status: 'PUBLISHED' }); const r = response(); if (kind === 'definition') await scaleController.updateDefinition(request({ definition }), r); else await scaleController.update(request({ name: 'Changed' }), r); expect(r.statusCode).toBe(409); expect(db.scale.update).not.toHaveBeenCalled() })
