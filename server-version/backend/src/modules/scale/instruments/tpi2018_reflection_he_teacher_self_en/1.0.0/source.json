@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tpi2018_reflection_he_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TPI实践清单｜补充说明与完成用时｜教师自评｜高校2018（目录候选）",
+      "abbreviation": "TPI practices",
+      "instrumentFamily": "Teaching Practices Inventory / Wieman & Gilbert / Natural & Social Sciences Oct 2018"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "高校教师对课程补充说明与完成用时的事实性实践使用自报；无计分背景或反思资料。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:teaching_practices_inventory",
+        "role:teacher_self",
+        "stage:higher_education",
+        "language:en",
+        "source_version:2018_10",
+        "use:developmental_reflection",
+        "use:research",
+        "status:PILOT",
+        "availability:catalog_only",
+        "rights:2018_digital_redistribution_unresolved",
+        "component:unscored_form"
+      ]
+    },
+    "population": {
+      "populationNotes": "教师为填答者和反思反馈接收者；参照高校课程当期/刚完成学期。2018题本面向自然和社会科学；不迁移到K12，不推定固定年龄界限或中文验证。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "current or just completed Term; lecture sections only",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "来源组号：IX；工作簿原始输入列：CV:CW。",
+        "itemCount记录映射字段位置数，包含复选标记/数值/文字位置，不等于独立题块或2014论文72题。",
+        "2分钟仅分组件目录规划估计，不是实测时间。",
+        "当前只有元数据候选；题表和评分文件已读，但2018题文数字处理/再分发范围尚未明确，不可施测。",
+        "高校讲授型课程、当期或刚完成学期；不用于K12，也不适用于主要为实验/研讨/项目的课程。",
+        "教师自报的是一门课的实践使用，不是自信、意图、实施质量、学生学习效果或教师绩效。",
+        "八类是便于填写的组织类别，不是八个经因子分析验证的心理测量子量表。",
+        "独立拆分应保留母工具情境、原顺序和字段语义；缺独立验证或常模不作为无分表单安装门槛。",
+        "无分表单候选，仅描述/反思，不计算分数或能力解释。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "来源实践描述用于教师成长；本站当前未提供实际工具。"
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "本地适用证据和精确使用权限需按实际范围管理；无分表单不要求常模。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "2018英文题表与工作簿来源定位；仅中文目录名称，无中文翻译题本。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "2014论文CC BY-NC-SA 3.0声明不被直接扩张为2018题表/Excel再分发许可。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Teaching Practices Inventory — Natural & Social Sciences Oct 2018",
+      "citation": "Wieman, C. & Gilbert, S. (2014). CBE—Life Sciences Education, 13(3), 552–569. doi:10.1187/cbe.14-02-0023. Official inventory updated Oct 2018; workbook internally dated Oct 12, 2018.",
+      "url": "https://cwsei.ubc.ca/resources/tools/tpi.html",
+      "publicationYear": 2018
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "补充说明与完成用时"
+      ],
+      "limitations": [
+        "当前只有元数据候选；题表和评分文件已读，但2018题文数字处理/再分发范围尚未明确，不可施测。",
+        "高校讲授型课程、当期或刚完成学期；不用于K12，也不适用于主要为实验/研讨/项目的课程。",
+        "教师自报的是一门课的实践使用，不是自信、意图、实施质量、学生学习效果或教师绩效。",
+        "八类是便于填写的组织类别，不是八个经因子分析验证的心理测量子量表。",
+        "独立拆分应保留母工具情境、原顺序和字段语义；缺独立验证或常模不作为无分表单安装门槛。",
+        "无分表单候选，仅描述/反思，不计算分数或能力解释。"
+      ],
+      "disclaimer": "教师成长用途：结合课程条件核对具体行为证据并选择一个微行动；不是实施质量/绩效判断。当前没有可作答工具或实际报告。"
+    },
+    "blockers": [
+      "DIGITAL_USE_AND_PUBLIC_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED"
+    ]
+  }
+}
