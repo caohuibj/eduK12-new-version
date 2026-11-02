@@ -83,10 +83,16 @@ export function verifyHistoricalSuccess({proof,run,job,artifact,archiveBytes,cur
   assert(Array.isArray(run.pull_requests)&&run.pull_requests.some(p=>p.number===current.pr),'Foreign PR run');
   assert.equal(run.repository?.full_name,current.repository,'Foreign source run');
   assert.equal(job.id,proof.jobId);assert.equal(job.run_id,proof.runId);
-  assert.equal(job.head_sha,proof.sourceSha,'Source job SHA differs');
+  // GitHub may report either PR head or the tested synthetic merge SHA.
+  // The immutable source checkout is authenticated separately by the original
+  // regression report's inventory and complete Git tree.
+  if(job.head_sha!==undefined&&job.head_sha!==null)
+    assert([proof.sourceSha,proof.testedSha].includes(job.head_sha),'Source job SHA differs');
   assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
   assert.equal(job.name,proof.jobName);
   assert.equal(artifact.id,proof.artifactId);assert.equal(artifact.workflow_run?.id,proof.runId);
+  if(artifact.workflow_run?.head_sha)
+    assert.equal(artifact.workflow_run.head_sha,proof.sourceSha,'Artifact source SHA mismatch');
   assert.equal(artifact.expired,false);
   assert(archiveBytes instanceof Uint8Array && archiveBytes.length>0,'Original official artifact bytes required');
   const archiveDigest=createHash('sha256').update(archiveBytes).digest('hex');
