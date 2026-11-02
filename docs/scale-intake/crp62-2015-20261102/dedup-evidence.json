@@ -1,0 +1,12 @@
+{
+  "base": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+  "sourceJsonCount": 257,
+  "wrapperCount": 280,
+  "nameAuthorDoiMatches": [],
+  "fullItemNormalizedMatches": [],
+  "itemsChecked": 62,
+  "openPrCount": 72,
+  "otherOpenPrNamePathMatches": [],
+  "productionAdminContent": "NOT_CHECKED",
+  "method": "Complete retained item alphanumeric-normalized substring and exact author/DOI/PII names against source JSON and wrappers; open PR title/path scan. Generic isolated item overlap is not automatically the same mother/version."
+}
