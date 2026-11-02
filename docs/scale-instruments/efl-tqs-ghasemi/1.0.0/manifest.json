@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "family": "Ghasemi EFL TQS",
+  "projectVersion": "1.0.0",
+  "sourceIdentity": {
+    "articleId": 1214976,
+    "pdfFileId": 2814420,
+    "onlinePublication": "2022-12-07",
+    "issueYear": 2023,
+    "volume": 7,
+    "issue": 1,
+    "pages": "1–23",
+    "versionPolicy": "one source identity; do not duplicate as separate2022 and2023 instruments"
+  },
+  "familyTag": "family:efl-tqs",
+  "tags": [
+    "family:efl-tqs",
+    "role:teacher_self",
+    "stage:not_fixed",
+    "lang:en",
+    "version:2023issue",
+    "use:research",
+    "status:pilot",
+    "license:cc-by-3.0"
+  ],
+  "tagPersistence": "PLANNED_NOT_WRITTEN",
+  "catalog": {
+    "key": "efl_tqs_ghasemi_teacher_self_en",
+    "version": "1.0.0",
+    "status": "CATALOG_ONLY_MISSING_FINAL_BOOKLET",
+    "reportedFinalItemCount": 57,
+    "actualItemTextsAcquired": 0
+  },
+  "reportedDevelopment": {
+    "initialItems": 62,
+    "deletedItemNumbers": [
+      22,
+      38,
+      44,
+      48,
+      56
+    ],
+    "reportedFinal": 57,
+    "doNotInfer": "Number arithmetic does not supply wording, response anchors, complete factors, reverse or missing rules."
+  },
+  "constructLeads": [
+    {
+      "construct": "Knowledge / TPACK knowledge",
+      "projectChineseLabel": "知识/技术教学整合知识",
+      "registeredInstrument": null,
+      "itemCount": null,
+      "originalItems": null,
+      "status": "RESEARCH_LEAD_NOT_A_SCALE",
+      "carrierDecision": "UNKNOWN_UNTIL_FINAL_ITEMS_AND_SCORING_ACQUIRED"
+    },
+    {
+      "construct": "Personality",
+      "projectChineseLabel": "人格",
+      "registeredInstrument": null,
+      "itemCount": null,
+      "originalItems": null,
+      "status": "RESEARCH_LEAD_NOT_A_SCALE",
+      "carrierDecision": "UNKNOWN_UNTIL_FINAL_ITEMS_AND_SCORING_ACQUIRED"
+    },
+    {
+      "construct": "Skills",
+      "projectChineseLabel": "职业技能",
+      "registeredInstrument": null,
+      "itemCount": null,
+      "originalItems": null,
+      "status": "RESEARCH_LEAD_NOT_A_SCALE",
+      "carrierDecision": "UNKNOWN_UNTIL_FINAL_ITEMS_AND_SCORING_ACQUIRED"
+    },
+    {
+      "construct": "Qualifications",
+      "projectChineseLabel": "资格及专业条件",
+      "registeredInstrument": null,
+      "itemCount": null,
+      "originalItems": null,
+      "status": "RESEARCH_LEAD_NOT_A_SCALE",
+      "carrierDecision": "UNKNOWN_UNTIL_FINAL_ITEMS_AND_SCORING_ACQUIRED"
+    }
+  ],
+  "forms": [],
+  "scoring": {
+    "installed": false,
+    "overallTeacherQualityScore": false,
+    "reverse": null,
+    "missing": null,
+    "range": null,
+    "direction": null
+  },
+  "optionalComposite": {
+    "status": "NOT_CREATED",
+    "kind": "COLLECTION",
+    "policy": "Only after final materials; distinct constructs stay separate, no cross-tool total."
+  },
+  "actualImport": {
+    "catalogDeclarations": 1,
+    "nativeScales": 0,
+    "nativeForms": 0,
+    "questionnaires": 0,
+    "developmentDB": "NOT_WRITTEN",
+    "productionDB": "NOT_ACCESSED"
+  },
+  "rights": {
+    "journalGuidelineLicense": "CC BY3.0",
+    "scope": "journal publication policy; no extra final questionnaire file was acquired, so its independent license is not presumed",
+    "attribution": "Jamshid Ghasemi; International Journal of Quality in Education7(1),1–23; article1214976",
+    "publicContent": "project metadata/original analysis/report drafts only; no full article or invented item text"
+  },
+  "articleLanguage": "en",
+  "finalAdministeredInstrumentLanguage": null
+}

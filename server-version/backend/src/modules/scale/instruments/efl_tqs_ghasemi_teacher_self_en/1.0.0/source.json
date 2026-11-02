@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "efl_tqs_ghasemi_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "EFL TQS｜母工具研究索引｜教师自评｜英文·2023卷期（缺最终题本）",
+      "abbreviation": "EFL TQS",
+      "instrumentFamily": "Ghasemi EFL Teacher Teaching Quality Scale"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "EFL教师知识、人格、职业技能及资格条件的异质研究构念；不输出统一教学质量分，不把自报构念当作实际课堂效果。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "family:efl-tqs",
+        "role:teacher_self",
+        "stage:not_fixed",
+        "lang:en",
+        "version:2023issue",
+        "use:research",
+        "status:pilot",
+        "license:cc-by-3.0"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原研究为伊朗EFL教师；教学学段在样本说明中未逐一固定，不推填年龄或中国K–12适用性。"
+    },
+    "administration": {
+      "itemCount": 57,
+      "estimatedMinutes": 15,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "未取得原施测指导语或回顾时窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "57仅为论文宣称的最终题量，本条没有57道题或任何可施测字段。",
+        "论文称62题删除22、38、44、48、56，不能据此补写题文或完整因子映射。",
+        "完整反应类别、编码及评分说明未取得；专家内容评审三档适切性不是教师作答锚点。",
+        "15分钟仅排程估计，不是源工具实测完成时间。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "研究目录与获取材料清单；未取得最终题本前不得施测或解释个体分数。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "English journal article; DergiPark article1214976 / PDF2814420",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文只指所读研究论文/目录语言，最终施测题本语言未核；不生成题文或中文翻译，不继承任何本地验证。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Development and Validation of an EFL Teacher Teaching Quality Scale",
+      "citation": "Ghasemi, J. (PDF/issue2023; online metadata2022). Development and Validation of an EFL Teacher Teaching Quality Scale. International Journal of Quality in Education,7(1),1–23. DergiPark article1214976.",
+      "url": "https://dergipark.org.tr/en/pub/ijqe/article/1214976",
+      "publicationYear": 2023
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Knowledge / TPACK knowledge（题键未取得）",
+        "Personality（题键未取得）",
+        "Skills（题键未取得）",
+        "Qualifications（题键未取得）"
+      ],
+      "limitations": [
+        "仅为母工具研究索引，不是四个已拆好或可独立施测的量表。",
+        "知识、人格、技能及资格条件分开看待；不合并成英语教师总质量或绩效排名。",
+        "缺最终题文、教师选项和原计分合同；不以理论内容自行造题，也不能用无分Form代替缺失原题。",
+        "原文出现不同样本统计与年份表述；不借高内部一致性宣称本地有效、预测学生成绩或可高风险使用。"
+      ],
+      "disclaimer": "缺题本，目录候选不可施测；Scale/Form/DB实际导入均为0。"
+    },
+    "blockers": [
+      "FINAL_57_ITEM_WORDING_NOT_ACQUIRED",
+      "RESPONDENT_RESPONSE_ANCHORS_AND_CODING_NOT_ACQUIRED",
+      "COMPLETE_ITEM_TO_FACTOR_KEY_NOT_ACQUIRED",
+      "SCORING_REVERSE_MISSING_CONTRACT_NOT_ACQUIRED"
+    ]
+  }
+}
