@@ -1,0 +1,351 @@
+{
+  "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "checkedAt": "2026-11-02T01:47:04.575331+00:00",
+  "method": "Main modules/intake metadata full text; open PR filenames and available patches; missing patch not full-file proof. No production/admin-custom dedup.",
+  "mainMatches": [],
+  "openPRs": [
+    {
+      "number": 573,
+      "files": 7,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 572,
+      "files": 23,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 571,
+      "files": 20,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 570,
+      "files": 6,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 569,
+      "files": 5,
+      "matches": [],
+      "patchUnavailable": 1
+    },
+    {
+      "number": 568,
+      "files": 6,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 567,
+      "files": 8,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 566,
+      "files": 15,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 565,
+      "files": 20,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 564,
+      "files": 40,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 563,
+      "files": 12,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 562,
+      "files": 18,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 561,
+      "files": 8,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 560,
+      "files": 76,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 559,
+      "files": 32,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 558,
+      "files": 26,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 557,
+      "files": 5,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 555,
+      "files": 71,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 554,
+      "files": 35,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 553,
+      "files": 28,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 552,
+      "files": 16,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 550,
+      "files": 24,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 548,
+      "files": 16,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 547,
+      "files": 14,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 546,
+      "files": 13,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 545,
+      "files": 40,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 544,
+      "files": 23,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 543,
+      "files": 82,
+      "matches": [],
+      "patchUnavailable": 1
+    },
+    {
+      "number": 542,
+      "files": 37,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 541,
+      "files": 31,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 540,
+      "files": 27,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 529,
+      "files": 5,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 515,
+      "files": 6,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 491,
+      "files": 4,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 489,
+      "files": 3,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 488,
+      "files": 3,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 482,
+      "files": 310,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 441,
+      "files": 693,
+      "matches": [],
+      "patchUnavailable": 2
+    },
+    {
+      "number": 413,
+      "files": 15,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 412,
+      "files": 1,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 397,
+      "files": 2,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 383,
+      "files": 5,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 379,
+      "files": 272,
+      "matches": [],
+      "patchUnavailable": 29
+    },
+    {
+      "number": 375,
+      "files": 374,
+      "matches": [],
+      "patchUnavailable": 75
+    },
+    {
+      "number": 373,
+      "files": 61,
+      "matches": [],
+      "patchUnavailable": 5
+    },
+    {
+      "number": 371,
+      "files": 208,
+      "matches": [],
+      "patchUnavailable": 86
+    },
+    {
+      "number": 370,
+      "files": 66,
+      "matches": [],
+      "patchUnavailable": 20
+    },
+    {
+      "number": 368,
+      "files": 2101,
+      "matches": [],
+      "patchUnavailable": 446
+    },
+    {
+      "number": 367,
+      "files": 136,
+      "matches": [],
+      "patchUnavailable": 46
+    },
+    {
+      "number": 362,
+      "files": 9,
+      "matches": [],
+      "patchUnavailable": 1
+    },
+    {
+      "number": 360,
+      "files": 1269,
+      "matches": [],
+      "patchUnavailable": 302
+    },
+    {
+      "number": 330,
+      "files": 15,
+      "matches": [],
+      "patchUnavailable": 0
+    },
+    {
+      "number": 329,
+      "files": 62,
+      "matches": [],
+      "patchUnavailable": 1
+    },
+    {
+      "number": 328,
+      "files": 73,
+      "matches": [],
+      "patchUnavailable": 2
+    },
+    {
+      "number": 574,
+      "files": 14,
+      "matches": [],
+      "patchUnavailable": 0
+    }
+  ],
+  "productionAndAdministratorCustomChecked": false,
+  "initialBase": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "mainRefreshAt": "2026-11-02T01:49:46.696082+00:00",
+  "refreshedMainMatches": [],
+  "openPRNumberRefresh": {
+    "checkedAt": "2026-11-02T01:49:46.696082+00:00",
+    "count": 54,
+    "newSincePatchSnapshot": [
+      574
+    ],
+    "existingPRHeadsNotRefreshed": true,
+    "newPRPatchesChecked": true
+  }
+}
