@@ -1,0 +1,731 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "kstc2020_slp_environment_teacher_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "KSTC｜备课：科学学习环境｜教师自评｜2020英文",
+      "abbreviation": "KSTC-SLP_ENVIRONMENT",
+      "instrumentFamily": "Kang et al. 2020 Science Teaching Competence Self-Assessment (54 items / Appendix B)"
+    },
+    "construct": {
+      "primaryDomain": "ENGAGEMENT",
+      "secondaryDomains": [],
+      "constructDefinition": "Consideration of science learning environment. Self-reported frequency of enacted teaching-related actions, mixed with self-perceived understanding and effectiveness; not observed teaching quality or student learning gains.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:kstc2020",
+        "role:teacher_self",
+        "population:teacher",
+        "stage:primary_secondary",
+        "subject:science",
+        "language:en",
+        "version:2020_appendix_b",
+        "use:research",
+        "license:cc_by_4_0",
+        "construct:slp_environment"
+      ]
+    },
+    "population": {
+      "populationNotes": "Original study: 210 South Korean primary/lower-secondary/upper-secondary science teachers. English publication wording; not the unprovided original Korean administration text. Project adult-teacher scope is not an author age boundary. No Chinese validation or local norms.",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "General science teaching practice; no additional recall interval specified in the paper.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Appendix B factor membership and relative order retained; published English wording, not a claimed Korean or Chinese validated form.",
+        "Source methods §3.1: five response positions, 1=rarely and 5=always. Positions 2–4 retain numeric labels; intermediate verbal anchors were not published.",
+        "Independent administration is a project selection; use within the original 54-item context where possible. Factor structure does not establish standalone validity.",
+        "Complete-case arithmetic mean; any missing/invalid response yields no score. This missing policy is a disclosed project choice.",
+        "Estimated minutes are reading estimates, not measured administration times."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Published factor grouping supports a research candidate; no standalone validation, diagnostic threshold, teacher ranking or causal learning inference."
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Published English Appendix B in Kang et al. (2020); no translation of item text.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Typographic line-break hyphens and PDF ligatures normalized. No item translation or validated Chinese claim. English publication items may differ in administration language from the original Korean study."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_slp_environment_teacher_en-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_slp_environment_teacher_en-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "kstc2020_slp_environment_teacher_en-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012",
+      "© Kang et al. (2020). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ . Original English items from Appendix B; preserved factor grouping and relative order. Changes: separate factor packages, numeric-only intermediate response labels (paper specifies endpoints only), project complete-case missing policy, and original developmental report. Not an author-endorsed standalone validation or validated Chinese version."
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Science Teaching Competence Self-Assessment — Appendix B: Consideration of science learning environment",
+        "citation": "Kang, N.-H., Kang, H., Maeng, S., Park, J., & Jeong, E. (2020). Teacher Competency in Competency-Focused Science Teaching in the South Korean Context: Teacher Self-Assessment Instrument Development and Application. Asia-Pacific Science Education, 6(2), 480–513. https://doi.org/10.1163/23641177-BJA10012",
+        "url": "https://doi.org/10.1163/23641177-BJA10012"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Kang et al. (2020). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ . Original English items from Appendix B; preserved factor grouping and relative order. Changes: separate factor packages, numeric-only intermediate response labels (paper specifies endpoints only), project complete-case missing policy, and original developmental report. Not an author-endorsed standalone validation or validated Chinese version."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 — rarely",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5 — always",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SLP1.1",
+          "content": "When designing science lessons, I consider the cultural, environmental, and developmental characteristics of students.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP1.2",
+          "content": "I understand and effectively create the environment necessary for science classes, such as the preparation of scientific teaching materials and tools and student seating arrangements.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP3.1",
+          "content": "I design student-centered lessons that allow students construct their own science knowledge.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP3.2",
+          "content": "I set learning objectives appropriate for the achievement standards presented in the curriculum and design learning activities accordingly.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP3.3",
+          "content": "I design science lessons by selecting and developing appropriate materials for students’ level and the science curriculum.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP3.4",
+          "content": "I design an appropriate assessment to confirm the level of achievement of the learning objectives.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP3.8",
+          "content": "When designing science lessons, I consider the human and material resources of the community where the school is located.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP3.9",
+          "content": "When designing science lessons, I improve teaching and assessment methods by considering previous student evaluation results.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP4.1",
+          "content": "I design science lessons so that I can effectively use experimental instruments and equipment.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SLP4.2",
+          "content": "I design science lessons so that I can effectively use information and communication technology (ICT) such as smart devices and the internet.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "SLP1.1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP1.2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP3.1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP3.2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP3.3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP3.4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP3.8",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP3.9",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP4.1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SLP4.2",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "slp_environment",
+            "type": "dimension",
+            "label": "Consideration of science learning environment",
+            "description": "Complete-case, equally weighted item mean (1–5). Higher means more frequent self-report, not verified effectiveness. No reverse-coded items in this retained positive-worded factor.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SLP1.1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP1.2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP3.1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP3.2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP3.3",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP3.4",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP3.8",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP3.9",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP4.1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SLP4.2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "slp_environment"
+        ],
+        "scoreOrder": [
+          "slp_environment"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "slp_environment",
+            "headline": "Consideration of science learning environment: a record for reflection",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This mean summarizes your own responses about consideration of science learning environment. Higher values indicate more frequent self-report on the published response continuum; they do not establish the quality or effectiveness of your teaching. Statements about understanding and effectiveness remain personal judgments. The endpoints are 1 (rarely) and 5 (always); intermediate verbal labels were not published. The result is not a normative rank, proficiency level or diagnosis. A lower response may reflect limited opportunities or support as well as choices; a higher response does not show that students learned more.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one upcoming science lesson. Which material, seating or local resource decision responds to an actual student need?"
+              },
+              {
+                "category": "strategy",
+                "text": "Before the lesson, check one experimental material or seating arrangement with a specific learning goal in mind. Afterward, record whether it helped students take part and what needs changing."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Original study context: South Korean school science teachers; English publication wording is not a validated Chinese translation or independently validated standalone factor.",
+          "No normative comparison, cutoff, teacher ranking, causal attribution or cross-factor/global total.",
+          "A score is produced only when every item in this factor has a valid response. Missing or unavailable evidence is not zero; no imputation or prorating.",
+          "The methods describe five frequency response positions and endpoint words only; intermediate numeric labels are a disclosed presentation choice."
+        ],
+        "disclaimer": "For teacher research and voluntary professional reflection. No diagnosis, appraisal, promotion or student-learning conclusion. If responses or evidence are insufficient, do not infer low competency.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "science",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "rarely",
+        "answers": [
+          {
+            "itemCode": "SLP1.1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP1.2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP3.1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP3.2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP3.3",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP3.4",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP3.8",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP3.9",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP4.1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SLP4.2",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "slp_environment": 1
+          },
+          "totalScoreKeys": [
+            "slp_environment"
+          ]
+        }
+      },
+      {
+        "name": "numeric_middle",
+        "answers": [
+          {
+            "itemCode": "SLP1.1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP1.2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.8",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.9",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP4.1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP4.2",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "slp_environment": 3
+          },
+          "totalScoreKeys": [
+            "slp_environment"
+          ]
+        }
+      },
+      {
+        "name": "always",
+        "answers": [
+          {
+            "itemCode": "SLP1.1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP1.2",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP3.1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP3.2",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP3.3",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP3.4",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP3.8",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP3.9",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP4.1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SLP4.2",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "slp_environment": 5
+          },
+          "totalScoreKeys": [
+            "slp_environment"
+          ]
+        }
+      },
+      {
+        "name": "missing_one_no_score",
+        "answers": [
+          {
+            "itemCode": "SLP1.1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP1.2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.3",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.4",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.8",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP3.9",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SLP4.1",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "slp_environment": null
+          },
+          "totalScoreKeys": [
+            "slp_environment"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "version": "1.0.0",
+    "language": "en",
+    "source": "Project presentation instruction based on source methods §3.1, not a quotation of an unpublished original survey introduction.",
+    "text": "Reflect on how often these statements describe your science teaching-related actions. Select one of five response positions: 1 = rarely; 5 = always. Intermediate positions are shown as numbers because their verbal labels are not specified in the publication. This is a research reflection record, not a teacher performance evaluation. Items about understanding or effectiveness reflect your own judgment, not an independently tested ability."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}
