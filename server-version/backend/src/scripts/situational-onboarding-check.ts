@@ -13,7 +13,7 @@ const needsGit = args.some(a => ['--base', '--content-only', '--governance-only'
 const repo = needsGit ? execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: backend, encoding: 'utf8' }).trim() : path.resolve(backend, '../..')
 const prefix = 'server-version/backend/src/modules/situational/instruments/'
 const option = (name: string) => args.includes(name) ? args[args.indexOf(name) + 1] : undefined
-const git = (...a: string[]) => execFileSync('git', a, { cwd: repo, encoding: 'utf8' })
+const git = (...a: string[]) => execFileSync('git', a, { cwd: repo, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 })
 async function main() {
   const switches = new Set(['--all', '--json', '--content-only', '--verify-reviews', '--governance-only'])
   for (let i = 0; i < args.length; i++) {

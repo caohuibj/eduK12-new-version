@@ -25,7 +25,7 @@ const url=integrationDatabaseUrl('BUNDLE_PRODUCT_TEST_DATABASE_URL')
 const suite=url?describe:describe.skip
 suite('unknown declarative packages: installation to frozen report',()=>{
   let db:PrismaClient,courseId:string,scaleId:string,assignmentId:string,scalePreviousStatus:any
-  const suffix=randomUUID(),actor={userId:'b3-admin-'+suffix,role:UserRole.ADMIN},reviewer='b3-reviewer-'+suffix,student='b3-student-'+suffix
+  const suffix=randomUUID(),actor={userId:'b3-admin-'+suffix,role:UserRole.ADMIN,platformRole:'SYSTEM_ADMIN' as const},reviewer='b3-reviewer-'+suffix,student='b3-student-'+suffix
   const keys:string[]=[],root=mkdtempSync(path.join(os.tmpdir(),'b3-packages-'))
   const secret='b3-isolated-review-key-'+suffix
   let runtime:typeof import('../../modules/composite/composite.service'),analysis:typeof import('../../modules/bundle-product/analysis')
@@ -34,7 +34,7 @@ suite('unknown declarative packages: installation to frozen report',()=>{
   beforeAll(async()=>{
     process.env.DATABASE_URL=url!;process.env.BUNDLE_PRODUCTS_ENABLED='true';process.env.BUNDLE_REVIEW_SIGNING_KEY=secret
     db=new PrismaClient({datasources:{db:{url}}})
-    for(const [id,role] of [[actor.userId,'ADMIN'],[reviewer,'ADMIN'],[student,'STUDENT']] as const)await db.user.create({data:{id,username:id,passwordHash:'fixture-only',role}})
+    for(const [id,role] of [[actor.userId,'ADMIN'],[reviewer,'ADMIN'],[student,'STUDENT']] as const)await db.user.create({data:{id,username:id,passwordHash:'fixture-only',role,...(role==='ADMIN'?{platformRole:'SYSTEM_ADMIN' as const}:{})}})
     courseId=(await db.course.create({data:{creatorId:actor.userId,title:'B3 fixture',courseCode:'B3-'+suffix,courseType:'TRAINING_COURSE',status:'PUBLISHED'}})).id
     await db.courseStudent.create({data:{courseId,studentId:student,status:'ACTIVE'}})
     scaleId=((await db.scale.findUnique({where:{code:'who5'}})) ?? await db.scale.create({data:{code:'who5',name:'WHO5 isolated fixture',creatorId:actor.userId,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'STANDARD',instrumentVersion:'1.0.0',definition:scale.definition as any,definitionHash:hashScaleDefinition(scale.definition),itemCount:5,dimensionCount:1}})).id
@@ -139,8 +139,8 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     expect(saved.status).toBe('DRAFT')
     const material = { contentHash: saved.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims }
     await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
-    await expect(approvePackage(db, { userId: reviewer, role: UserRole.ADMIN }, key, '1.0.0', { ...material, contentHash: 'f'.repeat(64) })).rejects.toMatchObject({ statusCode: 409 })
-    const approved = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN }, key, '1.0.0', material)
+    await expect(approvePackage(db, { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' }, key, '1.0.0', { ...material, contentHash: 'f'.repeat(64) })).rejects.toMatchObject({ statusCode: 409 })
+    const approved = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' }, key, '1.0.0', material)
     expect(approved.status).toBe('PUBLISHED')
     expect(approved.installedBy).toBe(actor.userId)
     expect(approved.publishedBy).toBe(reviewer)
@@ -160,7 +160,7 @@ suite('unknown declarative packages: installation to frozen report',()=>{
       vi.setSystemTime(expiry + 1)
       await expect(product.eligible(actor, key, '1.0.0')).rejects.toMatchObject({ statusCode: 409 })
       await expect(approvePackage(db, actor, key, '1.0.0', material)).rejects.toMatchObject({ statusCode: 403 })
-      const renewed = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN }, key, '1.0.0', material)
+      const renewed = await approvePackage(db, { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' }, key, '1.0.0', material)
       expect(renewed).toMatchObject({ status: 'PUBLISHED', installedBy: actor.userId, publishedBy: reviewer, contentHash: saved.contentHash })
       expect(Date.parse(renewed.review!.expiresAt)).toBeGreaterThan(Date.now())
       expect(renewed.content).toEqual(saved.content)
@@ -188,7 +188,7 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     keys.push(key)
     const pack = scaffoldPackage(key), preview = previewPackage(actor, pack), saved = await savePackage(db, actor, pack)
     const material = { contentHash: saved.contentHash, scientific: true, rights: true, language: true, report: true, claims: preview.requiredClaims }
-    const independent = { userId: reviewer, role: UserRole.ADMIN }
+    const independent = { userId: reviewer, role: UserRole.ADMIN, platformRole: 'SYSTEM_ADMIN' as const }
     await approvePackage(db, independent, key, '1.0.0', material)
     const where = { bundleKey_bundleVersion: { bundleKey: key, bundleVersion: '1.0.0' } }
     const published = await db.bundlePackageRelease.findUniqueOrThrow({ where })
