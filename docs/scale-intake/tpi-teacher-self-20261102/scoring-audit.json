@@ -1,0 +1,137 @@
+{
+  "source": "https://cwsei.ubc.ca/files/resources/tools/TPI_ETP-scoring.xlsx",
+  "sourceSHA256": "ede902d19a9ab59e2981b1b8584acc2ba7ca22bf411f663fab358f71c3797c2c",
+  "sourceVersion": "Oct 12, 2018 Natural & Social Sciences",
+  "sheetCount": 1,
+  "formulaCount": 2691,
+  "scoringSampleRowsCompared": 32,
+  "cachedPointFormulaMismatches": [],
+  "hasMacros": false,
+  "externalLinkCount": 0,
+  "categorySourceMaxima": {
+    "I": 6,
+    "II": 7,
+    "III": 15,
+    "IV": 6,
+    "V": 13,
+    "VI": 10,
+    "VII": 4,
+    "VIII": 6
+  },
+  "sourceWholeInventoryMaximum": 67,
+  "wholeInventoryScoreImplemented": false,
+  "boundaryObservations": [
+    {
+      "sourceColumn": "X",
+      "input": 3,
+      "contribution": 0
+    },
+    {
+      "sourceColumn": "X",
+      "input": 3.0001,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "Y",
+      "input": 0.5,
+      "contribution": 0
+    },
+    {
+      "sourceColumn": "Y",
+      "input": 1,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "Y",
+      "input": 1.0001,
+      "contribution": 2
+    },
+    {
+      "sourceColumn": "AA",
+      "input": 0.5,
+      "contribution": 0
+    },
+    {
+      "sourceColumn": "AA",
+      "input": 0.5001,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "AB",
+      "input": 2.999,
+      "contribution": 0
+    },
+    {
+      "sourceColumn": "AB",
+      "input": 3,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "AB",
+      "input": 5,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "AB",
+      "input": 5.0001,
+      "contribution": 2
+    },
+    {
+      "sourceColumn": "AQ",
+      "input": 1,
+      "contribution": 0
+    },
+    {
+      "sourceColumn": "AQ",
+      "input": 1.0001,
+      "contribution": 2
+    },
+    {
+      "sourceColumn": "BM",
+      "input": 15,
+      "contribution": 0
+    },
+    {
+      "sourceColumn": "BM",
+      "input": 15.0001,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "BN",
+      "input": 60,
+      "contribution": 1
+    },
+    {
+      "sourceColumn": "BN",
+      "input": 60.0001,
+      "contribution": 0
+    }
+  ],
+  "noTAConditionalObservations": [
+    {
+      "inputFlags": {
+        "CF3": 1
+      },
+      "categoryVII": 3
+    },
+    {
+      "inputFlags": {
+        "CF3": 1,
+        "CG3": 1
+      },
+      "categoryVII": 1
+    },
+    {
+      "inputFlags": {
+        "CF3": 1,
+        "CJ3": 1
+      },
+      "categoryVII": 3
+    }
+  ],
+  "blankCoercionObservation": {
+    "zeroOrBlankInputsYieldCategoryV": 1,
+    "reason": "Final-exam percentage comparison treats Excel blank as zero; missing data must not be interpreted as observed practice."
+  },
+  "verificationBoundary": "Independent finite arithmetic audit of the downloaded workbook; not a production scorer, not full Excel recalculation, not author review, not platform scoring or database import."
+}
