@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "familyTag": "family:dis_roy",
+  "status": "METADATA_CANDIDATES_NOT_IMPORTED",
+  "components": [
+    {
+      "instrumentKey": "dis_roy_ms12_ia_teacher_self_en_metadata",
+      "instrumentVersion": "1.0.0",
+      "parentVersion": "roy_ms12",
+      "dimension": "ia",
+      "itemCount": 8,
+      "countEvidence": "full retained-item tables read",
+      "title": "DIS｜教学调适｜教师自评｜Roy手稿12题体系（英文发表题文）",
+      "tags": [
+        "family:dis_roy",
+        "role:teacher_self",
+        "stage:primary",
+        "language:en_publication_only",
+        "source_version:roy_ms12",
+        "use:reflection",
+        "status:PILOT",
+        "license:redistribution_unverified",
+        "availability:catalog_only"
+      ],
+      "administrable": false,
+      "C": null,
+      "P": null,
+      "R": null,
+      "nativeForm": null
+    },
+    {
+      "instrumentKey": "dis_roy_ms12_apm_teacher_self_en_metadata",
+      "instrumentVersion": "1.0.0",
+      "parentVersion": "roy_ms12",
+      "dimension": "apm",
+      "itemCount": 4,
+      "countEvidence": "full retained-item tables read",
+      "title": "DIS｜学习进展监测｜教师自评｜Roy手稿12题体系（英文发表题文）",
+      "tags": [
+        "family:dis_roy",
+        "role:teacher_self",
+        "stage:primary",
+        "language:en_publication_only",
+        "source_version:roy_ms12",
+        "use:reflection",
+        "status:PILOT",
+        "license:redistribution_unverified",
+        "availability:catalog_only"
+      ],
+      "administrable": false,
+      "C": null,
+      "P": null,
+      "R": null,
+      "nativeForm": null
+    },
+    {
+      "instrumentKey": "dis_pozas2022_reported14_ia_teacher_self_en_metadata",
+      "instrumentVersion": "1.0.0",
+      "parentVersion": "pozas2022_reported14",
+      "dimension": "ia",
+      "itemCount": 10,
+      "countEvidence": "methods count only; complete questionnaire missing",
+      "title": "DIS｜教学调适｜教师自评｜德国2022所报14题体系（题本待补）",
+      "tags": [
+        "family:dis_roy",
+        "role:teacher_self",
+        "stage:mixed_school_tracks",
+        "language:en_publication_only",
+        "source_version:pozas2022_reported14",
+        "use:reflection",
+        "status:PILOT",
+        "license:redistribution_unverified",
+        "availability:catalog_only"
+      ],
+      "administrable": false,
+      "C": null,
+      "P": null,
+      "R": null,
+      "nativeForm": null
+    },
+    {
+      "instrumentKey": "dis_pozas2022_reported14_apm_teacher_self_en_metadata",
+      "instrumentVersion": "1.0.0",
+      "parentVersion": "pozas2022_reported14",
+      "dimension": "apm",
+      "itemCount": 4,
+      "countEvidence": "methods count only; complete questionnaire missing",
+      "title": "DIS｜学习进展监测｜教师自评｜德国2022所报14题体系（题本待补）",
+      "tags": [
+        "family:dis_roy",
+        "role:teacher_self",
+        "stage:mixed_school_tracks",
+        "language:en_publication_only",
+        "source_version:pozas2022_reported14",
+        "use:reflection",
+        "status:PILOT",
+        "license:redistribution_unverified",
+        "availability:catalog_only"
+      ],
+      "administrable": false,
+      "C": null,
+      "P": null,
+      "R": null,
+      "nativeForm": null
+    }
+  ],
+  "optionalOrdinaryCombinations": [
+    {
+      "version": "roy_ms12",
+      "componentKeys": [
+        "dis_roy_ms12_ia_teacher_self_en_metadata",
+        "dis_roy_ms12_apm_teacher_self_en_metadata"
+      ],
+      "status": "NOT_CREATED",
+      "scoreAggregation": null
+    },
+    {
+      "version": "pozas2022_reported14",
+      "componentKeys": [
+        "dis_pozas2022_reported14_ia_teacher_self_en_metadata",
+        "dis_pozas2022_reported14_apm_teacher_self_en_metadata"
+      ],
+      "status": "NOT_CREATED",
+      "scoreAggregation": null
+    }
+  ],
+  "unscoredForms": []
+}
