@@ -21,7 +21,7 @@ describe('versioned reversal research configuration', () => {
     expect(config).toMatchObject({ totalTrials: 240, acquisitionTrials: 120, reversalTrials: 120, rewardProbability: 0.8, trialTimeoutMs: 2000, practiceTrialCount: 30, practiceAcquisitionOnly: true })
     expect(old.configSchema.safeParse(config).success).toBe(false)
     expect(current.configSchema.safeParse({ ...config, totalTrials: 239 }).success).toBe(false)
-    expect(participantPresentations.map(p => [p.engineVersion, p.presentationVersion])).toEqual([['1.0.0', '1.3.0'], ['1.1.0', '1.3.1']])
+    expect(participantPresentations.map(p => [p.engineVersion, p.presentationVersion])).toEqual([['1.0.0', '1.2.0'], ['1.1.0', '1.3.1'], ['1.0.0', '3.0.0'], ['1.1.0', '3.0.0']])
   })
 
   it('keeps the same server-derived 80/0 feedback calculation in the new configuration', () => {

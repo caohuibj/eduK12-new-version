@@ -15,7 +15,7 @@ describe('matrix practice-only C version',()=>{
   const entries=executionEntries as any[]
   expect(entries.find(e=>e.engineVersion==='1.1.0').score).toBe(scoreMatrixV1)
   expect(entries.find(e=>e.engineVersion==='1.0.0').score).toBe(scoreMatrixV1)
-  expect(participantPresentations.some(p=>p.engineVersion==='1.0.0'&&p.presentationVersion==='1.3.0')).toBe(true)
+  expect(participantPresentations.some(p=>p.engineVersion==='1.0.0'&&p.presentationVersion==='1.2.0')).toBe(true)
   expect(participantPresentations.some(p=>p.engineVersion==='1.1.0'&&p.presentationVersion==='1.4.0')).toBe(true)
   for(const n of [6,16,24])expect(matrixSequence('practice-audit-252',n)).toHaveLength(n)
  })
