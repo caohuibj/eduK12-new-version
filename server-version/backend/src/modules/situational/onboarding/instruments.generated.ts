@@ -152,6 +152,9 @@ import scientific49 from '../instruments/sjt-assertiveness-golden/1.0.0/scientif
 import instrument50 from '../instruments/sjt-responsibility-golden/1.0.0/instrument.json'
 import publication50 from '../instruments/sjt-responsibility-golden/1.0.0/publication.json'
 import scientific50 from '../instruments/sjt-responsibility-golden/1.0.0/scientific.json'
+import instrument51 from '../instruments/tosa-teacher-wd-full/0.4.2/instrument.json'
+import publication51 from '../instruments/tosa-teacher-wd-full/0.4.2/publication.json'
+import scientific51 from '../instruments/tosa-teacher-wd-full/0.4.2/scientific.json'
 export const GENERATED_SITUATIONAL_INSTRUMENT_SOURCES: readonly unknown[] = [
   { content: instrument0, publication: publication0, scientific: scientific0 },
   { content: instrument1, publication: publication1, scientific: scientific1 },
@@ -204,4 +207,5 @@ export const GENERATED_SITUATIONAL_INSTRUMENT_SOURCES: readonly unknown[] = [
   { content: instrument48, publication: publication48, scientific: scientific48 },
   { content: instrument49, publication: publication49, scientific: scientific49 },
   { content: instrument50, publication: publication50, scientific: scientific50 },
+  { content: instrument51, publication: publication51, scientific: scientific51 },
 ]
