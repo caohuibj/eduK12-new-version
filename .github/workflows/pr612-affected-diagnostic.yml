@@ -1,0 +1,72 @@
+name: PR612 affected-code diagnostic
+on:
+  push:
+    branches: [ci/pr612-affected-diagnostic-20261102]
+permissions:
+  contents: read
+jobs:
+  affected:
+    name: Exact PR612 affected tests (diagnostic only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ptool -d ptool"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      CI: 'true'
+      NODE_ENV: test
+      TZ: UTC
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public
+      TRAINING_QUOTA_DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public
+      DATA_ENCRYPTION_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      DATA_PSEUDONYM_KEY: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    steps:
+      - name: Checkout exact PR source
+        uses: actions/checkout@v4
+        with:
+          ref: 1da8c127b9f4f0fc3edbd82d08fd7329869a25f1
+      - name: Assert tested commit
+        run: test "$(git rev-parse HEAD)" = 1da8c127b9f4f0fc3edbd82d08fd7329869a25f1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: Prepare native backend dependencies
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: Install locked backend dependencies and prepare isolated database
+        working-directory: server-version/backend
+        run: |
+          npm ci
+          npx prisma generate
+          npx prisma migrate deploy
+      - name: Install locked frontend dependencies
+        working-directory: server-version/frontend
+        run: npm ci
+      - name: Affected backend contracts and real PostgreSQL quota
+        working-directory: server-version/backend
+        run: >-
+          npx vitest run
+          src/__tests__/cognitive/training-task-quota.test.ts
+          src/__tests__/cognitive/training-wave-quota.postgres.integration.test.ts
+          src/__tests__/assessment-runtime/unified-final-parent-orchestration.test.ts
+          src/__tests__/composite/report-view.service.test.ts
+          src/__tests__/education-tools/native-cognitive-run-quota.test.ts
+          --no-file-parallelism
+      - name: Affected report and school anchor UI contracts
+        working-directory: server-version/frontend
+        run: >-
+          npx vitest run
+          src/modules/composite/__tests__/CompositeReportPage.report-view.test.tsx
+          src/school/SchoolPublicAnchor.test.tsx
+          --maxWorkers=2
