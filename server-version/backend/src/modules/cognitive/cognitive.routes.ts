@@ -8,6 +8,7 @@ import { cognitiveReleaseController } from './cognitive-release.controller'
 import { cognitiveImageController } from './cognitive-image.controller'
 import { cognitiveVideoController } from './cognitive-video.controller'
 import { authenticate, requireTeacher, requireRole, requireAdmin } from '../../middleware/auth'
+import { requireSystemAdmin } from '../admin-permissions/guards'
 import { UserRole } from '../../types'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 import { instrumentError } from '../../utils/response'
@@ -45,8 +46,8 @@ router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
 router.use('/profile-configurations',cognitiveProfileConfigurationsRouter)
 router.patch('/configs/:id/access-policy', authenticate, requireAdmin, newAuthoring, cognitiveController.updateAccessPolicy)
-router.post('/configs/:id/publish', authenticate, requireAdmin, newAuthoring, cognitiveReleaseController.publishConfig)
-router.post('/configs/:id/retire', authenticate, requireAdmin, cognitiveReleaseController.retireConfig)
+router.post('/configs/:id/publish', authenticate, requireSystemAdmin, newAuthoring, cognitiveReleaseController.publishConfig)
+router.post('/configs/:id/retire', authenticate, requireSystemAdmin, cognitiveReleaseController.retireConfig)
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
 router.get('/assignments/my', authenticate, cognitiveController.myAssignments)

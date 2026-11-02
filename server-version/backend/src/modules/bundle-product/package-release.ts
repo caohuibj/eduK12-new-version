@@ -14,7 +14,11 @@ export function validateReview(raw:unknown,hash:string,secret:string|undefined,n
   if(review.reviewedAt && (Date.parse(review.reviewedAt)>now || Date.parse(review.expiresAt)-Date.parse(review.reviewedAt)!==7*86400000))throw new Error('BUNDLE_REVIEW_INVALID_OR_EXPIRED')
   return review
 }
-async function admin(db:Prisma.TransactionClient,id:string){const user=await db.user.findUnique({where:{id}});if(user?.role!=='ADMIN')throw new Error('BUNDLE_ADMIN_REQUIRED')}
+async function admin(db:Prisma.TransactionClient,id:string){
+  const user=await db.user.findUnique({where:{id},select:{platformRole:true,isActive:true,isFrozen:true,expiresAt:true}})
+  if(!user||user.platformRole!=='SYSTEM_ADMIN'||!user.isActive||user.isFrozen
+    ||(user.expiresAt&&user.expiresAt<=new Date()))throw new Error('BUNDLE_ADMIN_REQUIRED')
+}
 export async function installPackage(db:PrismaClient,actorId:string,raw:unknown){
   const p=parseDeclarativePackage(raw),hash=hashDeclarativePackage(p),d=p.manifest.definition
   const existing = (await import('./code-catalog')).createCodeBundleDefinitionProvider().exact(d.bundleKey, d.bundleVersion)

@@ -1,0 +1,6231 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cpj-cj02-sd-baseline",
+    "instrumentVersion": "0.4.2"
+  },
+  "catalogOrder": 1002,
+  "definition": {
+    "schemaVersion": 2,
+    "respondentType": "teacher_self_report",
+    "source": {
+      "title": "过滤器做得很漂亮，却比较不了效果｜SD｜明示动作反思候选",
+      "citation": "课堂观察联合方案作者；本次AI编辑候选；私有原稿v0.2→文字修订v0.3→内容编码v0.4；24个母情境独立选用。本库为原创候选自述来源，授权状态待人工核对；不公开再分发。"
+    },
+    "license": {
+      "status": "unknown",
+      "redistribution": "restricted",
+      "note": "私有原稿v0.2→文字修订v0.3→内容编码v0.4；24个母情境独立选用。本库为原创候选自述来源，授权状态待人工核对；不公开再分发。"
+    },
+    "sampling": {
+      "strategy": "BRANCH_REACHABLE"
+    },
+    "scenes": [
+      {
+        "sceneKey": "R1_12ae32cb1ec0",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第1轮",
+        "sortOrder": 0,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "你的角色：你带领一个38人班开展过滤模型任务，可调整课堂评价，不可增加材料或延课。\n学习目标：学生能够用共同条件比较两种过滤方案，并说明结论的限制。\n现实条件：四人一组，每组只有一份浑水和两种材料；剩18分钟；展示墙已布置。\n已知信息：学生作品美观但各组水量、材料量和水的浑浊程度不同；目前没有可比较的记录。\n\n过滤器制作进入后半段。多数小组把时间用在外观和装饰，学生期待评选“最佳作品”。你发现各组用水量和材料量不同，展示再整齐也难判断哪种方案过滤更好。一组抗议：“开始说可以自由设计，现在改标准不公平。”剩余材料只能支持一次补充比较。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R1",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O3",
+                "label": "按原计划完成作品展示，教师随后演示公平比较供学生记录。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "保留本次评价，要求各组在报告里补写条件差异，下一课再安排比较。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "保留展示，但把本轮重点改为一次共同条件比较，说明原作品仍展示而不按外观排科学优劣。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "请每组指出自身作品能回答和不能回答的问题，再选两组用共同条件作比较。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R2B_03e70adab751",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第2轮",
+        "sortOrder": 1,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：按原计划完成作品展示，教师随后演示公平比较供学生记录。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你暂时保留了展示或把比较放到后续。展示时，一个组说“我们的过滤器把水变干净，所以可以喝”，其他学生点头。你知道本活动不能证明饮用安全，教室也不允许饮用实验水。剩7分钟，展示还未结束。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R2B",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O1",
+                "label": "立即澄清不得饮用，并把余下展示改为区分“观察到什么”和“尚不能证明什么”。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "停止饮用推断，用一次共同条件演示说明本课可以比较的范围。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "立即明确实验水不可饮用，先继续展示，课后给每组补充报告要求。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "立即说明实验水不可饮用，撤下饮用推断；由教师总结目前可支持的结论后结束展示。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R2B_95a6db1f41c3",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第2轮",
+        "sortOrder": 2,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：保留本次评价，要求各组在报告里补写条件差异，下一课再安排比较。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你暂时保留了展示或把比较放到后续。展示时，一个组说“我们的过滤器把水变干净，所以可以喝”，其他学生点头。你知道本活动不能证明饮用安全，教室也不允许饮用实验水。剩7分钟，展示还未结束。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R2B",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O1",
+                "label": "立即澄清不得饮用，并把余下展示改为区分“观察到什么”和“尚不能证明什么”。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "停止饮用推断，用一次共同条件演示说明本课可以比较的范围。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "立即明确实验水不可饮用，先继续展示，课后给每组补充报告要求。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "立即说明实验水不可饮用，撤下饮用推断；由教师总结目前可支持的结论后结束展示。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R2A_87f4cdc58eb2",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第2轮",
+        "sortOrder": 3,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：保留展示，但把本轮重点改为一次共同条件比较，说明原作品仍展示而不按外观排科学优劣。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你已在本节任务中加入比较条件的要求。两个小组认为统一水量会改变其设计优势，另一个组提出用“过滤后颜色看起来更清”作唯一指标。可用材料只够一次，不能靠反复试到满意。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R2A",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O4",
+                "label": "允许各组按自己的目标展示，把“不同设计不可直接排名”作为本节结论。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "与学生确定本次只比较同体积同来源水的可见浑浊程度，并保留不能判断其他效果的说明。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "让两个设计小组自行提出一项共同可执行标准，经全班检查后再使用材料。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "教师直接规定水量和观察方法，保证一次比较按时完成。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R2A_628226eb73f1",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第2轮",
+        "sortOrder": 4,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：请每组指出自身作品能回答和不能回答的问题，再选两组用共同条件作比较。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你已在本节任务中加入比较条件的要求。两个小组认为统一水量会改变其设计优势，另一个组提出用“过滤后颜色看起来更清”作唯一指标。可用材料只够一次，不能靠反复试到满意。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R2A",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O4",
+                "label": "允许各组按自己的目标展示，把“不同设计不可直接排名”作为本节结论。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "与学生确定本次只比较同体积同来源水的可见浑浊程度，并保留不能判断其他效果的说明。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "让两个设计小组自行提出一项共同可执行标准，经全班检查后再使用材料。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "教师直接规定水量和观察方法，保证一次比较按时完成。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3A2_926182c1eff6",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 5,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：允许各组按自己的目标展示，把“不同设计不可直接排名”作为本节结论。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n上一轮你选择教师规定比较流程，或保留多目标分别展示。课末巡视时，你问两组“不统一水量会怎样影响比较”，学生尚不能说明；有组仍把外观奖理解为过滤效果最好。你可留一张短记录单。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3A2",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O3",
+                "label": "教师再次说明作品奖与科学结论的区别，让学生记录。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "保留展示热情，把比较条件的问题列为下一课开场任务。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "让每人说明不统一水量会怎样影响比较，收两种不同解释再回应。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "要求每组给作品配一条“这个结果不能证明”的说明，再结束展示。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3A1_e40298558b25",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 6,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：与学生确定本次只比较同体积同来源水的可见浑浊程度，并保留不能判断其他效果的说明。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你们确定了共同指标或共同条件。比较结果显示，两种方案可见浑浊程度差异不明显，但学生认为“没有胜者就白做了”。全班还有4分钟形成结论。你没有其他测量设备，也不应编造过滤效果。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3A1",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O2",
+                "label": "请两组交换记录，检查共同条件是否做到，再由学生说明结论边界。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "按制作过程和外观评出作品奖，与实验结果分开说明。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "教师给出两种材料的一般特点，作为本节最终知识总结。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "让学生分别写下本次支持的结论和还需要的证据，保留无明显差异这一结果。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3A1_29ee161ec599",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 7,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：让两个设计小组自行提出一项共同可执行标准，经全班检查后再使用材料。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你们确定了共同指标或共同条件。比较结果显示，两种方案可见浑浊程度差异不明显，但学生认为“没有胜者就白做了”。全班还有4分钟形成结论。你没有其他测量设备，也不应编造过滤效果。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3A1",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O2",
+                "label": "请两组交换记录，检查共同条件是否做到，再由学生说明结论边界。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "按制作过程和外观评出作品奖，与实验结果分开说明。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "教师给出两种材料的一般特点，作为本节最终知识总结。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "让学生分别写下本次支持的结论和还需要的证据，保留无明显差异这一结果。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3A2_eff6db5cfceb",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 8,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：教师直接规定水量和观察方法，保证一次比较按时完成。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n上一轮你选择教师规定比较流程，或保留多目标分别展示。课末巡视时，你问两组“不统一水量会怎样影响比较”，学生尚不能说明；有组仍把外观奖理解为过滤效果最好。你可留一张短记录单。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3A2",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O3",
+                "label": "教师再次说明作品奖与科学结论的区别，让学生记录。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "保留展示热情，把比较条件的问题列为下一课开场任务。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "让每人说明不统一水量会怎样影响比较，收两种不同解释再回应。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "要求每组给作品配一条“这个结果不能证明”的说明，再结束展示。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3B1_a7fb53e45d24",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 9,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：立即澄清不得饮用，并把余下展示改为区分“观察到什么”和“尚不能证明什么”。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你已制止饮用推断，并把任务拉回证据范围。学生提出：“那能不能比较过滤速度？”这可以用现有钟表，但只剩3分钟，原先的浑浊程度目标可能又被替换。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3B1",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O4",
+                "label": "由教师口头说明两类指标不同，直接收齐当前报告。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "说明速度是另一问题，本轮先完成已有目标的结论，记录下次如何公平比较速度。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "允许一组做限时速度试验，但要求把它与本次浑浊程度结论分列。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "将剩余任务统一改为速度比较，使全班获得清晰的数量结果。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3B1_0a6ef7ff0390",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 10,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：停止饮用推断，用一次共同条件演示说明本课可以比较的范围。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你已制止饮用推断，并把任务拉回证据范围。学生提出：“那能不能比较过滤速度？”这可以用现有钟表，但只剩3分钟，原先的浑浊程度目标可能又被替换。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3B1",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O4",
+                "label": "由教师口头说明两类指标不同，直接收齐当前报告。"
+              },
+              {
+                "optionKey": "O1",
+                "label": "说明速度是另一问题，本轮先完成已有目标的结论，记录下次如何公平比较速度。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "允许一组做限时速度试验，但要求把它与本次浑浊程度结论分列。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "将剩余任务统一改为速度比较，使全班获得清晰的数量结果。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3B2_88feb41cf72f",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 11,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：立即明确实验水不可饮用，先继续展示，课后给每组补充报告要求。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你保证了安全并完成展示，但未让学生现场重新检查论据。收回报告后，一半学生仍把“颜色清”写成“已去除所有杂质”。下一节只有5分钟能接续本活动。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3B2",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O1",
+                "label": "呈现一份匿名报告，让学生标出观察事实和超出证据的结论，再改写自己的报告。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "展示清水加可溶物的生活例子，要求学生解释可见清澈为何不足以证明纯净。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "给出一份准确结论模板，要求各组按模板订正。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "向出现错误的组反馈，其他组按原进度开始新活动。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      },
+      {
+        "sceneKey": "R3B2_e1e12b69b4ee",
+        "title": "过滤器做得很漂亮，却比较不了效果｜第3轮",
+        "sortOrder": 12,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上一轮你选择：立即说明实验水不可饮用，撤下饮用推断；由教师总结目前可支持的结论后结束展示。\n未选行动不视为已完成。以下为预设后续信息，不能据此判断上一选项的优劣。\n\n你保证了安全并完成展示，但未让学生现场重新检查论据。收回报告后，一半学生仍把“颜色清”写成“已去除所有杂质”。下一节只有5分钟能接续本活动。"
+        },
+        "primaryConstruct": "cpj_t01_a_explicit_action",
+        "secondaryConstructs": [
+          "cpj_t01_b_explicit_action"
+        ],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "action_R3B2",
+            "purpose": "PROFESSIONAL_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "请判断哪项作为下一步更适切。",
+            "options": [
+              {
+                "optionKey": "O1",
+                "label": "呈现一份匿名报告，让学生标出观察事实和超出证据的结论，再改写自己的报告。"
+              },
+              {
+                "optionKey": "O2",
+                "label": "展示清水加可溶物的生活例子，要求学生解释可见清澈为何不足以证明纯净。"
+              },
+              {
+                "optionKey": "O3",
+                "label": "给出一份准确结论模板，要求各组按模板订正。"
+              },
+              {
+                "optionKey": "O4",
+                "label": "向出现错误的组反馈，其他组按原进度开始新活动。"
+              },
+              {
+                "optionKey": "U",
+                "label": "信息不足，无法判断",
+                "nonanswerReason": "UNABLE_TO_JUDGE"
+              },
+              {
+                "optionKey": "N",
+                "label": "不愿回答本情境",
+                "nonanswerReason": "DECLINED"
+              }
+            ]
+          }
+        ],
+        "measurementBundle": {
+          "contractVersion": "measurement-bundle-v1",
+          "maxRequiredResponses": 1,
+          "maxOptionalDiagnosticResponses": 0,
+          "maxTotalResponses": 1,
+          "estimatedSeconds": 120
+        }
+      }
+    ],
+    "scoring": {
+      "scoringVersion": "author-key-sum-v1",
+      "model": {
+        "contractVersion": "situational-model-v1",
+        "modelKey": "AUTHOR_KEY_SUM",
+        "modelVersion": "1",
+        "expertKey": [
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "metricKey": "T01_A_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "metricKey": "T01_B_explicit_count",
+            "contribution": 0
+          }
+        ]
+      },
+      "choiceScores": [],
+      "publishedMetrics": [
+        {
+          "key": "T01_A_explicit_count",
+          "label": "明确把任务产出对准学习理由或比较条件｜明示次数",
+          "construct": "cpj_t01_a_explicit_action",
+          "channelKey": "core",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        },
+        {
+          "key": "T01_B_explicit_count",
+          "label": "安排获取学生理解证据以检查或调整任务｜明示次数",
+          "construct": "cpj_t01_b_explicit_action",
+          "channelKey": "core",
+          "direction": "descriptive",
+          "role": "secondary",
+          "displayPrecision": 0
+        }
+      ]
+    },
+    "report": {
+      "narrative": {
+        "version": "sjt-narrative-v1",
+        "fragments": [
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O3",
+            "text": "第1轮，你认为下一步较适切的是：按原计划完成作品展示，教师随后演示公平比较供学生记录。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O4",
+            "text": "第1轮，你认为下一步较适切的是：保留本次评价，要求各组在报告里补写条件差异，下一课再安排比较。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O1",
+            "text": "第1轮，你认为下一步较适切的是：保留展示，但把本轮重点改为一次共同条件比较，说明原作品仍展示而不按外观排科学优劣。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "O2",
+            "text": "第1轮，你认为下一步较适切的是：请每组指出自身作品能回答和不能回答的问题，再选两组用共同条件作比较。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "U",
+            "text": "你在第1轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R1_12ae32cb1ec0",
+            "channelKey": "action_R1",
+            "optionKey": "N",
+            "text": "你在第1轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O1",
+            "text": "第2轮，你认为下一步较适切的是：立即澄清不得饮用，并把余下展示改为区分“观察到什么”和“尚不能证明什么”。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O2",
+            "text": "第2轮，你认为下一步较适切的是：停止饮用推断，用一次共同条件演示说明本课可以比较的范围。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O3",
+            "text": "第2轮，你认为下一步较适切的是：立即明确实验水不可饮用，先继续展示，课后给每组补充报告要求。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "O4",
+            "text": "第2轮，你认为下一步较适切的是：立即说明实验水不可饮用，撤下饮用推断；由教师总结目前可支持的结论后结束展示。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "U",
+            "text": "你在第2轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_03e70adab751",
+            "channelKey": "action_R2B",
+            "optionKey": "N",
+            "text": "你在第2轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O1",
+            "text": "第2轮，你认为下一步较适切的是：立即澄清不得饮用，并把余下展示改为区分“观察到什么”和“尚不能证明什么”。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O2",
+            "text": "第2轮，你认为下一步较适切的是：停止饮用推断，用一次共同条件演示说明本课可以比较的范围。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O3",
+            "text": "第2轮，你认为下一步较适切的是：立即明确实验水不可饮用，先继续展示，课后给每组补充报告要求。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "O4",
+            "text": "第2轮，你认为下一步较适切的是：立即说明实验水不可饮用，撤下饮用推断；由教师总结目前可支持的结论后结束展示。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "U",
+            "text": "你在第2轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2B_95a6db1f41c3",
+            "channelKey": "action_R2B",
+            "optionKey": "N",
+            "text": "你在第2轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O4",
+            "text": "第2轮，你认为下一步较适切的是：允许各组按自己的目标展示，把“不同设计不可直接排名”作为本节结论。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O1",
+            "text": "第2轮，你认为下一步较适切的是：与学生确定本次只比较同体积同来源水的可见浑浊程度，并保留不能判断其他效果的说明。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O2",
+            "text": "第2轮，你认为下一步较适切的是：让两个设计小组自行提出一项共同可执行标准，经全班检查后再使用材料。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "O3",
+            "text": "第2轮，你认为下一步较适切的是：教师直接规定水量和观察方法，保证一次比较按时完成。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "U",
+            "text": "你在第2轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_87f4cdc58eb2",
+            "channelKey": "action_R2A",
+            "optionKey": "N",
+            "text": "你在第2轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O4",
+            "text": "第2轮，你认为下一步较适切的是：允许各组按自己的目标展示，把“不同设计不可直接排名”作为本节结论。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O1",
+            "text": "第2轮，你认为下一步较适切的是：与学生确定本次只比较同体积同来源水的可见浑浊程度，并保留不能判断其他效果的说明。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O2",
+            "text": "第2轮，你认为下一步较适切的是：让两个设计小组自行提出一项共同可执行标准，经全班检查后再使用材料。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "O3",
+            "text": "第2轮，你认为下一步较适切的是：教师直接规定水量和观察方法，保证一次比较按时完成。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "U",
+            "text": "你在第2轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R2A_628226eb73f1",
+            "channelKey": "action_R2A",
+            "optionKey": "N",
+            "text": "你在第2轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：教师再次说明作品奖与科学结论的区别，让学生记录。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：保留展示热情，把比较条件的问题列为下一课开场任务。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：让每人说明不统一水量会怎样影响比较，收两种不同解释再回应。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：要求每组给作品配一条“这个结果不能证明”的说明，再结束展示。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_926182c1eff6",
+            "channelKey": "action_R3A2",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：请两组交换记录，检查共同条件是否做到，再由学生说明结论边界。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：按制作过程和外观评出作品奖，与实验结果分开说明。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：教师给出两种材料的一般特点，作为本节最终知识总结。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：让学生分别写下本次支持的结论和还需要的证据，保留无明显差异这一结果。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_e40298558b25",
+            "channelKey": "action_R3A1",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：请两组交换记录，检查共同条件是否做到，再由学生说明结论边界。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：按制作过程和外观评出作品奖，与实验结果分开说明。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：教师给出两种材料的一般特点，作为本节最终知识总结。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：让学生分别写下本次支持的结论和还需要的证据，保留无明显差异这一结果。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A1_29ee161ec599",
+            "channelKey": "action_R3A1",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：教师再次说明作品奖与科学结论的区别，让学生记录。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：保留展示热情，把比较条件的问题列为下一课开场任务。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：让每人说明不统一水量会怎样影响比较，收两种不同解释再回应。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：要求每组给作品配一条“这个结果不能证明”的说明，再结束展示。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3A2_eff6db5cfceb",
+            "channelKey": "action_R3A2",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：由教师口头说明两类指标不同，直接收齐当前报告。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：明确把任务产出对准学习理由或比较条件。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：说明速度是另一问题，本轮先完成已有目标的结论，记录下次如何公平比较速度。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：明确把任务产出对准学习理由或比较条件。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：允许一组做限时速度试验，但要求把它与本次浑浊程度结论分列。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：明确把任务产出对准学习理由或比较条件。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：将剩余任务统一改为速度比较，使全班获得清晰的数量结果。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_a7fb53e45d24",
+            "channelKey": "action_R3B1",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：由教师口头说明两类指标不同，直接收齐当前报告。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：明确把任务产出对准学习理由或比较条件。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：说明速度是另一问题，本轮先完成已有目标的结论，记录下次如何公平比较速度。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：明确把任务产出对准学习理由或比较条件。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：允许一组做限时速度试验，但要求把它与本次浑浊程度结论分列。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：明确把任务产出对准学习理由或比较条件。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：将剩余任务统一改为速度比较，使全班获得清晰的数量结果。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B1_0a6ef7ff0390",
+            "channelKey": "action_R3B1",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：呈现一份匿名报告，让学生标出观察事实和超出证据的结论，再改写自己的报告。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：展示清水加可溶物的生活例子，要求学生解释可见清澈为何不足以证明纯净。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：给出一份准确结论模板，要求各组按模板订正。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：向出现错误的组反馈，其他组按原进度开始新活动。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_88feb41cf72f",
+            "channelKey": "action_R3B2",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "text": "第3轮，你认为下一步较适切的是：呈现一份匿名报告，让学生标出观察事实和超出证据的结论，再改写自己的报告。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O1",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "text": "第3轮，你认为下一步较适切的是：展示清水加可溶物的生活例子，要求学生解释可见清澈为何不足以证明纯净。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O2",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "text": "第3轮，你认为下一步较适切的是：给出一份准确结论模板，要求各组按模板订正。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：明确把任务产出对准学习理由或比较条件。未明示：安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O3",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "text": "第3轮，你认为下一步较适切的是：向出现错误的组反馈，其他组按原进度开始新活动。 本轮提供的编码入口：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。该文字明示：未明示这两类特定动作。未明示：明确把任务产出对准学习理由或比较条件；安排获取学生理解证据以检查或调整任务。这不证明你现实中不会做；可检查是否需要补充、以及何时才适用。先核对时间、学生需要与可获证据，不以动作越多越好为目标；本次选择不证明实施或学习成效。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "O4",
+            "text": "针对本情境的小练习：比较表是否记下了相同条件、不同材料和结果。 练习步骤：课前用一句话写出学生需要解释的理由，再删去一个与它无关的活动。课中抽取三份不同学生的独立产出；课后比较是否真的出现该理由，下一课仅调整一处任务要求。不要把答对、安静或完成量直接当作达成证据。 迁移复盘：分别写出原选择保护的目标、付出的代价、一个使你改选的条件；下一课只试一处调整，留一份独立学生产出，和可信同伴区分观察事实与解释。愿意时填写独立课后反思表；它不改本次分支或分数。",
+            "kind": "GUIDANCE"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "U",
+            "text": "你在第3轮选择“信息不足，无法判断”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          },
+          {
+            "sceneKey": "R3B2_e1e12b69b4ee",
+            "channelKey": "action_R3B2",
+            "optionKey": "N",
+            "text": "你在第3轮选择“不愿回答”，本情境结束。此前选择与解释保留；若本轮是某指标机会，该指标记不可计算而非0；未呈现后续没有机会。愿意时可写下一项缺少的信息或一个需要支持的条件；不要求补答或继续反思。",
+            "kind": "ACTION"
+          }
+        ],
+        "comparisons": []
+      },
+      "reportVersion": "sjt-narrative-v1",
+      "primaryMetricKeys": [
+        "T01_A_explicit_count"
+      ],
+      "metricOrder": [
+        "T01_A_explicit_count",
+        "T01_B_explicit_count"
+      ],
+      "interpretations": [],
+      "limitations": [
+        "作者暂定评分键，尚未完成独立专家评审和实证校准。",
+        "行为意向及辅助回答仅用于低风险反思，不用于教师选聘或能力等级判定。"
+      ],
+      "disclaimer": "本次只统计所选文字明确提出的教学动作，并显示实际机会。0不是能力不足，较大次数不代表更适切；不同路径、SD/WD与观察不可合总分或排名。没有专家共识键、常模、可靠性保证或培训效果保证。一个情境仅一项独立情境证据；自愿、低风险反思用途。"
+    },
+    "referencePolicy": {
+      "type": "none"
+    },
+    "flow": {
+      "strategy": "BRANCHING_DAG_V1",
+      "entryNodeKey": "R1_12ae32cb1ec0",
+      "nodes": [
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R1_12ae32cb1ec0",
+          "sceneKey": "R1_12ae32cb1ec0",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R1",
+          "stepKey": "R1_12ae32cb1ec0",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R1",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R1"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R1",
+            "branches": [
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "R2B_03e70adab751"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "R2B_95a6db1f41c3"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "R2A_87f4cdc58eb2"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "R2A_628226eb73f1"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R2B_03e70adab751",
+          "sceneKey": "R2B_03e70adab751",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R2B",
+          "stepKey": "R2B_03e70adab751",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R2B",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R2B"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R2B",
+            "branches": [
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "R3B1_a7fb53e45d24"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "R3B1_0a6ef7ff0390"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "R3B2_88feb41cf72f"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "R3B2_e1e12b69b4ee"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R2B_95a6db1f41c3",
+          "sceneKey": "R2B_95a6db1f41c3",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R2B",
+          "stepKey": "R2B_95a6db1f41c3",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R2B",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R2B"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R2B",
+            "branches": [
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "R3B1_a7fb53e45d24"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "R3B1_0a6ef7ff0390"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "R3B2_88feb41cf72f"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "R3B2_e1e12b69b4ee"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R2A_87f4cdc58eb2",
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R2A",
+          "stepKey": "R2A_87f4cdc58eb2",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R2A",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R2A"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R2A",
+            "branches": [
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "R3A2_926182c1eff6"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "R3A1_e40298558b25"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "R3A1_29ee161ec599"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "R3A2_eff6db5cfceb"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R2A_628226eb73f1",
+          "sceneKey": "R2A_628226eb73f1",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R2A",
+          "stepKey": "R2A_628226eb73f1",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R2A",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R2A"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R2A",
+            "branches": [
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "R3A2_926182c1eff6"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "R3A1_e40298558b25"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "R3A1_29ee161ec599"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "R3A2_eff6db5cfceb"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3A2_926182c1eff6",
+          "sceneKey": "R3A2_926182c1eff6",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3A2",
+          "stepKey": "R3A2_926182c1eff6",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3A2",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3A2"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3A2",
+            "branches": [
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3A1_e40298558b25",
+          "sceneKey": "R3A1_e40298558b25",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3A1",
+          "stepKey": "R3A1_e40298558b25",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3A1",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3A1"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3A1",
+            "branches": [
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3A1_29ee161ec599",
+          "sceneKey": "R3A1_29ee161ec599",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3A1",
+          "stepKey": "R3A1_29ee161ec599",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3A1",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3A1"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3A1",
+            "branches": [
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3A2_eff6db5cfceb",
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3A2",
+          "stepKey": "R3A2_eff6db5cfceb",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3A2",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3A2"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3A2",
+            "branches": [
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3B1_a7fb53e45d24",
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3B1",
+          "stepKey": "R3B1_a7fb53e45d24",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3B1",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3B1"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3B1",
+            "branches": [
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3B1_0a6ef7ff0390",
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3B1",
+          "stepKey": "R3B1_0a6ef7ff0390",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3B1",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3B1"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3B1",
+            "branches": [
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3B2_88feb41cf72f",
+          "sceneKey": "R3B2_88feb41cf72f",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3B2",
+          "stepKey": "R3B2_88feb41cf72f",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3B2",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3B2"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3B2",
+            "branches": [
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "R3B2_e1e12b69b4ee",
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "motherSceneKey": "CJ02",
+          "roundKey": "R3B2",
+          "stepKey": "R3B2_e1e12b69b4ee",
+          "interactionRole": "DECISION",
+          "channelPolicies": [
+            {
+              "channelKey": "action_R3B2",
+              "measurementRole": "SCORED",
+              "required": true,
+              "interactionRole": "DECISION"
+            }
+          ],
+          "responseStages": [
+            {
+              "stageKey": "choice",
+              "kind": "CHOICE",
+              "channelKeys": [
+                "action_R3B2"
+              ]
+            }
+          ],
+          "transition": {
+            "type": "DECISION",
+            "channelKey": "action_R3B2",
+            "branches": [
+              {
+                "optionKey": "O1",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O2",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O3",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "O4",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "U",
+                "nextNodeKey": "END"
+              },
+              {
+                "optionKey": "N",
+                "nextNodeKey": "END"
+              }
+            ]
+          }
+        },
+        {
+          "nodeType": "TERMINAL",
+          "nodeKey": "END"
+        }
+      ]
+    }
+  },
+  "goldenCases": [
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O1__R3B1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O2__R3B1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 1,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O3__R3B2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 1,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-O4__R3B2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O3__R2B-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R2B_03e70adab751",
+          "channelKey": "action_R2B",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O1__R3B1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3B1_a7fb53e45d24",
+          "channelKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O2__R3B1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3B1_0a6ef7ff0390",
+          "channelKey": "action_R3B1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 1,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O3__R3B2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3B2_88feb41cf72f",
+          "channelKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 1,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-O4__R3B2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3B2_e1e12b69b4ee",
+          "channelKey": "action_R3B2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O4__R2B-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R2B_95a6db1f41c3",
+          "channelKey": "action_R2B",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O4__R3A2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O1__R3A1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O2__R3A1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 0
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-O3__R3A2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O1__R2A-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R2A_87f4cdc58eb2",
+          "channelKey": "action_R2A",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O4__R3A2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O4"
+        },
+        {
+          "sceneKey": "R3A2_926182c1eff6",
+          "channelKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O1__R3A1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O1"
+        },
+        {
+          "sceneKey": "R3A1_e40298558b25",
+          "channelKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 3
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 2,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 3
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O2__R3A1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R3A1_29ee161ec599",
+          "channelKey": "action_R3A1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O3",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O4",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 1
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O1",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O1"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-O2",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "O2"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": 3,
+          "T01_B_explicit_count": 2
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-O3__R3A2-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "O3"
+        },
+        {
+          "sceneKey": "R3A2_eff6db5cfceb",
+          "channelKey": "action_R3A2",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-O2__R2A-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "O2"
+        },
+        {
+          "sceneKey": "R2A_628226eb73f1",
+          "channelKey": "action_R2A",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-U",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "U"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    },
+    {
+      "name": "R1-N",
+      "responses": [
+        {
+          "sceneKey": "R1_12ae32cb1ec0",
+          "channelKey": "action_R1",
+          "responseValue": "N"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "T01_A_explicit_count",
+          "T01_B_explicit_count"
+        ],
+        "metrics": {
+          "T01_A_explicit_count": null,
+          "T01_B_explicit_count": null
+        }
+      }
+    }
+  ]
+}

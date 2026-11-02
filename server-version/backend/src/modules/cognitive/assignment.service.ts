@@ -499,8 +499,17 @@ export const updateDraftAssignment = async (
     data.profile = input.profile
   }
 
-  const updated = await prisma.cognitiveAssignment.update({ where: { id }, data })
-  return updated
+  try {
+    return await prisma.cognitiveAssignment.update({
+      where: { id, status: 'DRAFT', updatedAt: existing.updatedAt },
+      data: { ...data, updatedAt: new Date(Math.max(Date.now(), existing.updatedAt.getTime() + 1)) },
+    })
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw CONFLICT('Assignment changed while updating; reload and retry')
+    }
+    throw error
+  }
 }
 
 export const publishAssignment = async (userId: string, role: UserRole, id: string) => {
@@ -553,7 +562,7 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
   })
   // 单次条件写：DRAFT -> PUBLISHED + publishedAt + 最小 courseSnapshot + resolved snapshot。
   const { count } = await prisma.cognitiveAssignment.updateMany({
-    where: { id, status: 'DRAFT' },
+    where: { id, status: 'DRAFT', updatedAt: existing.updatedAt },
     data: {
       status: 'PUBLISHED',
       publishedAt: new Date(),
@@ -562,11 +571,7 @@ export const publishAssignment = async (userId: string, role: UserRole, id: stri
     },
   })
 
-  if (count === 0) {
-    const reloaded = await prisma.cognitiveAssignment.findUnique({ where: { id } })
-    if (reloaded?.status === 'PUBLISHED') throw CONFLICT('Assignment already published')
-    throw CONFLICT('Assignment cannot be published in its current state')
-  }
+  if (count !== 1) throw CONFLICT('Assignment changed while publishing; reload and retry')
 
   const published = await prisma.cognitiveAssignment.findUnique({ where: { id } })
   return published

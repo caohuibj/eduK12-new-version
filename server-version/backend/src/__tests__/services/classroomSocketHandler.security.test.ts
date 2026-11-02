@@ -73,6 +73,24 @@ const getHandlers = (socket: any) =>
     ])
   )
 
+const questionContentWithAnswers = {
+  type: 'single_choice',
+  question: 'Choose a public option',
+  options: [
+    { value: 'A', label: 'Alpha', isCorrect: true, score: 10 },
+    { key: 'B', text: 'Beta', correctAnswer: 'A', scoring: { points: 0 } },
+    { value: { correctAnswer: 'nested-key' }, label: { scoring: 'private' }, text: 'Public text' },
+  ],
+  correctAnswer: 'A',
+  scoring: { answerKey: 'A', points: 10 },
+  explanation: 'Private answer explanation',
+}
+const participantQuestionContent = {
+  type: 'single_choice',
+  question: 'Choose a public option',
+  options: [{ value: 'A', label: 'Alpha' }, { key: 'B', text: 'Beta' }, { text: 'Public text' }],
+}
+
 describe('classroom socket authorization boundary', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -492,6 +510,100 @@ describe('classroom socket authorization boundary', () => {
     }))
     expect(socket.emit).toHaveBeenCalledWith('broadcast:question', expect.objectContaining({ mySubmission: { answer: 'B', submittedAt }, startedAt: startedAt.toISOString() }))
     expect(JSON.stringify(mockSocketService.broadcastToRoom.mock.calls)).not.toContain('mySubmission')
+  })
+
+  it.each([false, true])('projects public question fields for an authenticated=%s student join', async authenticated => {
+    const handler = new ClassroomSocketHandler()
+    const studentId = authenticated ? 'actual-student' : 'temp_student'
+    const socket = makeSocket(authenticated
+      ? { authenticated, userRole: 'STUDENT', userId: studentId }
+      : { authenticated })
+    const startedAt = new Date()
+    const submittedAt = new Date()
+    const ownSubmission = { answer: 'B', submittedAt }
+    mockPrisma.classroom.findUnique.mockResolvedValue({ id: 'classroom-1', code: '123456', status: 'ACTIVE' })
+    mockPrisma.classroomSession.upsert.mockResolvedValue({ id: 'bound-session', studentId, leftAt: null })
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({
+      id: 'question-1', questionContent: questionContentWithAnswers, questionIndex: 1,
+      timeLimit: 600, startedAt, answers: [ownSubmission],
+    })
+
+    await (handler as any).handleStudentJoin(socket, { code: '123456' })
+
+    expect(socket.join).toHaveBeenCalledWith('classroom:classroom-1:students')
+    expect(socket.emit).toHaveBeenCalledWith('student:joined', expect.objectContaining({ classroomId: 'classroom-1' }))
+    const question = socket.emit.mock.calls.find(([event]) => event === 'broadcast:question')?.[1]
+    expect(question).toEqual({
+      questionId: 'question-1', questionContent: participantQuestionContent,
+      questionIndex: 1, timeLimit: 600, startedAt: startedAt.toISOString(),
+      remainingTime: expect.any(Number), mySubmission: ownSubmission,
+    })
+    expect(JSON.stringify(question)).not.toMatch(/correctAnswer|scoring|isCorrect|nested-key|Private answer/)
+    expect(mockSocketService.broadcastToRoom.mock.calls.filter(([, event]) => event === 'broadcast:question')).toEqual([])
+  })
+
+  it.each(['socket', 'notification'])('projects participant content on the %s start path while preserving manager snapshots', async path => {
+    const handler = new ClassroomSocketHandler()
+    const schedule = vi.spyOn(handler as any, 'scheduleQuestionTimer').mockImplementation(() => {})
+    const startedAt = new Date('2026-10-04T12:00:00.000Z')
+    const question = {
+      id: 'question-1', questionContent: questionContentWithAnswers, questionIndex: 1,
+      timeLimit: 60, startedAt, endedAt: null,
+    }
+    const managerQuestion = {
+      questionId: question.id, questionContent: questionContentWithAnswers,
+      questionIndex: 1, timeLimit: 60, startedAt: startedAt.toISOString(), endedAt: null,
+    }
+    const ack = vi.fn()
+    if (path === 'socket') {
+      const classroom = { id: 'classroom-1', status: 'PREPARING', creatorId: 'teacher-1' }
+      const socket = makeSocket({ authenticated: true, userId: 'teacher-1', userRole: 'TEACHER',
+        classroomId: classroom.id, clientRole: 'teacher' })
+      mockFindClassroomAccess.mockResolvedValue(classroom)
+      mockPrisma.classroom.findUnique.mockResolvedValue({ status: 'PREPARING' })
+      mockPrisma.classroomQuestion.findFirst.mockReset()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ ...question, classroomId: classroom.id, startedAt: null })
+      mockPrisma.classroomQuestion.updateMany.mockResolvedValue({ count: 1 })
+      mockPrisma.classroomQuestion.findUnique.mockResolvedValue(question)
+
+      await (handler as any).handleTeacherStart(socket, { questionId: question.id, timeLimit: 60 }, ack)
+
+      expect(ack).toHaveBeenCalledWith({ ok: true, started: true, question: managerQuestion })
+    } else {
+      handler.notifyQuestionStarted('classroom-1', question)
+    }
+
+    expect(mockSocketService.broadcastToRoom.mock.calls).toEqual([
+      ['classroom:classroom-1:students', 'broadcast:question', {
+        ...managerQuestion, questionContent: participantQuestionContent,
+      }],
+      ['classroom:classroom-1:teacher', 'broadcast:question', managerQuestion],
+      ['classroom:classroom-1:bigscreen', 'broadcast:question', managerQuestion],
+    ])
+    expect(schedule).toHaveBeenCalledWith('classroom-1', question.id, 60, startedAt)
+    expect(question.questionContent).toEqual(questionContentWithAnswers)
+    expect(question.questionContent.correctAnswer).toBe('A')
+  })
+
+  it.each(['teacher', 'bigscreen'])('retains the authorized %s join snapshot and feedback contract', async role => {
+    const handler = new ClassroomSocketHandler()
+    vi.spyOn(handler as any, 'startManagerRevalidation').mockImplementation(() => {})
+    vi.spyOn(handler as any, 'buildStats').mockResolvedValue({ questionId: 'question-1', answerCount: 1 })
+    const socket = makeSocket({ authenticated: true, userId: 'teacher-1', userRole: 'TEACHER' })
+    mockFindClassroomAccess.mockResolvedValue({ id: 'classroom-1', status: 'ACTIVE', creatorId: 'teacher-1' })
+    mockPrisma.classroomQuestion.findFirst.mockResolvedValue({
+      id: 'question-1', questionContent: questionContentWithAnswers, questionIndex: 1,
+      timeLimit: 600, startedAt: new Date(), endedAt: null,
+    })
+
+    await (handler as any)[role === 'teacher' ? 'handleTeacherJoin' : 'handleBigscreenJoin'](socket, { classroomId: 'classroom-1' })
+
+    expect(socket.join).toHaveBeenCalledWith('classroom:classroom-1:' + role)
+    expect(socket.emit).toHaveBeenCalledWith(role + ':joined', expect.objectContaining({
+      currentQuestion: expect.objectContaining({ questionContent: questionContentWithAnswers }),
+      ...(role === 'bigscreen' ? { stats: { questionId: 'question-1', answerCount: 1 } } : {}),
+    }))
   })
 
 })
