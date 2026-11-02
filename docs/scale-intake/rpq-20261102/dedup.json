@@ -454,5 +454,10 @@
     "Administrator-created tools",
     "Exhaustive semantic equivalence beyond source/author/version/item probes"
   ],
-  "note": "Existing school reflection titles alone do not imply same-sourceRPQ. Exact source and shared10/30 items checked; short10 directly reuses component instead of duplicate native package."
+  "note": "Existing school reflection titles alone do not imply same-sourceRPQ. Exact source and shared10/30 items checked; short10 directly reuses component instead of duplicate native package.",
+  "finalMainRefresh": {
+    "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "scaleSourceTreeUnchanged": true,
+    "note": "Main refresh adds independent situational declarations and docs, not scale identities; immutable source/author/item probes reused. Production/custom duplicate inventory still unknown."
+  }
 }

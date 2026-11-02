@@ -2,7 +2,7 @@
 
 本轮选用作者2024年修订英文版，拆成4个原生Scale组件：反思10题、自信8题、不确定／压力8题、工作满意感4题。均为DRAFT/PILOT，C（内容）／P（计分）／R（报告）各1.0.0。共同标签为 `family:rpq`；保留教师SELF、英文、2024源版本和专业反思用途。机器清单见 [inventory.json](inventory.json)。它们不测实际教学质量，不提供中国教师常模、诊断或绩效排序。
 
-基线为实际读取的main `688d61eb61094fe692ad8c6e6ce41315c8bc3402`，已包含共享CHEXI修复；独立worktree `/workspace/eduk12-rpq-20261102`、分支 `content/rpq-reflective-practice-20261102`。TIMSS PR550和SEfU PR561不改动，不混入本次内容。
+来源核验及隔离执行基线为main `688d61eb61094fe692ad8c6e6ce41315c8bc3402`，已包含共享CHEXI修复；提交前普通merge最新main `25d812d1f024bcc375b738235dd400654c679ff4`，只继承独立SJT声明和说明，Scale／schema／lock输入未变，原验证保留原执行身份；独立worktree `/workspace/eduk12-rpq-20261102`、分支 `content/rpq-reflective-practice-20261102`。TIMSS PR550和SEfU PR561不改动，不混入本次内容。
 
 本差异为4份原生声明／题本、现有生成索引及说明。原题／参数／报告 → 核对来源身份、计分方向、缺失和无常模报告 → 本地选中原生验证、一次临时真实PG导入回读，正式CI由主线按最终候选协调。只做相称检查，不构建全平台、不新增引擎／权限／门禁，不反复执行同一golden。原生验证已完成：[临时真实隔离库回读](isolated-import.json)、[代表性合成报告](representative-report.json)、[验证与保留失败](validation.json)。4个DRAFT/HIDDEN记录及4组三轴已实际读回，0公开发布；这不等于生产入库。
 

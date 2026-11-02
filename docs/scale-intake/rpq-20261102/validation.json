@@ -154,5 +154,15 @@
       "sha256": "12c7073bf5b731497ac3cb2db652d244d8f850dd7e6eb07e2ec60413a238576a"
     }
   ],
-  "reuse": "Subsequent evidence/docs commits do not alter these9 scientific/index inputs; no repeated goldens or DB apply to prove idempotence."
+  "reuse": "Subsequent evidence/docs commits do not alter these9 scientific/index inputs; no repeated goldens or DB apply to prove idempotence.",
+  "finalMainIntegration": {
+    "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "mergeHead": "3ecb87bbfc83700d362d39ad57621caf0cffaea5",
+    "mainDeltaCount": 297,
+    "mainDeltaGroups": {
+      "docs": 149,
+      "situational declarative content/index": 148
+    },
+    "scope": "Main updates only independent SJT declarative content/index and documentation; no Scale sources/scorer/report/schema/lock/selected-checker changes.9 RPQ scientific/index input hashes remain identical. No SJT tests or RPQ scoring/DB reapply performed."
+  }
 }
