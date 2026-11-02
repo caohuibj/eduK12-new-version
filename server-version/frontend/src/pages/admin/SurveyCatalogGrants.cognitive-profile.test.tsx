@@ -44,7 +44,7 @@ describe('Survey exact cognitive administrator and consumer UI contracts (mock A
  it('lets a researcher import the fixed business configuration without a profile selector',async()=>{
   const grant=makeGrant({source,exact:{requestId:id(9),configurationName:'课堂反应体验'}}),onImport=vi.fn(async()=>{}),api=vi.fn(async()=>({list:[grant]}))
   render(<ResearchCatalog api={api as CatalogApi} projectId={id(8)} busy={false} onImport={onImport}/>)
-  fireEvent.click(await screen.findByRole('button',{name:'使用此配置：课堂反应体验'}));expect(onImport).toHaveBeenCalledWith(grant);expect(screen.queryByRole('combobox')).toBeNull()
-  expect(within(screen.getByRole('button',{name:'使用此配置：课堂反应体验'}).closest('article')!).getByText('课堂反应体验')).toBeInTheDocument()
+  fireEvent.click(await screen.findByRole('button',{name:'使用此配置：课堂反应体验'}));expect(onImport).toHaveBeenCalledWith(grant);expect(within(screen.getByRole('button',{name:'使用此配置：课堂反应体验'}).closest('article')!).queryByRole('combobox')).toBeNull()
+  expect(within(screen.getByRole('button',{name:'使用此配置：课堂反应体验'}).closest('article')!).getByText(`${source.kind} · 版本 ${source.sourceVersion} · 课堂反应体验`)).toBeInTheDocument()
  })
 })
