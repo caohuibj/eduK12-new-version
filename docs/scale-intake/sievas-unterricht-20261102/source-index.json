@@ -1,0 +1,340 @@
+{
+  "metadataVersion": "1.0.0",
+  "publisher": "Landesamt für Schule und Bildung (LaSuB), Sachsen",
+  "questionnaireIndexUrl": "https://sievas-unterricht.de/de_DE/unterricht/fragebogen.html",
+  "termsUrl": "https://sievas-unterricht.de/de_DE/start/nutzungsbedingungen.html",
+  "termsProvision": "§3(6): instrument redistribution requires written permission from LaSuB",
+  "counts": {
+    "linkedQuestionnaires": 17,
+    "publicStudentPreviewsObtained": 16,
+    "unavailableStudentPreviews": 1,
+    "knownStudentBlocks": 105,
+    "knownStudentItemPositions": 744,
+    "teacherQuestionnairesObtained": 0,
+    "actualScalesImported": 0,
+    "actualFormsImported": 0
+  },
+  "questionnaires": [
+    {
+      "id": "117",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/117.html",
+      "label": "Fragebogen allgemein Primarstufe",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g3_4",
+      "subject": "general",
+      "sourceTitle": "Schülerfragebogen Primarstufe - Fragebogen Grundschule - Fragebogen Klassenstufe 3-4",
+      "studentPreviewItemPositions": 87,
+      "blockCount": 17,
+      "htmlSha256": "7538f40fe580dcb6b8c2db97efe5ed5ad713c94d86e4e81a1484f6dfd4499e67",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/117/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "110",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/110.html",
+      "label": "Deutsch",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g3_4",
+      "subject": "german",
+      "sourceTitle": "Deutschunterricht in der Primarstufe - Fragebogen Klassenstufe 3-4",
+      "studentPreviewItemPositions": 61,
+      "blockCount": 5,
+      "htmlSha256": "ef61f54d0a4b6feb482790afe17044519e6f67cbe622e2bd41f6869b68504411",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/110/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "112",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/112.html",
+      "label": "Sachunterricht",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g3_4",
+      "subject": "social_science",
+      "sourceTitle": "Sachunterricht in der Primarstufe - Fragebogen Klassenstufe 3-4",
+      "studentPreviewItemPositions": 42,
+      "blockCount": 4,
+      "htmlSha256": "77b8396df572d0502c6b17768f3fd5088f2d5d16fb346c647d985161217c1caa",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/112/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "111",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/111.html",
+      "label": "Fremdsprachen",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g3_4",
+      "subject": "foreign_languages",
+      "sourceTitle": "Fremdsprachenunterricht in der Primarstufe - Fragebogen Klassenstufe 3-4",
+      "studentPreviewItemPositions": 57,
+      "blockCount": 7,
+      "htmlSha256": "70cf63b1d651e62231ad5387e22cfb209facd1fd42595dba5e29c4188475aa11",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/111/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "126",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/126.html",
+      "label": "Mathematik",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g3_4",
+      "subject": "mathematics",
+      "sourceTitle": "Mathematikunterricht in der Primarstufe - Fragebogen Klassenstufe 3-4",
+      "studentPreviewItemPositions": 27,
+      "blockCount": 5,
+      "htmlSha256": "397fdea6b5b9463494464402babb91675ab848d37da122c2821dc3dc47f360ac",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/126/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "139",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/139.html",
+      "label": "Musik",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g3_4",
+      "subject": "music",
+      "sourceTitle": "Musikunterricht in der Primarstufe - Fragebogen Klassenstufe 3-4",
+      "studentPreviewItemPositions": 16,
+      "blockCount": 2,
+      "htmlSha256": "e527ee2a3574fc72d9140687a30ad87e2b720cd0a4164129a71feddfc9ebbbf3",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/139/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "121",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/121.html",
+      "label": "Fragebogen Orientierungsstufe",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g5_6",
+      "subject": "general",
+      "sourceTitle": "Schülerfragebogen Orientierungsstufe - Fragebogen Klassenstufe 5-6",
+      "studentPreviewItemPositions": 88,
+      "blockCount": 17,
+      "htmlSha256": "8bee3328fa42f89dcfd53193526acfe122dd2ce8a7017f51353241e632730581",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/121/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "130",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/130.html",
+      "label": "Deutsch",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g5_6",
+      "subject": "german",
+      "sourceTitle": "Deutschunterricht in der Orientierungsstufe - Fragebogen Klassenstufe 5-6",
+      "studentPreviewItemPositions": 45,
+      "blockCount": 5,
+      "htmlSha256": "a48ecd4563a20360c072032754f0c8652c3c121c9f43386c6d7e248d318421bc",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/130/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "113",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/113.html",
+      "label": "Geografie",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g5_6",
+      "subject": "geography",
+      "sourceTitle": "Geografie in der Sekundarstufe - Fragebogen Klassenstufe 5-6",
+      "studentPreviewItemPositions": 26,
+      "blockCount": 4,
+      "htmlSha256": "342529b902f2f07ad772f92539ed666d7bb50df274c79f6c702a6da45cbf091b",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/113/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "114",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/114.html",
+      "label": "Geschichte",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g5_6",
+      "subject": "history",
+      "sourceTitle": "Geschichte in der Sekundarstufe - Fragebogen Klassenstufe 5-6",
+      "studentPreviewItemPositions": 25,
+      "blockCount": 3,
+      "htmlSha256": "7d13a086d438fa0495c1e407dd739a114a787754c3908da3f914dc2ef827b701",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/114/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "127",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/127.html",
+      "label": "Biologie",
+      "status": "FAILED",
+      "stage": "g5_6",
+      "subject": "biology",
+      "sourceTitle": null,
+      "studentPreviewItemPositions": null,
+      "blockCount": null,
+      "htmlSha256": null,
+      "pdfLinks": [],
+      "error": "HTTP Error 400: Bad Request",
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "122",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/122.html",
+      "label": "Fragebogen allgemein Sekundarstufe",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g7_plus",
+      "subject": "general",
+      "sourceTitle": "Schülerfragebogen Sekundarstufe - Fragebogen Klassenstufe ab 7",
+      "studentPreviewItemPositions": 88,
+      "blockCount": 17,
+      "htmlSha256": "37abd71eab7afc2ed0c77650475fc482d9c7eb9ff53b617f0c6209c0c759c17d",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/122/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "131",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/131.html",
+      "label": "Deutsch",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g7_plus",
+      "subject": "german",
+      "sourceTitle": "Deutschunterricht in der Sekundarstufe 1- Klasse 7 bis 10 / Oberschule - Fragebogen Klassenstufe ab 7",
+      "studentPreviewItemPositions": 45,
+      "blockCount": 5,
+      "htmlSha256": "9282536ca1f036226a78f93d469eea74ca24bcdb297e63ce1f5b968be1d6ff99",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/131/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": "7–10 / Oberschule explicitly stated in this source title; not all secondary tracks"
+    },
+    {
+      "id": "115",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/115.html",
+      "label": "Geografie",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g7_plus",
+      "subject": "geography",
+      "sourceTitle": "Geografieunterricht in der Sekundarstufe 1- Klasse 7 bis 10 / Oberschule - Fragebogen Klassenstufe ab 7",
+      "studentPreviewItemPositions": 36,
+      "blockCount": 4,
+      "htmlSha256": "79ec6364e57ea8fc50ea4be4525cd7058ff2003b4f5790226606e859a08951ae",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/115/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": "7–10 / Oberschule explicitly stated in this source title; not all secondary tracks"
+    },
+    {
+      "id": "116",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/116.html",
+      "label": "Geschichte",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g7_plus",
+      "subject": "history",
+      "sourceTitle": "Geschichte in der Sekundarstufe 1 – Klasse 7 bis 10 / Oberschule - Fragebogen Klassenstufe ab 7",
+      "studentPreviewItemPositions": 35,
+      "blockCount": 3,
+      "htmlSha256": "9f712a05d92278dd14087e75650d99f2f6b884bc830fde7e229f706ba8225f8a",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/116/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": "7–10 / Oberschule explicitly stated in this source title; not all secondary tracks"
+    },
+    {
+      "id": "128",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/128.html",
+      "label": "Biologie",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g7_plus",
+      "subject": "biology",
+      "sourceTitle": "Biologie in der Sekundarstufe - Fragebogen Klassenstufe ab 7",
+      "studentPreviewItemPositions": 36,
+      "blockCount": 4,
+      "htmlSha256": "a6bd0786dd35cec12ea3f3d6e6910109b68c09025a186bb0f3b5a632fd4e09e1",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/128/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    },
+    {
+      "id": "129",
+      "url": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/129.html",
+      "label": "Chemie",
+      "status": "PUBLIC_STUDENT_PREVIEW_READ",
+      "stage": "g7_plus",
+      "subject": "chemistry",
+      "sourceTitle": "Chemie in der Sekundarstufe - Fragebogen Klassenstufe ab 7",
+      "studentPreviewItemPositions": 30,
+      "blockCount": 3,
+      "htmlSha256": "549a280f391a2d93767a0d15e92cb178000da34166fdc4f66904192f4ae75d33",
+      "pdfLinks": [
+        "https://sievas-unterricht.de/de_DE/fragebogen/download/129/.html"
+      ],
+      "error": null,
+      "sourceVersion": "UNDATED; snapshot 2026-11-02",
+      "teacherTextObtained": false,
+      "sourceTitleRestriction": null
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "status": "PASS_BOUNDED_METADATA_CONSISTENCY",
+  "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "verified": {
+    "linkedSources": 17,
+    "obtainedStudentPreviews": 16,
+    "knownStudentBlocks": 105,
+    "knownStudentItemPositions": 744,
+    "teacherCandidates": 17,
+    "teacherCountsRemainUnknown": true,
+    "stageAndRoleIdentitiesSeparate": true,
+    "uniqueCandidateAndBlockKeys": true,
+    "sharedFamilyTag": true,
+    "observedResponseStructure": "four substantive categories plus separate cannot judge; 105 blocks",
+    "privateItemStatementsCheckedAgainstPublicFiles": 744,
+    "exactFullStatementCopiesFound": 0
+  },
+  "actualNativeScales": 0,
+  "actualNativeForms": 0,
+  "databaseImports": 0,
+  "runtimeScoringExecutions": 0,
+  "actualReportRenders": 0,
+  "permissions": "LaSuB written redistribution permission absent; no registration or acceptance",
+  "failuresRetained": [
+    {
+      "action": "local helper import bs4",
+      "outcome": "ModuleNotFoundError; replaced helper with stdlib HTMLParser; no dependency changes"
+    },
+    {
+      "action": "first public-preview batch",
+      "outcome": "HTTP400 caused interrupted manifest assembly; 14 files retained; bounded re-read same public links obtained 128/129; 127 still400"
+    },
+    {
+      "target": "https://sievas-unterricht.de/de_DE/fragebogen/voransicht/127.html",
+      "outcome": "HTTP400 in ordinary reader and web; no guessed IDs or login bypass"
+    }
+  ],
+  "notExecuted": [
+    "Native Form/Scale schema or DB import because redistribution permission and teacher text absent",
+    "Teacher scoring protocol or missing/reverse/golden cases",
+    "Student/teacher report rendering or permission changes",
+    "Production/admin-built duplicate search",
+    "CI, merge, deployment, full frontend/backend tests"
+  ],
+  "scopeClassification": {
+    "scenario": "content",
+    "scale_intake_light": false,
+    "frontend_build": false,
+    "image_build": false,
+    "codeql": false,
+    "note": "Docs-only source metadata; no Scale wrapper or selected checker invoked."
+  }
+}
