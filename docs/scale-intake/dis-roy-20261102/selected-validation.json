@@ -1,0 +1,74 @@
+{
+  "selectedCheck": {
+    "builtinDependencies": [],
+    "bundleDependencies": [],
+    "status": "SCALE_INTAKE_SELECTED_PASSED",
+    "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "head": "f2c3e30fa1cb5549b53b65f2d6f1883b32e10c08",
+    "checked": 4,
+    "results": [
+      {
+        "instrumentKey": "dis_pozas2022_reported14_apm_teacher_self_en_metadata",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "dis_pozas2022_reported14_ia_teacher_self_en_metadata",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "dis_roy_ms12_apm_teacher_self_en_metadata",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "dis_roy_ms12_ia_teacher_self_en_metadata",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      }
+    ],
+    "boundary": "content-contract-only; generator checked separately; no scientific, copyright, publication or deployment approval"
+  },
+  "indexCheck": {
+    "status": "PASS",
+    "removedImports": 0,
+    "addedImports": 4,
+    "existingImports": 258
+  },
+  "staticComponentCheck": {
+    "status": "PASS",
+    "count": 4,
+    "nativeScales": 0,
+    "nativeForms": 0,
+    "databaseImports": 0
+  },
+  "invocationHistory": [
+    {
+      "status": "FAILED_BEFORE_SELECTION",
+      "reason": "First local git add used backend cwd with repository-relative paths; no commit. CLI passed literal HEAD instead of required 40-character SHA; refused before loading candidates. Corrected cwd and exact SHA; no checker/schema changes."
+    },
+    {
+      "status": "PASS",
+      "head": "f2c3e30fa1cb5549b53b65f2d6f1883b32e10c08"
+    }
+  ],
+  "ci": "NOT_ACTIVATED_NOT_PASSED",
+  "database": "NOT_IMPORTED_RIGHTS_AND_VERSION_BLOCKED"
+}
