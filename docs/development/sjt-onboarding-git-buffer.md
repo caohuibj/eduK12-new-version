@@ -60,3 +60,9 @@ Draft现有合格项为scope+release-tools；转Ready时现有merge gate仍强�
 原因已本地复现：CI导出的HUI_EVIDENCE_BRANCH继承进临时fixture子进程，导致其“同分支输入变化”用例走到“另一分支无证据”分支，尝试执行临时仓库中不存在的真实工具测试。只在两个fixture子进程显式设HUI_EVIDENCE_BRANCH=payload.branch；不修改生产fromEnvironment、签名、输入绑定或拒绝规则。在模拟CI分支环境下定向复验4项通过：同分支成功复用、同分支输入变化拒绝、不同分支旧证据不冒认、完全相同输入跨分支可复用。
 
 原始失败不会标成成功。Notion指定历史错误页当前连接此前404，回写pending；上述脱敏记录可供协调者后补。新提交保持同一8文件范围，仅复验受影响工具路线。
+
+## 第二轮汇总失败与指纹一致性修正
+
+CI run 41368345463 / head 34a652f106839bb89afb566d874e6532f6295a8a：scope及release-tools（job 125033332214）成功，独立publication run 41368345381成功；汇总job 125033481693报mixed-or-unknown-tooling。具体原因是CLI已进入toolingOnly精确名单，但componentFingerprint仍把它算成backend应用变更，分类和汇总不一致。
+
+按既有Cognitive/Scale开发工具规则，将同一个SJT CLI精确集合同时用于工具名单和组件指纹；没有排除整个scripts目录，也不修改汇总门禁。源码引用核对仅发现开发测试引用该CLI，实际调用为package.json中的tsx开发检查命令；不声称该文件被tsconfig排除。新增临时Git仓库回归已通过：仅该CLI变更不改变应用指纹；混入运行时、未登记脚本或后端锁文件时指纹仍变化且工具路线拒绝。两轮失败后暂停广泛复验，仅定位并修正这一受影响契约；提交后以实际完整差异重算scope及原生汇总，结果另记在PR中，不能将本地模拟的作业状态冒充GitHub成功。

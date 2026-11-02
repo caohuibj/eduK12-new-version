@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
-import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {readFileSync,mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {join} from 'node:path';
+import {join,dirname} from 'node:path';
 import {stripTypeScriptTypes} from 'node:module';
 import {compileFunction} from 'node:vm';
-import {toolingOnly} from '../../server-version/scripts/release/policy.mjs';
+import {toolingOnly,componentFingerprint,entries} from '../../server-version/scripts/release/policy.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 
 const cli='server-version/backend/src/scripts/situational-onboarding-check.ts';
@@ -43,4 +43,25 @@ test('SJT tooling keeps content, review authority, runtime, dependencies and uns
  assert.match(workflow,/situational:onboarding-check -- --all --json --verify-reviews/);
  const ci=readFileSync('.github/workflows/ci.yml','utf8');
  assert.match(ci,/RELEASE_TOOLING==='true'\?\{paths:\[[^\n]*server-version\/backend\/src\/scripts/);
+});
+test('actual Git fingerprints exclude only the registered SJT development CLI',()=>{
+ const root=mkdtempSync(join(tmpdir(),'sjt-git-components-')),cwd=process.cwd();
+ try{
+  process.chdir(root);
+  const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+  git('init','--quiet');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid');
+  const paths=[cli,'server-version/backend/src/modules/situational/situational-runtime.service.ts','server-version/backend/src/scripts/unknown.ts','server-version/backend/package-lock.json'];
+  const write=(file,value)=>{mkdirSync(dirname(file),{recursive:true});writeFileSync(file,value);};
+  const commit=()=>{git('add','.');git('commit','--quiet','-m','fixture');return git('rev-parse','HEAD');};
+  for(const file of paths)write(file,'baseline');
+  const base=commit(),fingerprint=componentFingerprint(base,'backend');
+  write(cli,'buffer fix');const toolHead=commit();
+  assert(toolingOnly(entries(base,toolHead)));
+  assert.equal(componentFingerprint(toolHead,'backend'),fingerprint);
+  for(const file of paths.slice(1)){
+   git('reset','--hard',toolHead);write(file,'changed');const mixed=commit();
+   assert.notEqual(componentFingerprint(mixed,'backend'),fingerprint,file);
+   assert(!toolingOnly(entries(base,mixed)),file);
+  }
+ }finally{process.chdir(cwd);rmSync(root,{recursive:true,force:true});}
 });

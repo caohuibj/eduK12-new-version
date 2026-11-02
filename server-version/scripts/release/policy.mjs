@@ -92,6 +92,7 @@ export const backendTestFile=file=>typeof file==='string'&&/^server-version\/bac
 // may travel with their changed tests; runtime source and unknown modes escalate.
 const selectedCognitiveControlFiles=new Set(cognitiveIntakeToolingInputs.filter(file=>file.startsWith('server-version/backend/')));
 const selectedScaleControlFiles=new Set(['server-version/backend/scripts/scale-intake-selected-check.ts','server-version/backend/scripts/scale-intake-selected-check.test.ts']);
+const selectedSituationalControlFiles=new Set(['server-version/backend/src/scripts/situational-onboarding-check.ts']);
 const imageBuildInputs=new Set([
  '.github/scripts/build-ci-images.sh','.github/scripts/ci-image-plan.mjs','.github/scripts/ci-image-plan.test.mjs','.github/workflows/ci-images.yml',
  'server-version/frontend/Dockerfile','server-version/backend/Dockerfile',
@@ -124,7 +125,7 @@ const releaseToolFiles=new Set([
  'docs/cognitive-intake/PROJECT-INSTRUCTIONS.md',
  'docs/cognitive-intake/USE-IN-CHAT.md',
 
- 'server-version/backend/src/scripts/situational-onboarding-check.ts',
+ ...selectedSituationalControlFiles,
  '.github/scripts/sjt-onboarding-git-buffer.test.mjs','.github/workflows/situational-publication.yml',
  '.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs',
  '.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs',
@@ -151,8 +152,8 @@ export function toolingOnly(entries){
 export function componentFingerprint(sha,component){
  const roots=component==='frontend'?[front]:['server-version/backend/'];
  const files=git('ls-tree','-r',sha,'--',...roots).trim().split('\n').filter(Boolean);
- // backend tsconfig excludes src/__tests__; these files do not enter dist.
- return hash(files.filter(row=>{const file=row.split('\t')[1];return !selectedScaleControlFiles.has(file)&&!selectedCognitiveControlFiles.has(file)&&!backendTestFile(file)}).join('\n'));
+ // Registered development CLIs are checked as tools; backend tests do not enter dist.
+ return hash(files.filter(row=>{const file=row.split('\t')[1];return !selectedScaleControlFiles.has(file)&&!selectedCognitiveControlFiles.has(file)&&!selectedSituationalControlFiles.has(file)&&!backendTestFile(file)}).join('\n'));
 }
 function toolFingerprint(sha,files){try{return hash(files.map(f=>`${f}\0${readAt(sha,f)}`).join('\0'));}catch{return null;}}
 export function plan(base,head){
