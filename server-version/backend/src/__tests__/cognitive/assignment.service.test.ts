@@ -315,6 +315,12 @@ describe('getAssignmentForTeacher / getAssignmentForStudent', () => {
     const result = await getAssignmentForStudent('student-1', 'asg-1')
     expect(result.config.config).toBeUndefined()
     expect(result.config.configVersion).toBe('1.0.0')
+    const select = mockPrisma.cognitiveAssignment.findUnique.mock.calls[0][0].select
+    expect(select.config.select).not.toHaveProperty('config')
+    expect(select).not.toHaveProperty('resolvedConfigSnapshotEncrypted')
+    expect(select).not.toHaveProperty('resolvedReportSnapshotEncrypted')
+    expect(select.listedStandalone).toBe(true)
+    expect(select.course.select.isLibrary).toBe(true)
     expect(result).toMatchObject({ usedAttempts: 0, remainingAttempts: 1, continueHref: null })
   })
 

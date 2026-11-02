@@ -104,7 +104,7 @@ export const compositeApi = {
   revealToken: (id: string, tokenId: string) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens/${tokenId}/reveal`, {}),
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip'; anonymize?: boolean; courseId?: string }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
-  listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available'),
+  listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available', { params: { view: 'summary' } }),
   start: (assessmentId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/${assessmentId}/attempts`),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/attempts/${attemptId}/restart`),
   getAttempt: (attemptId: string, view: 'full' | 'current-unit' = 'full') => apiClient.get<CompositeAttemptState>(`/composite-assessments/attempts/${attemptId}${view === 'current-unit' ? '?view=current-unit' : ''}`),

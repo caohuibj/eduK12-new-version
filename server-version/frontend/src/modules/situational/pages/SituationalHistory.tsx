@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom'
 import { DiscoveryCard, PageHeader, ProductPage, ProductStatus } from '../../../components/product-ui'
 import { situationalApi } from '../api'
 import { situationalErrorMessage } from '../draft'
-import type { SituationalAttemptResponse } from '../types'
+import type { SituationalHistorySummary } from '../types'
 
 const SituationalHistory: React.FC = () => {
-  const [rows, setRows] = useState<SituationalAttemptResponse[]>([])
+  const [rows, setRows] = useState<SituationalHistorySummary[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -59,8 +59,8 @@ const SituationalHistory: React.FC = () => {
           <div className="grid gap-4">
             {rows.map((row) => {
               const completed = row.attempt.status === 'COMPLETED'
-              const metric = row.result?.metrics.find((item) => item.role === 'primary')
-              const title = row.instrument.title || row.instrument.report.interpretations[0]?.headline || row.attempt.instrumentKey
+              const metric = row.primaryMetric
+              const title = row.instrument.title || row.attempt.instrumentKey
               return (
                 <DiscoveryCard
                   key={row.attemptId}
@@ -79,7 +79,7 @@ const SituationalHistory: React.FC = () => {
                       {completed ? '已完成' : '进行中'}
                     </span>
                   )}
-                  description={completed && row.result?.narrative ? '查看本次情境中的选择与反思。' : completed && metric
+                  description={completed && row.hasNarrative ? '查看本次情境中的选择与反思。' : completed && metric
                     ? `${metric.label}：${metric.value === null ? '暂不可计算' : metric.value.toFixed(metric.displayPrecision)}`
                     : undefined}
                   meta={(

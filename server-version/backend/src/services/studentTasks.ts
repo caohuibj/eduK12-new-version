@@ -52,7 +52,7 @@ export async function listStudentTasks(userId: string, options: { page: number; 
       select: { id: true, name: true, courseQuestionnaires: { where: { courseId: { in: scopedCourseIds } }, select: { courseId: true } },
         assessments: { where: { userId }, select: { id: true, status: true, completedAt: true } } },
     }),
-    listAvailableForStudent(userId, now.getTime(), options.courseId),
+    listAvailableForStudent(userId, now.getTime(), options.courseId, true),
   ])
   const deliveries = composites.length ? await prisma.questionnaireCourseDelivery.findMany({
     where: { compositeId: { in: composites.map(item => item.id) }, courseId: { in: scopedCourseIds } },
