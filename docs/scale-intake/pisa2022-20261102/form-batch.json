@@ -1,0 +1,141 @@
+{
+  "recordType": "native_FORM_import_package_not_new_runtime",
+  "mother": "PISA 2022 USA English classroom experience",
+  "familyTag": "mother:PISA_2022",
+  "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/data/datasets/pisa/pisa-2022-datasets/national-versions-pisa-2022-datasets/United%20States.zip",
+  "sourceMember": "USA/eng-USA_United States-Student_Questionnaire_MS22.pdf",
+  "sourceSha256": "baf0191c8da494801063dce61922d8a7fbbabee81ba559b943f5fb2d224ee6f2",
+  "licenseBasis": "https://www.oecd.org/en/about/terms-conditions.html §1.2",
+  "conditions": [
+    "English only, OECD attribution and adaptation disclaimer retained",
+    "No OECD logo, endorsement or NCES official survey privacy/OMB claims",
+    "Actual third-party exceptions remain outside OECD permission; none marked in these 37 items",
+    "Commercial translation is not authorized by this package"
+  ],
+  "forms": [
+    {
+      "key": "pisa2022_st267_usa_en_student_form",
+      "kind": "FORM",
+      "contentVersion": "1.0.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "fields": 8,
+      "nativeSubmission": "forms/pisa2022_st267_usa_en_student_form.json",
+      "csv": "csv/pisa2022_st267_usa_en_student_form.csv.txt",
+      "csvInput": "csv/pisa2022_st267_usa_en_student_form.import.json",
+      "sourceBlock": "ST267",
+      "sourceIds": [
+        "ST267Q01JA",
+        "ST267Q02JA",
+        "ST267Q03JA",
+        "ST267Q04JA",
+        "ST267Q05JA",
+        "ST267Q06JA",
+        "ST267Q07JA",
+        "ST267Q08JA"
+      ],
+      "rawQuestionsUnchanged": true,
+      "presentationOnlyChange": "page title and source/adaptation description",
+      "familyTag": "mother:PISA_2022"
+    },
+    {
+      "key": "pisa2022_st273_usa_en_student_form",
+      "kind": "FORM",
+      "contentVersion": "1.0.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "fields": 7,
+      "nativeSubmission": "forms/pisa2022_st273_usa_en_student_form.json",
+      "csv": "csv/pisa2022_st273_usa_en_student_form.csv.txt",
+      "csvInput": "csv/pisa2022_st273_usa_en_student_form.import.json",
+      "sourceBlock": "ST273",
+      "sourceIds": [
+        "ST273Q01JA",
+        "ST273Q02JA",
+        "ST273Q03JA",
+        "ST273Q04JA",
+        "ST273Q05JA",
+        "ST273Q06JA",
+        "ST273Q07JA"
+      ],
+      "rawQuestionsUnchanged": true,
+      "presentationOnlyChange": "page title and source/adaptation description",
+      "familyTag": "mother:PISA_2022"
+    },
+    {
+      "key": "pisa2022_st270_usa_en_student_form",
+      "kind": "FORM",
+      "contentVersion": "1.0.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "fields": 4,
+      "nativeSubmission": "forms/pisa2022_st270_usa_en_student_form.json",
+      "csv": "csv/pisa2022_st270_usa_en_student_form.csv.txt",
+      "csvInput": "csv/pisa2022_st270_usa_en_student_form.import.json",
+      "sourceBlock": "ST270",
+      "sourceIds": [
+        "ST270Q01JA",
+        "ST270Q02JA",
+        "ST270Q03JA",
+        "ST270Q04JA"
+      ],
+      "rawQuestionsUnchanged": true,
+      "presentationOnlyChange": "page title and source/adaptation description",
+      "familyTag": "mother:PISA_2022"
+    },
+    {
+      "key": "pisa2022_st285_usa_en_student_form",
+      "kind": "FORM",
+      "contentVersion": "1.0.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "fields": 9,
+      "nativeSubmission": "forms/pisa2022_st285_usa_en_student_form.json",
+      "csv": "csv/pisa2022_st285_usa_en_student_form.csv.txt",
+      "csvInput": "csv/pisa2022_st285_usa_en_student_form.import.json",
+      "sourceBlock": "ST285",
+      "sourceIds": [
+        "ST285Q01JA",
+        "ST285Q02JA",
+        "ST285Q03JA",
+        "ST285Q04JA",
+        "ST285Q05JA",
+        "ST285Q06JA",
+        "ST285Q07JA",
+        "ST285Q08JA",
+        "ST285Q09JA"
+      ],
+      "rawQuestionsUnchanged": true,
+      "presentationOnlyChange": "page title and source/adaptation description",
+      "familyTag": "mother:PISA_2022"
+    },
+    {
+      "key": "pisa2022_st283_usa_en_student_form",
+      "kind": "FORM",
+      "contentVersion": "1.0.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "fields": 9,
+      "nativeSubmission": "forms/pisa2022_st283_usa_en_student_form.json",
+      "csv": "csv/pisa2022_st283_usa_en_student_form.csv.txt",
+      "csvInput": "csv/pisa2022_st283_usa_en_student_form.import.json",
+      "sourceBlock": "ST283",
+      "sourceIds": [
+        "ST283Q01JA",
+        "ST283Q02JA",
+        "ST283Q03JA",
+        "ST283Q04JA",
+        "ST283Q05JA",
+        "ST283Q06JA",
+        "ST283Q07JA",
+        "ST283Q08JA",
+        "ST283Q09JA"
+      ],
+      "rawQuestionsUnchanged": true,
+      "presentationOnlyChange": "page title and source/adaptation description",
+      "familyTag": "mother:PISA_2022"
+    }
+  ],
+  "productionWrites": false,
+  "automaticPublication": false
+}

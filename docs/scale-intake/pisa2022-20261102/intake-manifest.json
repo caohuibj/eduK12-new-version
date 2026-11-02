@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "motherTool": "PISA 2022",
   "scope": "USA English Main Survey student classroom-experience extraction; 2022 wave only",
-  "status": "CANDIDATE_METADATA_ONLY",
+  "status": "PUBLIC_NATIVE_FORM_PACKAGE_AND_CATALOG_ONLY_WLE_CANDIDATES",
   "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
   "contentLocale": "en-US",
   "sourceReadAt": "2026-11-02",
@@ -64,8 +64,8 @@
       "formScores": [],
       "formScoringParameters": null,
       "formReportVersion": null,
-      "formStatus": "PRIVATE_LOCAL_PREPARATION_NOT_PUBLICLY_DISTRIBUTABLE",
-      "itemTextIncludedInRepository": false
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
     },
     {
       "catalogKey": "pisa2022_disclim_usa_en_student",
@@ -100,8 +100,8 @@
       "formScores": [],
       "formScoringParameters": null,
       "formReportVersion": null,
-      "formStatus": "PRIVATE_LOCAL_PREPARATION_NOT_PUBLICLY_DISTRIBUTABLE",
-      "itemTextIncludedInRepository": false
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
     },
     {
       "catalogKey": "pisa2022_teachsup_usa_en_student",
@@ -138,8 +138,8 @@
       "formScores": [],
       "formScoringParameters": null,
       "formReportVersion": null,
-      "formStatus": "PRIVATE_LOCAL_PREPARATION_NOT_PUBLICLY_DISTRIBUTABLE",
-      "itemTextIncludedInRepository": false
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
     },
     {
       "catalogKey": "pisa2022_cogacrco_usa_en_student",
@@ -176,8 +176,8 @@
       "formScores": [],
       "formScoringParameters": null,
       "formReportVersion": null,
-      "formStatus": "PRIVATE_LOCAL_PREPARATION_NOT_PUBLICLY_DISTRIBUTABLE",
-      "itemTextIncludedInRepository": false
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
     },
     {
       "catalogKey": "pisa2022_cogacmco_usa_en_student",
@@ -214,8 +214,8 @@
       "formScores": [],
       "formScoringParameters": null,
       "formReportVersion": null,
-      "formStatus": "PRIVATE_LOCAL_PREPARATION_NOT_PUBLICLY_DISTRIBUTABLE",
-      "itemTextIncludedInRepository": false
+      "formStatus": "PUBLIC_NATIVE_IMPORT_PAYLOAD_NOT_INSTALLED",
+      "itemTextIncludedInRepository": true
     }
   ],
   "ordinaryCombinationCandidates": [
@@ -266,7 +266,7 @@
     "No official or project cross-tool total"
   ],
   "permissions": {
-    "questionnaire": "US national item-redistribution scope unresolved; no item text or options committed",
+    "questionnaire": "English native Form payloads included under OECD written-content terms §1.2 with attribution/adaptation notice; actual specific/third-party exceptions excluded if identified. Commercial translation not included.",
     "oecdTerms": "https://www.oecd.org/en/about/terms-conditions.html §1.2 allows use/copy/distribution and adaptation of solely OECD-owned pre-July-2024 written content; third-party rights and exact USA national material still require verification. Not a CC BY claim for the 2022 questionnaire.",
     "technicalReport": "2025 revised Technical Report declares CC BY 4.0; metadata below paraphrases it.",
     "productionDedup": "NOT_CHECKED",
@@ -274,7 +274,7 @@
   },
   "versionPlan": {
     "candidateMetadata": "1.0.0",
-    "formContent": "1.0.0 local preparation only",
+    "formContent": "1.0.0 public native Form submission + CSV payload; not installed/published",
     "scoringParameters": "NOT_CREATED (FORM has no scoring)",
     "report": "NOT_INSTALLED; receiver-specific prose examples only",
     "motherRuntime": "NOT_CREATED; use ordinary composition after approved child versions exist"
