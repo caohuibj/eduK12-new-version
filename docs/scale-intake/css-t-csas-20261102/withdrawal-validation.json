@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "checkedAt": "2026-11-02T02:51:30.274422+00:00",
+  "baselineSha": "7cbe81a72623cc65a80c45217447e43364c3e285",
+  "scope": "English item35 incomplete-source module withdrawal and affected import/assembly references only",
+  "eligibleForms": 15,
+  "eligibleItemInstances": 92,
+  "frenchForms": 8,
+  "englishForms": 7,
+  "withheldModule": "css_t_lu2023_corrective_feedback_en",
+  "withheldComposite": "css_t_lu2023_frequency49_combo_en",
+  "retainedPayloadHashes": {
+    "forms/css_t_lu2023_academic_performance_feedback_en.json": "d64ac0b70c9ddd654c028d887dc6227433a5e746c7e4864c0250ec7a0a41de82",
+    "forms/css_t_lu2023_academic_performance_feedback_fr.json": "8ebb06a4f41ba3605de0999d41f28859b66238af6c98d4b212f5692e40ed911e",
+    "forms/css_t_lu2023_corrective_feedback_fr.json": "5f28c1fe77ead7a766131c000d514ee7706c7288997e3c4916256975d4292c2a",
+    "forms/css_t_lu2023_directives_transitions_en.json": "02e601b2612b0576b0b2e1b07299d41cfe6e06fd88d7e571e2de8c0744d573fb",
+    "forms/css_t_lu2023_directives_transitions_fr.json": "bae9059c96185dce0e71549b005b6060a16561431676e89ad1a1ec19202aebde",
+    "forms/css_t_lu2023_instructional_delivery_en.json": "a8cd901d110dc7116f7ded3e43d1c87a839509bda81f369e0390ea87836a994b",
+    "forms/css_t_lu2023_instructional_delivery_fr.json": "f7c0f0fd490cc6698aeb63de9eda892afc6f7bf9809eba9d93096e7c2ce5e5d9",
+    "forms/css_t_lu2023_praise_en.json": "3baa4f2d46288a49460119e6e9c4ebb57cbe3e8d65d78a7b75b6395fe647342f",
+    "forms/css_t_lu2023_praise_fr.json": "44fad173825da9f5533ea6ef0fc3f4ee1fa902092d69a5a0d3316c96a5038f3f",
+    "forms/css_t_lu2023_prevention_management_en.json": "7945225b9ab3873d5625700ababde724aa1fd60b19946555a43e30d479498508",
+    "forms/css_t_lu2023_prevention_management_fr.json": "0c4c69b278412ce07086238aa7467186c32752a0bcd99da2b1deab919bf7ca9a",
+    "forms/css_t_lu2023_promotes_student_thinking_en.json": "199cbee543ff355d378c1dd8970d4d3acde87d5d06f119efd70ea86da6750ebd",
+    "forms/css_t_lu2023_promotes_student_thinking_fr.json": "56bf13cfef61b9dbbf5dd6e276146f7dbf45c08b8dcbffb6debf1a2a7f768ec7",
+    "forms/css_t_lu2023_student_focused_learning_engagement_en.json": "0c34458777377cddde2e8446f41262cb647be144e6919d38f7c4029de807b9a1",
+    "forms/css_t_lu2023_student_focused_learning_engagement_fr.json": "878725e8678e7c645a4f916b69fc7b28b311a2ea6a321e74a378cebb3aa1ce0e"
+  },
+  "historicalValidationSha256": "e37a7930f44a6dd04071bd792ad27ebe8d60c2f612af9682f0b7d6592b87267f",
+  "checks": [
+    "READY/import manifest excludes incomplete English module: 15 complete forms",
+    "French8/49 and English7/43 remain as separate complete forms",
+    "Directory glob, manifest paths and import hash map all select the same15; blocked payload absent",
+    "15 retained payloads are byte-identical to prior validated commit; no runtime/schema/answer tests repeated",
+    "Only French49 assembly remains; all child references resolve to eligible complete forms",
+    "English49 plan is non-administerable metadata with no assembly childKeys",
+    "Original incomplete source excerpt preserved exactly; withheld record is not a native import payload",
+    "No residual executable Form payload for blocked module anywhere under this intake directory",
+    "Initial16-import evidence preserved byte-for-byte as historical evidence",
+    "No outside-directory runtime/index/assembly reference to blocked module",
+    "Change limited to this intake content and documentation; no generic engine or gate edits"
+  ],
+  "runtimeSchemaOrAnswerReplay": "NOT_RUN_unchanged_inputs",
+  "databaseWrite": "NOT_RUN_frozen_synthetic_records_unchanged",
+  "fullPlatformTests": "NOT_RUN",
+  "formalCI": "NOT_RUN_NOT_CLAIMED",
+  "script": {
+    "path": "/tmp/css-t-withdraw-check.py",
+    "sha256": "87d3fa81db90af782b771e57a31baed5886e333891e6708c857e1291a3829422"
+  }
+}
