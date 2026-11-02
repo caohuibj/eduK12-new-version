@@ -2453,12 +2453,13 @@
     "requiredBeforeActualImport": "再按作者/来源快照/题项/语言/年级/版本核目标DB与管理员自建同义ID；重合引用既有，不重复建立。"
   },
   "validation": {
-    "schema": "PENDING",
-    "registryAndPreview": "PENDING",
-    "formalCI": "NOT_RUN",
+    "schema": "PASS_38_SELECTED_SOURCES",
+    "registryAndPreview": "PASS_38_CATALOG_ONLY_BOUNDARIES",
+    "formalCI": "NOT_RUN_PENDING_DOT_REVIEW_AND_EXISTING_BUILTIN_SCANNER_BLOCKER",
     "isolatedDbInstall": "NOT_APPLICABLE_CATALOG_ONLY",
     "developmentDbInstalled": false,
     "productionInstalled": false,
-    "published": false
+    "published": false,
+    "fullLocalSelectedCli": "FAIL_EXISTING_BUILTIN_STATIC_FACTORY_SHAPE"
   }
 }

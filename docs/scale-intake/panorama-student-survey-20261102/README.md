@@ -44,4 +44,6 @@
 
 正式CI应沿现有content→scale-intake轻路线；本批先交主线dot独立复核精确base/head/tree及检查记录，未激活CI、未宣称merge-ready。依据仓库AGENTS及Notion [CI常见错误清单](https://app.notion.com/p/404d27635a388186ac80de3593da05a5)中“dot独立复核后决定是否触发”；不是新增应用门禁。适用CI-007（生成索引）和CI-020（精确身份）；CI-006仅核原有候选拒绝边界，无权限/发布变动。Draft提交标记skip ci以保留这一顺序。
 
+本地完整`scale-intake-selected-check.ts`命令实际FAIL：`BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape`。38个选中来源的schema/validator及CATALOG_ONLY检查通过，生成索引通过，生成Bundle反向依赖为空；随后未修改的既有Builtin工厂静态检查失败，CLI未输出整体验收成功。以精确main原Builtin blobs、零新增来源调用同一函数得到同一错误，检查器和该目录相对基线均未改。保留原失败，不将局部PASS叫完整CI通过，不修改共享检查器或转跑全平台；主线可另行处理这个既有工具范围限制。适用CI-004也记录为BLOCKED。
+
 管理员最终需：确认固定题本及使用/再分发/数字化/翻译范围；核目标库同义项；建立有合法内容和精确年级/层级的原生Scale及无计分Form；核研究计分规则到实际题本的绑定与各模块缺失边界；按既有C/P/R及接收者授权审阅学生/教师报告；再在明确开发/隔离库通过已有导入、读取和报告路径验证。当前CATALOG_ONLY按已有materialize流程不能安装，故本轮没有伪造隔离DB安装、DRAFT或公共发布。正式CI、安装、公开和部署分别报告，均不得由目录登记推断完成。

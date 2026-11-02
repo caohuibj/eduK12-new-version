@@ -1,0 +1,528 @@
+{
+  "recordType": "verification_evidence_not_runtime_payload",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "validatedDeclarationSha": "fc34938b5be434e45c4e497869f23cf341eb5993",
+  "validatedTree": "2dbd291bbbd1f59f00465fb9e7aaa360d586012a",
+  "selectedSourceChecks": {
+    "status": "SELECTED_SOURCE_CONTRACTS_PASS_CLI_BUILTIN_DEPENDENCY_BLOCKED",
+    "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "validatedDeclarationSha": "fc34938b5be434e45c4e497869f23cf341eb5993",
+    "checked": 38,
+    "results": [
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_belonging_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_belonging_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_climate_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_climate_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_engagement_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_engagement_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_learning_strategies_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_learning_strategies_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_mindset_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_mindset_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_pedagogical_effectiveness_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_pedagogical_effectiveness_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_rigorous_expectations_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_rigorous_expectations_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_valuing_subject_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_classroom_valuing_subject_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_belonging_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_belonging_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_climate_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_climate_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_engagement_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_engagement_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_learning_strategies_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_learning_strategies_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_mindset_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_mindset_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_perseverance_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_perseverance_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_rigorous_expectations_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_rigorous_expectations_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_safety_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_safety_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_teacher_student_relationships_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_teacher_student_relationships_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_valuing_g3_5_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      },
+      {
+        "instrumentKey": "panorama_ss_guide_school_valuing_g6_12_en",
+        "instrumentVersion": "1.0.0",
+        "status": "CATALOG_ONLY",
+        "administrable": false,
+        "goldenCases": 0,
+        "scoringExecutions": 0,
+        "issues": []
+      }
+    ],
+    "bundleDependencies": [],
+    "fullCli": {
+      "status": "FAIL",
+      "exitCode": 1,
+      "firstError": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape",
+      "downstream": "CLI success envelope not emitted"
+    },
+    "baselineControl": {
+      "inputSources": 0,
+      "error": "BUILTIN_SCALE_STATIC_UNRESOLVED_USE_BROADER_CONTENT_LANE:server-version/backend/src/modules/assessment-bundle/bundles/child-chexi-observer-zh-cn-v1.ts:factory-shape",
+      "consumerFilesChanged": [],
+      "interpretation": "Same builtin scanner failure using exact main builtin blobs and zero new Panorama sources; failure is not caused by these declarations. Builtin dependency closure remains unverified by full CLI; no bypass or broader CI."
+    }
+  },
+  "runtimeCatalogBoundary": {
+    "checkedAt": "2026-11-02T00:30:39.045Z",
+    "sourceCount": 38,
+    "registryDiscovery": "PASS",
+    "previewActivationDenied": 38,
+    "noExecutableOrRuntimePolicy": 38,
+    "noRuntimeReportOrDisclosure": 38,
+    "materializeRejectedBeforeDatabaseAccess": 38,
+    "databaseCalls": 0,
+    "formPlansNotRegisteredAsScales": 6,
+    "ordinaryCompositePlansResolvable": 4,
+    "actualDatabaseConnected": false,
+    "actualDatabaseInstall": "NOT_APPLICABLE_CATALOG_ONLY",
+    "actualReportRendering": "NOT_RUN_NO_RUNTIME_REPORT",
+    "boundary": "Existing registry/preview/materialize APIs; no new engine, no grants, no database writes; narrative samples manually reviewed, not a rendered R version."
+  },
+  "generatorCheck": {
+    "status": "PASS",
+    "command": "npm run scale:instruments:check",
+    "executions": 1
+  },
+  "diffCheck": "PASS",
+  "nodeVersion": "v24.21.0",
+  "backendLockSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+  "checkedDeclarationBlobs": {
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_belonging_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_belonging_g3_5_en/1.0.0/source.json": "4a789eead902fc62c04998938a0c0c9b424e6f78",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_belonging_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_belonging_g6_12_en/1.0.0/source.json": "b24723b3de11f150e4360d3c7bcc8078ca5463c4",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_climate_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_climate_g3_5_en/1.0.0/source.json": "7fae8e3ae48ed8d923597dc092705d54b444181e",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_climate_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_climate_g6_12_en/1.0.0/source.json": "24fe409ca32e18745ff214bbc90ab713d8fd2f41",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_engagement_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_engagement_g3_5_en/1.0.0/source.json": "ec798f5bda148fd115eee9883f2ca251d78f0d4b",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_engagement_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_engagement_g6_12_en/1.0.0/source.json": "476cadc679623bf8fe19d90e630e204652678c17",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_learning_strategies_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_learning_strategies_g3_5_en/1.0.0/source.json": "e70ed73bce8c48d92da65611910ebee01a2d9fdc",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_learning_strategies_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_learning_strategies_g6_12_en/1.0.0/source.json": "7898cdcca8b12351039725e88361c68b86cc287b",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_mindset_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_mindset_g3_5_en/1.0.0/source.json": "7c2730dd2bf3e4c6525994b9dabe5810ecf0a61e",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_mindset_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_mindset_g6_12_en/1.0.0/source.json": "ce83d7d0fb2b8f74012cf888ca18f392b5a2c7f2",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_pedagogical_effectiveness_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_pedagogical_effectiveness_g3_5_en/1.0.0/source.json": "592b6ac3d9c812261594aa20f058fc7f4eedb336",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_pedagogical_effectiveness_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_pedagogical_effectiveness_g6_12_en/1.0.0/source.json": "4d56bf19153e85263462c18fa9b09475662d8b37",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_rigorous_expectations_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_rigorous_expectations_g3_5_en/1.0.0/source.json": "1dac03f5db4cac69ab9f66e6a305d93b8ffdc654",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_rigorous_expectations_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_rigorous_expectations_g6_12_en/1.0.0/source.json": "2678fd79b4be9baec44a9fde36da2e4dca0ec9d1",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_teacher_student_relationships_g3_5_en/1.0.0/source.json": "2854caa9a4380c99bf86dc3627078c36e3e37d81",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_teacher_student_relationships_g6_12_en/1.0.0/source.json": "1c0815b3c2f5797e540f0b8b07a36d06059ea6d7",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_valuing_subject_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_valuing_subject_g3_5_en/1.0.0/source.json": "c55fe0a9f0c92271434ccdca6152598a095559b4",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_valuing_subject_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_classroom_valuing_subject_g6_12_en/1.0.0/source.json": "d08860052c5272ea9818d8e82c5ac7ccf8dbc095",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_belonging_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_belonging_g3_5_en/1.0.0/source.json": "ff894bb911f01a0ede3b4dbf6efcbc1b7c184520",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_belonging_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_belonging_g6_12_en/1.0.0/source.json": "3ba3cff1845ac73a03850f1200deeafc15da1ec2",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_climate_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_climate_g3_5_en/1.0.0/source.json": "512d09ddd48157521a5610eb0f759ec43a9b80ad",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_climate_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_climate_g6_12_en/1.0.0/source.json": "f34295676eba4ffb5b2bfebf388eb0d13d4ded5d",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_engagement_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_engagement_g3_5_en/1.0.0/source.json": "a26aec90cca0f205da45f3c71cc85812664401e0",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_engagement_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_engagement_g6_12_en/1.0.0/source.json": "573a4ae9252c503b301053d96df6a7a9961f783d",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_learning_strategies_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_learning_strategies_g3_5_en/1.0.0/source.json": "f25e6fe020f5ddb823796e231ad839669b904b3e",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_learning_strategies_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_learning_strategies_g6_12_en/1.0.0/source.json": "1b31154b4fc9b629e20796354aa0be63bdeaac2c",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_mindset_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_mindset_g3_5_en/1.0.0/source.json": "8d9f430a0306d5fd6539206b5a78c44c9c521e52",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_mindset_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_mindset_g6_12_en/1.0.0/source.json": "1a9ac9b8f9627565e26bd7101ffdbe92cf1aafb0",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_perseverance_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_perseverance_g3_5_en/1.0.0/source.json": "9116dbd5f098ec38aa029ee36a633b15d904de49",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_perseverance_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_perseverance_g6_12_en/1.0.0/source.json": "898ab820b91e98ae44d69b64638fd4acf337ab8f",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_rigorous_expectations_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_rigorous_expectations_g3_5_en/1.0.0/source.json": "1d29911a5f725ea6329e5c6de3140202dcce782e",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_rigorous_expectations_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_rigorous_expectations_g6_12_en/1.0.0/source.json": "3c6f61ebb024932be28043ea8e28aae74bb2d594",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_safety_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_safety_g3_5_en/1.0.0/source.json": "d727a074ac978c82f43773c482f510df54356457",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_safety_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_safety_g6_12_en/1.0.0/source.json": "d33def8081d1bd273a41618a87402a469f57ef1f",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_teacher_student_relationships_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_teacher_student_relationships_g3_5_en/1.0.0/source.json": "b3ec73f6ca7a0c85fadc0b196721cc504fb2347a",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_teacher_student_relationships_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_teacher_student_relationships_g6_12_en/1.0.0/source.json": "745885baafa7a1b01d13be25c3de8a7624d721cc",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_valuing_g3_5_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_valuing_g3_5_en/1.0.0/source.json": "a1742f34f95f5e333c25b65b81343018c0e2e838",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_valuing_g6_12_en/1.0.0/instrument.ts": "0eed070bb879576339c5a71afdf34c0026591fd3",
+    "server-version/backend/src/modules/scale/instruments/panorama_ss_guide_school_valuing_g6_12_en/1.0.0/source.json": "4f4756973e0133dc861cdaf54d6d6507242e2f98",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "5439563684603d02dacc7634c6543ad890228d48"
+  },
+  "evidenceReuse": "Subsequent evidence commit changes only docs/scale-intake metadata. All 38 source.json, 38 wrappers and generated registry retain these exact checked blobs; no repeat source/boundary/generator executions. Final raw-diff scope is checked after evidence commit.",
+  "reportReview": {
+    "status": "MANUAL_EDITORIAL_REVIEW",
+    "studentAgeBands": [
+      "3-5",
+      "6-12"
+    ],
+    "teacherRecipient": "existing_authorized_aggregate_only",
+    "scenarios": [
+      "interpretable_positive_experience",
+      "interpretable_low_experience",
+      "insufficient_evidence",
+      "no_score_form"
+    ],
+    "runtimeRendered": false,
+    "claim": "Draft language and recipient conditions only; no new disclosure policy or report version."
+  },
+  "formalCI": {
+    "status": "NOT_RUN",
+    "reason": "AGENTS/Notion require parent dot independent review; exact local selected CLI also has known unmodified-main builtin static dependency scanner blocker. No new engine/checker fix, no broader platform CI.",
+    "expectedRoute": "content -> scale-intake (scope selection only; not qualified)",
+    "runUrl": null
+  },
+  "database": {
+    "connected": false,
+    "developmentInstalled": false,
+    "productionDedup": "NOT_CHECKED",
+    "productionInstalled": false,
+    "isolatedImport": "NOT_APPLICABLE_CATALOG_ONLY; existing materialize rejected all 38 before DB access"
+  },
+  "remainingBlockers": [
+    {
+      "action": "Public item redistribution / digital commercial delivery / translation",
+      "target": "38 English guide module versions and 6 form content plans",
+      "reason": "Public source access verified; project-specific license scope not established",
+      "state": "PENDING_RIGHTS_EVIDENCE"
+    },
+    {
+      "action": "Freeze runnable per-module scoring and reports",
+      "target": "User Guide snapshot f7588c4b vs validity-report snapshot 90a605d8",
+      "reason": "Research scoring method available, but exact item-version/age-table mapping not verified; Valuing modules absent from report topic table",
+      "state": "PENDING_SOURCE_BINDING"
+    },
+    {
+      "action": "Complete selected-content CLI / formal lightweight CI",
+      "target": "checkSelectedBuiltinDependencies; child-chexi-observer-zh-cn-v1.ts:factory-shape",
+      "reason": "Same error on unchanged base builtin blobs with zero Panorama sources; full CLI success not reached",
+      "state": "BLOCKED_EXISTING_TOOLING; NOT_AUTO_REVIEW_DENIAL"
+    },
+    {
+      "action": "Actual target database import",
+      "target": "Panorama catalog-only sources",
+      "reason": "Existing importer requires executable content; catalog-only cannot install. No import attempted and no DB mutation",
+      "state": "NOT_APPLICABLE_UNTIL_LEGAL_EXECUTABLE_CONTENT_READY"
+    }
+  ]
+}
