@@ -200,7 +200,7 @@ async function main() {
         await page.goto(base + '/scale-library')
         await page.getByRole('heading', { name: longTitle, exact: true }).waitFor()
         assert.equal(await page.getByLabel('年龄下界', { exact: true }).isVisible(), false, 'advanced fields are initially collapsed')
-        const more = page.getByText('更多筛选', { exact: true })
+        const more = page.locator('details').filter({ has: page.getByLabel('年龄下界', { exact: true }) }).locator('summary')
         await more.press('Enter')
         await page.getByLabel('年龄下界', { exact: true }).fill('10')
         await capture(page, 'scale-more-filters', width)
