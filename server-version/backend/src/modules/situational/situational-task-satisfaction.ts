@@ -25,6 +25,9 @@ export function onlineSituationalTaskSatisfied(definition: SituationRuntimeDefin
 
 /** Only the new server-owned protocol marker activates this qualification. */
 export function onlineSituationalCanonicalTaskSatisfaction(core: Pick<CanonicalUnitResultCoreV1, 'unitType' | 'quality'>): 'SATISFIED' | 'NOT_SATISFIED' | null {
+  // The bounded unscored contract contains required choice channels only.
+  // U/N finishes the attempt normally; this is task qualification, never ability.
+  if (core.unitType === 'SITUATIONAL' && core.quality.status === 'unscored') return core.quality.flags.includes('nonanswer_present') ? 'NOT_SATISFIED' : 'SATISFIED'
   if (core.unitType !== 'SITUATIONAL' || !core.quality.flags.includes(SJT_ONLINE_PROTOCOL_FLAG)) return null
   return core.quality.flags.includes(SJT_ONLINE_UNSATISFIED_FLAG) ? 'NOT_SATISFIED' : 'SATISFIED'
 }

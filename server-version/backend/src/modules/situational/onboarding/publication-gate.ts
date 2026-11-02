@@ -43,7 +43,7 @@ export function evaluateSituationalPublicationGate(value: unknown) {
   try {
     runtime = compileSituationRuntime({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, definition: pkg.definition, sourceDefinitionHash: validation.definitionHash })
     const c = runtime.runtimeCapabilities
-    if (!c.supported || !c.standalone || !c.embedded || !c.aggregateEligible || c.collectionFacts) errors.push({ code: 'UNSUPPORTED_CAPABILITY', path: 'runtimeCapabilities', message: 'Existing SJT execution contract is required' })
+    if (!c.supported || !c.standalone || !c.embedded || c.aggregateEligible !== (pkg.definition.scoring.mode !== 'UNSCORED') || c.collectionFacts) errors.push({ code: 'UNSUPPORTED_CAPABILITY', path: 'runtimeCapabilities', message: 'Existing SJT execution contract is required' })
   } catch (e) { errors.push({ code: 'RUNTIME_COMPILE', path: 'definition', message: String(e) }) }
   return { identity: source.content.identity, eligibleToPublish: errors.length === 0, errors, warnings,
     definitionHash: validation.definitionHash, compiledRuntimeHash: runtime?.compiledRuntimeHash,

@@ -1,4 +1,4 @@
-import type { SituationDefinitionV1 } from './situation-definition'
+import { isUnscoredSituational, type SituationDefinitionV1 } from './situation-definition'
 import {
   situationalBranchChannelPolicy,
 } from './situation-branching'
@@ -152,7 +152,7 @@ export const projectReachableSituationDefinitionForScoring = (
     const scene = sceneByKey.get(sceneKey)
     if (!scene) throw new Error(`Frozen Situational trajectory scene is missing: ${sceneKey}`)
     const channels = scene.channels.filter((channel) => {
-      const scored = situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).measurementRole === 'SCORED'
+      const scored = isUnscoredSituational(definition) || situationalBranchChannelPolicy(definition, scene.sceneKey, channel.channelKey).measurementRole === 'SCORED'
       if (scored) scoredPairs.add(responseKey(scene.sceneKey, channel.channelKey))
       return scored
     })

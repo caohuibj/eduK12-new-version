@@ -56,3 +56,14 @@ it('permits explicit historical correction publication without reopening old mea
   }
   expect(()=>assertMeasurementDependency('REVOKED','HISTORICAL_INTERPRETATION')).toThrow('CONTENT_REVOKED')
 })
+
+it('requires an explicit single unscored SJT report and never relaxes scored reports',()=>{
+ const base={family:'SJT',layer:'REPORT',key:'u4-test',version:'1',scope:{kind:'PLATFORM'},assetRefs:[],sourceReleaseId:null,
+  content:{projectionVersion:1,resultMode:'UNSCORED',measurements:[{releaseId:'00000000-0000-4000-8000-000000000001',contentHash:hash}],metricKeys:[],audience:'researcher',language:'zh-CN',generatorVersion:'1',template:{title:'Choice evidence',blocks:[{type:'TEXT',text:'No score'}]}}}
+ expect(prepareRelease(base).content).toMatchObject({resultMode:'UNSCORED',metricKeys:[]})
+ expect(()=>prepareRelease({...base,content:{...base.content,resultMode:undefined}})).toThrow()
+ expect(()=>prepareRelease({...base,family:'SCALE'})).toThrow()
+ expect(()=>prepareRelease({...base,content:{...base.content,metricKeys:['completion']}})).toThrow()
+ expect(()=>prepareRelease({...base,content:{...base.content,measurements:[...base.content.measurements,...base.content.measurements]}})).toThrow()
+ expect(()=>prepareRelease({...base,content:{...base.content,template:{blocks:[{type:'METRIC',metricKey:'completion',display:'RAW'}]}}})).toThrow()
+})

@@ -1,9 +1,13 @@
-import type { SituationDefinitionV1 } from './situation-definition'
+import { isUnscoredSituational, unscoredSituationalScoringSchema, type SituationDefinitionV1 } from './situation-definition'
 import { createSituationalResponseValidator, scoreSituational, type SituationalResponse, type SituationalResultV1, type SituationalScoringOptions } from './situation-scoring'
 
 export const SUPPORTED_SITUATIONAL_MODEL_VERSIONS = { PROVISIONAL_SCALAR: '1', EXPERT_KEY: '1', AUTHOR_KEY_SUM: '1' } as const
 
 export function assertSituationalScorerAvailable(definition: Pick<SituationDefinitionV1, 'scoring'>): void {
+  if (isUnscoredSituational(definition)) {
+    unscoredSituationalScoringSchema.parse(definition.scoring)
+    return
+  }
   const model = definition.scoring.model
   if (!model) return
   if (!(model.modelKey in SUPPORTED_SITUATIONAL_MODEL_VERSIONS) || SUPPORTED_SITUATIONAL_MODEL_VERSIONS[model.modelKey as keyof typeof SUPPORTED_SITUATIONAL_MODEL_VERSIONS] !== model.modelVersion) throw new Error(`Unsupported Situational scorer: ${model.modelKey}@${model.modelVersion}; no scalar fallback`)
@@ -12,6 +16,21 @@ export function assertSituationalScorerAvailable(definition: Pick<SituationDefin
 /** Pure bounded online calculation; calibration/training stays offline. */
 export function scoreSituationalModel(definition: SituationDefinitionV1, responses: SituationalResponse[], options: SituationalScoringOptions & { independentSceneKeyBySceneKey?: Record<string, string> } = {}): SituationalResultV1 {
   assertSituationalScorerAvailable(definition)
+  if (isUnscoredSituational(definition)) {
+    // Same frozen response contract, no scalar/zero/completion-score fallback.
+    const validate = createSituationalResponseValidator(definition), seen = new Set<string>()
+    let nonanswer = false
+    for (const response of responses) {
+      validate(response)
+      const pair = `${response.sceneKey}:${response.channelKey}`
+      if (seen.has(pair)) throw new Error(`Duplicate raw observation: ${pair}`)
+      seen.add(pair)
+      const channel = definition.scenes.find(s => s.sceneKey === response.sceneKey)?.channels.find(c => c.channelKey === response.channelKey)
+      if (channel?.responseType === 'SINGLE_CHOICE' && channel.options.some(o => o.optionKey === response.responseValue && o.nonanswerReason)) nonanswer = true
+    }
+    if (!seen.size || definition.scenes.some(scene => scene.channels.some(channel => !seen.has(`${scene.sceneKey}:${channel.channelKey}`)))) throw new Error('UNSCORED_REQUIRES_COMPLETE_REACHABLE_OBSERVATIONS')
+    return { mode: 'UNSCORED', responseStatus: nonanswer ? 'NONANSWER' : 'COMPLETE', metrics: [], quality: { status: 'unscored', flags: nonanswer ? ['nonanswer_present'] : [] } }
+  }
   const model = definition.scoring.model
   if (!model) return scoreSituational(definition, responses, options)
   if (model.modelKey === 'PROVISIONAL_SCALAR') {

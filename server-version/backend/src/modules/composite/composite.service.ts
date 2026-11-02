@@ -434,7 +434,7 @@ export const lockCompositeAssetReferences = async (db: Db, items: any[], formSec
 }
 const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease, educationProduct?:'SCHOOL'|'TEACHER') => {
   const { runtime, situationPackage } = situation
-  if (!runtime.runtimeCapabilities.supported || !runtime.runtimeCapabilities.embedded || !runtime.runtimeCapabilities.aggregateEligible || runtime.runtimeCapabilities.collectionFacts) throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
+  if (!runtime.runtimeCapabilities.supported || !runtime.runtimeCapabilities.embedded || (!runtime.runtimeCapabilities.aggregateEligible && runtime.scorerKey !== 'situational.unscored') || runtime.runtimeCapabilities.collectionFacts) throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
   // Composite course delivery and anonymous student entry must not silently
   // administer teacher self-report instruments to students.
   if (situationPackage.definition.respondentType === 'teacher_self_report' && educationProduct!=='TEACHER') throw compositeBadRequest('教师自评题包不能用于学员综合测评')

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { reportTemplateSchema, validateReportTemplateBindings } from './report-template'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
+import { validateSituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 
 export const CONTENT_HASH_SCHEME = 'MEASUREMENT_CONTENT_CANONICAL_V1' as const
 export const releaseLayer = z.enum(['MEASUREMENT', 'REFERENCE', 'REPORT'])
@@ -28,9 +29,12 @@ export const measurementContent = z.object({
   runnerVersion: text,
   locale: text,
   localizationVersion: text,
-  metrics: z.array(metric).min(1),
+  resultMode: z.literal('UNSCORED').optional(),
+  metrics: z.array(metric),
   executable: z.record(z.string(), z.unknown()),
-}).strict()
+}).strict().superRefine((content, ctx) => {
+  if (content.resultMode === 'UNSCORED' ? content.metrics.length !== 0 : content.metrics.length === 0) ctx.addIssue({ code: 'custom', path: ['metrics'], message: 'Scored content requires metrics; explicitly unscored SJT forbids them' })
+})
 export const referenceContent = z.object({
   projectionVersion: z.literal(1),
   measurement: exactRelease,
@@ -45,13 +49,18 @@ export const referenceContent = z.object({
 export const reportContent = z.object({
   projectionVersion: z.literal(1),
   measurements: z.array(exactRelease).min(1),
-  metricKeys: z.array(text).min(1),
+  resultMode: z.literal('UNSCORED').optional(),
+  metricKeys: z.array(text),
   audience: text,
   language: text,
   generatorVersion: text,
   // Text/layout only. Numeric reference rules belong to reference releases.
   template: reportTemplateSchema,
-}).strict()
+}).strict().superRefine((content, ctx) => {
+  if (content.resultMode === 'UNSCORED') {
+    if (content.metricKeys.length || content.measurements.length !== 1 || content.template.blocks.some(block => block.type !== 'TEXT')) ctx.addIssue({ code: 'custom', message: 'Unscored reports require one measurement, text only and no metric keys' })
+  } else if (!content.metricKeys.length) ctx.addIssue({ code: 'custom', path: ['metricKeys'], message: 'Scored reports require metric keys' })
+})
 const common = {
   family: releaseFamily, key: text, version: text, scope: contentScope,
   assetRefs: z.array(assetReference).max(1000),
@@ -73,6 +82,22 @@ export class ContentReleaseError extends Error {
 
 export function prepareRelease(input: unknown): PreparedRelease {
   const value = releaseInputSchema.parse(input)
+  if (value.layer === 'REPORT' && value.content.resultMode === 'UNSCORED' && value.family !== 'SJT') throw new ContentReleaseError('CONTENT_UNSCORED_FAMILY_INVALID')
+  if (value.layer === 'MEASUREMENT' && value.family === 'SJT'
+    && (value.content.executable.scoring as { mode?: string } | undefined)?.mode === 'UNSCORED'
+    && value.content.resultMode !== 'UNSCORED') throw new ContentReleaseError('CONTENT_UNSCORED_MODE_REQUIRED')
+  if (value.layer === 'MEASUREMENT' && value.content.resultMode === 'UNSCORED') {
+    if (value.family !== 'SJT' || value.content.runnerKey !== 'situational-v2') throw new ContentReleaseError('CONTENT_UNSCORED_FAMILY_INVALID')
+    // The core rechecks the adapter's claim. Report/source metadata are not part
+    // of measurement identity; reconstruct only a neutral validation envelope.
+    const e = value.content.executable
+    const scenes = Array.isArray(e.scenes) ? e.scenes : []
+    const fragments = scenes.flatMap((scene: any) => (Array.isArray(scene?.channels) ? scene.channels : []).flatMap((channel: any) => (Array.isArray(channel?.options) ? channel.options : []).map((option: any) => ({ sceneKey: scene.sceneKey, channelKey: channel.channelKey, optionKey: option.optionKey, text: option.label, kind: 'ACTION' }))))
+    const checked = validateSituationRuntimeDefinition({ ...e, source: {}, license: { status: 'unknown', redistribution: 'unknown' }, referencePolicy: { type: 'none' }, report: {
+      reportVersion: 'unscored-projection-validation-v1', primaryMetricKeys: [], metricOrder: [], interpretations: [], limitations: [], disclaimer: 'Unscored selected-action evidence only.', narrative: { version: 'sjt-narrative-v1', fragments, comparisons: [] },
+    } })
+    if (!checked.definition || checked.definition.scoring.mode !== 'UNSCORED' || checked.issues.some(issue => issue.severity === 'error')) throw new ContentReleaseError('CONTENT_SJT_DEFINITION_INVALID')
+  }
   const assetRefs = [...value.assetRefs].sort((a, b) => a.assetId < b.assetId ? -1 : a.assetId > b.assetId ? 1 : 0)
   if (new Set(assetRefs.map(a => a.assetId)).size !== assetRefs.length) throw new ContentReleaseError('CONTENT_ASSET_DUPLICATE')
   if (value.layer === 'MEASUREMENT' && new Set(value.content.metrics.map(m => m.metricKey)).size !== value.content.metrics.length) {

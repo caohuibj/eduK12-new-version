@@ -76,6 +76,18 @@ describe('SituationalResult report convergence', () => {
     expect(screen.getByText('冻结限制')).toBeTruthy()
   })
 
+  it.each(['COMPLETE','NONANSWER'])('renders unscored %s as saved choice evidence without ability invalidity', async responseStatus => {
+    resultMock.mockResolvedValue({code:0,data:{attemptId:'attempt-1',attempt:{id:'attempt-1',instrumentKey:'u4-cjx01-sd',instrumentVersion:'0.3.0',scoringVersion:'unscored-path-v1',status:'COMPLETED'},
+      instrument:{report:{metricOrder:[],interpretations:[],limitations:[],disclaimer:'仅回顾本次选择'}},
+      result:{mode:'UNSCORED',responseStatus,metrics:[],quality:{status:'unscored',flags:responseStatus==='NONANSWER'?['nonanswer_present']:[]},narrative:{version:'sjt-narrative-v1',paragraphs:['原始所选行动','仅回顾本次选择']}}}})
+    render(<MemoryRouter initialEntries={['/student/situational/attempts/attempt-1/result']}><Routes><Route path='/student/situational/attempts/:attemptId/result' element={<SituationalResult/>}/></Routes></MemoryRouter>)
+    expect(await screen.findByText('本次选择回顾（未计分）')).toBeInTheDocument()
+    expect(screen.getByText('原始所选行动')).toBeInTheDocument()
+    expect(screen.getByText(responseStatus==='NONANSWER'?'已保存选择与非回答；本次未计分。':'已保存本次选择回顾；本次未计分。')).toBeInTheDocument()
+    expect(screen.queryByText(/数据质量：invalid/)).not.toBeInTheDocument()
+    expect(screen.getByText('记录规则版本')).toBeInTheDocument()
+  })
+
   it('presents a read failure without implying submission failure', async () => {
     resultMock.mockRejectedValue(new Error('network unavailable'))
 

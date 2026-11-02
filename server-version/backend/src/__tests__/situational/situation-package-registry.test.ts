@@ -6,15 +6,14 @@ import {
   validateSituationPackage,
   type SituationPackageV1,
 } from '../../modules/situational/situation-package.registry'
+import { instrumentSourceSchema } from '../../modules/situational/onboarding/schema'
+import { GENERATED_SITUATIONAL_INSTRUMENT_SOURCES } from '../../modules/situational/onboarding/instruments.generated'
 import { SJT_ANXIETY_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-anxiety-golden-zh-cn-v1'
 
 describe('situation package registry', () => {
-  it('exposes the three golden packages and resolves them by key:version', () => {
-    expect(listSituationPackages().map((situationPackage) => situationPackage.key)).toEqual([
-      'sjt-assertiveness-golden',
-      'sjt-responsibility-golden',
-      'sjt-anxiety-golden',
-    ])
+  it('exposes installed packages in catalog order and resolves golden identities', () => {
+    expect(listSituationPackages().map(p => [p.key,p.instrumentVersion])).toEqual(
+      GENERATED_SITUATIONAL_INSTRUMENT_SOURCES.map(s=>instrumentSourceSchema.parse(s)).sort((a,b)=>a.content.catalogOrder-b.content.catalogOrder||a.content.identity.instrumentKey.localeCompare(b.content.identity.instrumentKey,'en')).map(s=>[s.content.identity.instrumentKey,s.content.identity.instrumentVersion]))
     expect(hasSituationPackage('sjt-anxiety-golden', '1.0.0')).toBe(true)
     expect(hasSituationPackage('sjt-anxiety-golden', '9.9.9')).toBe(false)
     expect(getSituationPackage('sjt-anxiety-golden', '1.0.0')?.key).toBe('sjt-anxiety-golden')

@@ -103,7 +103,7 @@ const SituationalResult: React.FC = () => {
   }
   const facts = [
     { label: '工具', value: `${data.attempt.instrumentKey} · v${data.attempt.instrumentVersion}` },
-    { label: '评分版本', value: data.attempt.scoringVersion },
+    { label: result.mode === 'UNSCORED' ? '记录规则版本' : '评分版本', value: data.attempt.scoringVersion },
     ...(data.attempt.completedAt ? [{ label: '完成时间', value: new Date(data.attempt.completedAt).toLocaleString('zh-CN') }] : []),
     ...(data.attempt.totalTime != null ? [{ label: '用时', value: formatDuration(data.attempt.totalTime) }] : []),
   ]
@@ -116,12 +116,12 @@ const SituationalResult: React.FC = () => {
       status={{
         kind: 'success',
         title: '测评已完成',
-        description: result.narrative ? (result.quality.status==='invalid'?'存在非回答，报告按已回答内容描述。':'已保存本次作答与报告。') : <><span>已提交</span> · 数据质量：{result.quality.status}</>,
+        description: result.narrative ? (result.mode==='UNSCORED' ? (result.responseStatus==='NONANSWER'?'已保存选择与非回答；本次未计分。':'已保存本次选择回顾；本次未计分。') : result.quality.status==='invalid'?'存在非回答，报告按已回答内容描述。':'已保存本次作答与报告。') : <><span>已提交</span> · 数据质量：{result.quality.status}</>,
       }}
       backAction={<Link to={learner.enabled ? learner.backHref : `${situationalBasePath()}/history`} aria-label={learner.enabled ? learner.backLabel : "测评历史"} className="btn-secondary">{learner.enabled ? learner.backLabel : '返回测评历史'}</Link>}
       limitations={[
         ...data.instrument.report.limitations,
-        result.narrative ? '类别变化只用于描述本次回答，不代表能力变化或因果改善。' : '本页面只展示服务器保存的 Construct × Channel 指标；没有百分位、常模或参考分布，不应把不同通道简单合成为单一人格结论。',
+        result.mode === 'UNSCORED' ? '本次仅回顾实际选择；不推断能力，也不合成分数。' : result.narrative ? '类别变化只用于描述本次回答，不代表能力变化或因果改善。' : '本页面只展示服务器保存的 Construct × Channel 指标；没有百分位、常模或参考分布，不应把不同通道简单合成为单一人格结论。',
       ]}
       actions={
         <>

@@ -1,9 +1,10 @@
-import type { DefinitionIssue } from './situation-definition'
+import { isUnscoredSituational, type DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
 
 /** Narrow cross-field publication contract. No candidate mapping implies a score. */
 export function validateSituationalScientificDesign(definition: SituationDefinitionV2): DefinitionIssue[] {
   const issues: DefinitionIssue[] = []
+  const unscored = isUnscoredSituational(definition)
   const fail = (path: string, message: string) => issues.push({ path, message, severity: 'error' })
   const pairs = new Map<string, SituationDefinitionV2['scenes'][number]['channels'][number]>(definition.scenes.flatMap(s => s.channels.map(c => [`${s.sceneKey}:${c.channelKey}`, c] as const)))
   const nodes = definition.flow.nodes.filter(n => n.nodeType === 'SCENE')
@@ -20,6 +21,7 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
     } else if (scene.channels.length > 3) fail(`flow.${node.nodeKey}`, 'More than three channels requires an explicit measurement bundle')
     for (const channel of scene.channels) {
       const role = policy(channel.channelKey)?.measurementRole ?? 'SCORED'
+      if (unscored && (role === 'SCORED' || channel.scoredConstruct || channel.responseType !== 'SINGLE_CHOICE' || policy(channel.channelKey)?.required === false)) fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'UNSCORED v1 requires required non-scored choice channels; reflection remains a separate Form')
       if (channel.responseType === 'FREE_TEXT' && (role !== 'RAW_ONLY' || policy(channel.channelKey)?.required !== false)) fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'Free text must be optional RAW_ONLY')
       if (channel.responseType === 'SINGLE_CHOICE' && channel.options.some(o => o.nonanswerReason) && role === 'SCORED' && definition.scoring.model?.modelKey !== 'AUTHOR_KEY_SUM') fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'Scored nonanswers require AUTHOR_KEY_SUM')
       if (role === 'SCORED' && !channel.scoredConstruct && (!definition.scoring.model || definition.scoring.model.modelKey === 'PROVISIONAL_SCALAR')) fail(`scenes.${scene.sceneKey}.${channel.channelKey}`, 'Scalar SCORED channels require a scoredConstruct')
@@ -77,13 +79,14 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
   }
   const narrative = definition.report.narrative
   if (narrative) {
-    if (definition.scoring.model?.modelKey !== 'AUTHOR_KEY_SUM') fail('report.narrative','叙述报告规则需要 AUTHOR_KEY_SUM')
+    if (!unscored && definition.scoring.model?.modelKey !== 'AUTHOR_KEY_SUM') fail('report.narrative','叙述报告规则需要 AUTHOR_KEY_SUM')
+    if (unscored && narrative.comparisons.length) fail('report.narrative.comparisons', 'UNSCORED only describes selected actions; no numeric category-change comparisons')
     const seen = new Set<string>()
     for (const [i,f] of narrative.fragments.entries()) {
       const channel = pairs.get(`${f.sceneKey}:${f.channelKey}`), node = nodes.find(n=>n.sceneKey===f.sceneKey)
       const role = node?.channelPolicies?.find(p=>p.channelKey===f.channelKey)?.measurementRole
       const id = `${f.sceneKey}:${f.channelKey}:${f.optionKey}:${f.kind}`
-      if (seen.has(id) || channel?.responseType !== 'SINGLE_CHOICE' || !channel.options.some(o=>o.optionKey===f.optionKey) || (f.kind==='PROBE' ? role!=='RAW_ONLY' : role!=='SCORED')) fail(`report.narrative.fragments.${i}`,'报告片段引用或类型不合法')
+      if (seen.has(id) || channel?.responseType !== 'SINGLE_CHOICE' || !channel.options.some(o=>o.optionKey===f.optionKey) || (unscored ? !role || role === 'SCORED' || f.kind !== 'ACTION' : f.kind==='PROBE' ? role!=='RAW_ONLY' : role!=='SCORED')) fail(`report.narrative.fragments.${i}`,'报告片段引用或类型不合法')
       seen.add(id)
     }
     for (const [i,c] of narrative.comparisons.entries()) {
@@ -91,6 +94,13 @@ export function validateSituationalScientificDesign(definition: SituationDefinit
       const a=channels[0]?.[0],b=channels[1]?.[0]
       const anchors=(ch:typeof a)=>ch?.responseType==='SINGLE_CHOICE'?ch.options.filter(o=>!o.nonanswerReason).map(o=>({key:o.optionKey,label:o.label})):[]
       if (!a || !b || c.firstChannelKey===c.secondChannelKey || a.prompt!==b.prompt || anchors(a).length!==5 || JSON.stringify(anchors(a))!==JSON.stringify(anchors(b)) || JSON.stringify(anchors(a).map(o=>o.key))!==JSON.stringify(c.categories) || channels.some(list=>list.some(ch=>ch.responseType!=='SINGLE_CHOICE' || JSON.stringify(anchors(ch))!==JSON.stringify(anchors(a))))) fail(`report.narrative.comparisons.${i}`,'重复题比较需同母场景、相同五级锚点')
+    }
+  }
+  if (unscored) {
+    if (!narrative) fail('report.narrative', 'UNSCORED requires a selected-action narrative')
+    for (const scene of definition.scenes) for (const channel of scene.channels) if (channel.responseType === 'SINGLE_CHOICE') for (const option of channel.options) {
+      const fragments = narrative?.fragments.filter(f => f.sceneKey === scene.sceneKey && f.channelKey === channel.channelKey && f.optionKey === option.optionKey && f.kind === 'ACTION') ?? []
+      if (fragments.length !== 1 || fragments[0]?.text !== option.label) fail(`report.narrative.${scene.sceneKey}.${channel.channelKey}.${option.optionKey}`, 'UNSCORED narrative must quote each selected option exactly once, without inferred quality or ability')
     }
   }
   const model = definition.scoring.model

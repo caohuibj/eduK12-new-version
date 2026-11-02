@@ -2,7 +2,7 @@ import { GENERATED_SITUATIONAL_INSTRUMENT_SOURCES } from '../../../modules/situa
 import { instrumentSourceSchema, publicationContentDigest } from '../../../modules/situational/onboarding/schema'
 import { SJT_BRANCHING_E2E_PACKAGE } from '../../../modules/situational/packages/sjt-branching-e2e-fixture'
 export function unknownSource(version: 1 | 2 = 1) {
-  const source = instrumentSourceSchema.parse(structuredClone(GENERATED_SITUATIONAL_INSTRUMENT_SOURCES[0]))
+  const source = GENERATED_SITUATIONAL_INSTRUMENT_SOURCES.map(value=>instrumentSourceSchema.parse(value)).find(source=>source.content.identity.instrumentKey==='sjt-assertiveness-golden')!
   source.content.identity = { instrumentKey: `test-unknown-sjt-v${version}`, instrumentVersion: '1.0.0' }
   if (version === 2) { source.content.definition = structuredClone(SJT_BRANCHING_E2E_PACKAGE.definition); source.content.goldenCases = structuredClone(SJT_BRANCHING_E2E_PACKAGE.goldenCases)
     source.content.definition.scenes = source.content.definition.scenes.map(scene => ({ ...scene, stimulus: { type: 'TEXT_V1' as const, text: scene.stimulus.text! } }))

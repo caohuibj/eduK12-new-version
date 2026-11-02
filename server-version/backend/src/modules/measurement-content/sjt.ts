@@ -31,6 +31,7 @@ export function sjtMeasurementRelease(input:{localId:string;version:string;instr
   return {layer:'MEASUREMENT',family:'SJT',key:`sjt:${canonicalHash(input.scope)}:${input.localId}`,version:input.version,
     scope:input.scope,sourceReleaseId:null,provenance:input.provenance??{},assetRefs:[...assets.values()],
     content:{projectionVersion:1,instrumentVersion:input.instrumentVersion,measurementHash:canonicalHash(executable),
+      ...(d.scoring.mode === 'UNSCORED' ? { resultMode: 'UNSCORED' as const } : {}),
       measurementHashScheme:'SJT_MEASUREMENT_PROJECTION_V1',scoringVersion:d.scoring.scoringVersion,
       runnerKey:`situational-v${d.schemaVersion}`,runnerVersion:String(d.schemaVersion),locale:'und',localizationVersion:'unversioned',
       metrics:d.scoring.publishedMetrics.map(m=>({metricKey:m.key,unit:'score',direction:m.direction})),executable}}

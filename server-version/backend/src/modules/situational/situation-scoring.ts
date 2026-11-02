@@ -47,14 +47,16 @@ export interface SituationalMetricValue {
   maturity?: 'PROVISIONAL' | 'CALIBRATED'
 }
 
-export type SituationalQualityStatus = 'interpretable' | 'limited' | 'invalid'
+export type SituationalQualityStatus = 'interpretable' | 'limited' | 'invalid' | 'unscored'
 
 export interface SituationalQuality {
   status: SituationalQualityStatus
-  flags: Array<'missing_responses' | 'metric_not_calculable'>
+  flags: Array<'missing_responses' | 'metric_not_calculable' | 'nonanswer_present'>
 }
 
 export interface SituationalResultV1 {
+  mode?: 'UNSCORED'
+  responseStatus?: 'COMPLETE' | 'NONANSWER'
   narrative?: { version: 'sjt-narrative-v1'; paragraphs: string[] }
   metrics: SituationalMetricValue[]
   quality: SituationalQuality
@@ -88,6 +90,7 @@ export interface SituationalGoldenCase {
     quality: SituationalQualityStatus
     metrics: Record<string, number | null>
     metricKeys: string[]
+    unscored?: { nodeKeys: string[]; sceneKeys: string[]; terminalNodeKey: string; responseStatus: 'COMPLETE' | 'NONANSWER'; paragraphs: string[] }
   }
 }
 
@@ -264,6 +267,7 @@ export const scoreSituational = (
   inputResponses: SituationalResponse[] | Record<string, SituationalResponseValue>,
   options: SituationalScoringOptions = {},
 ): SituationalResultV1 => {
+  if (definitionInput.scoring.mode === 'UNSCORED') throw new Error('UNSCORED_REQUIRES_MODEL_RESOLVER')
   // Frozen definitions are trusted runtime input: publication/compile gates
   // own cross-field validation. Keep structural parsing here. Only the
   // internally projected zero-scene case uses the relaxed scoring-view schema.

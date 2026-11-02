@@ -730,6 +730,7 @@ const buildCompositePackageAnalysis = (input: {
     const assignment = item.cognitiveAssignment
     const config = assignment?.config
     if (!payload?.envelope || !assignment || !config) throw aggregateInputError(`认知槽位 ${protocolSlot.key} 冻结输入缺失`)
+    if (payload.envelope.core.quality.status === 'unscored') throw aggregateInputError('Unscored observations cannot enter scored aggregation')
     const frozenReport = readFrozenReport(assignment.resolvedReportSnapshotEncrypted)
     const measurement = cognitiveMeasurementBySlot.get(protocolSlot.key)
     if (
@@ -773,6 +774,7 @@ const buildCompositePackageAnalysis = (input: {
     const measurement = scaleMeasurementBySlot.get(protocolSlot.key)
     const scale = item.scale
     if (!payload?.envelope || !measurement || !scale) throw aggregateInputError(`量表槽位 ${protocolSlot.key} 冻结输入缺失`)
+    if (payload.envelope.core.quality.status === 'unscored') throw aggregateInputError('Unscored observations cannot enter scored aggregation')
     const metric = payload.envelope.core.metrics.find((candidate) => candidate.key === measurement.dimensionCode)
     const dimensionScore = metric?.value === null || metric?.value === undefined
       ? null

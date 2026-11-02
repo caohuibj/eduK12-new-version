@@ -48,7 +48,7 @@ export interface CanonicalUnitResultCoreV1 {
   scorerKey: string
   scorerVersion: string
   quality: {
-    status: 'interpretable' | 'limited' | 'invalid'
+    status: 'interpretable' | 'limited' | 'invalid' | 'unscored'
     flags: string[]
   }
   metrics: MetricFactV1[]
@@ -316,6 +316,21 @@ export const projectSituationCanonicalUnitResult = (input: {
   for (const metric of input.result.metrics) {
     if (!allowed.has(metric.key)) throw new Error(`Situational metric ${metric.key} is not declared by the compiled runtime`)
   }
+  const unscored = input.runtime.scorerKey === 'situational.unscored'
+  if (unscored) {
+    if (allowed.size !== 0 || input.result.metrics.length !== 0 || input.result.mode !== 'UNSCORED'
+      || input.result.quality.status !== 'unscored' || input.result.model !== undefined
+      || !['COMPLETE', 'NONANSWER'].includes(input.result.responseStatus ?? '')
+      || input.result.quality.flags.some(flag => flag !== 'nonanswer_present')
+      || input.result.quality.flags.includes('nonanswer_present') !== (input.result.responseStatus === 'NONANSWER')) {
+      throw new Error('Unscored Situational result does not match frozen mode')
+    }
+  } else if (input.result.mode !== undefined || input.result.responseStatus !== undefined || input.result.quality.status === 'unscored'
+    || new Set(input.result.metrics.map(metric => metric.key)).size !== input.result.metrics.length
+    || input.result.metrics.length !== allowed.size || [...allowed].some(key => !input.result.metrics.some(metric => metric.key === key))) {
+    throw new Error('Scored Situational result must contain every frozen metric exactly once')
+  }
+
   const metrics = input.result.metrics
     .filter((metric) => allowed.has(metric.key))
     .map((metric) => ({
@@ -485,7 +500,7 @@ const canonicalUnitResultCoreSchema = z.object({
   scorerKey: z.string().min(1),
   scorerVersion: z.string().min(1),
   quality: z.object({
-    status: z.enum(['interpretable', 'limited', 'invalid']),
+    status: z.enum(['interpretable', 'limited', 'invalid', 'unscored']),
     flags: z.array(z.string()),
   }).strict(),
   metrics: z.array(metricFactSchema),
@@ -500,6 +515,8 @@ const canonicalUnitResultCoreSchema = z.object({
     resolvedConfigHash: z.string().regex(/^[0-9a-f]{64}$/).nullable().optional(),
   }).strict(),
 }).strict().superRefine((core,ctx)=>{
+ if (core.scorerKey === 'situational.unscored' && core.quality.status !== 'unscored') ctx.addIssue({ code: 'custom', path: ['quality'], message: 'UNSCORED_CANONICAL_MODE_MISMATCH' })
+ if (core.quality.status === 'unscored' && (core.unitType !== 'SITUATIONAL' || core.scorerKey !== 'situational.unscored' || core.metrics.length || core.references.length)) ctx.addIssue({ code: 'custom', path: ['quality'], message: 'UNSCORED_CANONICAL_MODE_MISMATCH' })
  core.metrics.forEach((metric,i)=>{
   const id=metric.scaleReference
   if(!id)return

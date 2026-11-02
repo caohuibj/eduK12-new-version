@@ -7,7 +7,7 @@ import { scientificSchema, type SituationalScientificDeclarationV1, type Situati
 export const situationalExecutionRef = (pkg: SituationPackage): SituationalExecutionRefV1 => ({
   instrumentKey: pkg.key,
   instrumentVersion: pkg.instrumentVersion,
-  scorerKey: 'situational.default',
+  scorerKey: pkg.definition.scoring.mode === 'UNSCORED' ? 'situational.unscored' : 'situational.default',
   scoringVersion: pkg.definition.scoring.scoringVersion,
   definitionHash: hashSituationRuntimeDefinition(pkg.definition),
 })
@@ -19,7 +19,7 @@ export function evaluateScopedSituationalQualification(pkg: SituationPackage, va
   const scopeHash = declaration.claimScope ? canonicalHash(declaration.claimScope) : undefined
   const scoped = declaration.evidence.filter(evidence => (
     canonicalHash(evidence.executionRef) === canonicalHash(executionRef)
-    && (!evidence.modelEvidence || (evidence.modelEvidence.modelKey === (pkg.definition.scoring.model?.modelKey ?? 'PROVISIONAL_SCALAR') && evidence.modelEvidence.modelVersion === (pkg.definition.scoring.model?.modelVersion ?? '1') && evidence.modelEvidence.parameterSetHash === pkg.definition.scoring.model?.parameterSet?.hash && evidence.modelEvidence.metricKeys.every(k => pkg.definition.scoring.publishedMetrics.some(m => m.key === k))))
+    && (!evidence.modelEvidence || (pkg.definition.scoring.mode !== 'UNSCORED' && evidence.modelEvidence.modelKey === (pkg.definition.scoring.model?.modelKey ?? 'PROVISIONAL_SCALAR') && evidence.modelEvidence.modelVersion === (pkg.definition.scoring.model?.modelVersion ?? '1') && evidence.modelEvidence.parameterSetHash === pkg.definition.scoring.model?.parameterSet?.hash && evidence.modelEvidence.metricKeys.every(k => pkg.definition.scoring.publishedMetrics.some(m => m.key === k))))
     && scopeHash !== undefined && canonicalHash(evidence.scope) === scopeHash
   ))
   // Metric-specific artifacts cannot expand whole-instrument eligibility by themselves.
