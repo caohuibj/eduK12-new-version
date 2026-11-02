@@ -258,6 +258,16 @@ import { SCALE_INSTRUMENT_SOURCE as source254 } from '../instruments/value_cost_
 import { SCALE_INSTRUMENT_SOURCE as source255 } from '../instruments/value_cost_physics_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source256 } from '../instruments/who5/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source257 } from '../instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source258 } from '../instruments/wihic52_actual_zh_cn_upper_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source259 } from '../instruments/wihic56_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source260 } from '../instruments/wihic56_preferred_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source261 } from '../instruments/wihic_cooperation_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source262 } from '../instruments/wihic_equity_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source263 } from '../instruments/wihic_investigation_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source264 } from '../instruments/wihic_involvement_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source265 } from '../instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source266 } from '../instruments/wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source267 } from '../instruments/wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/instrument'
 import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
@@ -523,4 +533,14 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source255,
   source256,
   source257,
+  source258,
+  source259,
+  source260,
+  source261,
+  source262,
+  source263,
+  source264,
+  source265,
+  source266,
+  source267,
 ]
