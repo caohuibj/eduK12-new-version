@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import { ExportArtifactStatus, UserRole } from '../backend/node_modules/@prisma/client'
 import { prisma } from '../backend/src/config/database'
-import { closeQueues } from '../backend/src/config/queue'
+import { closeQueues, exportQueue } from '../backend/src/config/queue'
 import { enqueueExportJob } from '../backend/src/services/exportJobService'
 import { validateStorageKey } from '../backend/src/services/exportArtifactService'
 import '../backend/src/workers/exportProcessor'
@@ -101,7 +101,16 @@ async function main(): Promise<void> {
     }
     if (scaleId) await prisma.scale.deleteMany({ where: { id: scaleId } }).catch(() => undefined)
     if (userId) await prisma.user.deleteMany({ where: { id: userId } }).catch(() => undefined)
-    await closeQueues(true).catch(() => undefined)
+    // The database reaches READY/FAILED slightly before Bull releases the active
+    // handler. Drain that local bookkeeping before closing so the next smoke
+    // does not inherit a stalled "active" job from this process.
+    const queueDrainDeadline = Date.now() + 5_000
+    let activeExports = await exportQueue.getActiveCount().catch(() => 0)
+    while (activeExports > 0 && Date.now() < queueDrainDeadline) {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      activeExports = await exportQueue.getActiveCount().catch(() => 0)
+    }
+    await closeQueues(activeExports > 0).catch(() => undefined)
     await prisma.$disconnect().catch(() => undefined)
   }
   
