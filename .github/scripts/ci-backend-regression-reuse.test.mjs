@@ -34,3 +34,15 @@ test('historical regression evidence uses the complete official reusable workflo
  assert.throws(()=>knownJob(jobs,'backend regression (shard-2, isolated job database)'));
  assert.throws(()=>knownJob([...jobs,{...jobs[0],id:4}],'backend regression complete reports'));
 });
+
+test('checkpoint reuse permits only explicitly independent frontend and browser changes',async()=>{
+ const {requireSafeBackendReuseDelta}=await import('./ci-backend-regression-reuse.mjs');
+ const same={path:'server-version/backend/src/runtime.ts',sha:'a'.repeat(40),mode:'100644',type:'blob'};
+ const source=[same,{...same,path:'server-version/e2e/qa-round3-browser-e2e.cjs'}];
+ requireSafeBackendReuseDelta(source,[same,{...source[1],sha:'b'.repeat(40)}]);
+ requireSafeBackendReuseDelta(source,[same,{...source[1],path:'server-version/frontend/src/components/form.css'}]);
+ assert.throws(()=>requireSafeBackendReuseDelta(source,[{...same,sha:'b'.repeat(40)},source[1]]));
+ assert.throws(()=>requireSafeBackendReuseDelta(source,[same,{...source[1],path:'server-version/e2e/backend-seed.cjs'}]));
+ assert.throws(()=>requireSafeBackendReuseDelta(source,[same,source[1],{...same,path:'.github/workflows/ci.yml'}]));
+ assert.throws(()=>requireSafeBackendReuseDelta(source,[same,source[1],{...same,path:'server-version/package-lock.json'}]));
+});

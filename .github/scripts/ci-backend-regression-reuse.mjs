@@ -117,6 +117,23 @@ function fetchHistoricalCommit(sha){
   try{git('cat-file','-e',sha+'^{commit}');}
   catch{git('fetch','--no-tags','--depth=1','origin',sha);git('cat-file','-e',sha+'^{commit}');}
 }
+
+// Every changed path outside this set invalidates backend reuse even when it
+// lies outside the backend import closure. This forbids unknown root config,
+// CI, infrastructure, security, schema and shared fixture changes from hiding.
+const frontendIndependent=p=>p.startsWith('server-version/frontend/')
+  ||p.startsWith('docs/')||p==='README.md'
+  ||/^server-version\/e2e\/(?:training-bundle-browser|media-2-browser-e2e|bundle-products-browser-e2e|training-lifecycle-browser|training-optional-form-browser|school-teacher-browser|training-materials-browser|qa-round5-anonymous-browser-e2e|questionnaire-products-browser-e2e|qa-round3-browser-e2e)\.cjs$/.test(p);
+export function requireSafeBackendReuseDelta(sourceTree,currentTree){
+  const old=new Map(sourceTree.map(e=>[e.path,e.mode+':'+e.type+':'+e.sha]));
+  const now=new Map(currentTree.map(e=>[e.path,e.mode+':'+e.type+':'+e.sha]));
+  assert.equal(old.size,sourceTree.length,'Duplicate source tree entry');
+  assert.equal(now.size,currentTree.length,'Duplicate target tree entry');
+  for(const path of new Set([...old.keys(),...now.keys()]))
+    if(old.get(path)!==now.get(path))
+      assert(frontendIndependent(path),'Unproven backend-independent change: '+path);
+}
+
 function isAncestor(source,target){
   mustSha(source);mustSha(target);
   try{execFileSync('git',['merge-base','--is-ancestor',source,target]);return true;}catch{return false;}
@@ -162,6 +179,7 @@ export async function verifiedBackendRegression({token,repo,pr,branch,prHead,bas
       fetchHistoricalCommit(testedSha);
       const sourceTree=treeFor(testedSha);
       if(closureDigest('backend-regression',sourceTree)!==currentFingerprint)continue;
+      requireSafeBackendReuseDelta(sourceTree,currentTree);
       const current={
         repository:repo,pr,baseSha,headSha:prHead,workflowPath:'.github/workflows/ci.yml',
         workflowDigest:git('rev-parse',currentCheckout+':.github/workflows/ci.yml'),
