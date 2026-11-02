@@ -1,0 +1,128 @@
+{
+  "artifactType": "ordinary-composite-assembly-recipe",
+  "recipeVersion": "1.0.0",
+  "motherInstrumentKey": "wihic56_actual_en_lower_secondary_student",
+  "status": "PREPARATION_ONLY_NOT_INSTALLED",
+  "runtime": "existing ordinary composite questionnaire",
+  "orderedScaleUnits": [
+    {
+      "instrumentKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "instrumentKey": "wihic_teacher_support_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "instrumentKey": "wihic_involvement_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "instrumentKey": "wihic_investigation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ]
+    },
+    {
+      "instrumentKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ]
+    },
+    {
+      "instrumentKey": "wihic_cooperation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48
+      ]
+    },
+    {
+      "instrumentKey": "wihic_equity_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "originalItemNumbers": [
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56
+      ]
+    }
+  ],
+  "unscoredForms": [],
+  "aggregateScore": "NONE",
+  "notes": [
+    "Preserves original 56-item relative order and Appendix A response anchors, with seven separate outcomes.",
+    "Project digital instructions and split-unit boundaries are adaptations, not proof of equivalence to original administration.",
+    "This JSON is documentation for the existing editor, not a new import schema, assessment-bundle engine or automatic composite installer."
+  ]
+}

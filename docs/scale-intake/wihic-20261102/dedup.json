@@ -1,0 +1,103 @@
+{
+  "baseCommit": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "checkedAt": "2026-11-02",
+  "registeredSourceVersionsInspected": 235,
+  "identityPatterns": [
+    "WIHIC",
+    "What Is Happening In this Class",
+    "educsci13030257",
+    "s10984-026-09583-2"
+  ],
+  "sameSourceVersions": [],
+  "normalizedEnglishItemTextMatches": [],
+  "openContentPullRequests": [
+    {
+      "headRefName": "feat/scale-intake-cumulative-20261030",
+      "number": 413,
+      "title": "feat(scale): cumulative reviewed Scale intake — keep open until all batches finish",
+      "pathsInspected": 15,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "fix/scale-frozen-instruction-import-20261030",
+      "number": 412,
+      "title": "fix(scale): break frozen instruction schema import cycle",
+      "pathsInspected": 1,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "feat/jdr-report-locale-gate-20261030",
+      "number": 397,
+      "title": "fix(scale): decouple report language from questionnaire locale",
+      "pathsInspected": 2,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "work/scale-test-anxiety-intake-20261029",
+      "number": 383,
+      "title": "draft(scale): intake CTAS-12 zh-CN, TAS-37 zh-CN and CTAS-2 en",
+      "pathsInspected": 5,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "integration/scale-26-b0-main-20261028",
+      "number": 379,
+      "title": "feat(scale): integrate 26 validated instrument packages, version metadata and respondent reports",
+      "pathsInspected": 272,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "content/scale-content-batch3-20261028",
+      "number": 375,
+      "title": "content(scale): audit candidate queue and prepare 17 versioned packages [skip ci]",
+      "pathsInspected": 374,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "content/scale-ipip-batch2-20261028",
+      "number": 373,
+      "title": "content(scale): audit three IPIP packages and bind traced instructions [skip ci]",
+      "pathsInspected": 61,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "content/scale-ipip-batch1-20261028",
+      "number": 371,
+      "title": "content(scale): audit and intake three IPIP packages [skip ci]",
+      "pathsInspected": 208,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "content/scale-bps9-intake-20261028",
+      "number": 370,
+      "title": "content(scale): bind BPS9 instruction and verify isolated intake [skip ci]",
+      "pathsInspected": 66,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "content/scale-structural-batch1-20261028",
+      "number": 367,
+      "title": "feat(scale): onboard ARS30 and improve scale report presentation",
+      "pathsInspected": 136,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "release/dbt-wccl59-v1-0-2-20261027",
+      "number": 362,
+      "title": "content(scale): approve DBT-WCCL59 zh-CN v1.0.2 as noncommercial publication candidate",
+      "pathsInspected": 9,
+      "matchingWIHICPaths": []
+    },
+    {
+      "headRefName": "public-library/scales-20261022",
+      "number": 328,
+      "title": "Public scale library: construct classification foundation and staged imports",
+      "pathsInspected": 73,
+      "matchingWIHICPaths": []
+    }
+  ],
+  "productionDatabase": "NOT_QUERIED",
+  "administratorCustomInstruments": "NOT_QUERIED",
+  "conclusion": "No source/identity/item match in this repository baseline or matching open PR paths. Production duplicate status unknown.",
+  "registeredVersionsInspected": 258
+}
