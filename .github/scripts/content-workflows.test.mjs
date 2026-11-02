@@ -456,6 +456,13 @@ test('browser scenario matrix partitions every former acceptance, isolates datab
   assert.match(part,/redis:/);
   assert.match(part,/ci-artifact\.mjs\" verify backend/);
   assert.match(part,/ci-artifact\.mjs\" verify frontend/);
+  for(const title of ['prisma generate and guarded migration','seed reference and configuration data',
+    'restore tested backend build','verify restored backend entry point','seed isolated Bundle fixture',
+    'seed PR5 Organization fixture','start backend','start frontend','verify built frontend in Chromium']){
+    const start=part.indexOf('      - name: '+title+'\n');
+    assert.ok(start>=0,title);
+    assert.match(part.slice(start,start+260),/matrix\.group != 'security' \|\| inputs\.admin_permissions_functional \|\| inputs\.training_followup_functional/,title);
+  }
   const csp=part.slice(part.indexOf('      - name: enforced production CSP browser acceptance'),part.indexOf('      - name: administrator virtual CTAP2'));
   assert.match(csp,/node e2e\/production-csp-browser\.cjs/);
   assert.doesNotMatch(csp,/apt-get|ffmpeg/);

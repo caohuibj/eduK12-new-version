@@ -188,17 +188,20 @@ jobs:
       - name: verify restored frontend entry point
         run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" verify frontend
       - name: prisma generate and guarded migration
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         working-directory: server-version/backend
         run: |
           npx prisma generate
           npm run db:migrate:guarded
       - name: seed reference and configuration data
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         working-directory: server-version/backend
         run: npm run db:seed
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: restore tested backend build
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         id: backend-build-download
         # Runner DNS/transport can fail transiently even when the artifact exists.
         # Every attempt consumes this run's exact tested SHA; no rebuild fallback.
@@ -208,35 +211,39 @@ jobs:
           name: backend-dist-${{ github.sha }}
           path: server-version/backend/dist
       - name: wait before retrying backend build download
-        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
+        if: ${{ !cancelled() && (matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional) && steps.backend-build-download.outcome == 'failure' }}
         run: sleep 15
       - name: retry tested backend build download
         id: backend-build-download-retry
         continue-on-error: true
-        if: ${{ !cancelled() && steps.backend-build-download.outcome == 'failure' }}
+        if: ${{ !cancelled() && (matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional) && steps.backend-build-download.outcome == 'failure' }}
         uses: actions/download-artifact@v4
         with:
           name: backend-dist-${{ github.sha }}
           path: server-version/backend/dist
       - name: wait before final backend build download
-        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
+        if: ${{ !cancelled() && (matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional) && steps.backend-build-download-retry.outcome == 'failure' }}
         run: sleep 45
       - name: final tested backend build download
         # Final failure remains fatal, even if earlier attempts left partial files.
-        if: ${{ !cancelled() && steps.backend-build-download-retry.outcome == 'failure' }}
+        if: ${{ !cancelled() && (matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional) && steps.backend-build-download-retry.outcome == 'failure' }}
         uses: actions/download-artifact@v4
         with:
           name: backend-dist-${{ github.sha }}
           path: server-version/backend/dist
       - name: verify restored backend entry point
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" verify backend
       - name: seed isolated Bundle fixture
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         working-directory: server-version/backend
         run: npx tsx ../e2e/situational-bundle-browser-fixture.ts
       - name: seed PR5 Organization fixture
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         working-directory: server-version/backend
         run: npx tsx ../e2e/pr5-organization-browser-fixture.ts
       - name: start backend
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         run: |
           mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
           nohup setsid node backend/dist/index.js > /tmp/eduk12-situational-bundle-backend.log 2>&1 &
@@ -248,6 +255,7 @@ jobs:
           cat /tmp/eduk12-situational-bundle-backend.log
           exit 1
       - name: start frontend
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         run: |
           nohup setsid npm --prefix frontend run preview -- --host 127.0.0.1 --port 5173 --strictPort > /tmp/eduk12-situational-bundle-frontend.log 2>&1 &
           echo $! > /tmp/eduk12-situational-bundle-frontend.pid
@@ -259,6 +267,7 @@ jobs:
           cat /tmp/eduk12-situational-bundle-frontend.log
           exit 1
       - name: verify built frontend in Chromium
+        if: matrix.group != 'security' || inputs.admin_permissions_functional || inputs.training_followup_functional
         run: node e2e/browser-preflight.cjs http://127.0.0.1:5173 /tmp/eduk12-situational-bundle-e2e/preflight
       - name: run seeded browser acceptance
         if: matrix.group == 'foundation'
