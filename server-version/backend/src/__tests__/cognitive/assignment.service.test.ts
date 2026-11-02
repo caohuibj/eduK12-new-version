@@ -410,7 +410,7 @@ describe('publishAssignment / archiveAssignment', () => {
     expect(result.status).toBe('PUBLISHED')
     expect(mockPrisma.cognitiveAssignment.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 'asg-1', status: 'DRAFT' },
+        where: { id: 'asg-1', status: 'DRAFT', updatedAt: assignment.updatedAt },
         data: expect.objectContaining({ status: 'PUBLISHED', courseSnapshot: { id: 'course-1', title: 'C1', courseCode: 'CC1' } }),
       })
     )
@@ -461,7 +461,7 @@ describe('publishAssignment / archiveAssignment', () => {
     await expect(publishAssignment('teacher-1', TEACHER, 'asg-1')).resolves.toMatchObject({ status: 'PUBLISHED' })
     expect(mockPrisma.cognitiveAssignment.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 'asg-1', status: 'DRAFT' },
+        where: { id: 'asg-1', status: 'DRAFT', updatedAt: assignment.updatedAt },
         data: expect.objectContaining({ status: 'PUBLISHED' }),
       }),
     )
