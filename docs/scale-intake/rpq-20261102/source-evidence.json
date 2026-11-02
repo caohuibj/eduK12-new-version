@@ -38,9 +38,11 @@
     "bytes": 132162,
     "sha256": "7291cf31392e71c41817357d8981b41efeb7637a443d352707369b54c7d13cf8",
     "license": "CC BY4.0",
-    "copyright": "©2024 Rogers et al."
+    "copyright": "©2024 Rogers et al.",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
   },
   "crossCheck": "All30 item wordings in author2024 DOCX equal articleTable6 after whitespace normalization; short10 equals first10 extended items.",
   "privateLead": "User research report C06 read via connected Drive; private link and raw report not committed.",
-  "publicRawPolicy": "Source item text within CC BY4.0 retained in native sources with attribution; author Word originals and private research report not copied to Git."
+  "publicRawPolicy": "Source item text within CC BY4.0 retained in native sources with attribution; author Word originals and private research report not copied to Git.",
+  "distributionAttribution": "Each native package includes THIRD_PARTY_LICENSE.md with authors, title, source/DOI, license link and declared project changes; these external notices do not rewrite frozen source or C/P/R."
 }
