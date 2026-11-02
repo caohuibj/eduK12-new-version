@@ -1,0 +1,86 @@
+{
+  "recordType": "intake_work_record_not_new_runtime",
+  "mother": {
+    "key": "mass_inclusive_practice",
+    "name": "Massachusetts Inclusive Practice Self-Assessment",
+    "sharedTag": "family:mass_inclusive_practice",
+    "noCrossToolTotal": true
+  },
+  "baseSha": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "source": {
+    "url": "https://www.doe.mass.edu/edeval/guidebook/2d-teacherselfassess.pdf",
+    "pdfSha256": "e5d4ebf240ec79e71df9c30f12aa6cc4ed271a64e4ff3e1eb58b2e057bdd2722",
+    "permissionSource": "https://www.doe.mass.edu/edeval/guidebook/guidebook.docx",
+    "guidebookSha256": "7cdc21aa2882c5216c6b8c1600e1a18771f2e87c44ac1f67eb165dc3d89a6a92",
+    "edition": "2017 Guidebook; 7-page standalone PDF retrieved 2026-11-02, no printed revision number",
+    "locale": "en",
+    "author": "Massachusetts Department of Elementary and Secondary Education",
+    "permission": "copy any or all parts for non-commercial educational purposes with attribution; no commercial authorization claimed"
+  },
+  "forms": [
+    {
+      "key": "mass_inclusive_practice_part_a_en",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 22,
+      "path": "forms/mass_inclusive_practice_part_a_en.json",
+      "title": "Massachusetts Inclusive Practice｜A·证据与实践反思｜教师自评｜EN·2017指南无分表单",
+      "tags": [
+        "family:mass_inclusive_practice",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "source_version:guidebook2017_2d_pdf20261102",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:noncommercial_educational"
+      ]
+    },
+    {
+      "key": "mass_inclusive_practice_part_b_en",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 18,
+      "path": "forms/mass_inclusive_practice_part_b_en.json",
+      "title": "Massachusetts Inclusive Practice｜B·Power Elements 实施状态｜教师自评｜EN·2017指南无分表单",
+      "tags": [
+        "family:mass_inclusive_practice",
+        "role:teacher_self",
+        "stage:k12",
+        "language:en",
+        "source_version:guidebook2017_2d_pdf20261102",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:noncommercial_educational"
+      ]
+    }
+  ],
+  "scales": [],
+  "optionalOrdinaryCombination": {
+    "status": "PLAN_NOT_IMPORTED",
+    "order": [
+      "mass_inclusive_practice_part_a_en",
+      "mass_inclusive_practice_part_b_en"
+    ],
+    "kind": "ordinary_questionnaire",
+    "combinedScore": null,
+    "note": "A then B follows the source order; either may be selected for teacher reflection. Not a new Bundle or psychometric total."
+  },
+  "excludedSourceWorkflow": [
+    "Educator signature/date",
+    "Evaluator signature/date and receipt note; these are external evaluation workflow, not teacher self-response items"
+  ],
+  "deduplication": {
+    "mainSha": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+    "openPrCount": 45,
+    "matchingSameSource": 0,
+    "differentInstrument": "PR #541 DESE student/staff feedback surveys are not Tool 2d",
+    "productionAndAdministratorCreatedTools": "NOT_QUERIED"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "motherTag": "family:k12_tfl2025",
+  "version": "1.0.0",
+  "runtime": "existing ordinary questionnaire and reusable FORM_TEMPLATE",
+  "recipes": [
+    {
+      "key": "k12_tfl2025_all_en_teacher_self_reflection",
+      "locale": "en",
+      "orderedFormKeys": [
+        "k12_tfl2025_knowledge_en_teacher_self_form",
+        "k12_tfl2025_skills_en_teacher_self_form",
+        "k12_tfl2025_values_en_teacher_self_form",
+        "k12_tfl2025_actionability_en_teacher_self_form"
+      ],
+      "questionCount": 30
+    },
+    {
+      "key": "k12_tfl2025_all_zh_cn_working_teacher_self_reflection",
+      "locale": "zh-CN",
+      "orderedFormKeys": [
+        "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form",
+        "k12_tfl2025_skills_zh_cn_working_teacher_self_form",
+        "k12_tfl2025_values_zh_cn_working_teacher_self_form",
+        "k12_tfl2025_actionability_zh_cn_working_teacher_self_form"
+      ],
+      "questionCount": 30
+    }
+  ],
+  "scoring": "NONE",
+  "reportMode": "COLLECTION_ONLY",
+  "notes": [
+    "Do not combine both languages in a single administration unless explicitly designed as a separate study.",
+    "No cross-language equivalence, cross-component score or teacher quality level.",
+    "Form units preserve K1–K7, S1–S8, V1–V8, A1–A7 order; independent reflection is not an assertion of standalone psychometric validity."
+  ]
+}

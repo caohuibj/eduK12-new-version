@@ -1,0 +1,102 @@
+{
+  "scope": "Complete licensed actual-English WIHIC only",
+  "currentNativeSources": 8,
+  "executableActualEnglishScales": 7,
+  "catalogOnlyActualEnglishParent": 1,
+  "sourceCommit": "2426aee58647236dd6084845ea834f23a95c6b17",
+  "contentScoringReportVersions": "unchanged 1.0.0",
+  "parameterReference": "none",
+  "sourceAndAttributionParity": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "c8495cd1a60fbc0113fc2e95f6019f14349e4520"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_student_cohesiveness_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "f5eaeb1bf61d17ee24bf8947390c47dab0ecc15c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_teacher_support_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_involvement_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "d319a5dfd964c68576682dc598cc38db706616a7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_involvement_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_involvement_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_investigation_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "4a96faef6c74edc068eed185eb16a50781e01c1c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_investigation_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_investigation_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "acc971b868e353324b18314bbab8f4c6b0b01fa5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_task_orientation_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_cooperation_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "20cb227adf6f713291a28e85447cd2555daa8192"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_cooperation_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_cooperation_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_equity_actual_en_lower_secondary_student/1.0.0/source.json",
+      "gitBlob": "b96c982d570374326a42a80d859e0a99902fa18a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_equity_actual_en_lower_secondary_student/1.0.0/instrument.ts",
+      "gitBlob": "0eed070bb879576339c5a71afdf34c0026591fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wihic_equity_actual_en_lower_secondary_student/1.0.0/THIRD_PARTY_LICENSE.md",
+      "gitBlob": "70fd20c7f9fc96a85b027d6213f0d7b90cd0ea64"
+    }
+  ],
+  "excludedMissingFormKeys": [
+    "wihic56_preferred_en_lower_secondary_student",
+    "wihic52_actual_zh_cn_upper_secondary_student"
+  ],
+  "oldEvidence": "10-source check is historical; seven executable payloads and licenses unchanged; no local scorer/report/DB rerun",
+  "runtimeLogicPermissionsCIChanged": false,
+  "productionWrite": false
+}

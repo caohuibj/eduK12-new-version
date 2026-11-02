@@ -1,0 +1,556 @@
+{
+  "recordType": "intake_work_record_not_a_new_runtime",
+  "mother": {
+    "key": "sep_klassik",
+    "sharedTag": "family:sep_klassik",
+    "metadataVersion": "0.1.0",
+    "noCrossToolTotal": true
+  },
+  "baseSha": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "sources": {
+    "math": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=2026-01/Item%C3%BCbersicht+Mathematik_Eigenperspektive+.pdf",
+      "sha256": "37191c01134456b5c73949c1e897c6607490ea8b4c502fcfb3e7ecef9720ef15",
+      "title": "SEP-Klassik Bausteine zum Thema Mathematik Klasse 3-6 — Lehrkraft",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "3-6",
+      "itemCount": 35,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "Cover visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.; DE is the source label, not a claimed separate 4.0 jurisdiction port."
+    },
+    "sinus": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-10/SINUS-Skala_Lernmotivation.pdf",
+      "sha256": "16e2ac0d3698add5df24f0754f9fabc86f92b60aed3326b3fd7576356114bcb3",
+      "title": "Bausteine SEP-Klassik SINUS-Skala zur Lernmotivation — teacher column",
+      "resourceRevision": "2026-10_resource_path_no_printed_revision",
+      "role": "teacher_report",
+      "gradeBand": "primary_secondary_as_listed_by_portal",
+      "itemCount": 18,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "First page visually shows CC BY NC SA pictogram and 4.0 DE, Institut für Schulqualität des Landes Berlin e.V.",
+      "originalCitation": "Seidel et al. (2003), Technischer Bericht zur Videostudie Lehr-Lern-Prozesse im Physikunterricht, p.317 ff.; teacher adaptation and positive rewording by ISQ, not the untouched 2003 instrument."
+    },
+    "media": {
+      "url": "https://sep-klassik.isq.berlin/de_DE/download/datei.html?file=/2026-01/Medienbildung%20SEP-Klassik%20Sek%20I-D.pdf",
+      "sha256": "69a14d32f0173f2d293ea897e8619e1815f0c01b6714d551d8dd80a94cfd3576",
+      "title": "Bausteine SEP-Klassik Medienbildung Sek I, RLP 1-10, Niveaustufe D — teacher column",
+      "resourceRevision": "2026-01_resource_path_no_printed_revision",
+      "role": "teacher_self",
+      "gradeBand": "secondary_I_level_D",
+      "itemCount": 38,
+      "license": "CC BY-NC-SA 4.0",
+      "licenseEvidence": "First-page CC BY NC SA pictogram and 4.0 DE visually verified.",
+      "responseOptionsSource": "https://sep-klassik.isq.berlin/de_DE/fragebogen/voransicht/SMS2627/vollst%C3%A4ndig.html",
+      "note": "PDF teacher items preserved verbatim, including De typo in module6 item1 and no final period in module4 item5; common response anchors verified in matching official public preview."
+    }
+  },
+  "forms": [
+    {
+      "key": "sep_klassik_math_m1_teacher_de",
+      "title": "SEP-Klassik｜数学论证｜教师自评｜DE·数学3–6年级·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 5,
+      "source": "math",
+      "sourceModule": 1,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:3-6",
+        "source_version:math_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": {
+        "basis": [
+          1,
+          2,
+          3
+        ],
+        "extended": [
+          4,
+          5
+        ]
+      },
+      "path": "forms/sep_klassik_math_m1_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_math_m2_teacher_de",
+      "title": "SEP-Klassik｜数学交流｜教师自评｜DE·数学3–6年级·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 8,
+      "source": "math",
+      "sourceModule": 2,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:3-6",
+        "source_version:math_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": {
+        "basis": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "extended": [
+          6,
+          7,
+          8
+        ]
+      },
+      "path": "forms/sep_klassik_math_m2_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_math_m3_teacher_de",
+      "title": "SEP-Klassik｜数学问题解决｜教师自评｜DE·数学3–6年级·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 7,
+      "source": "math",
+      "sourceModule": 3,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:3-6",
+        "source_version:math_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": {
+        "basis": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "extended": [
+          6,
+          7
+        ]
+      },
+      "path": "forms/sep_klassik_math_m3_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_math_m4_teacher_de",
+      "title": "SEP-Klassik｜数学建模｜教师自评｜DE·数学3–6年级·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 6,
+      "source": "math",
+      "sourceModule": 4,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:3-6",
+        "source_version:math_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": {
+        "basis": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "extended": [
+          5,
+          6
+        ]
+      },
+      "path": "forms/sep_klassik_math_m4_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_math_m5_teacher_de",
+      "title": "SEP-Klassik｜数学表征｜教师自评｜DE·数学3–6年级·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 4,
+      "source": "math",
+      "sourceModule": 5,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:3-6",
+        "source_version:math_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": {
+        "basis": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "extended": []
+      },
+      "path": "forms/sep_klassik_math_m5_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_math_m6_teacher_de",
+      "title": "SEP-Klassik｜数学对象与工具｜教师自评｜DE·数学3–6年级·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 5,
+      "source": "math",
+      "sourceModule": 6,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:3-6",
+        "source_version:math_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": {
+        "basis": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "extended": [
+          5
+        ]
+      },
+      "path": "forms/sep_klassik_math_m6_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_sinus_m1_teacher_de",
+      "title": "SEP-Klassik｜SINUS·学习参与（原无动机／外部动机模块）｜教师报告学生动机｜DE·2026-10",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 6,
+      "source": "sinus",
+      "sourceModule": 1,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_report",
+        "language:de",
+        "stage:primary_secondary_as_listed_by_portal",
+        "source_version:sinus_202610",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_sinus_m1_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_sinus_m2_teacher_de",
+      "title": "SEP-Klassik｜SINUS·内摄动机感知｜教师报告学生动机｜DE·2026-10",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 3,
+      "source": "sinus",
+      "sourceModule": 2,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_report",
+        "language:de",
+        "stage:primary_secondary_as_listed_by_portal",
+        "source_version:sinus_202610",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_sinus_m2_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_sinus_m3_teacher_de",
+      "title": "SEP-Klassik｜SINUS·认同动机感知｜教师报告学生动机｜DE·2026-10",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 3,
+      "source": "sinus",
+      "sourceModule": 3,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_report",
+        "language:de",
+        "stage:primary_secondary_as_listed_by_portal",
+        "source_version:sinus_202610",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_sinus_m3_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_sinus_m4_teacher_de",
+      "title": "SEP-Klassik｜SINUS·内在／兴趣动机感知｜教师报告学生动机｜DE·2026-10",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 6,
+      "source": "sinus",
+      "sourceModule": 4,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_report",
+        "language:de",
+        "stage:primary_secondary_as_listed_by_portal",
+        "source_version:sinus_202610",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_sinus_m4_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_media_m1_teacher_de",
+      "title": "SEP-Klassik｜媒介教育·信息检索｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 6,
+      "source": "media",
+      "sourceModule": 1,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:secondary_I_level_D",
+        "source_version:media_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_media_m1_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_media_m2_teacher_de",
+      "title": "SEP-Klassik｜媒介教育·沟通｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 7,
+      "source": "media",
+      "sourceModule": 2,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:secondary_I_level_D",
+        "source_version:media_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_media_m2_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_media_m3_teacher_de",
+      "title": "SEP-Klassik｜媒介教育·呈现｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 8,
+      "source": "media",
+      "sourceModule": 3,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:secondary_I_level_D",
+        "source_version:media_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_media_m3_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_media_m4_teacher_de",
+      "title": "SEP-Klassik｜媒介教育·制作｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 6,
+      "source": "media",
+      "sourceModule": 4,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:secondary_I_level_D",
+        "source_version:media_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_media_m4_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_media_m5_teacher_de",
+      "title": "SEP-Klassik｜媒介教育·分析｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 6,
+      "source": "media",
+      "sourceModule": 5,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:secondary_I_level_D",
+        "source_version:media_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_media_m5_teacher_de.json"
+    },
+    {
+      "key": "sep_klassik_media_m6_teacher_de",
+      "title": "SEP-Klassik｜媒介教育·反思｜教师自评｜DE·Sek I·Niveaustufe D·2026-01",
+      "kind": "FORM",
+      "version": "0.1.0",
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": 5,
+      "source": "media",
+      "sourceModule": 6,
+      "tags": [
+        "family:sep_klassik",
+        "role:teacher_self",
+        "language:de",
+        "stage:secondary_I_level_D",
+        "source_version:media_202601",
+        "use:developmental_reflection",
+        "state:pilot",
+        "scoring:none",
+        "license:cc_by_nc_sa_4_0"
+      ],
+      "sourceItemGroups": null,
+      "path": "forms/sep_klassik_media_m6_teacher_de.json"
+    }
+  ],
+  "nativeScales": 0,
+  "optionalOrdinaryCombinations": [
+    {
+      "status": "PLAN_ONLY_NOT_IMPORTED",
+      "title": "SEP-Klassik｜数学六模块｜教师自评｜DE·3–6年级",
+      "members": [
+        "sep_klassik_math_m1_teacher_de",
+        "sep_klassik_math_m2_teacher_de",
+        "sep_klassik_math_m3_teacher_de",
+        "sep_klassik_math_m4_teacher_de",
+        "sep_klassik_math_m5_teacher_de",
+        "sep_klassik_math_m6_teacher_de"
+      ],
+      "combinedScore": null
+    },
+    {
+      "status": "PLAN_ONLY_NOT_IMPORTED",
+      "title": "SEP-Klassik｜SINUS四模块｜教师报告学生动机｜DE",
+      "members": [
+        "sep_klassik_sinus_m1_teacher_de",
+        "sep_klassik_sinus_m2_teacher_de",
+        "sep_klassik_sinus_m3_teacher_de",
+        "sep_klassik_sinus_m4_teacher_de"
+      ],
+      "combinedScore": null
+    },
+    {
+      "status": "PLAN_ONLY_NOT_IMPORTED",
+      "title": "SEP-Klassik｜媒介教育六模块｜教师自评｜DE·Sek I·D",
+      "members": [
+        "sep_klassik_media_m1_teacher_de",
+        "sep_klassik_media_m2_teacher_de",
+        "sep_klassik_media_m3_teacher_de",
+        "sep_klassik_media_m4_teacher_de",
+        "sep_klassik_media_m5_teacher_de",
+        "sep_klassik_media_m6_teacher_de"
+      ],
+      "combinedScore": null
+    }
+  ],
+  "remainingMotherScope": {
+    "generalPrimarySecondary": "Full public previews include original teacher perspectives; the corresponding downloaded general PDF is labelled student-view and does not establish permission to redistribute teacher HTML. Portal terms §3.6 require written consent; no such consent obtained. Candidate only, no borrowed teacher items.",
+    "otherSubjects": "Download inventory and role-specific original/permission still need per-file confirmation; not claimed fully imported.",
+    "studentAndObserver": "Not imported in this teacher-only assignment; source roles are not rewritten or automatically disclosed."
+  },
+  "deduplication": {
+    "mainSourceJsonFiles": 235,
+    "mainAndRelevantDocs": "no SEP-Klassik/ISQ source-domain mother match located",
+    "openPrTitlesBodies": 54,
+    "matchFound": false,
+    "productionAdministratorCreatedTools": "NOT_QUERIED"
+  },
+  "manual": {
+    "originalUrl": "https://sep-klassik.isq-bb.de/de_DE/download/datei.html?file=2020-04%2FAnleitung_Unterricht_1.pdf",
+    "sha256": "8c9403cb5ce4046ea3445a9a62a47d197324b84050c7fd1f1075e3f66e4d4923",
+    "pages": 8,
+    "edition": "Berlin March 2020, manual part 1; not an item booklet or current scoring authority"
+  }
+}

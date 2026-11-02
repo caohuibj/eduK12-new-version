@@ -1,0 +1,146 @@
+{
+  "sourceDOI": "10.1163/23641177-BJA10012",
+  "publicationDate": "2020-12-16",
+  "researchLeadAlias": "Korean science teaching competence 2021",
+  "familyTag": "family:kstc2020",
+  "C": "1.0.0",
+  "P": "1.0.0",
+  "R": "1.0.1",
+  "factors": [
+    {
+      "key": "kstc2020_slp_environment_teacher_en",
+      "version": "1.0.0",
+      "area": "SLP",
+      "factor": "Consideration of science learning environment",
+      "count": 10,
+      "itemCodes": [
+        "SLP1.1",
+        "SLP1.2",
+        "SLP3.1",
+        "SLP3.2",
+        "SLP3.3",
+        "SLP3.4",
+        "SLP3.8",
+        "SLP3.9",
+        "SLP4.1",
+        "SLP4.2"
+      ]
+    },
+    {
+      "key": "kstc2020_slp_content_teacher_en",
+      "version": "1.0.0",
+      "area": "SLP",
+      "factor": "Understanding of science teaching content",
+      "count": 4,
+      "itemCodes": [
+        "SLP2.1",
+        "SLP2.2",
+        "SLP2.3",
+        "SLP2.4"
+      ]
+    },
+    {
+      "key": "kstc2020_slp_cognition_teacher_en",
+      "version": "1.0.0",
+      "area": "SLP",
+      "factor": "Consideration of student cognition",
+      "count": 3,
+      "itemCodes": [
+        "SLP3.5",
+        "SLP3.6",
+        "SLP3.7"
+      ]
+    },
+    {
+      "key": "kstc2020_stp_inquiry_teacher_en",
+      "version": "1.0.0",
+      "area": "STP",
+      "factor": "Teaching science inquiry",
+      "count": 14,
+      "itemCodes": [
+        "STP1.CL5",
+        "STP1.ST1",
+        "STP1.ST2",
+        "STP1.ST3",
+        "STP1.SE1",
+        "STP1.SE2",
+        "STP1.SE3",
+        "STP1.SE4",
+        "STP1.SC2",
+        "STP1.SC3",
+        "STP1.SC4",
+        "STP1.SP1",
+        "STP1.SP2",
+        "STP1.SP4"
+      ]
+    },
+    {
+      "key": "kstc2020_stp_everyday_teacher_en",
+      "version": "1.0.0",
+      "area": "STP",
+      "factor": "Relating science to everyday life",
+      "count": 7,
+      "itemCodes": [
+        "STP1.SC1",
+        "STP1.SP3",
+        "STP1.SL1",
+        "STP1.SL2",
+        "STP1.SL3",
+        "STP1.SL4",
+        "STP1.SL5"
+      ]
+    },
+    {
+      "key": "kstc2020_stp_engagement_teacher_en",
+      "version": "1.0.0",
+      "area": "STP",
+      "factor": "Facilitating productive engagement",
+      "count": 6,
+      "itemCodes": [
+        "STP1.CL1",
+        "STP1.CL2",
+        "STP1.CL3",
+        "STP1.CL4",
+        "STP1.CL6",
+        "STP1.CL7"
+      ]
+    },
+    {
+      "key": "kstc2020_stp_assessment_teacher_en",
+      "version": "1.0.0",
+      "area": "STP",
+      "factor": "Administrating assessment",
+      "count": 3,
+      "itemCodes": [
+        "STP2.1",
+        "STP2.2",
+        "STP2.3"
+      ]
+    },
+    {
+      "key": "kstc2020_spd_new_teacher_en",
+      "version": "1.0.0",
+      "area": "SPD",
+      "factor": "New mode of professional development",
+      "count": 3,
+      "itemCodes": [
+        "SPD4",
+        "SPD5",
+        "SPD6"
+      ]
+    },
+    {
+      "key": "kstc2020_spd_traditional_teacher_en",
+      "version": "1.0.0",
+      "area": "SPD",
+      "factor": "Traditional mode of professional development",
+      "count": 4,
+      "itemCodes": [
+        "SPD1",
+        "SPD2",
+        "SPD3",
+        "SPD7"
+      ]
+    }
+  ]
+}

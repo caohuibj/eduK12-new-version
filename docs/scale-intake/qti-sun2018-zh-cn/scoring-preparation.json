@@ -1,0 +1,182 @@
+{
+  "status": "PREPARATION_ONLY_NOT_RUNTIME",
+  "no40ItemTotal": true,
+  "reverseItemKeys": [],
+  "reverseStatus": "No item reverse-keying prescribed in the paper; negative behaviour is NOT reversed into positive teacher quality.",
+  "missingPolicy": {
+    "source": "NOT_SPECIFIED",
+    "projectProposal": "complete_required per octant; no imputation or proration; all 8 complete octants required for either derived dimension",
+    "activated": false
+  },
+  "octants": [
+    {
+      "instrumentKey": "qti_sun2018_directing_zh_cn",
+      "label": "统领",
+      "itemCount": 5,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O1-01",
+        "QTI-SUN2018-O1-02",
+        "QTI-SUN2018-O1-03",
+        "QTI-SUN2018-O1-04",
+        "QTI-SUN2018-O1-05"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_helpful_zh_cn",
+      "label": "支持",
+      "itemCount": 5,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O2-01",
+        "QTI-SUN2018-O2-02",
+        "QTI-SUN2018-O2-03",
+        "QTI-SUN2018-O2-04",
+        "QTI-SUN2018-O2-05"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_understanding_zh_cn",
+      "label": "体谅",
+      "itemCount": 4,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O3-01",
+        "QTI-SUN2018-O3-02",
+        "QTI-SUN2018-O3-03",
+        "QTI-SUN2018-O3-04"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_compliant_zh_cn",
+      "label": "顺从",
+      "itemCount": 7,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O4-01",
+        "QTI-SUN2018-O4-02",
+        "QTI-SUN2018-O4-03",
+        "QTI-SUN2018-O4-04",
+        "QTI-SUN2018-O4-05",
+        "QTI-SUN2018-O4-06",
+        "QTI-SUN2018-O4-07"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_uncertain_zh_cn",
+      "label": "犹疑",
+      "itemCount": 4,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O5-01",
+        "QTI-SUN2018-O5-02",
+        "QTI-SUN2018-O5-03",
+        "QTI-SUN2018-O5-04"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_dissatisfied_zh_cn",
+      "label": "不满",
+      "itemCount": 5,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O6-01",
+        "QTI-SUN2018-O6-02",
+        "QTI-SUN2018-O6-03",
+        "QTI-SUN2018-O6-04",
+        "QTI-SUN2018-O6-05"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_confrontational_zh_cn",
+      "label": "对抗",
+      "itemCount": 5,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O7-01",
+        "QTI-SUN2018-O7-02",
+        "QTI-SUN2018-O7-03",
+        "QTI-SUN2018-O7-04",
+        "QTI-SUN2018-O7-05"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    },
+    {
+      "instrumentKey": "qti_sun2018_imposing_zh_cn",
+      "label": "强权",
+      "itemCount": 5,
+      "sourceItemCodes": [
+        "QTI-SUN2018-O8-01",
+        "QTI-SUN2018-O8-02",
+        "QTI-SUN2018-O8-03",
+        "QTI-SUN2018-O8-04",
+        "QTI-SUN2018-O8-05"
+      ],
+      "aggregationProposal": "mean of confirmed numeric response coding; NOT activated",
+      "range": null,
+      "direction": "higher_is_more_of_this_behaviour_not_better",
+      "independentAdministrationEvidence": "NOT_ESTABLISHED"
+    }
+  ],
+  "derivedDimensions": {
+    "sourceLocator": "Table 2 footnote, printed p12",
+    "a": 0.92388,
+    "b": 0.382683,
+    "agencyWeights": [
+      0.92388,
+      0.382683,
+      -0.382683,
+      -0.92388,
+      -0.92388,
+      -0.382683,
+      0.382683,
+      0.92388
+    ],
+    "communionWeights": [
+      0.382683,
+      0.92388,
+      0.92388,
+      0.382683,
+      -0.382683,
+      -0.92388,
+      -0.92388,
+      -0.382683
+    ],
+    "input": "eight octant scores, not forty unequally weighted individual items",
+    "sourceReportedRange": [
+      -1,
+      1
+    ],
+    "runtimeRange": null,
+    "normalization": "UNRESOLVED: do not silently select divisor 4 or 2*(a+b)",
+    "notSeparateQuestionBanks": true,
+    "notActivated": true
+  },
+  "referencePolicy": "none; original sample means are descriptive statistics, not norms or cutoffs",
+  "administrationPreparation": {
+    "sourceRequires": "randomise before use, not necessarily runtime randomisation per respondent",
+    "proposal": "prepare and review a frozen cross-octant permutation with stable IDs, using existing randomizeItems=false display",
+    "frozenPermutation": null,
+    "activated": false
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "checkedAt": "2026-11-02T01:04:40.575267+00:00",
+  "scope": "DMEE-Class-T content/forms only",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "dependencyReuse": {
+    "packageLockSHA256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "prismaSchemaSHA256": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "exactBytesSameAsExistingInstalledWorkspace": true,
+    "newInstallBuildOrFullTest": false
+  },
+  "commands": [
+    {
+      "command": "prisma db push --skip-generate against loopback dmee_isolated only",
+      "exit": 0,
+      "purpose": "Prepare disposable current-schema integration fixture, not production migration"
+    },
+    {
+      "command": "tsx /tmp/dmee-class-t/isolated-import.ts",
+      "exit": 0,
+      "result": "9 DRAFT ordinary questionnaires, 110 native Form fields, existing tags and readback; no score or publication"
+    },
+    {
+      "command": "tsx /tmp/dmee-class-t/report-check.ts",
+      "exit": 0,
+      "result": "27 descriptive presentation cases from persisted items; missing null, no score; stale tag CAS rejected"
+    },
+    {
+      "command": "tsx /tmp/dmee-class-t/check-content.ts",
+      "exit": 0,
+      "result": "8 registered catalog-only sources valid; no ESEM runtime policy"
+    },
+    {
+      "command": "npm run scale:instruments:check",
+      "exit": 0
+    },
+    {
+      "command": "npm run scale:onboarding:check",
+      "exit": 0
+    }
+  ],
+  "executedSource": [
+    {
+      "path": "verification/isolated-import.ts.txt",
+      "sha256": "0c0fa749b664b0d10f376039465d5e41cb42493d27d010f587d7f3c533e3c701",
+      "note": "Exact one-off executed source retained as non-executable documentation; paths identify this selected environment, not a platform CLI."
+    },
+    {
+      "path": "verification/report-check.ts.txt",
+      "sha256": "5bf535c0927cca106d87c7605a8338ece8d88304726c5ff844c7bad336d7ccba",
+      "note": "Exact one-off executed source retained as non-executable documentation; paths identify this selected environment, not a platform CLI."
+    },
+    {
+      "path": "verification/check-content.ts.txt",
+      "sha256": "a8a279722ef6f086c6a3184dd79f0cd96b5e10e5417f73e33d76b4fda6c6aea4",
+      "note": "Exact one-off executed source retained as non-executable documentation; paths identify this selected environment, not a platform CLI."
+    }
+  ],
+  "notExecuted": [
+    "full frontend/backend tests or builds",
+    "production DB access or dedup",
+    "public administration or participant FINAL",
+    "ESEM scorer or factor-score fixtures",
+    "native French response anchors not provided"
+  ],
+  "reportCopyReview": {
+    "method": "manual review of report-examples.md",
+    "states": [
+      "general reflection",
+      "difficulties or less frequent practices",
+      "insufficient information/missing"
+    ],
+    "recipient": "teacher self-reflection under existing recipient authorization",
+    "claimsExcluded": [
+      "teacher performance ranking",
+      "diagnosis",
+      "student labels",
+      "actual teaching-quality proof",
+      "student achievement causality",
+      "cross-tool total"
+    ]
+  },
+  "cleanup": {
+    "checkedAt": "2026-11-02T01:05:11.817341+00:00",
+    "ownedIsolatedContainersRemoved": true,
+    "ownedAnonymousPostgresVolumeRemoved": true,
+    "developmentDatabasePersists": false,
+    "note": "Readback installation proof retained; no claim of persistent development-library installation."
+  },
+  "currentMainContinuation": {
+    "checkedAt": "2026-11-02T01:05:58.852795+00:00",
+    "originalExecutionBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+    "currentMain": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+    "contentCommitAfterRebase": "1fc27575737eb8a71940ab1c4ede45538ef36d8e",
+    "unchangedConsumerInputs": [
+      {
+        "path": "server-version/backend/src/modules/questionnaire-product/service.ts",
+        "unchangedBlob": "96ea8096f2c7a537228461da4623f6064df42325"
+      },
+      {
+        "path": "server-version/backend/src/modules/training-catalog/tags.ts",
+        "unchangedBlob": "af26fbd939f32e599063956b98166f19cf268ae4"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-core/form/definition.ts",
+        "unchangedBlob": "269514b731b6caa3cea0b2cf17fd18d46d918cc8"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-core/form/runtime.ts",
+        "unchangedBlob": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/typed-form.ts",
+        "unchangedBlob": "4a95fde00a03c6f6708221ee4752e684b4377ca4"
+      },
+      {
+        "path": "server-version/backend/src/modules/reporting/typed-form-presentation.ts",
+        "unchangedBlob": "262e61e81308a613f1b38ed72cc82022d667050c"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/form-section-definition.ts",
+        "unchangedBlob": "e153c2d3f52494e45aee5469d321ced15bacccc7"
+      },
+      {
+        "path": "server-version/backend/package-lock.json",
+        "unchangedBlob": "a9d8032f6511c4b1a12c31cc72e6a95aab79d491"
+      },
+      {
+        "path": "server-version/backend/prisma/schema.prisma",
+        "unchangedBlob": "99ea9850cabaad4a61561bc968384d2149f4ce31"
+      }
+    ],
+    "noDatabaseReplay": "Existing native Form/tags/import/display consumers, schema and lock are byte-identical; original isolated proof retained, not relabelled as a new run.",
+    "formalSelectedChecker": {
+      "status": "LOCAL_PASS_OFFICIAL_CI_PENDING_PR_NOT_CREATED",
+      "command": "SCALE_INTAKE_BASE_SHA=ae05ed2e70691bda817ab323130f9caf4dff26ca SCALE_INTAKE_HEAD_SHA=e3d85131bcbcf44a3442f83ad5ef506e0b0e8959 node --import tsx server-version/backend/scripts/scale-intake-selected-check.ts",
+      "exit": 0,
+      "checkedSources": 8,
+      "scope": "Existing repaired main checker, source contract only. Receipt keeps its exact original source HEAD; later evidence-only additions do not alter instrument/form/consumer blobs. No CI run or skipped success claimed."
+    }
+  },
+  "draftPRAction": {
+    "status": "DENIED_NOT_EXECUTED",
+    "action": "Create GitHub Draft PR from content/dmee-class-t-teacher-self-20261102 to main in caohuibj/eduK12-new-version",
+    "reason": "Automatic approval review states the user authorized preparing teacher tools but did not explicitly authorize opening this PR, despite received batch confirmation.",
+    "readback": "Branch-scoped PR query returned [] after denial.",
+    "retry": "Not retried via another tool or workaround."
+  }
+}

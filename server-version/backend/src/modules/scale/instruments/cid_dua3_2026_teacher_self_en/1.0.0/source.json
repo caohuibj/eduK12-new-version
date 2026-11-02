@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cid_dua3_2026_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "CID-DUA3｜整量表12项｜教师自评｜2026英文题文（反应协议待补）",
+      "abbreviation": "CID-DUA3",
+      "instrumentFamily": "CID-DUA3 / Gómez Martín et al. / 2026 revised 12-item version"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师参照具体教学计划，自报与UDL 3.0相关的实践频率；不是教学质量、能力、知识或学生结果的直接测量。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:cid_dua3",
+        "role:teacher_self",
+        "stage:mixed_teaching_contexts",
+        "language:en",
+        "source_version:2026_revised_12",
+        "use:reflection",
+        "status:PILOT",
+        "license:cc_by_4_0",
+        "availability:catalog_only"
+      ]
+    },
+    "population": {
+      "populationNotes": "原研究Spain跨学段在职教师、以小学为主；混合样本不证明每学段适用。英文为发表题文，原施测语言和精确锚点未核，不是假称验证中文版。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "a specific routine instructional plan selected by the respondent",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "正文及Crossref证实2026-09-09发表并提供CC BY 4.0；Table 2为12个英文陈述。",
+        "原教师实施频率的反应类别、完整锚点及精确编码未在已读HTML/XML/PDF中找到；专家内容审题的1–4适切性锚点不可替代。",
+        "91个非概率样本、以小学教师为主，EFA与CFA同一样本；只作PILOT，不代表各学段/语言均已验证。",
+        "三个UDL原则为理论框架，作者明确整量表而非三个独立子量表；不拆三个分数。",
+        "作者计算12项合计与均值；反向键/理论范围待精确反应协议，不从均值或专家量规推造。",
+        "缺常模不阻止合法内容做无分表单；项目证据表是另版本适配，不是原频率量表已安装。",
+        "5分钟仅目录规划估计，不是作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究为初步单因子证据，本地语言/各学段/完整施测协议未核。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "具体实践反思；无分证据表另项目版本，不自动继承原量表效度。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "正文Table 2英文发表题文；原研究施测语言未据此假定。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "无中文版原量表；项目中文页提示在无分证据表中单独注明。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Psychometric evidence for the universal design for learning 3.0 teacher implementation questionnaire (CID-DUA3): development and preliminary validation",
+      "citation": "Gómez Martín, M., Cruz Cruz, P., Martínez Cano, A. & Martín Cruz, I. (2026). Frontiers in Education 11:1921354. DOI:10.3389/feduc.2026.1921354. CC BY 4.0.",
+      "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1921354/full",
+      "publicationYear": 2026
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "整体UDL相关实践频率"
+      ],
+      "limitations": [
+        "正文及Crossref证实2026-09-09发表并提供CC BY 4.0；Table 2为12个英文陈述。",
+        "原教师实施频率的反应类别、完整锚点及精确编码未在已读HTML/XML/PDF中找到；专家内容审题的1–4适切性锚点不可替代。",
+        "91个非概率样本、以小学教师为主，EFA与CFA同一样本；只作PILOT，不代表各学段/语言均已验证。",
+        "三个UDL原则为理论框架，作者明确整量表而非三个独立子量表；不拆三个分数。",
+        "作者计算12项合计与均值；反向键/理论范围待精确反应协议，不从均值或专家量规推造。",
+        "缺常模不阻止合法内容做无分表单；项目证据表是另版本适配，不是原频率量表已安装。"
+      ],
+      "disclaimer": "未形成原计分报告。无分表单只保存实践证据和行动，不计算分数或能力判断。"
+    },
+    "blockers": [
+      "TEACHER_RESPONSE_ANCHORS_AND_CODING_NOT_REPORTED",
+      "EXECUTABLE_SCALE_NOT_PREPARED"
+    ]
+  }
+}
