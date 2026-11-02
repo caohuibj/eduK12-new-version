@@ -124,6 +124,8 @@ const releaseToolFiles=new Set([
  'docs/cognitive-intake/PROJECT-INSTRUCTIONS.md',
  'docs/cognitive-intake/USE-IN-CHAT.md',
 
+ 'server-version/backend/src/scripts/situational-onboarding-check.ts',
+ '.github/scripts/sjt-onboarding-git-buffer.test.mjs','.github/workflows/situational-publication.yml',
  '.github/scripts/scale-intake-scope.mjs','.github/scripts/scale-intake-scope.test.mjs',
  '.github/scripts/admin-permissions-functional.test.mjs','.github/scripts/ci-topology.test.mjs',
  '.github/scripts/content-workflows.test.mjs','.github/scripts/maintenance-routing.test.mjs',

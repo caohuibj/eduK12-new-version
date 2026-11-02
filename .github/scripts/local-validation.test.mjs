@@ -128,3 +128,12 @@ test('mixed/unknown metadata cannot enter the documentation shortcut; login reta
  const b={scope:{outputs:{application_route:'B',release_plan:JSON.stringify({required:['login-contracts','sast']})}}};
  assert.deepEqual(requiredChecks(b,false),['scope','scoped-release','codeql']);
 });
+
+test('SJT CLI tooling uses the bounded Git regression without full content or app checks',()=>{
+ for(const file of ['server-version/backend/src/scripts/situational-onboarding-check.ts','.github/scripts/sjt-onboarding-git-buffer.test.mjs','.github/workflows/situational-publication.yml'])fixture(({base,head})=>{
+  const commands=recipe('release-tools',base,head);
+  assert(commands.some(argv=>argv.includes('.github/scripts/sjt-onboarding-git-buffer.test.mjs')));
+  assert(commands.every(argv=>argv[0]==='node'&&argv.includes('--test')));
+  assert(!commands.flat().some(arg=>/vitest|playwright|prisma|tsc|situational:contracts|onboarding-check\.ts|^build$/.test(arg)));
+ },file);
+});

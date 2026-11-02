@@ -41,3 +41,14 @@ API等价入口：`POST /api/admin/permissions/static-sjt/prepare`、`POST /api/
 当前完整三文件差异被原生分类器判为platform：content/backend_modules/frontend/maintenance/release-tooling均false；脚本路径为outside-scoped-allowlists。向main创建Draft PR会选中`PR light / backend compile`（包含npm run build和situational:contracts）、`PR light / frontend lint + typecheck`，并触发独立publication workflow。它不是本修复要求的定向验证路线。
 
 因此先保留已验证独立分支及审阅说明，PR激活待协调者明确处理现有CI范围与“不重复全套内容验证”的约束冲突。没有用skip-ci、改文件名、借其他分支身份、修改路由或伪造绿灯绕过。此状态不等于修复已经合格合并或进入生产。
+
+
+## 定向CI路由补充（继续保留上面的历史pending记录）
+
+现复用已有release-tooling路线：仅将此开发CLI、新增Node回归测试和原有publication工作流列入精确工具路径；local-validation现有recipe按变化文件选择Git容量与路由测试。publication工作流用同一完整差异的toolingOnly判定，将纯工具检查交给release-tools；题包、publication/scientific元数据、独立审阅实现、运行时、依赖、schema或不安全文件模式混入时均拒绝工具路线，仍走原有实际检查。没有新的PR号、分支名或hash资格。
+
+新增Node测试执行真实CLI helper的类型擦除后表达式，覆盖小文件、大UTF-8、8MiB以下和超限失败；原真实3.1MB候选结果保持复用。配套正负路由/recipe测试确认没有选择应用编译、Prisma、Vitest全库或完整内容校验。此处TypeScript类型擦除是Node24.21原生能力，不添加依赖或运行引擎。未变更任何GitHub人类审批要求。
+
+Draft现有合格项为scope+release-tools；转Ready时现有merge gate仍强制codeql，既有release-tooling CodeQL paths包含backend/src/scripts及本次共享工具。Draft未执行SAST不得写成已经通过；无需扩大为应用编译或增设新门禁。
+
+与#538协调：本分支基于main adad907a，不修改maintenance-repair-scope.mjs、maintenance-repair.test.mjs或ci.yml；未引入其未合入代码。读取#538的c6c415436ed3ff6f3de2cdf320b7c160cc4fd489快照时未发现文件交集。若其随后改动local-validation等共享文件，合入时应保留各自recipe增量，不能以整文件覆盖另一分支；当前修复不依赖#538业务改动。
