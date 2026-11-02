@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tfals_practical_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "TFALS｜实践素养｜教师自评｜2022英文（待授权题本）",
+      "abbreviation": "TFALS",
+      "instrumentFamily": "TFALS 2022"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "形成性评价实践素养的教师自报，属于素养画像；不能直接证明实际教学质量。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "family:tfals",
+        "role:teacher_self",
+        "stage:primary_sec",
+        "lang:en",
+        "version:2022",
+        "use:literacy",
+        "status:pilot",
+        "license:pending"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原研究涉及香港小学及中学教师，实际施测中文版；英文为原始开发语言，本候选不声称英语独立验证或新中文版验证。"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "不擅自新增回顾时窗；正式指导语须与取得的授权题本核对。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "最终附录题号 [8, 9, 10, 11, 12, 13, 14, 15]；27题分析编号 [10, 12, 13, 14, 15, 16, 17, 18]，两套编号不可混用。",
+        "三维度通常保留完整22题组卷；单维度拆开施测的效度尚未建立。",
+        "3分钟是项目排程估计，并非作者测得完成时间。",
+        "六级同意选项；不得套用TFAPS频率选项。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "拟用于教师自主反思；本候选尚未取得平台使用及题文公开再分发授权。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original English development items in the author-uploaded accepted manuscript appendix; standalone author booklet currently unavailable.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "不新译题文；中文题本只确认作者入口线索，未取得及逐题核对。不将开发英文题目误称为香港实测英文版。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "TFALS 2022 — 实践素养",
+      "citation": "Yan, Z., & Pastore, S. (2022). Are teachers literate in formative assessment? The development and validation of the Teacher Formative Assessment Literacy Scale. Studies in Educational Evaluation, 74, 101183. https://doi.org/10.1016/j.stueduc.2022.101183",
+      "url": "https://doi.org/10.1016/j.stueduc.2022.101183",
+      "publicationYear": 2022
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "实践素养"
+      ],
+      "limitations": [
+        "教师自报素养不能作为教师绩效、学生成绩或实际教学质量的证明。",
+        "当前只登记目录；题文和运行计分未安装，不能据此施测。",
+        "报告为项目原创教师成长文案草案；仅沿用现有报告版本及接收者授权。",
+        "不使用研究样本均值作常模；没有TFALS与TFAPS互换分数或跨工具总分。"
+      ],
+      "disclaimer": "候选待审：受限题文未公开、无可施测Scale/Form入库，不能标为开发库已入。"
+    },
+    "blockers": [
+      "AUTHOR_BOOKLET_UNAVAILABLE_HTTP_503",
+      "PLATFORM_USE_AND_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED",
+      "INDIVIDUAL_SCORING_CONTRACT_NOT_VERIFIED"
+    ]
+  }
+}

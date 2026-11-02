@@ -1,0 +1,29 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import {strict as assert} from 'node:assert'
+import {scaleInstrumentSourceV1Schema} from './server-version/backend/src/modules/scale/onboarding/schema'
+import {validateScaleInstrumentSource} from './server-version/backend/src/modules/scale/onboarding/validate-instrument'
+import {getScaleInstrumentSource,getScaleInstrumentRuntimePolicy} from './server-version/backend/src/modules/scale/onboarding/instrument-registry'
+import {previewScaleInstrument} from './server-version/backend/src/modules/scale/onboarding/preview'
+// Copy this text to .tfals-check.ts at the repository root; run with backend tsx; remove the temporary copy afterward.
+const root=path.resolve('docs/scale-instruments/tfals/1.0.0')
+const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'))
+assert.equal(m.parts.length,3);assert.deepEqual(m.parts.map((p:any)=>p.itemCount),[7,8,7])
+assert.deepEqual(m.parts.flatMap((p:any)=>p.finalAppendixItems),Array.from({length:22},(_,i)=>i+1))
+assert.equal(m.forms.length,0);assert.equal(m.actualImport.scales,0);assert.equal(m.actualImport.forms,0)
+assert(m.tags.length<=10);assert(m.tags.every((s:string)=>s.length<=20));assert(m.tags.includes('family:tfals'))
+const results=[]
+for(const p of m.parts){
+ const s=getScaleInstrumentSource(p.key,p.version);assert(s)
+ scaleInstrumentSourceV1Schema.parse(s);const v=validateScaleInstrumentSource(s);assert(v.valid,JSON.stringify(v.issues))
+ assert.equal(s.executable,undefined);assert.equal(getScaleInstrumentRuntimePolicy(p.key,p.version),undefined)
+ const preview=previewScaleInstrument({instrumentKey:p.key,instrumentVersion:p.version,locale:'en',territory:'HK',commercialNature:'COMMERCIAL',deploymentModes:['STANDALONE']})
+ assert.equal(preview.sourceValidation.ok,true);assert.equal(preview.allowActivation,false);assert.equal(preview.executable,null)
+ assert(preview.blockers.includes('PLATFORM_USE_AND_REDISTRIBUTION_PERMISSION_NOT_ESTABLISHED'))
+ results.push({key:p.key,version:p.version,itemCount:p.itemCount,schema:'PASS',registry:'PASS',nativePreview:'PASS_NO_ACTIVATION',scoreRuntime:false,blockers:preview.blockers})
+}
+const reports=fs.readFileSync(path.join(root,'report-examples.md'),'utf8')
+for(const name of ['概念素养','实践素养','社会情绪素养'])assert(reports.includes(name))
+assert(reports.includes('信息不足'));assert(reports.includes('不补零'));assert(reports.includes('尚未绑定运行报告版本'))
+fs.writeFileSync(path.join(root,'verification/candidate-check.json'),JSON.stringify({checkedAt:new Date().toISOString(),results,reportDraftCases:9,reportCheck:'MANUAL_CASE_REVIEW_AND_CONTENT_ASSERTIONS_ONLY',notTested:['runtime scored reports','DB import','English/Chinese original booklet equivalence','scientific review','production duplicates']},null,2)+'\n')
+console.log(JSON.stringify({candidates:results.length,valid:true,allowActivation:false}))

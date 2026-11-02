@@ -1,0 +1,239 @@
+{
+  "checkedAt": "2026-11-02T01:16:08.178671+00:00",
+  "baseMain": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "primarySources": [
+    {
+      "url": "https://www.yanzi.hk/instruments",
+      "status": "search index confirms author-listed TFALS English/Chinese entry; direct read HTTP503/timeout"
+    },
+    {
+      "url": "https://www.yanzi.hk/assets/instruments/teacher-formative-assessment-literacy-scale-en.pdf",
+      "status": "HTTP503; not downloaded or silently substituted"
+    },
+    {
+      "url": "https://repository.eduhk.hk/en/publications/are-teachers-literate-in-formative-assessment-the-development-and/",
+      "status": "bibliographic metadata read; published PDF restricted to EdUHK users, not accessed"
+    },
+    {
+      "url": "https://ricerca.uniba.it/handle/11586/405891",
+      "status": "metadata read; no associated downloadable file"
+    },
+    {
+      "url": "https://www.researchgate.net/publication/361713204_Are_teachers_literate_in_formative_assessment_The_development_and_validation_of_the_Teacher_Formative_Assessment_Literacy_Scale",
+      "status": "author-uploaded accepted manuscript read: Method, final Appendix, analytical Table1/S1, Discussion, rights notice; no original item text copied into public branch",
+      "rights": "personal-use restriction and explicit prohibition on open-source repository upload; commercial permission required; no broader separate booklet license obtained"
+    }
+  ],
+  "deduplication": {
+    "mainSourceJsonFiles": 235,
+    "mainHits": [],
+    "queries": [
+      "TFALS",
+      "Teacher Formative Assessment Literacy",
+      "101183",
+      "Pastore",
+      "yanzi.hk"
+    ],
+    "openPRCount": 44,
+    "openPRHeads": [
+      {
+        "number": 560,
+        "head": "fb17b18d5804bce4a550dc53b1d33c3a069dbed6"
+      },
+      {
+        "number": 559,
+        "head": "87fbe2eefd34aa79fc8983d8c5a2c726b667aa25"
+      },
+      {
+        "number": 558,
+        "head": "5e57ff4fa40d0b462bc9aee69facd3dd6c8b8b9d"
+      },
+      {
+        "number": 557,
+        "head": "0a0cd827f92e445b4bb56d775a82e05bebc36437"
+      },
+      {
+        "number": 555,
+        "head": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b"
+      },
+      {
+        "number": 554,
+        "head": "84b802dd591ef623e615194552c800e2f7b78862"
+      },
+      {
+        "number": 553,
+        "head": "6162cda4b880b3c89b3d712d6c316fb9ee108ed7"
+      },
+      {
+        "number": 552,
+        "head": "51569d88e26ef7d9c58ef93cca206c451159673d"
+      },
+      {
+        "number": 550,
+        "head": "21162f30b500011c6b3e9f296fad0d0545b58755"
+      },
+      {
+        "number": 549,
+        "head": "03f0d3409a8499b7cf0db0bb8c4cac67810797bf"
+      },
+      {
+        "number": 548,
+        "head": "7820b248cc8aae4a97f583c761b462eae2f9a54a"
+      },
+      {
+        "number": 547,
+        "head": "a8ddd88f7256bf9534603fc825dc71ef326ebfa8"
+      },
+      {
+        "number": 546,
+        "head": "64cbe6a78fc42292f80d780200bd8882034d7bcb"
+      },
+      {
+        "number": 545,
+        "head": "783729150611c865cf753bff408288a39a141c6d"
+      },
+      {
+        "number": 544,
+        "head": "f05c29a5f0843ede8bc8d450be7708d5c1fc4de1"
+      },
+      {
+        "number": 543,
+        "head": "12acadbed9944c2d04dfaadb44d24682c2aa5078"
+      },
+      {
+        "number": 542,
+        "head": "2426aee58647236dd6084845ea834f23a95c6b17"
+      },
+      {
+        "number": 541,
+        "head": "2c69a375498b971941aa689ddbf6d684a5b1ab4e"
+      },
+      {
+        "number": 540,
+        "head": "648c2bf5b35515de62e8719c1788616ba337d49f"
+      },
+      {
+        "number": 539,
+        "head": "fd5be2a6a899524ad2fdb962095a58e5591cb3ca"
+      },
+      {
+        "number": 537,
+        "head": "bd863704646a80355599436b0e4a171a7c980622"
+      },
+      {
+        "number": 529,
+        "head": "cff8728f67818a28b9ab0a2189c30040470dbd6b"
+      },
+      {
+        "number": 515,
+        "head": "70a6b3bc54e30c95c35733a705c6350f929d2a6d"
+      },
+      {
+        "number": 491,
+        "head": "290aa955a3445bcb0b519829423e626d044a2fc1"
+      },
+      {
+        "number": 489,
+        "head": "dafc0b90b337e5ec7ab28f5b28208d74f51f2b28"
+      },
+      {
+        "number": 488,
+        "head": "0c526f0529ab47c0054f9470d0bb9217e1d787a5"
+      },
+      {
+        "number": 482,
+        "head": "9feffb8d0f5c91dd19f0744c43d62dba0a2818f8"
+      },
+      {
+        "number": 441,
+        "head": "16d9bbaa5fffb424ce463220d6f9f7d3a7280db5"
+      },
+      {
+        "number": 413,
+        "head": "0f8057fa75bcb89215275f6ad7695f189fcf0e65"
+      },
+      {
+        "number": 412,
+        "head": "4d79bc45d607f8e771eccfacc49a7558b8a3985e"
+      },
+      {
+        "number": 397,
+        "head": "3ee375d87aa8d72ad8de5dcdf5ce10fd1a0a763d"
+      },
+      {
+        "number": 383,
+        "head": "5454a7d7630a4ccb7125d0c621fa10317dc6924f"
+      },
+      {
+        "number": 379,
+        "head": "333200ade0c6cb42130cbc052189ba9c64691a12"
+      },
+      {
+        "number": 375,
+        "head": "5eca82fb13bcf0f2bbf3bb5b6deaa47fa1f9b792"
+      },
+      {
+        "number": 373,
+        "head": "3f17247865a6a83e5ee9e88cf3d0fa3060b59a53"
+      },
+      {
+        "number": 371,
+        "head": "75b956cbd4c45f75beee606fb53257494adc1ca0"
+      },
+      {
+        "number": 370,
+        "head": "bfd6dcbca24567219ec24979481f3da8e0137984"
+      },
+      {
+        "number": 368,
+        "head": "1388d5db6f845b8d907f0e4090e4fd727aea8926"
+      },
+      {
+        "number": 367,
+        "head": "8e4440cac46086f73390f8774c40853beb9a6ddd"
+      },
+      {
+        "number": 362,
+        "head": "e2b23122e1a41f52f61719fdd31a6daf338b97e1"
+      },
+      {
+        "number": 360,
+        "head": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2"
+      },
+      {
+        "number": 330,
+        "head": "bf73bdf66dcc4e1e169a0153596c43efdc203a0a"
+      },
+      {
+        "number": 329,
+        "head": "a5effd7f86249a77b7c82606130e5db6f89aae45"
+      },
+      {
+        "number": 328,
+        "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+      }
+    ],
+    "openPRTitleBranchPathHits": [],
+    "limitations": "No final item-text corpus ingested; no exhaustive semantic item match claimed. Production/admin-created tools not examined. Open PR paths/title/head were searched; private database remains unchecked.",
+    "mainRegisteredVersions": 258,
+    "mainInlineDeclarationsAlsoSearched": true
+  },
+  "preservedPreviousWork": {
+    "massDESE": {
+      "branch": "content/mass-dese-feedback-20261102",
+      "head": "2c69a375498b971941aa689ddbf6d684a5b1ab4e",
+      "PR": 541
+    },
+    "dmeeClassT": {
+      "branch": "content/dmee-class-t-teacher-self-20261102",
+      "head": "3a1ffc3c26063f24129e1c6c9995f3743bcc02d0",
+      "PR": "not created; prior approval-review rejection remains unresolved"
+    }
+  },
+  "scoringContract": {
+    "response": "6-point agreement, coded1..6; different from TFAPS frequency",
+    "reverse": "No reverse item specified in final Appendix; not an independently verified author scoring manual",
+    "missing": "Research analysis excluded >5% missing and used model-based imputation. No personal-report imputation copied from that research workflow. Candidate remains unscored/uninstalled.",
+    "method": "Paper analyzes Rasch-calibrated subscale measures and discusses raw mean responses; full person-scoring contract not established from standalone author materials. No fabricated cutoffs, norms, coefficients or overall score."
+  }
+}
