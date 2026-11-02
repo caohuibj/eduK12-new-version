@@ -1,0 +1,41 @@
+{
+  "checkedContentCommit": "bf2be1216aa68b5a2e4a3dc42521a0d48fde9919",
+  "checkedContentTree": "996a29c0bb87c1503546479c929d737cc5eff580",
+  "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+  "sourceAndOriginalDocumentParity": "PASS: every original tool file except the generated registry has the same Git blob as its reviewed tool head",
+  "originalHeadsPreserved": "PASS: all thirteen original current heads are Git ancestors",
+  "newSources": 156,
+  "newExecutableScales": 7,
+  "newExecutableStatus": "DRAFT only; all other sources CATALOG_ONLY",
+  "registryCheck": {
+    "status": "PASS",
+    "command": "Node24.21.0 --import tsx scripts/generate-scale-instruments.ts --check",
+    "cwd": "server-version/backend",
+    "historicalFirstAttempt": "NOT_EXECUTED: loader ERR_MODULE_NOT_FOUND for tsx when invoked from repository root; corrected cwd only, no dependency or source changes"
+  },
+  "scope": {
+    "content": true,
+    "codeql": true,
+    "scenario": "content",
+    "image_build": false,
+    "frontend_build": false,
+    "scale_intake_light": true,
+    "platformReasons": []
+  },
+  "selectedSourceAndScoringTests": "NOT_RUN_LOCALLY: delegate once to official exact-union selected check; do not repeat owner full suites",
+  "isolatedImports": "Original WIHIC/QTI/PISA evidence retained; no new DB import, publication, deployment or production write",
+  "formalCI": "NOT_RUN_AT_PREPARATION; actual run and head must be read back",
+  "notionCICommonErrors": {
+    "read": true,
+    "account": "Qiang",
+    "page": "404d27635a388186ac80de3593da05a5",
+    "applicable": [
+      "CI-007: regenerate complete registry without dropping sources",
+      "CI-020: exact base/head and source-evidence boundary",
+      "CI-004: no expansion to unrelated frontend/backend/full tests"
+    ]
+  },
+  "budget": "Existing selected content normally under 5 minutes; existing full CodeQL previously about 9 minutes, retained as required rather than bypassed",
+  "sourceInputChangesAfterCheck": "Only this preflight evidence file; no source or registry inputs changed",
+  "originalPRStates": "Read actual GitHub merged flag only after main contains original head; no manual close as merged"
+}
