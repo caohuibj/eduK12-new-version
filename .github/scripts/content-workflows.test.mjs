@@ -555,7 +555,6 @@ test('backend-only unit edits use a dedicated bounded route with unchanged fixed
   const ci=source('ci');
   const scope=fs.readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8');
   const gate=fs.readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
-  const workflow=source('ci-backend-unit');
   const example={file:'server-version/backend/src/__tests__/situational/scientific-governance.test.ts',
     status:'M',oldMode:'100644',newMode:'100644'};
   assert.equal(unitOnly([example]),true);
@@ -563,8 +562,8 @@ test('backend-only unit edits use a dedicated bounded route with unchanged fixed
   assert.deepEqual(requiredChecks({scope:{outputs:{application_route:'backend-unit'}}},false),['scope','backend-unit']);
   assert.match(scope,/backendUnit \? 'backend-unit'/);
   assert.match(gate,/recomputed-backend-unit-scope/);
-  assert.match(job(ci,'backend-unit'),/uses: \.\/\.github\/workflows\/ci-backend-unit\.yml/);
+  assert.match(job(ci,'backend-unit'),/ci-backend-unit-runner\.mjs/);
   assert.ok(jobNeeds(job(ci,'merge-gate')).includes('backend-unit'));
-  assert.match(workflow,/node --test \.github\/scripts\/ci-qualification\.test\.mjs/);
-  assert.match(workflow,/ci-backend-unit-runner\.mjs/);
+  const refs=[...ci.matchAll(/uses:\s+\.\/\.github\/workflows\/([^\s]+)/g)].map(row=>row[1]);
+  assert.ok(new Set(refs).size<=46,'No additional reusable-workflow fanout until legacy CI is simplified');
 });

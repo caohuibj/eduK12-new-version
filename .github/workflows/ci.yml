@@ -1360,9 +1360,31 @@ jobs:
     name: CI backend / exact changed unit tests
     needs: scope
     if: ${{ github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'backend-unit' }}
-    uses: ./.github/workflows/ci-backend-unit.yml
-    with:
-      base_sha: ${{ needs.scope.outputs.diff_base }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      NODE_ENV: test
+      CI_BASE_SHA: ${{ needs.scope.outputs.diff_base }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: Fetch exact PR base
+        run: git fetch --no-tags --depth=1 origin "$CI_BASE_SHA"
+      - name: Install locked backend dependencies
+        working-directory: server-version/backend
+        run: npm ci
+      - name: Generate exact Prisma types
+        working-directory: server-version/backend
+        run: npx prisma generate
+      - name: Run only the changed admitted backend unit tests
+        run: node .github/scripts/ci-backend-unit-runner.mjs
 
   backend:
     needs: scope
