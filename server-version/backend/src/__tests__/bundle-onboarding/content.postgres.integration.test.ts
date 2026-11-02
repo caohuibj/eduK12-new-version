@@ -28,6 +28,7 @@ import { requireCognitiveRegistryEntry } from '../../modules/cognitive/cognitive
 import { freezeAssignmentProfile, freezeDataForWrite } from '../../modules/cognitive/profile-freeze'
 import { decryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
+import { hashRecoveryToken } from '../../services/anonymousAccess'
 
 vi.mock('node:crypto', async importOriginal => {
   const actual = await importOriginal<typeof import('node:crypto')>()
@@ -77,13 +78,15 @@ function mixedDriverCase() {
   fixture.slots.cognitive = {type:'COGNITIVE',trials:gonogoSequence(fixture.randomSeed,120,0.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1300,endedAtPerfMs:trialIndex*1300+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))}
   return {name:'synthetic four-type driver',pack,fixture}
 }
-// Exact immutable DRAFTs lack the declared age context required by their
-// population. Adult 0.2.0 versions supply it; the adolescent candidate remains
-// unsupported. Retain these artifacts and prove refusal, never readiness.
+// Exact immutable DRAFTs have undeclared age context or an unpublished Scale
+// dependency. Retain these artifacts and prove the actual refusal, never
+// readiness; newer adult versions with complete context keep their lifecycle.
 const blockedDraftIdentities = new Set([
   'emotion_beliefs_strategies_adult_zh_cn@0.1.0',
   'adult_interests_exploration_zh_cn@0.1.0',
   'cognitive_self_regulation_adolescent_en_v1@1.0.0',
+  'online_learning_regulation_procrastination_zh_cn@0.1.0',
+  'online_learning_regulation_procrastination_zh_cn@0.2.0',
 ])
 const cases = [...runnable.map(({ name, pack }) => ({name: blockedDraftIdentities.has(name) ? 'blocked DRAFT candidate: ' + name : name,pack,fixture:readSmoke(pack.manifest.definition.bundleKey,pack.manifest.definition.bundleVersion)})), mixedDriverCase()]
 const url = integrationDatabaseUrl('BUNDLE_PRODUCT_TEST_DATABASE_URL')
@@ -189,13 +192,15 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
     const material = { contentHash: hashDeclarativePackage(pack), reviewerId: reviewer, expiresAt: new Date(Date.now() + 3600000).toISOString(), claims: ['independent_summary', 'cross_source_condition', 'joint_conclusion'], scientific: true, rights: true, language: true, report: true }
     const review = { ...material, signature: createHmac('sha256', secret).update(canonicalJsonString(material)).digest('hex') }
     const provider = new BundleDefinitionProvider([packageEntry(pack)])
-    if (d.bundleKey === 'cognitive_self_regulation_adolescent_en_v1' && d.bundleVersion === '1.0.0') {
+    const adolescentDraft = d.bundleKey === 'cognitive_self_regulation_adolescent_en_v1' && d.bundleVersion === '1.0.0'
+    const onlineLearningDraft = d.bundleKey === 'online_learning_regulation_procrastination_zh_cn' && ['0.1.0', '0.2.0'].includes(d.bundleVersion)
+    if (adolescentDraft || onlineLearningDraft) {
       expect(d.status).toBe('DRAFT')
       expect(pack.publication.requestedStatus).toBe('DRAFT')
-      expect(getExecutableScalePackage('texi_self_en', '1.0.0')!.releaseStatus).toBe('DRAFT')
+      expect(getExecutableScalePackage(adolescentDraft ? 'texi_self_en' : 'srlo44_zh_cn_research', '1.0.0')!.releaseStatus).toBe('DRAFT')
       // The source-release gate is reached before runtime creation. The age
       // blocker is a separate static assertion, not a claimed dynamic result.
-      expect(provider.publicationBlockers(d.bundleKey, d.bundleVersion)).toContain('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
+      if (adolescentDraft) expect(provider.publicationBlockers(d.bundleKey, d.bundleVersion)).toContain('AGE_POPULATION_REQUIRES_DECLARED_CONTEXT')
       await expect(publishPackage(db, actor.userId, d.bundleKey, d.bundleVersion, review)).rejects.toThrow('BUNDLE_SCALE_DEPENDENCY_UNAVAILABLE')
       const saved = await db.bundlePackageRelease.findUniqueOrThrow({ where: { bundleKey_bundleVersion: { bundleKey: d.bundleKey, bundleVersion: d.bundleVersion } } })
       expect(saved.status).toBe('DRAFT')
@@ -206,7 +211,10 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
     await publishPackage(db, actor.userId, d.bundleKey, d.bundleVersion, review)
     const { createBundleProductService, readInstance } = await import('../../modules/bundle-product/service')
     const product = createBundleProductService(provider), runtime = await import('../../modules/composite/composite.service')
-    const createInput = { requestId: randomUUID(), bundleKey: d.bundleKey, bundleVersion: d.bundleVersion, name: d.name, courseId, bindings }
+    const anonymous = !d.initiationModes.includes('TEACHER_ASSIGNMENT') && d.initiationModes.includes('ANONYMOUS_SELF')
+    const createInput = { requestId: randomUUID(), bundleKey: d.bundleKey, bundleVersion: d.bundleVersion, name: d.name,
+      courseId: anonymous ? null : courseId, bindings,
+      ...(anonymous ? { publicEnabled: true, expiresAt: new Date(Date.now() + 3600000).toISOString() } : {}) }
     if (blockedDraftIdentities.has(d.bundleKey + '@' + d.bundleVersion)) {
       expect(d.status).toBe('DRAFT')
       expect(pack.publication.requestedStatus).toBe('DRAFT')
@@ -226,21 +234,40 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
     // authoritative scorer still validates trials against the real frozen seed.
     vi.mocked(randomBytes).mockImplementation(((size: number) => size === 16 ? Buffer.from(fixture.randomSeed, 'hex') : crypto.randomBytes(size)) as any)
     let started: Awaited<ReturnType<typeof runtime.startUserAttempt>>
-    try { started = await runtime.startUserAttempt(student, row.id) } finally { vi.mocked(randomBytes).mockImplementation(crypto.randomBytes) }
+    let principal: { userId?: string; recoveryTokenHash?: string } = { userId: student }
+    try {
+      if (anonymous) {
+        // The public-only parenting package uses its real token/recovery path.
+        // Its measurement children are all Scales; no student impersonation.
+        expect(d.slots.filter(s => s.unitType !== 'FORM').every(s => s.unitType === 'SCALE')).toBe(true)
+        const token = await runtime.createAccessTokenForComposite(actor.userId, actor.role, row.id, createInput.expiresAt!, 1)
+        const admitted = await runtime.startPublicAttempt(token.token!)
+        expect(admitted.recoveryToken).toBeTruthy()
+        started = admitted
+        principal = { recoveryTokenHash: hashRecoveryToken(admitted.recoveryToken!) }
+      } else started = await runtime.startUserAttempt(student, row.id)
+    } finally { vi.mocked(randomBytes).mockImplementation(crypto.randomBytes) }
     const attemptId = started.attempt.id
+    if (anonymous) {
+      expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })).userId).toBeNull()
+      await expect(runtime.getAttemptState(attemptId, { recoveryTokenHash: hashRecoveryToken('synthetic-invalid-recovery') })).rejects.toBeDefined()
+    }
     const instance = await db.bundleInstance.findUniqueOrThrow({ where: { compositeId: row.id } })
     const frozen = readInstance(instance)
     if (frozen.bindings.context.length) {
       const section = await db.compositeFormSection.findFirstOrThrow({ where: { compositeAssessmentId: row.id }, include: { items: true } })
-      await (await import('../../modules/composite/final-submit.service')).submitCompositeFormSectionFinal({ attemptId, sectionId: section.id, userId: student, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: (started.attempt.currentItem as any).definitionHash,
-        answers: section.items.map(i => { const key = frozen.bindings.context.find(c => c.itemId === i.id)!.contextKey; return { formItemId: i.id, value: fixture.context[key] == null ? '' : String(fixture.context[key]) } }) })
+      await (await import('../../modules/composite/final-submit.service')).submitCompositeFormSectionFinal({ attemptId, sectionId: section.id, ...principal, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: (started.attempt.currentItem as any).definitionHash,
+        answers: section.items.map(i => { const key = frozen.bindings.context.find(c => c.itemId === i.id)!.contextKey; return { formItemId: i.id, value: fixture.context[key] == null ? null : String(fixture.context[key]) } }) })
     }
-    const contextSnapshotHash = (await runtime.getAttemptState(attemptId, { userId: student })).contextSnapshotHash
+    const contextSnapshotHash = (await runtime.getAttemptState(attemptId, principal)).contextSnapshotHash
     for (const slot of d.slots.filter(s => s.unitType !== 'FORM')) {
       const sample = fixture.slots[slot.slotKey], itemId = frozen.bindings.slots.find(b => b.slotKey === slot.slotKey)!.itemId
       if (sample.type === 'SCALE') {
         const child = await db.assessment.findFirstOrThrow({ where: { compositeAttemptId: attemptId, compositeItemId: itemId } })
-        await (await import('../../modules/scale/scale-final-submit.service')).submitScaleAssessmentFinal({ assessmentId: child.id, userId: student, submissionId: randomUUID(), attemptEpoch: 1, definitionHash: hashScaleDefinition(getExecutableScalePackage(slot.instrumentKey, slot.instrumentVersion)!.definition), contextSnapshotHash, answers: sample.answers as any })
+        const submit = await import('../../modules/scale/scale-final-submit.service')
+        const input = { submissionId: randomUUID(), attemptEpoch: 1, definitionHash: hashScaleDefinition(getExecutableScalePackage(slot.instrumentKey, slot.instrumentVersion)!.definition), contextSnapshotHash, answers: sample.answers as any }
+        if (anonymous) await submit.submitCompositeScaleFinal(attemptId, itemId, input, principal)
+        else await submit.submitScaleAssessmentFinal({ assessmentId: child.id, ...principal, ...input })
       } else if (sample.type === 'COGNITIVE') {
         const child = await db.cognitiveSession.findFirstOrThrow({ where: { compositeAttemptId: attemptId, compositeItemId: itemId }, include: { assignment: true } })
         expect(child.randomSeed).toBe(fixture.randomSeed)
