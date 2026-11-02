@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "researchLead": "https://docs.google.com/document/d/1ic-HBy3OdxvauwbyUxvZTX7cxghiDhdpkMHk_38Fxb4/edit",
+  "researchLeadRead": "EMU section01 and scope; used only as lead, independently verified official files below",
+  "author": "A. Helmke et al.; core copyright2016",
+  "files": [
+    {
+      "filename": "Abgleichfrageboegen_weibliche_Lehrperson_V6.0.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/Abgleichfrageboegen_weibliche_Lehrperson_V6.0.pdf",
+      "bytes": 272025,
+      "sha256": "a5fc4399a6e3729801612e4e0d13d6e4a6771e8248ece5e80d864e9d8358e1b3",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "Abgleichfrageboegen_maennliche_Lehrperson_V6.0.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/Abgleichfrageboegen_maennliche_Lehrperson_V6.0.pdf",
+      "bytes": 272256,
+      "sha256": "9d7df12a505c8b2e2397b072ed63e4e2641a429dee35bfc2e18cc7b3d6c420f7",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "Abgleichfrageboegen_Sie-Version_weibliche_Lehrperson_V6.0.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/Abgleichfrageboegen_Sie-Version_weibliche_Lehrperson_V6.0.pdf",
+      "bytes": 271868,
+      "sha256": "fd01ea519ea07aa6ebbe51a03aafd8249581593da6594c1c5c3c926a0b39483f",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "Abgleichfrageboegen_Sie-Fassung_maennliche_Lehrperson_V6.0.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/Abgleichfrageboegen_Sie-Fassung_maennliche_Lehrperson_V6.0.pdf",
+      "bytes": 272186,
+      "sha256": "36d038c5d7864d78c459b532ee90000430f11a42e383500f63d3aceaba7d852a",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "SFB_zur_Unterrichtsqualitaet_weibliche_Lehrperson.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/SFB_zur_Unterrichtsqualitaet_weibliche_Lehrperson.pdf",
+      "bytes": 130259,
+      "sha256": "1641bc3f106c590d21d2ccc5f547e8020a7d6be51496228bc879c6786d5952d9",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "SFB_zur_Unterrichtsqualitaet_maennliche_Lehrperson.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/SFB_zur_Unterrichtsqualitaet_maennliche_Lehrperson.pdf",
+      "bytes": 130385,
+      "sha256": "b63b512d7396bffc2ff0192295741c06f1cff56538275e3b69a52f4cf4ef1bbd",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "LFB_zur_Unterrichtsqualitaet.pdf",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/LFB_zur_Unterrichtsqualitaet.pdf",
+      "bytes": 136613,
+      "sha256": "d36b04d84e84dc92637f670f82b4bb3c42abde99fa024d6cbb96b44d2767cc59",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "bibliographic metadata/item identifiers only; no item text or source PDF committed"
+    },
+    {
+      "filename": "terms.html",
+      "url": "https://www.unterrichtsdiagnostik.de/nutzungsbedingungen/index.html",
+      "bytes": 5399,
+      "sha256": "f6e1e6cc1c84f0bcb85e7f62625d28e357b88bac86c93e01f98c5ab05fdd35d0",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "metadata and bounded factual findings only"
+    },
+    {
+      "filename": "downloads.html",
+      "url": "https://www.unterrichtsdiagnostik.de/downloads/fragebogen.html",
+      "bytes": 14428,
+      "sha256": "ec148b851e10b103210557f0fe1fcc911e44cc9bdb8516d7008645b7fb56d223",
+      "retrievedOn": "2026-11-02",
+      "publicContent": "metadata and bounded factual findings only"
+    }
+  ],
+  "rights": {
+    "status": "NOT_ESTABLISHED_FOR_THIS_PLATFORM",
+    "usageUrl": "https://www.unterrichtsdiagnostik.de/nutzungsbedingungen/index.html",
+    "findings": [
+      "School and teacher-training institutions/noncommercial teacher-education institutions may use EMU free with author/site attribution.",
+      "Commercial companies are explicitly excluded from use of instruments, software and accompanying texts.",
+      "Changes other than the explicitly designated supplemental area, adaptations and translations require author consent.",
+      "Authors intentionally do not construct content-domain scales or sums; focus is discussion of individual items.",
+      "Stated purpose is teaching diagnosis and self-evaluation in teacher education/school practice, not research."
+    ],
+    "downloadPageQualification": "The downloads page provides Word files for adapting the reference period. This specific statement is preserved; it is not evidence for unrestricted platform embedding, core-block splitting, translation or commercial redistribution.",
+    "projectAssessment": "Institutional eligibility and consent for digital embedding, block extraction and public redistribution are not established. Restriction is substantive, not a missing-norm or missing-validation rule.",
+    "noActions": [
+      "no license terms accepted for user",
+      "no author contact sent",
+      "no original words/PDF/Word/software committed",
+      "no native questionnaire derivative or platform administration installed"
+    ],
+    "contact": "unterrichtsdiagnostik@gmail.com"
+  }
+}
