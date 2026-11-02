@@ -1,0 +1,72 @@
+{
+  "status": "LOCAL_CATALOG_BOUNDARY_PASS",
+  "recordedAt": "2026-11-02T00:31:53.642Z",
+  "base": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "node": "v24.19.0",
+  "scope": "4 new catalog-only entries through existing registry/read-model/materialization rejection; editorial examples shape only",
+  "results": [
+    {
+      "instrumentKey": "harvard_tsr_2011_student_negativity_en",
+      "version": "1.0.0",
+      "sourceValidation": "PASS",
+      "catalogDiscovery": "PASS",
+      "availability": "NOT_AVAILABLE",
+      "runtimePolicy": null,
+      "executable": null,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "bf8531eacf6cf57bceeeb48cf3a165effc473a2ff20957ca8974ab2f6fd4ff36"
+    },
+    {
+      "instrumentKey": "harvard_tsr_2011_student_positivity_en",
+      "version": "1.0.0",
+      "sourceValidation": "PASS",
+      "catalogDiscovery": "PASS",
+      "availability": "NOT_AVAILABLE",
+      "runtimePolicy": null,
+      "executable": null,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "d2647254c77061acc275662e2b4a26d61287d6932f1f557aecf7ae656cdc3f2d"
+    },
+    {
+      "instrumentKey": "harvard_tsr_2011_teacher_negativity_en",
+      "version": "1.0.0",
+      "sourceValidation": "PASS",
+      "catalogDiscovery": "PASS",
+      "availability": "NOT_AVAILABLE",
+      "runtimePolicy": null,
+      "executable": null,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "ccc436b2cc0ba10aa60dbf20aa66762dbcae98cd55ea2117333d82668c49e45d"
+    },
+    {
+      "instrumentKey": "harvard_tsr_2011_teacher_positivity_en",
+      "version": "1.0.0",
+      "sourceValidation": "PASS",
+      "catalogDiscovery": "PASS",
+      "availability": "NOT_AVAILABLE",
+      "runtimePolicy": null,
+      "executable": null,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "df0700b7b87855b48957a906be32410d28b67ab0de1d3286999b5b30ab978a1b"
+    }
+  ],
+  "databaseAccesses": 0,
+  "editorialReportExampleShapeChecks": 6,
+  "editorialReportExamplesSha256": "f6865b0066945f8ccfcb67fdea2b330f2e98e17d8397bee996702e34e09a2900",
+  "notRun": [
+    "actual report rendering or scoring (no executable C/P/R)",
+    "isolated DB import (catalog-only rejection is expected)",
+    "production/admin-custom-library deduplication",
+    "formal GitHub CI",
+    "application build/browser/full frontend/backend tests"
+  ],
+  "limitations": [
+    "No copyright approval, scientific validation, publication, deployment or DB-import success is asserted.",
+    "Editorial report examples are not scored/rendered runtime reports.",
+    "Existing local dependencies used; no clean install qualification is claimed."
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "recordType": "editorial_report_candidates_not_runtime_payload",
+  "motherTool": "Harvard TSR 2011",
+  "reportVersion": null,
+  "status": "PENDING_REVIEW_NOT_INSTALLED",
+  "conditions": [
+    "No score bands, diagnostic labels, rankings, fabricated norms or score changes.",
+    "Student report speaks to secondary-school students about their own perceived experience. Respondent and recipient are distinct fields.",
+    "Teacher self-report concerns one named/pseudonymously bound student and is visible only under existing authorization.",
+    "Teacher receipt of student feedback requires existing authorized group aggregation, minimum-group-size and anonymity rules. Individual responses and sensitive open text are not automatically disclosed.",
+    "Neither catalog-only entries nor unscored factual forms generate numeric reports.",
+    "Normal, lower-experience and insufficient-evidence are editorial scenarios, not operational categories. No known scoring threshold is implied."
+  ],
+  "examples": [
+    {
+      "audience": "STUDENT_SELF",
+      "scenario": "normal_experience",
+      "scenarioIsScoreThreshold": false,
+      "title": "你感受到的支持，是值得留意的学习资源。",
+      "body": "你在这段师生关系中感受到了一些支持。这个结果描述的是你的学习和相处经历，不是对老师或你的好坏评价。感受到支持，也不代表每一次互动都会让你舒服；让你困扰的具体事情仍然值得说出来。",
+      "microActions": [
+        "下次遇到不懂的地方，可以准备一个具体问题，例如“这一步可以再举个例子吗？”",
+        "想一想哪种帮助对你最有用，在合适的时候告诉老师。"
+      ],
+      "visibility": "Existing publication, recipient authorization and confidentiality rules must permit this exact report; no new access is granted.",
+      "scores": null,
+      "runtimeExecuted": false
+    },
+    {
+      "audience": "STUDENT_SELF",
+      "scenario": "lower_positive_or_more_negative_experience",
+      "scenarioIsScoreThreshold": false,
+      "title": "有些互动让你不舒服，你的感受值得认真听见。",
+      "body": "你的回答提示，有些学习或相处的需要还没有得到满足。这不说明你能力差，也不是你的错。你可能既感受到支持，也遇到过让你不舒服的互动。具体的不公平或不当对待，值得被认真听见和处理。",
+      "microActions": [
+        "如果你愿意并觉得安全，可以记下一次具体经历和你希望得到的帮助。",
+        "可以请家长、学校辅导人员或另一位你信任的成人陪你商量下一步。",
+        "表达学习需要时可用“我在……时有点困难，我希望能……”；你不需要独自与老师对抗。"
+      ],
+      "visibility": "Existing publication, recipient authorization and confidentiality rules must permit this exact report; no new access is granted.",
+      "scores": null,
+      "runtimeExecuted": false
+    },
+    {
+      "audience": "STUDENT_SELF",
+      "scenario": "insufficient_evidence",
+      "scenarioIsScoreThreshold": false,
+      "title": "现在的信息还不足以说明这段关系。",
+      "body": "这次的信息还不足以给出可靠的结果，所以先不作判断。没有结果，不表示你的感受不重要，也不影响你寻求帮助。",
+      "microActions": [
+        "如果你正为课堂里的事情困扰，不必等分数，可以找一位信任的成人说说具体发生了什么。"
+      ],
+      "visibility": "Existing publication, recipient authorization and confidentiality rules must permit this exact report; no new access is granted.",
+      "scores": null,
+      "runtimeExecuted": false
+    },
+    {
+      "audience": "TEACHER_SELF",
+      "scenario": "normal_experience",
+      "scenarioIsScoreThreshold": false,
+      "title": "留意你与这名学生之间已经有效的互动。",
+      "body": "你在与这名学生的关系中感受到了一些积极互动，可将它们作为教学反思的线索。这只反映你自己的看法，不代表学生有相同感受，也不能证明教学质量或学生特质。",
+      "microActions": [
+        "记录一种对这名学生有效的支持方式，并在之后的互动中观察它是否仍有帮助。",
+        "用开放、无压力的方式了解这名学生的学习需要，不要求其认同你的判断。"
+      ],
+      "visibility": "Existing publication, recipient authorization and confidentiality rules must permit this exact report; no new access is granted.",
+      "scores": null,
+      "runtimeExecuted": false
+    },
+    {
+      "audience": "TEACHER_SELF",
+      "scenario": "lower_positive_or_more_negative_experience",
+      "scenarioIsScoreThreshold": false,
+      "title": "把需要改善的互动变成一个具体教学行动。",
+      "body": "较少积极感知或较多消极感知提示可以关注具体互动，而不是给学生贴“不配合”等标签。学生可能有不同体验；不能用教师自评推断学生观点。积极与消极分别解释，不能互相抵消。",
+      "microActions": [
+        "回顾一次具体互动，区分可观察行为与自己的推断。",
+        "尝试一项调整，例如说明任务步骤、给予提问时间或单独温和沟通。",
+        "涉及可能不公平或不当对待时，按学校现行支持流程处理，避免把修复责任转给学生。"
+      ],
+      "visibility": "Existing publication, recipient authorization and confidentiality rules must permit this exact report; no new access is granted.",
+      "scores": null,
+      "runtimeExecuted": false
+    },
+    {
+      "audience": "TEACHER_SELF",
+      "scenario": "insufficient_evidence",
+      "scenarioIsScoreThreshold": false,
+      "title": "暂不作关系质量判断。",
+      "body": "这次资料不足，暂不生成关系分数或关系质量结论。信息不足不能当作0分，也不能据此判断这名学生的态度。",
+      "microActions": [
+        "可记录近期一个具体互动，待完整、获许可的工具就绪后再按实际需要使用。"
+      ],
+      "visibility": "Existing publication, recipient authorization and confidentiality rules must permit this exact report; no new access is granted.",
+      "scores": null,
+      "runtimeExecuted": false
+    }
+  ]
+}
