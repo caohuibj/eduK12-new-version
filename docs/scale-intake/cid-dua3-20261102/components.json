@@ -1,0 +1,46 @@
+{
+  "familyTag": "family:cid_dua3",
+  "motherKey": "cid_dua3",
+  "sourceVersion": "2026 revised 12",
+  "components": [
+    {
+      "key": "cid_dua3_2026_teacher_self_en",
+      "version": "1.0.0",
+      "kind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tags": [
+        "family:cid_dua3",
+        "role:teacher_self",
+        "stage:mixed_teaching_contexts",
+        "language:en",
+        "source_version:2026_revised_12",
+        "use:reflection",
+        "status:PILOT",
+        "license:cc_by_4_0"
+      ]
+    },
+    {
+      "key": "cid_dua3_2026_evidence_form_en",
+      "version": "1.0.0",
+      "kind": "NATIVE_UNSCORED_EVIDENCE_FORM_ADAPTATION",
+      "sourceStatements": 12,
+      "projectQuestions": 3,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tags": [
+        "family:cid_dua3",
+        "role:teacher_self",
+        "stage:mixed_teaching_contexts",
+        "language:en",
+        "source_version:2026_revised_12",
+        "use:reflection",
+        "status:PILOT",
+        "license:cc_by_4_0"
+      ]
+    }
+  ],
+  "ordinaryComposite": "Plan only: whole scale (after exact response protocol is obtained) plus optional evidence form; no cross-component total, no three-UDL-principle scores."
+}
