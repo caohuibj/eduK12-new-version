@@ -242,5 +242,14 @@
   "excludedSameNameTools": [
     "school-level SELFIE",
     "DigCompEdu Check-In22"
-  ]
+  ],
+  "preSubmissionRecheck": {
+    "base": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "registeredVersions": 269,
+    "sourceIdentityMatches": [],
+    "openPRsInspected": 71,
+    "openPRIdentityMatches": [],
+    "checkedAt": "2026-11-02",
+    "productionAndAdminCustom": "NOT_QUERIED"
+  }
 }
