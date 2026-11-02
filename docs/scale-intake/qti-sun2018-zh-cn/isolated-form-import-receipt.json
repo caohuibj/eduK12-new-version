@@ -1,0 +1,232 @@
+{
+  "status": "PASS_NATIVE_FORM_ISOLATED_IMPORT",
+  "scope": "Existing createFormTemplate/addItem/importFormTemplate services; schema-only disposable PostgreSQL, not production/public catalog",
+  "database": {
+    "host": "127.0.0.1",
+    "port": 55461,
+    "name": "eduk12_qti_validation",
+    "postgres": "16.15",
+    "provisioning": "prisma db push of current schema; no full migration replay"
+  },
+  "receipts": [
+    {
+      "formKey": "qti_sun2018_observation_form_zh_cn",
+      "id": "b6ba0abf-7836-4736-806d-fbc18a4342c0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "publicEnabled": false,
+      "itemCount": 40,
+      "revision": 40,
+      "reportMode": "COLLECTION_ONLY",
+      "scaleItems": 0,
+      "numericOptionScores": 0,
+      "readback": "PASS",
+      "sourceItemToStoredKey": [
+        {
+          "sourceItemKey": "qti_sun2018_o3_02",
+          "storedItemKey": "q_2bac704f-76cc-4d7b-99c8-b0068fe27bca"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o7_03",
+          "storedItemKey": "q_2dc85036-54f6-465f-a646-e00dd41130b0"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o8_01",
+          "storedItemKey": "q_d8fb947d-0f2d-4c18-af89-69d5de44a09a"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o8_05",
+          "storedItemKey": "q_71044358-e749-44c7-9ffb-e7b26bff7232"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o1_05",
+          "storedItemKey": "q_513f737b-0e17-4222-9489-bd4cc7ca525e"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o6_02",
+          "storedItemKey": "q_533d94bb-f313-49cd-93dd-d4d4bf47674c"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_05",
+          "storedItemKey": "q_c8013755-cd6c-4160-b14d-51f3110960b9"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o2_03",
+          "storedItemKey": "q_cf440648-e224-47aa-aa2b-2130363506bb"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o3_01",
+          "storedItemKey": "q_d11e9c42-be7f-4474-8098-f20353116090"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_01",
+          "storedItemKey": "q_cc7deea7-39e5-4519-b612-f1b8df47eeb4"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o8_04",
+          "storedItemKey": "q_ae83f909-1fb3-4a3a-a0b2-9d2e7b541ee6"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o3_04",
+          "storedItemKey": "q_0ad03ab2-46e8-41c0-abec-e7916e03625f"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o6_01",
+          "storedItemKey": "q_bcb2e195-c671-426a-9bf5-dfe77e915e6e"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o2_05",
+          "storedItemKey": "q_9468490e-8814-4e39-878a-cd55b2a0d02b"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o7_04",
+          "storedItemKey": "q_f77109ce-a64a-455c-a60b-f896396955ae"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o2_02",
+          "storedItemKey": "q_91f29468-fec3-484f-a7b8-eb5c0d1e0ab7"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_02",
+          "storedItemKey": "q_ca8825f6-ebe2-4ba1-870d-54a7650e7636"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_03",
+          "storedItemKey": "q_73dfe2c7-fe9a-43a9-b6ab-65ab4808b5de"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o2_04",
+          "storedItemKey": "q_c3e1c1c1-a638-4290-b7b9-4e074e20c1f0"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o1_02",
+          "storedItemKey": "q_acd5f0d4-17cf-4d44-9b48-607a8bed5554"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o1_03",
+          "storedItemKey": "q_7ec9c765-88e6-4086-bd05-f1db8d093619"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_06",
+          "storedItemKey": "q_7161b555-c307-417c-a3f2-6f96f3653871"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o3_03",
+          "storedItemKey": "q_adc00fb6-9cee-4981-9d4b-3d0209ea143f"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_07",
+          "storedItemKey": "q_caf6e375-b108-4be2-8e5d-094cf9be7e6c"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o1_04",
+          "storedItemKey": "q_ac53187b-d26d-4cfa-9d93-7b8b689cd1e9"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o8_03",
+          "storedItemKey": "q_ac4a8e23-a57c-4bac-a15a-5b1b5c79a379"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o5_01",
+          "storedItemKey": "q_2e669ff8-8601-4169-8677-ce675b975252"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o8_02",
+          "storedItemKey": "q_5fc4acaa-6812-4c34-95c2-ea909c3c9d06"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o7_05",
+          "storedItemKey": "q_002b3bd6-4e0c-443b-a114-30b5c4c5a098"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o5_03",
+          "storedItemKey": "q_70b889d1-8cb9-4e4c-8b11-ab4f56e01fa0"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o6_03",
+          "storedItemKey": "q_70169b2d-1037-4d24-a7c1-8a69fd1c05ff"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o7_01",
+          "storedItemKey": "q_9c75d6f1-888b-4cbd-bc30-b0ecf6227a32"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o5_02",
+          "storedItemKey": "q_24fa2640-a2f9-4491-ae85-208db23bf555"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o5_04",
+          "storedItemKey": "q_3e81e45f-f117-4cfd-94c0-4e442176eb4d"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o1_01",
+          "storedItemKey": "q_30b8f86b-bea6-498a-bd1c-febb7cdcdc10"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o6_04",
+          "storedItemKey": "q_d9fddda0-a95a-4303-ab11-680b5673659c"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o7_02",
+          "storedItemKey": "q_c137e949-a064-44f3-bc80-8f60bbe67f47"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o2_01",
+          "storedItemKey": "q_04a206b7-e212-4b43-8e9b-9594f0c6f580"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o4_04",
+          "storedItemKey": "q_a752f892-784f-4388-aaee-eb230f01b08b"
+        },
+        {
+          "sourceItemKey": "qti_sun2018_o6_05",
+          "storedItemKey": "q_2624f28a-d7c4-463b-86b3-0083391a76be"
+        }
+      ]
+    },
+    {
+      "formKey": "qti_sun2018_context_form_zh_cn",
+      "id": "aa4b4519-8b22-48cd-8384-5bf077ab1537",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "publicEnabled": false,
+      "itemCount": 3,
+      "revision": 3,
+      "reportMode": "COLLECTION_ONLY",
+      "scaleItems": 0,
+      "numericOptionScores": 0,
+      "readback": "PASS",
+      "sourceItemToStoredKey": [
+        {
+          "sourceItemKey": "qti_context_grade",
+          "storedItemKey": "q_7de41e0b-82f1-4813-a8bb-25f8f36f448d"
+        },
+        {
+          "sourceItemKey": "qti_context_class",
+          "storedItemKey": "q_2241e6bd-9f29-489a-beb3-6d05e6386438"
+        },
+        {
+          "sourceItemKey": "qti_context_teacher",
+          "storedItemKey": "q_89d7c417-f2b2-4fa8-b9f9-db51f8b50d7a"
+        }
+      ]
+    }
+  ],
+  "ordinaryCombination": {
+    "id": "e526e8db-0071-4f54-bda3-8956c3cc9a21",
+    "productKind": "QUESTIONNAIRE",
+    "status": "DRAFT",
+    "publicEnabled": false,
+    "formSections": 2,
+    "itemCount": 43,
+    "scaleItems": 0,
+    "reportMode": "COLLECTION_ONLY"
+  },
+  "realStudentData": false,
+  "productionTouched": false,
+  "cleanup": {
+    "status": "DESTROYED_AFTER_VERIFIED_READBACK",
+    "container": "eduk12-qti-validation-20261102",
+    "persistentDevelopmentInstall": false
+  }
+}
