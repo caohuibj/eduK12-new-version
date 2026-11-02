@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "pisa2022_cogacmco_usa_en_student",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "PISA 2022｜数学认知激活：鼓励数学思考｜中学15岁目标群体｜学生填答（美国英文）",
+      "abbreviation": "PISA2022-COGACMCO-USA",
+      "instrumentFamily": "PISA 2022 / United States / English / Main Survey / Student Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "数学认知激活：鼓励数学思考；已直接读取美国英文原题本 ST283 共9项及官方技术报告/附表。此记录仅登记官方指数候选，无可执行评分。与同题块的无计分表单是不同使用形态，不重复施测。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mother:PISA_2022",
+        "wave:2022",
+        "country:USA",
+        "language:en-US",
+        "respondent:student",
+        "student_evaluation_of_teaching",
+        "evaluation_target:数学教师",
+        "age:PISA_15_year_old_population",
+        "school_stage:secondary_grade_7_plus",
+        "status:PILOT",
+        "availability:catalog_only",
+        "rights:USA_national_redistribution_pending",
+        "scoring:official_WLE_not_implemented",
+        "source_block:ST283",
+        "official_index:COGACMCO"
+      ]
+    },
+    "population": {
+      "minAge": 15,
+      "maxAge": 16,
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 12
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "PISA 原目标为施测时15岁3个月至16岁2个月、7年级及以上学生；整数年龄/7–12年级仅作目录展示，不能替代原精确年龄窗口，7–12为本项目中学候选范围。美国英文独立抽取版未有新效度研究，不外推为全K12或中国常模。"
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "原题本 This school year 数学课堂教学行为",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留完整 ST283 的9项与美国英文原选项顺序；不从摘要或国际占位符重造题。",
+        "矩阵抽样来源；完整题块抽出独立施测不自动等同原PISA设计。",
+        "不把题块均分、总和或类别代码当官方IRT/WLE指数。",
+        "estimatedMinutes为编辑估计，未实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "来源候选与导入准备；待题项使用范围及独立施测适用性审核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en-US",
+    "targetLocale": "en-US",
+    "localizationVersion": "1.0.0",
+    "translationSource": "NCES PISA 2022 USA English Student Questionnaire, ST283; not the international master or a Chinese translation.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "实际读题，仅元数据公开。尚未证明独立抽取版测量等价性；中文目录名不是中文版量表。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "PISA 2022 USA Student Questionnaire ST283; COGACMCO technical index",
+      "citation": "NCES/OECD, PISA 2022 USA English Student Questionnaire, ST283; OECD (2025 revised edition), PISA 2022 Technical Report, Chapter 19, Table 19.A.49, https://doi.org/10.1787/01820d6d-en; official 27 June 2024 codebook.",
+      "url": "https://nces.ed.gov/surveys/pisa/pisa2022/questionnaires/P22_StuQ-USA.html#ST283",
+      "publicationYear": 2022
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "数学认知激活：鼓励数学思考"
+      ],
+      "limitations": [
+        "Official COGACMCO uses GPCM and WLE; no native executable index or arithmetic substitute installed.",
+        "Item identities: ST283Q01JA, ST283Q02JA, ST283Q03JA, ST283Q04JA, ST283Q05JA, ST283Q06JA, ST283Q07JA, ST283Q08JA, ST283Q09JA.",
+        "Annex table 19.A.49; reverse-coded item identities before official scaling: none indicated. These are provenance facts, not an executable recoding key.",
+        "Higher official index values indicate more frequent perceived encouragement of mathematical thinking.",
+        "No individual student/teacher labels, norms, diagnostic thresholds, rankings, or cross-tool total.",
+        "Student recipient: describe perceived experience and safe micro-actions; teacher recipient: existing-authorized group summaries only. No new disclosure rights.",
+        "Raw descriptive FORM answers stay categorical, including negative-worded items; do not reverse them."
+      ],
+      "disclaimer": "候选元数据不可施测。无计分表单只保留事实/描述，不生成数字或评分报告。学生填写不表示教师可查看该生个体意见。"
+    },
+    "blockers": [
+      "Exact USA English national item redistribution/third-party scope not confirmed; do not publish full questionnaire text.",
+      "Existing native scoring path has no verified official PCM/GPCM/WLE reproduction for these sources; no new scoring engine in this task.",
+      "Standalone extraction is a project administration change; matrix sampling/context validity not established.",
+      "Production database/admin custom-content deduplication remains unverified."
+    ]
+  }
+}
