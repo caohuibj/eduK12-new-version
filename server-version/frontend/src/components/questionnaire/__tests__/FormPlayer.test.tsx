@@ -92,7 +92,7 @@ describe('FormPlayer', () => {
     )
 
     expect(screen.getByLabelText('入学年月')).toHaveAttribute('type', 'month')
-    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await user.click(screen.getByRole('button', { name: '提交本页' }))
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
   it('preserves Chinese composition events without submitting or navigating', () => {
@@ -232,7 +232,7 @@ it('saves before advancing a School single choice once and keeps the last questi
  await act(async()=>finish(true))
  expect(await screen.findByRole('region',{name:'表单题目 2 / 2'})).toHaveFocus()
  await userEvent.click(screen.getByRole('radio',{name:'选项 A'}))
- await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled())
+ await waitFor(()=>expect(screen.getByRole('button',{name:'提交本页'})).toBeEnabled())
  expect(submit).not.toHaveBeenCalled()
  await userEvent.click(screen.getByRole('button',{name:'上一题'}))
  expect(screen.getByRole('radio',{name:'选项 A'})).toBeChecked()

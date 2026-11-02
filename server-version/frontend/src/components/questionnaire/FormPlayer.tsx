@@ -100,7 +100,7 @@ export function FormPlayer({
   onChange,
   onPrevious,
   onNext,
-  onSubmit, submitLabel='提交整个区段',
+  onSubmit, submitLabel='提交本页',
   submitting = false,
   allowSkip = false,
   autoAdvance = false, scopeKey = '',
