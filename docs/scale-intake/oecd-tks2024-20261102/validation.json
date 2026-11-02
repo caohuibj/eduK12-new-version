@@ -1,0 +1,300 @@
+{
+  "status": "PASS",
+  "scope": "actual native Form API create/add/read, owned DRAFT tag metadata, one nine-block ordinary combination with five existing template imports and Form answer boundaries",
+  "database": "existing isolated disposable loopback PostgreSQL16.15 / eduk12_talis24_test; shared TALIS fixture reused, no production connection",
+  "schemaPreparation": "Existing isolated TALIS fixture schema was prepared previously; schema remains unchanged, no db push or migration executed for TKS.",
+  "fixture": "synthetic teacher; no real respondents; no Attempt/FINAL/access token or public delivery",
+  "nativeForms": [
+    {
+      "instrumentKey": "tks2024_assessment_methods_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "011e206a-1765-4ed2-8341-b647e5d9ce47",
+      "nativeCode": "tks2024_assessment_methods_isced2_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G53A",
+        "TT4G53B",
+        "TT4G53C",
+        "TT4G53D",
+        "TT4G53E",
+        "TT4G53F"
+      ],
+      "answerChecks": 6
+    },
+    {
+      "instrumentKey": "tks2024_adaptive_learning_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "754bb5e7-f065-4fb4-a4c3-a2f008d9470b",
+      "nativeCode": "tks2024_adaptive_learning_isced2_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G55A",
+        "TT4G55B",
+        "TT4G55C",
+        "TT4G55D",
+        "TT4G55E"
+      ],
+      "answerChecks": 6
+    },
+    {
+      "instrumentKey": "tks2024_progression_learning_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "13ceb80d-6513-4972-8e5c-cabb510ec1ef",
+      "nativeCode": "tks2024_progression_learning_isced2_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G56A",
+        "TT4G56B",
+        "TT4G56C",
+        "TT4G56D"
+      ],
+      "answerChecks": 6
+    },
+    {
+      "instrumentKey": "tks2024_lesson_aims_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "146012cf-547e-446a-8f56-bd9762e242bc",
+      "nativeCode": "tks2024_lesson_aims_isced2_teacher_self_en",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G58A",
+        "TT4G58B",
+        "TT4G58C",
+        "TT4G58D",
+        "TT4G58E",
+        "TT4G58F",
+        "TT4G58G"
+      ],
+      "answerChecks": 6
+    }
+  ],
+  "reusedTemplates": [
+    {
+      "instrumentKey": "talis2024_time_allocation_isced2_teacher_self_en",
+      "id": "008e3e36-10ea-4d92-9790-ddbdebf6f1bb",
+      "nativeRevision": 1,
+      "questionSha256": "8a638ae593a5ba4ae0285d7dda27a1b38804e9e4348f261f11a3026204379f1f",
+      "tksAlias": "tks2024_time_allocation_isced2_teacher_self_en",
+      "operation": "REUSED_EXISTING_TEMPLATE",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd",
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "contentAndRevisionUnchanged": "PASS"
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced2_teacher_self_en",
+      "id": "659d35a9-6a43-44d0-bb43-3944c16a0c94",
+      "nativeRevision": 1,
+      "questionSha256": "c3ad785c681c5adfc84ac5479fac279e0a815931b0d4f395d69c1f7fbd688ecc",
+      "tksAlias": "tks2024_clarity_isced2_teacher_self_en",
+      "operation": "REUSED_EXISTING_TEMPLATE",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd",
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "contentAndRevisionUnchanged": "PASS"
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+      "id": "e1aab316-91d9-42ad-9984-8a9926910ae5",
+      "nativeRevision": 1,
+      "questionSha256": "52ef78766a03a9005f16fc8ffdc7336b53bcc9d703f36a4b307b5ddf9d5468d0",
+      "tksAlias": "tks2024_cognitive_activation_isced2_teacher_self_en",
+      "operation": "REUSED_EXISTING_TEMPLATE",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd",
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "contentAndRevisionUnchanged": "PASS"
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced2_teacher_self_en",
+      "id": "6700db02-f9cb-4acf-83b6-6b90451c174a",
+      "nativeRevision": 1,
+      "questionSha256": "06ad505aca36f3c1355d31e01dd57ba4dd3bcba680ea46bf14ef8283cad0df53",
+      "tksAlias": "tks2024_classroom_management_isced2_teacher_self_en",
+      "operation": "REUSED_EXISTING_TEMPLATE",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd",
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "contentAndRevisionUnchanged": "PASS"
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced2_teacher_self_en",
+      "id": "a051eab2-93cf-43ef-ba04-db44e8fa59c2",
+      "nativeRevision": 1,
+      "questionSha256": "e7bf95b6fa7d71f1b86813c8af21d7947bb260a3fbaa295464eaf7971bdffd83",
+      "tksAlias": "tks2024_other_practices_isced2_teacher_self_en",
+      "operation": "REUSED_EXISTING_TEMPLATE",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd",
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "contentAndRevisionUnchanged": "PASS"
+    }
+  ],
+  "combinations": [
+    {
+      "key": "tks2024_practice_context_isced2_teacher_self_en",
+      "id": "309f3f96-414d-4bce-b7c4-d77e10f92de7",
+      "status": "DRAFT",
+      "nativeRevision": 10,
+      "items": 9,
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "reportMode": "COLLECTION_ONLY"
+    }
+  ],
+  "sourceFields": 22,
+  "answerChecks": 24,
+  "scoringExecutions": 0,
+  "reportRendering": "NOT_EXECUTED_UNSCORED_FORMS",
+  "fieldTagLimitation": "FORM_TEMPLATE tag editor/API not supported on current main; fixture writes existing tags column only under owner+DRAFT restriction; ordinary QUESTIONNAIRE tags use existing updateCatalogTags",
+  "nativePayloadSha256": "d015066d299c9b94b7e325e84c6a401d4adf69b88f5a8e1bdce9d0e50f72bd9b",
+  "baseCommit": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "dependencyEvidence": {
+    "existingTemplates": "TALIS2024 #569, exact source commit 2a5e57fadbc5b578594b2feb0ab661578e2de379; five ISCED2 Form templates already persisted in this isolated database",
+    "sameInputs": "schema.prisma, package-lock.json, native Form service/runtime and final.compute unchanged between ae05ed2e and current base; reuse installed dependencies and existing Prisma client without regenerating shared node_modules",
+    "newForms": 4,
+    "reusedForms": 5,
+    "newRows": 22,
+    "reusedPositions": 18,
+    "newScalePackages": 0
+  },
+  "sourceVerification": "22 new rows plus 18 reused positions checked against actual TKS PDF; Q27 anchors also visually verified on original page23; source-mapping.json",
+  "executionPreparationHistory": [
+    {
+      "status": "FAIL_BEFORE_EXECUTION",
+      "reason": "First shell used repository-relative docs paths while cwd was backend; copy and module lookup failed, no import script ran."
+    },
+    {
+      "status": "PASS",
+      "reason": "Corrected relative paths; unchanged native import script executed successfully once."
+    }
+  ],
+  "notExecuted": [
+    "Official OECD CFA/EBmodal factor scoring and its missing/standardisation chain",
+    "GPK assessment: original items officially redacted",
+    "Actual respondent submission/report rendering: unscored native Forms COLLECTION_ONLY",
+    "Full platform/frontend/backend/build/deployment",
+    "Production or private administrator duplicate lookup",
+    "Human independent review"
+  ],
+  "inputSha256": {
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "0dd47cd9be36adf776936d1c561443d78e2fbcbbd3e5a63df91cd5194598a0d0",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/src/modules/survey/final.compute.ts": "2cfd50b03964bb511e2b4d476d35375e38537b16e558ba949d7840b1954e2c23"
+  },
+  "sharedTagUpdate": "PASS: five existing owner-created DRAFT templates, discovery tags only; all content/items and native revisions unchanged. No frozen version changes.",
+  "baseAdvance": {
+    "validatedAt": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "preparedAt": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "difference": "SEEQ content only; schema, lock and consumed native Form/runtime inputs unchanged, existing input evidence reused rather than rerun"
+  },
+  "reproductionRecipeSha256": "f50472b9e0d51634610085d6d49883d728ff6f60fa7f8823d0169ecb89afa3f7"
+}

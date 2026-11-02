@@ -1,0 +1,135 @@
+{
+  "sourceCheckResults": [
+    {
+      "instrumentKey": "wihic52_actual_zh_cn_upper_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic56_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic56_preferred_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_cooperation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_equity_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_investigation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_involvement_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    },
+    {
+      "instrumentKey": "wihic_teacher_support_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "administrationEligibility": "not-evaluated",
+      "goldenCases": 5,
+      "scoringExecutions": 6,
+      "referencePolicy": "none",
+      "issues": []
+    }
+  ],
+  "totalGoldenCases": 35,
+  "uniqueScoringExecutions": 42,
+  "validationStatus": "LOCAL_SELECTED_CONTRACT_PASSED",
+  "formalCI": "NOT_RUN_SAME_CHECKS_ALREADY_PASSED_LOCALLY",
+  "prismaGenerate": "PASS_AFTER_EXPLICIT_EXISTING_ENGINE_SELECTION",
+  "database": "see isolated-import-receipt.json",
+  "notionHistoryRead": {
+    "status": "UNAVAILABLE",
+    "action": "fetch CI errors page and get_tool_access",
+    "target": "404d27635a388186ac80de3593da05a5",
+    "error": "This app tool requires a non-empty string link_id argument"
+  },
+  "excludedChecks": [
+    "full frontend/backend builds",
+    "full platform regression",
+    "browser",
+    "production operations"
+  ],
+  "lockfileSha256": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+  "generatedRegistryCheck": "PASS",
+  "englishAppendixFidelity": "PASS_EXACTLY_56_UNCHANGED_UNIQUE_ITEMS",
+  "outOfRangeAndDisclosure": "PASS_21_REJECTED_VALUES_AND_EXISTING_DISCLOSURE_PROJECTION",
+  "sourceJsonSha256": {
+    "wihic52_actual_zh_cn_upper_secondary_student": "8c6b34539544e6230ae1d09d9e3cfb294ec22ed142401c6df6918c3f01c9aafd",
+    "wihic_involvement_actual_en_lower_secondary_student": "a2b6ee276dad0def80d0b5e6c5a58096d0fa559ede86a1d828fcd6424b1bb479",
+    "wihic56_actual_en_lower_secondary_student": "b38c89987ae6d9017206078ef661e8492e65573d11e0d9296a30eb5dae2fc232",
+    "wihic_investigation_actual_en_lower_secondary_student": "05df01f8ea8664fc000443a1b2e8894f25ae9307f263114ddd5180c00eff42ed",
+    "wihic_task_orientation_actual_en_lower_secondary_student": "c186466dc9fe011344bbd237c392c686c61448ec62311a4c96e3805b2ef7db0c",
+    "wihic_teacher_support_actual_en_lower_secondary_student": "fe42fe28a2282aa1548f5ef50dfcfddb792cac5d995d9a77c894eb99ab3efb32",
+    "wihic_cooperation_actual_en_lower_secondary_student": "23b038b4e8b7dd1811881d4847f54f626b588e668f3013c06fa52a5e64006dfe",
+    "wihic56_preferred_en_lower_secondary_student": "ae3dfcbe7ab1e8c98dd63dc30f94ddfb9735aba11fd4508f32b3ec3ef7707723",
+    "wihic_equity_actual_en_lower_secondary_student": "46350362ce1718f5b1b3a3e4a974c755bd68f505eb7fa9333c7956aa84bba428",
+    "wihic_student_cohesiveness_actual_en_lower_secondary_student": "e614c9a1f30e972d86f016420ba0bbd6cadba87f3ec84f9a9fb72b0a311edddb"
+  }
+}

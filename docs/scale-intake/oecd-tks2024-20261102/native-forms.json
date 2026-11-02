@@ -1,0 +1,769 @@
+{
+  "motherTool": "OECD Teacher Knowledge Survey 2024 contextual practice modules",
+  "sourceUrl": "https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+  "sourcePdfSha256": "93b8ecdf49bec06df4987b5842ec9fd3c7be93455db8667d29bf0628f3744d45",
+  "sourceCitation": "OECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+  "adaptationDisclaimer": "This is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+  "nativeContentVersion": "1.0.0",
+  "scoringVersion": null,
+  "reportVersion": null,
+  "resources": [
+    {
+      "instrumentKey": "tks2024_assessment_methods_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceQuestion": "Q24",
+      "sourceCluster": "TKS_Context_Cluster2_18",
+      "sourcePdfPage": 20,
+      "sourceScaleCandidate": null,
+      "sourceItemIds": [
+        "TT4G53A",
+        "TT4G53B",
+        "TT4G53C",
+        "TT4G53D",
+        "TT4G53E",
+        "TT4G53F"
+      ],
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "OECD TKS2024｜评价方法（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TKS 2024 contextual item block; unscored, not a knowledge test or an OECD factor score. Version 1.0.0. OECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "How often do you use the following methods of assessing student learning in the <target class>?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "How often do you use the following methods of assessing student learning in the <target class>?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g53a",
+              "label": "I administer an assessment at the end of a unit or block of lessons."
+            },
+            {
+              "rowKey": "tt4g53b",
+              "label": "I give a <mark, e.g. numeric score, letter grade, smiley face> to communicate to students how they performed in relation to their classmates."
+            },
+            {
+              "rowKey": "tt4g53c",
+              "label": "I provide oral or written feedback to indicate areas for improvement."
+            },
+            {
+              "rowKey": "tt4g53d",
+              "label": "I ask students to assess their own progress."
+            },
+            {
+              "rowKey": "tt4g53e",
+              "label": "I observe students when working on particular tasks and provide immediate feedback."
+            },
+            {
+              "rowKey": "tt4g53f",
+              "label": "I use assessments to check whether students have learned the material presented."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "tks2024_assessment_methods_isced2_teacher_self_en",
+            "title": "OECD TKS2024｜评价方法（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "tks2024_assessment_methods_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "How often do you use the following methods of assessing student learning in the <target class>?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g53a",
+                    "label": "I administer an assessment at the end of a unit or block of lessons."
+                  },
+                  {
+                    "rowKey": "tt4g53b",
+                    "label": "I give a <mark, e.g. numeric score, letter grade, smiley face> to communicate to students how they performed in relation to their classmates."
+                  },
+                  {
+                    "rowKey": "tt4g53c",
+                    "label": "I provide oral or written feedback to indicate areas for improvement."
+                  },
+                  {
+                    "rowKey": "tt4g53d",
+                    "label": "I ask students to assess their own progress."
+                  },
+                  {
+                    "rowKey": "tt4g53e",
+                    "label": "I observe students when working on particular tasks and provide immediate feedback."
+                  },
+                  {
+                    "rowKey": "tt4g53f",
+                    "label": "I use assessments to check whether students have learned the material presented."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "tks2024_adaptive_learning_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceQuestion": "Q25",
+      "sourceCluster": "TKS_Context_Cluster2_20",
+      "sourcePdfPage": 21,
+      "sourceScaleCandidate": "T4ADLE",
+      "sourceItemIds": [
+        "TT4G55A",
+        "TT4G55B",
+        "TT4G55C",
+        "TT4G55D",
+        "TT4G55E"
+      ],
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "OECD TKS2024｜适应性教学实践（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TKS 2024 contextual item block; unscored, not a knowledge test or an OECD factor score. Version 1.0.0. OECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you perform the following actions?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you perform the following actions?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g55a",
+              "label": "I consider students’ prior knowledge and needs when planning a lesson."
+            },
+            {
+              "rowKey": "tt4g55b",
+              "label": "I point students to different materials for learning depending on their needs."
+            },
+            {
+              "rowKey": "tt4g55c",
+              "label": "I change my way of explaining when a student has difficulties understanding a topic or task."
+            },
+            {
+              "rowKey": "tt4g55d",
+              "label": "I adapt my teaching methods to students’ needs."
+            },
+            {
+              "rowKey": "tt4g55e",
+              "label": "I ask questions at various difficulty levels to check students’ understanding of the subject matter."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "tks2024_adaptive_learning_isced2_teacher_self_en",
+            "title": "OECD TKS2024｜适应性教学实践（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "tks2024_adaptive_learning_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you perform the following actions?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g55a",
+                    "label": "I consider students’ prior knowledge and needs when planning a lesson."
+                  },
+                  {
+                    "rowKey": "tt4g55b",
+                    "label": "I point students to different materials for learning depending on their needs."
+                  },
+                  {
+                    "rowKey": "tt4g55c",
+                    "label": "I change my way of explaining when a student has difficulties understanding a topic or task."
+                  },
+                  {
+                    "rowKey": "tt4g55d",
+                    "label": "I adapt my teaching methods to students’ needs."
+                  },
+                  {
+                    "rowKey": "tt4g55e",
+                    "label": "I ask questions at various difficulty levels to check students’ understanding of the subject matter."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "tks2024_progression_learning_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceQuestion": "Q26",
+      "sourceCluster": "TKS_Context_Cluster2_23",
+      "sourcePdfPage": 22,
+      "sourceScaleCandidate": "T4PBLE",
+      "sourceItemIds": [
+        "TT4G56A",
+        "TT4G56B",
+        "TT4G56C",
+        "TT4G56D"
+      ],
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "OECD TKS2024｜循序练习实践（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TKS 2024 contextual item block; unscored, not a knowledge test or an OECD factor score. Version 1.0.0. OECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Thinking about your teaching in the <target class>, how often do you perform the following actions?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Thinking about your teaching in the <target class>, how often do you perform the following actions?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Never or almost never"
+            },
+            {
+              "optionKey": "r2",
+              "label": "Occasionally"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Frequently"
+            },
+            {
+              "optionKey": "r4",
+              "label": "Always"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g56a",
+              "label": "I let students review multiple examples to practice the steps involved in a procedure or skill."
+            },
+            {
+              "rowKey": "tt4g56b",
+              "label": "I select tasks for student practice that gradually increase in difficulty."
+            },
+            {
+              "rowKey": "tt4g56c",
+              "label": "I prepare students for difficulties that can occur while practicing a procedure or skill."
+            },
+            {
+              "rowKey": "tt4g56d",
+              "label": "I let students practise similar tasks until I know that every student has understood the subject matter."
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "tks2024_progression_learning_isced2_teacher_self_en",
+            "title": "OECD TKS2024｜循序练习实践（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "tks2024_progression_learning_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Thinking about your teaching in the <target class>, how often do you perform the following actions?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Never or almost never"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "Occasionally"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Frequently"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "Always"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g56a",
+                    "label": "I let students review multiple examples to practice the steps involved in a procedure or skill."
+                  },
+                  {
+                    "rowKey": "tt4g56b",
+                    "label": "I select tasks for student practice that gradually increase in difficulty."
+                  },
+                  {
+                    "rowKey": "tt4g56c",
+                    "label": "I prepare students for difficulties that can occur while practicing a procedure or skill."
+                  },
+                  {
+                    "rowKey": "tt4g56d",
+                    "label": "I let students practise similar tasks until I know that every student has understood the subject matter."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "instrumentKey": "tks2024_lesson_aims_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "kind": "FORM",
+      "sourceQuestion": "Q27",
+      "sourceCluster": "TKS_Context_Cluster2_25",
+      "sourcePdfPage": 23,
+      "sourceScaleCandidate": "T4FULFIL uses A–E only; F–G are not included",
+      "sourceItemIds": [
+        "TT4G58A",
+        "TT4G58B",
+        "TT4G58C",
+        "TT4G58D",
+        "TT4G58E",
+        "TT4G58F",
+        "TT4G58G"
+      ],
+      "contentLocale": "en",
+      "respondentRole": "teacher_self",
+      "iscedLevel": 2,
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "create": {
+        "name": "OECD TKS2024｜上周课堂目标达成感受（无计分）｜教师自评｜ISCED2英文",
+        "description": "Original English TKS 2024 contextual item block; unscored, not a knowledge test or an OECD factor score. Version 1.0.0. OECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf",
+        "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries."
+      },
+      "addItem": {
+        "type": "FORM",
+        "formType": "matrix",
+        "formLabel": "Teaching is a complex activity with often competing goals. To what extent have the lessons you taught over the past week in the <target class> achieved the following aims?\nPlease mark one choice in each row.",
+        "required": false,
+        "formDefinition": {
+          "type": "MATRIX",
+          "prompt": "Teaching is a complex activity with often competing goals. To what extent have the lessons you taught over the past week in the <target class> achieved the following aims?\nPlease mark one choice in each row.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "r1",
+              "label": "Not at all"
+            },
+            {
+              "optionKey": "r2",
+              "label": "To some extent"
+            },
+            {
+              "optionKey": "r3",
+              "label": "Quite a bit"
+            },
+            {
+              "optionKey": "r4",
+              "label": "A lot"
+            }
+          ],
+          "rows": [
+            {
+              "rowKey": "tt4g58a",
+              "label": "Presenting the content in a comprehensible way"
+            },
+            {
+              "rowKey": "tt4g58b",
+              "label": "Engaging students in work that challenges them"
+            },
+            {
+              "rowKey": "tt4g58c",
+              "label": "Providing students with feedback to support their learning"
+            },
+            {
+              "rowKey": "tt4g58d",
+              "label": "Offering students opportunities to practice what they learned"
+            },
+            {
+              "rowKey": "tt4g58e",
+              "label": "Adapting teaching to meet the different needs of students"
+            },
+            {
+              "rowKey": "tt4g58f",
+              "label": "Helping students to manage their own emotions, thoughts, and behaviour"
+            },
+            {
+              "rowKey": "tt4g58g",
+              "label": "Managing student behaviour"
+            }
+          ]
+        },
+        "formPolicy": {
+          "version": 3,
+          "requiredRefusal": "BLOCK_SUBMIT",
+          "hiddenRequired": "EXEMPT"
+        }
+      },
+      "definition": {
+        "schemaVersion": 2,
+        "pages": [
+          {
+            "pageKey": "tks2024_lesson_aims_isced2_teacher_self_en",
+            "title": "OECD TKS2024｜上周课堂目标达成感受（无计分）｜教师自评｜ISCED2英文",
+            "description": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+            "questions": [
+              {
+                "itemKey": "tks2024_lesson_aims_isced2_teacher_self_en",
+                "type": "MATRIX",
+                "prompt": "Teaching is a complex activity with often competing goals. To what extent have the lessons you taught over the past week in the <target class> achieved the following aims?\nPlease mark one choice in each row.",
+                "required": false,
+                "options": [
+                  {
+                    "optionKey": "r1",
+                    "label": "Not at all"
+                  },
+                  {
+                    "optionKey": "r2",
+                    "label": "To some extent"
+                  },
+                  {
+                    "optionKey": "r3",
+                    "label": "Quite a bit"
+                  },
+                  {
+                    "optionKey": "r4",
+                    "label": "A lot"
+                  }
+                ],
+                "rows": [
+                  {
+                    "rowKey": "tt4g58a",
+                    "label": "Presenting the content in a comprehensible way"
+                  },
+                  {
+                    "rowKey": "tt4g58b",
+                    "label": "Engaging students in work that challenges them"
+                  },
+                  {
+                    "rowKey": "tt4g58c",
+                    "label": "Providing students with feedback to support their learning"
+                  },
+                  {
+                    "rowKey": "tt4g58d",
+                    "label": "Offering students opportunities to practice what they learned"
+                  },
+                  {
+                    "rowKey": "tt4g58e",
+                    "label": "Adapting teaching to meet the different needs of students"
+                  },
+                  {
+                    "rowKey": "tt4g58f",
+                    "label": "Helping students to manage their own emotions, thoughts, and behaviour"
+                  },
+                  {
+                    "rowKey": "tt4g58g",
+                    "label": "Managing student behaviour"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "sharedReferences": [
+    {
+      "existingKey": "talis2024_time_allocation_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tksAlias": "tks2024_time_allocation_isced2_teacher_self_en",
+      "tksSourceQuestion": "Q22",
+      "sourceItemIds": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "questionSha256": "8a638ae593a5ba4ae0285d7dda27a1b38804e9e4348f261f11a3026204379f1f",
+      "existingPr": 569,
+      "sourceCommit": "2a5e57fadbc5b578594b2feb0ab661578e2de379",
+      "additionalDiscoveryTags": [
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "operation": "REFERENCE_EXISTING_FORM_TEMPLATE; do not create a duplicate template"
+    },
+    {
+      "existingKey": "talis2024_clarity_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tksAlias": "tks2024_clarity_isced2_teacher_self_en",
+      "tksSourceQuestion": "Q23",
+      "sourceItemIds": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "questionSha256": "c3ad785c681c5adfc84ac5479fac279e0a815931b0d4f395d69c1f7fbd688ecc",
+      "existingPr": 569,
+      "sourceCommit": "2a5e57fadbc5b578594b2feb0ab661578e2de379",
+      "additionalDiscoveryTags": [
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "operation": "REFERENCE_EXISTING_FORM_TEMPLATE; do not create a duplicate template"
+    },
+    {
+      "existingKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tksAlias": "tks2024_cognitive_activation_isced2_teacher_self_en",
+      "tksSourceQuestion": "Q23",
+      "sourceItemIds": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "questionSha256": "52ef78766a03a9005f16fc8ffdc7336b53bcc9d703f36a4b307b5ddf9d5468d0",
+      "existingPr": 569,
+      "sourceCommit": "2a5e57fadbc5b578594b2feb0ab661578e2de379",
+      "additionalDiscoveryTags": [
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "operation": "REFERENCE_EXISTING_FORM_TEMPLATE; do not create a duplicate template"
+    },
+    {
+      "existingKey": "talis2024_classroom_management_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tksAlias": "tks2024_classroom_management_isced2_teacher_self_en",
+      "tksSourceQuestion": "Q23",
+      "sourceItemIds": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "questionSha256": "06ad505aca36f3c1355d31e01dd57ba4dd3bcba680ea46bf14ef8283cad0df53",
+      "existingPr": 569,
+      "sourceCommit": "2a5e57fadbc5b578594b2feb0ab661578e2de379",
+      "additionalDiscoveryTags": [
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "operation": "REFERENCE_EXISTING_FORM_TEMPLATE; do not create a duplicate template"
+    },
+    {
+      "existingKey": "talis2024_other_practices_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "tksAlias": "tks2024_other_practices_isced2_teacher_self_en",
+      "tksSourceQuestion": "Q23",
+      "sourceItemIds": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "questionSha256": "e7bf95b6fa7d71f1b86813c8af21d7947bb260a3fbaa295464eaf7971bdffd83",
+      "existingPr": 569,
+      "sourceCommit": "2a5e57fadbc5b578594b2feb0ab661578e2de379",
+      "additionalDiscoveryTags": [
+        "family:tks24",
+        "wave:tks2024"
+      ],
+      "operation": "REFERENCE_EXISTING_FORM_TEMPLATE; do not create a duplicate template"
+    }
+  ],
+  "ordinaryCombinations": [
+    {
+      "key": "tks2024_practice_context_isced2_teacher_self_en",
+      "name": "OECD TKS2024｜课堂实践与上周目标（无计分组合）｜教师自评｜ISCED2英文",
+      "tags": [
+        "family:tks24",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:tks2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "instruction": "The <class> that we would like you to respond to is the first <ISCED 2011 Level 2> <class> that you taught in this school after 11 a.m. last Tuesday. Please note that if you do not teach a <class> at <ISCED 2011 Level 2> on Tuesday, this can be a class taught on a day following the last Tuesday. In the questions below, this <class> will be referred to as the <target class>.\n\nEduK12 adaptation: selected original English TKS contextual questions for unscored teacher reflection. Numeric source response codes identify categories, not points. You may leave an item unanswered. Keep the same target class across modules. These forms do not measure pedagogical knowledge, competence or observed teaching quality. Q27 refers specifically to lessons over the past week.\n\nOECD (2024), “Teacher Knowledge Survey (TKS): Teacher Questionnaire”, https://www.oecd.org/content/dam/oecd/en/about/programmes/edu/talis/tks2024questionnaires/TKS_MS_instrument(long)_withSEnames-REDACTED.pdf\n\nThis is an adaptation of an original work by the OECD. The opinions expressed and arguments employed in this adaptation should not be reported as representing the official views of the OECD or of its Member countries.",
+      "sourceOrder": [
+        "talis2024_time_allocation_isced2_teacher_self_en",
+        "talis2024_clarity_isced2_teacher_self_en",
+        "talis2024_cognitive_activation_isced2_teacher_self_en",
+        "talis2024_classroom_management_isced2_teacher_self_en",
+        "talis2024_other_practices_isced2_teacher_self_en",
+        "tks2024_assessment_methods_isced2_teacher_self_en",
+        "tks2024_adaptive_learning_isced2_teacher_self_en",
+        "tks2024_progression_learning_isced2_teacher_self_en",
+        "tks2024_lesson_aims_isced2_teacher_self_en"
+      ],
+      "reportMode": "COLLECTION_ONLY"
+    }
+  ]
+}

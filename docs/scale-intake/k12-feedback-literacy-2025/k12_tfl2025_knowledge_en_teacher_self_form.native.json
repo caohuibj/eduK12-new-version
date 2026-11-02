@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "k_reflection",
+      "title": "中国K12反馈素养｜反馈知识无分反思｜教师自评｜2025英文公开题文",
+      "description": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "questions": [
+        {
+          "itemKey": "k1",
+          "type": "LONG_TEXT",
+          "prompt": "K1: I understand the theoretical principles that guide effective feedback.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "k2",
+          "type": "LONG_TEXT",
+          "prompt": "K2: I understand different feedback strategies and their application.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "k3",
+          "type": "LONG_TEXT",
+          "prompt": "K3: I am concerned with feeding back relevant research to enhance my teaching practice.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "k4",
+          "type": "LONG_TEXT",
+          "prompt": "K4: I am familiar with different types of feedback and the purposes for which they are used.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "k5",
+          "type": "LONG_TEXT",
+          "prompt": "K5: I am aware of the impact of timely and appropriate feedback on student learning outcomes.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "k6",
+          "type": "LONG_TEXT",
+          "prompt": "K6: I know the importance of feedback being aligned with student learning goals and needs.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "k7",
+          "type": "LONG_TEXT",
+          "prompt": "K7: I know the importance of developing actionable feedback.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}

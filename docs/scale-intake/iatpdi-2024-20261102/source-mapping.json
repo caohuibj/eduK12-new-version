@@ -1,0 +1,309 @@
+{
+  "citation": "Dorji T and Nima P (2024). Psychometric properties of an instrument to assess teachers’ practice of differentiated instruction (IATPDI): a confirmatory factor analysis on Bhutanese teachers’ data. Front. Educ. 9:1445865. doi:10.3389/feduc.2024.1445865.",
+  "sourceUrl": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2024.1445865/full",
+  "initialTable1Items": [
+    {
+      "sourceItemNumber": 1,
+      "domain": "Assessment",
+      "content": "Before beginning a unit, I assess student’s readiness level (student’s prior knowledge, understanding, and skill related to a particular sequence of learning which vary from lesson to lesson, skill to skill, and concept to concept) and plan instruction/activity accordingly.",
+      "model1Loading": "0.563",
+      "model2Loading": "0.664",
+      "model2R2": "0.441"
+    },
+    {
+      "sourceItemNumber": 2,
+      "domain": "Assessment",
+      "content": "To assess each student’s readiness level, I pre-test them, question them about their background knowledge, use KWL charts (charts that ask students to identify what they already know, what they want to know, and what they have learned about a topic), concept inventories (multiple choice or short answer tests), concept map activities, etc.",
+      "model1Loading": "0.513",
+      "model2Loading": "0.651",
+      "model2R2": "0.424"
+    },
+    {
+      "sourceItemNumber": 3,
+      "domain": "Assessment",
+      "content": "Before beginning a lesson or activity, I assess student’s interest (child’s affinity, curiosity, or passion for a particular topic or skill) and deliver instruction accordingly.",
+      "model1Loading": "0.640",
+      "model2Loading": "0.744",
+      "model2R2": "0.553"
+    },
+    {
+      "sourceItemNumber": 4,
+      "domain": "Assessment",
+      "content": "To identify student’s areas of interest, I conduct student-teacher conferences, use personally developed interest inventories or interest inventories that are available in educational resources and online.",
+      "model1Loading": "0.545",
+      "model2Loading": "0.706",
+      "model2R2": "0.499"
+    },
+    {
+      "sourceItemNumber": 5,
+      "domain": "Assessment",
+      "content": "Before beginning a lesson, I assess student’s learning profiles (student’s preferred method of learning, which is influenced by learning style, intillegence preferences, gender, or culture) and plan instruction/activity accordingly.",
+      "model1Loading": "0.499",
+      "model2Loading": "0.648",
+      "model2R2": "0.420"
+    },
+    {
+      "sourceItemNumber": 6,
+      "domain": "Assessment",
+      "content": "To assess student’s learning style preferences, I use learning style inventories like Kolb’s Learning Style Inventory, Fleming’s VARK Learning Style Questionnarie, Jackson’s Learning Styles Profiler, multiple intelligences test (based on Howard Gardner’s multiple intelligences model), and many others which are readily available in educational resources and online.",
+      "model1Loading": "0.583",
+      "model2Loading": "0.691",
+      "model2R2": "0.477"
+    },
+    {
+      "sourceItemNumber": 7,
+      "domain": "Assessment",
+      "content": "I assess students often (i.e., their readiness level and interest) so that instruction may be modified to keep students challenged just beyond their level of comfort.",
+      "model1Loading": "0.610",
+      "model2Loading": "0.696",
+      "model2R2": "0.484"
+    },
+    {
+      "sourceItemNumber": 8,
+      "domain": "Assessment",
+      "content": "I administer summative assessment at the end of unit of study to determine students’ knowledge acquisition and measure the effectiveness of differentiated instruction.",
+      "model1Loading": "0.034",
+      "model2Loading": "–",
+      "model2R2": "–"
+    },
+    {
+      "sourceItemNumber": 9,
+      "domain": "Content",
+      "content": "I tier content based on students’ abilities (When teachers tier content, all students complete the same type of activity, but the content varies in difficulty).",
+      "model1Loading": "0.618",
+      "model2Loading": "0.625",
+      "model2R2": "0.390"
+    },
+    {
+      "sourceItemNumber": 10,
+      "domain": "Content",
+      "content": "I use variety of materials related to the content (e.g., internet resources, magazines, newspapers, audio books, videos, etc.) in addition to the standard grade-level textbooks, to let students access the information in the way that works for them.",
+      "model1Loading": "0.631",
+      "model2Loading": "0.629",
+      "model2R2": "0.395"
+    },
+    {
+      "sourceItemNumber": 11,
+      "domain": "Content",
+      "content": "I present concept through both part-to-whole (starting with the smallest part of something and building up to teaching a more complex system) and whole-to-part approaches to convey key concepts to varied students.",
+      "model1Loading": "0.641",
+      "model2Loading": "0.639",
+      "model2R2": "0.408"
+    },
+    {
+      "sourceItemNumber": 12,
+      "domain": "Content",
+      "content": "I provide digests of key ideas, highlighted print materials, or text materials at varied reading levels of complexity as a means to help them develop understanding and knowledge of the topic or concept.",
+      "model1Loading": "0.664",
+      "model2Loading": "0.667",
+      "model2R2": "0.445"
+    },
+    {
+      "sourceItemNumber": 13,
+      "domain": "Content",
+      "content": "I present ideas through auditory, visual, and kinesthetic means (e.g., supplement oral presentations with visual demonstrations, computer simulations/programs, and videos; use graphic organizers, diagrams, and charts, etc.).",
+      "model1Loading": "0.620",
+      "model2Loading": "0.617",
+      "model2R2": "0.381"
+    },
+    {
+      "sourceItemNumber": 14,
+      "domain": "Content",
+      "content": "I use several instructional formats (e.g., whole class, small groups, pairs, one-on-one teacher directed group) to teach content.",
+      "model1Loading": "0.666",
+      "model2Loading": "0.663",
+      "model2R2": "0.440"
+    },
+    {
+      "sourceItemNumber": 15,
+      "domain": "Content",
+      "content": "I meet with small groups to re-teach an idea or skill for struggling students, or to extend the thinking or skills of advanced students.",
+      "model1Loading": "0.563",
+      "model2Loading": "0.571",
+      "model2R2": "0.326"
+    },
+    {
+      "sourceItemNumber": 16,
+      "domain": "Content",
+      "content": "I reteach students who need another demonstration, or exempt students who already demonstrate mastery from sitting through a re-teaching session.",
+      "model1Loading": "0.687",
+      "model2Loading": "0.683",
+      "model2R2": "0.466"
+    },
+    {
+      "sourceItemNumber": 17,
+      "domain": "Content",
+      "content": "I use manipulatives and models (tangible objects that can help students better understand abstract concepts) with some, but not all, students to assist them understand a new idea.",
+      "model1Loading": "0.680",
+      "model2Loading": "0.687",
+      "model2R2": "0.472"
+    },
+    {
+      "sourceItemNumber": 18,
+      "domain": "Content",
+      "content": "To differentiate instruction for advanced students who have already mastered certain concept or skills, I practice curriculum compacting (a process that involves pre-assessing students before a unit of study and then eliminating content in areas of mastery).",
+      "model1Loading": "0.623",
+      "model2Loading": "0.626",
+      "model2R2": "0.391"
+    },
+    {
+      "sourceItemNumber": 19,
+      "domain": "Process",
+      "content": "I present content through various media and formats (visual, auditory, reading/writing, or kinesthetic means) to help students understand and assimilate facts, concepts, or skills being taught.",
+      "model1Loading": "0.739",
+      "model2Loading": "0.746",
+      "model2R2": "0.557"
+    },
+    {
+      "sourceItemNumber": 20,
+      "domain": "Process",
+      "content": "As appropriate, I vary the format of lessons through a unit to maintain student engagement and interest (e.g., use simulation activities, cooperative learning, inquiry-based learning, class debates, interactive lecture-discussions, work in pairs, etc.).",
+      "model1Loading": "0.726",
+      "model2Loading": "0.730",
+      "model2R2": "0.533"
+    },
+    {
+      "sourceItemNumber": 21,
+      "domain": "Process",
+      "content": "I use several instructional groups (e.g., whole class, small groups, pairs, one-on-one teacher directed group, groups of similar readiness level, interest, learning profile, and/or achievement level).",
+      "model1Loading": "0.742",
+      "model2Loading": "0.762",
+      "model2R2": "0.580"
+    },
+    {
+      "sourceItemNumber": 22,
+      "domain": "Process",
+      "content": "I use a variety of instructional strategies (e.g., lectures, demonstrations, manupulatives, role plays, simulations, readings, jigsaws, cubing, think-pair-shares, tiered activities, centers, stations, peer-to-peer tutoring approaches, etc.).",
+      "model1Loading": "0.666",
+      "model2Loading": "0.694",
+      "model2R2": "0.481"
+    },
+    {
+      "sourceItemNumber": 23,
+      "domain": "Process",
+      "content": "In re-teaching, I use different instructional methods from the one I used to teach the concept or skill the first time.",
+      "model1Loading": "0.674",
+      "model2Loading": "0.701",
+      "model2R2": "0.491"
+    },
+    {
+      "sourceItemNumber": 24,
+      "domain": "Process",
+      "content": "Whenever possible, I vary tasks for my students from simple to complex based on their abilities (e.g., break assignments/activities into smaller parts with structured directions at varied levels of specificity).",
+      "model1Loading": "0.729",
+      "model2Loading": "0.764",
+      "model2R2": "0.584"
+    },
+    {
+      "sourceItemNumber": 25,
+      "domain": "Process",
+      "content": "I use tiered activities where all students work with the same content, but proceed with different levels of support, challenge, or complexity.",
+      "model1Loading": "0.736",
+      "model2Loading": "0.759",
+      "model2R2": "0.576"
+    },
+    {
+      "sourceItemNumber": 26,
+      "domain": "Process",
+      "content": "As appropriate, I vary the length of time a student may take to complete a task in order to provide additional support for a struggling student or to encourage an advanced student to pursue a topic in greater depth.",
+      "model1Loading": "0.718",
+      "model2Loading": "0.739",
+      "model2R2": "0.546"
+    },
+    {
+      "sourceItemNumber": 27,
+      "domain": "Process",
+      "content": "As appropriate, I use models and manupulatives with some, but not all, students to assist them understand a new idea.",
+      "model1Loading": "0.627",
+      "model2Loading": "0.628",
+      "model2R2": "0.394"
+    },
+    {
+      "sourceItemNumber": 28,
+      "domain": "Process",
+      "content": "I provide various levels of scaffolding (variety of temporary instructional supports) to help students move successfully from one instructional level to the next, or help students gain higher levels of understanding and skill.",
+      "model1Loading": "0.781",
+      "model2Loading": "0.779",
+      "model2R2": "0.607"
+    },
+    {
+      "sourceItemNumber": 29,
+      "domain": "Product",
+      "content": "As appropriate, besides giving choice in how they demonstrate their mastery of the learning objectives, I also give students a menu of product options (e.g., making model, scrapbook, comic strip, poster, video; writing essay, letter, portfolio, poem, short story, play, song, journal, report; or conduct debate, oral/PowerPoint presentation, etc.) which allow them to demonstrate mastery of their learning in a way they prefer.",
+      "model1Loading": "0.608",
+      "model2Loading": "0.670",
+      "model2R2": "0.448"
+    },
+    {
+      "sourceItemNumber": 30,
+      "domain": "Product",
+      "content": "As appropriate, I offer differentiated assignments/projects (i.e., at varying degrees of difficulty based on pre-assessments) to demonstrate mastery of the same learning objectives.",
+      "model1Loading": "0.693",
+      "model2Loading": "0.734",
+      "model2R2": "0.539"
+    },
+    {
+      "sourceItemNumber": 31,
+      "domain": "Product",
+      "content": "As appropriate, I encourage students to create their own product assignments that meet required expectations, besides menu of product options, to express what they have learned.",
+      "model1Loading": "0.648",
+      "model2Loading": "0.709",
+      "model2R2": "0.503"
+    },
+    {
+      "sourceItemNumber": 32,
+      "domain": "Product",
+      "content": "As appropriate, I allow students to work alone, in pairs, or in small groups to complete their final product to demonstrate mastery of their learning.",
+      "model1Loading": "0.647",
+      "model2Loading": "0.688",
+      "model2R2": "0.473"
+    },
+    {
+      "sourceItemNumber": 33,
+      "domain": "Product",
+      "content": "I use rubrics that match and extend students’ varied skill levels (Rubrics is a tool that clearly state the purpose and goal of the project, steps for completing the project, and expectations of the final product, and how the final product will be assessed).",
+      "model1Loading": "0.717",
+      "model2Loading": "0.743",
+      "model2R2": "0.552"
+    },
+    {
+      "sourceItemNumber": 34,
+      "domain": "Product",
+      "content": "I use a wide variety of assessments to evaluate students’ products on essential skills that are provided at different levels of complexity, abstractness, and open-endedness.",
+      "model1Loading": "0.667",
+      "model2Loading": "0.701",
+      "model2R2": "0.491"
+    },
+    {
+      "sourceItemNumber": 35,
+      "domain": "Product",
+      "content": "My final product assignment work demands critical and creative thinking.",
+      "model1Loading": "0.684",
+      "model2Loading": "0.742",
+      "model2R2": "0.551"
+    }
+  ],
+  "model2Counts": {
+    "count": 34,
+    "assessment": 7,
+    "content": 10,
+    "process": 10,
+    "product": 7,
+    "excludedSourceItem": 8,
+    "importantDistinction": "Authors recommend retaining item8 in discussion, so 34 is the fitted M2 model rather than an unqualified final questionnaire."
+  },
+  "initial35NotPublishedAsValidatedFinal35": true,
+  "sourceSensitiveItemNumbers": [
+    5,
+    6,
+    13,
+    19,
+    21
+  ],
+  "additionalSections": {
+    "A": "7 demographic items: not reconstructed without actual supplement",
+    "C36_C37": "Adlam2007-derived dichotomous strategy matrices: exact options and redistribution scope not obtained; no guessed contents",
+    "D38_D39_D40": "Adlam2007-derived check-all content: exact options and redistribution scope not obtained; no guessed contents"
+  },
+  "supplementStatus": "XML points Data_Sheet_1.zip; attempted normal publisher download URLs failed, no final supplementary item booklet read"
+}

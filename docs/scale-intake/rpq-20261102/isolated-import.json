@@ -1,0 +1,157 @@
+{
+  "head": "92e1e0951705c73657eefb5af4369ffd5df1d4ad",
+  "base": "688d61eb61094fe692ad8c6e6ce41315c8bc3402",
+  "database": "local temporary isolated rpq_intake",
+  "scope": "Actual native source materialization and report consumers; not HTTP/MFA authorization, publication, production or browser test",
+  "results": [
+    {
+      "key": "rpq2024_reflective_practice10_teacher_self_en",
+      "scaleId": "60fdcf52-91ad-47e7-9fea-58c036701e76",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 10,
+      "definitionHash": "76f03d0cc250107319e6365c5d86d39147aa7966ca721f32acad099b97f2a166",
+      "tags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:en",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:reflective_practice10"
+      ],
+      "versions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "sourceValidation": "PASS (5 source golden cases via existing readiness once; cached during materialization)",
+      "normalMean": 3.5,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "normalReportCount": 1,
+      "missingReportCount": 0
+    },
+    {
+      "key": "rpq2024_confidence8_teacher_self_en",
+      "scaleId": "0f5fb603-fe23-4a04-b81f-e528a950c57d",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "63d123abf1c61c8301022d7c73f1e95f9ff52f69b6fcad245f2b4bc907faffc8",
+      "tags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:en",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:confidence8"
+      ],
+      "versions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "sourceValidation": "PASS (5 source golden cases via existing readiness once; cached during materialization)",
+      "normalMean": 3.5,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "normalReportCount": 1,
+      "missingReportCount": 0
+    },
+    {
+      "key": "rpq2024_uncertainty_stress8_teacher_self_en",
+      "scaleId": "4005ae96-bf89-42c6-b85c-6d66a2b6a16e",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "58fbf38d8e0facb1f1fd7dbbf5ac50b267fd6dae56fa6a468463bf12204a5574",
+      "tags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:en",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:uncertainty_stress8"
+      ],
+      "versions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "sourceValidation": "PASS (5 source golden cases via existing readiness once; cached during materialization)",
+      "normalMean": 3.5,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "normalReportCount": 1,
+      "missingReportCount": 0
+    },
+    {
+      "key": "rpq2024_work_satisfaction4_teacher_self_en",
+      "scaleId": "41dd3e7c-eff0-4b19-8a92-b8955e0144cc",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 4,
+      "definitionHash": "f9fd685a290116e9936dcf18d94073b57b3a6a562d0d47e9ff2b34e2059cac2d",
+      "tags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:en",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:work_satisfaction4"
+      ],
+      "versions": {
+        "C": "1.0.0",
+        "P": "1.0.0",
+        "R": "1.0.0"
+      },
+      "sourceValidation": "PASS (5 source golden cases via existing readiness once; cached during materialization)",
+      "normalMean": 3.5,
+      "missingMean": null,
+      "missingQuality": "invalid",
+      "normalReportCount": 1,
+      "missingReportCount": 0
+    }
+  ],
+  "errors": [],
+  "postgres": [
+    {
+      "version": "PostgreSQL 17.11 (Debian 17.11-0+deb13u1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit"
+    }
+  ],
+  "before": {
+    "scales": 0,
+    "snapshots": [
+      {
+        "count": 0
+      }
+    ]
+  },
+  "after": {
+    "scales": 4,
+    "snapshots": [
+      {
+        "count": 4
+      }
+    ],
+    "publicationRows": 0
+  },
+  "status": "PASS",
+  "serverStateAfterReadback": "Owned temporary PostgreSQL stopped cleanly; /tmp data files retained, not a durable managed deployment"
+}

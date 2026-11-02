@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "k12_tfl2025_30_zh_cn_teacher_self",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "中国K12反馈素养｜30题原研究中文候选｜教师自评｜2025",
+      "abbreviation": "K12-TFL2025-ZH",
+      "instrumentFamily": "Kang, Huang, Liu & Yin 2025 K-12 teacher feedback-giving literacy final 30-item scale"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "Original Chinese 30-item study form has not been obtained. Catalog source identity only; not the separately identified project working translation.",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "source:kang2025",
+        "maturity:pilot",
+        "license:CCBY4",
+        "availability:catalog",
+        "scoring:unverified"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Adult K-12 teachers able to read the published English items. The research was conducted in a Chinese K-12 sample and included pre-/in-service teachers; complete original Chinese wording was not supplied in the verified public material. 18+ is the project audience scope, not a study-derived age threshold. The separate digital components are not validated as standalone instruments."
+    },
+    "administration": {
+      "itemCount": 30,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Original teacher administration window and instructions not verified.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Original Chinese final 30-item wording, exact response anchors and scoring key not obtained.",
+        "Published English tables do not establish exact Chinese administration text.",
+        "This record is not the project working translation reflection form."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Catalog identity/score-protocol follow-up; not ready for administration as a scored scale."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4. English public Tables 2–3; no original Chinese item form was obtained.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "No original Chinese questionnaire is included or claimed."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "K-12 teacher feedback-giving literacy: published final 30 English items, Tables 2–3",
+      "citation": "Kang, C., Huang, J., Liu, Y., & Yin, H. (2025). Development and validation of a generic self-assessment scale for K-12 teachers as feedback givers: Insights from item response theory and factor analysis. Humanities and Social Sciences Communications, 12, 616. https://doi.org/10.1057/s41599-025-04927-4.",
+      "url": "https://www.nature.com/articles/s41599-025-04927-4",
+      "publicationYear": 2025
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Knowledge",
+        "Skills",
+        "Values",
+        "Actionability"
+      ],
+      "limitations": [
+        "Original teacher response anchors/coding and scoring/missing rules are not verified. Do not confuse expert appropriateness ratings with teacher responses.",
+        "Self-reported perception is not objective knowledge, observed practice or feedback actually received by students.",
+        "No executable score, teacher quality level or individualized numerical report is produced."
+      ],
+      "disclaimer": "Metadata only; original scoring versions remain uncreated. Unscored reflection forms are separate project adaptations."
+    },
+    "blockers": [
+      "ORIGINAL_TEACHER_RESPONSE_LABELS_AND_NUMERIC_CODING_NOT_VERIFIED",
+      "ORIGINAL_AGGREGATION_REVERSE_AND_MISSING_RULES_NOT_VERIFIED",
+      "COMPLETE_IRT_ITEM_PARAMETERS_NOT_SUPPLIED",
+      "ORIGINAL_CHINESE_30_ITEM_FORM_NOT_OBTAINED"
+    ]
+  }
+}
