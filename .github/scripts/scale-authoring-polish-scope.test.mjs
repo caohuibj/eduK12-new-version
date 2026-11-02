@@ -22,3 +22,12 @@ test('recipe supplies actual draft and publish boundaries without database or pl
  assert(readFileSync('.github/scripts/content-scope.mjs','utf8').includes('authoring_polish:catalogDiscovery&&authoringPolishScope(entries)'));
  assert(ci.includes("'scale-authoring-polish-checks.json'"));assert(frontend.includes("'scale-authoring-polish-checks.json'"));
 });
+
+test('authoring routing runs its scoped contracts rather than legacy parser suites without dependencies',()=>{
+ const ci=readFileSync('.github/workflows/ci.yml','utf8');
+ const legacy=ci.split('      - name: legacy routing contracts only for the legacy route')[1].split('\n      - name:')[0];
+ assert(legacy.includes("steps.scope.outputs.authoring_polish != 'true'"));
+ const scoped=ci.split('      - name: bounded authoring recipe routing')[1].split('\n      - name:')[0];
+ assert(scoped.includes("steps.scope.outputs.authoring_polish == 'true'"));
+ assert(scoped.includes('scale-authoring-polish-scope.test.mjs'));
+});
