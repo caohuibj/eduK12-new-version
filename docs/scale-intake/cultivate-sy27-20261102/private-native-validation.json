@@ -346,5 +346,15 @@
     "Commercial or public item redistribution",
     "Translation",
     "Full platform CI/build/deployment"
-  ]
+  ],
+  "preparedBase": "88e3328d44d29fa3bc2afd12486e8505bd932ede",
+  "runtimeInputSha256": {
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/src/modules/assessment-core/form/answers.ts": "172eb777fc670d6b2fa421474d77a75b607b84fbfd43c91cc25bca02e4477716",
+    "server-version/backend/src/modules/survey/final.compute.ts": "2cfd50b03964bb511e2b4d476d35375e38537b16e558ba949d7840b1954e2c23",
+    "server-version/backend/src/modules/composite/composite.schema.ts": "6cf06740d91944ddfb8b793e066483c5b0ef1188b0ea2c3940421ec635f4c5f6",
+    "server-version/backend/src/modules/assessment-runtime/typed-form.ts": "22916625447e435c019a8a81b025895dd35f2fc39779d97b2a8199dd0e58ae4d"
+  },
+  "baseAdvanceReuse": "Consumed Form/schema/runtime files unchanged from private check runtime commit; no repeated answer checks after main integration. Generated declaration index regenerated separately; all 329 main entries preserved plus the nine existing Cultivate catalog candidates."
 }
