@@ -1,0 +1,4 @@
+﻿type,prompt,required,options,rows,dimension,reverse,min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone
+SINGLE,可选课后回顾（已看反馈）：学生多次不能按计划完成时，你首先担心什么？,false,失去学习习惯||班级进度被拖慢||自己的放手不负责任||计划本身未适配实际条件||其他||无法判断||不愿回答,,,,,,,,,,,,
+LONG_TEXT,原选择保护了什么目标？有哪些代价或现实限制？,false,,,,,,,,,,,,,
+LONG_TEXT,哪一项新证据会使你改变？下一课愿意试的一小步是什么？如何确认是否有帮助？,false,,,,,,,,,,,,,

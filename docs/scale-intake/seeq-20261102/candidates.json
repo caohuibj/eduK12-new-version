@@ -1,0 +1,571 @@
+{
+  "motherKey": "seeq_ll9515_he_student_en",
+  "motherStatus": "METADATA_DOSSIER_NOT_EXECUTABLE",
+  "catalogDossierVersion": "1.0.0",
+  "sourceItemPositions": 36,
+  "namedDimensions": 9,
+  "overallEvaluationItems": 3,
+  "children": [
+    {
+      "instrumentKey": "seeq_ll9515_learning_value_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "学习价值",
+      "sourceSection": "Learning Value",
+      "sourcePrintedNumbers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_learning_value_01",
+        "seeq_ll9515_learning_value_02",
+        "seeq_ll9515_learning_value_03",
+        "seeq_ll9515_learning_value_04"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_enthusiasm_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "教学热情",
+      "sourceSection": "Enthusiasm",
+      "sourcePrintedNumbers": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_enthusiasm_05",
+        "seeq_ll9515_enthusiasm_06",
+        "seeq_ll9515_enthusiasm_07",
+        "seeq_ll9515_enthusiasm_08"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_organization_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "教学组织",
+      "sourceSection": "Organization",
+      "sourcePrintedNumbers": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_organization_09",
+        "seeq_ll9515_organization_10",
+        "seeq_ll9515_organization_11",
+        "seeq_ll9515_organization_12"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_group_interaction_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "群体互动",
+      "sourceSection": "Group Interaction",
+      "sourcePrintedNumbers": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_group_interaction_13",
+        "seeq_ll9515_group_interaction_14",
+        "seeq_ll9515_group_interaction_15",
+        "seeq_ll9515_group_interaction_16"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_individual_rapport_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "师生融洽",
+      "sourceSection": "Individual Rapport",
+      "sourcePrintedNumbers": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_individual_rapport_17",
+        "seeq_ll9515_individual_rapport_18",
+        "seeq_ll9515_individual_rapport_19",
+        "seeq_ll9515_individual_rapport_20"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_breadth_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "内容广度",
+      "sourceSection": "Breadth of Coverage",
+      "sourcePrintedNumbers": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_breadth_21",
+        "seeq_ll9515_breadth_22",
+        "seeq_ll9515_breadth_23",
+        "seeq_ll9515_breadth_24"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_examinations_grading_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "考试与评分",
+      "sourceSection": "Examinations/Grading",
+      "sourcePrintedNumbers": [
+        25,
+        26,
+        27
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_examinations_grading_25",
+        "seeq_ll9515_examinations_grading_26",
+        "seeq_ll9515_examinations_grading_27"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_assignments_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "作业与阅读",
+      "sourceSection": "Assignments",
+      "sourcePrintedNumbers": [
+        28,
+        29
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_assignments_28",
+        "seeq_ll9515_assignments_29"
+      ],
+      "candidateKind": "SCALE_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_workload_difficulty_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "工作量与难度记录",
+      "sourceSection": "Workload/Difficulty",
+      "sourcePrintedNumbers": [
+        30,
+        31,
+        32,
+        33
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_workload_difficulty_30",
+        "seeq_ll9515_workload_difficulty_31",
+        "seeq_ll9515_workload_difficulty_32",
+        "seeq_ll9515_workload_difficulty_33"
+      ],
+      "candidateKind": "UNSCORED_FORM_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    },
+    {
+      "instrumentKey": "seeq_ll9515_overall_evaluation_he_student_en",
+      "instrumentVersion": "1.0.0",
+      "catalogManifestVersion": 1,
+      "localizationVersion": "1.0.0",
+      "contentVersion": null,
+      "scoringVersion": null,
+      "reportVersion": null,
+      "label": "总体评价逐题记录",
+      "sourceSection": "Overall Evaluation",
+      "sourcePrintedNumbers": [
+        11,
+        12,
+        13
+      ],
+      "itemLocatorIds": [
+        "seeq_ll9515_overall_evaluation_11",
+        "seeq_ll9515_overall_evaluation_12",
+        "seeq_ll9515_overall_evaluation_13"
+      ],
+      "candidateKind": "UNSCORED_FORM_CANDIDATE",
+      "status": "CATALOG_ONLY",
+      "administrable": false
+    }
+  ],
+  "sourceOrder": [
+    {
+      "sourcePosition": 1,
+      "sourcePage": 1,
+      "sourceSection": "Learning Value",
+      "sourcePrintedNumber": 1,
+      "itemLocatorId": "seeq_ll9515_learning_value_01",
+      "instrumentKey": "seeq_ll9515_learning_value_he_student_en"
+    },
+    {
+      "sourcePosition": 2,
+      "sourcePage": 1,
+      "sourceSection": "Learning Value",
+      "sourcePrintedNumber": 2,
+      "itemLocatorId": "seeq_ll9515_learning_value_02",
+      "instrumentKey": "seeq_ll9515_learning_value_he_student_en"
+    },
+    {
+      "sourcePosition": 3,
+      "sourcePage": 1,
+      "sourceSection": "Learning Value",
+      "sourcePrintedNumber": 3,
+      "itemLocatorId": "seeq_ll9515_learning_value_03",
+      "instrumentKey": "seeq_ll9515_learning_value_he_student_en"
+    },
+    {
+      "sourcePosition": 4,
+      "sourcePage": 1,
+      "sourceSection": "Learning Value",
+      "sourcePrintedNumber": 4,
+      "itemLocatorId": "seeq_ll9515_learning_value_04",
+      "instrumentKey": "seeq_ll9515_learning_value_he_student_en"
+    },
+    {
+      "sourcePosition": 5,
+      "sourcePage": 1,
+      "sourceSection": "Overall Evaluation",
+      "sourcePrintedNumber": 11,
+      "itemLocatorId": "seeq_ll9515_overall_evaluation_11",
+      "instrumentKey": "seeq_ll9515_overall_evaluation_he_student_en"
+    },
+    {
+      "sourcePosition": 6,
+      "sourcePage": 1,
+      "sourceSection": "Overall Evaluation",
+      "sourcePrintedNumber": 12,
+      "itemLocatorId": "seeq_ll9515_overall_evaluation_12",
+      "instrumentKey": "seeq_ll9515_overall_evaluation_he_student_en"
+    },
+    {
+      "sourcePosition": 7,
+      "sourcePage": 1,
+      "sourceSection": "Overall Evaluation",
+      "sourcePrintedNumber": 13,
+      "itemLocatorId": "seeq_ll9515_overall_evaluation_13",
+      "instrumentKey": "seeq_ll9515_overall_evaluation_he_student_en"
+    },
+    {
+      "sourcePosition": 8,
+      "sourcePage": 1,
+      "sourceSection": "Enthusiasm",
+      "sourcePrintedNumber": 5,
+      "itemLocatorId": "seeq_ll9515_enthusiasm_05",
+      "instrumentKey": "seeq_ll9515_enthusiasm_he_student_en"
+    },
+    {
+      "sourcePosition": 9,
+      "sourcePage": 1,
+      "sourceSection": "Enthusiasm",
+      "sourcePrintedNumber": 6,
+      "itemLocatorId": "seeq_ll9515_enthusiasm_06",
+      "instrumentKey": "seeq_ll9515_enthusiasm_he_student_en"
+    },
+    {
+      "sourcePosition": 10,
+      "sourcePage": 1,
+      "sourceSection": "Enthusiasm",
+      "sourcePrintedNumber": 7,
+      "itemLocatorId": "seeq_ll9515_enthusiasm_07",
+      "instrumentKey": "seeq_ll9515_enthusiasm_he_student_en"
+    },
+    {
+      "sourcePosition": 11,
+      "sourcePage": 1,
+      "sourceSection": "Enthusiasm",
+      "sourcePrintedNumber": 8,
+      "itemLocatorId": "seeq_ll9515_enthusiasm_08",
+      "instrumentKey": "seeq_ll9515_enthusiasm_he_student_en"
+    },
+    {
+      "sourcePosition": 12,
+      "sourcePage": 1,
+      "sourceSection": "Organization",
+      "sourcePrintedNumber": 9,
+      "itemLocatorId": "seeq_ll9515_organization_09",
+      "instrumentKey": "seeq_ll9515_organization_he_student_en"
+    },
+    {
+      "sourcePosition": 13,
+      "sourcePage": 1,
+      "sourceSection": "Organization",
+      "sourcePrintedNumber": 10,
+      "itemLocatorId": "seeq_ll9515_organization_10",
+      "instrumentKey": "seeq_ll9515_organization_he_student_en"
+    },
+    {
+      "sourcePosition": 14,
+      "sourcePage": 1,
+      "sourceSection": "Organization",
+      "sourcePrintedNumber": 11,
+      "itemLocatorId": "seeq_ll9515_organization_11",
+      "instrumentKey": "seeq_ll9515_organization_he_student_en"
+    },
+    {
+      "sourcePosition": 15,
+      "sourcePage": 1,
+      "sourceSection": "Organization",
+      "sourcePrintedNumber": 12,
+      "itemLocatorId": "seeq_ll9515_organization_12",
+      "instrumentKey": "seeq_ll9515_organization_he_student_en"
+    },
+    {
+      "sourcePosition": 16,
+      "sourcePage": 1,
+      "sourceSection": "Group Interaction",
+      "sourcePrintedNumber": 13,
+      "itemLocatorId": "seeq_ll9515_group_interaction_13",
+      "instrumentKey": "seeq_ll9515_group_interaction_he_student_en"
+    },
+    {
+      "sourcePosition": 17,
+      "sourcePage": 1,
+      "sourceSection": "Group Interaction",
+      "sourcePrintedNumber": 14,
+      "itemLocatorId": "seeq_ll9515_group_interaction_14",
+      "instrumentKey": "seeq_ll9515_group_interaction_he_student_en"
+    },
+    {
+      "sourcePosition": 18,
+      "sourcePage": 1,
+      "sourceSection": "Group Interaction",
+      "sourcePrintedNumber": 15,
+      "itemLocatorId": "seeq_ll9515_group_interaction_15",
+      "instrumentKey": "seeq_ll9515_group_interaction_he_student_en"
+    },
+    {
+      "sourcePosition": 19,
+      "sourcePage": 1,
+      "sourceSection": "Group Interaction",
+      "sourcePrintedNumber": 16,
+      "itemLocatorId": "seeq_ll9515_group_interaction_16",
+      "instrumentKey": "seeq_ll9515_group_interaction_he_student_en"
+    },
+    {
+      "sourcePosition": 20,
+      "sourcePage": 1,
+      "sourceSection": "Individual Rapport",
+      "sourcePrintedNumber": 17,
+      "itemLocatorId": "seeq_ll9515_individual_rapport_17",
+      "instrumentKey": "seeq_ll9515_individual_rapport_he_student_en"
+    },
+    {
+      "sourcePosition": 21,
+      "sourcePage": 2,
+      "sourceSection": "Individual Rapport",
+      "sourcePrintedNumber": 18,
+      "itemLocatorId": "seeq_ll9515_individual_rapport_18",
+      "instrumentKey": "seeq_ll9515_individual_rapport_he_student_en"
+    },
+    {
+      "sourcePosition": 22,
+      "sourcePage": 2,
+      "sourceSection": "Individual Rapport",
+      "sourcePrintedNumber": 19,
+      "itemLocatorId": "seeq_ll9515_individual_rapport_19",
+      "instrumentKey": "seeq_ll9515_individual_rapport_he_student_en"
+    },
+    {
+      "sourcePosition": 23,
+      "sourcePage": 2,
+      "sourceSection": "Individual Rapport",
+      "sourcePrintedNumber": 20,
+      "itemLocatorId": "seeq_ll9515_individual_rapport_20",
+      "instrumentKey": "seeq_ll9515_individual_rapport_he_student_en"
+    },
+    {
+      "sourcePosition": 24,
+      "sourcePage": 2,
+      "sourceSection": "Breadth of Coverage",
+      "sourcePrintedNumber": 21,
+      "itemLocatorId": "seeq_ll9515_breadth_21",
+      "instrumentKey": "seeq_ll9515_breadth_he_student_en"
+    },
+    {
+      "sourcePosition": 25,
+      "sourcePage": 2,
+      "sourceSection": "Breadth of Coverage",
+      "sourcePrintedNumber": 22,
+      "itemLocatorId": "seeq_ll9515_breadth_22",
+      "instrumentKey": "seeq_ll9515_breadth_he_student_en"
+    },
+    {
+      "sourcePosition": 26,
+      "sourcePage": 2,
+      "sourceSection": "Breadth of Coverage",
+      "sourcePrintedNumber": 23,
+      "itemLocatorId": "seeq_ll9515_breadth_23",
+      "instrumentKey": "seeq_ll9515_breadth_he_student_en"
+    },
+    {
+      "sourcePosition": 27,
+      "sourcePage": 2,
+      "sourceSection": "Breadth of Coverage",
+      "sourcePrintedNumber": 24,
+      "itemLocatorId": "seeq_ll9515_breadth_24",
+      "instrumentKey": "seeq_ll9515_breadth_he_student_en"
+    },
+    {
+      "sourcePosition": 28,
+      "sourcePage": 2,
+      "sourceSection": "Examinations/Grading",
+      "sourcePrintedNumber": 25,
+      "itemLocatorId": "seeq_ll9515_examinations_grading_25",
+      "instrumentKey": "seeq_ll9515_examinations_grading_he_student_en"
+    },
+    {
+      "sourcePosition": 29,
+      "sourcePage": 2,
+      "sourceSection": "Examinations/Grading",
+      "sourcePrintedNumber": 26,
+      "itemLocatorId": "seeq_ll9515_examinations_grading_26",
+      "instrumentKey": "seeq_ll9515_examinations_grading_he_student_en"
+    },
+    {
+      "sourcePosition": 30,
+      "sourcePage": 2,
+      "sourceSection": "Examinations/Grading",
+      "sourcePrintedNumber": 27,
+      "itemLocatorId": "seeq_ll9515_examinations_grading_27",
+      "instrumentKey": "seeq_ll9515_examinations_grading_he_student_en"
+    },
+    {
+      "sourcePosition": 31,
+      "sourcePage": 2,
+      "sourceSection": "Assignments",
+      "sourcePrintedNumber": 28,
+      "itemLocatorId": "seeq_ll9515_assignments_28",
+      "instrumentKey": "seeq_ll9515_assignments_he_student_en"
+    },
+    {
+      "sourcePosition": 32,
+      "sourcePage": 2,
+      "sourceSection": "Assignments",
+      "sourcePrintedNumber": 29,
+      "itemLocatorId": "seeq_ll9515_assignments_29",
+      "instrumentKey": "seeq_ll9515_assignments_he_student_en"
+    },
+    {
+      "sourcePosition": 33,
+      "sourcePage": 2,
+      "sourceSection": "Workload/Difficulty",
+      "sourcePrintedNumber": 30,
+      "itemLocatorId": "seeq_ll9515_workload_difficulty_30",
+      "instrumentKey": "seeq_ll9515_workload_difficulty_he_student_en"
+    },
+    {
+      "sourcePosition": 34,
+      "sourcePage": 2,
+      "sourceSection": "Workload/Difficulty",
+      "sourcePrintedNumber": 31,
+      "itemLocatorId": "seeq_ll9515_workload_difficulty_31",
+      "instrumentKey": "seeq_ll9515_workload_difficulty_he_student_en"
+    },
+    {
+      "sourcePosition": 35,
+      "sourcePage": 2,
+      "sourceSection": "Workload/Difficulty",
+      "sourcePrintedNumber": 32,
+      "itemLocatorId": "seeq_ll9515_workload_difficulty_32",
+      "instrumentKey": "seeq_ll9515_workload_difficulty_he_student_en"
+    },
+    {
+      "sourcePosition": 36,
+      "sourcePage": 2,
+      "sourceSection": "Workload/Difficulty",
+      "sourcePrintedNumber": 33,
+      "itemLocatorId": "seeq_ll9515_workload_difficulty_33",
+      "instrumentKey": "seeq_ll9515_workload_difficulty_he_student_en"
+    }
+  ],
+  "optionalOrdinaryComposite": {
+    "status": "PLANNED_ONLY_NOT_CREATED",
+    "childInstrumentKeys": [
+      "seeq_ll9515_learning_value_he_student_en",
+      "seeq_ll9515_overall_evaluation_he_student_en",
+      "seeq_ll9515_enthusiasm_he_student_en",
+      "seeq_ll9515_organization_he_student_en",
+      "seeq_ll9515_group_interaction_he_student_en",
+      "seeq_ll9515_individual_rapport_he_student_en",
+      "seeq_ll9515_breadth_he_student_en",
+      "seeq_ll9515_examinations_grading_he_student_en",
+      "seeq_ll9515_assignments_he_student_en",
+      "seeq_ll9515_workload_difficulty_he_student_en"
+    ],
+    "preserveOriginalSourcePositions": true,
+    "standaloneValidity": "UNVERIFIED",
+    "totalScore": null
+  },
+  "versionBoundary": "1.0.0 denotes candidate catalog identity only; C/P/R executable axes have not been created."
+}
