@@ -1,0 +1,14 @@
+{
+  "base": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "mainSourceJson": 235,
+  "mainInstrumentModules": 258,
+  "mainHits": [],
+  "openPRs": 54,
+  "openPrPaths": 6477,
+  "openPrSourceContentsRead": 673,
+  "openPrSourceHits": [],
+  "errors": [],
+  "queryBasis": "exact Korean/English title, DOI/KCI id, selected author names/romanization; no original item text acquired so item-level matching NOT_PERFORMED",
+  "productionDb": "NOT_QUERIED",
+  "administratorCustomTools": "NOT_QUERIED"
+}
