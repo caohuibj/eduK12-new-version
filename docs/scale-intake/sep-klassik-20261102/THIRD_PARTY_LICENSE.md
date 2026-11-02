@@ -1,0 +1,11 @@
+# Source-specific license and adaptation notice
+
+Attribution: Institut für Schulqualität des Landes Berlin e.V. (ISQ), SEP-Klassik. Exact source titles, URLs, SHA-256 values, page/item references and teacher perspectives are recorded in `source-map.json` and each Form payload. The SINUS source credits Seidel et al. (2003), *Technischer Bericht zur Videostudie Lehr-Lern-Prozesse im Physikunterricht*, p.317ff, and identifies ISQ's teacher adaptation and positive rewording.
+
+The covers/first pages of the three used PDFs visibly carry the CC BY-NC-SA pictogram and “4.0 DE” with ISQ attribution. The material and adaptations here are distributed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) ([German deed](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de), [legal code](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)). “DE” is retained as printed source notation, not asserted to be a separate jurisdiction-ported 4.0 license.
+
+Changes: native Form format, extraction of explicitly printed teacher columns, division by original modules, technical identifiers, optional answering/refusal, and Chinese catalog names and original explanatory prose. Item text remains German as printed; no validated Chinese item translation or transfer of source psychometric evidence is claimed. Original authorship, licenses and source limitations remain with the content.
+
+NonCommercial and ShareAlike conditions apply to the source text and these content adaptations, including `forms/*.json` and `source-map.json`. Project-authored content in this directory is also offered under CC BY-NC-SA 4.0. The repository's software license does not replace these content terms. No ISQ endorsement, commercial integration right, portal service account, official scoring/manual license beyond these files, or authority to disclose confidential responses is granted here.
+
+The separate portal terms require written permission for onward distribution of unlicensed portal instruments. This file does not relicense other HTML views, textbooks, older manuals, student-only questionnaires, other subject content or platform software. No logos, source PDFs, screenshots or portal source code are bundled.
