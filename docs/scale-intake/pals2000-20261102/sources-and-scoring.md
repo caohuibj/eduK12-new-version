@@ -2,7 +2,7 @@
 
 原始来源为 Midgley、Maehr、Hruda、Anderman 等（2000），University of Michigan，PALS 手册。已直接读取 [官方 PDF](https://public.websites.umich.edu/~pals/pals/PALS%202000_V13Word97.pdf)，74 页。2026-11-02 下载文件 SHA-256：`dc27657aa1ff7bc3eda64e6d8e683ba973912fc4bbe054ff07d5366d94b49301`。下载名含 V13，PDF 元数据标题可能显示 Version 12，均不是另一套可互换测量版本；以本次哈希及页码定位，不合并其他转载。PDF 不随 PR 分发。
 
-[官方手册页](https://public.websites.umich.edu/~pals/manuals.html)明确把研究使用/内容许可导向 [Flintbox 协议入口](https://umich.flintbox.com/)。当前只读跳转显示需要 JavaScript，未取得协议条款、签署记录或使用授权。PDF 首页标注 Michigan 2000 版权。公共下载并未证明题文的公开 Git 再分发、电子施测或翻译许可。二手网站称免费、公共领域等，均未采用为本项目授权证据。本次不复制题文、不提供翻译替代、不填“已获授权”。
+[官方手册页](https://public.websites.umich.edu/~pals/manuals.html)明确把研究使用/内容许可导向 [Flintbox 协议入口](https://umich.flintbox.com/)。首次只读跳转停留在JavaScript首页。后续已找回具体技术UUID和旧协议号，见rights-resolution-20261102.md；具体协议正文请求仍不可用。没有读取到条款或接受协议，不把未知范围推断成全面禁止，也不虚报已获使用许可。PDF 首页标注 Michigan 2000 版权。公共下载并未证明题文的公开 Git 再分发、电子施测或翻译许可。二手网站称免费、公共领域等，均未采用为本项目授权证据。本次不复制题文、不提供翻译替代、不填“已获授权”。
 
 ## 定义、样本与拆分边界
 
@@ -20,12 +20,12 @@
 
 手册明确标记的反向题：社区空间74、77、93；教师感知学校掌握结构14；教师感知学校成绩结构15；个人教学效能6、18、24。拟按 `6-x` 转换。其他量表不因负面题意、鼓励性报告或维度名称而反向。原版/修订版成绩回避等“高”只代表所测取向更强，不改为统一积极分。
 
-手册报告1–5量尺的描述性均值，但本次未找到独立个体聚合与缺失容忍的明确算法段落。`subscales.json` 的逐量表算术均值是**后续实现的编辑性提案**，不是已确认的官方评分器。缺失处理提案采取保守完整作答：任何所需题缺失则该子量表 null/not_calculable，不填0、不按已答比例折算，也不沿用其他量表的80%规则。正式实现前须确认并冻结P；当前没有可执行scorer或golden案例，不能宣称计分实测通过。
+手册报告1–5量尺的描述性均值，但本次未找到独立个体聚合与缺失容忍的明确算法段落。`subscales.json` 的逐量表算术均值是**后续实现的编辑性提案**，不是已确认的官方评分器。缺失处理提案采取保守完整作答：任何所需题缺失则该子量表 null/not_calculable，不填0、不按已答比例折算，也不沿用其他量表的80%规则。正式实现前须确认并冻结P；原目录交付未执行scorer。后续已在私有技术草稿中明确实现项目预定均值/完整作答规则，并通过定向端点、反向和缺失检查；见private-native-validation.json。这不等于已确认官方聚合算法或获得施测许可，公共source仍不可执行。
 
 仅每子量表内部聚合，理论范围1–5；如某流程显示原始和，须明确其n–5n范围和与均值不同的单位，不能误用报告阈值。本批不安装原始和、常模或任何分级。手册中的均值/标准差是来源样本描述，不导成中国常模或优秀教师门槛。`referencePolicy=none` 是未来实现计划，非当前已安装策略。
 
 ## 原生导入与暂不可执行部分
 
-现有 registry 可读取无 executable 的 `CATALOG_ONLY` 来源并用于目录发现；对应 `getExecutable` 与 `getRuntimePolicy` 应为空。当前 `install-scale-instrument.ts` 在无编译runtime policy时拒绝安装，不存在可对这29项运行的合法数据库安装payload；不新增目录安装器或占位可施测壳。因缺许可与executable，计分边界、真实报告生成、隔离库安装/回读均未执行。目录schema及空可执行边界是本批应验证部分。
+现有 registry 可读取无 executable 的 `CATALOG_ONLY` 来源并用于目录发现；对应 `getExecutable` 与 `getRuntimePolicy` 应为空。当前 `install-scale-instrument.ts` 在无编译runtime policy时拒绝安装，不存在可对这29项运行的合法数据库安装payload；不新增目录安装器或占位可施测壳。首次交付仅验证目录schema及空可执行边界，未执行计分/报告/安装。后续新增私有原生技术草稿已执行计分边界和buildScaleResult代表报告；隔离库安装/回读及真实施测仍未执行，不能把私有草稿当公共source已安装。
 
 两份自编表单使用现有 `assessment-core/form/definition` 和 CSV parser/import builder。官方仅提到人口背景封面，没有提供字段；表单均由本项目编写，只询问学段/科目/研究场景代码/学期与事实补充。不是官方封面复原，也没有维度、反向、聚合、得分或评分报告；所有字段可跳过。CSV格式不支持完整文本长度元数据，`*.form.json`为完整约束定义；CSV导入后用现有编辑器核对长度与说明，不声称两种输入字节级等价。

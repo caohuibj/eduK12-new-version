@@ -1,0 +1,1840 @@
+{
+  "status": "PASS",
+  "node": "v24.21.0",
+  "definitionCount": 29,
+  "itemOccurrences": 152,
+  "sourcePdfSha256": "dc27657aa1ff7bc3eda64e6d8e683ba973912fc4bbe054ff07d5366d94b49301",
+  "sourceExecutionHead": "d9511b6478a04ed21a6f6b9dcab870095bfcf58b",
+  "receipts": [
+    {
+      "instrumentKey": "pals2000_personal_mastery_original_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_approach_original_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_avoid_original_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_mastery_revised_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_approach_revised_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_avoid_revised_en",
+      "itemCount": 4,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_teacher_mastery_goal_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+      "itemCount": 3,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_teacher_performance_avoid_goal_en",
+      "itemCount": 4,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_classroom_mastery_structure_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_classroom_performance_approach_structure_en",
+      "itemCount": 3,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_classroom_performance_avoid_structure_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_academic_efficacy_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_academic_press_en",
+      "itemCount": 7,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_academic_self_handicapping_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_avoiding_novelty_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_cheating_behavior_en",
+      "itemCount": 3,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_disruptive_behavior_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_low_achievement_self_presentation_en",
+      "itemCount": 7,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_school_future_skepticism_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_parent_mastery_goal_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_parent_performance_goal_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_home_school_dissonance_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_neighborhood_space_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [
+        74,
+        77,
+        93
+      ],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_school_mastery_structure_teacher_en",
+      "itemCount": 7,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [
+        14
+      ],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_school_performance_structure_teacher_en",
+      "itemCount": 6,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [
+        15
+      ],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_mastery_instruction_teacher_en",
+      "itemCount": 4,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_performance_instruction_teacher_en",
+      "itemCount": 5,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+      "itemCount": 7,
+      "definitionValidated": true,
+      "correctedEndpointMeanValues": [
+        1,
+        3,
+        5
+      ],
+      "reverseItems": [
+        6,
+        18,
+        24
+      ],
+      "oneMissing": "NULL_NOT_CALCULABLE",
+      "invalidValuesRejected": [
+        0,
+        6,
+        1.5,
+        "1"
+      ],
+      "sourceHashVerified": true
+    }
+  ],
+  "representativeNativeReports": [
+    {
+      "instrumentKey": "pals2000_teacher_mastery_goal_en",
+      "scenario": "normal",
+      "reportAudience": "student",
+      "score": 3,
+      "interpretationCount": 1,
+      "referenceCount": 0,
+      "bandLabels": [
+        null
+      ],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_teacher_mastery_goal_en",
+      "scenario": "difficult_experience",
+      "reportAudience": "student",
+      "score": 1,
+      "interpretationCount": 1,
+      "referenceCount": 0,
+      "bandLabels": [
+        null
+      ],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_teacher_mastery_goal_en",
+      "scenario": "insufficient",
+      "reportAudience": "student",
+      "score": null,
+      "interpretationCount": 0,
+      "referenceCount": 0,
+      "bandLabels": [],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_neighborhood_space_en",
+      "scenario": "normal",
+      "reportAudience": "student",
+      "score": 3,
+      "interpretationCount": 1,
+      "referenceCount": 0,
+      "bandLabels": [
+        null
+      ],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_neighborhood_space_en",
+      "scenario": "difficult_experience",
+      "reportAudience": "student",
+      "score": 3,
+      "interpretationCount": 1,
+      "referenceCount": 0,
+      "bandLabels": [
+        null
+      ],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_neighborhood_space_en",
+      "scenario": "insufficient",
+      "reportAudience": "student",
+      "score": null,
+      "interpretationCount": 0,
+      "referenceCount": 0,
+      "bandLabels": [],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+      "scenario": "normal",
+      "reportAudience": "teacher",
+      "score": 3,
+      "interpretationCount": 1,
+      "referenceCount": 0,
+      "bandLabels": [
+        null
+      ],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+      "scenario": "difficult_experience",
+      "reportAudience": "teacher",
+      "score": 2.7142857142857144,
+      "interpretationCount": 1,
+      "referenceCount": 0,
+      "bandLabels": [
+        null
+      ],
+      "informationInsufficientIsNotLow": true
+    },
+    {
+      "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+      "scenario": "insufficient",
+      "reportAudience": "teacher",
+      "score": null,
+      "interpretationCount": 0,
+      "referenceCount": 0,
+      "bandLabels": [],
+      "informationInsufficientIsNotLow": true
+    }
+  ],
+  "scoringPolicy": "Project arithmetic mean after source reverse coding; complete-case choice explicitly editorial, not official missing-data rule; no norms/thresholds or total across subscales.",
+  "rights": "Original agreement unavailable; no acceptance, registered account, live administration, public item upload or commercial permission claimed.",
+  "databaseImports": 0,
+  "productionWrites": 0,
+  "contentFrozen": false,
+  "reportRenderingBoundary": "Native buildScaleResult only; no UI, authorized-recipient HTTP or online publication tested.",
+  "localFirstFailure": {
+    "kind": "NATIVE_SCHEMA_REJECTED_EXPLICIT_GENERIC_RANGE",
+    "fix": "Remove explicit generic range; original endpoint1–5 assertions retained; no product code changed"
+  },
+  "consumerSha256": {
+    "server-version/backend/src/modules/scale/scale-definition.ts": "6f1e9f1992c4393dfe10b89ee2d65d87bffe5b81713a1b9d6bad2cf08fc5799d",
+    "server-version/backend/src/modules/scale/scale-scoring.ts": "a6af3b51ce1766defa6d2e6eccc2fe3ab09d86e7e0f8f1e1920cdf59f96915fd",
+    "server-version/backend/src/modules/scale/scale-result.ts": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591"
+  },
+  "privateCandidateMetadata": [
+    {
+      "instrumentKey": "pals2000_personal_mastery_original_en",
+      "sourceNamespace": "definition_local",
+      "sourcePdfPage": 11,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "3a327cea727be744fde3f9ceb9953e2050775f31d50dbaea43fc14219c72b6ad",
+      "sourcePromptSha256": [
+        "ce6c3a7a142bd586b2c8cbe78fcf19f2d3e8cd77ce4a983b62e57a596d418cd5",
+        "1a0bc1069b42c3443b14c7c71637d4a0d44a44b3cac3a3e5d234cd64be05a78c",
+        "d3f0f77161357a59cb32838bfbfaa4e933e034f700c5632702167712d36705f4",
+        "500d6a2de2726b5fe2eb6ac8a2ab420bbe7ebfd06bfca3a56535a70e8798bb80",
+        "12c40c5a0c930566eaef0424dd7178f54af508bf5f19660928855eb43dc4c086",
+        "b6f4742ffb35ca5abede48f5c9133365155c6179d825daafbc20a6cb186bc0aa"
+      ],
+      "privateDefinitionFile": "pals2000_personal_mastery_original_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_approach_original_en",
+      "sourceNamespace": "definition_local",
+      "sourcePdfPage": 13,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "e68ae993a461178f111bdff4ccc424b3d03ac92c73fba2455c789181e29d94e7",
+      "sourcePromptSha256": [
+        "8f16b670b36707f1d4e2256c3d5495ada5fd4c0d39ecbbd5b0d3150edb4fc3f0",
+        "ded7f0afca463f3dcebbb1df3433ef867b03414681f4bd0736e90fbda2bf82f1",
+        "3cb3a6d832c7e8f8f134e0f4b07d07f945dfe473e3c23b08ac1c29d9a6575dac",
+        "0a86d06d5317e36711c02f71739f60b3cb20c2b7ab12908ac6f67df6bd5fc46e",
+        "31e3f1f1047a1d4cf5291e30e7353a62c9a0f223c675bab3c0905aae1e49fb90"
+      ],
+      "privateDefinitionFile": "pals2000_personal_performance_approach_original_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_avoid_original_en",
+      "sourceNamespace": "definition_local",
+      "sourcePdfPage": 14,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "af8102734cb4c33898dd586098f1649eeab775d423a79d624434b5afdec358f5",
+      "sourcePromptSha256": [
+        "27d61079e909ae813e0dcd677b88607fe9f6cc11a31ada17b97d1e8142de965a",
+        "43c9e5571de6516672d449c7e70f2b1ef602f6e321ba5c51a786110ab06ca19c",
+        "ab3c593fe28c6590e151a442604cda27ae9bbed13fe9bc3110747286de9ed2bf",
+        "c5906503972a02d8fa5183de4c7850366fe0443febe605bc9eff7f8416da26fb",
+        "03f849224004ab68da50fc376ca926a60de3ef29a7d11fb81411dc8dbac8cf45",
+        "ce56f39e646352a69b51a804d08a4feb15ac8bbe820ac4e49af33774e1c170e7"
+      ],
+      "privateDefinitionFile": "pals2000_personal_performance_avoid_original_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_personal_mastery_revised_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 15,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        9,
+        25,
+        29,
+        38,
+        49
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "97b9d4cb5ae68f6b372e94d950b62c0f854db0565127dd4e9f511d9370602dfe",
+      "sourcePromptSha256": [
+        "14f72cbf9c9738237431a3c9d67249a8125ec6c93b3d68bb307c712eb723b656",
+        "b4a39eca09c20eb5b91b5221abf34e99e32c2771cfb17f83f512c5047c635549",
+        "53a3fd32bd15de8fd004ea798273fd1a9140a29c00994295bcb9c0e5e49b0b1e",
+        "6b753791d75a27c7e9e055fa590f94484723e36467d204a52e5cc6aeec28b005",
+        "b552d1e7a8d43230f6a842c320fe58a88dd4c7de3ed11d7465133ebc75d60b56"
+      ],
+      "privateDefinitionFile": "pals2000_personal_mastery_revised_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_approach_revised_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 16,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        8,
+        26,
+        41,
+        45,
+        48
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "c1bd91cba2d959daee6e1181a3c7df94aa7e4dd8a2839b62752d4b73fd3fce9a",
+      "sourcePromptSha256": [
+        "dc398ba9db5c1d11f0415dce914348b3c2bc26b587b869eb68094caaabf24f0e",
+        "ad34385e24639510b71fff1b816dd100dabd8fe5ffda637b475ea34d2684fd06",
+        "420c2baebe82719654d7dcbcabbd3fb60d533c24ac38385f22a7d27942168dcd",
+        "16ed90d0f5eb695707684278b293e0b99b31f77544e3ddcdef5adcb31e221979",
+        "caec3f6b99e8fb39a947c9c057ea5dc80afbd82696128a3b501790563e09b02d"
+      ],
+      "privateDefinitionFile": "pals2000_personal_performance_approach_revised_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_personal_performance_avoid_revised_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 17,
+      "itemCount": 4,
+      "sourceItemNumbers": [
+        3,
+        33,
+        51,
+        55
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "cf54f2a913ac19d73736d4e57b3277ea6c86a04c70061cf240d7bbd24ecdb789",
+      "sourcePromptSha256": [
+        "2b751779ff23dc5033dfded981e9310ab14eb73fbe98f6ac8950c829b2add6bf",
+        "bc42447ed8a495930ef0e2eb55c9c66451a0a0baab1c0097c4a32efc010f268f",
+        "883e6af09fdfedb3aec968237927ed239877c14944b01368aafcb8a022c2cda2",
+        "0eac64dd237f32914cbd944020cf1fa43caead30a30cff77db741f9c7280b212"
+      ],
+      "privateDefinitionFile": "pals2000_personal_performance_avoid_revised_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_teacher_mastery_goal_en",
+      "sourceNamespace": "definition_local",
+      "sourcePdfPage": 18,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "4e5eb4c119d26115ba794a77809445738f38d65d27aa4fd70e943bb58094add3",
+      "sourcePromptSha256": [
+        "ac185b2247505e44a2f96a8ed2e1f884d57a04cd4220aae0418233988b5f8ea2",
+        "5dbce1c6c210ac585b49927eccf20352a9cfbccaf406a7eefb0b7a28db6ebc56",
+        "041fa68bd50f48ddded6f174167eb82ac14871cf572e99fd57c2927a1dabbbb4",
+        "50626164ec6a5f0a816471e86a0a9b37d4addbb6d6deea3b2153fb91ebc1233f",
+        "1b6eee09f8f2d264d1f27ec0551af2561870564d9377f508986a7db4f87f28e5"
+      ],
+      "privateDefinitionFile": "pals2000_teacher_mastery_goal_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+      "sourceNamespace": "definition_local",
+      "sourcePdfPage": 19,
+      "itemCount": 3,
+      "sourceItemNumbers": [
+        1,
+        2,
+        3
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "ddd9c8ff7ca1b668dd024fdc300c9c90455c1991d98d5e68c9e1fb804fd258d2",
+      "sourcePromptSha256": [
+        "97e80beb919e7be56066c6f1dc21763add6150d012870ce0e8c23be0c43fc127",
+        "a551c463b565c1fb596482fa8a32b14dd2105d8d2061b5b760fbb1dd10884996",
+        "e68604a74ff8bd81c6bce7719024fb2433486f7fa35a8702f4716908ae8a7d7d"
+      ],
+      "privateDefinitionFile": "pals2000_teacher_performance_approach_goal_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_teacher_performance_avoid_goal_en",
+      "sourceNamespace": "definition_local",
+      "sourcePdfPage": 20,
+      "itemCount": 4,
+      "sourceItemNumbers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "c32a51508f0b3394b910d52754ca279da45c33c6206f827c8cac263f2c7faebe",
+      "sourcePromptSha256": [
+        "3880eff6b52b7435a03e1fac200b69948663d397c87fa7bf4654827e73dc338d",
+        "2367f417c1650f6cc37ad0e86225d96604711a0a06da93bb7d7b421a6b94d703",
+        "7ccffcf5a00ee74ef22c693b7834f8fa1045ea61af092ad7c53bcc37a98ac312",
+        "3a684b5bb98ce8603b2d1354a49453c396d9e6bdd30be04a6d41a3f9aeca79a0"
+      ],
+      "privateDefinitionFile": "pals2000_teacher_performance_avoid_goal_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_classroom_mastery_structure_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 21,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        59,
+        61,
+        63,
+        66,
+        68,
+        70
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "596b648c9c8a8d138128e9e9a56bdc0b5b428c5cce8f5c2b35c612a4c9f66ce6",
+      "sourcePromptSha256": [
+        "8d2cf575865b25102bf7fdd1dea86e36c972c005447078511e0ceb0ae76fd9e3",
+        "b06d5c0eb6ceaa94e4d1d2428f1e30e3ec93db37eea52de2bdcc8a384234a6f0",
+        "8d606a9e679d279e9d824ce998fd1aa768ef6ffdb73669ed45c92be826024806",
+        "6aeaeba985b1ca063478670c9724c19ee10d9a9dbf81910a914e7d9f65d794a6",
+        "b19c238f225612f7d348114c0696af5de6c2acf7ea57315eae6d8de80a1de938",
+        "22dac2c23dbb86bb4ce1b6bb8018f7150e75016a701e0ff1a3a2d3c126e7af43"
+      ],
+      "privateDefinitionFile": "pals2000_classroom_mastery_structure_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_classroom_performance_approach_structure_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 22,
+      "itemCount": 3,
+      "sourceItemNumbers": [
+        62,
+        64,
+        71
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "d25327fc619e517dd43e5802fe2c3ed9906e903f71c449fd27b841d8489e27bb",
+      "sourcePromptSha256": [
+        "02d6b26b297105e5f750920145b7db0f02743a59c5a870c32f2d333011ae132a",
+        "a910fca8a521becfe4ef41a5cca97fbd5e113def8c9e137395e1719259eae3c4",
+        "dbc108971896a87c4233993d9e96017be2e7833cece14ea1a2d3faf00335cc94"
+      ],
+      "privateDefinitionFile": "pals2000_classroom_performance_approach_structure_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_classroom_performance_avoid_structure_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 23,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        60,
+        65,
+        67,
+        69,
+        72
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "8dbf3e43dc4b15fb663d7da611e5b78c1dccb026935e91e87fddde01ce80ce83",
+      "sourcePromptSha256": [
+        "879963e604797971ef3acb6ea7f4c6efd057755dbb448942e279642cab2cf6ef",
+        "e99c0bb4222c3a9d4485cf30a30495246a858ab849e21b1a78c824dbd12ec6db",
+        "753b1d7d0bae0b2e2e510a29ee571836215823a09b16fa70ef2f74cb629af285",
+        "10de66e617431ab1de93f9432f64f55f675fcdc82fb92a241c6390d006a19b19",
+        "20f42898aff3cb09c82c31044f221aa3a7609c5e7f78504a35c6dd323c768346"
+      ],
+      "privateDefinitionFile": "pals2000_classroom_performance_avoid_structure_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_academic_efficacy_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 24,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        1,
+        11,
+        52,
+        56,
+        58
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "5880abf2b6e72bb77bade5bd814688f00688ce8bc4b0f16253a9772e9e14c458",
+      "sourcePromptSha256": [
+        "277b21e2e4cfff29278760c35eb5445d15c3f41f4895f10be853177aef89c586",
+        "6a71fd9d66b088cd7086dca2c1ce5f18900194a4e1b550971a5fa319e5ded4c4",
+        "04dc4d9e181d689460648691006aeda4a9a48fe912d40a769156b218ed9340c1",
+        "6ea67642a607cb4db3ec7f34a78b6fbd1ea16feb2c14e9a981591cb9520f11a3",
+        "38ec7377f94c2cd115d2ace96a1c3a5deae4641256de3e2451d67bb071b289b6"
+      ],
+      "privateDefinitionFile": "pals2000_academic_efficacy_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_academic_press_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 25,
+      "itemCount": 7,
+      "sourceItemNumbers": [
+        6,
+        10,
+        15,
+        17,
+        19,
+        53,
+        57
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "e4e482461ed50ca9f7ed3cba6e85dd03f001bc20599b69a224668c6eb1bfc215",
+      "sourcePromptSha256": [
+        "2e9a8a849f5142bbcfd6d67da2ea78208289b616410f977aad771516fbcec119",
+        "c4a6f3dd86c5c91db0669d5b2c48687e02840e83c61b7a84dfda8676d6ff2e9e",
+        "cd473d693ed7b2d48fc029367e7a9d9859c71d595c810cb60d1c9f9ecd28afd6",
+        "6a8b4cf6500fbd5544f3b36a95dd26641c004fb841467be0dc25a1218da58783",
+        "277ed74cc9151b45b8fe8b43b395f541041b2fcc6104463c4344e8829ff3c291",
+        "06c583c8b4f41f49b9aad4d650c5458bfe1c993f65f7579dccef10b7010b2d37",
+        "3a59e10a706ed33f62ad077239f3bba9f86f1add64761c5acb44ead1df3336ca"
+      ],
+      "privateDefinitionFile": "pals2000_academic_press_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_academic_self_handicapping_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 26,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        12,
+        16,
+        18,
+        42,
+        44,
+        47
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "1808e6136951067ad613f156d2918d167b0811cf83fd9ae16c90a6939887ab7f",
+      "sourcePromptSha256": [
+        "f0fae94663e4bf10a7a4a9b55ed9e2d0449be3749aefa36de72a69b3e118d8cc",
+        "c844bd85b9358bfb794e368f06a30cd3c7e19df2f316430e66afc63e86abb1aa",
+        "817d887f9c28945c27c96ba7a690a337f0f97cbf76197e1cc00208e70abb3236",
+        "27ec709a4f80a8dfd1f26a6ac29969568d4fbe8860b53f557100df4f19f61f80",
+        "9097a7e415c983e954e4cc3546d9f0892d6d76468c29b8198458c6091faf2d57",
+        "d73800f38561175fc39a41fc763b9ad7d1d84eeffeb77fa53d1d1377db95e429"
+      ],
+      "privateDefinitionFile": "pals2000_academic_self_handicapping_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_avoiding_novelty_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 28,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        7,
+        20,
+        23,
+        35,
+        40
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "c963db7294f43ee7534a5b8c39a7355bbe824736c9845eb4133467b143af7272",
+      "sourcePromptSha256": [
+        "f7e0e0491c6532b873bd9174cde80de41916cc27b5312ebdce05d1b8e57f0fad",
+        "954abab671684410050e8b0e8fcd97730be8c086e2121c277dee7bbe1b345e01",
+        "c4d822232587b3537a9724bfd54cbaa8a1f147ec403ba61384ee4afce7d91718",
+        "befe9a11f17674b7a7967c2bc91f32a22136d7c9551833bc84e48aae446cd45d",
+        "ef0c4dc9a6855e957b390c5202a6772d868150270ce3f0f2267619a0656705e5"
+      ],
+      "privateDefinitionFile": "pals2000_avoiding_novelty_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_cheating_behavior_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 29,
+      "itemCount": 3,
+      "sourceItemNumbers": [
+        22,
+        31,
+        39
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "454eca23d6b7ede089bfb28ae642b2a7dcc4086fa337eb646f462c2414f091cb",
+      "sourcePromptSha256": [
+        "93b0bf987d26814a0df598dbb742e273b39ae0c3f2a908362b3908a265bf23b7",
+        "eaa6c48d9d763170cde05dc721a4481859bd945deac2031165678b5acb08b53d",
+        "b51adbd214ce7bc57ab65b977c2ded56d8c8b7ff0f0fa5a678841895efe314f5"
+      ],
+      "privateDefinitionFile": "pals2000_cheating_behavior_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_disruptive_behavior_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 30,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        14,
+        30,
+        34,
+        50,
+        54
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "b25c371e122f3b99bb04b7d409828ff80246368db72efb653d61136e10da9c1b",
+      "sourcePromptSha256": [
+        "e27d9a8dcf5621379d924caeab7055f7de75066a9c67803a329bc25611513bb8",
+        "8b7169bac078c54b7e229274f5768b61e57a45bcfaa1830af670e5d4fd6048e9",
+        "e3675396efde13972ffca640b867d9dd1e9f2c6b2aef844792044a3c716967d6",
+        "17fb94f69db8f6c611f0fc3572b4884fd831b31898032d5084ec4649204975de",
+        "cc3db5967ba77a7aa0e4042859ac6e1faabbe3e03fdb22f3018bcbd894114991"
+      ],
+      "privateDefinitionFile": "pals2000_disruptive_behavior_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_low_achievement_self_presentation_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 31,
+      "itemCount": 7,
+      "sourceItemNumbers": [
+        2,
+        5,
+        21,
+        24,
+        27,
+        37,
+        46
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "fb180198aa002fec2323dc5c04429fda145c7053d006fe82794499ee19db68ee",
+      "sourcePromptSha256": [
+        "4695d083650621c33fa05e87942858c50ccfe7f491ca040beb972ca84eec0a83",
+        "9890293f6f70b815907ecddc02bdf9b37a3ff2d33cdb47a922c4debad0dd1251",
+        "9e2603e7348a43b3d943cdfef56be2786966c25ce725334921886fc279450621",
+        "75d5b5e2666151ce58cc021226f3772e36e4a720d7e33fa29736174d08db6c6a",
+        "e385f267a8abbb9f9b1e1dd00e6fc452f03109d6b3a7be103be5299b3d494cb3",
+        "8b54174864719e95d46d78239ff911fe197fd69f4b2e7d96e014d8748d423e13",
+        "57ca9d63e7fb90a9eacf015792c07efe18d7c64da6784eb8f89e68d6867aed2d"
+      ],
+      "privateDefinitionFile": "pals2000_low_achievement_self_presentation_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_school_future_skepticism_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 32,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        4,
+        13,
+        28,
+        32,
+        36,
+        43
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "7b008a0c05468fd4e6b8504607c684387865781a55f85e37eba623b398d0e177",
+      "sourcePromptSha256": [
+        "44be2bd8e3d72c035909c5ce80dfc02ec55778ab479954c74b9cdd54c7fa6887",
+        "49623b0e502c832876e63352bc0b37e63485220a0a71d8685e1073570ee975da",
+        "e78f8bb626edf1e1b90dfe87ff38be97b1091f254b67ea64c49444800ffa3bc8",
+        "496c85c9a7586c2c0eee39f4bf3d5b8abed8a7b9a4cc06913bd1d54c95668b4b",
+        "03620f667823fd26720d11612b8683aa3545ac3489d124f59c546d3b4f4a3406",
+        "753144e1f2cf22c9bae4d3a19982972e4c6dfccf05c85bd1fd3765230fbc1e47"
+      ],
+      "privateDefinitionFile": "pals2000_school_future_skepticism_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_parent_mastery_goal_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 33,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        75,
+        80,
+        82,
+        87,
+        89,
+        91
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "7569b2023d7de9ac399fa7b4589bd74b6b6ff5f6f2d7e355ef77562f99463a29",
+      "sourcePromptSha256": [
+        "e25863479e29716483b287cd262ef85aae61616b0652eac0a2519d93966e488c",
+        "00b6f3139cf02a8df269b2efc1086460ba4f65415dc187d2a3fe15697d06148a",
+        "cbf3699a85e65729fb0bc6d4413038f76da3c4080512b9cbfa6bc04a61a5e43e",
+        "90531147709627cb37d4c35618ed5a7f15863258f4a617e3d8bb337429ecc4e1",
+        "8ca5002d2e7f885862fa2ed0a6c9b1bd1951a6bf9edd9f71c1416673b62d7236",
+        "4f23d0d3701b44212db958d1ab91b8418eaf9c8a203f2181c2aba69c505f2e03"
+      ],
+      "privateDefinitionFile": "pals2000_parent_mastery_goal_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_parent_performance_goal_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 34,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        73,
+        78,
+        90,
+        92,
+        94
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "55fc1f1df74458724dd3c776d50f89af3977a7e5a117de397a4c9346bdc7b0b7",
+      "sourcePromptSha256": [
+        "a9c4f9e9f1f19fc3d7f143a7308f0d2fbc1e25a326fbc1e7a4972d644da4690b",
+        "b6125e2c43bc3e0cfe293baad62b889ba471e15c1d6b78d5ee7394bc1e46a7a6",
+        "3f587e538b4a728ebfedc06c31c4ff282bf9466c49192f3f68d435c474c15f7d",
+        "cf0b61c55c48c3438a1e9f14f4aade7d2ab14bb47e8c68abdbf0f62381a12148",
+        "caa7ba1b3c1a736054987cd2d399b59962cbbcf7d71166377f836faa52c7f329"
+      ],
+      "privateDefinitionFile": "pals2000_parent_performance_goal_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_home_school_dissonance_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 35,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        76,
+        81,
+        83,
+        85,
+        88
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "1dfa48bc99471ae68eeed62fc61819e3504505f26eb86beb66564c6ebcc2051e",
+      "sourcePromptSha256": [
+        "7fb66d873909470264577388d1c3052f197d8ca42104c3d0828c44b87c70bcc0",
+        "ca57fd5b9c101c96808c9e89b3c11fcf864dd347b55d09c2b5d3752a49d5f24e",
+        "51c0137909f0c2d28ccbd8ed165be471936b972a259c24168a1b40e98a230eaf",
+        "01353ab297e7ad6e3da99fef23a8afedc5463f0bbed5159b61bcb7b1785cf4c0",
+        "ee16becab798c5800c8f967e427338d5176f1e6779ddc353f704afaa83ca0d80"
+      ],
+      "privateDefinitionFile": "pals2000_home_school_dissonance_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_neighborhood_space_en",
+      "sourceNamespace": "student_sample_survey",
+      "sourcePdfPage": 36,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        74,
+        77,
+        79,
+        84,
+        86,
+        93
+      ],
+      "reverseItemNumbers": [
+        74,
+        77,
+        93
+      ],
+      "respondent": "student",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "68f6e92543554215921104f064d242685af639c839b827b6c2bc4bf3fab8b91c",
+      "sourcePromptSha256": [
+        "7f4622d24288428ece00644584f8b4cd5dd4c8cee1ad188ad8874a00f63975c2",
+        "7e6aacb953a4eadf64c78667989c71eb73f129816be3621d48ca598a4029adff",
+        "f62936067732a9e180e1474c22e43fe42543be86ecf319772ece4f147bbd6282",
+        "be5a08833993771c92d1c33e60325c73191e0a8c1da844e638c9409a8bc23690",
+        "5f6d323616ee45f89e39346e32f8c1bb2c7d1dfb4f7b73ce6c3f23c2fe48111e",
+        "3ba0255780e31f47da59dea0bdeb35f20a764c7c71f25b76560fe55a52b9860e"
+      ],
+      "privateDefinitionFile": "pals2000_neighborhood_space_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_school_mastery_structure_teacher_en",
+      "sourceNamespace": "teacher_sample_survey",
+      "sourcePdfPage": 38,
+      "itemCount": 7,
+      "sourceItemNumbers": [
+        3,
+        5,
+        14,
+        16,
+        20,
+        22,
+        27
+      ],
+      "reverseItemNumbers": [
+        14
+      ],
+      "respondent": "teacher",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "a8e7027e82b5a8290ba8dc9fbc2073a1c349c6054977f22e06613ee2f3b31200",
+      "sourcePromptSha256": [
+        "fb38aafa33fa43883da841b78af627646cc5f23af630b1e339f65e002dbdcec2",
+        "5d0794950026cc7de65004a46fb230d14db1b40d038b2dfa7cf45842db5a730a",
+        "5fbaae48ddb44bbb628f71c66a55250f2194824b3d88f350636c75a1beaf29da",
+        "58383ce86579f7ed5fbdd0e20d4c923acf1c264c8be65b33232202fa4a9518c5",
+        "015cb5ef72ba23dd7a91221c849d22ebf79f7f340536048a625356c37d763986",
+        "99b816313d91b295cd1678ccd3fc80ea1952eceacb29cc430a759cab20539879",
+        "ab4c8d4c2ddf7a0e44c58242f5b287514d4b1902ad6d36333aac536cbf717bc6"
+      ],
+      "privateDefinitionFile": "pals2000_school_mastery_structure_teacher_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_school_performance_structure_teacher_en",
+      "sourceNamespace": "teacher_sample_survey",
+      "sourcePdfPage": 39,
+      "itemCount": 6,
+      "sourceItemNumbers": [
+        7,
+        10,
+        12,
+        15,
+        25,
+        29
+      ],
+      "reverseItemNumbers": [
+        15
+      ],
+      "respondent": "teacher",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "2a092a7862aa914a488198952e758ad12c39981dbcc0d50da1fe41a3cc462568",
+      "sourcePromptSha256": [
+        "85004c21599d54117339bf4564da81a2d129e366b0535c7f4a80dbf1faebe5d2",
+        "6766735aabbe0826d00bf4f3b6c72a91b7ee4baa6e9b8ac593c4d01947a20632",
+        "745b0a4f216927cf9b9d40369e3445e261124b5758c6850460cf918b84b670a2",
+        "07d731e99bd4709b8a3d5670f5fd883d5b597dc3c20e371dceb3206f243e4091",
+        "73c1142110f221b45e6158cc5a6b26f3644f026d569cbbad6047879e81961486",
+        "d2697e0249ca5182a441cc47c094e5074f8a7f8822f9d28b86aaafccc6edcfa0"
+      ],
+      "privateDefinitionFile": "pals2000_school_performance_structure_teacher_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_mastery_instruction_teacher_en",
+      "sourceNamespace": "teacher_sample_survey",
+      "sourcePdfPage": 40,
+      "itemCount": 4,
+      "sourceItemNumbers": [
+        4,
+        11,
+        13,
+        26
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "teacher",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "22c8643ab14d0eca36c71c50f0687497326f01c0f6a9989645002e844c19fbd1",
+      "sourcePromptSha256": [
+        "957f098788967b8b30b9821b889bb1d030c98f0d8ff5d94abca196a3f170c37a",
+        "ff11559c6e50c3bb6a977722007bfc2fa6a494c37ac2104655ee9d39c852434d",
+        "78fd6d5c49971055da66a8069dd7acdd346d86e745c68f9860b47c39daf664e6",
+        "e456a04abb59c84e77d8b2465c728e3be9750890ff311415272cd0f1ce008dd2"
+      ],
+      "privateDefinitionFile": "pals2000_mastery_instruction_teacher_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_performance_instruction_teacher_en",
+      "sourceNamespace": "teacher_sample_survey",
+      "sourcePdfPage": 41,
+      "itemCount": 5,
+      "sourceItemNumbers": [
+        1,
+        9,
+        17,
+        19,
+        21
+      ],
+      "reverseItemNumbers": [],
+      "respondent": "teacher",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "9aacbe943dbfabfa53c5bf8b3642317a61e67aa21e386470cdaeff38e1805408",
+      "sourcePromptSha256": [
+        "9580dab69248835f06db187527a494fc09da2f36680cf097853ab625ce626d0a",
+        "1ac9795b9766f8244d4d0418faa931dacb0f6e4e671473ba1978c3213d8a0239",
+        "490c6fbb8f7b40101ded76de3012b480c6f28155ac07b1a37444560149da6921",
+        "128987a9a846cc6d67e9ff4205f870463c784c4057afc41421a6287ebfcede80",
+        "10b86b8af5cab698ce402e53b7dd694e33cce502ef22f3f6926d4758544244a4"
+      ],
+      "privateDefinitionFile": "pals2000_performance_instruction_teacher_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    },
+    {
+      "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+      "sourceNamespace": "teacher_sample_survey",
+      "sourcePdfPage": 42,
+      "itemCount": 7,
+      "sourceItemNumbers": [
+        2,
+        6,
+        8,
+        18,
+        23,
+        24,
+        28
+      ],
+      "reverseItemNumbers": [
+        6,
+        18,
+        24
+      ],
+      "respondent": "teacher",
+      "contentDraftVersion": "0.1.0",
+      "scoringDraftVersion": "pals2000-project-mean-complete-0.1.0",
+      "reportDraftVersion": "pals2000-project-growth-en-0.1.0",
+      "definitionFileSha256": "655559e706c9974e48ead7d7a8aaea9f3ea97d85611faae608bef67809d67382",
+      "sourcePromptSha256": [
+        "88643dae860720f3902849c00e0701e7d8f4813d6922bb1ea2d85ba9b9f7cbdb",
+        "4ca59fc5004385fdb17cd29af485320f9d6d1265ef315db3bcf4f6122d089d37",
+        "91dbc9535f6550fab9ce8b8517cd1df18ca0e1c4bd80fb8b31f6195631053cd1",
+        "ddd9db35a558ceba7347926d3f972aa60dfda74d335beb3eabf74c13c6b71023",
+        "7bb80beb98956089da35ed942b4908c233d1ce8a74298c46de211950941a182f",
+        "e045bfad00b0f7ef4a3faa19791a7ffdd79e2985b636cb74702a20af097b596c",
+        "58643fc278ad14ed46ec42a82a149e73a5fc2a45b08f7ef8ec2dc4e891eed05b"
+      ],
+      "privateDefinitionFile": "pals2000_personal_teaching_efficacy_teacher_en.definition.json",
+      "status": "LOCAL_PRIVATE_TECHNICAL_DRAFT_NOT_LICENSE_APPROVED_NOT_INSTALLED"
+    }
+  ],
+  "priorSuccessfulChecksReplayed": false,
+  "existingComponentImporter": {
+    "parsedDrafts": 29,
+    "results": [
+      {
+        "instrumentKey": "pals2000_personal_mastery_original_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "e4136c24c6f4a7426e587815b695b9bc1bed111fd9b81508ddb993b8d9164ef2",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_approach_original_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "e5fb39353bbb1481d574342c47c57bd4ba71f5c902c8910c1e7bd255e89741dc",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_avoid_original_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "020b274e96bdd70c4566ee09c1eb1ad5854ce005fa5655714bcfa99bfe9c3a3d",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_personal_mastery_revised_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "2d8b506819d36f71ce94ff4afea43f0e46298356c71b76a3d3a8cdf270a97724",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_approach_revised_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "5039daec8db97ead4f35b38f206d589b23827fda2072d8a09f486ad558bc93e8",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_personal_performance_avoid_revised_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "98dbcdc8627d0753eceb26429ca8ac498a483985efa0bc72a84b47c0de7766b0",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_teacher_mastery_goal_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "590989b58709daa638b7d81d57cc33761f0554c6ad0ac7a03c273ab0e45e8c2e",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_teacher_performance_approach_goal_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "b805397aaa68e90f1586cf28e5e375d2d492ae38452e2eb2af12fab8328cc36d",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_teacher_performance_avoid_goal_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "45311898a36a29b60b50e0f44314c5f74faca65c20304e7b80e913e2bbce5f78",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_classroom_mastery_structure_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "a992db079ba660ef9ce27def8c92e80cb7fdf57f640dd7a9d48aad13c65d3efd",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_classroom_performance_approach_structure_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "fd9bd48c3feda49b7282ba44fc70aa9e21b8b9590f0fe1657465d22e47a96933",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_classroom_performance_avoid_structure_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "f348f3161972c7438b05009c12b47e26e13c1cc5c1238cc32c048b0b7d906a26",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_academic_efficacy_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "c2729fe16241601b1596ccc27acfb3d50a0b9fc92c1605398176f364161184cb",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_academic_press_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "e8b40f2b09fb6258933294abde96449af28382f2b9f8f75539be06e7c083f663",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_academic_self_handicapping_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "60ddaad6165f326396a7a226638fbd78abcb2115abe0dd561bbaea20c651fee4",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_avoiding_novelty_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "25ea3b08dd5ff108e91c88bcc68f08165e1c2e967edce7dd315095247c2b7f7e",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_cheating_behavior_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "72518641d3bcd40da6c226c8cf0e89d3eeac0a0906a518c30c74792b6bb8aeb2",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_disruptive_behavior_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "16a2293882db8a68797d0794fd21335620cc8302c6175cdc40283e3a7ea65b4d",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_low_achievement_self_presentation_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "ec33ef5641c6408fbd19921967fbbf1d58d79f7fade7e42b2f30cc19b6ef9969",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_school_future_skepticism_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "239ffd4ed270e0ba9aba342c6fb9cc573311ed94f75429efa34689902cc6580b",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_parent_mastery_goal_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "94668154a34a7edf25d416ab1d40c96016f094185302ec6b4b05ab7dc0d5f4d0",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_parent_performance_goal_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "9e69696d06da25f878293dc9bff3c8de7534636f6ff210f76cc64d022d4f5296",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_home_school_dissonance_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "0abd7a5d32e87b07e1836b5fd5171b1d3caf367b883aa3d1fd900d68a4d9e1f0",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_neighborhood_space_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "67203431a9f64dbe22036471e49169b06b7767930ff8964581671825255185d9",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_school_mastery_structure_teacher_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "60fc3757d50245a06bb10b748ffcb8b0758b6cc2af4f02dee3baa1579722f02e",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_school_performance_structure_teacher_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "5403c47fb767c6aa3c36315c73e951b08ee7cf634ec5e7a529262125edb2b467",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_mastery_instruction_teacher_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "f86ddf8209b87923db25b25aaaceae703e239446486532e9c63efa54677ebca3",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_performance_instruction_teacher_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "e8c00148b97b9b46e29bee6eec01914678a76697b2aa0705985d3f9acaa8d05f",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      },
+      {
+        "instrumentKey": "pals2000_personal_teaching_efficacy_teacher_en",
+        "nativeComponentDraftParsed": true,
+        "contentVersion": "0.1.0",
+        "referenceParameterVersion": "0.1.0",
+        "reportVersion": "pals2000-project-growth-en-0.1.0",
+        "componentFileSha256": "52b184e909acdd17c5f350d1d08f98aac0bfeea19e866dc94b7123697c748f44",
+        "instruction": "PROJECT_PROCEDURAL_DRAFT_NEEDS_ORIGINAL_SECTION_CONTEXT_REVIEW",
+        "postedToDatabase": false
+      }
+    ],
+    "metadata": "Separate native C, reference PARAMETERS, and REPORT; C report remains the required emptyReport placeholder; project mean/item transforms are in native C scoring schema as required by existing platform.",
+    "databaseImport": false
+  },
+  "nativeComponentConsumerSha256": "509101265157b0da0292ef4ffbd59354afa000e099757850fb4ba1b1c6e45d97",
+  "latestMainBeforePublication": "88e3328d44d29fa3bc2afd12486e8505bd932ede",
+  "sameNativeConsumersOnLatestMain": {
+    "server-version/backend/src/modules/scale/scale-definition.ts": true,
+    "server-version/backend/src/modules/scale/scale-scoring.ts": true,
+    "server-version/backend/src/modules/scale/scale-result.ts": true,
+    "server-version/backend/package-lock.json": true,
+    "server-version/backend/src/modules/scale/component-import/contract.ts": true
+  }
+}
