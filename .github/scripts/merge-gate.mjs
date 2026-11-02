@@ -48,12 +48,7 @@ export function recheckContentSast(needs,entries,readers) {
   return failed;
 }
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
-import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
 import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
-import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
-import {post356Plan,post356Outputs} from './post356-scope.mjs';
-import {requiredPr356Checks,failedPr356Checks} from './pr356-gate-contract.mjs';
 import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
 import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
 import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
@@ -124,12 +119,7 @@ export function requiredChecks(needs, draft) {
   if(scope.application_route==='personal-tracking'){let p;try{p=JSON.parse(scope.personal_tracking_plan)}catch{}return draft?['scope']:['scope','personal-tracking',...(p?.imageReuse?[]:['docker']),'codeql'];}
   if(scope.application_route==='group-report-draft')return draft?['scope']:['scope','group-report-ready-qualification-required'];
   if(scope.application_route==='onboarding-structure')return ['scope','onboarding-structure','codeql'];
-  if(scope.application_route==='pr364')return ['scope','pr364','codeql'];
-  if(scope.application_route==='pr363')return ['scope','pr363','codeql'];
-  if(scope.application_route==='pr356')return requiredPr356Checks();
   if(scope.application_route==='report-planning')return ['scope','report-planning','codeql'];
-  if(scope.application_route==='pr357')return ['scope','pr357','codeql'];
-  if(scope.application_route==='post356')return ['scope','post356','codeql'];
   if(scope.application_route==='survey-governance')return ['scope','survey-governance','codeql'];
   if(scope.application_route==='training-polish')return ['scope','training-polish','codeql'];
   if(scope.application_route==='sjt-native')return ['scope','sjt-native','codeql'];
@@ -222,7 +212,6 @@ export function requiredChecks(needs, draft) {
 
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
-  if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
   if(scope.application_route==='legacy'&&scope.scenario==='platform'){
     const reuse=needs['backend-regression-reuse'];
@@ -254,24 +243,8 @@ export function failedChecks(needs, draft) {
     try{const p=JSON.parse(scope.onboarding_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='onboarding-structure'||Object.entries(onboardingOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
   }
-  if(scope.application_route==='pr364'){
-    try{const p=JSON.parse(scope.pr364_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='pr364'||Object.entries(pr364Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
-    return [...new Set(failed)];
-  }
-  if(scope.application_route==='pr363'){
-    try{const p=JSON.parse(scope.pr363_plan);if(draft||p.draft||p.postMerge!==false||p.route!=='pr363'||Object.entries(pr363Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
-    return [...new Set(failed)];
-  }
   if(scope.application_route==='report-planning'){
     try{const p=JSON.parse(scope.report_planning_plan);if(draft||p.postMerge!==false||p.route!=='report-planning'||Object.entries(reportPlanningOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
-    return [...new Set(failed)];
-  }
-  if(scope.application_route==='pr357'){
-    try{const p=JSON.parse(scope.pr357_plan);if(draft||p.postMerge!==false||p.route!=='pr357'||Object.entries(pr357Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
-    return [...new Set(failed)];
-  }
-  if(scope.application_route==='post356'){
-    try{const p=JSON.parse(scope.post356_plan);if(draft||p.postMerge!==false||p.route!=='post356'||Object.entries(post356Outputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
   }
   if(scope.application_route==='survey-governance'){
@@ -585,12 +558,6 @@ export function failedChecks(needs, draft) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const needs = readNeeds();
-  if(needs.scope?.outputs?.application_route==='pr356'||process.env.CI_HEAD_REF==='fix/runtime-time-and-validation-20261025'||process.env.CI_PR_NUMBER==='356'){
-    const {runPr356StableGate}=await import('./pr356-stable-gate.mjs');
-    const receipt=await runPr356StableGate({needs});
-    console.log(JSON.stringify({route:'pr356',head:receipt.head,base:receipt.base,tree:receipt.tree,role:receipt.role,externalDotApprovalRequired:true,releaseAuthorized:false}));
-    process.exit(0);
-  }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
   if(needs.scope?.outputs?.application_route==='backend-unit'){
@@ -617,20 +584,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(needs.scope?.outputs?.application_route==='onboarding-structure'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.onboarding_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(onboardingPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-onboarding-plan');}catch{failed.push('recomputed-onboarding-plan');}
   }
-  if(needs.scope?.outputs?.application_route==='pr364'){
-    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.pr364_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(pr364Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr364-plan');}catch{failed.push('recomputed-pr364-plan');}
-  }
-  if(needs.scope?.outputs?.application_route==='pr363'){
-    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const p=JSON.parse(needs.scope.outputs.pr363_plan),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();if(p.head!==head||JSON.stringify(pr363Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr363-plan');}catch{failed.push('recomputed-pr363-plan');}
-  }
   if(needs.scope?.outputs?.application_route==='report-planning'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.report_planning_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(reportPlanningPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-report-planning-plan');}catch{failed.push('recomputed-report-planning-plan');}
-  }
-  if(needs.scope?.outputs?.application_route==='pr357'){
-    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.pr357_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(pr357Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-pr357-plan');}catch{failed.push('recomputed-pr357-plan');}
-  }
-  if(needs.scope?.outputs?.application_route==='post356'){
-    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.post356_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(post356Plan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-post356-plan');}catch{failed.push('recomputed-post356-plan');}
   }
   if(needs.scope?.outputs?.application_route==='survey-governance'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.survey_governance_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(surveyGovernancePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-governance-plan');}catch{failed.push('recomputed-survey-governance-plan');}

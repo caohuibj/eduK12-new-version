@@ -11,13 +11,8 @@ import {selectCognitiveIntake, cognitiveTaskRoot} from './cognitive-intake-scope
 import {selectScaleIntake} from './scale-intake-scope.mjs';
 import {declarationReaders,verifiedDeclarativeContent} from './declarative-content.mjs';
 import {onboardingPlan,onboardingOutputs} from './onboarding-scope.mjs';
-import {pr364Plan,pr364Outputs} from './pr364-scope.mjs';
-import {pr363Plan,pr363Outputs} from './pr363-scope.mjs';
 import {reportPlanningPlan,reportPlanningOutputs} from './report-planning-scope.mjs';
 import {groupReportDraftPlan,groupReportDraftOutputs,groupReportDiffBase} from './group-report-draft.mjs';
-import {pr357Plan,pr357Outputs} from './pr357-scope.mjs';
-import {post356Plan,post356Outputs} from './post356-scope.mjs';
-import {refuseUnplannedPR356} from './pr356-entry.mjs';
 export {refuseUnplannedPR356} from './pr356-entry.mjs';
 import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
 import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
@@ -419,7 +414,6 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
-  refuseUnplannedPR356();
   const base = catalogDiffBase(process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),changedEntries);
   if((event==='push'||event==='pull_request'&&process.env.CI_PR_REPOSITORY===process.env.GITHUB_REPOSITORY)&&process.env.CI_FORCE_FULL!=='true'&&readEdgeScope(base)){const output={...edgeConfigOutputs(),diff_base:base};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   if((event==='push'||event==='pull_request'&&process.env.CI_PR_REPOSITORY===process.env.GITHUB_REPOSITORY)&&process.env.CI_FORCE_FULL!=='true'&&readMaintenanceRepairScope(base)){const output={...maintenanceRepairOutputs(),diff_base:base};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
@@ -430,16 +424,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const groupHead=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),groupBase=groupReportDiffBase(base,groupHead);
   const groupDraft=groupReportDraftPlan(event==='workflow_dispatch'?[]:changedEntries(groupBase),groupBase,groupHead);
   if(groupDraft){const output=groupReportDraftOutputs(groupDraft);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const pr364=pr364Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(pr364){const output=pr364Outputs(pr364);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const pr363=pr363Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(pr363){const output=pr363Outputs(pr363);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const reportPlanning=reportPlanningPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(reportPlanning){const output=reportPlanningOutputs(reportPlanning);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const pr357=pr357Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(pr357){const output=pr357Outputs(pr357);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
-  const post356=post356Plan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(post356){const output=post356Outputs(post356);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const surveyGovernance=surveyGovernancePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(surveyGovernance){const output=surveyGovernanceOutputs(surveyGovernance);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const polish=trainingPolishPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
