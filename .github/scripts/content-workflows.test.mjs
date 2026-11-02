@@ -86,7 +86,7 @@ test('content declarations keep pure schema/fixture/reference checks without dat
     assert.match(block,/npm run build/,name);
     assert.doesNotMatch(block,/npx tsx scripts\/bundle-content-check\.ts/,name);
   }
-  const scripts=JSON.parse(fs.readFileSync('server-version/backend/package.json','utf8')).scripts;
+  const scripts=JSON.parse(fs.readFileSync(new URL('../../server-version/backend/package.json',import.meta.url),'utf8')).scripts;
   assert.match(scripts.build,/bundle:manifest:check.*bundle:declarations:check/);
   assert.match(scripts['bundle:declarations:check'],/bundle-onboarding\.ts check-public$/);
   const inline=job(source('ci-backend'),'backend').match(/node --import tsx --input-type=module <<'JS'\n([\s\S]*?)\n\s+JS/)[1].replace(/^\s*import[^\n]*\n/gm,'');
