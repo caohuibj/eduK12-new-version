@@ -1,0 +1,6 @@
+type,prompt,required,min,max,integer_only
+NUMBER,Grade level for this learning context (4–12).,false,4,12,true
+TEXT,Subject or course for this learning context (optional).,false,,,
+TEXT,Researcher-provided class or course code (optional; do not enter a person’s name).,false,,,
+TEXT,School term or reference period for this learning context (optional).,false,,,
+LONG_TEXT,Any factual context needed to understand this setting (optional; please leave out names and private details).,false,,,
