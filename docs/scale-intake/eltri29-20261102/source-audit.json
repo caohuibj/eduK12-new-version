@@ -1,0 +1,96 @@
+{
+  "recordType": "source_audit_not_runtime_payload",
+  "base": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+  "sourceIdentity": "2018 English29-item reproduction; not original2010 Appendix II verified page-for-page",
+  "sources": [
+    {
+      "url": "https://eric.ed.gov/?id=EJ885935",
+      "read": "Indexed ERIC original abstract/bibliography; live page timed out; no ERIC fulltext link observed."
+    },
+    {
+      "url": "https://doi.org/10.1016/j.system.2010.03.003",
+      "read": "Publisher abstract index read; direct page403. Original author ResearchGate page no fulltext."
+    },
+    {
+      "url": "https://www.academia.edu/30933445/Development_of_English_language_teaching_reflection_inventory",
+      "read": "Public HTML original article methods, Table2, CFA and conclusion read. AppendixII instruction visible but table items absent from extracted HTML. No login/download bypass."
+    },
+    {
+      "url": "https://www.iier.org.au/iier28/rahimi.pdf",
+      "read": "Actual publisher25-page PDF obtained and read: methods760–761, complete AppendixA775–776 and descriptive AppendixD778. Pages775–776 table visually checked.",
+      "sha256": "20985f1105d08891e568008ca06e5dc8d2ac22501e870ac77e1253cbbf8d52db"
+    },
+    {
+      "url": "https://www.iier.org.au/iier-inf.html",
+      "read": "Current publisher copyright section states CC BY-ND4.0; not treated as third-party instrument-specific permission."
+    },
+    {
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.828901/full",
+      "read": "Methods: adapted36-item measure includes29 prior items plus7 moral items; different study/version, excluded. Article CC BY does not transfer original questionnaire rights."
+    }
+  ],
+  "fullReprintObtained": true,
+  "originalFinalAppendixPageComparisonCompleted": false,
+  "rights": {
+    "original": "Original2010 public article replica prints ©2010 Elsevier all rights reserved; no instrument-specific reuse grant located. Crossref license is TDM, not questionnaire administration/redistribution permission.",
+    "reprint": "Actual2018 PDF/abstract accessed lawfully on publisher site. Current IIER about page states CC BY-ND4.0; the2018 article PDF/abstract does not specify a separate license or third-party questionnaire reuse grant. No assumption of retroactive license or ownership of cited questionnaire.",
+    "publicScope": "Metadata, numbering/counts, citations and original project report guidance only; no questionnaire text, instructions, PDF, private item JSON or executable prototype.",
+    "actionNeeded": "Confirm with rights holder and, where relevant, IIER editor permission for electronic administration, extraction/splitting, translations and redistribution in intended platform scope. No contact sent or terms accepted."
+  },
+  "scorePreparation": {
+    "anchors": {
+      "1": "Never",
+      "2": "Rarely",
+      "3": "Sometimes",
+      "4": "Often",
+      "5": "Always"
+    },
+    "direction": "Higher raw responses indicate more frequent self-reported reflection, not better teaching quality.",
+    "subscaleMeansEvidence": "2018 AppendixD reports1–5 subscale means. Equal-weight raw means are a plausible operational candidate, not a separately verified original scoring manual.",
+    "reverseItems": "No explicit reverse-key instructions located; no operational key declared.",
+    "missingRule": "No official operational missing-data rule located. No imputation, cutoffs or norms invented.",
+    "range": "Prospective raw subscale mean1–5 only if matching scoring convention is confirmed; not an installed score.",
+    "total": "No mother total or cross-tool score implemented.",
+    "separateAdministration": "Source management split does not establish stand-alone subscale validity; preserve original29-item administration."
+  },
+  "contentLimitations": [
+    {
+      "reprintItem": 13,
+      "concern": "learning-style terminology",
+      "handling": "Preserve original if authorized; no learner type labels or learning-style-matching advice. Rewriting is another version and cannot inherit validation."
+    },
+    {
+      "subscale": "critical",
+      "handling": "Reflection on context and equity, never political-view/ethics screening or teacher ranking."
+    }
+  ],
+  "missing": [
+    "Original2010 AppendixII page-faithful final29-item table for source comparison",
+    "Instrument-specific rights scope for extraction, electronic administration, splitting, translation and redistribution",
+    "Verified operational score/reverse/missing guidance or confirmation of no defined scoring"
+  ],
+  "deduplication": {
+    "initialBase": "6cad86d8f721a45a47a91290edf1523519d1d239",
+    "allTrackedFiles": 13948,
+    "sourceAuthorNameDoiMatches": 0,
+    "openPrMatches": 0,
+    "productionAndAdminLibraryChecked": false,
+    "itemLevel": {
+      "method": "29 actual reprint first-line phrases normalized locally against tracked Scale instrument TS/JSON at refreshed main; potential exact wording collisions only, not semantic equivalence",
+      "instrumentFilesChecked": 598,
+      "sourceJsonCount": 257,
+      "matchingPhrases": [],
+      "productionChecked": false
+    },
+    "refreshedBase": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2"
+  },
+  "nativeStatus": {
+    "scales": 0,
+    "forms": 0,
+    "composites": 0,
+    "isolatedImport": "NOT_RUN_RIGHTS_SCOPE_UNCONFIRMED",
+    "development": "NOT_IMPORTED",
+    "production": "NOT_ACCESSED"
+  },
+  "formDecision": "No ancillary respondent form identified. Original AppendixI is development-expert interview, excluded. If full items are authorized but operational score stays absent, use existing native unscored Form rather than inventing scoring; rights uncertainty is not bypassed by Form."
+}

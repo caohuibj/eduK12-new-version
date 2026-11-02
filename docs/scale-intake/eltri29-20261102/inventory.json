@@ -1,0 +1,116 @@
+{
+  "motherTool": "ELTRI-29",
+  "sharedTag": "family:eltri29",
+  "sourceCandidates": [
+    {
+      "key": "eltri29_practical_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "label": "实践反思",
+      "itemCount": 6,
+      "reprintItemNumbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "source": "Rahimi & Weisi 2018 Appendix A, pp.775–776",
+      "sourceStatus": "FULL_REPRINT_READ_RIGHTS_SCOPE_PENDING",
+      "nativeScaleCreated": false,
+      "contentVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "eltri29_cognitive_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "label": "认知反思",
+      "itemCount": 6,
+      "reprintItemNumbers": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "source": "Rahimi & Weisi 2018 Appendix A, pp.775–776",
+      "sourceStatus": "FULL_REPRINT_READ_RIGHTS_SCOPE_PENDING",
+      "nativeScaleCreated": false,
+      "contentVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "eltri29_affective_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "label": "情感／学习者反思",
+      "itemCount": 3,
+      "reprintItemNumbers": [
+        13,
+        14,
+        15
+      ],
+      "source": "Rahimi & Weisi 2018 Appendix A, pp.775–776",
+      "sourceStatus": "FULL_REPRINT_READ_RIGHTS_SCOPE_PENDING",
+      "nativeScaleCreated": false,
+      "contentVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "eltri29_metacognitive_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "label": "元认知反思",
+      "itemCount": 7,
+      "reprintItemNumbers": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "source": "Rahimi & Weisi 2018 Appendix A, pp.775–776",
+      "sourceStatus": "FULL_REPRINT_READ_RIGHTS_SCOPE_PENDING",
+      "nativeScaleCreated": false,
+      "contentVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "key": "eltri29_critical_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "label": "批判反思",
+      "itemCount": 7,
+      "reprintItemNumbers": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "source": "Rahimi & Weisi 2018 Appendix A, pp.775–776",
+      "sourceStatus": "FULL_REPRINT_READ_RIGHTS_SCOPE_PENDING",
+      "nativeScaleCreated": false,
+      "contentVersion": null,
+      "parameterVersion": null,
+      "reportVersion": null
+    }
+  ],
+  "candidateCount": 5,
+  "nativeScaleCount": 0,
+  "nativeFormCount": 0,
+  "optionalCompositeCreated": false,
+  "futureComposite": "原完整29项组卷，按原分量并列呈现；无母工具总分，不宣称拆开施测等值。",
+  "excluded": [
+    "42-item developmental pool and morality component",
+    "2010 Appendix I nine development-expert interview questions, not participant form",
+    "2022 adapted ELTRI36 with new moral items",
+    "IIER Appendix B self-efficacy and Appendix C research practice instruments"
+  ]
+}

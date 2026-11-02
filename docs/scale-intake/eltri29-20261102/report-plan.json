@@ -1,0 +1,46 @@
+{
+  "status": "EDITORIAL_PLAN_NOT_EXECUTABLE",
+  "language": "zh-CN project original editorial; not validated Chinese questionnaire",
+  "respondent": "teacher_self",
+  "recipient": "same teacher under existing recipient authorization and release settings",
+  "reportVersion": null,
+  "score": null,
+  "examples": [
+    {
+      "scenario": "normal",
+      "isScoreThreshold": false,
+      "text": "你提供的反思经历能帮助你找到下一步的小尝试。选择最近一节英语课的一处教学决定，记下你依据的学习证据，再在下一节课观察效果。反思频率只是自述，不能证明课堂质量或学生进步。",
+      "microActions": [
+        "选一个具体教学决定，记下依据。",
+        "观察一次调整后的学生学习表现。"
+      ]
+    },
+    {
+      "scenario": "difficulty_or_low_reported_frequency",
+      "isScoreThreshold": false,
+      "text": "如果最近较少有时间记录或交流，不代表你不关心学生或教学能力不足。工作安排、支持资源和反思方式都可能影响作答。可以先用两分钟写下一件课堂小事，与可信同事讨论一个问题；不必为了得分增加负担。",
+      "microActions": [
+        "用两分钟记录一次具体经历。",
+        "自愿与可信同事讨论一个可调整的问题。"
+      ]
+    },
+    {
+      "scenario": "insufficient_evidence",
+      "isScoreThreshold": false,
+      "text": "本项目尚未核实本题本的使用范围及操作计分说明，目前没有你的可解释测量结果。不能据缺失答案推断你的反思能力或教学表现。材料齐备并按原权限发布后，再由你选择是否参与。",
+      "microActions": [
+        "需要时可自愿记录一个想进一步了解的课堂问题。"
+      ]
+    }
+  ],
+  "dimensionActions": {
+    "practical": "在不增加负担的前提下留一条课后记录，或自愿和同事交流。",
+    "cognitive": "围绕一个真实课堂问题找一份相关研究，关注证据适用条件。",
+    "affective": "自愿询问学生哪种任务帮助理解并结合实际表现，不给学生贴学习风格标签。",
+    "metacognitive": "选一个教学假设，对照一次具体课堂证据。",
+    "critical": "审视任务是否给不同背景学生公平的参与机会；尊重隐私与适龄讨论。"
+  },
+  "noScoreForm": "Only descriptive responses and voluntary reflection; no numerical/profile report.",
+  "groupDisclosure": "Existing authorized aggregation/anonymity/minimum-size rules only; no individual sensitive responses disclosed by adding this report plan.",
+  "renderingTest": "NOT_RUN_NO_AUTHORIZED_EXECUTABLE"
+}

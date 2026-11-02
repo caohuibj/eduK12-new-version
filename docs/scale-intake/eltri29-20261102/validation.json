@@ -1,0 +1,78 @@
+{
+  "status": "SOURCE_CANDIDATE_BOUNDARY_PASS",
+  "recordedAt": "2026-11-02T02:06:08.271Z",
+  "base": "6cbf4eaa5a269f54f9872b656d0294a48ec15dc2",
+  "node": "v24.19.0",
+  "checks": [
+    {
+      "key": "eltri29_practical_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "catalogValidation": "PASS",
+      "discoverable": true,
+      "administrable": false,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "ff0fded990e2ecc11e89a920f8bd6d2953dd4e5a1558627680edb8f5d2c271b5"
+    },
+    {
+      "key": "eltri29_cognitive_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "catalogValidation": "PASS",
+      "discoverable": true,
+      "administrable": false,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "e6bfd41f0b6d3b72150f53c7ae6e94b445bba99d3e23fae36ac0bd528ca19c99"
+    },
+    {
+      "key": "eltri29_affective_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "catalogValidation": "PASS",
+      "discoverable": true,
+      "administrable": false,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "9dba8bc2d59b6d95c2fafb026e0f532046bce09205af506292fbefa6f56f8775"
+    },
+    {
+      "key": "eltri29_metacognitive_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "catalogValidation": "PASS",
+      "discoverable": true,
+      "administrable": false,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "95004ffb5b8f866cdec587fb79f23446b945108a8f494851aeadf161c658307b"
+    },
+    {
+      "key": "eltri29_critical_teacher_en_2018",
+      "metadataVersion": "1.0.0",
+      "catalogValidation": "PASS",
+      "discoverable": true,
+      "administrable": false,
+      "reportEligible": false,
+      "materialization": "REJECTED_BEFORE_DB_ACCESS",
+      "sourceSha256": "c1cedd1b10c2e1351f35225e35a6aa5490a4edba1f55a3a60fc80651bfc9743b"
+    }
+  ],
+  "databaseReads": 0,
+  "originalReprintItemsVerified": 29,
+  "reportEditorialExamples": 3,
+  "reportRendering": "NOT_RUN_NO_AUTHORIZED_EXECUTABLE",
+  "nativeScaleCount": 0,
+  "nativeFormCount": 0,
+  "notRun": [
+    "Executable item schema/scoring fixtures/report renderer (rights scope and operational guidance pending)",
+    "Isolated import; candidate rejection does not mean database import passed",
+    "Development/production access or writes",
+    "Browser/full-platform tests",
+    "Formal CI at recording time"
+  ],
+  "notClaimed": [
+    "Original2010 AppendixII compared page-faithfully",
+    "Independent administration of subscales validated",
+    "Instrument rights approved",
+    "Chinese validated translation",
+    "Human independent scientific approval"
+  ]
+}
