@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "panorama_ss_guide_school_perseverance_g3_5_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Panorama Student Survey｜坚持与目标推进｜3–5年级｜学生填答",
+      "abbreviation": "Panorama-SS-g3_5-EN",
+      "instrumentFamily": "Panorama Student Survey | public User Guide snapshot (PDF metadata 2024-10-30; official release ID unknown)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "学生对坚持与目标推进的主观感知；Perseverance独立模块的来源元数据，不代表客观教学成效或个人能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:panorama_student_survey",
+        "usecase:student_feedback",
+        "evaluation:student_evaluation",
+        "evaluation_target:school",
+        "context:school",
+        "grade:3_5",
+        "age:chronological_not_specified",
+        "respondent:student",
+        "locale:en",
+        "rights:public_redist_unknown",
+        "availability:catalog_only",
+        "maturity:pilot",
+        "source:public_guide_snapshot",
+        "scoring:not_runtime",
+        "report:draft_only"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 3,
+        "maxGrade": 5
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原指南p.3指定3–5年级学生填答；SELF指学生自述自身感知，不将评价对象改为学生。评价对象见evaluation_target标签。未推定确切年龄界限；K–2不适用。中国情境与本数字版本效度未建立。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "PAPER",
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "各题沿用原情境与措辞；不存在已核统一回忆期；本目录不可施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原指南p.25的整模块及对应年级表，不另截短；模块可选依据p.2与p.4。",
+        "逐题5级；不能用统一同意度选项替换原选项。本表原选项从较少到较多的积极感知排列；仍须逐题核定方向。",
+        "目录estimatedMinutes为项目按约每题20秒、最低2分钟的排程估计，非官方建议或实测；数字施测模式只是未来候选。",
+        "元数据无现有运行时课堂/学校评价对象绑定，未据此授予或扩展入口权限。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前只用于来源排重、版本定位和后续授权范围内的导入准备；整模块选用有官方指南依据，当前数字实例无验证证据。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Panorama Education, User Guide: Panorama Student Survey, p.25, 3–5年级英文表；只登记元数据，无题项翻译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "中文目录名与原创报告方向不是中文版题本；未声明官方题本发行日期或新版商业题库覆盖。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "User Guide: Panorama Student Survey — Perseverance, grades 3–5, p.25",
+      "citation": "Panorama Education; development led by Hunter Gehlbach with Harvard Graduate School of Education researchers. Public User Guide retrieved 2026-11-02. PDF metadata created 2024-10-30; formal instrument edition not stated.",
+      "url": "https://panorama-www.s3.amazonaws.com/files/User-Guide.pdf"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "坚持与目标推进"
+      ],
+      "limitations": [
+        "仅目录候选；无公开题文、选项、可执行计分、常模或结果报告。",
+        "原指南p.25，3–5年级英文表，共5题。题本快照SHA-256见本批README；PDF元数据日期不是官方发布版本号。",
+        "逐题5级；不能用统一同意度选项替换原选项。本表原选项从较少到较多的积极感知排列；仍须逐题核定方向。",
+        "官方效度报告p.7说明研究分析用1–5主题均分与超过半数漏答排除；具体历史题本、年龄表与报告所分析题集尚未逐项绑定。",
+        "公开下载未确证公开Git再分发、商用电子施测及翻译的授权范围；目录备注不构成授权记录。",
+        "不生成跨模块总分、教师排名、诊断或中国学生常模；英文资料不构成已验证中文版。",
+        "填答者与报告接收者分别核定；不因填写评教就开放原保密结果，不改匿名、发布、最小人数或接收者授权。"
+      ],
+      "disclaimer": "学生接收版原创草稿：这些回答说的是你感受到的坚持与目标推进，不是能力评定。可以尝试：把想做的事分成一个小步骤；太累或遇到困难时可以找人帮忙。 仅在既有结果接收者授权允许时可见；教师版另用授权群体汇总，不披露学生个体。本目录无可执行报告或R版本。"
+    },
+    "blockers": [
+      "PUBLIC_ITEM_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "DIGITAL_COMMERCIAL_USE_NOT_ESTABLISHED",
+      "EXACT_GUIDE_TO_SCORING_REPORT_MAPPING_NOT_VERIFIED"
+    ]
+  }
+}
