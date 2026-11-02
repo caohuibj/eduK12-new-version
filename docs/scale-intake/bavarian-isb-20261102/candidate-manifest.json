@@ -1,0 +1,232 @@
+{
+  "recordType": "source_research_and_intake_plan_NOT_a_native_import_payload",
+  "mother": {
+    "key": "bavarian_isb_unterrichtsgestaltung",
+    "name": "Bavarian ISB Unterrichtsqualität / Unterrichtsgestaltung — five-criterion legacy teacher self-reflection",
+    "sharedTag": "family:bavarian_isb_unterrichtsgestaltung",
+    "metadataVersion": "0.1.0"
+  },
+  "baseSha": "25d812d1f024bcc375b738235dd400654c679ff4",
+  "source": {
+    "landingPage": "https://www.isb.bayern.de/schulqualitaet/qualitaetssicherung/evaluation-konzeption-und-methoden/interne-evaluation/unterrichtsqualitaet/",
+    "manualUrl": "https://www.isb.bayern.de/fileadmin/user_upload/Qualitaetsagentur/Fotos/anleitung_gestaltung.pdf",
+    "manualSha256": "d0a32365f7f099625eed942fd4c38a139b04a43f489896719762239b1f4c3270",
+    "manualPages": 6,
+    "issuer": "ISB landing page; Bayerisches Landesamt für Schule / Qualitätsagentur on manual illustration",
+    "edition": "Undated legacy five-criterion instrument; retrieval 2026-11-02 is not a publication year",
+    "itemCount": null,
+    "responseFormatVerified": "five-point agreement; screenshot only, not a complete questionnaire",
+    "numericMapping": "Original workbook not obtained; no scoring parameters authored",
+    "rightsStatus": "CONSENT_REQUIRED_NOT_OBTAINED",
+    "rightsUrl": "https://www.isb.bayern.de/impressum/",
+    "additionalRightsUrl": "https://www.las.bayern.de/meta/impressum/index.html"
+  },
+  "children": [
+    {
+      "candidateKey": "bavarian_isb_individual_support_teacher_de",
+      "title": "Bavarian ISB｜个别支持｜教师自评｜DE·五专题原件待补",
+      "sourceModule": "Individuelle Unterstützung",
+      "proposedKind": "FORM",
+      "status": "NOT_IMPORTABLE_MISSING_COMPLETE_ITEMS_AND_PERMISSION",
+      "metadataVersion": "0.1.0",
+      "contentVersion": null,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": null,
+      "language": "de",
+      "role": "teacher_self",
+      "schoolStage": "NOT_SPECIFIED_BY_VERIFIED_SOURCE",
+      "tags": [
+        "family:bavarian_isb_unterrichtsgestaltung",
+        "role:teacher_self",
+        "language:de",
+        "stage:unspecified",
+        "source_version:undated_five_criteria_legacy",
+        "use:developmental_reflection",
+        "state:source_pending"
+      ],
+      "independentAdministrationEvidence": "NOT_ESTABLISHED",
+      "source": "https://www.isb.bayern.de/schulqualitaet/qualitaetssicherung/evaluation-konzeption-und-methoden/interne-evaluation/unterrichtsqualitaet/"
+    },
+    {
+      "candidateKey": "bavarian_isb_self_directed_learning_teacher_de",
+      "title": "Bavarian ISB｜自主学习支持｜教师自评｜DE·五专题原件待补",
+      "sourceModule": "Förderung selbstgesteuerten Lernens",
+      "proposedKind": "FORM",
+      "status": "NOT_IMPORTABLE_MISSING_COMPLETE_ITEMS_AND_PERMISSION",
+      "metadataVersion": "0.1.0",
+      "contentVersion": null,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": null,
+      "language": "de",
+      "role": "teacher_self",
+      "schoolStage": "NOT_SPECIFIED_BY_VERIFIED_SOURCE",
+      "tags": [
+        "family:bavarian_isb_unterrichtsgestaltung",
+        "role:teacher_self",
+        "language:de",
+        "stage:unspecified",
+        "source_version:undated_five_criteria_legacy",
+        "use:developmental_reflection",
+        "state:source_pending"
+      ],
+      "independentAdministrationEvidence": "NOT_ESTABLISHED",
+      "source": "https://www.isb.bayern.de/schulqualitaet/qualitaetssicherung/evaluation-konzeption-und-methoden/interne-evaluation/unterrichtsqualitaet/"
+    },
+    {
+      "candidateKey": "bavarian_isb_learning_motivation_teacher_de",
+      "title": "Bavarian ISB｜学习动机支持｜教师自评｜DE·五专题原件待补",
+      "sourceModule": "Förderung der Lernmotivation",
+      "proposedKind": "FORM",
+      "status": "NOT_IMPORTABLE_MISSING_COMPLETE_ITEMS_AND_PERMISSION",
+      "metadataVersion": "0.1.0",
+      "contentVersion": null,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": null,
+      "language": "de",
+      "role": "teacher_self",
+      "schoolStage": "NOT_SPECIFIED_BY_VERIFIED_SOURCE",
+      "tags": [
+        "family:bavarian_isb_unterrichtsgestaltung",
+        "role:teacher_self",
+        "language:de",
+        "stage:unspecified",
+        "source_version:undated_five_criteria_legacy",
+        "use:developmental_reflection",
+        "state:source_pending"
+      ],
+      "independentAdministrationEvidence": "NOT_ESTABLISHED",
+      "source": "https://www.isb.bayern.de/schulqualitaet/qualitaetssicherung/evaluation-konzeption-und-methoden/interne-evaluation/unterrichtsqualitaet/"
+    },
+    {
+      "candidateKey": "bavarian_isb_learning_retention_teacher_de",
+      "title": "Bavarian ISB｜学习巩固｜教师自评｜DE·五专题原件待补",
+      "sourceModule": "Sicherung des Lernerfolgs",
+      "proposedKind": "FORM",
+      "status": "NOT_IMPORTABLE_MISSING_COMPLETE_ITEMS_AND_PERMISSION",
+      "metadataVersion": "0.1.0",
+      "contentVersion": null,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": null,
+      "language": "de",
+      "role": "teacher_self",
+      "schoolStage": "NOT_SPECIFIED_BY_VERIFIED_SOURCE",
+      "tags": [
+        "family:bavarian_isb_unterrichtsgestaltung",
+        "role:teacher_self",
+        "language:de",
+        "stage:unspecified",
+        "source_version:undated_five_criteria_legacy",
+        "use:developmental_reflection",
+        "state:source_pending"
+      ],
+      "independentAdministrationEvidence": "NOT_ESTABLISHED",
+      "source": "https://www.isb.bayern.de/schulqualitaet/qualitaetssicherung/evaluation-konzeption-und-methoden/interne-evaluation/unterrichtsqualitaet/"
+    },
+    {
+      "candidateKey": "bavarian_isb_cross_curricular_competencies_teacher_de",
+      "title": "Bavarian ISB｜跨领域能力支持｜教师自评｜DE·五专题原件待补",
+      "sourceModule": "Förderung überfachlicher Kompetenzen",
+      "proposedKind": "FORM",
+      "status": "NOT_IMPORTABLE_MISSING_COMPLETE_ITEMS_AND_PERMISSION",
+      "metadataVersion": "0.1.0",
+      "contentVersion": null,
+      "parametersVersion": null,
+      "reportVersion": null,
+      "itemCount": null,
+      "language": "de",
+      "role": "teacher_self",
+      "schoolStage": "NOT_SPECIFIED_BY_VERIFIED_SOURCE",
+      "tags": [
+        "family:bavarian_isb_unterrichtsgestaltung",
+        "role:teacher_self",
+        "language:de",
+        "stage:unspecified",
+        "source_version:undated_five_criteria_legacy",
+        "use:developmental_reflection",
+        "state:source_pending"
+      ],
+      "independentAdministrationEvidence": "NOT_ESTABLISHED",
+      "source": "https://www.isb.bayern.de/schulqualitaet/qualitaetssicherung/evaluation-konzeption-und-methoden/interne-evaluation/unterrichtsqualitaet/"
+    }
+  ],
+  "missingOriginals": [
+    {
+      "filename": "unterrichtsgestaltung_lehrer.docx",
+      "role": "teacher_self",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/unterrichtsgestaltung_lehrer.docx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Exact teacher wording, item order, topic membership and all instructions"
+    },
+    {
+      "filename": "unterrichtsgestaltung_schueler.docx",
+      "role": "student",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/unterrichtsgestaltung_schueler.docx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Exact student wording, source age range and actual teacher/student item mapping; not required to start a standalone teacher form once its own source/rights are available"
+    },
+    {
+      "filename": "unterrichtsgestaltung_hospitation.docx",
+      "role": "observer",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/unterrichtsgestaltung_hospitation.docx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Exact observation template and topic boundaries; separate identity, no inferred teacher-to-observer rewrite"
+    },
+    {
+      "filename": "ausw_gestaltung.xlsx",
+      "role": "analysis",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/ausw_gestaltung.xlsx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Original item-level coding, formulas, nonresponse handling and any original grouping; not needed to invent scores or block a legitimately obtained unscored Form"
+    }
+  ],
+  "runtime": {
+    "imported": false,
+    "nativeForms": 0,
+    "nativeScales": 0,
+    "databaseWritten": false,
+    "contentInstalled": false,
+    "parametersInstalled": false,
+    "reportsInstalled": false,
+    "noCrossModuleTotal": true,
+    "noTeacherStudentDifferenceScore": true
+  },
+  "optionalOrdinaryCombination": {
+    "status": "PLAN_ONLY_CONDITIONAL_ON_COMPLETE_ITEMS_AND_PERMISSION",
+    "members": [
+      "bavarian_isb_individual_support_teacher_de",
+      "bavarian_isb_self_directed_learning_teacher_de",
+      "bavarian_isb_learning_motivation_teacher_de",
+      "bavarian_isb_learning_retention_teacher_de",
+      "bavarian_isb_cross_curricular_competencies_teacher_de"
+    ],
+    "sourceOrderPreserved": true,
+    "combinedScore": null,
+    "note": "Future ordinary questionnaire organization only; no engine or frozen package created. Teacher-only use is permitted as a workflow concept; no paired administration prerequisite invented."
+  },
+  "deduplication": {
+    "mainSha": "25d812d1f024bcc375b738235dd400654c679ff4",
+    "mainSourceJsonFilesSearched": 235,
+    "openPrTitlesAndBodiesSearched": 54,
+    "matchingMotherSourceFound": false,
+    "notChecked": [
+      "production database",
+      "administrator-created private tools",
+      "every open PR file body"
+    ]
+  },
+  "newerVersionNotSubstituted": {
+    "name": "BETSIE Unterrichtsqualität — 15 modules",
+    "url": "https://betsie.las.bayern.de/de_DE/start/befragungsinhalte/unterrichtsqualitaet.html",
+    "teacherPreview": "https://betsie.las.bayern.de/de_DE/vorschau/modul/23/1.html",
+    "status": "VERSION_DISTINCTION_ONLY_NOT_IMPORTED_NOT_ASSIGNED_AS_NEW_TOOL",
+    "reason": "Different module inventory, wording and validation assertions; no equivalence or authorization transfer to the legacy five-criterion instrument."
+  }
+}

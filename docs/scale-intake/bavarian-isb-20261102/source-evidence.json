@@ -1,0 +1,96 @@
+{
+  "status": "SOURCE_AND_RIGHTS_RESEARCH_COMPLETE_NATIVE_INTAKE_BLOCKED",
+  "checkedAt": "2026-11-02T01:39:45.166689+00:00",
+  "completeOfficialFiles": {
+    "manual": {
+      "url": "https://www.isb.bayern.de/fileadmin/user_upload/Qualitaetsagentur/Fotos/anleitung_gestaltung.pdf",
+      "status": 200,
+      "pages": 6,
+      "sha256": "d0a32365f7f099625eed942fd4c38a139b04a43f489896719762239b1f4c3270",
+      "scopeRead": "all text and visual screenshots pp.2 and 5; illustrations are explicitly excerpts, not full item sets"
+    }
+  },
+  "missingOfficialFiles": [
+    {
+      "filename": "unterrichtsgestaltung_lehrer.docx",
+      "role": "teacher_self",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/unterrichtsgestaltung_lehrer.docx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Exact teacher wording, item order, topic membership and all instructions"
+    },
+    {
+      "filename": "unterrichtsgestaltung_schueler.docx",
+      "role": "student",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/unterrichtsgestaltung_schueler.docx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Exact student wording, source age range and actual teacher/student item mapping; not required to start a standalone teacher form once its own source/rights are available"
+    },
+    {
+      "filename": "unterrichtsgestaltung_hospitation.docx",
+      "role": "observer",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/unterrichtsgestaltung_hospitation.docx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Exact observation template and topic boundaries; separate identity, no inferred teacher-to-observer rewrite"
+    },
+    {
+      "filename": "ausw_gestaltung.xlsx",
+      "role": "analysis",
+      "url": "https://www.las.bayern.de/qualitaetsagentur/evaluation_konzeption_methoden/downloads/ausw_gestaltung.xlsx",
+      "httpStatus": 404,
+      "completeContentObtained": false,
+      "neededFor": "Original item-level coding, formulas, nonresponse handling and any original grouping; not needed to invent scores or block a legitimately obtained unscored Form"
+    }
+  ],
+  "officialPageSnapshots": {
+    "landingPageSha256": "802ab844edc00de5e047f68cad1383e1ab763cc38d4710ae391038e9315ff143",
+    "isbImpressumSha256": "faf93dbfd7e014bea4e67cd6666a9e8bfc9fc575cf64028b9ccd1f703931676a"
+  },
+  "secondaryMigrationChecks": {
+    "isbManualDirectorySameFourBasenames": "4 x HTTP404",
+    "manualShortNameAliasesInISBAndLASDirectories": "6 x HTTP404",
+    "search": "exact filenames and module titles searched; no complete same-version official replacement located"
+  },
+  "verifiedFacts": [
+    {
+      "claim": "five criterion titles and teacher self-assessment purpose",
+      "source": "official landing page and manual p.1"
+    },
+    {
+      "claim": "five response levels",
+      "source": "manual p.2 text and figure1"
+    },
+    {
+      "claim": "item-level teacher values/student means and student response distributions, not a psychometric cross-module total",
+      "source": "manual p.5 figure6 and explanatory text"
+    },
+    {
+      "claim": "some teacher and student items have no parallel counterpart",
+      "source": "manual p.5 notice"
+    },
+    {
+      "claim": "reflection variations and anonymity requirement",
+      "source": "manual p.6"
+    },
+    {
+      "claim": "electronic/printed republication of copyright-protected material requires consent; no instrument-specific open permission located",
+      "source": "ISB Impressum Nutzungsbedingungen and LAS Impressum"
+    }
+  ],
+  "validation": {
+    "jsonParse": "PASS",
+    "fiveCandidateIdsUnique": "PASS",
+    "tagsUseExistingReferenceTagsPattern": "PLAN_ONLY_NO_RUNTIME_SAVE_CLAIM",
+    "itemsInPublicCommit": 0,
+    "protectedOriginalFilesInPublicCommit": 0,
+    "nativeSchemaCompile": "NOT_RUN_NO_COMPLETE_NATIVE_DEFINITION",
+    "scoringBoundaries": "NOT_RUN_NO_SCORER_OR_PARAMETERS",
+    "isolatedDatabaseImport": "NOT_RUN_NO_COMPLETE_LEGALLY_REUSABLE_CONTENT",
+    "runtimeReport": "NOT_CREATED",
+    "fullPlatformTests": "NOT_RUN_NO_PLATFORM_CHANGE",
+    "officialCI": "NOT_RUN_NOT_CLAIMED"
+  },
+  "permissionContact": "No email or external message sent; use official content-responsible contact listed on the landing page if the user elects to request original files and permission."
+}
