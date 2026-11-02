@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mass_dese_student_mini_i_g3_5_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Massachusetts DESE｜Mini Standard I｜3–5年级｜学生（目录候选）",
+      "abbreviation": "MA-DESE",
+      "instrumentFamily": "Massachusetts DESE Model Feedback Instruments"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [
+        "TEACHER_OBSERVATION"
+      ],
+      "constructDefinition": "Mini Standard I官方独立表单的来源目录；学生反馈教师与课堂实践。保留原组卷，不把标准/指标映射自动当作可独立施测量表；不合成长短版或跨学段总分。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "mother:massachusetts_dese",
+        "source:Massachusetts_DESE",
+        "state:PILOT",
+        "availability:catalog_only",
+        "language:en",
+        "rights:redistribution_scope_unresolved",
+        "scoring:not_installed",
+        "report:not_installed",
+        "form:mini_i",
+        "grade:g3_5",
+        "respondent:student",
+        "evaluation_target:teacher_and_classroom",
+        "age:grade_defined_no_age_conversion",
+        "学生评教",
+        "评价对象:教师",
+        "评价对象:课堂"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "OBSERVER"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原版英文，适用角色/年级：3–5年级；学生填答，评价teacher_and_classroom。年级不能自动换算为年龄，不外推中国K12效度或中文验证。OBSERVER为既有目录枚举；具体学生评教关系见educationApplicability。",
+      "gradeRange": {
+        "minGrade": 3,
+        "maxGrade": 5
+      }
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "PAPER"
+      ],
+      "timeFrame": "原表针对该教师课堂/该管理者的实践反馈，没有据此设定固定过去若干天；本目录不能用于施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Mini estimatedMinutes=10只是项目预留排程预算，官方独立时长未确认，不能当作实测或推荐时长。",
+        "当前官方文件正式编号题共8题；题项键、可选评论、补充/替换题不混入正式题数。",
+        "保留原表单和原锚点；不公开复制题文、指导语、完整条目键或译本。",
+        "普通组合只可选用同一学段的一种版本，附原版可选无分评论；无跨工具总分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "官网建议专业反思用途；2014研究题本与当前下载题数不同，当前精确表单的证据映射未确认，仅登记不可施测的来源目录。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-i.docx",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "仅官方英文来源索引；没有创建或声称已验证的中文译本。2014技术报告与当前下载版本的对应范围见同母工具证据。"
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "DESE Model Student Feedback Survey — 3–5年级, Mini Standard I",
+      "citation": "Massachusetts Department of Elementary and Secondary Education. Model Feedback Instruments & Administration Protocols. Current official DOCX retrieved 2026-11-02; not assigned a new official edition year.",
+      "url": "https://www.doe.mass.edu/edeval/evidence/feedback/g3-5mini-form-i.docx"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "内容映射：Standard I: Curriculum, Planning & Assessment"
+      ],
+      "limitations": [
+        "目录候选不生成个体、班级或教师评分报告。",
+        "标准/指标为官方内容对应；拆开施测的效度、Mini独立信度和当前题本与2014试测的对应须分别审查。",
+        "不使用常模、优秀教师排名、跨来源总分或中文验证声明。",
+        "原指导语承诺教师不看个人答案；既有披露能力是否能兑现须在启用前核定，不通过删改原承诺绕开。",
+        "2014报告研究3–5长46/短25及6–12长56/短25题；当前40/20及45/20题不能直接继承全部效度或计分规则。",
+        "2014报告§6.2不建议短版拆报Standard/Indicator；Standard I信度不足，尤其3–5年级。保留原组卷，不据Mini名称扩展独立量表效度。",
+        "按获准接收者分别审阅3–5/6–12学生文案和教师群体汇总，覆盖一般体验、较困难体验、证据不足；示例见docs/scale-instruments/mass-dese/1.0.0/report-examples.md。",
+        "官方题文与题项来源许可需逐项核定；不把2014技术报告的非商业教育复制说明当作当前全题本改编或收费再分发许可。"
+      ],
+      "disclaimer": "候选待审；未安装内容、计分参数或评分报告，不可公开施测。"
+    },
+    "blockers": [
+      "PUBLIC_EDITABLE_REDISTRIBUTION_SCOPE_UNRESOLVED",
+      "SCORING_AND_REPORT_NOT_INSTALLED",
+      "PRODUCTION_CUSTOM_TOOL_DEDUP_NOT_VERIFIED",
+      "MINI_INDEPENDENT_VALIDITY_NOT_ESTABLISHED",
+      "HISTORICAL_2014_FORM_TO_CURRENT_MAPPING_UNVERIFIED",
+      "THIRD_PARTY_ITEM_RIGHTS_SCOPE_UNRESOLVED"
+    ]
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "STUDENT_REPORT"
+      }
+    ]
+  }
+}

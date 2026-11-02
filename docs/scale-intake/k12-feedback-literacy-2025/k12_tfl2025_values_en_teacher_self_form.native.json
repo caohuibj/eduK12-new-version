@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "v_reflection",
+      "title": "中国K12反馈素养｜反馈价值无分反思｜教师自评｜2025英文公开题文",
+      "description": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "questions": [
+        {
+          "itemKey": "v1",
+          "type": "LONG_TEXT",
+          "prompt": "V1: I don’t see feedback as making simple judgments, but as an opportunity for personal growth and development for teachers.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v2",
+          "type": "LONG_TEXT",
+          "prompt": "V2: I believe that constructive feedback is conducive to creating a positive learning environment.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v3",
+          "type": "LONG_TEXT",
+          "prompt": "V3: I believe that feedback promotes student autonomy and self-regulated learning.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v4",
+          "type": "LONG_TEXT",
+          "prompt": "V4: I believe that engaging students in feedback enhances their motivation to learn.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v5",
+          "type": "LONG_TEXT",
+          "prompt": "V5: I think feedback has an impact on students’ emotions.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v6",
+          "type": "LONG_TEXT",
+          "prompt": "V6: I believe that feedback challenges and grows students.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v7",
+          "type": "LONG_TEXT",
+          "prompt": "V7: When providing constructive feedback, I think it is important to use appropriate language and tone.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "v8",
+          "type": "LONG_TEXT",
+          "prompt": "V8: I think building a trusting relationship with students makes them more open to feedback.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}

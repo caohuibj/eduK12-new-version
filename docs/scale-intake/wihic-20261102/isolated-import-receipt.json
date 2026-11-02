@@ -1,0 +1,108 @@
+{
+  "status": "ISOLATED_DEVELOPMENT_DATABASE_IMPORTED",
+  "database": "wihic_intake_test_20261102",
+  "postgresVersion": "PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2)",
+  "migrationsApplied": 273,
+  "importMethod": "existing materializeScaleInstrumentContent with createScaleInstrumentRegistry; hidden DRAFT only",
+  "syntheticAdministrator": true,
+  "scales": [
+    {
+      "instrumentKey": "wihic_cooperation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "5cb6f9c88e20039b7c504698c04b35833ccd14763358aec52b62e96e90bbe44f",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    },
+    {
+      "instrumentKey": "wihic_equity_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "88c4538442409ac03f4c4c4d2d6589fe7c6d9099efea0d35ad6ddf78638457d4",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    },
+    {
+      "instrumentKey": "wihic_investigation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "89aa2660f3a146f14590a7c94e8b29b3f5c3b0e934a96eadd6a4a29eaa6d4113",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    },
+    {
+      "instrumentKey": "wihic_involvement_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "88f1eebd47b27bc86b73925acb524d5386ff9aa33089314e2be89faf64f8f2af",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    },
+    {
+      "instrumentKey": "wihic_student_cohesiveness_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "9ba891427f470a9963924292820d318dffce23b4edfe3a0db98444ae24691bd1",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    },
+    {
+      "instrumentKey": "wihic_task_orientation_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "c1ed59986723c0c47ef855e93dbcf8215ad06fa4434af00f7790d404182608c7",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    },
+    {
+      "instrumentKey": "wihic_teacher_support_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "itemCount": 8,
+      "definitionHash": "e29a5f4471a9209250f0d81bada28c922dc0b7adfe0d3cf1a376de788b7632a9",
+      "created": true,
+      "verifiedByReadbackAfterDiagnosticFailure": true,
+      "instructionMatched": true
+    }
+  ],
+  "immutableAxisSnapshots": 7,
+  "activeDeploymentRevisions": 0,
+  "catalogCandidatesNotMaterialized": [
+    {
+      "instrumentKey": "wihic52_actual_zh_cn_upper_secondary_student",
+      "instrumentVersion": "1.0.0"
+    },
+    {
+      "instrumentKey": "wihic56_actual_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0"
+    },
+    {
+      "instrumentKey": "wihic56_preferred_en_lower_secondary_student",
+      "instrumentVersion": "1.0.0"
+    }
+  ],
+  "productionDatabaseQueried": false,
+  "productionWrites": false,
+  "compositeCreated": false,
+  "retainedForReview": true,
+  "readbackRecordedAt": "2026-11-02T00:34:42.125957+00:00"
+}

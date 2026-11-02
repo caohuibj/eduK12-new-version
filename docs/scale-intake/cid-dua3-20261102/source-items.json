@@ -1,0 +1,92 @@
+{
+  "reference": {
+    "source": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1921354/full",
+    "doi": "10.3389/feduc.2026.1921354",
+    "published": "2026-09-09",
+    "authors": [
+      "Marta Gómez Martín",
+      "Purificación Cruz Cruz",
+      "Amparo Martínez Cano",
+      "Inés Martín Cruz"
+    ],
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "sourceTable": "Table 2",
+    "sourceItemIds": [
+      "I1",
+      "I2",
+      "I3",
+      "I4",
+      "I5",
+      "I6",
+      "I7",
+      "I8",
+      "I9",
+      "I10",
+      "I11",
+      "I12"
+    ],
+    "tags": [
+      "family:cid_dua3",
+      "role:teacher_self",
+      "stage:mixed_teaching_contexts",
+      "language:en",
+      "source_version:2026_revised_12",
+      "use:reflection",
+      "status:PILOT",
+      "license:cc_by_4_0"
+    ],
+    "adaptation": "Original published English statements preserved. Original response anchors are not reported; project-created optional text evidence fields and Chinese page guidance replace the unknown frequency response protocol. This is an unscored adaptation, not administration or validation of the original CID-DUA3.",
+    "languageStatus": "published_English_item_text_with_project_Chinese_instructions_not_validated_Chinese_scale"
+  },
+  "items": [
+    {
+      "sourceId": "I1",
+      "statement": "I present content in different formats, such as text, images, audio, or video, to facilitate students’ access and understanding."
+    },
+    {
+      "sourceId": "I2",
+      "statement": "I adapt materials, examples, and explanations to avoid barriers that may hinder understanding."
+    },
+    {
+      "sourceId": "I3",
+      "statement": "I activate students’ prior knowledge before introducing new content."
+    },
+    {
+      "sourceId": "I4",
+      "statement": "I highlight the key ideas, steps, or important relationships involved in the task."
+    },
+    {
+      "sourceId": "I5",
+      "statement": "I provide different ways for students to participate and interact during the activity."
+    },
+    {
+      "sourceId": "I6",
+      "statement": "I allow students to demonstrate what they have learned in different ways suited to the task, for example, orally, in writing, visually, or digitally."
+    },
+    {
+      "sourceId": "I7",
+      "statement": "I provide support to help students plan and organize their work before beginning the task, such as guides, graphic organizers, or step-by-step sequences."
+    },
+    {
+      "sourceId": "I8",
+      "statement": "I provide structured support to help students review and adjust their progress during the task, such as monitoring guidelines, checklists, or self-assessment tools."
+    },
+    {
+      "sourceId": "I9",
+      "statement": "I incorporate meaningful opportunities for choice in different aspects of the activity to promote students’ autonomy and engagement."
+    },
+    {
+      "sourceId": "I10",
+      "statement": "I connect activities with students’ interests, goals, or motivations."
+    },
+    {
+      "sourceId": "I11",
+      "statement": "I design activities that promote collaboration and peer support throughout the learning process."
+    },
+    {
+      "sourceId": "I12",
+      "statement": "I organize the learning environment to foster students’ confidence, emotional well-being, and participation."
+    }
+  ]
+}

@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "dmee_class_t_structuring_teacher_self_en",
+      "title": "Structuration",
+      "description": "Teacher self-reflection using the author’s English translations from Table S1. Choose the frequency that describes your practice. There are no teacher grades or performance rankings. You may leave items blank when you cannot describe them. No fixed recall window was specified in the published item table. This unscored form does not reproduce the paper’s ESEM factor scores. Do not enter pupils’ names or identifiable cases. Platform guidance is newly written and is not the original administration script.",
+      "questions": [
+        {
+          "itemKey": "dmee_en_item_09",
+          "type": "LIKERT",
+          "prompt": "At the start of each lesson/activity, I give a brief summary/review of the previous lesson/activity.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_10",
+          "type": "LIKERT",
+          "prompt": "I make links between the different activities I propose to the students.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_11",
+          "type": "LIKERT",
+          "prompt": "I draw the students' attention to the main points of the lesson/activity.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_12",
+          "type": "LIKERT",
+          "prompt": "At the end of the lesson/activity, I summarise what has been seen/worked on.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_13",
+          "type": "LIKERT",
+          "prompt": "The students make links between the lesson/activity in progress and other previous lessons/activities.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_14",
+          "type": "LIKERT",
+          "prompt": "Students are able to explain what happened in the previous lesson/activity.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        },
+        {
+          "itemKey": "dmee_en_item_15",
+          "type": "LIKERT",
+          "prompt": "At the end of the lesson/activity, the students summarise what they have seen/worked on.",
+          "required": false,
+          "options": [
+            {
+              "optionKey": "frequency_1",
+              "label": "never"
+            },
+            {
+              "optionKey": "frequency_2",
+              "label": "rarely"
+            },
+            {
+              "optionKey": "frequency_3",
+              "label": "sometimes"
+            },
+            {
+              "optionKey": "frequency_4",
+              "label": "regularly"
+            },
+            {
+              "optionKey": "frequency_5",
+              "label": "frequently"
+            },
+            {
+              "optionKey": "frequency_6",
+              "label": "very frequently"
+            },
+            {
+              "optionKey": "frequency_7",
+              "label": "systematically"
+            }
+          ],
+          "rows": []
+        }
+      ]
+    }
+  ]
+}

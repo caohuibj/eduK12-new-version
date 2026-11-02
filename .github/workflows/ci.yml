@@ -648,7 +648,10 @@ jobs:
           JS
       - name: install pinned release classification tools
         if: steps.pr356-entry.outputs.candidate != 'true' && steps.documentation-scope.outputs.lightweight != 'true'
-        run: npm ci --ignore-scripts --prefix .github/release-tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          mkdir -p server-version/backend/node_modules
+          test -e server-version/backend/node_modules/typescript || ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/backend/node_modules/typescript
       - id: scope
         env:
           GH_TOKEN: ${{ github.token }}
@@ -4088,7 +4091,10 @@ jobs:
         != ''training-appearance'' && needs.scope.outputs.application_route != ''survey-cloud'' && needs.scope.outputs.documentation != ''true'' && needs.scope.outputs.scenario
         != ''release-tooling'' && !(needs.scope.outputs.application_route == ''training-workspace'' && fromJSON(needs.scope.outputs.training_workspace_plan || ''{}'').candidate
         == ''mac-followup''))'
-      run: npm ci --ignore-scripts --prefix .github/release-tools
+      run: |
+        npm ci --ignore-scripts --prefix .github/release-tools
+        mkdir -p server-version/backend/node_modules
+        test -e server-version/backend/node_modules/typescript || ln -s "$PWD/.github/release-tools/node_modules/typescript" server-version/backend/node_modules/typescript
     - name: require exact success for the selected route
       if: ${{ !inputs.complete_training || (github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref ==
         'fix/runtime-time-and-validation-20261025')) || github.ref_name == 'fix/runtime-time-and-validation-20261025' }}

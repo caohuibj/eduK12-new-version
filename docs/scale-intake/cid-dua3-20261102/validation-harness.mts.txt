@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict'
+import {readFileSync,writeFileSync} from 'node:fs'
+import {randomUUID} from 'node:crypto'
+import {canonicalHash} from '/workspace/eduK12-cid-dua3/server-version/backend/src/modules/assessment-runtime/canonical.ts'
+import {prisma} from '/workspace/eduK12-cid-dua3/server-version/backend/src/config/database.ts'
+import {originalFormArtifact,submitOriginalForm,governedRow} from '/workspace/eduK12-cid-dua3/server-version/backend/src/modules/survey/governed-tool.service.ts'
+import {normalizeFormAnswers} from '/workspace/eduK12-cid-dua3/server-version/backend/src/modules/assessment-core/form/runtime.ts'
+import {formDraftSchema,validateFormDefinition} from '/workspace/eduK12-cid-dua3/server-version/backend/src/modules/assessment-core/form/definition.ts'
+import * as products from '/workspace/eduK12-cid-dua3/server-version/backend/src/modules/questionnaire-product/service.ts'
+const root='/workspace/eduK12-cid-dua3',input=JSON.parse(readFileSync(root+'/docs/scale-intake/cid-dua3-20261102/native-form.json','utf8'))
+const u=new URL(process.env.DATABASE_URL!);assert.ok(['127.0.0.1','localhost'].includes(u.hostname)&&u.port==='55432'&&/^\/eduk12_form_intake_test_[a-f0-9]+$/.test(u.pathname))
+const definition=formDraftSchema.parse(input.definition)
+const questions=definition.pages.flatMap(p=>p.questions),source=JSON.parse(readFileSync(root+'/docs/scale-intake/cid-dua3-20261102/source-items.json','utf8'))
+assert.equal(questions.length,15);assert.deepEqual(questions.slice(1,13).map(q=>q.prompt),source.items.map((q:any)=>q.statement))
+assert.deepEqual(validateFormDefinition(definition,{forPreview:true}).issues.filter(x=>x.severity==='error'),[])
+assert.ok(questions.every(q=>q.type==='LONG_TEXT'&&!q.required&&!q.options.length))
+const blank=normalizeFormAnswers(definition,{});assert.equal(blank.missing.length,15);assert.deepEqual(blank.rawAnswers,{})
+const full=Object.fromEntries(questions.map(q=>[q.itemKey,'Synthetic development evidence; no actual teacher or student response.']))
+assert.equal(normalizeFormAnswers(definition,full).missing.length,0)
+const limited=normalizeFormAnswers(definition,{[questions[1].itemKey]:'Synthetic limited evidence.'});assert.equal(limited.missing.length,14)
+assert.throws(()=>normalizeFormAnswers(definition,{unexpected_key:'Synthetic'}))
+try{
+ const prior=await prisma.$queryRaw<Array<{submitted_by:string}>>`SELECT submitted_by FROM survey_governed_tools WHERE id=${input.requestId}`
+ const actor=prior[0]?await prisma.user.findUniqueOrThrow({where:{id:prior[0].submitted_by}}):await prisma.user.create({data:{username:'cid_dua3_isolated_'+randomUUID(),passwordHash:'synthetic fixture, cannot be used to sign in',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY',isActive:true,isFrozen:false,mustChangePassword:false}})
+ const artifact=originalFormArtifact(actor.id,input);assert.equal(artifact.unit?.scoringDigest,null);assert.equal(artifact.parameters,null);assert.equal(artifact.report,null)
+ const saved=await submitOriginalForm(actor.id,input);assert.equal(saved.state,'SUBMITTED');assert.equal(saved.approvedBy,null)
+ const retry=await submitOriginalForm(actor.id,input);assert.equal(retry.id,saved.id)
+ const stored=await governedRow(prisma,saved.id)
+ assert.equal(stored.snapshot_hash,canonicalHash(artifact));assert.deepEqual(stored.snapshot.unit?.compiledDefinition,input.definition)
+ assert.equal(stored.snapshot.parameters,null);assert.equal(stored.snapshot.report,null)
+ const actorRef={userId:actor.id,role:'ADMIN' as const}
+ const existing=await prisma.compositeAssessment.findFirst({where:{createdBy:actor.id,productKind:'FORM_TEMPLATE',name:input.title}})
+ let template=existing?await products.detail(actorRef,existing.id):await products.createFormTemplate(actorRef,{name:input.title,requestId:randomUUID(),description:input.statement,instruction:definition.pages.map(p=>p.description).join('\n')})
+ for(const q of questions.slice(template.items.length)){const {itemKey,...formDefinition}=q;template=await products.addItem(actorRef,template.id,{revision:template.revision,item:{type:'FORM',formType:'long_text',formLabel:q.prompt,required:false,formPolicy:{version:3,requiredRefusal:'BLOCK_SUBMIT',hiddenRequired:'EXEMPT'},formDefinition}})}
+ await prisma.compositeAssessment.update({where:{id:template.id},data:{tags:input.reference.tags}})
+ const reread=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:template.id},include:{items:{orderBy:{position:'asc'}}}})
+ assert.equal(reread.productKind,'FORM_TEMPLATE');assert.equal(reread.status,'DRAFT');assert.equal(reread.items.length,15)
+ assert.deepEqual(reread.tags,input.reference.tags);assert.deepEqual(reread.items.map(x=>x.formLabel),questions.map(q=>q.prompt))
+ const found=await prisma.compositeAssessment.findMany({where:{id:template.id,tags:{has:'family:cid_dua3'}}});assert.equal(found.length,1)
+ const trialCount=await prisma.$queryRaw<Array<{n:bigint}>>`SELECT COUNT(*)::bigint n FROM survey_governed_trials WHERE tool_id=${saved.id}`;assert.equal(Number(trialCount[0].n),0)
+ const out={status:'NATIVE_UNSCORED_FORM_IMPORTED_AND_READ_BACK',database:u.pathname.slice(1),governedToolId:saved.id,governedState:saved.state,governedHash:stored.snapshot_hash,approvedBy:null,templateId:template.id,templateState:reread.status,templateKind:reread.productKind,questionCount:15,preservedPublishedStatements:12,projectQuestions:3,tags:reread.tags,familyTagQueryMatched:true,idempotentSubmission:true,parameters:null,report:null,scoringDigest:null,trialCount:0,runtimeCases:{completeMissing:0,blankMissing:15,limitedMissing:14,unknownFieldRejected:true},actualTeacherOrStudentData:false,originalScaleImported:false,productionTouched:false}
+ writeFileSync('/tmp/cid-dua3-source/native-isolated-validation.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out))
+}finally{await prisma.$disconnect();const {closeQueues}=await import('/workspace/eduK12-cid-dua3/server-version/backend/src/config/queue.ts');await closeQueues(true)}
