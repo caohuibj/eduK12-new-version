@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "harvard_tsr_2011_student_negativity_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "Harvard TSR｜消极关系｜中学（原研究6–12年级）｜学生填答（英文目录候选）",
+      "abbreviation": "TSR-2011-S-N",
+      "instrumentFamily": "Harvard TSR / Gehlbach–Brinkworth–Harris 2011 / ERIC ED525284 Appendix A"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [],
+      "constructDefinition": "学生针对一名指定教师报告自己感知的关系中的消极关系。仅登记原版子量表元数据；更高表示感知到更多消极关系特征，不反向后并入积极总分。拆分目录不证明独立施测有效，不能作为教师质量或学生品格结论。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:harvard_tsr_2011",
+        "source:ERIC_ED525284",
+        "source:Appendix_A",
+        "category:学生评教",
+        "evaluation_target:教师",
+        "evaluation_target:师生关系",
+        "evaluation_target:not_whole_class",
+        "grade:6_12",
+        "age:secondary_school_grade_defined",
+        "respondent:student",
+        "subscale:negativity",
+        "language:en",
+        "rights:permission_unconfirmed",
+        "availability:catalog_only",
+        "scientific:PILOT",
+        "use:RESEARCH",
+        "scoring:not_installed",
+        "administration:retain_14_item_form"
+      ]
+    },
+    "population": {
+      "gradeRange": {
+        "minGrade": 6,
+        "maxGrade": 12
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "学生针对一名指定教师报告自己感知的关系。原研究覆盖美国6–12年级学生及教师；未据年级换算年龄上下界。SELF表示填答者自己的关系感知；教师版不等同学生代理填答。未建立中国常模、中文版验证或本拆分电子版效度。"
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "原版关于当前指定师生关系；未核到统一回忆时窗，不添加过去两周等窗口。当前目录不可施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "附录A原题号：N1, N2, N3, N4, N5；仅记录题号，不复制题文。",
+        "学生针对一名指定教师报告自己感知的关系。",
+        "原版每个填答者14题（积极9、消极5）；仅确认分维度计分，不确认拆分独立施测效度。",
+        "页50只给五点选项示例，缺逐题锚点映射；不得统一替换成同意程度选项。",
+        "积极与消极分别解释，无14题总分；双方不相加、不求差分阈值、不跨工具汇总。",
+        "星号为对称题标记，不是反向题标记；不把图1相关误差的主题簇再造为量表。",
+        "3分钟只是目录占位估计，原论文未提供本子项独立完成时长；不是可施测版本。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原版研究证据已读；本候选尚无获许可电子题本及独立施测证据。目录发现不表示施测授权。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ED525284_student_negativity_context",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "US secondary-school students and their teachers; original paired 14-item forms",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "Original study tests separate positivity and negativity factors in each respondent form; not a validation of independently administered extracts.",
+        "rating": "MIXED",
+        "citation": "Gehlbach, H., Brinkworth, M. E., & Harris, A. D. (2011, April). Social motivation in the secondary classroom: Assessing teacher-student relationships and student outcomes. AERA conference paper, ERIC ED525284, Appendix A, pp. 49–50.",
+        "url": "https://files.eric.ed.gov/fulltext/ED525284.pdf",
+        "notes": "原论文pp.16–18，附录A pp.49–50；只作为原完整版本的背景证据，不授予本候选科研等级、常模或跨语言等值。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Gehlbach, H., Brinkworth, M. E., & Harris, A. D. (2011, April). Social motivation in the secondary classroom: Assessing teacher-student relationships and student outcomes. AERA conference paper, ERIC ED525284, Appendix A, pp. 49–50. Metadata only; original items are not reproduced.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文原版元数据，中文名称和说明是编辑性目录信息，不是已验证中文版题本；1.0.0为候选元数据身份，无已冻结C/P/R。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Social motivation in the secondary classroom: Assessing teacher-student relationships from both perspectives",
+      "citation": "Gehlbach, H., Brinkworth, M. E., & Harris, A. D. (2011, April). Social motivation in the secondary classroom: Assessing teacher-student relationships and student outcomes. AERA conference paper, ERIC ED525284, Appendix A, pp. 49–50.",
+      "url": "https://files.eric.ed.gov/fulltext/ED525284.pdf",
+      "publicationYear": 2011
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "消极关系"
+      ],
+      "limitations": [
+        "更高表示感知到更多消极关系特征，不反向后并入积极总分；暂无可执行分数或报告。",
+        "原论文支持区分积极与消极，不能把消极反转合并为单一关系质量分。",
+        "逐题选项、原始分聚合及缺失规则未核齐；不执行求和、均分、插补、阈值或百分位。",
+        "完整版研究不自动支持独立施测、中文版、教师排名、学校排名或学生标签。",
+        "ERIC公开下载不等于题项翻译、电子施测、商业使用或公开再分发许可。"
+      ],
+      "disclaimer": "仅目录候选，未导入开发库或生产库；无题文、可执行C/P/R或可启动施测。"
+    },
+    "blockers": [
+      "ITEM_REDISTRIBUTION_AND_DIGITAL_USE_PERMISSION_UNCONFIRMED",
+      "ITEM_SPECIFIC_RESPONSE_ANCHORS_MISSING",
+      "RAW_SCORE_AGGREGATION_AND_MISSING_RULE_UNCONFIRMED",
+      "STANDALONE_SUBSCALE_ADMINISTRATION_NOT_VALIDATED",
+      "EXECUTABLE_CONTENT_NOT_PREPARED"
+    ]
+  }
+}

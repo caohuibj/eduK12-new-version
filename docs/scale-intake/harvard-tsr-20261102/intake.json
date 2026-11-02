@@ -1,0 +1,135 @@
+{
+  "recordType": "research_intake_notes_not_runtime_payload",
+  "motherTool": "Harvard TSR",
+  "sourceEdition": "2011 AERA / ERIC ED525284 / Appendix A pp.49–50",
+  "sourceUrl": "https://files.eric.ed.gov/fulltext/ED525284.pdf",
+  "sourcePdfSha256": "68c2d098f16cc928e597a3474034a835b55e31e2cdeed6fb3db4d1ab54f8fc05",
+  "repositoryBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "checkedOn": "2026-11-02",
+  "children": [
+    {
+      "instrumentKey": "harvard_tsr_2011_student_positivity_en",
+      "instrumentVersion": "1.0.0",
+      "respondent": "student",
+      "subscale": "positivity",
+      "sourceItemIds": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7",
+        "P8",
+        "P9"
+      ],
+      "status": "CATALOG_ONLY",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "instrumentKey": "harvard_tsr_2011_student_negativity_en",
+      "instrumentVersion": "1.0.0",
+      "respondent": "student",
+      "subscale": "negativity",
+      "sourceItemIds": [
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "status": "CATALOG_ONLY",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "instrumentKey": "harvard_tsr_2011_teacher_positivity_en",
+      "instrumentVersion": "1.0.0",
+      "respondent": "teacher",
+      "subscale": "positivity",
+      "sourceItemIds": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7",
+        "P8",
+        "P9"
+      ],
+      "status": "CATALOG_ONLY",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null
+    },
+    {
+      "instrumentKey": "harvard_tsr_2011_teacher_negativity_en",
+      "instrumentVersion": "1.0.0",
+      "respondent": "teacher",
+      "subscale": "negativity",
+      "sourceItemIds": [
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "status": "CATALOG_ONLY",
+      "contentVersion": null,
+      "scoringParameterVersion": null,
+      "reportVersion": null
+    }
+  ],
+  "forms": [],
+  "formsNote": "Appendix A contains only the scored relationship items. No original unscored form identified. Appendix B is excluded. Administrative dyad/context fields may use the existing ordinary questionnaire metadata after review; no extra scale is invented.",
+  "ordinaryCombinationCandidates": [
+    {
+      "name": "Harvard TSR｜原学生14题组卷候选",
+      "children": [
+        "harvard_tsr_2011_student_positivity_en",
+        "harvard_tsr_2011_student_negativity_en"
+      ],
+      "status": "NOT_CREATED",
+      "totalScore": false
+    },
+    {
+      "name": "Harvard TSR｜原教师14题组卷候选（每名指定学生一份）",
+      "children": [
+        "harvard_tsr_2011_teacher_positivity_en",
+        "harvard_tsr_2011_teacher_negativity_en"
+      ],
+      "status": "NOT_CREATED",
+      "totalScore": false
+    }
+  ],
+  "license": {
+    "status": "UNCONFIRMED",
+    "publicFullItemsIncluded": false,
+    "permissionAccepted": false,
+    "permissionRequestSent": false,
+    "note": "No explicit item redistribution/digital administration grant was found in ED525284 or the inspected official source information. Not a finding that all uses are prohibited."
+  },
+  "deduplication": {
+    "registeredInstrumentVersionsBeforeChange": 258,
+    "exactOrSynonymousSourceMatchFound": false,
+    "relatedNonmatches": [
+      "jcq_en:2024 job-crafting paper mentioning teacher-student relationships",
+      "teacher_subject_liking_*",
+      "TALIS",
+      "Pianta STRS is a different instrument; not substituted"
+    ],
+    "scope": "Current source.json and inline instrument.ts identities, authors, source URL and distinctive Appendix A wording; additional GitHub open-PR keyword search returned zero; parent reports comprehensive prior open-PR path audit.",
+    "productionDatabaseChecked": false,
+    "administratorCustomLibraryChecked": false
+  },
+  "import": {
+    "developmentDatabase": "NOT_IMPORTED",
+    "productionDatabase": "NOT_ACCESSED",
+    "isolatedDatabaseImport": "NOT_RUN_CATALOG_ONLY_NOT_EXECUTABLE",
+    "reason": "Existing materializeScaleInstrumentContent requires source.executable; no bypass or schema/engine change introduced."
+  }
+}
