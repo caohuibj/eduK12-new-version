@@ -35,7 +35,7 @@ export function assertRegressionFiles(report,expectedFiles){
   assert.deepEqual(actual,[...expectedFiles].sort(),'Regression file coverage must be complete and disjoint');
 }
 export function assertRegressionGroupCoverage(result,inventories){
-  assert.deepEqual(inventories.map(plan=>plan.group).sort(),['fixtures','shard-1','shard-2','shard-3','shard-4']);
+  assert.deepEqual(inventories.map(plan=>plan.group).sort(),['fixtures','shard-1','shard-2','shard-3','shard-4','shard-5','shard-6']);
   for(const plan of inventories)assert.deepEqual(plan.fullExpectedFiles,inventories[0].fullExpectedFiles,'Group inventories must agree');
   assert.deepEqual(inventories.flatMap(plan=>plan.expectedFiles).sort(),inventories[0].fullExpectedFiles,'Planned groups must cover the original regression exactly');
   assertRegressionFiles(result,inventories[0].fullExpectedFiles);
@@ -48,7 +48,7 @@ export function collectRegressionGroups(directory,execution,groupResult){
   assert.ok(Number.isSafeInteger(execution.attempt)&&execution.attempt>=1);
   const latest=new Map();
   for(const entry of readdirSync(directory,{withFileTypes:true})){
-    const match=/^backend-regression-group-(fixtures|shard-[1-4])-run-([0-9]+)-attempt-([0-9]+)$/.exec(entry.name);
+    const match=/^backend-regression-group-(fixtures|shard-[1-6])-run-([0-9]+)-attempt-([0-9]+)$/.exec(entry.name);
     assert.ok(entry.isDirectory()&&match,`Unexpected regression artifact: ${entry.name}`);
     const [,group,runId,number]=match,attempt=Number(number);
     assert.equal(runId,execution.runId,'Only this native Actions run is eligible');

@@ -522,7 +522,7 @@ test('backend regression groups isolate services and retain the complete mandato
   assert.match(groups,/timeout-minutes: 45/);
   assert.match(groups,/fail-fast: false/);
   assert.ok(groups.indexOf('uses: actions/setup-node@v4') < groups.indexOf('name: validate disjoint regression report controls'));
-  assert.ok(groups.includes('["fixtures","shard-1","shard-2","shard-3","shard-4"]'));
+  assert.ok(groups.includes('["fixtures","shard-1","shard-2","shard-3","shard-4","shard-5","shard-6"]'));
   assert.ok(groups.includes('["focused"]'));
   assert.match(groups,/services:\n      postgres:/);assert.match(groups,/      redis:/);
   const steps=groups.split('      - name: ');

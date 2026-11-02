@@ -32,7 +32,7 @@ test('missing, overlapping, empty and malformed reports are refused',()=>{
     [report('a'),{...report('b'),numTotalTests:NaN}]])assert.throws(()=>mergeRegressionReports(reports));
 });
 
-test('four serial shards and the retained fixture lane cover the exact existing file inventory once',async()=>{
+test('six serial shards and the retained fixture lane cover the exact existing file inventory once',async()=>{
   const {globSync,readFileSync}=await import('node:fs');
   const {fileURLToPath}=await import('node:url');
   const {partitionRegressionFiles,regressionGroups,backendOwnedFile}=await import('./backend-regression-selection.mjs');
@@ -76,7 +76,7 @@ test('complete-group report coverage rejects missing, foreign and duplicate path
 
 test('group aggregation refuses missing, repeated or inconsistent inventories',async()=>{
   const {assertRegressionGroupCoverage}=await import('./backend-regression-reports.mjs');
-  const names=['fixtures','shard-1','shard-2','shard-3','shard-4'];
+  const names=['fixtures','shard-1','shard-2','shard-3','shard-4','shard-5','shard-6'];
   const files=names.map(name=>`src/__tests__/${name}.test.ts`).sort();
   const plans=names.map(group=>({group,expectedFiles:[`src/__tests__/${group}.test.ts`],fullExpectedFiles:files}));
   const combined=mergeRegressionReports(files.map(file=>report(file)));
@@ -93,7 +93,7 @@ test('same-run retries retain immutable attempts and choose newest per group wit
   const {collectRegressionGroups}=await import('./backend-regression-reports.mjs');
   const directory=mkdtempSync(join(tmpdir(),'regression-attempts-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
   const execution={runId:'123',sha:'a'.repeat(40),attempt:2};
-  const groups=['fixtures','shard-1','shard-2','shard-3','shard-4'];
+  const groups=['fixtures','shard-1','shard-2','shard-3','shard-4','shard-5','shard-6'];
   const files=groups.map(group=>`src/__tests__/${group}.test.ts`).sort();
   function artifact(group,attempt,passed=true,changes={}){
     const dir=join(directory,`backend-regression-group-${group}-run-123-attempt-${attempt}`);mkdirSync(dir,{recursive:true});
