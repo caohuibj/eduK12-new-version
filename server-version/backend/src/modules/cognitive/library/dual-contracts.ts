@@ -311,6 +311,80 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['音序列（服务端按 seed 重建；客户端回显仅审计）', 'n 水平/音集/节奏（frozen config）'],
     serverDerivedFacts: ['命中/误报判定', 'metrics（Hautus d′/hitRate/falseAlarmRate）', 'quality flags（含 stimulusEchoMismatch）'],
   },
+  // Task packages added after the original inventory. These declarations describe
+  // existing facts only; execution readiness does not grant publication or maturity.
+  cogest: {
+    testType: 'cogest',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['数量估计选择题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  logicdeduce: {
+    testType: 'logicdeduce',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['逻辑推断题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  proofread: {
+    testType: 'proofread',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['文字校对题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  readingcomp: {
+    testType: 'readingcomp',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['阅读理解题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  seriescomplete: {
+    testType: 'seriescomplete',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['序列补全题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  wordanalogy: {
+    testType: 'wordanalogy',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['词语类比题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  wordmeaning: {
+    testType: 'wordmeaning',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['词义判断题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  wordproblem: {
+    testType: 'wordproblem',
+    clientObservedFacts: ['itemId（客户端呈现题号，须按冻结题库校验）', 'responseIndex / null 漏答', 'rtMs / null', 'interrupted'],
+    runtimeReconstructableFacts: ['文字应用题内容、选项与答案（exact engine/scoring 对应的冻结题库）', 'totalTrials/timeoutMs/validRtFloorMs（frozen config）'],
+    serverDerivedFacts: ['题库成员与重复题校验', '正确/错误/漏答判定', 'accuracy/medianRtMs/validRtCount 与 quality flags（按 exact scorer）'],
+  },
+  lineangle: {
+    testType: 'lineangle',
+    clientObservedFacts: ["responseAngle / null", "rtMs / null", "interrupted", "targetAngle/optionAngles（客户端回显；当前 scorer 检查选项合法性，不作 seed 重放）"],
+    runtimeReconstructableFacts: ["角度生成规则与 optionCount（exact engine + frozen config）"],
+    serverDerivedFacts: ["选项合法性与响应正误", "v2 无向角按 modulo 180 归一化", "accuracy/medianRtMs/timeoutCount/quality flags"],
+  },
+  embeddedfigures: {
+    testType: 'embeddedfigures',
+    clientObservedFacts: ["clickedShapeId / null", "rtMs / null", "interrupted", "itemIndex 回显"],
+    runtimeReconstructableFacts: ["目标形状与候选图形（exact engine 生成器 + randomSeed + trialIndex）"],
+    serverDerivedFacts: ["itemIndex/目标命中判定", "accuracy/medianRtMs/timeoutCount/quality flags"],
+  },
+  icarmatrix: {
+    testType: 'icarmatrix',
+    clientObservedFacts: ["responseIndex / null（呈现选项序）", "rtMs / null", "interrupted", "v1 itemIndex；v2/v2.1 trialIndex/bankItemId 回显"],
+    runtimeReconstructableFacts: ["v1 seed 生成矩阵；v2/v2.1 冻结题库与 seed 派生题序/选项序（分别绑定 exact engine）"],
+    serverDerivedFacts: ["题序/选项映射与正确性", "accuracy/medianRtMs 与版本特有 metrics/quality flags"],
+  },
+  sharegame: {
+    testType: 'sharegame',
+    clientObservedFacts: ["given（真实零选择保留）", "rtMs", "interrupted", "v2 response=choice/timeout/omitted；未答 given/rtMs=null"],
+    runtimeReconstructableFacts: ["每轮 endowment（frozen config.endowments；payload 回显校验）"],
+    serverDerivedFacts: ["给出量合法性", "givingRate/medianDecisionMs 等描述指标，不判正确答案", "v2 answeredRounds/timeoutRounds/omittedRounds 与有效回答分母；无回答指标为 null"],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -541,6 +615,66 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'auditorynback',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次 responded/rtMs/toneIndex 回显'],
     futureCaptureFacts: ['音频输出延迟自动校准事实', '反应标准（criterion）逐块漂移', '真实 input modality（事件级区分 key/pointer）', 'device provenance'],
+  },
+  cogest: {
+    testType: 'cogest',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；数量估计选择题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  logicdeduce: {
+    testType: 'logicdeduce',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；逻辑推断题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  proofread: {
+    testType: 'proofread',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；文字校对题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  readingcomp: {
+    testType: 'readingcomp',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；阅读理解题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  seriescomplete: {
+    testType: 'seriescomplete',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；序列补全题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  wordanalogy: {
+    testType: 'wordanalogy',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；词语类比题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  wordmeaning: {
+    testType: 'wordmeaning',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；词义判断题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  wordproblem: {
+    testType: 'wordproblem',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemId/responseIndex/rtMs/interrupted；文字应用题冻结题库身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次修改选择事件（当前仅最终响应）', 'device provenance'],
+  },
+  lineangle: {
+    testType: 'lineangle',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'targetAngle/optionAngles/responseAngle/rtMs/interrupted'],
+    futureCaptureFacts: ['真实 input modality', '逐次指针/按键事件（当前仅最终响应）', 'device provenance'],
+  },
+  embeddedfigures: {
+    testType: 'embeddedfigures',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'itemIndex/clickedShapeId/rtMs/interrupted；冻结生成器身份'],
+    futureCaptureFacts: ['真实 input modality', '逐次指针/按键事件（当前仅最终响应）', 'device provenance'],
+  },
+  icarmatrix: {
+    testType: 'icarmatrix',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '版本对应的 itemIndex 或 trialIndex/bankItemId、responseIndex/rtMs/interrupted'],
+    futureCaptureFacts: ['真实 input modality', '逐次指针/按键事件（当前仅最终响应）', 'device provenance'],
+  },
+  sharegame: {
+    testType: 'sharegame',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, 'endowment/given/rtMs/interrupted；v2 显式 choice/timeout/omitted，不外推为真实金钱转移'],
+    futureCaptureFacts: ['真实 input modality', '逐次指针/按键事件（当前仅最终响应）', 'device provenance'],
   },
 }
 

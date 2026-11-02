@@ -57,7 +57,10 @@ describe('Cognitive v2 registry adapter', () => {
     const compatibilityDrafts = definitions.filter((definition) => definition.publication.status === 'DRAFT')
     const compatibilityRetired = definitions.filter((definition) => definition.publication.status === 'RETIRED')
 
-    expect(compatibilityDrafts.map((definition) => definition.testType)).toEqual(['fake'])
+    const key = (entry: { testType: string; engineVersion: string; scoringVersion: string }) => `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`
+    expect(compatibilityDrafts.map(key).sort()).toEqual(entries.filter(entry => entry.executionSemantics?.legacyStatus === 'DRAFT').map(key).sort())
+    expect(compatibilityDrafts.map(key)).toContain('fake/1.0.0/1.0.0')
+    expect(compatibilityDrafts.map(key)).toContain('proofread/1.1.0/1.1.0')
     expect(compatibilityRetired.map((definition) => `${definition.testType}/${definition.engineVersion}/${definition.scoringVersion}`).sort()).toEqual([
       'memory/1.0.0/1.0.0',
       'reaction/1.0.0/1.0.0',

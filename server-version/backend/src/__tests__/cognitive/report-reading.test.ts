@@ -6,6 +6,7 @@ import { freezeAssignmentProfile, readFrozenReport } from '../../modules/cogniti
 import { getCognitiveV2TaskDefinition, buildCognitiveV2TaskDefinition } from '../../modules/cognitive/v2/registry'
 import { projectThreeLayerReport, referencesForReportReading } from '../../modules/cognitive/v2/report'
 import { compileCognitiveRuntime } from '../../modules/assessment-runtime/compiler'
+import { cognitivePresentations } from '../../modules/cognitive/generated/presentation'
 import { COGNITIVE_SEEDS } from '../../../prisma/seeds/cognitive'
 import type { CognitiveProfile, CognitiveScoreResult } from '../../modules/cognitive/v2/types'
 
@@ -17,12 +18,12 @@ const reactionInput = (valid = 18, interrupted = false) => ({
   trials: Array.from({ length: 20 }, (_, i) => ({ trialIndex: i, payload: { foreperiodMs: 800, rtMs: i < valid ? [280, 305, 310, 295, 330, 315, 300, 290, 340, 325, 310, 300, 320, 355, 305, 295, 310, 335][i] : null, prematureCount: i === 4 ? 1 : 0, interrupted: interrupted && i === 4, inputMode: 'pointer' } })),
 })
 
-function project(testType: string, scoringVersion: string, metrics: Record<string, unknown>, score: CognitiveScoreResult, profile: CognitiveProfile = 'standard', extras: { trials?: unknown[]; config?: Record<string, unknown> } = {}) {
-  const entry = requireCognitiveRegistryEntry(testType, '1.0.0', scoringVersion)
-  const definition = getCognitiveV2TaskDefinition(testType, '1.0.0', scoringVersion)!
-  return projectThreeLayerReport({ testType, engineVersion: '1.0.0', scoringVersion, configVersion: scoringVersion, protocolSignature: 'test', profile,
+function project(testType: string, scoringVersion: string, metrics: Record<string, unknown>, score: CognitiveScoreResult, profile: CognitiveProfile = 'standard', extras: { trials?: unknown[]; config?: Record<string, unknown> } = {}, engineVersion = '1.0.0', reportVersion?: string) {
+  const entry = requireCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
+  const definition = getCognitiveV2TaskDefinition(testType, engineVersion, scoringVersion)!
+  return projectThreeLayerReport({ testType, engineVersion, scoringVersion, configVersion: scoringVersion, protocolSignature: 'test', profile,
     definition: definition.report, metrics, score, metricDefinitions: definition.metrics, qualityDefinitions: definition.quality,
-    participantPresentation: resolveParticipantPresentation(entry), reportCaveats: entry.profiles[profile]!.reportCaveats, ...extras })
+    participantPresentation: resolveParticipantPresentation({ ...entry, reportVersion }), reportCaveats: entry.profiles[profile]!.reportCaveats, ...extras })
 }
 
 describe('versioned participant report interpretation', () => {
@@ -132,22 +133,32 @@ describe('versioned participant report interpretation', () => {
   })
   it('covers exact identities with valid display references and never projects research-only metrics', () => {
     const families = new Set<string>()
-    for (const entry of listCognitiveRegistryEntries().filter(e => e.testType !== 'fake')) {
+    const historicalWithoutAudiences: string[] = []
+    const coveredIdentities = new Set<string>()
+    for (const presentation of cognitivePresentations.filter(p => p.testType !== 'fake')) {
+      const entry = requireCognitiveRegistryEntry(presentation.testType, presentation.engineVersion, presentation.scoringVersion)
       families.add(entry.testType)
-      const policy = resolveParticipantPresentation(entry)!.reportReading!
+      coveredIdentities.add(`${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`)
+      const policy = presentation.reportReading!
       expect(policy).toBeDefined()
-      expect(policy.popular?.frames).toHaveLength(3)
-      expect(policy.professional?.procedure.length).toBeGreaterThan(20)
+      if (policy.popular || policy.professional) {
+        expect(policy.popular?.frames).toHaveLength(3)
+        expect(policy.professional?.procedure.length).toBeGreaterThan(20)
+      } else {
+        historicalWithoutAudiences.push(`${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}/${policy.version}`)
+      }
       expect([...policy.summary.template.matchAll(/\{(\w+)\}/g)].map(match => match[1]).every(key => policy.summary.metricKeys.includes(key))).toBe(true)
       const definition = getCognitiveV2TaskDefinition(entry.testType, entry.engineVersion, entry.scoringVersion)!
       for (const key of [...policy.summary.metricKeys, ...policy.studentMetricKeys, ...policy.processMetricKeys, ...(policy.chart?.metricKeys ?? [])]) expect(definition.metrics[key], `${entry.testType}/${key}`).toBeDefined()
       const metrics = Object.fromEntries(Object.keys(definition.metrics).map(key => [key, 1]))
-      const report = project(entry.testType, entry.scoringVersion, metrics, { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 1, scorerVersion: entry.scoringVersion } }, 'research')
+      const report = project(entry.testType, entry.scoringVersion, metrics, { metrics, quality: { state: 'interpretable', flags: {}, reasons: [] }, audit: { trialCount: 1, scorerVersion: entry.scoringVersion } }, 'research', {}, entry.engineVersion, policy.version)
       expect([...report.headline, ...report.user, ...report.detail].some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
-      expect(report.reading!.professional!.metrics.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
-      expect(report.reading!.professional!.withheld.some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      expect((report.reading!.professional?.metrics ?? []).some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
+      expect((report.reading!.professional?.withheld ?? []).some(m => definition.metrics[m.key].role === 'research_only')).toBe(false)
     }
-    expect(families.size).toBe(24)
+    expect(historicalWithoutAudiences.sort()).toEqual(['cogest/1.1.0/1.1.0/1.1.0', 'seriescomplete/1.1.0/1.1.0/1.1.0'])
+    expect([...coveredIdentities].sort()).toEqual(listCognitiveRegistryEntries().filter(entry => entry.testType !== 'fake').map(entry => `${entry.testType}/${entry.engineVersion}/${entry.scoringVersion}`).sort())
+    expect([...families].sort()).toEqual([...new Set(COGNITIVE_SEEDS.filter(seed => seed.testType !== 'fake').map(seed => seed.testType))].sort())
   })
   it('keeps specialist explanations separate from the popular voice and withholds professional numeric estimates too', () => {
     const input = reactionInput(5)
