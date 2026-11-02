@@ -422,7 +422,7 @@ jobs:
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',...new Set(refs)],{stdio:'inherit'});
           JS
       - name: verify bounded risk-tier routing and historical evidence refusal
-        run: node --test .github/scripts/ci-qualification.test.mjs
+        run: node --test .github/scripts/ci-qualification.test.mjs .github/scripts/ci-backend-regression-reuse.test.mjs
       - name: fetch the exact diff base without full history
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -1398,10 +1398,41 @@ jobs:
       focus: ${{ needs.scope.outputs.backend_focus || 'full' }}
       training_followup_functional: ${{ needs.scope.outputs.training_functional_only == 'true' && fromJSON(needs.scope.outputs.training_functional_plan).mode == 'training-followup-functional-only' }}
 
-  backend-regression:
+  backend-regression-reuse:
+    name: verify historical backend regression checkpoint
     needs: scope
+    if: ${{ github.event_name == 'pull_request' && needs.scope.result == 'success' && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario == 'platform' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      reuse_backend_regression: ${{ steps.verify.outputs.reuse_backend_regression }}
+      source_run: ${{ steps.verify.outputs.source_run }}
+      evidence_digest: ${{ steps.verify.outputs.evidence_digest }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CI_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_BASE_SHA: ${{ needs.scope.outputs.diff_base }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: Verify historical regression report, official job and source tree
+        id: verify
+        run: node .github/scripts/ci-backend-regression-reuse.mjs
+
+  backend-regression:
+    needs: [scope, backend-regression-reuse]
     name: backend regression (isolated job database)
-    if: ${{ needs.scope.outputs.backend_focus != 'form-intake' && needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling'))))) }}
+    if: ${{ always() && needs.scope.result == 'success' && needs['backend-regression-reuse'].result != 'failure' && needs['backend-regression-reuse'].outputs.reuse_backend_regression != 'true' && (needs.scope.outputs.backend_focus != 'form-intake' && needs.scope.outputs.scenario != 'catalog-discovery' && (needs.scope.outputs.dependencies_frontend_only != 'true' && (!(github.event_name == 'pull_request' && (github.event.pull_request.number == 363 || github.event.pull_request.head.ref == 'perf/four-entry-feedback-20261027')) && (!(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && (needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling')))))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -4002,6 +4033,7 @@ jobs:
       && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
+    - backend-regression-reuse
     - backend-unit
     - maintenance-repair
     - edge-config

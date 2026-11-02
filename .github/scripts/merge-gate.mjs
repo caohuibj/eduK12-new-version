@@ -211,6 +211,12 @@ export function requiredChecks(needs, draft) {
   if ((!draft || dependencies) && scope.codeql === 'true') checks.push('codeql');
   if (!draft) for (const [output, job] of Object.entries(acceptanceJobs))
     if (scope[output] === 'true') checks.push(job);
+  if(scope.application_route==='legacy'&&scope.scenario==='platform'){
+    checks.push('backend-regression-reuse');
+    if(needs['backend-regression-reuse']?.result==='success'
+      &&needs['backend-regression-reuse']?.outputs?.reuse_backend_regression==='true')
+      checks=checks.filter(check=>check!=='backend-regression');
+  }
   return [...new Set(checks)];
 }
 
@@ -218,6 +224,14 @@ export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='legacy'&&scope.scenario==='platform'){
+    const reuse=needs['backend-regression-reuse'];
+    if(!['true','false'].includes(reuse?.outputs?.reuse_backend_regression))failed.push('backend-regression-reuse-output');
+    if(reuse?.outputs?.reuse_backend_regression==='true'
+      &&(!/^[0-9]+$/.test(reuse.outputs.source_run||'')
+        ||!/^[a-f0-9]{64}$/.test(reuse.outputs.evidence_digest||'')
+        ||reuse.result!=='success'))failed.push('backend-regression-reuse-evidence');
+  }
   if(scope.application_route==='backend-unit'){
     if(scope.scenario!=='backend-unit'||scope.codeql!=='false'||scope.frontend!=='false'||scope.content!=='false'
       ||scope.presentation!=='false'||scope.documentation!=='false'||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
