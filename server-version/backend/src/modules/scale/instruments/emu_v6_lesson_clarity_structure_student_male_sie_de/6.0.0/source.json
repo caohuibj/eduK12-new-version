@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "emu_v6_lesson_clarity_structure_student_male_sie_de",
+    "instrumentVersion": "6.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "EMU｜Klarheit und Strukturiertheit（清晰与结构）｜学生填答（执教者男性措辞，SIE）｜单课v6.0",
+      "abbreviation": "EMU",
+      "instrumentFamily": "EMU — Evidenzbasierte Methoden der Unterrichtsdiagnostik und -entwicklung"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "清晰与结构；EMU单课v6.0的原内容块，原题号12,13,14,15,16。作者有意不形成维度量表或总分；未来在许可明确后走原生无计分Form，不能称实际教学质量得分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:emu",
+        "role:student",
+        "language:de",
+        "version:emu_core_v6_0",
+        "timeframe:single_lesson",
+        "use:professional_reflection",
+        "license:author_consent_required",
+        "unit_kind:unscored_form_candidate",
+        "target_teacher_wording:male",
+        "student_address:sie",
+        "status:PILOT",
+        "source:Helmke_2016",
+        "scoring:none_by_author_design",
+        "grades:5-12",
+        "population:original_source_grade5plus",
+        "age:grade_based_no_fixed_age"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "OBSERVER"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原学生版适用于5年级起；本项目K12候选筛选5–12，原件还举11–13年级时长。未臆定年龄；DU/SIE保留原指导语。",
+      "gradeRange": {
+        "minGrade": 5,
+        "maxGrade": 12
+      }
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "PAPER",
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "单节具体课堂，非长期累计判断；当前仅目录候选，不能施测。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原角色、原题号、德文、性别措辞及DU/SIE指导语。",
+        "原核心块是四档同意程度响应；本候选不提供选项原文或评分。",
+        "五分钟只是本项目目录估计，不是原件独立子块施测时长。",
+        "拆分、数字嵌入及翻译的具体授权未建立；不把单课v6.0与40项长期版混合。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原用途为教师教育/学校实践中的诊断与自我反思；当前候选未获平台使用批准。官方不将原工具定位为科研。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "de",
+    "targetLocale": "de",
+    "localizationVersion": "1.0.0",
+    "translationSource": "A. Helmke et al., EMU core v6.0, original German metadata only. No item text translation/transcription distributed.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Chinese editorial names and original commentary do not constitute a translated EMU questionnaire."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "EMU Basisfragebogen v6.0 — Klarheit und Strukturiertheit / student_male_sie",
+      "citation": "A. Helmke et al. (2016), Abgleichfrageboegen_Sie-Fassung_maennliche_Lehrperson_V6.0.pdf, PDF pages [8, 9]; source terms prohibit commercial-company use and require consent for adaptations.",
+      "url": "https://www.unterrichtsdiagnostik.de/media/files/Abgleichfrageboegen_Sie-Fassung_maennliche_Lehrperson_V6.0.pdf",
+      "publicationYear": 2016
+    },
+    "reportPlan": {
+      "dimensionLabels": [],
+      "limitations": [
+        "No executable questionnaire or score report. Original authors intentionally use individual-item feedback, not domain scales or totals.",
+        "Educational/noncommercial eligibility and adaptation/digital embedding/redistribution consent are unresolved; no rights approved.",
+        "Student recipient and teacher aggregate recipient retain existing visibility, anonymity and release rules; no sensitive individual answers may be disclosed by this metadata.",
+        "No research-validation claim, Chinese validated version, norms, ranks, cross-role composite or score inferred."
+      ],
+      "disclaimer": "来源目录候选；未来原生Form，不计分；原题文未导入，C未实例化，P/R评分不适用。"
+    },
+    "blockers": [
+      "PLATFORM_USE_ELIGIBILITY_NOT_ESTABLISHED",
+      "AUTHOR_CONSENT_FOR_ADAPTATION_EMBEDDING_NOT_ESTABLISHED",
+      "PUBLIC_ITEM_REDISTRIBUTION_NOT_AUTHORIZED",
+      "NO_NATIVE_FORM_CONTENT_INSTALLED"
+    ]
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "STUDENT_REPORT"
+      }
+    ]
+  }
+}
