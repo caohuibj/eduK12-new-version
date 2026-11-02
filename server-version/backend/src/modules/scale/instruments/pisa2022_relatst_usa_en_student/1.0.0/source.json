@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -31,7 +31,7 @@
         "school_stage:secondary_grade_7_plus",
         "status:PILOT",
         "availability:catalog_only",
-        "rights:USA_national_redistribution_pending",
+        "rights:OECD_terms_1_2_English",
         "scoring:official_WLE_not_implemented",
         "source_block:ST267",
         "official_index:RELATST"
@@ -97,7 +97,7 @@
     "cognitiveDebriefStatus": "NOT_ESTABLISHED",
     "localEvidenceRefs": [],
     "reviewStatus": "PENDING",
-    "notes": "实际读题，仅元数据公开。尚未证明独立抽取版测量等价性；中文目录名不是中文版量表。"
+    "notes": "原英文37项及选项已与OECD官方美国Main PDF核对，公开描述Form包另附来源/改编说明。未建立独立抽取测量等价性，中文目录不是译题版。"
   },
   "educationApplicability": {
     "schemaVersion": 1,
@@ -132,7 +132,7 @@
       "disclaimer": "候选元数据不可施测。无计分表单只保留事实/描述，不生成数字或评分报告。学生填写不表示教师可查看该生个体意见。"
     },
     "blockers": [
-      "Exact USA English national item redistribution/third-party scope not confirmed; do not publish full questionnaire text.",
+      "English native descriptive Form package is available under OECD written-content terms §1.2 with source/adaptation notice; this catalog candidate remains non-executable WLE metadata. Commercial translation and any actual third-party exceptions are not granted by this package.",
       "Existing native scoring path has no verified official PCM/GPCM/WLE reproduction for these sources; no new scoring engine in this task.",
       "Standalone extraction is a project administration change; matrix sampling/context validity not established.",
       "Production database/admin custom-content deduplication remains unverified."
