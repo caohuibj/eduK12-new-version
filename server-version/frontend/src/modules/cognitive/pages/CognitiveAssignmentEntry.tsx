@@ -145,7 +145,7 @@ const CognitiveAssignmentEntryContent: React.FC<{ assignmentId?: string }> = ({ 
             <p>截止时间：{new Date(assignment.dueAt).toLocaleString('zh-CN')}</p>
           )}
           <p>最多尝试：{assignment.maxAttempts} 次</p>
-          {assignment.usedAttempts !== undefined && <p>已使用 {assignment.usedAttempts} 次 · 剩余 {assignment.remainingAttempts} 次。独立入口与组合测评共用次数，继续原作答不额外计次。</p>}
+          {assignment.usedAttempts !== undefined && <p>已使用 {assignment.usedAttempts} 次 · 剩余 {assignment.remainingAttempts} 次。{learner.enabled ? '本次独立任务单独计次；继续原作答不额外计次。' : '独立入口与组合测评共用次数，继续原作答不额外计次。'}</p>}
           <p>预计用时以本任务指导语为准，请在可连续完成的环境中开始。</p>
           {assignment.config && (
             <p>
