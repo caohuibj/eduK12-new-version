@@ -1,0 +1,77 @@
+{
+  "checkedAt": "2026-11-02T01:42:39.627Z",
+  "catalog": [
+    {
+      "key": "jp_itbs_general_teacher_self_ja",
+      "schema": "PASS",
+      "registry": "PASS",
+      "preview": "NO_ACTIVATION"
+    },
+    {
+      "key": "jp_itbs_bridging_teacher_self_ja",
+      "schema": "PASS",
+      "registry": "PASS",
+      "preview": "NO_ACTIVATION"
+    },
+    {
+      "key": "jp_itbs_individual_teacher_self_ja",
+      "schema": "PASS",
+      "registry": "PASS",
+      "preview": "NO_ACTIVATION"
+    }
+  ],
+  "numericFixture": {
+    "status": "PASS_SYNTHETIC_ONLY_NOT_INSTRUMENT_VALIDATION",
+    "results": [
+      {
+        "scenario": "low",
+        "values": [
+          4,
+          4,
+          4,
+          12
+        ],
+        "quality": "interpretable",
+        "nativeReportInterpretations": 3
+      },
+      {
+        "scenario": "high",
+        "values": [
+          16,
+          16,
+          16,
+          48
+        ],
+        "quality": "interpretable",
+        "nativeReportInterpretations": 3
+      },
+      {
+        "scenario": "mixed",
+        "values": [
+          10,
+          10,
+          10,
+          30
+        ],
+        "quality": "interpretable",
+        "nativeReportInterpretations": 3
+      },
+      {
+        "scenario": "missing",
+        "values": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "quality": "invalid",
+        "nativeReportInterpretations": 0
+      }
+    ],
+    "invalidZeroFiveAndTypeMismatch": "REJECTED",
+    "oneMissing": "affected dimension and original whole12 unavailable; no imputation"
+  },
+  "reportDraftCases": 9,
+  "actualInstrumentDBImports": 0,
+  "rightsApproval": false
+}

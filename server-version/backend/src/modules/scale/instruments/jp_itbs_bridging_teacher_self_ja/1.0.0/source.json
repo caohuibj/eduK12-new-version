@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "jp_itbs_bridging_teacher_self_ja",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "日本融合教学行为自评｜架け橋対応（桥接支持）｜教师自评｜小学·日文2020（授权待补）",
+      "abbreviation": "日本融合教学行为自评",
+      "instrumentFamily": "Fukasawa–Kawamura Inclusive Teaching Behavior Self-Evaluation Scale 2020"
+    },
+    "construct": {
+      "primaryDomain": "TEACHER_OBSERVATION",
+      "secondaryDomains": [],
+      "constructDefinition": "教师对桥接支持相关融合教学行为的自我描述；高分只表示更趋向原题所述行为，不能直接证明教学质量。",
+      "constructLevel": "FACET",
+      "constructOverlapTags": [
+        "family:jp-itbs",
+        "role:teacher_self",
+        "stage:primary",
+        "lang:ja",
+        "version:2020",
+        "use:reflection",
+        "status:pilot",
+        "license:pending"
+      ]
+    },
+    "population": {
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "populationNotes": "原研究为日本公立小学通常学级担任教师；不外推到中学或中国教师，未制作中文题本。"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "无自行添加的回顾时窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Table 2 原题号/表列顺序 [9, 8, 10, 11]；数字不是最终连续题号，不重排为原作者新版本。",
+        "四级行为/意向混合锚点，不改成通用从不—总是；完整12题原组卷优先。",
+        "2分钟仅项目排程估计。单维度独立施测效度未建立。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "拟作教师自主发展性反思；需补内容再利用授权后方可施测。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "ja",
+    "targetLocale": "ja",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Original Japanese article Table 2 and methods; doi:10.34318/jacmp.9.0_7",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "只登记日文身份；中文维度名称和反馈是项目说明草案，不是经过验证的中文题本。任何未来题文翻译另立版本并核授权。"
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Inclusive Teaching Behavior Self-Evaluation Scale — 架け橋対応",
+      "citation": "深沢和彦・河村茂雄 (2020). インクルーシブ指導行動自己評定尺度（小学校版）の開発. 学級経営心理学研究, 9, 7–17. doi:10.34318/jacmp.9.0_7",
+      "url": "https://doi.org/10.34318/jacmp.9.0_7",
+      "publicationYear": 2020
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "架け橋対応（桥接支持）"
+      ],
+      "limitations": [
+        "仅自报融合教学行为，不作为绩效、诊断或优秀教师排名。",
+        "目前目录无题文及可执行版本；不得以此施测或生成分数报告。",
+        "样本描述不是常模；单维度分离施测和中文本地效度均未建立。",
+        "桥接支持的反思应尊重儿童隐私，不把原文行为机械化为公开诊断或家庭情况的要求。"
+      ],
+      "disclaimer": "目录候选待授权；全文已读取但未复制入GitHub/数据库，不是缺题本，也不是已实际入库。"
+    },
+    "blockers": [
+      "RIGHTSHOLDER_PERMISSION_FOR_REUSE_TRANSLATION_DATABASE_NOT_ESTABLISHED"
+    ]
+  }
+}
