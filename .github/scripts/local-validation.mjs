@@ -55,6 +55,7 @@ export function recipe(check,base,head) {
   if(cognitiveIntakeToolingChanged(files)) {
    commands.push(['node','--test','.github/scripts/cognitive-intake-scope.test.mjs','.github/scripts/cognitive-intake-check.test.mjs','server-version/scripts/cognitive/onboarding-selection.test.cjs']);
   }
+  if(files.some(f=>['server-version/backend/src/scripts/situational-onboarding-check.ts','.github/scripts/sjt-onboarding-git-buffer.test.mjs','.github/workflows/situational-publication.yml'].includes(f)))commands.push(['node','--test','.github/scripts/sjt-onboarding-git-buffer.test.mjs']);
   const backendTests=toolingBackendTests(files);
   if(backendTests.length)commands.push(['npm','--prefix','server-version/backend','test','--',...backendTests,'--maxWorkers=1']);
   if(files.includes('server-version/backend/src/scripts/cognitive-onboarding-check.ts'))commands.push(['node','server-version/backend/node_modules/typescript/bin/tsc','--project','server-version/backend/tsconfig.json','--noEmit']);

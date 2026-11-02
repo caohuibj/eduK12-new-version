@@ -53,7 +53,7 @@ suite('child cross-method real relational START / FINAL / saved report', {timeou
     process.env.DATA_ENCRYPTION_KEY='e'.repeat(64); process.env.DATA_PSEUDONYM_KEY='d'.repeat(64)
     process.env.BUNDLE_PRODUCTS_ENABLED='true'; process.env.BUNDLE_REVIEW_SIGNING_KEY='synthetic-child-review-key-000000000000'
     for (const [key,id] of Object.entries(ids)) await db.user.create({data:{id,username:id,passwordHash:'SYNTHETIC ONLY',accountDomain:'TRAINING',
-      role:key==='child'?'STUDENT':key==='parent'?'PARENT':key==='teacher'?'TEACHER':'ADMIN',teacherApproved:key==='teacher',platformRole:key==='admin'?'SYSTEM_ADMIN':'STANDARD'}})
+      role:key==='child'?'STUDENT':key==='parent'?'PARENT':key==='teacher'?'TEACHER':'ADMIN',teacherApproved:key==='teacher',platformRole:key==='admin'||key==='reviewer'?'SYSTEM_ADMIN':'STANDARD'}})
     courseId=(await db.course.create({data:{title:'Synthetic child workflow',courseCode:'child-'+suffix,courseType:'TRAINING_COURSE',status:'PUBLISHED',creatorId:ids.teacher}})).id
     await db.courseStudent.create({data:{courseId,studentId:ids.child,status:'ACTIVE'}})
     await db.parentStudentRelationship.create({data:{parentUserId:ids.parent,studentUserId:ids.child,status:'ACTIVE',approvedByUserId:ids.teacher,approvedAt:new Date()}})

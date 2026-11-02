@@ -1,0 +1,435 @@
+{
+  "sourceCitation": "Ersoy et al. (2024). Digital competence of faculty members in health sciences measured via self-reflection: current status and contextual aspects. PeerJ 12:e18456. https://doi.org/10.7717/peerj.18456 ; Supplemental Information 1, Digital Competency Assessment Questionnaire for Academicians, form timestamp 2023-06-02.",
+  "sourceUrl": "https://dfzljdn9uc3pi.cloudfront.net/2024/18456/1/Survey_Blind_Version.pdf",
+  "sha256": "176c0dbce586980d00474284b11bc173048cff69cba050d400784f4d01397aac",
+  "license": "© 2024 Ersoy et al., PeerJ, https://doi.org/10.7717/peerj.18456 ; survey Supplemental Information 1 https://doi.org/10.7717/peerj.18456/supp-1 ; CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Original framework: Redecker, C. (2017), edited by Punie, Y., European Framework for the Digital Competence of Educators: DigCompEdu, European Commission JRC, doi:10.2760/159770. This package extracts the published higher-education English survey; area separation, complete-case scoring policy and project feedback are adaptations. Layout, compulsory background fields and email collection are not reproduced. No author/European Commission endorsement implied.",
+  "items": [
+    {
+      "sourceQuestion": 3,
+      "page": 3,
+      "prompt": "I systematically use different digital channels to enhance communication with students and fellow academics e.g. emails, blogs, the department’s website, Apps",
+      "options": [
+        "I rarely use digital communication channels",
+        "I use basic digital communication channels, e.g. e-mail",
+        "I combine different communication channels, e.g. e-mail and class blog or the daprtment's website",
+        "I systematically select, adjust and combine different digital solutions to communicate effectively",
+        "I reflect on, discuss and proactively develop my communication strategies"
+      ]
+    },
+    {
+      "sourceQuestion": 4,
+      "page": 3,
+      "prompt": "I use digital technologies to work together with colleagues inside and outside my educational organisation",
+      "options": [
+        "I rarely have the opportunity to collaborate with other academics",
+        "Sometimes I exchange materials with colleagues, e.g. via e-mail",
+        "Among colleagues, we work together in collaborative environments or use shared drives",
+        "I exchange ideas and materials, also with academics outside my organisation, e.g. in an online professional network",
+        "I jointly create materials with other academics in an online network"
+      ]
+    },
+    {
+      "sourceQuestion": 5,
+      "page": 4,
+      "prompt": "I actively develop my digital teaching skills",
+      "options": [
+        "I rarely have the time to work on my digital teaching skills",
+        "I improve my skills through reflection and experimentation",
+        "I use a range of resources to develop my digital teaching skills",
+        "I discuss with peers how to use digital technologies to innovate and improve educational practice.",
+        "I help colleagues in developing their digital teaching strategies."
+      ]
+    },
+    {
+      "sourceQuestion": 6,
+      "page": 4,
+      "prompt": "I participate in online training opportunities e.g. online courses, MOOCs, webinars, virtual conferences...",
+      "options": [
+        "This is a new area that I have not yet considered",
+        "Not yet, but I am definitely interested",
+        "I have participated in online training once or twice",
+        "I have tried out various different online training opportunities",
+        "I frequently participate in all kinds of online training"
+      ]
+    },
+    {
+      "sourceQuestion": 7,
+      "page": 5,
+      "prompt": "I use different Internet sites and search strategies to find and select a range of different digital resources",
+      "options": [
+        "I only rarely use the internet to find resources",
+        "I use search engines and resource platforms to find relevant resources",
+        "I evaluate and select resources on the basis of their suitability for my learner group",
+        "I compare resources using a range of relevant criteria, e.g. reliability, quality, fit, design, interactivity, appeal",
+        "I advise colleagues on suitable resources and search strategies"
+      ]
+    },
+    {
+      "sourceQuestion": 8,
+      "page": 5,
+      "prompt": "I create my own digital resources and modify existing ones to adapt them to my needs",
+      "options": [
+        "I do not create my own digital resources",
+        "I do create lecture notes or reading lists with a computer, but then I print them",
+        "I create digital presentations, but not much more",
+        "I create and modify different types of resources",
+        "I set up and adapt complex, interactive resources"
+      ]
+    },
+    {
+      "sourceQuestion": 9,
+      "page": 5,
+      "prompt": "I effectively protect sensitive content, e.g. exams, students' grades, personal data",
+      "options": [
+        "I do not need to do that, because the department takes care of this",
+        "I avoid storing personal data electronically",
+        "I protect some personal data",
+        "I password protect files with personal data",
+        "I comprehensively protect personal data, e.g. combining hard-to-guess passwords with encryption and frequent software updates"
+      ]
+    },
+    {
+      "sourceQuestion": 10,
+      "page": 6,
+      "prompt": "I carefully consider how, when and why to use digital technologies in teaching, to ensure that they are used with added value",
+      "options": [
+        "I do not or only rarely use technology in class",
+        "I make basic use of available equipment, e.g. digital whiteboards or projectors",
+        "I use a variety of digital strategies in my teaching",
+        "I use digital tools to systematically enhance teaching",
+        "I use digital tools to implement innovative pedagogic strategies"
+      ]
+    },
+    {
+      "sourceQuestion": 11,
+      "page": 6,
+      "prompt": "I monitor my students' activities and interactions in the collaborative online environments we use",
+      "options": [
+        "I do not use digital environments with my students",
+        "I do not monitor student activity in the online environments we use",
+        "I occasionally check on them and their discussions",
+        "I regularly monitor and analyse my students' online activity",
+        "I regularly intervene with motivating or corrective comments"
+      ]
+    },
+    {
+      "sourceQuestion": 12,
+      "page": 7,
+      "prompt": "When my students work in groups or teams, they use digital technologies to acquire and document evidence",
+      "options": [
+        "My students do not work in groups",
+        "It is not possible for me to integrate digital technologies into group work",
+        "I encourage students working in groups to search for information online or to present their results in digital format",
+        "I require students working in teams to use the internet to find information and present their results in a digital format",
+        "My students exchange evidence and jointly create knowledge in a collaborative online space"
+      ]
+    },
+    {
+      "sourceQuestion": 13,
+      "page": 7,
+      "prompt": "I use digital technologies to allow students to plan, document and monitor their learning themselves E.g. quizzes for self-assessment, ePortfolios for documentation and showcasing, online diaries/blogs for reflection...",
+      "options": [
+        "Not possible in my work environment",
+        "My students do reflect on their learning, but not with digital technologies",
+        "Sometimes I use, for example, quizzes for self-assessment",
+        "I use a variety of digital tools to allow learners to plan, document or reflect on their learning",
+        "I systematically integrate different digital tools to allow learners to plan, monitor and reflect on their progress"
+      ]
+    },
+    {
+      "sourceQuestion": 14,
+      "page": 8,
+      "prompt": "I use digital assessment formats to monitor student progress",
+      "options": [
+        "I do not monitor students’ progress",
+        "I do monitor students' progress regularly, but not with digital means",
+        "Sometimes I use a digital tool, e.g. a quiz, to check on students' progress",
+        "I use a variety of digital tools to monitor student progress",
+        "I systematically use a variety of digital tools to monitor student progress"
+      ]
+    },
+    {
+      "sourceQuestion": 15,
+      "page": 8,
+      "prompt": "I analyse all data available to me to timely identify students who need additional support \"Data\" includes: students' engagement, performance, grades, attendance; activities and social interactions in (online) environments;\"Students who need additional support\" are: students who are at risk of dropping out or underperforming; students who have learning disorders or specific learning needs, students who lack transversal skills, e.g. social, verbal or study skills.",
+      "options": [
+        "These data are not available and/or it is not my responsibility to analyse them",
+        "I only analyse academically relevant data, e.g. performance and grades",
+        "I also consider data on student activity and behaviour to identify students who need additional support",
+        "I regularly screen all available evidence to identify students who need additional support",
+        "I systematically analyse data and intervene in a timely manner"
+      ]
+    },
+    {
+      "sourceQuestion": 16,
+      "page": 8,
+      "prompt": "I use digital technologies to provide effective feedback",
+      "options": [
+        "Feedback is not necessary in my work environment",
+        "I do provide feedback to students, but not in digital format",
+        "Sometimes I use digital ways of providing feedback, e.g. automatic scores in online quizzes, comments or \"likes\" in online environments",
+        "I use a variety of digital ways of providing feedback",
+        "I systematically use digital approaches to provide feedback"
+      ]
+    },
+    {
+      "sourceQuestion": 17,
+      "page": 9,
+      "prompt": "When I create digital assignments for students I consider and address potential digital problems E.g. equal access to digital devices and resources; interoperability and conversion problems; lack of digital skills",
+      "options": [
+        "I do not create digital assignments",
+        "My students do not have problems with using digital technology",
+        "I adapt the task so as to minimize difficulties",
+        "I discuss possible obstacles with students and outline solutions",
+        "I allow for variety, e.g. I adapt the task, discuss solutions and provide alternative ways for completing the task"
+      ]
+    },
+    {
+      "sourceQuestion": 18,
+      "page": 10,
+      "prompt": "I use digital technologies to offer students personalised learning opportunities e.g. I give different students different digital tasks to address individual learning needs, preferences and interests",
+      "options": [
+        "In my work environment, all students are required to do the same activities, irrespective of their level",
+        "I do provide students with recommendations for additional resources",
+        "I provide optional digital activities for those who are advanced or lagging behind",
+        "Whenever possible, I use digital technologies to offer differentiated learning opportunities",
+        "I systematically adapt my teaching to link to students' individual learning needs, preferences and interests"
+      ]
+    },
+    {
+      "sourceQuestion": 19,
+      "page": 10,
+      "prompt": "I use digital technologies for students to actively participate in classes",
+      "options": [
+        "In my work environment it is not possible to actively involve students in class",
+        "I do involve students actively, but not with digital technologies",
+        "When instructing, I use motivating stimuli, e.g. videos, animations, cartoons",
+        "My students engage with digital media in my classes, e.g. electronic worksheets, games, quizzes",
+        "My students systematically use digital technologies to investigate, discuss and create knowledge"
+      ]
+    },
+    {
+      "sourceQuestion": 20,
+      "page": 11,
+      "prompt": "I teach students how to assess the reliability of information and to identify misinformation and bias",
+      "options": [
+        "This is not possible in my subject or work environment",
+        "I occasionally remind them that not all online information is reliable",
+        "I teach them how to discern reliable and unreliable sources",
+        "I discuss with students how to verify the accuracy of information",
+        "We comprehensively discuss how information is generated and can be distorted"
+      ]
+    },
+    {
+      "sourceQuestion": 21,
+      "page": 11,
+      "prompt": "I set up assignments which require students to use digital means to communicate and collaborate with each other or with an outside audience",
+      "options": [
+        "This is not possible in my subject or work environment",
+        "Only on rare occasions are my students required to communicate or collaborate online",
+        "My students use digital communication and cooperation mainly among each other",
+        "My students use digital ways to communicate and to cooperate with each other and with an external audience",
+        "I systematically set assignments that allow students to slowly expand their skills"
+      ]
+    },
+    {
+      "sourceQuestion": 22,
+      "page": 11,
+      "prompt": "I set up assignments which require students to create digital content e.g. videos, audios, photos, digital presentations, blogs, wikis...",
+      "options": [
+        "This is not possible in my subject or work environment",
+        "This is difficult to implement with my students",
+        "Sometimes, for diversion and motivation",
+        "My students create digital content as integral part of their study",
+        "This is an integral part of their learning and I systematically increase the level of difficulty to further develop their skills"
+      ]
+    },
+    {
+      "sourceQuestion": 23,
+      "page": 12,
+      "prompt": "I teach students how to behave safely and responsibly online",
+      "options": [
+        "This is not possible in my subject or work environment",
+        "I inform them that they have to be careful with relaying personal information online",
+        "I explain the basic rules for safely and responsibly acting in online environments",
+        "We discuss and agree on rules of conduct",
+        "I systematically develop my students’ use of social rules in the different digital environments we use"
+      ]
+    },
+    {
+      "sourceQuestion": 24,
+      "page": 12,
+      "prompt": "I encourage students to use digital technologies creatively to solve concrete problems e.g. to overcome obstacles or challenges emerging in the learning process",
+      "options": [
+        "This is not possible with my students, in my work environment",
+        "I rarely have the opportunity to foster students' digital problem solving",
+        "Occasionally, whenever an opportunity arises",
+        "We often experiment with technological solutions to problems",
+        "I systematically integrate opportunities for creative digital problem solving"
+      ]
+    }
+  ],
+  "normalizations": [
+    {
+      "sourceQuestion": 3,
+      "field": "prompt",
+      "option": null,
+      "from": "1) I systematically use different digital channels to enhance communication with students and fellow academics e.g. emails, blogs, the department’s website, Apps",
+      "to": "I systematically use different digital channels to enhance communication with students and fellow academics e.g. emails, blogs, the department’s website, Apps"
+    },
+    {
+      "sourceQuestion": 3,
+      "field": "options",
+      "option": 4,
+      "from": "I re ect on, discuss and proactively develop my communication strategies",
+      "to": "I reflect on, discuss and proactively develop my communication strategies"
+    },
+    {
+      "sourceQuestion": 4,
+      "field": "prompt",
+      "option": null,
+      "from": "2. I use digital technologies to work together with colleagues inside and outside my educational organisation",
+      "to": "I use digital technologies to work together with colleagues inside and outside my educational organisation"
+    },
+    {
+      "sourceQuestion": 5,
+      "field": "prompt",
+      "option": null,
+      "from": "3. I actively develop my digital teaching skills",
+      "to": "I actively develop my digital teaching skills"
+    },
+    {
+      "sourceQuestion": 6,
+      "field": "prompt",
+      "option": null,
+      "from": "4. I participate in online training opportunities  e.g. online courses, MOOCs, webinars, virtual conferences...",
+      "to": "I participate in online training opportunities e.g. online courses, MOOCs, webinars, virtual conferences..."
+    },
+    {
+      "sourceQuestion": 7,
+      "field": "prompt",
+      "option": null,
+      "from": "1. I use different Internet sites and search strategies to find and select a range of different digital resources",
+      "to": "I use different Internet sites and search strategies to find and select a range of different digital resources"
+    },
+    {
+      "sourceQuestion": 8,
+      "field": "prompt",
+      "option": null,
+      "from": "2. I create my own digital resources and modify existing ones to adapt them to my needs",
+      "to": "I create my own digital resources and modify existing ones to adapt them to my needs"
+    },
+    {
+      "sourceQuestion": 9,
+      "field": "prompt",
+      "option": null,
+      "from": "3. I effectively protect sensitive content, e.g. exams, students' grades, personal data",
+      "to": "I effectively protect sensitive content, e.g. exams, students' grades, personal data"
+    },
+    {
+      "sourceQuestion": 10,
+      "field": "prompt",
+      "option": null,
+      "from": "1. I carefully consider how, when and why to use digital technologies in teaching, to ensure that they are used with added value",
+      "to": "I carefully consider how, when and why to use digital technologies in teaching, to ensure that they are used with added value"
+    },
+    {
+      "sourceQuestion": 11,
+      "field": "prompt",
+      "option": null,
+      "from": "2. I monitor my students' activities and interactions in the collaborative online environments we use",
+      "to": "I monitor my students' activities and interactions in the collaborative online environments we use"
+    },
+    {
+      "sourceQuestion": 12,
+      "field": "prompt",
+      "option": null,
+      "from": "3. When my students work in groups or teams, they use digital technologies to acquire and document evidence",
+      "to": "When my students work in groups or teams, they use digital technologies to acquire and document evidence"
+    },
+    {
+      "sourceQuestion": 13,
+      "field": "prompt",
+      "option": null,
+      "from": "4. I use digital technologies to allow students to plan, document and monitor their learning themselves E.g. quizzes for self-assessment, ePortfolios for documentation and showcasing, online diaries/blogs for re ection...",
+      "to": "I use digital technologies to allow students to plan, document and monitor their learning themselves E.g. quizzes for self-assessment, ePortfolios for documentation and showcasing, online diaries/blogs for reflection..."
+    },
+    {
+      "sourceQuestion": 14,
+      "field": "prompt",
+      "option": null,
+      "from": "1. I use digital assessment formats to monitor student progress",
+      "to": "I use digital assessment formats to monitor student progress"
+    },
+    {
+      "sourceQuestion": 15,
+      "field": "prompt",
+      "option": null,
+      "from": "2. I analyse all data available to me to timely identify students who need additional support \"Data\" includes: students' engagement, performance, grades, attendance; activities and social interactions in (online) environments;\"Students who need additional support\" are: students who are at risk of dropping out or underperforming; students who have learning disorders or specific learning needs, students who lack transversal skills, e.g. social, verbal or study skills.",
+      "to": "I analyse all data available to me to timely identify students who need additional support \"Data\" includes: students' engagement, performance, grades, attendance; activities and social interactions in (online) environments;\"Students who need additional support\" are: students who are at risk of dropping out or underperforming; students who have learning disorders or specific learning needs, students who lack transversal skills, e.g. social, verbal or study skills."
+    },
+    {
+      "sourceQuestion": 16,
+      "field": "prompt",
+      "option": null,
+      "from": "3. I use digital technologies to provide effect ve feedback",
+      "to": "I use digital technologies to provide effective feedback"
+    },
+    {
+      "sourceQuestion": 17,
+      "field": "prompt",
+      "option": null,
+      "from": "1. When I create digital assignments for students I consider and address potential digital problems E.g. equal access to digital devices and resources; interoperability and conversion problems; lack of digital skills",
+      "to": "When I create digital assignments for students I consider and address potential digital problems E.g. equal access to digital devices and resources; interoperability and conversion problems; lack of digital skills"
+    },
+    {
+      "sourceQuestion": 18,
+      "field": "prompt",
+      "option": null,
+      "from": "2. I use digital technologies to offer students personalised learning opportunities e.g. I give different students different digital tasks to address individual learning needs, preferences and interests",
+      "to": "I use digital technologies to offer students personalised learning opportunities e.g. I give different students different digital tasks to address individual learning needs, preferences and interests"
+    },
+    {
+      "sourceQuestion": 19,
+      "field": "prompt",
+      "option": null,
+      "from": "3. I use digital technologies for students to act vely part c pate n classes",
+      "to": "I use digital technologies for students to actively participate in classes"
+    },
+    {
+      "sourceQuestion": 20,
+      "field": "prompt",
+      "option": null,
+      "from": "1. I teach students how to assess the reliability of information and to identify mis information and bias",
+      "to": "I teach students how to assess the reliability of information and to identify misinformation and bias"
+    },
+    {
+      "sourceQuestion": 21,
+      "field": "prompt",
+      "option": null,
+      "from": "2. I set up assignments which require students to use digital means to communicate and collaborate with each other or with an outs de aud ence",
+      "to": "I set up assignments which require students to use digital means to communicate and collaborate with each other or with an outside audience"
+    },
+    {
+      "sourceQuestion": 22,
+      "field": "prompt",
+      "option": null,
+      "from": "3. I set up assignments which require students to create digital content  e.g. videos, audios, photos, digital presentations, blogs, wikis...",
+      "to": "I set up assignments which require students to create digital content e.g. videos, audios, photos, digital presentations, blogs, wikis..."
+    },
+    {
+      "sourceQuestion": 23,
+      "field": "prompt",
+      "option": null,
+      "from": "4. I teach students how to behave safely and responsibly online",
+      "to": "I teach students how to behave safely and responsibly online"
+    },
+    {
+      "sourceQuestion": 24,
+      "field": "prompt",
+      "option": null,
+      "from": "5. I encourage students to use digital technologies creatively to solve concrete problems e.g. to overcome obstacles or challenges emerging in the learning process",
+      "to": "I encourage students to use digital technologies creatively to solve concrete problems e.g. to overcome obstacles or challenges emerging in the learning process"
+    }
+  ]
+}

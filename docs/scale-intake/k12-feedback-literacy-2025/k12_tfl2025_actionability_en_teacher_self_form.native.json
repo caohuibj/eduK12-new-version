@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "pages": [
+    {
+      "pageKey": "a_reflection",
+      "title": "中国K12反馈素养｜反馈行动性无分反思｜教师自评｜2025英文公开题文",
+      "description": "These statements come from a teacher feedback-giving literacy study. For each statement, you may describe an example, a learning need or a question. You can leave any statement unanswered or decline to answer. No ratings, scores, levels or automated judgements are produced. This is a project reflection form, not the original validated questionnaire; the original teacher response anchors and scoring instructions have not been verified. Your perspective does not establish the feedback students actually received. Do not include student names or identifiable work. © The Author(s) 2025 (Cui Kang, Jinyan Huang, Ying Liu, Hua Yin). CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Original English item text reproduced from Tables 2–3 of https://www.nature.com/articles/s41599-025-04927-4. These are author-created items; no separate restrictive credit line accompanies the tables. Project changes: four standalone unscored reflection forms, optional long-text answers, instructions and independently drafted Simplified Chinese working translations. Neither an author-endorsed digital questionnaire nor a validated Chinese/English standalone scale is claimed. No participant datasets, article layout, images or supplement charts are redistributed.",
+      "questions": [
+        {
+          "itemKey": "a1",
+          "type": "LONG_TEXT",
+          "prompt": "A1: My feedback is easy to understand and implement.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a2",
+          "type": "LONG_TEXT",
+          "prompt": "A2: My feedback takes into account the student’s strengths, but also emphasizes specific areas for improvement.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a3",
+          "type": "LONG_TEXT",
+          "prompt": "A3: My feedback encourages students to reflect and improve.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a4",
+          "type": "LONG_TEXT",
+          "prompt": "A4: My feedback includes specific, actionable steps that are easy for students to understand and implement.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a5",
+          "type": "LONG_TEXT",
+          "prompt": "A5: My feedback helps students understand their current level of learning and how to improve in the future.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a6",
+          "type": "LONG_TEXT",
+          "prompt": "A6: I can offer actionable feedback at the right time.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        },
+        {
+          "itemKey": "a7",
+          "type": "LONG_TEXT",
+          "prompt": "A7: My feedback motivates students to go deeper into the course content.",
+          "required": false,
+          "allowRefusal": true,
+          "options": [],
+          "rows": [],
+          "maxLength": 1000
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1332 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "SELFIEforTEACHERS｜促进学习者数字能力（6项）｜教师自评｜2022 Toolkit英文固定版",
+      "abbreviation": "SELFIE4T-6",
+      "instrumentFamily": "SELFIEforTEACHERS 32-item tool, fixed 2022 Toolkit; NOT DigCompEdu Check-In22 or school-level SELFIE"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "Facilitating learners’ digital competence: teacher self-positioning on digital-competence maturity statements. Preserves each competence’s A1–C2 statement and separate zero-point not-aware response; not an agreement scale, a teaching-quality measure or an observed performance test. No area/global aggregate is computed by this split unit.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:selfie4t",
+        "role:teacher_self",
+        "stage:primary_sec",
+        "locale:en",
+        "version:2022tk1",
+        "use:reflection",
+        "license:CCBY4",
+        "pilot",
+        "scoring:0_6_items",
+        "source:JRC129699"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Adult primary and secondary teachers able to understand the fixed English Toolkit. Initial digital split scope; age18+ is a project scope, not a source-derived validation cut-off. Source studies do not establish Chinese-language or separate-area digital equivalence. Early-years use on the current website is not borrowed as validation for this fixed primary/secondary version."
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Current professional digital practice and experience; no fixed day/week recall period.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Choose the ONE original maturity statement that best describes your current competence in each item. Six item-specific A1/A2/B1/B2/C1/C2 statements are scored1–6, and the seventh not-aware response is scored0.",
+        "Keep the original competence order and original option order; no agreement anchors, automatic reversal, simplified alternatives or shortened items.",
+        "Six separate native area units are project packaging; independent administration equivalence is not established. The ordinary-composite recipe retains all32 competences in order.",
+        "This unit reports each competence separately; no area mean, global192-point total or overall A1–C2 band is manufactured across the split tools.",
+        "Missing items remain null; 0 is a real not-aware answer, not missing data. Any unanswered competence makes this area incomplete and suppresses its interpretations; this complete-area policy is a project choice, not an inferred source missing-data algorithm.",
+        "Timing is an approximate project allocation of the official circa25-minute whole-tool estimate, not measured timing."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Professional learning self-reflection using a fixed EU source, not a certification, teacher appraisal or observed competence test."
+        },
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Separate-area digital packaging and local applicability require explicit interpretation limits; not automatic cross-language/role equivalence."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text). All six-level statements from this fixed Toolkit; seventh awareness option and scoring from official2023 report.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Original English content, typographic extraction normalization only; project English instructions and feedback. No validated Chinese item translation and no EU certification/badge. Exact current login-only online text was not accessed."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "selfie4t_2022tk_learners_digital_competence_en_teacher_self-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "selfie4t_2022tk_learners_digital_competence_en_teacher_self-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": false,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "selfie4t_2022tk_learners_digital_competence_en_teacher_self-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© European Union 2022 (Toolkit JRC129699) and 2023 (JRC131282 scoring scheme); author Anastasia Economou. CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Reproduces EU-owned item/level text from the 2022 Toolkit Annex I and the common “I am not aware of this competence” option/scoring from the official 2023 report p.11/Annex1. Project changes: six separate digital area units, normalized extraction whitespace, instructions, per-competence output/report wording and conservative missing handling. The 2023 chapter4 omits the B2 row for6.5; no missing statement was invented: ALL six-level item text is taken consistently from the complete 2022 Toolkit. No EU logos, badges, screenshots, third-party figures or software copied; no endorsement or current online equivalence claimed.",
+      "Item text: https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+      "Per-item scoring/awareness option: https://publications.jrc.ec.europa.eu/repository/bitstream/JRC131282/JRC131282_01.pdf"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "SELFIEforTEACHERS fixed 2022 English Toolkit Annex I (32 competences); official 2023 per-item scoring",
+        "citation": "Economou, A. (2022). SELFIEforTEACHERS Toolkit – Using SELFIEforTEACHERS. Publications Office of the European Union, Luxembourg. doi:10.2760/626409, JRC129699, Annex I, pp. 48–64 (PDF pages 49–64 for the item text). Scoring/awareness option: Economou, A. (2023). SELFIEforTEACHERS. Designing and developing a self-reflection tool for teachers’ digital competence. doi:10.2760/561258, JRC131282, p.11 and Annex 1 p.92 (PDF page96).",
+        "url": "https://education.ec.europa.eu/sites/default/files/2022-12/selfie-for-teachers-toolkit-dec-22_en.pdf",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© European Union 2022 (Toolkit JRC129699) and 2023 (JRC131282 scoring scheme); author Anastasia Economou. CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Reproduces EU-owned item/level text from the 2022 Toolkit Annex I and the common “I am not aware of this competence” option/scoring from the official 2023 report p.11/Annex1. Project changes: six separate digital area units, normalized extraction whitespace, instructions, per-competence output/report wording and conservative missing handling. The 2023 chapter4 omits the B2 row for6.5; no missing statement was invented: ALL six-level item text is taken consistently from the complete 2022 Toolkit. No EU logos, badges, screenshots, third-party figures or software copied; no endorsement or current online equivalence claimed."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "maturity_6_1",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1: I am aware of learning activities and resources that can enhance students’ information and data literacy (e.g. searching for digital information, evaluating information found, reading graphs, reading and understanding data).",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2: I have tried learning activities that encourage students to search, evaluate and manage information and data in digital environments (e.g. setting search criteria, comparing different sources, interpreting data).",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1: I implement various learning activities that require students to critically search, evaluate and manage information and data from different digital environments, according to their learning needs (e.g. setting selection criteria, identifying inaccuracies, missing information or bias, cross-checking different sources to judge credibility, managing misinformation, racism, and xenophobia).",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2: I design learning to support students to critically search, evaluate and manage information and data (e.g. analysing the choice of the information medium, the source, purpose, transparency of algorithms used to decide what kind of information and data is returned).",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1: I lead project-based initiatives where students, as both recipients and creators of content, go through the process of critically searching, evaluating and managing information and data (e.g. editing the school newsletter, organising information and data access using taxonomies and categories).",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2: My students and I contribute to the creation of strategies that promote ways to use digital technologies to improve information and data literacy across my school and its wider community (e.g. workshops, debates, experiential activities).",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "I am not aware of this competence.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_6_2",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1: I am aware of learning activities that can enhance students’ digital communication and collaboration (e.g. using email, instant messaging, social networks, etc. to communicate with teachers and peers).",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2: I have tried learning activities that encourage students to communicate and collaborate with teachers and each other using digital technologies (e.g. using online meetings, discussion forums).",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1: I implement various learning activities that require students to communicate and collaborate in digital contexts according to their learning needs (e.g. use of appropriate medium for students ’ digital communication, use of digital tools that best support students ’ collaboration, managing an online shared space, editing online shared documents).",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2: I design learning to support students to use digital technologies for communication and collaboration respecting behavioural and communication norms (e.g. respecting others ’ ideas and diversity while contributing to team work, sharing messages across multicultural networks, creating positive connections and building contacts).",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1: I reflect on the suitability of my teaching practices in view of fostering students ’ digital communication and collaboration, and readjust them accordingly (e.g. exchange good practices with other colleagues, discuss with students communication and collaboration needs, exploring new digital tools).",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2: My students and I initiate and promote digital communication and collaboration networks with other schools and educational stakeholders (nationally and internationally) to exchange learning experiences, activities and pursue common projects (e.g. participation in and/or co-creation of educational initiatives, competitions).",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "I am not aware of this competence.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_6_3",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1: I am aware of learning activities that encourage students to express themselves through digital means (e.g. in the form of text, photos, images, presentations).",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2: I have tried learning activities that encourage students to create and modify digital content (e.g. text, presentations, audios, videos).",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1: I implement various learning activities that require my students to express and convey their ideas creatively, by using appropriate digital tools (e.g. visualisations, simulations, digital stories).",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2: I design learning to engage students in creative design processes in order to (re)create quality digital content, while respecting copyright rules and licenses (e.g. scaffolding students to go through a design process for content development, facilitating students to select appropriate digital tools, guiding students to understand copyright, attribute licences and give credits).",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1: I reflect on and (re)design learning activities for fostering students’ digital expression and content (re)creation, while encouraging sharing practices (e.g. digital stories, e-portfolios).",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2: My students and I initiate and promote strategies across the school and its wider community that allow students to engage in designing, developing and publishing their digital (re)creations, while sharing them in novel ways (e.g. co-creating mobile apps, maintaining makerspaces, promoting audio and video broadcasts).",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "I am not aware of this competence.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_6_4",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1: I am aware of learning activities that encourage students to use digital technologies safely (e.g. how to protect data privacy, read terms of use, avoid social exclusion, and prevent violence in digital environments).",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2: I have tried learning activities that allow students to consider the safety and wellbeing implications of using digital technologies (e.g. identifying inappropriate behaviour, discussing overuse/addiction issues).",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1: I implement various learning activities to prompt students to act in responsible and ethical ways when creating and consuming digital information (e.g. adjusting the settings of their social media, protecting personal data and privacy, setting strong passwords, block and report individuals who make them feel uncomfortable).",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2: I design learning to help students develop strategies of responsible and ethical use of technologies, to safeguard their reputation, and promote social well-being (e.g. balancing online & offline activities, recognising and facing cyberbullying / sexting / racism, etc. in digital environments).",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1: I reflect on and (re)design learning activities based on continuous developments on online risks and threats, so as to enable students to follow and adopt positive practices towards their and their peers’ physical, psychological and social well-being (e.g. how companies collect and use data about individuals, how social media affect emotional and social relationships).",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2: My students and I contribute to create a culture in our school and its wider community, in which the negative and positive uses of digital technologies are openly discussed and ways of avoiding risks and threats (e.g. online safety experiential workshops, digital well-being coaching for peers, teachers and parents).",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "I am not aware of this competence.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_6_5",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1: I am aware of learning activities to empower students to understand the legal and ethical implications of using digital technologies (e.g. sharing personal and others’ sensitive information, managing private settings on online apps).",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2: I have tried learning activities that foster students’ understanding of legal and ethical implications when using digital technologies (e.g. sharing of copyrighted digital content, accepting permissions when installing apps).",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1: I implement various digital learning activities that require students to act in a responsible and ethical way both as consumers and creators of digital information and content (e.g. critically assessing online information, reacting to misinformation, behaving positively online, complying with data protection and copyright rules, respecting diversity and multiple opinions).",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2: I design learning to provide opportunities for students to manage their digital identities and reputations (e.g. tracing their digital footprint, managing their digital identity, being aware of the terms of use of different media and applications, managing application settings).",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1: I reflect on and (re)design my learning activities to allow students to consider the ethics and potential impact of their digital behaviours in authentic situations (e.g. considering how something they post online might be hurtful, respectfully sharing a difference of opinion in a comment, online activism).",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2: My students and I initiate and promote strategies across the school and its wider community that promote ethical and responsible use of digital technologies by staff, students and parents (e.g. workshops, coaching peers, teachers and parents).",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "I am not aware of this competence.",
+              "score": 0
+            }
+          ]
+        },
+        {
+          "key": "maturity_6_6",
+          "options": [
+            {
+              "value": "A1",
+              "label": "A1: I am aware of learning activities that encourage students to use digital technologies to understand and solve problems (e.g. using a search engine, help features, apps to record and organise information for analysis).",
+              "score": 1
+            },
+            {
+              "value": "A2",
+              "label": "A2: I have tried learning activities that encourage students to use digital technologies to understand and solve problems (e.g. brainstorming, mapping, using visualisation tools, etc. to analyse a problem and develop a possible solution).",
+              "score": 2
+            },
+            {
+              "value": "B1",
+              "label": "B1: I implement various learning activities that allow students to apply problem solving processes supported by digital technologies (e.g. finding and organizing information, analysing, inferring, predicting outcomes, making analogies and formulating ideas).",
+              "score": 3
+            },
+            {
+              "value": "B2",
+              "label": "B2: I design learning to allow students to look for different innovative and creative solutions to be applied in new situations and contexts (e.g. generating/testing new ideas and solutions, simulation, modelling).",
+              "score": 4
+            },
+            {
+              "value": "C1",
+              "label": "C1: I reflect on my teaching and (re)design teaching and learning activities to enable the co-creation of problem solving processes with my students and finding solutions which involve digital technologies (e.g. representation of abstract models, debugging, decomposing problems in small parts).",
+              "score": 5
+            },
+            {
+              "value": "C2",
+              "label": "C2: My students and I contribute to exploring and developing innovative and creative solutions to real world challenges within and beyond our school (e.g. social, environmental, technological challenges).",
+              "score": 6
+            },
+            {
+              "value": "UNAWARE",
+              "label": "I am not aware of this competence.",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "S4T_6_1",
+          "content": "6.1. Facilitating learners’ digital competence - Information and data literacy Incorporating learning activities, which require learners to use digital technologies to search, evaluate and manage information and data in digital environments.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "maturity_6_1",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_6_2",
+          "content": "6.2. Facilitating learners' digital competence - Communication and collaboration Implementing learning activities that require learners to communicate and collaborate using digital technologies.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "maturity_6_2",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_6_3",
+          "content": "6.3. Facilitating learners' digital competence - Content creation Incorporating learning activities that require learners to express themselves by creating digital artefacts.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "maturity_6_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_6_4",
+          "content": "6.4. Facilitating learners' digital competence - Safety and wellbeing Empowering learners to use digital technologies safely, while mitigating risks to ensure physical, psychological and social well-being.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "maturity_6_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_6_5",
+          "content": "6.5. Facilitating learners' digital competence - Responsible use Empowering learners to use digital technologies responsibly and ethically, managing their digital identity, digital footprint and digital reputation.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "maturity_6_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "S4T_6_6",
+          "content": "6.6. Facilitating learners' digital competence - Problem-solving Incorporating learning activities, where learners use digital technologies to understand and solve problems.",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "maturity_6_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "S4T_6_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "competence_6_1",
+            "type": "dimension",
+            "label": "6.1 Information and data literacy Incorporating learning activities, which require learners to use digital technol",
+            "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_6_1",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_6_2",
+            "type": "dimension",
+            "label": "6.2 Communication and collaboration Implementing learning activities that require learners to communicate and coll",
+            "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_6_2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_6_3",
+            "type": "dimension",
+            "label": "6.3 Content creation Incorporating learning activities that require learners to express themselves by creating dig",
+            "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_6_3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_6_4",
+            "type": "dimension",
+            "label": "6.4 Safety and wellbeing Empowering learners to use digital technologies safely, while mitigating risks to ensure ",
+            "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_6_4",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_6_5",
+            "type": "dimension",
+            "label": "6.5 Responsible use Empowering learners to use digital technologies responsibly and ethically, managing their digi",
+            "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_6_5",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "competence_6_6",
+            "type": "dimension",
+            "label": "6.6 Problem-solving Incorporating learning activities, where learners use digital technologies to understand and s",
+            "description": "One original competence self-position:0=not aware;1–6=its original A1–C2 statements. No norm, percentile, area aggregate or teacher-quality rating.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "S4T_6_6",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "competence_6_1",
+          "competence_6_2",
+          "competence_6_3",
+          "competence_6_4",
+          "competence_6_5",
+          "competence_6_6"
+        ],
+        "scoreOrder": [
+          "competence_6_1",
+          "competence_6_2",
+          "competence_6_3",
+          "competence_6_4",
+          "competence_6_5",
+          "competence_6_6"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "competence_6_1",
+            "headline": "Reflecting on competence 6.1",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one everyday digital task for students and discuss how to check information, protect privacy or explain a choice responsibly."
+              },
+              {
+                "category": "support",
+                "text": "Use age-appropriate activities and your school’s safeguards. You can ask colleagues for a worked example before trying a new approach."
+              }
+            ]
+          },
+          {
+            "scoreKey": "competence_6_2",
+            "headline": "Reflecting on competence 6.2",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one everyday digital task for students and discuss how to check information, protect privacy or explain a choice responsibly."
+              },
+              {
+                "category": "support",
+                "text": "Use age-appropriate activities and your school’s safeguards. You can ask colleagues for a worked example before trying a new approach."
+              }
+            ]
+          },
+          {
+            "scoreKey": "competence_6_3",
+            "headline": "Reflecting on competence 6.3",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one everyday digital task for students and discuss how to check information, protect privacy or explain a choice responsibly."
+              },
+              {
+                "category": "support",
+                "text": "Use age-appropriate activities and your school’s safeguards. You can ask colleagues for a worked example before trying a new approach."
+              }
+            ]
+          },
+          {
+            "scoreKey": "competence_6_4",
+            "headline": "Reflecting on competence 6.4",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one everyday digital task for students and discuss how to check information, protect privacy or explain a choice responsibly."
+              },
+              {
+                "category": "support",
+                "text": "Use age-appropriate activities and your school’s safeguards. You can ask colleagues for a worked example before trying a new approach."
+              }
+            ]
+          },
+          {
+            "scoreKey": "competence_6_5",
+            "headline": "Reflecting on competence 6.5",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one everyday digital task for students and discuss how to check information, protect privacy or explain a choice responsibly."
+              },
+              {
+                "category": "support",
+                "text": "Use age-appropriate activities and your school’s safeguards. You can ask colleagues for a worked example before trying a new approach."
+              }
+            ]
+          },
+          {
+            "scoreKey": "competence_6_6",
+            "headline": "Reflecting on competence 6.6",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This response records the maturity statement you selected for this specific digital competence. The statements describe awareness, exploration, use, purposeful selection, reflective support and wider initiative in item-specific ways. A higher point value indicates a later self-described position in this framework; it does not establish better teaching or better student outcomes. The separate not-aware response is a valid starting point for learning. Use a recent example and your working conditions to put the choice in context. The displayed points preserve the original statement order: 0 = not aware; 1 = A1; 2 = A2; 3 = B1; 4 = B2; 5 = C1; 6 = C2. These codes are maturity statements within this framework, not agreement levels, teacher grades or population percentiles.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one recent example connected with this competence. What did you do, what evidence did you notice, and which conditions helped or limited it?"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one everyday digital task for students and discuss how to check information, protect privacy or explain a choice responsibly."
+              },
+              {
+                "category": "support",
+                "text": "Use age-appropriate activities and your school’s safeguards. You can ask colleagues for a worked example before trying a new approach."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Fixed source: 2022 Toolkit Annex I for complete item text and A1–C2 labels; official2023 report p.11/Annex1 for seventh not-aware option and0–6 point mapping. The2023 report omits the B2 row for6.5; no omitted row was invented.",
+          "These are self-reported digital-competence positions, not observed teaching, student learning outcomes, professional certification, personality labels or a school/teacher ranking.",
+          "The six separate digital area units, instructions, feedback and conservative missing policy are project adaptations. Current online text, independent-area validity and Chinese-version validity were not established.",
+          "Missing answers remain null and are not treated as a zero-point not-aware response. Any missing competence makes this area invalid/incomplete for interpretation. Other area units have their own completeness; no missing value is imputed. This project policy is not claimed as an author-issued missing-data algorithm.",
+          "No area average, global192-point score, overall proficiency band, population norm, percentile or cross-tool total is supplied. Consult the official Toolkit and2023 report for original glossary and full-tool interpretation."
+        ],
+        "disclaimer": "For supportive professional learning reflection by the teacher receiving their own authorized results. A1–C2 are this framework’s maturity codes, not grades for teacher quality. No EU endorsement, badge or certificate is issued. Existing access and feedback permissions still apply.",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "selfie4t_2022tk_learners_digital_competence_en_teacher_self",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_unaware",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "UNAWARE"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 0,
+            "competence_6_2": 0,
+            "competence_6_3": 0,
+            "competence_6_4": 0,
+            "competence_6_5": 0,
+            "competence_6_6": 0
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_a1",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "A1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 1,
+            "competence_6_2": 1,
+            "competence_6_3": 1,
+            "competence_6_4": 1,
+            "competence_6_5": 1,
+            "competence_6_6": 1
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_a2",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "A2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 2,
+            "competence_6_2": 2,
+            "competence_6_3": 2,
+            "competence_6_4": 2,
+            "competence_6_5": 2,
+            "competence_6_6": 2
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_b1",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "B1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 3,
+            "competence_6_2": 3,
+            "competence_6_3": 3,
+            "competence_6_4": 3,
+            "competence_6_5": 3,
+            "competence_6_6": 3
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_b2",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "B2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 4,
+            "competence_6_2": 4,
+            "competence_6_3": 4,
+            "competence_6_4": 4,
+            "competence_6_5": 4,
+            "competence_6_6": 4
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_c1",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "C1"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "C1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 5,
+            "competence_6_2": 5,
+            "competence_6_3": 5,
+            "competence_6_4": 5,
+            "competence_6_5": 5,
+            "competence_6_6": 5
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_c2",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "C2"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "C2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 6,
+            "competence_6_2": 6,
+            "competence_6_3": 6,
+            "competence_6_4": 6,
+            "competence_6_5": 6,
+            "competence_6_6": 6
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "mixed_positions",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "UNAWARE"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "A1"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "A2"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "B2"
+          },
+          {
+            "itemCode": "S4T_6_6",
+            "responseValue": "C1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "competence_6_1": 0,
+            "competence_6_2": 1,
+            "competence_6_3": 2,
+            "competence_6_4": 3,
+            "competence_6_5": 4,
+            "competence_6_6": 5
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "missing_one_not_zero",
+        "answers": [
+          {
+            "itemCode": "S4T_6_1",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_2",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_3",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_4",
+            "responseValue": "B1"
+          },
+          {
+            "itemCode": "S4T_6_5",
+            "responseValue": "B1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "competence_6_1": 3,
+            "competence_6_2": 3,
+            "competence_6_3": 3,
+            "competence_6_4": 3,
+            "competence_6_5": 3,
+            "competence_6_6": null
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "competence_6_1": null,
+            "competence_6_2": null,
+            "competence_6_3": null,
+            "competence_6_4": null,
+            "competence_6_5": null,
+            "competence_6_6": null
+          },
+          "totalScoreKeys": [
+            "competence_6_1",
+            "competence_6_2",
+            "competence_6_3",
+            "competence_6_4",
+            "competence_6_5",
+            "competence_6_6"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Reflect on your current professional digital practice. For each competence choose the ONE statement that best describes your current position. A1, A2, B1, B2, C1 and C2 are progressive, item-specific statements; they are not agreement ratings. If appropriate, choose “I am not aware of this competence”, which is a real zero-point answer. A missing response remains missing. This digital unit is one area of the fixed2022 SELFIEforTEACHERS Toolkit and uses the official per-item0–6 mapping described in2023. Feedback is for your professional learning, not teacher appraisal, EU certification or student-outcome prediction.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "Project-written digital instruction grounded in JRC129699 Toolkit self-reflection navigation/AnnexI and JRC131282 p.11/Annex1; not a verbatim official platform instruction."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

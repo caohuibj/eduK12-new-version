@@ -1,0 +1,133 @@
+{
+  "status": "PASS",
+  "forms": [
+    {
+      "key": "k12_tfl2025_knowledge_en_teacher_self_form",
+      "items": 7,
+      "definitionDigest": "6213b8d7a7d40fa4f515bf8ae0cd9c3090e9280b2e5a3eb0ab7f0af4441ef7a7",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_skills_en_teacher_self_form",
+      "items": 8,
+      "definitionDigest": "a1212703e05ef4dc3a497d628685398aef3343774541016de5076c3e503f7ec7",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_values_en_teacher_self_form",
+      "items": 8,
+      "definitionDigest": "203e8b9a88dd19da76e379eb4d4253cf676849c3ed3130cb35c4fdd0f42239f6",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_actionability_en_teacher_self_form",
+      "items": 7,
+      "definitionDigest": "371f67b21f62582931cffd7be39ac15355f88274a4ac135a87664ee3b6df5ba9",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form",
+      "items": 7,
+      "definitionDigest": "ced397caa85b014e9b508908a2e59427f7ffc4d0261f327cda2774bc3652b495",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_skills_zh_cn_working_teacher_self_form",
+      "items": 8,
+      "definitionDigest": "a1d2f7c7647fae14061ffe729f3aae2321ad80a72f24a7a8c8a6ad9c48111c99",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_values_zh_cn_working_teacher_self_form",
+      "items": 8,
+      "definitionDigest": "50d9f49d3bef58afe1fc03589adba089d9c7de4b9e4adff8030a8de694ba0ac7",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    },
+    {
+      "key": "k12_tfl2025_actionability_zh_cn_working_teacher_self_form",
+      "items": 7,
+      "definitionDigest": "27d3ba8a46a7afce008d20e30028124a19245ae5da11c7f4fac27e953844aceb",
+      "complete": "PASS",
+      "empty": "PASS",
+      "refused": "PASS",
+      "scoring": "ABSENT"
+    }
+  ],
+  "catalogs": [
+    {
+      "instrumentKey": "k12_tfl2025_30_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "k12_tfl2025_30_zh_cn_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "k12_tfl2025_actionability_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "k12_tfl2025_knowledge_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "k12_tfl2025_skills_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    },
+    {
+      "instrumentKey": "k12_tfl2025_values_en_teacher_self",
+      "instrumentVersion": "1.0.0",
+      "status": "CATALOG_ONLY",
+      "administrable": false,
+      "goldenCases": 0,
+      "scoringExecutions": 0,
+      "issues": []
+    }
+  ]
+}

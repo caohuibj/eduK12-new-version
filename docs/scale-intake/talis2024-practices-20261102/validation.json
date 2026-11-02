@@ -1,0 +1,573 @@
+{
+  "status": "PASS",
+  "scope": "actual native Form API create/add/read, owned DRAFT tag metadata, three ordinary combination imports and Form answer boundaries",
+  "database": "isolated disposable loopback PostgreSQL16.15 / eduk12_talis24_test",
+  "schemaPreparation": "current Prisma schema db push, not migration/deployment validation",
+  "fixture": "synthetic teacher; no real respondents; no Attempt/FINAL/access token or public delivery",
+  "nativeForms": [
+    {
+      "instrumentKey": "talis2024_clarity_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "53efae1b-0dca-444e-ab9f-eec9679f2661",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_clarity_isced1_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "e57fd550-82b2-4626-a391-becbd9db21e5",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_cognitive_activation_isced1_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "b27e5a68-afd9-4cc7-a801-58bf166c0feb",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_classroom_management_isced1_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "bcc0db6e-5846-44bd-a07a-117d274ad616",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_other_practices_isced1_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced1_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "9fa91e9f-7bd0-4798-8c48-e859357ce70b",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "answerChecks": 7,
+      "nativeCode": "talis2024_time_allocation_isced1_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "659d35a9-6a43-44d0-bb43-3944c16a0c94",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_clarity_isced2_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "e1aab316-91d9-42ad-9984-8a9926910ae5",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_cognitive_activation_isced2_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "6700db02-f9cb-4acf-83b6-6b90451c174a",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_classroom_management_isced2_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "a051eab2-93cf-43ef-ba04-db44e8fa59c2",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_other_practices_isced2_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced2_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "008e3e36-10ea-4d92-9790-ddbdebf6f1bb",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "answerChecks": 7,
+      "nativeCode": "talis2024_time_allocation_isced2_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_clarity_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "e65c7a38-9047-40cd-8cff-ccf8e320c24e",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51A",
+        "TT4G51B",
+        "TT4G51C",
+        "TT4G51D"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_clarity_isced3_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_cognitive_activation_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "4c68f9bc-0775-47a2-af73-453c4c617ec3",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51E",
+        "TT4G51F",
+        "TT4G51G",
+        "TT4G51H"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_cognitive_activation_isced3_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_classroom_management_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "e4e2728e-e5c1-4dfd-bdb0-1bf971894a0c",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51I",
+        "TT4G51J",
+        "TT4G51K",
+        "TT4G51L"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_classroom_management_isced3_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_other_practices_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "d8a6079c-5cf0-44e3-afdf-327952adb7b2",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G51M",
+        "TT4G51N",
+        "TT4G51O"
+      ],
+      "answerChecks": 6,
+      "nativeCode": "talis2024_other_practices_isced3_teacher_self_en"
+    },
+    {
+      "instrumentKey": "talis2024_time_allocation_isced3_teacher_self_en",
+      "contentVersion": "1.0.0",
+      "scoringVersion": null,
+      "reportVersion": null,
+      "id": "4b23df25-f815-4968-ba2e-5d991cbd861c",
+      "nativeRevision": 1,
+      "status": "DRAFT",
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection",
+        "state:research",
+        "source:oecd"
+      ],
+      "sourceVariables": [
+        "TT4G50A",
+        "TT4G50B",
+        "TT4G50C"
+      ],
+      "answerChecks": 7,
+      "nativeCode": "talis2024_time_allocation_isced3_teacher_self_en"
+    }
+  ],
+  "combinations": [
+    {
+      "key": "talis2024_teaching_practices_isced1_teacher_self_en",
+      "id": "7a35994c-3bab-4b8e-ab37-45d83e982c87",
+      "status": "DRAFT",
+      "nativeRevision": 5,
+      "items": 5,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced1",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "reportMode": "COLLECTION_ONLY"
+    },
+    {
+      "key": "talis2024_teaching_practices_isced2_teacher_self_en",
+      "id": "93c9a7f2-1ae2-40f2-8282-5adf3e6637d7",
+      "status": "DRAFT",
+      "nativeRevision": 5,
+      "items": 5,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced2",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "reportMode": "COLLECTION_ONLY"
+    },
+    {
+      "key": "talis2024_teaching_practices_isced3_teacher_self_en",
+      "id": "a7ed4e81-629a-470c-8bcf-f0bd31f5fca8",
+      "status": "DRAFT",
+      "nativeRevision": 5,
+      "items": 5,
+      "tags": [
+        "family:talis24_tp",
+        "role:teacher_self",
+        "level:isced3",
+        "lang:en",
+        "wave:talis2024",
+        "use:reflection"
+      ],
+      "reportMode": "COLLECTION_ONLY"
+    }
+  ],
+  "sourceFields": 54,
+  "answerChecks": 93,
+  "scoringExecutions": 0,
+  "reportRendering": "NOT_EXECUTED_UNSCORED_FORMS",
+  "fieldTagLimitation": "FORM_TEMPLATE tag editor/API not supported on current main; fixture writes existing tags column only under owner+DRAFT restriction; ordinary QUESTIONNAIRE tags use existing updateCatalogTags",
+  "nativePayloadSha256": "d658ccff529aee3ce35c112d985c277a6de82e0a7c4e50148d3e39a78e564109",
+  "sourceTextChecks": [
+    {
+      "key": "talis2024_clarity_isced1_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_cognitive_activation_isced1_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_classroom_management_isced1_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_other_practices_isced1_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_time_allocation_isced1_teacher_self_en",
+      "sourcePdfPage": 31,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_clarity_isced2_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_cognitive_activation_isced2_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_classroom_management_isced2_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_other_practices_isced2_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_time_allocation_isced2_teacher_self_en",
+      "sourcePdfPage": 31,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_clarity_isced3_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_cognitive_activation_isced3_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_classroom_management_isced3_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_other_practices_isced3_teacher_self_en",
+      "sourcePdfPage": 32,
+      "sourceTextAndAnchors": "PASS"
+    },
+    {
+      "key": "talis2024_time_allocation_isced3_teacher_self_en",
+      "sourcePdfPage": 31,
+      "sourceTextAndAnchors": "PASS"
+    }
+  ],
+  "sourceTextComparison": "original English text/options and IDs compared to physical source PDF pp31–32; ignore extraction punctuation/spacing only",
+  "earlierLocalFailure": {
+    "status": "FAIL retained",
+    "stage": "native addItem schema",
+    "message": "formDefinition itemKey is unrecognized: native API assigns the key",
+    "fix": "omit itemKey only in addItem API argument; retain source definition and stable row/variable mapping; no engine/schema changed",
+    "subsequentRun": "PASS"
+  },
+  "baseSha": "ae05ed2e70691bda817ab323130f9caf4dff26ca",
+  "nodeVersion": "v24.21.0",
+  "dependencyPreparation": "official npm ci --ignore-scripts from unchanged lock; locally generated Prisma5.22 client from unchanged main schema",
+  "unexecuted": [
+    "whole-platform tests",
+    "backend/frontend build",
+    "browser",
+    "production or admin-private dedup",
+    "OECD factor scoring",
+    "respondent delivery or FINAL",
+    "runtime scored report"
+  ],
+  "testInputs": {
+    "server-version/backend/prisma/schema.prisma": "416335ca188d43a69e6c883e3f6ae66e221d929bdbc6c1615ab3a2a2203b49e0",
+    "server-version/backend/package-lock.json": "11b5fce38cb9a708a8ba28b99882a65e0b4d3719ea63e300b1e5c31f406cf591",
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60",
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "0dd47cd9be36adf776936d1c561443d78e2fbcbbd3e5a63df91cd5194598a0d0"
+  },
+  "earlierExecutionBase": "adad907a4b68606ce71bb1a4f2d7c511c872c715",
+  "baseUpdateReuse": "All recorded native Form/combination/tag services, schema and lock inputs unchanged between bases; no repeated native import",
+  "nativeCodeVerification": "15 source keys persisted/read via existing code column on same owner DRAFT; content/answer definitions unchanged, 93 answer checks not repeated",
+  "reproductionRecipeSha256": "384da42bdcfcd02e3f5664954526a5d03d11ea25facfbeea7c5ffc0526ebbba2",
+  "reproductionRecipeDisclosure": "Final combined recipe includes the later code-field metadata assignment; 93 Form answer checks passed before that metadata-only addition, followed by 15 focused code persistence/read checks. No single uninterrupted execution of the final combined text is claimed."
+}

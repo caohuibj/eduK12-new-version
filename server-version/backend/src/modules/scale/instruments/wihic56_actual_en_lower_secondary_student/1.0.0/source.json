@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "wihic56_actual_en_lower_secondary_student",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "WIHIC｜实际课堂56题母工具（英文·组合目录）｜初中｜学生填答",
+      "abbreviation": "WIHIC56",
+      "instrumentFamily": "What Is Happening In this Class? (WIHIC)"
+    },
+    "construct": {
+      "primaryDomain": "SCHOOL_CLIMATE",
+      "secondaryDomains": [],
+      "constructDefinition": "Mother-tool metadata only. Seven dimensions of perceived classroom learning environment; no executable mother total, item form or scoring for this record.",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "family:wihic",
+        "学生评教",
+        "评价对象:课堂",
+        "评价对象:教师",
+        "response:student_self_perception",
+        "locale:en",
+        "availability:catalog_only",
+        "maturity:pilot",
+        "form:actual",
+        "population:lower_secondary_student",
+        "license:cc_by_4_0_article"
+      ]
+    },
+    "population": {
+      "minAge": 12,
+      "maxAge": 15,
+      "gradeRange": {
+        "minGrade": 7,
+        "maxGrade": 9
+      },
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "English age/grade limits are the initial project scope, not source validation cut-offs. Chinese 2026 sample covers grades 10–11; abstract age 14–18 differs from Method age 15–18. Complete Mandarin form was not obtained; no item translation or deletion-based reconstruction is supplied."
+    },
+    "administration": {
+      "itemCount": 56,
+      "estimatedMinutes": 15,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Current classroom perceptions; preferred form is only an unverified separate candidate.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Catalog metadata only; no administration or individual scoring from this record.",
+        "Time estimate is a project estimate.",
+        "Actual/preferred, English/Mandarin, lower/upper-secondary versions remain separate."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Source identity and version tracking only; this catalog record cannot be administered."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Fraser, B. J. (2023). The Evolution of the Field of Learning Environments Research. Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257. Appendix A, Table A1, pp. 7–8.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Metadata only; no full translated or preferred questionnaire has been verified. The actual English mother references a separate ordinary-composite recipe."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "STUDENT",
+        "responseMode": "SELF"
+      }
+    ]
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "WIHIC English 56-item Appendix A (Fraser, 2023)",
+      "citation": "Fraser, B. J. (2023). The Evolution of the Field of Learning Environments Research. Education Sciences, 13(3), 257. https://doi.org/10.3390/educsci13030257. Appendix A, Table A1, pp. 7–8.",
+      "url": "https://www.mdpi.com/2227-7102/13/3/257",
+      "publicationYear": 2023
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "Student Cohesiveness",
+        "Teacher Support",
+        "Involvement",
+        "Investigation",
+        "Task Orientation",
+        "Cooperation",
+        "Equity"
+      ],
+      "limitations": [
+        "No executable mother score or report. All seven scales retain separate outcomes.",
+        "Chinese 52-item and preferred English item forms require verification from an authorized complete source; do not derive them by deleting or rewriting English items."
+      ],
+      "disclaimer": "Catalog candidate only; not installed or ready for administration."
+    },
+    "blockers": [
+      "ORDINARY_COMPOSITE_RECIPE_NOT_INSTALLED",
+      "DIGITAL_SPLIT_PROTOCOL_NOT_VALIDATED"
+    ]
+  }
+}

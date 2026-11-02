@@ -1,0 +1,686 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "rpq2024_confidence8_teacher_self_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "RPQ｜专业自信｜教师自评｜2024英文8题",
+      "abbreviation": "RPQ-E Confidence",
+      "instrumentFamily": "Reflective Practice Questionnaire / RPQ (Rogers et al.,2024)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [],
+      "constructDefinition": "More frequent feelings of preparedness and communication confidence, not demonstrated skill or complete knowledge. Original professional self-report wording retained; client is defined to include student in the source instruction.",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "family:rpq",
+        "role:teacher_self",
+        "language:en",
+        "source_version:2024",
+        "stage:teacher_all_school_levels",
+        "purpose:professional_reflection",
+        "source:Rogers_2024",
+        "rights:CC_BY_4_0",
+        "status:pilot",
+        "component:confidence8"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "Initial project scope: adult teachers reporting their own professional experience. The 2024 validation sample was employed university students across professions; no China K12 teacher-specific norms or standalone-subscale validation is claimed. Student in client definition is not a student respondent role.",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "Work perceptions and behaviour, no fixed recall days in author2024 instructions.",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "Author 2024 RPQ-E items 11–18; keep original wording, order and six frequency anchors.",
+        "No substitution from2018 agreement-form scoring; no reverse-coded items in this2024 component.",
+        "Component split is a project administration choice; independent administration is not claimed psychometrically equivalent to full RPQ-E.",
+        "Duration is a project estimate, not an author-validated per-component time."
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Author-scored English professional self-report; project teacher subscale packaging is PILOT."
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "Descriptive personal development; no diagnosis or teaching-quality rating."
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "en",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Author 2024 English Word questionnaire cross-checked verbatim with PeerJ2024 Table6.",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "NOT_ESTABLISHED",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "Original English content, not a validated Chinese questionnaire. Chinese catalogue names and separate report drafts are project editorial text."
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_confidence8_teacher_self_en-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_confidence8_teacher_self_en-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": false,
+        "references": false,
+        "individualInterpretations": false,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": false,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "rpq2024_confidence8_teacher_self_en-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Author website: freely available for use, no formal permission required.",
+      "Source item text: Rogers et al2024 PeerJ Table6, CC BY4.0; original authors/title/source/DOI attributed.",
+      "https://www.shanerogersresearch.com/rpq",
+      "https://doi.org/10.7717/peerj.16879",
+      "No clinical, high-stakes teacher accountability or local norm claim."
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "en",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "teacher_self_report",
+      "source": {
+        "title": "RPQ2024 / RPQ-E — Confidence",
+        "citation": "Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., & Priddis, L. (2024). Further development of the reflective practice questionnaire. PeerJ 12:e16879. https://doi.org/10.7717/peerj.16879",
+        "url": "https://doi.org/10.7717/peerj.16879"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "©2024 Rogers et al. PeerJ12:e16879, CC BY4.0 explicitly permits distribution/reproduction/adaptation in any medium and purpose with attribution. Original English Table6 wording reproduced; split into project component packages. Author page also permits free use without formal permission."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "rpq2024_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "Very rarely",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "Rarely",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "Sometimes",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "Often",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "Very often",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "Almost always",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "RPQ2024_11",
+          "content": "I feel like I have all the experience I require to effectively interact with clients.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_12",
+          "content": "I feel like I have all the practical skills I require to effectively interact with clients.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_13",
+          "content": "I feel like I have learnt everything I need to know in order to effectively interact with clients.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_14",
+          "content": "I feel like I have all the theoretical knowledge I require to effectively interact with clients.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_15",
+          "content": "I feel able to communicate so that a client can understand me easily.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_16",
+          "content": "I feel confident when communicating my ideas with a client.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_17",
+          "content": "I feel that I provide clear messages to my clients.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RPQ2024_18",
+          "content": "I feel capable in my ability to communicate with clients.",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "rpq2024_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "RPQ2024_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RPQ2024_18",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "confidence8",
+            "type": "total",
+            "label": "Confidence (mean 1–6)",
+            "description": "More frequent feelings of preparedness and communication confidence, not demonstrated skill or complete knowledge.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "RPQ2024_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RPQ2024_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "confidence8"
+        ],
+        "scoreOrder": [
+          "confidence8"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "confidence8",
+            "headline": "Your professional confidence in context",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "This mean describes how often you felt prepared and confident in your professional interactions. It does not verify your knowledge, communication skill or the experiences of students. A stronger sense of confidence can coexist with a need for feedback; a weaker sense does not prove poor teaching. Use a specific task and available evidence to decide what preparation or support would help. The mean ranges from 1 to 6 and follows the source frequency anchors; it is not a population percentile. No high/low threshold or teacher ranking is applied.",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Choose one task you felt ready for and one point you still wanted to check. Seek a concrete example or feedback from an appropriate colleague without treating confidence as proof."
+              },
+              {
+                "category": "support",
+                "text": "Use practical support that fits your situation. You do not need to change a number or complete repeated questionnaires before asking for help."
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "English2024 professional self-report; client/student wording follows original instruction, not a validated Chinese teacher adaptation.",
+          "No author missing-answer rule was located. Project complete_required withholds this component mean if any item is missing; missing is not zero and no imputation is used. Other independently completed components remain separate.",
+          "Splitting author-scored components does not prove independent administration equivalence; preserve the full30-item sequence for studies using the original extended protocol.",
+          "No local teacher norm, diagnosis, student-outcome inference or cross-component total."
+        ],
+        "disclaimer": "Teacher development and research only. Rogers, S. L., Van Winkle, L., Michels, N., Lucas, C., Ziada, H., Da Silva, E. J., Jotangia, A., Gabrielsson, S., Gustafsson, S., & Priddis, L. (2024). Further development of the reflective practice questionnaire. PeerJ 12:e16879. https://doi.org/10.7717/peerj.16879",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "en"
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "rpq2024_confidence8_teacher_self_en",
+        "locale": "en",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "rpq2024_confidence8_teacher_self_en_all_min",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "confidence8": 1
+          },
+          "totalScoreKeys": [
+            "confidence8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_confidence8_teacher_self_en_all_max",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_11",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_17",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_18",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "confidence8": 6
+          },
+          "totalScoreKeys": [
+            "confidence8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_confidence8_teacher_self_en_mixed",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "RPQ2024_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RPQ2024_18",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "confidence8": 3.5
+          },
+          "totalScoreKeys": [
+            "confidence8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_confidence8_teacher_self_en_one_missing",
+        "answers": [
+          {
+            "itemCode": "RPQ2024_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RPQ2024_17",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "confidence8": null
+          },
+          "totalScoreKeys": [
+            "confidence8"
+          ]
+        }
+      },
+      {
+        "name": "rpq2024_confidence8_teacher_self_en_all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "confidence8": null
+          },
+          "totalScoreKeys": [
+            "confidence8"
+          ]
+        }
+      }
+    ]
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "Please answer the questions below that ask you about your work perceptions and behaviour.\n\nPlease read each question carefully, and choose the response option that most accurately reflects how often the statement applies to you.\n\nPlease note: in this survey we use the term \"client\" to refer to the type of person you provide a service for in your work. In your particular line of work you may use a different term. For example, in retail the term might be \"customer\", in hospitality \"patron\", in education \"student\", in medical settings \"patient\", and so on. In this survey whenever you see the term \"client\" please simply think of your usual term.",
+    "language": "en",
+    "version": "1.0.0",
+    "source": "Rogers et al2024 author Word file; original note explicitly defines client as student in education."
+  },
+  "educationApplicability": {
+    "schemaVersion": 1,
+    "administrations": [
+      {
+        "population": "TEACHER",
+        "responseMode": "SELF"
+      }
+    ]
+  }
+}

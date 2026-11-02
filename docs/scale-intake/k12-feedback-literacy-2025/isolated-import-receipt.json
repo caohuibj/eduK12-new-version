@@ -1,0 +1,386 @@
+{
+  "database": "k12_tfl2025_intake_test_20261102",
+  "status": "ISOLATED_DEVELOPMENT_NATIVE_FORMS_IMPORTED",
+  "templates": [
+    {
+      "key": "k12_tfl2025_knowledge_en_teacher_self_form",
+      "id": "a57d78b4-e41b-4210-aeaa-ee1433d14e94",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5",
+        "K6",
+        "K7"
+      ],
+      "revision": 7,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "items": 7
+    },
+    {
+      "key": "k12_tfl2025_skills_en_teacher_self_form",
+      "id": "cf3fdf47-72a8-4ddf-8d8a-00a7a174dfbd",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8"
+      ],
+      "revision": 8,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "items": 8
+    },
+    {
+      "key": "k12_tfl2025_values_en_teacher_self_form",
+      "id": "0012b594-103a-4897-b802-a0bd107d9368",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+        "V8"
+      ],
+      "revision": 8,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "items": 8
+    },
+    {
+      "key": "k12_tfl2025_actionability_en_teacher_self_form",
+      "id": "7d4bc1c6-0e2a-4ea2-832d-920f9424c258",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7"
+      ],
+      "revision": 7,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ],
+      "items": 7
+    },
+    {
+      "key": "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form",
+      "id": "e7bcb470-3dd9-407c-98a7-b3408454225c",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K5",
+        "K6",
+        "K7"
+      ],
+      "revision": 7,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "items": 7
+    },
+    {
+      "key": "k12_tfl2025_skills_zh_cn_working_teacher_self_form",
+      "id": "99327f2a-9fcb-4ee6-9059-a61f27ae1f5b",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "S5",
+        "S6",
+        "S7",
+        "S8"
+      ],
+      "revision": 8,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "items": 8
+    },
+    {
+      "key": "k12_tfl2025_values_zh_cn_working_teacher_self_form",
+      "id": "9977520e-232b-4850-bd3a-b4a0cea0f9fd",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+        "V8"
+      ],
+      "revision": 8,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "items": 8
+    },
+    {
+      "key": "k12_tfl2025_actionability_zh_cn_working_teacher_self_form",
+      "id": "90702198-ddfb-4042-b2fe-97dba805bb3e",
+      "contentVersion": "1.0.0",
+      "status": "DRAFT",
+      "productKind": "FORM_TEMPLATE",
+      "steps": [
+        "CREATED",
+        "ITEMS_READBACK_MATCH",
+        "NO_SCORE",
+        "TAGS_READBACK_MATCH",
+        "NORMAL_EMPTY_REFUSAL_THROUGH_EXISTING_TYPED_ADAPTER"
+      ],
+      "originalItemCodes": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7"
+      ],
+      "revision": 7,
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ],
+      "items": 7
+    }
+  ],
+  "combinations": [
+    {
+      "key": "k12_tfl2025_all_en_teacher_self_reflection",
+      "id": "b43c77ef-d2c7-404c-97e3-d05b6888c092",
+      "steps": [
+        "CREATED",
+        "COPIED_VIA_EXISTING_IMPORT_FORM_TEMPLATE",
+        "30_FORMS_4_SECTIONS",
+        "NO_SCALE_NO_SCORES",
+        "COLLECTION_ONLY",
+        "TAGS_READBACK_MATCH"
+      ],
+      "sourceTemplateKeys": [
+        "k12_tfl2025_knowledge_en_teacher_self_form",
+        "k12_tfl2025_skills_en_teacher_self_form",
+        "k12_tfl2025_values_en_teacher_self_form",
+        "k12_tfl2025_actionability_en_teacher_self_form"
+      ],
+      "items": 30,
+      "sections": 4,
+      "status": "DRAFT",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:en",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "text:published_en"
+      ]
+    },
+    {
+      "key": "k12_tfl2025_all_zh_cn_working_teacher_self_reflection",
+      "id": "466a51d6-1cc3-4717-bdc9-ff0a568ec6f5",
+      "steps": [
+        "CREATED",
+        "COPIED_VIA_EXISTING_IMPORT_FORM_TEMPLATE",
+        "30_FORMS_4_SECTIONS",
+        "NO_SCALE_NO_SCORES",
+        "COLLECTION_ONLY",
+        "TAGS_READBACK_MATCH"
+      ],
+      "sourceTemplateKeys": [
+        "k12_tfl2025_knowledge_zh_cn_working_teacher_self_form",
+        "k12_tfl2025_skills_zh_cn_working_teacher_self_form",
+        "k12_tfl2025_values_zh_cn_working_teacher_self_form",
+        "k12_tfl2025_actionability_zh_cn_working_teacher_self_form"
+      ],
+      "items": 30,
+      "sections": 4,
+      "status": "DRAFT",
+      "tags": [
+        "family:k12_tfl2025",
+        "role:teacher_self",
+        "stage:k12",
+        "locale:zh-CN",
+        "version:1.0.0",
+        "use:reflection",
+        "unscored",
+        "pilot",
+        "license:CCBY4",
+        "translation:working"
+      ]
+    }
+  ],
+  "productionWrites": false,
+  "checkedAt": "2026-11-02T01:04:22.376Z",
+  "originalScalesInstalled": 0,
+  "formTemplatesInstalled": 8,
+  "nativePromptCount": 60,
+  "ordinaryQuestionnaires": 2,
+  "formOnlyCopiesInCombinations": 60,
+  "noPublishedOrPublicObjects": true,
+  "realParticipantData": false,
+  "databaseRetainedForReview": true,
+  "migrationsApplied": 273,
+  "postgresVersion": "PostgreSQL 16.15 (Debian 16.15-1.pgdg12+2)"
+}
