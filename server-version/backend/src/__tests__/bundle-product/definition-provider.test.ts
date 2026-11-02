@@ -8,11 +8,24 @@ const freeze=()=>freezeBundleProductionDefinition(entry(),{frozenAt:'2026-09-22T
 describe('Bundle production definition provider and full freeze',()=>{
   it('keeps all existing draft products blocked and observer products separate',()=>{
     expect(catalog.list().filter(entry => !entry.declarativePackage)).toHaveLength(7)
+    const dedicatedObservers=['child_chexi_parent_zh_cn_v1@0.1.0','child_chexi_teacher_zh_cn_v1@0.1.0']
+    const observedDedicated:string[]=[]
     for(const item of catalog.list()) {
       expect(item.definition.status).toBe('DRAFT')
       expect(catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)).toContain('BUNDLE_NOT_PUBLISHED')
-      if(item.definition.category==='observer') expect(catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)).toContain('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
+      if(item.definition.category==='observer') {
+        const identity=item.definition.bundleKey+'@'+item.definition.bundleVersion
+        const blockers=catalog.publicationBlockers(item.definition.bundleKey,item.definition.bundleVersion)
+        if(dedicatedObservers.includes(identity)) {
+          // Dedicated child episode delivery removes only the generic observer
+          // blocker; registration must not publish these draft packages.
+          expect(item.declarativePackage).toBeDefined()
+          expect(blockers).toEqual(['BUNDLE_NOT_PUBLISHED'])
+          observedDedicated.push(identity)
+        } else expect(blockers).toContain('OBSERVER_DELIVERY_REQUIRES_DEDICATED_PRODUCT')
+      }
     }
+    expect(observedDedicated.sort()).toEqual(dedicatedObservers)
   })
   it('rejects aliases and duplicate definitions; never resolves an unknown exact version to latest',()=>{
     expect(()=>catalog.exact(entry().definition.bundleKey,'latest')).toThrow()

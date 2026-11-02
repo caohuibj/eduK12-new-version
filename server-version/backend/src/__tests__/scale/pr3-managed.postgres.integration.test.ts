@@ -22,6 +22,11 @@ vi.mock('../../modules/scale/onboarding/instrument-registry', async importOrigin
   // overriding only source/policy leaves its install validation undefined.
   const syntheticRegistry = actual.createScaleInstrumentRegistry([source])
   return { ...actual,
+    SCALE_INSTRUMENT_REGISTRY: { ...actual.SCALE_INSTRUMENT_REGISTRY,
+      // Materialization consumes this object rather than the exported wrappers.
+      getSource: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getSource(k, v) : actual.SCALE_INSTRUMENT_REGISTRY.getSource(k, v),
+      getValidation: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getValidation(k, v) : actual.SCALE_INSTRUMENT_REGISTRY.getValidation(k, v),
+    },
     getScaleInstrumentSource: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getSource(k, v) : actual.getScaleInstrumentSource(k, v),
     getScaleInstrumentRuntimePolicy: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getRuntimePolicy(k, v) : actual.getScaleInstrumentRuntimePolicy(k, v),
     getScaleInstrumentValidation: (k: string, v: string) => k === source.identity.instrumentKey ? syntheticRegistry.getValidation(k, v) : actual.getScaleInstrumentValidation(k, v),

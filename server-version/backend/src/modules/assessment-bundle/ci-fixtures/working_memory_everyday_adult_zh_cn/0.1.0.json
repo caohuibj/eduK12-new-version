@@ -1,0 +1,894 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "randomSeed": "0123456789abcdef0123456789abcdef",
+  "context": {
+    "subject_age_years": 26,
+    "birth_year_month": "2000-01"
+  },
+  "slots": {
+    "spatial": {
+      "type": "COGNITIVE",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "startedAtPerfMs": 0,
+          "endedAtPerfMs": 14000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 3,
+            "trialWithinLevel": 1,
+            "sequence": [
+              2,
+              7,
+              3
+            ],
+            "response": [
+              2,
+              7,
+              3
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "startedAtPerfMs": 15000,
+          "endedAtPerfMs": 29000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 3,
+            "trialWithinLevel": 2,
+            "sequence": [
+              5,
+              8,
+              4
+            ],
+            "response": [
+              5,
+              8,
+              4
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "startedAtPerfMs": 30000,
+          "endedAtPerfMs": 44000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 4,
+            "trialWithinLevel": 1,
+            "sequence": [
+              0,
+              1,
+              8,
+              6
+            ],
+            "response": [
+              0,
+              1,
+              8,
+              6
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "startedAtPerfMs": 45000,
+          "endedAtPerfMs": 59000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 4,
+            "trialWithinLevel": 2,
+            "sequence": [
+              3,
+              4,
+              7,
+              8
+            ],
+            "response": [
+              3,
+              4,
+              7,
+              8
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "startedAtPerfMs": 60000,
+          "endedAtPerfMs": 74000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 5,
+            "trialWithinLevel": 1,
+            "sequence": [
+              3,
+              5,
+              4,
+              1,
+              2
+            ],
+            "response": [
+              3,
+              5,
+              4,
+              1,
+              2
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "startedAtPerfMs": 75000,
+          "endedAtPerfMs": 89000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 5,
+            "trialWithinLevel": 2,
+            "sequence": [
+              1,
+              5,
+              8,
+              3,
+              7
+            ],
+            "response": [
+              1,
+              5,
+              8,
+              3,
+              7
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "startedAtPerfMs": 90000,
+          "endedAtPerfMs": 104000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 6,
+            "trialWithinLevel": 1,
+            "sequence": [
+              6,
+              8,
+              7,
+              3,
+              2,
+              5
+            ],
+            "response": [
+              6,
+              8,
+              7,
+              3,
+              2,
+              5
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "startedAtPerfMs": 105000,
+          "endedAtPerfMs": 119000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 6,
+            "trialWithinLevel": 2,
+            "sequence": [
+              5,
+              8,
+              3,
+              7,
+              2,
+              0
+            ],
+            "response": [
+              5,
+              8,
+              3,
+              7,
+              2,
+              0
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "startedAtPerfMs": 120000,
+          "endedAtPerfMs": 134000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 7,
+            "trialWithinLevel": 1,
+            "sequence": [
+              8,
+              5,
+              7,
+              1,
+              4,
+              2,
+              6
+            ],
+            "response": [
+              8,
+              5,
+              7,
+              1,
+              4,
+              2,
+              6
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "startedAtPerfMs": 135000,
+          "endedAtPerfMs": 149000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 7,
+            "trialWithinLevel": 2,
+            "sequence": [
+              2,
+              1,
+              4,
+              8,
+              0,
+              5,
+              6
+            ],
+            "response": [
+              2,
+              1,
+              4,
+              8,
+              0,
+              5,
+              6
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "startedAtPerfMs": 150000,
+          "endedAtPerfMs": 164000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 8,
+            "trialWithinLevel": 1,
+            "sequence": [
+              6,
+              4,
+              7,
+              3,
+              1,
+              8,
+              0,
+              5
+            ],
+            "response": [
+              6,
+              4,
+              7,
+              3,
+              1,
+              8,
+              0,
+              5
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "startedAtPerfMs": 165000,
+          "endedAtPerfMs": 179000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 8,
+            "trialWithinLevel": 2,
+            "sequence": [
+              3,
+              4,
+              5,
+              2,
+              8,
+              6,
+              7,
+              0
+            ],
+            "response": [
+              3,
+              4,
+              5,
+              2,
+              8,
+              6,
+              7,
+              0
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false
+          }
+        }
+      ]
+    },
+    "backward": {
+      "type": "COGNITIVE",
+      "trials": [
+        {
+          "schemaVersion": 1,
+          "trialIndex": 0,
+          "phase": "test",
+          "startedAtPerfMs": 0,
+          "endedAtPerfMs": 14000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 2,
+            "trialWithinLevel": 1,
+            "sequence": [
+              2,
+              0
+            ],
+            "response": [
+              0,
+              2
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 1,
+          "phase": "test",
+          "startedAtPerfMs": 15000,
+          "endedAtPerfMs": 29000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 2,
+            "trialWithinLevel": 2,
+            "sequence": [
+              7,
+              2
+            ],
+            "response": [
+              2,
+              7
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 2,
+          "phase": "test",
+          "startedAtPerfMs": 30000,
+          "endedAtPerfMs": 44000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 3,
+            "trialWithinLevel": 1,
+            "sequence": [
+              6,
+              9,
+              5
+            ],
+            "response": [
+              5,
+              9,
+              6
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 3,
+          "phase": "test",
+          "startedAtPerfMs": 45000,
+          "endedAtPerfMs": 59000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 3,
+            "trialWithinLevel": 2,
+            "sequence": [
+              8,
+              4,
+              0
+            ],
+            "response": [
+              0,
+              4,
+              8
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 4,
+          "phase": "test",
+          "startedAtPerfMs": 60000,
+          "endedAtPerfMs": 74000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 4,
+            "trialWithinLevel": 1,
+            "sequence": [
+              7,
+              1,
+              8,
+              2
+            ],
+            "response": [
+              2,
+              8,
+              1,
+              7
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 5,
+          "phase": "test",
+          "startedAtPerfMs": 75000,
+          "endedAtPerfMs": 89000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 4,
+            "trialWithinLevel": 2,
+            "sequence": [
+              2,
+              0,
+              3,
+              8
+            ],
+            "response": [
+              8,
+              3,
+              0,
+              2
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 6,
+          "phase": "test",
+          "startedAtPerfMs": 90000,
+          "endedAtPerfMs": 104000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 5,
+            "trialWithinLevel": 1,
+            "sequence": [
+              4,
+              0,
+              9,
+              8,
+              6
+            ],
+            "response": [
+              6,
+              8,
+              9,
+              0,
+              4
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 7,
+          "phase": "test",
+          "startedAtPerfMs": 105000,
+          "endedAtPerfMs": 119000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 5,
+            "trialWithinLevel": 2,
+            "sequence": [
+              7,
+              0,
+              5,
+              9,
+              8
+            ],
+            "response": [
+              8,
+              9,
+              5,
+              0,
+              7
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 8,
+          "phase": "test",
+          "startedAtPerfMs": 120000,
+          "endedAtPerfMs": 134000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 6,
+            "trialWithinLevel": 1,
+            "sequence": [
+              6,
+              9,
+              2,
+              0,
+              4,
+              7
+            ],
+            "response": [
+              7,
+              4,
+              0,
+              2,
+              9,
+              6
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 9,
+          "phase": "test",
+          "startedAtPerfMs": 135000,
+          "endedAtPerfMs": 149000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 6,
+            "trialWithinLevel": 2,
+            "sequence": [
+              9,
+              3,
+              8,
+              6,
+              5,
+              7
+            ],
+            "response": [
+              7,
+              5,
+              6,
+              8,
+              3,
+              9
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 10,
+          "phase": "test",
+          "startedAtPerfMs": 150000,
+          "endedAtPerfMs": 164000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 7,
+            "trialWithinLevel": 1,
+            "sequence": [
+              5,
+              9,
+              7,
+              6,
+              1,
+              4,
+              2
+            ],
+            "response": [
+              2,
+              4,
+              1,
+              6,
+              7,
+              9,
+              5
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "trialIndex": 11,
+          "phase": "test",
+          "startedAtPerfMs": 165000,
+          "endedAtPerfMs": 179000,
+          "durationMs": 14000,
+          "flags": {
+            "timeout": false,
+            "premature": false
+          },
+          "qualityEvents": [],
+          "payload": {
+            "spanLength": 7,
+            "trialWithinLevel": 2,
+            "sequence": [
+              5,
+              0,
+              9,
+              8,
+              7,
+              2,
+              3
+            ],
+            "response": [
+              3,
+              2,
+              7,
+              8,
+              9,
+              0,
+              5
+            ],
+            "responseDurationMs": 1500,
+            "interrupted": false,
+            "timedOut": false
+          }
+        }
+      ]
+    },
+    "everyday": {
+      "type": "SCALE",
+      "answers": [
+        {
+          "itemCode": "ADEXI-01",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-02",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-03",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-04",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-05",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-06",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-07",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-08",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-09",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-10",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-11",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-12",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-13",
+          "responseValue": "never"
+        },
+        {
+          "itemCode": "ADEXI-14",
+          "responseValue": "never"
+        }
+      ]
+    }
+  },
+  "expectedKind": "COMPUTED",
+  "expectedRuleIds": [
+    "spatial_record",
+    "backward_record",
+    "everyday_record",
+    "wm2",
+    "scope"
+  ]
+}

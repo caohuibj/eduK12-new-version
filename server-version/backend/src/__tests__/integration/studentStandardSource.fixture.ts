@@ -39,6 +39,10 @@ export async function installStudentStandardFixtures(){
  for(const source of sources)expect(local.getValidation(source.identity.instrumentKey,'1.0.0')?.issues.filter(issue=>issue.severity==='error')).toEqual([])
  const source=registry.getScaleInstrumentSource,validation=registry.getScaleInstrumentValidation,policy=registry.getScaleInstrumentRuntimePolicy,list=registry.listScaleInstrumentSources,getPackage=packages.getScalePackage
  const matches=(key:string)=>sources.some(row=>row.identity.instrumentKey===key)
+ // Materialization reads the registry object directly; share the exact local
+ // validation cache with wrapper consumers while delegating real identities.
+ vi.spyOn(registry.SCALE_INSTRUMENT_REGISTRY,'getSource').mockImplementation((key,version)=>matches(key)?local.getSource(key,version):source(key,version))
+ vi.spyOn(registry.SCALE_INSTRUMENT_REGISTRY,'getValidation').mockImplementation((key,version)=>matches(key)?local.getValidation(key,version):validation(key,version))
  vi.spyOn(registry,'getScaleInstrumentSource').mockImplementation((key,version)=>matches(key)?local.getSource(key,version):source(key,version))
  vi.spyOn(registry,'getScaleInstrumentValidation').mockImplementation((key,version)=>matches(key)?local.getValidation(key,version):validation(key,version))
  vi.spyOn(registry,'getScaleInstrumentRuntimePolicy').mockImplementation((key,version)=>matches(key)?local.getRuntimePolicy(key,version):policy(key,version))

@@ -15,13 +15,26 @@ const additions = [
   'child_cognitive_control_parent_zh_cn@0.1.0', 'child_cognitive_control_teacher_zh_cn@0.1.0',
   'child_cognitive_tasks_zh_cn@0.1.0',
 ]
+const expectedPackageIdentities = [
+  ...additions,
+  'example_descriptive_v1@1.0.0',
+  'learning_motivation_math_support@0.1.1', 'learning_motivation_math_support@0.1.2',
+  'teacher_jdr_workplace_zh_cn@0.1.0',
+  'adult_bedtime_sleep_zh_cn@0.1.0',
+  'adult_interests_exploration_zh_cn@0.1.0', 'adult_interests_exploration_zh_cn@0.2.0',
+  'emotion_beliefs_strategies_adult_zh_cn@0.1.0', 'emotion_beliefs_strategies_adult_zh_cn@0.2.0',
+  'online_learning_regulation_procrastination_zh_cn@0.1.0', 'online_learning_regulation_procrastination_zh_cn@0.2.0',
+  'parenting_burden_efficacy_zh_cn@0.1.0',
+  'working_memory_everyday_adult_zh_cn@0.1.0',
+].sort()
 describe('local three-line registration junction only', () => {
   it('loads the exact union once, preserves legacy and base packages, and resolves all three histories', () => {
     const discovered = discoverPackages(path.resolve(__dirname, '../../modules/assessment-bundle/packages'))
     const generated = generatedPackages()
-    expect(generated).toHaveLength(12)
+    expect(generated.map(pack => pack.manifest.definition.bundleKey + '@' + pack.manifest.definition.bundleVersion).sort()).toEqual(expectedPackageIdentities)
     expect(canonicalHash(generated)).toBe(canonicalHash(discovered))
     const provider = createCodeBundleDefinitionProvider()
+    expect(provider.list().filter(entry => entry.declarativePackage).map(entry => entry.definition.bundleKey + '@' + entry.definition.bundleVersion).sort()).toEqual(expectedPackageIdentities)
     for (const identity of additions) {
       const [key, version] = identity.split('@')
       expect(provider.exact(key, version)?.definition.status).toBe('DRAFT')

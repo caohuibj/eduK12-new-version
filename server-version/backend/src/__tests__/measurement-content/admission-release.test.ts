@@ -1,6 +1,7 @@
 import {describe,it,expect,vi} from 'vitest'
 import {prepareRelease} from '../../modules/measurement-content/release'
 import {requirePublishedContentRelease} from '../../modules/measurement-content/repository'
+import {compileFrozenResearchUnit,resolveSurveyMeasurementUnit} from '../../modules/survey/publication.service'
 const input=()=>({family:'SCALE',layer:'MEASUREMENT',key:'scope:scale',version:'1',scope:{kind:'PRIVATE',ownerId:'owner',product:'SURVEY',resourceId:'project'},assetRefs:[],sourceReleaseId:null,
  content:{projectionVersion:1,instrumentVersion:'1',measurementHash:'a'.repeat(64),measurementHashScheme:'SCALE_MEASUREMENT_PROJECTION_V1',scoringVersion:'1',runnerKey:'scale',runnerVersion:'2',locale:'und',localizationVersion:'1',metrics:[{metricKey:'total',unit:'points',direction:'descriptive'}],executable:{items:[]}}})
 const row=()=>{const x=prepareRelease(input());return {id:'release',family:x.family,layer:x.layer,content_key:x.key,version:x.version,hash_scheme:x.hashScheme,content_hash:x.contentHash,content:x.content,scope:x.scope,provenance:x.provenance,asset_refs:x.assetRefs,source_release_id:x.sourceReleaseId,published_by:'owner',published_at:new Date(),status:'PUBLISHED'}}
@@ -28,7 +29,6 @@ describe('admission requires an existing locked exact release',()=>{
 })
 
 it('Survey native freeze reports a controlled conflict when its exact revision was not published',async()=>{
-  const {compileFrozenResearchUnit,resolveSurveyMeasurementUnit}=await import('../../modules/survey/publication.service')
   const unit=compileFrozenResearchUnit({id:'draft',instrumentKey:'scale',kind:'SCALE',title:'Scale',revision:2,definition:{schemaVersion:1,
     respondentType:'participant_self_report',aggregation:'sum',responseOptions:[{optionKey:'a',label:'A',score:1},{optionKey:'b',label:'B',score:2}],
     dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],items:[{itemKey:'one',prompt:'Item',required:true,reverse:false,dimensionKeys:['total']}]}})

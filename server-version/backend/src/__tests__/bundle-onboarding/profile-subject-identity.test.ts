@@ -28,15 +28,20 @@ function crossSubject(){
       runtimeDefinitionHash:canonicalHash(d),measurementHash:hashScaleDefinition(d),expectedItems:d.items.length}
     b.transformation={...b.transformation,min:1,max:5}
   }
+  // Keep rights attached to the replacement sources; never disable the gate.
+  p.manifest.definition.rightsRequirements.instrumentKeys=p.profile.bindings.map(b=>b.source.instrumentKey)
   return p
 }
 it('preserves legacy same-domain validation and accepts exact distinct source subjects',()=>{
   expect(dependencyBlockers(legacy())).toEqual([])
   const p=crossSubject()
+  expect(p.manifest.definition.rightsRequirements).toEqual({required:true,instrumentKeys:['hse_demands_zh_cn','hse_control_zh_cn']})
   expect(p.profile.bindings.map(b=>b.source.subjectKey)).toEqual(['hse_msit_demands','hse_msit_control'])
   expect(dependencyBlockers(p)).toEqual([])
 })
 it('rejects an absent/wrong subject or a changed runtime while preserving source identity checks',()=>{
+  const staleRights=crossSubject();staleRights.manifest.definition.rightsRequirements.instrumentKeys[0]='academic_self_efficacy_mathematics_zh_cn'
+  expect(()=>dependencyBlockers(staleRights)).toThrow('rights instrument 不在 Bundle slots 中: academic_self_efficacy_mathematics_zh_cn')
   const missing=crossSubject();delete missing.profile.bindings[0].source.subjectKey
   expect(dependencyBlockers(missing)).toEqual(['e: PROFILE frozen measurement/scoring/locale/item identity mismatch'])
   const wrong=crossSubject();wrong.profile.bindings[1].source.subjectKey='hse_msit_demands'

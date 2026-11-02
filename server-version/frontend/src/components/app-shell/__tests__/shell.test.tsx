@@ -646,7 +646,7 @@ describe('independent system administrator workspace',()=>{
   expect(screen.queryByRole('link',{name:'Research 首页'})).not.toBeInTheDocument()
   expect(screen.queryByRole('link',{name:'研究者授权'})).not.toBeInTheDocument()
   const nav=screen.getByRole('navigation',{name:'主要导航'})
-  expect(nav).toHaveTextContent('管理授权工具库治理报告内容数据审计')
+  expect(nav).toHaveTextContent('管理授权工具库治理报告内容认知入库数据审计')
   expect(nav.querySelector('a[href*="workspace=business"]')).toBeNull()
   expect(document.title).toBe('系统管理 · eduK12')
   expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'受保护的系统页面'}))
