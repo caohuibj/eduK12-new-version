@@ -50,7 +50,7 @@ async function assertModal(page, dialog, background) {
 }
 
 async function main() {
-  if (process.env.VISUAL_QA_SCOPE !== undefined && scope !== 'assignment-list-states') {
+  if (process.env.VISUAL_QA_SCOPE !== undefined && !['assignment-list-states', 'scale-library-filters'].includes(scope)) {
     throw new Error(`Unknown VISUAL_QA_SCOPE: ${scope}`)
   }
   fs.mkdirSync(output, { recursive: true })
@@ -215,7 +215,7 @@ async function main() {
         assert.equal(await page.getByLabel('已应用筛选').count(), 0)
         await page.getByText('版本与证据', { exact: true }).press('Enter')
         await capture(page, 'scale-card-evidence', width)
-      })
+      }, 'scale-library-filters')
       for (const state of assignmentStates) {
         await scenario(width, 'TEACHER', async page => {
           let release
